@@ -15,12 +15,11 @@ class ManaBaseWidget : public QWidget
 
 public:
     explicit ManaBaseWidget(QWidget *parent, DeckListModel *deckListModel);
-    std::unordered_map<QString, int> analyzeManaBase();
+    QHash<QString, int> analyzeManaBase();
     void updateDisplay();
 
-    std::unordered_map<QString, int> determineManaProduction(const QString &manaString);
-    void mergeManaCounts(std::unordered_map<QString, int> &manaCounts1,
-                         const std::unordered_map<QString, int> &manaCounts2);
+    QHash<QString, int> determineManaProduction(const QString &manaString);
+    void mergeManaCounts(QHash<QString, int> &manaCounts1, const QHash<QString, int> &manaCounts2);
 
 public slots:
     void setDeckModel(DeckListModel *deckModel);
@@ -29,7 +28,7 @@ public slots:
 private:
     DeckListModel *deckListModel;
     BannerWidget *bannerWidget;
-    std::unordered_map<QString, int> manaBaseMap;
+    QHash<QString, int> manaBaseMap;
     QVBoxLayout *layout;
     QHBoxLayout *barLayout;
 };
