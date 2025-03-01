@@ -8,8 +8,6 @@ class TabDeckEditorVisual : public AbstractTabDeckEditor
 {
     Q_OBJECT
 protected slots:
-    void actNewDeck() override;
-    void actLoadDeck() override;
     void actLoadDeckFromClipboard() override;
 
     void loadLayout() override;
@@ -23,7 +21,6 @@ protected slots:
     void dockTopLevelChanged(bool topLevel) override;
 
 protected:
-    void openDeckFromFile(const QString &fileName, AbstractTabDeckEditor::DeckOpenLocation deckOpenLocation) override;
     TabDeckEditorVisualTabWidget *tabContainer;
 
     QVBoxLayout *centralFrame;
