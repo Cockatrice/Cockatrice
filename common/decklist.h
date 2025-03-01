@@ -5,6 +5,8 @@
 #include <QVector>
 
 // Required on Mac. Forward declaration doesn't work. Don't ask why.
+#include "../cockatrice/src/game/cards/card_database.h"
+
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 #include <common/pb/move_card_to_zone.pb.h>
@@ -364,6 +366,8 @@ public:
     }
     QStringList getCardList() const;
     QMap<QString, QString> getCardListWithProviderId() const;
+    QList<CardInfoPtr> *getCardsAsCardInfoPtrs() const;
+    QList<CardInfoPtr> *getCardsAsCardInfoPtrsForZone(QString zoneName) const;
 
     int getSideboardSize() const;
 
