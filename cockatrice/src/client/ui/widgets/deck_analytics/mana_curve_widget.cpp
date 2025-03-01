@@ -16,7 +16,7 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    bannerWidget = new BannerWidget(this, "Mana Curve", Qt::Vertical, 100);
+    bannerWidget = new BannerWidget(this, tr("Mana Curve"), Qt::Vertical, 100);
     bannerWidget->setMaximumHeight(100);
     layout->addWidget(bannerWidget);
 
@@ -24,6 +24,13 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
     layout->addLayout(barLayout);
 
     connect(deckListModel, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
+
+    retranslateUi();
+}
+
+void ManaCurveWidget::retranslateUi()
+{
+    bannerWidget->setText(tr("Mana Curve"));
 }
 
 void ManaCurveWidget::setDeckModel(DeckListModel *deckModel)
@@ -65,7 +72,7 @@ void ManaCurveWidget::updateDisplay()
     if (barLayout != nullptr) {
         QLayoutItem *item;
         while ((item = barLayout->takeAt(0)) != nullptr) {
-            delete item->widget();
+            item->widget()->deleteLater();
             delete item;
         }
     }

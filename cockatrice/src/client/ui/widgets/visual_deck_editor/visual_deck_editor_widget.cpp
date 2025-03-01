@@ -93,13 +93,13 @@ void VisualDeckEditorWidget::updateDisplay()
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
 
     DeckCardZoneDisplayWidget *mainBoardWidget =
-        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(mainDeckCards), "Mainboard", 20, 10);
+        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(mainDeckCards), tr("Mainboard"), 20, 10);
     connect(mainBoardWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
     connect(mainBoardWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onMainboardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
 
     DeckCardZoneDisplayWidget *sideBoardWidget =
-        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(sideboardCards), "Sideboard", 40, 30);
+        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(sideboardCards), tr("Sideboard"), 40, 30);
     connect(sideBoardWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
     connect(sideBoardWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
             SLOT(onSideboardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));

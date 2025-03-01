@@ -12,7 +12,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    resetButton = new QPushButton("Reset");
+    resetButton = new QPushButton(this);
     connect(resetButton, SIGNAL(clicked()), this, SLOT(updateDisplay()));
     layout->addWidget(resetButton);
 
@@ -24,6 +24,11 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
         displayWidget->setCard(card);
         flowWidget->addWidget(displayWidget);
     }
+}
+
+void VisualDeckEditorSampleHandWidget::retranslateUi()
+{
+    resetButton->setText(tr("Reset"));
 }
 
 void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)

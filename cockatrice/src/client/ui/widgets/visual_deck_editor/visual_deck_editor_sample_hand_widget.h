@@ -17,6 +17,7 @@ public:
 public slots:
     void updateDisplay();
     void setDeckModel(DeckListModel *deckModel);
+    void retranslateUi();
 
 private:
     DeckListModel *deckListModel;

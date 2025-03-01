@@ -19,6 +19,7 @@ public:
 public slots:
     void setDeckModel(DeckListModel *deckModel);
     std::unordered_map<int, int> analyzeManaCurve();
+    void retranslateUi();
 
 private:
     DeckListModel *deckListModel;
