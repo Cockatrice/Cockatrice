@@ -16,12 +16,12 @@
 #include <QResizeEvent>
 #include <qscrollarea.h>
 
-VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deck_list_model)
-    : QWidget(parent), deck_list_model(_deck_list_model)
+VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)
+    : QWidget(parent), deckListModel(_deckListModel)
 {
     this->mainDeckCards = new QList<CardInfoPtr>;
     this->sideboardCards = new QList<CardInfoPtr>;
-    connect(deck_list_model, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
+    connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
 
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
     this->setMinimumSize(0, 0);
@@ -202,9 +202,9 @@ void VisualDeckEditorWidget::populateCards()
     mainDeckCards->clear();
     sideboardCards->clear();
 
-    if (!deck_list_model)
+    if (!deckListModel)
         return;
-    DeckList *decklist = deck_list_model->getDeckList();
+    DeckList *decklist = deckListModel->getDeckList();
     mainDeckCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_MAIN);
     sideboardCards = decklist->getCardsAsCardInfoPtrsForZone(DECK_ZONE_SIDE);
 }
