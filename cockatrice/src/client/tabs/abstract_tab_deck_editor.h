@@ -44,6 +44,8 @@ class AbstractTabDeckEditor : public Tab
 {
     Q_OBJECT
 
+    friend class DeckEditorMenu;
+
 public:
     explicit AbstractTabDeckEditor(TabSupervisor *_tabSupervisor);
 
@@ -91,6 +93,7 @@ protected slots:
     virtual void actLoadDeck();
     bool actSaveDeck();
     bool actSaveDeckAs();
+    void actEditDeckInClipboard();
     virtual void actLoadDeckFromClipboard();
     void actSaveDeckToClipboard();
     void actSaveDeckToClipboardNoSetNameAndNumber();

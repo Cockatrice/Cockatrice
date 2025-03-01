@@ -372,6 +372,18 @@ void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
         setModified(false);
 }
 
+void AbstractTabDeckEditor::actEditDeckInClipboard()
+{
+    DlgLoadDeckFromClipboard dlg(*getDeckList(), this);
+    if (!dlg.exec())
+        return;
+
+    setDeck(dlg.getDeckList());
+    setModified(true);
+
+    deckMenu->setSaveStatus(true);
+}
+
 void AbstractTabDeckEditor::actLoadDeckFromClipboard()
 {
     auto deckOpenLocation = confirmOpen();

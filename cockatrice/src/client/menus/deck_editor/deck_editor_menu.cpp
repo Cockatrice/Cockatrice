@@ -27,6 +27,9 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckAs()));
 
+    aEditDeckInClipboard = new QAction(QString(), this);
+    connect(aEditDeckInClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actEditDeckInClipboard);
+
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeckFromClipboard()));
 
@@ -76,6 +79,7 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     addAction(aSaveDeck);
     addAction(aSaveDeckAs);
     addSeparator();
+    addAction(aEditDeckInClipboard);
     addAction(aLoadDeckFromClipboard);
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
@@ -133,6 +137,8 @@ void DeckEditorMenu::retranslateUi()
     aClearRecents->setText(tr("Clear"));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
+
+    aEditDeckInClipboard->setText(tr("Edit deck in clipboard"));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
 
     saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
@@ -159,6 +165,7 @@ void DeckEditorMenu::refreshShortcuts()
     aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));
     aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
+    aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
     aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
