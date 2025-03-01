@@ -162,6 +162,9 @@ void OverlapLayout::setGeometry(const QRect &rect)
             // Use the smaller of maxColumns and availableColumns.
             qCDebug(OverlapLayoutLog) << " Max Columns " << maxColumns << " available columns " << availableColumns;
             columns = qMin(maxColumns, availableColumns);
+            if (columns < 1) {
+                columns = 1;
+            }
         } else {
             // If no maxColumns constraint, allow as many columns as possible.
             columns = INT_MAX;
@@ -180,6 +183,9 @@ void OverlapLayout::setGeometry(const QRect &rect)
             // Use the smaller of maxRows and availableRows.
             qCDebug(OverlapLayoutLog) << " Max Rows " << maxRows << " available rows " << availableRows;
             rows = qMin(maxRows, availableRows);
+            if (rows < 1) {
+                rows = 1;
+            }
         } else {
             // If no maxRows constraint, allow as many rows as possible.
             rows = INT_MAX;
@@ -204,16 +210,17 @@ void OverlapLayout::setGeometry(const QRect &rect)
         const int yPos = rect.top() + currentRow * (maxItemHeight - overlapOffsetHeight);
         item->setGeometry(QRect(xPos, yPos, maxItemWidth, maxItemHeight));
 
+        // TODO: Figure this out properly or maybe adjust size hint to account for this?
         // Update row and column indices based on the layout direction.
-        if (flowDirection == Qt::Horizontal) {
+        if (overlapDirection == Qt::Horizontal) {
             currentColumn++;
-            if (currentColumn >= columns) {
+            if (currentColumn > qCeil(itemList.size() / rows)) {
                 currentColumn = 0;
                 currentRow++;
             }
         } else {
             currentRow++;
-            if (currentRow >= rows) {
+            if (currentRow > qCeil(itemList.size() / columns)) {
                 currentRow = 0;
                 currentColumn++;
             }
