@@ -34,6 +34,11 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
 {
     QList<CardInfoPtr> cardsInZone = getCardsMatchingGroup(deckListModel->getCardsAsCardInfoPtrsForZone(zoneName));
 
+    bool shouldBeVisible = !cardsInZone.isEmpty();
+    if (shouldBeVisible != isVisible()) {
+        setVisible(shouldBeVisible);
+    }
+
     QList<CardInfoPictureWithTextOverlayWidget *> existingWidgets =
         overlapWidget->findChildren<CardInfoPictureWithTextOverlayWidget *>();
 
