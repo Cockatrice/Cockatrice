@@ -34,7 +34,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
                    << "cmc"
                    << "name";
     sortByComboBox->addItems(sortProperties);
-    connect(sortByComboBox, &QComboBox::currentIndexChanged, this,
+    connect(sortByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
             &VisualDeckEditorWidget::actChangeActiveSortCriteria);
     actChangeActiveSortCriteria();
 
