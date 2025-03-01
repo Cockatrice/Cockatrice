@@ -26,6 +26,9 @@ public:
     void sortCardList(QStringList properties, Qt::SortOrder order);
     void setDeckList(const DeckList &new_deck_list_model);
 
+public slots:
+    void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
+
 signals:
     void activeCardChanged(CardInfoPtr activeCard);
     void mainboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
@@ -35,7 +38,6 @@ protected slots:
     void onHover(CardInfoPtr hoveredCard);
     void onMainboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void onSideboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void activeSortCriteriaChanged();
 
 private:
