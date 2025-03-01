@@ -2,8 +2,6 @@
 
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_stats_interface.h"
-#include "../../../dialogs/dlg_load_deck.h"
-#include "../../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../game/cards/card_database_model.h"
 #include "../../../game/filters/filter_builder.h"
 #include "../../../server/pending_command.h"
@@ -27,7 +25,6 @@
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QMenu>
-#include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
 #include <QSplitter>
@@ -148,13 +145,13 @@ QString TabDeckEditorVisual::getTabText() const
     return result;
 }
 
-void TabDeckEditorVisual::changeModelIndexAndCardInfo(CardInfoPtr activeCard)
+void TabDeckEditorVisual::changeModelIndexAndCardInfo(const CardInfoPtr &activeCard)
 {
     updateCard(activeCard);
     changeModelIndexToCard(activeCard);
 }
 
-void TabDeckEditorVisual::changeModelIndexToCard(CardInfoPtr activeCard)
+void TabDeckEditorVisual::changeModelIndexToCard(const CardInfoPtr &activeCard)
 {
     QString cardName = activeCard->getName();
     QModelIndex index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_MAIN);
