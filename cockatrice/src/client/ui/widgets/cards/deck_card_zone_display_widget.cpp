@@ -26,6 +26,8 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     cardGroupContainer->setLayout(cardGroupLayout);
     layout->addWidget(cardGroupContainer);
 
+    banner->setBuddy(cardGroupContainer);
+
     displayCards();
     connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::displayCards);
 }
