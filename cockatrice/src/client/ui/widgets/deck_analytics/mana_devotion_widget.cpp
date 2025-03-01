@@ -99,38 +99,29 @@ void ManaDevotionWidget::updateDisplay()
 // Function to count mana symbols W, U, B, R, G in the input string
 std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString &manaString)
 {
-    // Only track counts for W, U, B, R, G
     std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
 
-    // Convert QString to std::string for regex processing
-    std::string stdManaString = manaString.toStdString();
-    std::regex regexPattern(R"(\{([WUBRG])\/([WUBRG])\})");
-    std::string::const_iterator searchStart(stdManaString.cbegin());
-    std::smatch match;
-
-    // Go through the string and find pairs within {}/ for W, U, B, R, G
-    while (std::regex_search(searchStart, stdManaString.cend(), match, regexPattern)) {
-        char mana1 = match[1].str()[0];
-        char mana2 = match[2].str()[0];
-
-        // Increment the count for both mana symbols
-        manaCounts[mana1]++;
-        manaCounts[mana2]++;
-
-        // Move past the current match
-        searchStart = match.suffix().first;
-    }
-
-    // Now go through the string again but ignore the {}/ parts and non-WUBRG symbols
-    for (int i = 0; i < manaString.size(); ++i) {
+    int len = manaString.length();
+    for (int i = 0; i < len; ++i) {
         if (manaString[i] == '{') {
-            // Skip over the {X/Y} pattern
-            while (manaString[i] != '}' && i < manaString.size()) {
-                ++i;
+            ++i; // Move past '{'
+            if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
+                char mana1 = manaString[i].toLatin1();
+                ++i; // Move to next character
+                if (i < len && manaString[i] == '/') {
+                    ++i; // Move past '/'
+                    if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
+                        char mana2 = manaString[i].toLatin1();
+                        manaCounts[mana1]++;
+                        manaCounts[mana2]++;
+                    }
+                } else {
+                    manaCounts[mana1]++;
+                }
             }
-        } else if (manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-            // If it's one of W, U, B, R, G, count it
-            manaCounts[manaString[i].toLatin1()]++;
+            while (i < len && manaString[i] != '}') {
+                ++i; // Skip to closing '}'
+            }
         }
     }
 

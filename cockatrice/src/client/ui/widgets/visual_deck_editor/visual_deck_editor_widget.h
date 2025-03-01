@@ -17,41 +17,34 @@ class VisualDeckEditorWidget : public QWidget
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
     void resizeEvent(QResizeEvent *event) override;
-    void updateDisplay();
-    QWidget *displayCards(QList<QPair<QString, QList<CardInfoPtr>>> cardLists, int bannerOpacity);
-    QList<QPair<QString, QList<CardInfoPtr>>> sortCards(QList<CardInfoPtr> *cardsToSort);
 
-    OverlapWidget *getSortedCards();
-    void populateCards();
-    void sortCardList(QStringList properties, Qt::SortOrder order);
-    void setDeckList(const DeckList &new_deck_list_model);
+    void setDeckList(const DeckList &_deckListModel);
 
 public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
+    void updateZoneWidgets();
+    void addZoneIfDoesNotExist();
+    void deleteZoneIfDoesNotExist();
 
 signals:
     void activeCardChanged(CardInfoPtr activeCard);
-    void mainboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void sideboardCardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void activeSortCriteriaChanged(QString activeSortCriteria);
+    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);
-    void onMainboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void onSideboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void activeSortCriteriaChanged();
+    void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void actChangeActiveSortCriteria();
 
 private:
     DeckListModel *deckListModel;
-    QList<CardInfoPtr> *mainDeckCards;
-    QList<CardInfoPtr> *sideboardCards;
     QVBoxLayout *mainLayout;
     QComboBox *sortByComboBox;
     QString activeSortCriteria = "maintype";
-    FlowWidget *flowWidget;
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;
-    OverlapControlWidget *overlap_control_widget;
+    OverlapControlWidget *overlapControlWidget;
     QWidget *container;
 };
 

@@ -100,41 +100,26 @@ QHash<QString, int> ManaBaseWidget::analyzeManaBase()
 
 QHash<QString, int> ManaBaseWidget::determineManaProduction(const QString &rulesText)
 {
-    // Initialize mana counts
-    QHash<QString, int> manaCounts;
-    manaCounts.insert("W", 0);
-    manaCounts.insert("U", 0);
-    manaCounts.insert("B", 0);
-    manaCounts.insert("R", 0);
-    manaCounts.insert("G", 0);
-    manaCounts.insert("C", 0);
+    QHash<QString, int> manaCounts = {{"W", 0}, {"U", 0}, {"B", 0}, {"R", 0}, {"G", 0}, {"C", 0}};
 
-    // Define regex patterns for different mana production rules
-    QRegularExpression tapAddColorless(R"(\{T\}:\s*Add\s*\{C\}|Add\s*one\s*colorless\s*mana)");
-    QRegularExpression tapAddAnyColor(
-        R"(\{T\}:\s*Add\s*one\s*mana\s*of\s*any\s*color|Add\s*one\s*mana\s*of\s*any\s*color)");
-    QRegularExpression tapAddSpecificColor(
-        R"(\{T\}:\s*Add\s*\{(W|U|B|R|G)\}|Add\s*one\s*(white|blue|black|red|green)\s*mana)");
+    QString text = rulesText.toLower(); // Normalize case for matching
 
-    // Check for mana production rules in the text
-    if (tapAddColorless.match(rulesText).hasMatch()) {
-        manaCounts["C"] += 1; // Adds colorless mana
+    // Quick keyword-based checks for any color and colorless mana
+    if (text.contains("{t}: add one mana of any color") || text.contains("add one mana of any color")) {
+        for (const auto &color : {QStringLiteral("W"), QStringLiteral("U"), QStringLiteral("B"), QStringLiteral("R"),
+                                  QStringLiteral("G")}) {
+            manaCounts[color]++;
+        }
+    }
+    if (text.contains("{t}: add {c}") || text.contains("add one colorless mana")) {
+        manaCounts["C"]++;
     }
 
-    if (tapAddAnyColor.match(rulesText).hasMatch()) {
-        manaCounts["W"] += 1; // Assumes at least 1 of any color can be produced
-        manaCounts["U"] += 1;
-        manaCounts["B"] += 1;
-        manaCounts["R"] += 1;
-        manaCounts["G"] += 1;
-    }
-
-    // Check for specific color production
-    QRegularExpression specificColorRegex(R"(\{T\}:\s*Add\s*\{(W|U|B|R|G)\})");
-    auto match = specificColorRegex.match(rulesText);
+    // Optimized regex for specific mana symbols
+    static const QRegularExpression specificColorRegex(R"(\{T\}:\s*Add\s*\{([WUBRG])\})");
+    QRegularExpressionMatch match = specificColorRegex.match(rulesText);
     if (match.hasMatch()) {
-        QString color = match.captured(1);
-        manaCounts[color] += 1;
+        manaCounts[match.captured(1)]++;
     }
 
     return manaCounts;
