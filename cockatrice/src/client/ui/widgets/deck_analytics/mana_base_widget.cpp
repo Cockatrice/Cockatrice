@@ -138,4 +138,3 @@ void ManaBaseWidget::mergeManaCounts(std::unordered_map<QString, int> &manaCount
         manaCounts1[pair.first] += pair.second; // Add values for matching keys
     }
 }
-
