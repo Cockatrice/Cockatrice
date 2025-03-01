@@ -77,9 +77,11 @@ void ManaCurveWidget::updateDisplay()
         }
     }
 
-    int totalSum = 0;
+    int highestEntry = 0;
     for (const auto &entry : manaCurveMap) {
-        totalSum += entry.second;
+        if (entry.second > highestEntry) {
+            highestEntry = entry.second;
+        }
     }
 
     // Convert unordered_map to ordered map to ensure sorting by CMC
@@ -88,7 +90,7 @@ void ManaCurveWidget::updateDisplay()
     // Add new widgets to the layout in sorted order
     for (const auto &entry : sortedManaCurve) {
         BarWidget *barWidget =
-            new BarWidget(QString::number(entry.first), entry.second, totalSum, QColor(11, 11, 11), this);
+            new BarWidget(QString::number(entry.first), entry.second, highestEntry, QColor(11, 11, 11), this);
         barLayout->addWidget(barWidget);
     }
 

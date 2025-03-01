@@ -77,9 +77,11 @@ void ManaDevotionWidget::updateDisplay()
         delete item;
     }
 
-    int totalSum = 0;
+    int highestEntry = 0;
     for (auto entry : manaDevotionMap) {
-        totalSum += entry.second;
+        if (highestEntry < entry.second) {
+            highestEntry = entry.second;
+        }
     }
 
     // Define color mapping for devotion bars
@@ -89,14 +91,13 @@ void ManaDevotionWidget::updateDisplay()
 
     for (auto entry : manaDevotionMap) {
         QColor barColor = manaColors.count(entry.first) ? manaColors[entry.first] : Qt::gray;
-        BarWidget *barWidget = new BarWidget(QString(entry.first), entry.second, totalSum, barColor, this);
+        BarWidget *barWidget = new BarWidget(QString(entry.first), entry.second, highestEntry, barColor, this);
         barLayout->addWidget(barWidget);
     }
 
     update(); // Update the widget display
 }
 
-// Function to count mana symbols W, U, B, R, G in the input string
 std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString &manaString)
 {
     std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
@@ -114,14 +115,22 @@ std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString
                         char mana2 = manaString[i].toLatin1();
                         manaCounts[mana1]++;
                         manaCounts[mana2]++;
+                    } else {
+                        // Handle cases like "{W/}" where second part is invalid
+                        manaCounts[mana1]++;
                     }
                 } else {
                     manaCounts[mana1]++;
                 }
             }
+            // Ensure we always skip to the closing '}'
             while (i < len && manaString[i] != '}') {
-                ++i; // Skip to closing '}'
+                ++i;
             }
+        }
+        // Check if the character is a standalone mana symbol (not inside {})
+        else if (manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
+            manaCounts[manaString[i].toLatin1()]++;
         }
     }
 
