@@ -3186,7 +3186,7 @@ void Player::cardMenuAction()
                     auto *scmd = new Command_Shuffle;
                     scmd->set_zone_name("deck");
                     scmd->set_start(0);
-                    scmd->set_end(idList.card_size() - 1);
+                    scmd->set_end(idList.card_size() - 1); // inclusive, the indexed card at end will be shuffled
                     // Server process events backwards, so...
                     commandList.append(scmd);
                 }
