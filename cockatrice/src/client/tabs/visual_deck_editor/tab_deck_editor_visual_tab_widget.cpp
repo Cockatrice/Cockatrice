@@ -21,32 +21,30 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     visualDeckView = new VisualDeckEditorWidget(this, deckModel);
     visualDeckView->setObjectName("visualDeckView");
     visualDeckView->updateDisplay();
-    connect(visualDeckView, SIGNAL(activeCardChanged(CardInfoPtr)), this, SLOT(onCardChanged(CardInfoPtr)));
-    connect(visualDeckView, SIGNAL(mainboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onMainboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-    connect(visualDeckView, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onSideboardCardClickedDeckEditor(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(visualDeckView, &VisualDeckEditorWidget::activeCardChanged, this,
+            &TabDeckEditorVisualTabWidget::onCardChanged);
+    connect(visualDeckView, &VisualDeckEditorWidget::mainboardCardClicked, this,
+            &TabDeckEditorVisualTabWidget::onMainboardCardClickedDeckEditor);
+    connect(visualDeckView, &VisualDeckEditorWidget::sideboardCardClicked, this,
+            &TabDeckEditorVisualTabWidget::onSideboardCardClickedDeckEditor);
 
     visualDatabaseDisplay =
         new VisualDatabaseDisplayWidget(this, deckEditor, cardDatabaseModel, cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
-    connect(visualDatabaseDisplay, SIGNAL(cardHoveredDatabaseDisplay(CardInfoPtr)), this,
-            SLOT(onCardChangedDatabaseDisplay(CardInfoPtr)));
-    connect(visualDatabaseDisplay,
-            SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onCardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay, this,
+            &TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardClickedDatabaseDisplay, this,
+            &TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay);
 
     deckAnalytics = new DeckAnalyticsWidget(this, deckModel);
     deckAnalytics->setObjectName("deckAnalytics");
 
     sampleHandWidget = new VisualDeckEditorSampleHandWidget(this, deckModel);
 
-    // printingSelector = new PrintingSelector(this, this->deckModel);
-
-    this->addNewTab(visualDeckView, "Visual Deck View");
-    this->addNewTab(visualDatabaseDisplay, "Visual Database Display");
-    this->addNewTab(deckAnalytics, "Deck Analytics");
-    this->addNewTab(sampleHandWidget, "Sample Hand");
+    this->addNewTab(visualDeckView, tr("Visual Deck View"));
+    this->addNewTab(visualDatabaseDisplay, tr("Visual Database Display"));
+    this->addNewTab(deckAnalytics, tr("Deck Analytics"));
+    this->addNewTab(sampleHandWidget, tr("Sample Hand"));
 }
 
 void TabDeckEditorVisualTabWidget::onCardChanged(CardInfoPtr activeCard)

@@ -61,20 +61,20 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, this->deckDockWidget->deckModel,
-                                                    this->databaseDisplayDockWidget->databaseModel,
-                                                    this->databaseDisplayDockWidget->databaseDisplayModel);
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckDockWidget->deckModel,
+                                                    databaseDisplayDockWidget->databaseModel,
+                                                    databaseDisplayDockWidget->databaseDisplayModel);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChangedDatabaseDisplay, this,
             &AbstractTabDeckEditor::updateCard);
-    connect(tabContainer, SIGNAL(mainboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(processMainboardCardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-    connect(tabContainer, SIGNAL(sideboardCardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(processSideboardCardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::mainboardCardClicked, this,
+            &TabDeckEditorVisual::processMainboardCardClick);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::sideboardCardClicked, this,
+            &TabDeckEditorVisual::processSideboardCardClick);
 
-    connect(tabContainer, SIGNAL(cardClickedDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
-            this, SLOT(processCardClickDatabaseDisplay(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
+            &TabDeckEditorVisual::processCardClickDatabaseDisplay);
     centralFrame->addWidget(tabContainer);
 
     setCentralWidget(centralWidget);
@@ -83,7 +83,7 @@ void TabDeckEditorVisual::createCentralFrame()
 
 void TabDeckEditorVisual::createMenus()
 {
-    deckMenu = new DeckEditorMenu(this, this);
+    deckMenu = new DeckEditorMenu(this);
     addTabMenu(deckMenu);
 
     viewMenu = new QMenu(this);
@@ -371,7 +371,7 @@ void TabDeckEditorVisual::openDeckFromFile(const QString &fileName, DeckOpenLoca
             TabDeckEditorVisual::setDeck(l);
         }
     } else {
-        delete l;
+        l->deleteLater();
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     deckMenu->setSaveStatus(true);
