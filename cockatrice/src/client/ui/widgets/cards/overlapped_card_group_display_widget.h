@@ -20,6 +20,7 @@ public:
                                      DeckListModel *deckListModel,
                                      QString zoneName,
                                      QString cardGroupCategory,
+                                     QString activeGroupCriteria,
                                      QString activeSortCriteria,
                                      int bannerOpacity);
 
@@ -29,6 +30,7 @@ public:
     DeckListModel *deckListModel;
     QString zoneName;
     QString cardGroupCategory;
+    QString activeGroupCriteria;
     QString activeSortCriteria;
 
 public slots:
@@ -36,6 +38,7 @@ public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
     void updateCardDisplays();
+    void onActiveSortCriteriaChanged(QString activeSortCriteria);
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
