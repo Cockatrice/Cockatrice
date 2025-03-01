@@ -19,8 +19,6 @@
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)
 {
-    this->mainDeckCards = new QList<CardInfoPtr>;
-    this->sideboardCards = new QList<CardInfoPtr>;
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
 
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
@@ -36,7 +34,9 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
                    << "cmc"
                    << "name";
     sortByComboBox->addItems(sortProperties);
-    connect(sortByComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(activeSortCriteriaChanged()));
+    connect(sortByComboBox, &QComboBox::currentIndexChanged, this,
+            &VisualDeckEditorWidget::actChangeActiveSortCriteria);
+    actChangeActiveSortCriteria();
 
     scrollArea = new QScrollArea();
     scrollArea->setWidgetResizable(true);
@@ -52,13 +52,63 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    updateZoneWidgets();
 
-    overlap_control_widget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
+    overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
 
     mainLayout->addWidget(sortByComboBox);
     mainLayout->addWidget(scrollArea);
-    mainLayout->addWidget(overlap_control_widget);
+    mainLayout->addWidget(overlapControlWidget);
+}
+
+void VisualDeckEditorWidget::updateZoneWidgets()
+{
+    addZoneIfDoesNotExist();
+    deleteZoneIfDoesNotExist();
+}
+
+void VisualDeckEditorWidget::addZoneIfDoesNotExist()
+{
+    QList<DeckCardZoneDisplayWidget *> cardZoneDisplayWidgets =
+        zoneContainer->findChildren<DeckCardZoneDisplayWidget *>();
+    for (const QString &zone : *deckListModel->getZones()) {
+        bool found = false;
+        for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
+            if (displayWidget->zoneName == zone) {
+                found = true;
+            }
+        }
+
+        if (!found) {
+            DeckCardZoneDisplayWidget *zoneDisplayWidget =
+                new DeckCardZoneDisplayWidget(zoneContainer, deckListModel, zone, activeSortCriteria, 20, 10);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this,
+                    &VisualDeckEditorWidget::onCardClick);
+            connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+            zoneContainerLayout->addWidget(zoneDisplayWidget);
+        }
+    }
+}
+
+void VisualDeckEditorWidget::deleteZoneIfDoesNotExist()
+{
+    QList<DeckCardZoneDisplayWidget *> cardZoneDisplayWidgets =
+        zoneContainer->findChildren<DeckCardZoneDisplayWidget *>();
+    for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
+        bool found = false;
+        for (const QString &zone : *deckListModel->getZones()) {
+
+            if (displayWidget->zoneName == zone) {
+                found = true;
+            }
+        }
+
+        if (!found) {
+            zoneContainerLayout->removeWidget(displayWidget);
+        }
+    }
 }
 
 void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
@@ -67,11 +117,10 @@ void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
     zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
 }
 
-void VisualDeckEditorWidget::activeSortCriteriaChanged()
+void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
     activeSortCriteria = sortByComboBox->currentText();
-    qDebug() << "activeSortCriteria changed: " << activeSortCriteria;
-    updateDisplay();
+    emit activeSortCriteriaChanged(activeSortCriteria);
 }
 
 void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight)
@@ -81,69 +130,7 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
     (void)bottomRight;
     // Necessary to delay this in this manner else the updateDisplay will nuke widgets while their onClick event
     // hasn't returned yet. Interval of 0 means QT will schedule this after the current event loop has finished.
-    QTimer::singleShot(0, this, [this] { updateDisplay(); });
-}
-
-void VisualDeckEditorWidget::updateDisplay()
-{
-    // Clear the layout first
-    populateCards();
-    zoneContainer = new QWidget(scrollArea);
-    zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
-    zoneContainerLayout = new QVBoxLayout(zoneContainer);
-
-    DeckCardZoneDisplayWidget *mainBoardWidget =
-        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(mainDeckCards), tr("Mainboard"), 20, 10);
-    connect(mainBoardWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-    connect(mainBoardWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onMainboardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-
-    DeckCardZoneDisplayWidget *sideBoardWidget =
-        new DeckCardZoneDisplayWidget(zoneContainer, sortCards(sideboardCards), tr("Sideboard"), 40, 30);
-    connect(sideBoardWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-    connect(sideBoardWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onSideboardClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-
-    zoneContainerLayout->addWidget(mainBoardWidget);
-    zoneContainerLayout->addWidget(sideBoardWidget);
-
-    scrollArea->setWidget(zoneContainer);
-    update();
-}
-
-QList<QPair<QString, QList<CardInfoPtr>>> VisualDeckEditorWidget::sortCards(QList<CardInfoPtr> *cardsToSort)
-{
-    QList<QPair<QString, QList<CardInfoPtr>>> sortedCardGroups;
-    QList<CardInfoPtr> activeList;
-
-    QStringList sortCriteria;
-    sortCriteria.append(activeSortCriteria);
-    sortCardList(sortCriteria, Qt::SortOrder::AscendingOrder);
-
-    QString lastSortCriteriaValue = cardsToSort->isEmpty() ? "" : cardsToSort->at(0)->getProperty(activeSortCriteria);
-
-    for (int i = 0; i < cardsToSort->size(); ++i) {
-        CardInfoPtr info = cardsToSort->at(i);
-        if (info) {
-            QString currentCriteriaValue = info->getProperty(activeSortCriteria);
-            if (currentCriteriaValue != lastSortCriteriaValue) {
-                // Save the current tuple (criteriaValue, list) and start a new list
-                sortedCardGroups.append(qMakePair(lastSortCriteriaValue, activeList));
-                activeList.clear();
-                lastSortCriteriaValue = currentCriteriaValue;
-            }
-            activeList.append(info);
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-
-    // Add the last tuple to sortedCardGroups
-    if (!activeList.isEmpty()) {
-        sortedCardGroups.append(qMakePair(lastSortCriteriaValue, activeList));
-    }
-
-    return sortedCardGroups;
+    updateZoneWidgets();
 }
 
 /*void VisualDeckEditorWidget::sortCards()
@@ -187,31 +174,9 @@ void VisualDeckEditorWidget::onHover(CardInfoPtr hoveredCard)
     emit activeCardChanged(hoveredCard);
 }
 
-void VisualDeckEditorWidget::onMainboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
+void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
+                                         CardInfoPictureWithTextOverlayWidget *instance,
+                                         QString zoneName)
 {
-    emit mainboardCardClicked(event, instance);
-}
-
-void VisualDeckEditorWidget::onSideboardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
-{
-    emit sideboardCardClicked(event, instance);
-}
-
-void VisualDeckEditorWidget::populateCards()
-{
-    mainDeckCards->clear();
-    sideboardCards->clear();
-
-    if (!deckListModel)
-        return;
-
-    mainDeckCards = deckListModel->getCardsAsCardInfoPtrsForZone(DECK_ZONE_MAIN);
-    sideboardCards = deckListModel->getCardsAsCardInfoPtrsForZone(DECK_ZONE_SIDE);
-}
-
-void VisualDeckEditorWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
-{
-    CardInfoComparator comparator(properties, order);
-    std::sort(mainDeckCards->begin(), mainDeckCards->end(), comparator);
-    std::sort(sideboardCards->begin(), sideboardCards->end(), comparator);
+    emit cardClicked(event, instance, zoneName);
 }
