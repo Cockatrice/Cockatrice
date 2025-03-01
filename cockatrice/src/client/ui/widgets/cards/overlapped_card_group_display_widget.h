@@ -1,7 +1,3 @@
-//
-// Created by ascor on 11/12/24.
-//
-
 #ifndef OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 #define OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 

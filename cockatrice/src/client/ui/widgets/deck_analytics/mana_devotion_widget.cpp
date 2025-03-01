@@ -19,7 +19,7 @@ ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *_deckList
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    bannerWidget = new BannerWidget(this, "Mana Devotion", Qt::Vertical, 100);
+    bannerWidget = new BannerWidget(this, tr("Mana Devotion"), Qt::Vertical, 100);
     bannerWidget->setMaximumHeight(100);
     layout->addWidget(bannerWidget);
 
@@ -27,6 +27,13 @@ ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *_deckList
     layout->addLayout(barLayout);
 
     connect(deckListModel, &DeckListModel::dataChanged, this, &ManaDevotionWidget::analyzeManaDevotion);
+
+    retranslateUi();
+}
+
+void ManaDevotionWidget::retranslateUi()
+{
+    bannerWidget->setText(tr("Mana Devotion"));
 }
 
 void ManaDevotionWidget::setDeckModel(DeckListModel *deckModel)
@@ -66,7 +73,7 @@ void ManaDevotionWidget::updateDisplay()
     // Clear the layout first
     QLayoutItem *item;
     while ((item = barLayout->takeAt(0)) != nullptr) {
-        delete item->widget();
+        item->widget()->deleteLater();
         delete item;
     }
 
