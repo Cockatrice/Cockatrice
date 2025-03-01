@@ -141,6 +141,9 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         CardInfoPtr card = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderID);
+        if (!card) {
+            card = CardDatabaseManager::getInstance()->getCard(cardName);
+        }
         emit cardChanged(card);
     }
 }
