@@ -278,15 +278,6 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
     emit deckLoadRequested(filePath);
 }
 
-static void saveDeckToClipboard(DeckLoader *deckLoader, bool addComments, bool addSetNameAndNumber)
-{
-    QString buffer;
-    QTextStream stream(&buffer);
-    deckLoader->saveToStream_Plain(stream, addComments, addSetNameAndNumber);
-    QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
-    QApplication::clipboard()->setText(buffer, QClipboard::Selection);
-}
-
 QMenu *DeckPreviewWidget::createRightClickMenu()
 {
     auto *menu = new QMenu(this);
@@ -303,13 +294,13 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
-            [this] { saveDeckToClipboard(deckLoader, true, true); });
+            [this] { deckLoader->saveToClipboard(true, true); });
     connect(saveToClipboardMenu->addAction(tr("Annotated (No set name or number)")), &QAction::triggered, this,
-            [this] { saveDeckToClipboard(deckLoader, true, false); });
+            [this] { deckLoader->saveToClipboard(true, false); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated")), &QAction::triggered, this,
-            [this] { saveDeckToClipboard(deckLoader, false, true); });
+            [this] { deckLoader->saveToClipboard(false, true); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set name or number)")), &QAction::triggered, this,
-            [this] { saveDeckToClipboard(deckLoader, false, false); });
+            [this] { deckLoader->saveToClipboard(false, false); });
 
     return menu;
 }
