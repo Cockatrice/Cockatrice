@@ -299,17 +299,13 @@ QString DeckLoader::exportDeckToDecklist()
     return deckString;
 }
 
-// This struct is here to support the forEachCard function call, defined in decklist.
-// It requires a function to be called for each card, and it will set the providerId.
-struct SetProviderId
+/**
+ * This function iterates through each card in the decklist and sets the providerId
+ * on each card based on its set name and collector number.
+ */
+void DeckLoader::resolveSetNameAndNumberToProviderID()
 {
-    // Main operator for struct, allowing the foreachcard to work.
-    SetProviderId()
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
-    {
+    auto setProviderId = [](const auto node, const auto card) {
         Q_UNUSED(node);
         // Retrieve the providerId based on setName and collectorNumber
         QString providerId =
@@ -319,39 +315,10 @@ struct SetProviderId
 
         // Set the providerId on the card
         card->setCardProviderId(providerId);
-    }
-};
+    };
 
-/**
- * This function iterates through each card in the decklist and sets the providerId
- * on each card based on its set name and collector number.
- */
-void DeckLoader::resolveSetNameAndNumberToProviderID()
-{
-    // Set up the struct to call.
-    SetProviderId setProviderId;
-
-    // Call the forEachCard method for each card in the deck
     forEachCard(setProviderId);
 }
-
-// This struct is here to support the forEachCard function call, defined in decklist.
-// It requires a function to be called for each card, and it will set the providerId.
-struct ClearSetNameAndNumber
-{
-    // Main operator for struct, allowing the foreachcard to work.
-    ClearSetNameAndNumber()
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
-    {
-        Q_UNUSED(node);
-        // Set the providerId on the card
-        card->setCardSetShortName(nullptr);
-        card->setCardCollectorNumber(nullptr);
-    }
-};
 
 /**
  * This function iterates through each card in the decklist and sets the providerId
@@ -359,10 +326,13 @@ struct ClearSetNameAndNumber
  */
 void DeckLoader::clearSetNamesAndNumbers()
 {
-    // Set up the struct to call.
-    ClearSetNameAndNumber clearSetNameAndNumber;
+    auto clearSetNameAndNumber = [](const auto node, auto card) {
+        Q_UNUSED(node)
+        // Set the providerId on the card
+        card->setCardSetShortName(nullptr);
+        card->setCardCollectorNumber(nullptr);
+    };
 
-    // Call the forEachCard method for each card in the deck
     forEachCard(clearSetNameAndNumber);
 }
 

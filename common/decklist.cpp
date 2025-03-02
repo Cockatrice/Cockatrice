@@ -755,20 +755,9 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
     return loadFromStream_Plain(in);
 }
 
-struct WriteToStream
+bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
-    QTextStream &stream;
-    bool prefixSideboardCards;
-    bool slashTappedOutSplitCards;
-
-    WriteToStream(QTextStream &_stream, bool _prefixSideboardCards, bool _slashTappedOutSplitCards)
-        : stream(_stream), prefixSideboardCards(_prefixSideboardCards),
-          slashTappedOutSplitCards(_slashTappedOutSplitCards)
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card)
-    {
+    auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
             stream << "SB: ";
         }
@@ -777,12 +766,8 @@ struct WriteToStream
         } else {
             stream << QString("%1 %2\n").arg(card->getNumber()).arg(card->getName().replace("//", "/"));
         }
-    }
-};
+    };
 
-bool DeckList::saveToStream_Plain(QTextStream &out, bool prefixSideboardCards, bool slashTappedOutSplitCards)
-{
-    WriteToStream writeToStream(out, prefixSideboardCards, slashTappedOutSplitCards);
     forEachCard(writeToStream);
     return true;
 }
