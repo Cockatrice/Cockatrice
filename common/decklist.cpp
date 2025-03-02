@@ -262,21 +262,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-class InnerDecklistNode::compareFunctor
-{
-private:
-    Qt::SortOrder order;
-
-public:
-    explicit compareFunctor(Qt::SortOrder _order) : order(_order)
-    {
-    }
-    inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
-    {
-        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
-    }
-};
-
 bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
 {
     while (!xml->atEnd()) {
@@ -347,7 +332,10 @@ QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
     }
 
     // Sort temporary list
-    compareFunctor cmp(order);
+    auto cmp = [order](const auto &a, const auto &b) {
+        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
+    };
+
     std::sort(tempList.begin(), tempList.end(), cmp);
 
     // Map old indexes to new indexes and
