@@ -28,6 +28,8 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     // Set minimum height for the widget
     setMinimumHeight(50);
     connect(this, &BannerWidget::buddyVisibilityChanged, this, &BannerWidget::toggleBuddyVisibility);
+
+    updateDropdownIconState();
 }
 
 void BannerWidget::mousePressEvent(QMouseEvent *event)
@@ -46,22 +48,27 @@ void BannerWidget::setText(const QString &text) const
 void BannerWidget::setClickable(bool _clickable)
 {
     clickable = _clickable;
-    setDropdownIconState(true);
+    updateDropdownIconState();
+}
+
+void BannerWidget::setBuddy(QWidget *_buddy)
+{
+    buddy = _buddy;
+    updateDropdownIconState();
 }
 
 void BannerWidget::toggleBuddyVisibility() const
 {
     if (buddy) {
         buddy->setVisible(!buddy->isVisible());
-        setDropdownIconState(buddy->isVisible());
-    } else {
-        setDropdownIconState(false);
+        updateDropdownIconState();
     }
 }
 
-void BannerWidget::setDropdownIconState(bool expanded) const
+void BannerWidget::updateDropdownIconState() const
 {
     if (clickable) {
+        bool expanded = buddy && buddy->isVisible();
         iconLabel->setPixmap(DropdownIconPixmapGenerator::generatePixmap(24, expanded));
     } else {
         // we cannot directly hide the iconLabel, since it's needed to center the text; set an empty image instead

@@ -17,10 +17,7 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void setText(const QString &text) const;
     void setClickable(bool _clickable);
-    void setBuddy(QWidget *_buddy)
-    {
-        buddy = _buddy;
-    }
+    void setBuddy(QWidget *_buddy);
     QString getText() const
     {
         return bannerLabel->text();
@@ -40,7 +37,7 @@ signals:
     void buddyVisibilityChanged();
 private slots:
     void toggleBuddyVisibility() const;
-    void setDropdownIconState(bool expanded) const;
+    void updateDropdownIconState() const;
 };
 
 #endif // BANNER_WIDGET_H
