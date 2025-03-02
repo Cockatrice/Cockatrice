@@ -381,23 +381,7 @@ public:
     QString getDeckHash() const;
     void refreshDeckHash();
 
-    /**
-     * Calls a given function object for each card in the deck. It must
-     * take a InnerDecklistNode* as its first argument and a
-     * DecklistCardNode* as its second.
-     */
-    template <typename Callback> void forEachCard(Callback &callback)
-    {
-        // Support for this is only possible if the internal structure
-        // doesn't get more complicated.
-        for (int i = 0; i < root->size(); i++) {
-            InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-            for (int j = 0; j < node->size(); j++) {
-                DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-                callback(node, card);
-            }
-        }
-    }
+    void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func);
 };
 
 #endif
