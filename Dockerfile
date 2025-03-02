@@ -26,6 +26,6 @@ RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 -DWITH_DBCONVERTER=
 
 WORKDIR /home/servatrice
 
-EXPOSE 4747 4748
+EXPOSE 4748
 
 ENTRYPOINT [ "servatrice", "--log-to-console" ]
