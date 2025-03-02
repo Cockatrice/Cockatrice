@@ -181,12 +181,14 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
 }
 
 /**
- * Sorts the DeckPreviewWidgets in this folder and all subfolders
+ * Sorts the DeckPreviewWidgets in this folder
  *
  * @param comparator The comparator to use for sorting
+ * @param recursive Also sort all nested subfolders
  */
 void VisualDeckStorageFolderDisplayWidget::sortBy(
-    const std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> &comparator)
+    const std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> &comparator,
+    bool recursive)
 {
     auto deckPreviewWidgets = flowWidget->findChildren<DeckPreviewWidget *>();
 
@@ -200,9 +202,11 @@ void VisualDeckStorageFolderDisplayWidget::sortBy(
         flowWidget->addWidget(previewWidget);
     }
 
-    // also sort all subfolders
-    for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-        subFolder->sortBy(comparator);
+    if (recursive) {
+        // also sort all subfolders
+        for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+            subFolder->sortBy(comparator, false);
+        }
     }
 }
 
