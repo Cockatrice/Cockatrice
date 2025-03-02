@@ -24,6 +24,14 @@ private:
 
 public:
     explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
+
+    /**
+     * Gets the loaded deck. Only call this method after this dialog window has been successfully exec'd.
+     *
+     * The returned DeckLoader is parented to this object; make sure to take ownership of the DeckLoader if you intend
+     * to use it, since otherwise it will get destroyed once this dlg is destroyed
+     * @return The DeckLoader
+     */
     DeckLoader *getDeckList() const
     {
         return deckList;

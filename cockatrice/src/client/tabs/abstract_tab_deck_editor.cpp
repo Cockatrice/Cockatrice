@@ -128,6 +128,10 @@ void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
         deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
 }
 
+/**
+ * Sets the currently active deck for this tab
+ * @param _deck The deck. Takes ownership of the object
+ */
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
@@ -289,12 +293,13 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
         SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
+            l->deleteLater();
         } else {
             deckMenu->setSaveStatus(false);
             setDeck(l);
         }
     } else {
-        delete l;
+        l->deleteLater();
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     deckMenu->setSaveStatus(true);

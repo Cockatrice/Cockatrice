@@ -764,6 +764,10 @@ void TabSupervisor::talkLeft(TabMessage *tab)
     removeTab(indexOf(tab));
 }
 
+/**
+ * Creates a new deck editor tab
+ * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
+ */
 TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 {
     auto *tab = new TabDeckEditor(this);
