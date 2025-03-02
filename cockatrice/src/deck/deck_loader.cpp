@@ -321,8 +321,7 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
 }
 
 /**
- * This function iterates through each card in the decklist and sets the providerId
- * on each card based on its set name and collector number.
+ * This function iterates through each card in the decklist and clears the set name and numbers on the cards.
  */
 void DeckLoader::clearSetNamesAndNumbers()
 {
