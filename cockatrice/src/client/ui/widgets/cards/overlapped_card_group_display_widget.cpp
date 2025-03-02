@@ -103,7 +103,7 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
     overlapWidget->adjustMaxColumnsAndRows();
 }
 
-QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> *cardsToSort)
+QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort)
 {
     QList<CardInfoPtr> activeList;
 
@@ -111,8 +111,8 @@ QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList
     sortCriteria.append(activeSortCriteria);
     sortCardList(cardsToSort, sortCriteria, Qt::SortOrder::AscendingOrder);
 
-    for (int i = 0; i < cardsToSort->size(); ++i) {
-        CardInfoPtr info = cardsToSort->at(i);
+    for (int i = 0; i < cardsToSort.size(); ++i) {
+        CardInfoPtr info = cardsToSort.at(i);
         if (info) {
             if (info->getProperty(activeGroupCriteria) == cardGroupCategory) {
                 activeList.append(info);
@@ -125,12 +125,12 @@ QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList
     return activeList;
 }
 
-void OverlappedCardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> *cardsToSort,
+void OverlappedCardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
                                                     const QStringList properties,
                                                     Qt::SortOrder order = Qt::AscendingOrder)
 {
     CardInfoComparator comparator(properties, order);
-    std::sort(cardsToSort->begin(), cardsToSort->end(), comparator);
+    std::sort(cardsToSort.begin(), cardsToSort.end(), comparator);
 }
 
 void OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged(QString _activeSortCriteria)

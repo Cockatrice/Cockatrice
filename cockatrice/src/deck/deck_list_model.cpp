@@ -485,9 +485,9 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
     rebuildTree();
 }
 
-QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrs() const
+QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
 {
-    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
+    QList<CardInfoPtr> cards;
     DeckList *decklist = getDeckList();
     if (!decklist) {
         return cards;
@@ -508,7 +508,7 @@ QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrs() const
                 CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                     currentCard->getName(), currentCard->getCardProviderId());
                 if (info) {
-                    cards->append(info);
+                    cards.append(info);
                 } else {
                     qDebug() << "Card not found in database!";
                 }
@@ -518,9 +518,9 @@ QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrs() const
     return cards;
 }
 
-QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName) const
+QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName) const
 {
-    QList<CardInfoPtr> *cards = new QList<CardInfoPtr>();
+    QList<CardInfoPtr> cards;
     DeckList *decklist = getDeckList();
     if (!decklist) {
         return cards;
@@ -542,7 +542,7 @@ QList<CardInfoPtr> *DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneNam
                     CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                         currentCard->getName(), currentCard->getCardProviderId());
                     if (info) {
-                        cards->append(info);
+                        cards.append(info);
                     } else {
                         qDebug() << "Card not found in database!";
                     }
