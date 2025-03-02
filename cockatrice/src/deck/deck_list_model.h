@@ -110,8 +110,8 @@ public:
         return deckList;
     }
     void setDeckList(DeckLoader *_deck);
-    QList<CardInfoPtr> *getCardsAsCardInfoPtrs() const;
-    QList<CardInfoPtr> *getCardsAsCardInfoPtrsForZone(QString zoneName) const;
+    QList<CardInfoPtr> getCardsAsCardInfoPtrs() const;
+    QList<CardInfoPtr> getCardsAsCardInfoPtrsForZone(QString zoneName) const;
     QList<QString> *getZones() const;
 
 private:
