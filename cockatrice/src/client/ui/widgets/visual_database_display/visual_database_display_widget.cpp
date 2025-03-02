@@ -118,7 +118,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
-    auto loadCardsTimer = new QTimer(this);
+    loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
     connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
