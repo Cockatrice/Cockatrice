@@ -14,6 +14,11 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "visual_database_display_color_filter_widget.h"
+#include "visual_database_display_filter_save_load_widget.h"
+#include "visual_database_display_main_type_filter_widget.h"
+#include "visual_database_display_name_filter_widget.h"
+#include "visual_database_display_set_filter_widget.h"
+#include "visual_database_display_sub_type_filter_widget.h"
 
 #include <QLoggingCategory>
 #include <QTreeView>
@@ -64,6 +69,12 @@ protected slots:
     void updateSearch(const QString &search);
 
 private:
+    SettingsButtonWidget *quickFilterWidget;
+    VisualDatabaseDisplayFilterSaveLoadWidget *saveLoadWidget;
+    VisualDatabaseDisplayNameFilterWidget *nameFilterWidget;
+    VisualDatabaseDisplayMainTypeFilterWidget *mainTypeFilterWidget;
+    VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
+    VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     KeySignals searchKeySignals;
     AbstractTabDeckEditor *deckEditor;
     CardDatabaseModel *databaseModel;
@@ -73,9 +84,9 @@ private:
     QVBoxLayout *mainLayout;
     QScrollArea *scrollArea;
     FlowWidget *flowWidget;
-    QWidget *overlap_categories;
-    QVBoxLayout *overlap_categories_layout;
-    OverlapControlWidget *overlap_control_widget;
+    QWidget *overlapCategories;
+    QVBoxLayout *overlapCategoriesLayout;
+    OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
     QWidget *container;
     QTimer *debounceTimer;
