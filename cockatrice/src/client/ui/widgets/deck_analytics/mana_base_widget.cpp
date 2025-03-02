@@ -21,8 +21,9 @@ ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     bannerWidget->setMaximumHeight(100);
     layout->addWidget(bannerWidget);
 
-    barLayout = new QHBoxLayout(this);
-    layout->addLayout(barLayout);
+    barContainer = new QWidget(this);
+    barLayout = new QHBoxLayout(barContainer);
+    layout->addWidget(barContainer);
 
     connect(deckListModel, &DeckListModel::dataChanged, this, &ManaBaseWidget::analyzeManaBase);
 

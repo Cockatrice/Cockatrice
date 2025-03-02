@@ -30,6 +30,7 @@ private:
     BannerWidget *bannerWidget;
     QHash<QString, int> manaBaseMap;
     QVBoxLayout *layout;
+    QWidget *barContainer;
     QHBoxLayout *barLayout;
 };
 
