@@ -93,35 +93,25 @@ void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
 
     QList<QString> validGroups = getGroupCriteriaValueList();
 
-    qDebug() << "DeckCardZoneDisplayWidget: Checking for obsolete card groups.";
-    qDebug() << "Valid groups (should remain):" << validGroups;
-
     for (OverlappedCardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
-        qDebug() << "Checking group:" << cardGroupDisplayWidget->cardGroupCategory;
-
         if (!validGroups.contains(cardGroupDisplayWidget->cardGroupCategory)) {
-            qDebug() << "Deleting group:" << cardGroupDisplayWidget->cardGroupCategory;
             cardGroupLayout->removeWidget(cardGroupDisplayWidget);
             cardGroupDisplayWidget->deleteLater(); // Properly delete the widget after the event loop cycles
         } else {
-            qDebug() << "Keeping group:" << cardGroupDisplayWidget->cardGroupCategory;
         }
     }
 
-    qDebug() << "Finished checking for obsolete card groups.";
 }
 
 void DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged(QString _activeGroupCriteria)
 {
     activeGroupCriteria = _activeGroupCriteria;
-    qDebug() << "DeckCardZoneDisplayWidget says: We group by " << activeGroupCriteria << " and display cards";
     displayCards();
 }
 
 void DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged(QString _activeSortCriteria)
 {
     activeSortCriteria = _activeSortCriteria;
-    qDebug() << "DeckCardZoneDisplayWidget says: we sort by" << activeSortCriteria << " and emit a signal";
     emit activeSortCriteriaChanged(activeSortCriteria);
 }
 
@@ -137,11 +127,6 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
 
     groupCriteriaValues.removeDuplicates();
     groupCriteriaValues.sort();
-
-    qDebug() << "These are the group by criteria values";
-    for (QString groupCriteria : groupCriteriaValues) {
-        qDebug() << groupCriteria;
-    }
 
     return groupCriteriaValues;
 }
