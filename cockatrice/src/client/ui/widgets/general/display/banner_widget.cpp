@@ -67,9 +67,8 @@ void BannerWidget::toggleBuddyVisibility() const
 
 void BannerWidget::updateDropdownIconState() const
 {
-    if (clickable) {
-        bool expanded = buddy && !buddy->isHidden();
-        iconLabel->setPixmap(DropdownIconPixmapGenerator::generatePixmap(24, expanded));
+    if (clickable && buddy) {
+        iconLabel->setPixmap(DropdownIconPixmapGenerator::generatePixmap(24, !buddy->isHidden()));
     } else {
         // we cannot directly hide the iconLabel, since it's needed to center the text; set an empty image instead
         iconLabel->setPixmap(QPixmap());
