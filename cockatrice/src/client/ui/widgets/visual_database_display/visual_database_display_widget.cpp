@@ -37,6 +37,9 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
 
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    cardSizeWidget = new CardSizeWidget(this, flowWidget);
+
     searchContainer = new QWidget(this);
     searchLayout = new QHBoxLayout(searchContainer);
     searchContainer->setLayout(searchLayout);
@@ -71,12 +74,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(help, &QAction::triggered, deckEditor->databaseDisplayDockWidget,
             &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 
-    /*databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
-    databaseModel->setObjectName("databaseModel");
-    databaseDisplayModel = new CardDatabaseDisplayModel(this);
-    databaseDisplayModel->setSourceModel(databaseModel);
-    databaseDisplayModel->setFilterKeyColumn(0);*/
-
     databaseView = new QTreeView(this);
     databaseView->setObjectName("databaseView");
     databaseView->setFocusProxy(searchEdit);
@@ -86,11 +83,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView->sortByColumn(0, Qt::AscendingOrder);
     databaseView->setModel(databaseDisplayModel);
     databaseView->setVisible(false);
-
-    /*connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-            deckEditor, SLOT(updateCardInfoLeft(const QModelIndex &, const QModelIndex &)));
-    connect(databaseView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-            deckEditor, SLOT(updatePrintingSelectorDatabase(const QModelIndex &, const QModelIndex &)));*/
 
     searchEdit->setTreeView(databaseView);
 
@@ -117,10 +109,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     mainLayout->addWidget(searchContainer);
 
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     mainLayout->addWidget(flowWidget);
 
-    cardSizeWidget = new CardSizeWidget(this, flowWidget);
     mainLayout->addWidget(cardSizeWidget);
 
     debounceTimer = new QTimer(this);
