@@ -92,16 +92,9 @@ void TappedOutInterface::analyzeDeck(DeckList *deck)
     manager->post(request, data);
 }
 
-struct CopyMainOrSide
+void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
-    CardDatabase &cardDatabase;
-    DeckList &mainboard, &sideboard;
-
-    CopyMainOrSide(CardDatabase &_cardDatabase, DeckList &_mainboard, DeckList &_sideboard)
-        : cardDatabase(_cardDatabase), mainboard(_mainboard), sideboard(_sideboard){};
-
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
-    {
+    auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.getCard(card->getName());
         if (!dbCard || dbCard->getIsToken())
             return;
@@ -112,11 +105,7 @@ struct CopyMainOrSide
         else
             addedCard = mainboard.addCard(card->getName(), node->getName());
         addedCard->setNumber(card->getNumber());
-    }
-};
+    };
 
-void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
-{
-    CopyMainOrSide copyMainOrSide(cardDatabase, mainboard, sideboard);
     source.forEachCard(copyMainOrSide);
 }
