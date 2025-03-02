@@ -95,6 +95,7 @@ void TabDeckEditorVisual::createMenus()
     deckDockMenu = viewMenu->addMenu(QString());
     deckAnalyticsMenu = viewMenu->addMenu(QString());
     filterDockMenu = viewMenu->addMenu(QString());
+    printingSelectorDockMenu = viewMenu->addMenu(QString());
 
     aCardInfoDockVisible = cardInfoDockMenu->addAction(QString());
     aCardInfoDockVisible->setCheckable(true);
@@ -123,6 +124,13 @@ void TabDeckEditorVisual::createMenus()
     aFilterDockFloating = filterDockMenu->addAction(QString());
     aFilterDockFloating->setCheckable(true);
     connect(aFilterDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+
+    aPrintingSelectorDockVisible = printingSelectorDockMenu->addAction(QString());
+    aPrintingSelectorDockVisible->setCheckable(true);
+    connect(aPrintingSelectorDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    aPrintingSelectorDockFloating = printingSelectorDockMenu->addAction(QString());
+    aPrintingSelectorDockFloating->setCheckable(true);
+    connect(aPrintingSelectorDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
 
     viewMenu->addSeparator();
 
@@ -303,7 +311,9 @@ void TabDeckEditorVisual::retranslateUi()
     viewMenu->setTitle(tr("&View"));
     cardInfoDockMenu->setTitle(tr("Card Info"));
     deckDockMenu->setTitle(tr("Deck"));
+    deckAnalyticsMenu->setTitle(tr("Deck Analytics"));
     filterDockMenu->setTitle(tr("Filters"));
+    printingSelectorDockMenu->setTitle(tr("Printing"));
 
     aCardInfoDockVisible->setText(tr("Visible"));
     aCardInfoDockFloating->setText(tr("Floating"));
@@ -311,8 +321,14 @@ void TabDeckEditorVisual::retranslateUi()
     aDeckDockVisible->setText(tr("Visible"));
     aDeckDockFloating->setText(tr("Floating"));
 
+    aDeckAnalyticsDockVisible->setText(tr("Visible"));
+    aDeckAnalyticsDockFloating->setText(tr("Floating"));
+
     aFilterDockVisible->setText(tr("Visible"));
     aFilterDockFloating->setText(tr("Floating"));
+
+    aPrintingSelectorDockVisible->setText(tr("Visible"));
+    aPrintingSelectorDockFloating->setText(tr("Floating"));
 
     aResetLayout->setText(tr("Reset layout"));
 }
@@ -333,6 +349,9 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
         } else if (o == filterDockWidget) {
             aFilterDockVisible->setChecked(false);
             aFilterDockFloating->setEnabled(false);
+        } else if (o == printingSelectorDockWidget) {
+            aPrintingSelectorDockVisible->setChecked(false);
+            aPrintingSelectorDockFloating->setEnabled(false);
         }
     }
     if (o == this && e->type() == QEvent::Hide) {
@@ -342,6 +361,7 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
         layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
         layouts.setDeckEditorFilterSize(filterDockWidget->size());
         layouts.setDeckEditorDeckSize(deckDockWidget->size());
+        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
     }
     return false;
 }
@@ -372,6 +392,12 @@ void TabDeckEditorVisual::dockVisibleTriggered()
         aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
         return;
     }
+
+    if (o == aPrintingSelectorDockVisible) {
+        printingSelectorDockWidget->setHidden(!aPrintingSelectorDockVisible->isChecked());
+        aPrintingSelectorDockFloating->setEnabled(aPrintingSelectorDockVisible->isChecked());
+        return;
+    }
 }
 
 void TabDeckEditorVisual::dockFloatingTriggered()
@@ -396,6 +422,11 @@ void TabDeckEditorVisual::dockFloatingTriggered()
         filterDockWidget->setFloating(aFilterDockFloating->isChecked());
         return;
     }
+
+    if (o == aPrintingSelectorDockFloating) {
+        printingSelectorDockWidget->setFloating(aPrintingSelectorDockFloating->isChecked());
+        return;
+    }
 }
 
 void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
@@ -418,5 +449,10 @@ void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
 
     if (o == deckAnalyticsDock) {
         aDeckAnalyticsDockFloating->setChecked(topLevel);
+    }
+
+    if (o == printingSelectorDockWidget) {
+        aPrintingSelectorDockFloating->setChecked(topLevel);
+        return;
     }
 }
