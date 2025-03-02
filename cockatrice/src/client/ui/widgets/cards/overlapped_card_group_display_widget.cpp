@@ -137,7 +137,6 @@ void OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged(QString _acti
 {
     if (activeSortCriteria != _activeSortCriteria) {
         activeSortCriteria = _activeSortCriteria;
-        qDebug() << "OverlappedCardGroupDisplayWidget changed the sort criteria to " << activeSortCriteria;
         updateCardDisplays(); // Refresh display with new sorting
     }
 }
