@@ -6,6 +6,7 @@
 #include "../../../../game/filters/filter_tree_model.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_info_comparator.h"
+#include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "visual_database_display_color_filter_widget.h"
@@ -36,8 +37,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
 
-    auto quickFilterWidget = new SettingsButtonWidget(this);
-
     searchContainer = new QWidget(this);
     searchLayout = new QHBoxLayout(searchContainer);
     searchContainer->setLayout(searchLayout);
@@ -46,8 +45,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setObjectName("searchEdit");
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
-    // searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    // auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
@@ -56,24 +55,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
-
-    auto saveLoadWidget =
-        new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel, "/home/ascor/Cockatrice_presets/");
-    quickFilterWidget->addSettingsWidget(saveLoadWidget);
-
-    auto nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
-    quickFilterWidget->addSettingsWidget(nameFilterWidget);
-
-    auto mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
-    quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
-
-    auto subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
-    quickFilterWidget->addSettingsWidget(subTypeFilterWidget);
-
-    auto setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
-    quickFilterWidget->addSettingsWidget(setFilterWidget);
-
-    colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
     connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
@@ -87,7 +68,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));*/
-    // connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
+    connect(help, &QAction::triggered, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 
     /*databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
     databaseModel->setObjectName("databaseModel");
@@ -111,6 +93,23 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
             deckEditor, SLOT(updatePrintingSelectorDatabase(const QModelIndex &, const QModelIndex &)));*/
 
     searchEdit->setTreeView(databaseView);
+
+    colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
+
+    quickFilterWidget = new SettingsButtonWidget(this);
+
+    saveLoadWidget =
+        new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel, "/home/ascor/Cockatrice_presets/");
+    nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
+    mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+    subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
+    setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+
+    quickFilterWidget->addSettingsWidget(saveLoadWidget);
+    quickFilterWidget->addSettingsWidget(nameFilterWidget);
+    quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
+    quickFilterWidget->addSettingsWidget(subTypeFilterWidget);
+    quickFilterWidget->addSettingsWidget(setFilterWidget);
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(quickFilterWidget);
