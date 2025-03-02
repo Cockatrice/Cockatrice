@@ -100,7 +100,6 @@ void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
         } else {
         }
     }
-
 }
 
 void DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged(QString _activeGroupCriteria)
