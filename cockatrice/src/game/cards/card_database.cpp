@@ -96,23 +96,18 @@ void CardSet::setIsKnown(bool _isknown)
     SettingsCache::instance().cardDatabase().setIsKnown(shortName, _isknown);
 }
 
-class SetList::KeyCompareFunctor
+void SetList::sortByKey()
 {
-public:
-    inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
-    {
+    auto keyComparator = [](const CardSetPtr &a, const CardSetPtr &b) {
         if (a.isNull() || b.isNull()) {
-            qCDebug(CardDatabaseLog) << "SetList::KeyCompareFunctor a or b is null";
+            qCDebug(CardDatabaseLog) << "keyComparator: a or b is null";
             return false;
         }
 
         return a->getSortKey() < b->getSortKey();
-    }
-};
+    };
 
-void SetList::sortByKey()
-{
-    std::sort(begin(), end(), KeyCompareFunctor());
+    std::sort(begin(), end(), keyComparator);
 }
 
 int SetList::getEnabledSetsNum()
