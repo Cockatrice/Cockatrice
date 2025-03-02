@@ -29,17 +29,18 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     cards = new QList<CardInfoPtr>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);
-    connect(databaseDisplayModel, &QSortFilterProxyModel::invalidate, this, &VisualDatabaseDisplayWidget::modelDirty);
 
     // Set up main layout and widgets
     setMinimumSize(0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    main_layout = new QVBoxLayout(this);
-    setLayout(main_layout);
+    mainLayout = new QVBoxLayout(this);
+    setLayout(mainLayout);
 
     auto quickFilterWidget = new SettingsButtonWidget(this);
 
-    auto searchLayout = new QHBoxLayout(this);
+    searchContainer = new QWidget(this);
+    searchLayout = new QHBoxLayout(searchContainer);
+    searchContainer->setLayout(searchLayout);
 
     searchEdit = new SearchLineEdit();
     searchEdit->setObjectName("searchEdit");
@@ -77,7 +78,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
     searchKeySignals.setObjectName("searchKeySignals");
-    connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+    connect(searchEdit, &QLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
     /*connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
     connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actAddCard()));
     connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), this, SLOT(actAddCardToSideboard()));
@@ -115,18 +116,18 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchLayout->addWidget(quickFilterWidget);
     searchLayout->addWidget(searchEdit);
 
-    main_layout->addLayout(searchLayout);
+    mainLayout->addWidget(searchContainer);
 
-    flow_widget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    main_layout->addWidget(flow_widget);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+    mainLayout->addWidget(flowWidget);
 
-    cardSizeWidget = new CardSizeWidget(this, flow_widget);
-    main_layout->addWidget(cardSizeWidget);
+    cardSizeWidget = new CardSizeWidget(this, flowWidget);
+    mainLayout->addWidget(cardSizeWidget);
 
-    debounce_timer = new QTimer(this);
-    debounce_timer->setSingleShot(true); // Ensure it only fires once after the timeout
+    debounceTimer = new QTimer(this);
+    debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
-    connect(debounce_timer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
+    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
     auto loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
@@ -154,13 +155,12 @@ void VisualDatabaseDisplayWidget::onHover(CardInfoPtr hoveredCard)
 void VisualDatabaseDisplayWidget::addCard(CardInfoPtr cardToAdd)
 {
     cards->append(cardToAdd);
-    CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flow_widget, false);
+    CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
     display->setScaleFactor(cardSizeWidget->getSlider()->value());
     display->setCard(cardToAdd);
-    flow_widget->addWidget(display);
-    connect(display, SIGNAL(imageClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-            SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-    connect(display, SIGNAL(hoveredOnCard(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+    flowWidget->addWidget(display);
+    connect(display, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &VisualDatabaseDisplayWidget::onClick);
+    connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &VisualDatabaseDisplayWidget::onHover);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
 }
 
@@ -207,10 +207,10 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search)
 void VisualDatabaseDisplayWidget::searchModelChanged()
 {
     // Clear the current page and prepare for new data
-    flow_widget->clearLayout(); // Clear existing cards
+    flowWidget->clearLayout(); // Clear existing cards
     cards->clear();             // Clear the card list
     // Reset scrollbar position to the top after loading new cards
-    QScrollBar *scrollBar = flow_widget->scrollArea->verticalScrollBar();
+    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
     if (scrollBar) {
         scrollBar->setValue(0); // Reset scrollbar to top
     }
@@ -263,7 +263,7 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
 
 void VisualDatabaseDisplayWidget::modelDirty()
 {
-    debounce_timer->start(debounce_time);
+    debounceTimer->start(debounceTime);
 }
 
 void VisualDatabaseDisplayWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
