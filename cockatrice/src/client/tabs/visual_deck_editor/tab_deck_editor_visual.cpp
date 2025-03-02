@@ -259,17 +259,20 @@ void TabDeckEditorVisual::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
-    aCardInfoDockVisible->setChecked(cardInfoDockWidget->isVisible());
-    aFilterDockVisible->setChecked(filterDockWidget->isVisible());
-    aDeckDockVisible->setChecked(deckDockWidget->isVisible());
+    aCardInfoDockVisible->setChecked(!cardInfoDockWidget->isHidden());
+    aFilterDockVisible->setChecked(!filterDockWidget->isHidden());
+    aDeckDockVisible->setChecked(!deckDockWidget->isHidden());
+    aPrintingSelectorDockVisible->setChecked(!printingSelectorDockWidget->isHidden());
 
     aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
     aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
     aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
+    aPrintingSelectorDockFloating->setEnabled(aPrintingSelectorDockVisible->isChecked());
 
     aCardInfoDockFloating->setChecked(cardInfoDockWidget->isFloating());
     aFilterDockFloating->setChecked(filterDockWidget->isFloating());
     aDeckDockFloating->setChecked(deckDockWidget->isFloating());
+    aPrintingSelectorDockFloating->setChecked(printingSelectorDockWidget->isFloating());
 
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
     cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
@@ -279,6 +282,9 @@ void TabDeckEditorVisual::loadLayout()
 
     deckDockWidget->setMinimumSize(layouts.getDeckEditorDeckSize());
     deckDockWidget->setMaximumSize(layouts.getDeckEditorDeckSize());
+
+    printingSelectorDockWidget->setMinimumSize(layouts.getDeckEditorPrintingSelectorSize());
+    printingSelectorDockWidget->setMaximumSize(layouts.getDeckEditorPrintingSelectorSize());
 
     databaseDisplayDockWidget->setMinimumSize(100, 100);
     databaseDisplayDockWidget->setMaximumSize(1400, 5000);
@@ -344,25 +350,25 @@ void TabDeckEditorVisual::dockVisibleTriggered()
 {
     QObject *o = sender();
     if (o == aCardInfoDockVisible) {
-        cardInfoDockWidget->setVisible(aCardInfoDockVisible->isChecked());
+        cardInfoDockWidget->setHidden(!aCardInfoDockVisible->isChecked());
         aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
         return;
     }
 
     if (o == aDeckDockVisible) {
-        deckDockWidget->setVisible(aDeckDockVisible->isChecked());
+        deckDockWidget->setHidden(!aDeckDockVisible->isChecked());
         aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
         return;
     }
 
     if (o == aDeckAnalyticsDockVisible) {
-        deckAnalyticsDock->setVisible(aDeckAnalyticsDockVisible->isChecked());
+        deckAnalyticsDock->setHidden(!aDeckAnalyticsDockVisible->isChecked());
         aDeckAnalyticsDockFloating->setEnabled(aDeckAnalyticsDockVisible->isChecked());
         return;
     }
 
     if (o == aFilterDockVisible) {
-        filterDockWidget->setVisible(aFilterDockVisible->isChecked());
+        filterDockWidget->setHidden(!aFilterDockVisible->isChecked());
         aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
         return;
     }
