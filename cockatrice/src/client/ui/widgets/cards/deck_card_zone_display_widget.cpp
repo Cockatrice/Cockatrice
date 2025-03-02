@@ -129,9 +129,9 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
 {
     QList<QString> groupCriteriaValues;
 
-    QList<CardInfoPtr> *cardsInZone = deckListModel->getCardsAsCardInfoPtrsForZone(zoneName);
+    QList<CardInfoPtr> cardsInZone = deckListModel->getCardsAsCardInfoPtrsForZone(zoneName);
 
-    for (CardInfoPtr cardInZone : *cardsInZone) {
+    for (CardInfoPtr cardInZone : cardsInZone) {
         groupCriteriaValues.append(cardInZone->getProperty(activeGroupCriteria));
     }
 
