@@ -208,7 +208,7 @@ void VisualDatabaseDisplayWidget::searchModelChanged()
 {
     // Clear the current page and prepare for new data
     flowWidget->clearLayout(); // Clear existing cards
-    cards->clear();             // Clear the card list
+    cards->clear();            // Clear the card list
     // Reset scrollbar position to the top after loading new cards
     QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
     if (scrollBar) {
