@@ -67,26 +67,15 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
     manager->post(request, data);
 }
 
-struct CopyIfNotAToken
+void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
 {
-    CardDatabase &cardDatabase;
-    DeckList &destination;
-
-    CopyIfNotAToken(CardDatabase &_cardDatabase, DeckList &_destination)
-        : cardDatabase(_cardDatabase), destination(_destination){};
-
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
-    {
+    auto copyIfNotAToken = [this, &destination](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.getCard(card->getName());
         if (dbCard && !dbCard->getIsToken()) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName());
             addedCard->setNumber(card->getNumber());
         }
-    }
-};
+    };
 
-void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
-{
-    CopyIfNotAToken copyIfNotAToken(cardDatabase, destination);
     source.forEachCard(copyIfNotAToken);
 }
