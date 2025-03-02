@@ -134,14 +134,12 @@ void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
 void VisualDeckEditorWidget::actChangeActiveGroupCriteria()
 {
     activeGroupCriteria = groupByComboBox->currentText();
-    qDebug() << "VDE says we group by " << activeGroupCriteria;
     emit activeGroupCriteriaChanged(activeGroupCriteria);
 }
 
 void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
     activeSortCriteria = sortByComboBox->currentText();
-    qDebug() << "VDE says we sort by " << activeSortCriteria;
     emit activeSortCriteriaChanged(activeSortCriteria);
 }
 
