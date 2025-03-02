@@ -37,51 +37,92 @@ PictureLoader::~PictureLoader()
 
 void PictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
+    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderLog) << "PictureLoader: cache fail for" << backCacheKey;
-        pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        qCDebug(PictureLoaderLog) << "PictureLoader: cache miss for" << backCacheKey;
+        QPixmap tmpPixmap("theme:cardback");
+
+        if (tmpPixmap.isNull()) {
+            qCWarning(PictureLoaderLog) << "Failed to load 'theme:cardback'! Using fallback pixmap.";
+            tmpPixmap = QPixmap(size);
+            tmpPixmap.fill(Qt::gray); // Fallback to a gray pixmap
+        } else {
+            qCDebug(PictureLoaderLog) << "Successfully loaded 'theme:cardback'.";
+        }
+
+        pixmap = tmpPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
 }
 
 void PictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
+    QString backCacheKey =
+        "_trice_card_back_inprogress_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
-        pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
+        QPixmap tmpPixmap("theme:cardback");
+
+        if (tmpPixmap.isNull()) {
+            qCWarning(PictureLoaderLog) << "Failed to load 'theme:cardback' for in-progress state! Using fallback.";
+            tmpPixmap = QPixmap(size);
+            tmpPixmap.fill(Qt::blue); // Fallback with blue color
+        } else {
+            qCDebug(PictureLoaderCardBackCacheFailLog) << "Successfully loaded 'theme:cardback' for in-progress state.";
+        }
+
+        pixmap = tmpPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
 }
 
 void PictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + QString::number(size.height());
+    QString backCacheKey =
+        "_trice_card_back_failed_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
-        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache fail for" << backCacheKey;
-        pixmap = QPixmap("theme:cardback").scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        qCDebug(PictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
+        QPixmap tmpPixmap("theme:cardback");
+
+        if (tmpPixmap.isNull()) {
+            qCWarning(PictureLoaderLog) << "Failed to load 'theme:cardback' for failed state! Using fallback.";
+            tmpPixmap = QPixmap(size);
+            tmpPixmap.fill(Qt::red); // Fallback with red color
+        } else {
+            qCDebug(PictureLoaderCardBackCacheFailLog) << "Successfully loaded 'theme:cardback' for failed state.";
+        }
+
+        pixmap = tmpPixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert(backCacheKey, pixmap);
     }
 }
 
 void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
 {
-    if (card == nullptr) {
+    if (!card) {
+        qCWarning(PictureLoaderLog) << "getPixmap called with null card!";
         return;
     }
 
-    // search for an exact size copy of the picture in cache
     QString key = card->getPixmapCacheKey();
-    QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + QString::number(size.height());
-    if (QPixmapCache::find(sizeKey, &pixmap))
-        return;
+    QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + "x" + QString::number(size.height());
+
+    if (QPixmapCache::find(sizeKey, &pixmap)) {
+        return; // Use cached version
+    }
 
     // load the image and create a copy of the correct size
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
+        if (bigPixmap.isNull()) {
+            qCWarning(PictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
+            return;
+        }
+
         QScreen *screen = qApp->primaryScreen();
-        qreal dpr = screen->devicePixelRatio();
+        qreal dpr = screen ? screen->devicePixelRatio() : 1.0;
+        qCDebug(PictureLoaderLog) << "Scaling cached image for" << card->getName();
+
         pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         pixmap.setDevicePixelRatio(dpr);
         QPixmapCache::insert(sizeKey, pixmap);
