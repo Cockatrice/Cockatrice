@@ -506,10 +506,12 @@ void TabGame::actConcede()
 bool TabGame::leaveGame()
 {
     if (!gameClosed) {
-        if (!spectator)
+        if (!spectator) {
+            tabSupervisor->setCurrentWidget(this);
             if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
                 return false;
+        }
 
         if (!replay)
             sendGameCommand(Command_LeaveGame());
