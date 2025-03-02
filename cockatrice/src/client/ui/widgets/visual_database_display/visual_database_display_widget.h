@@ -90,6 +90,7 @@ private:
     CardSizeWidget *cardSizeWidget;
     QWidget *container;
     QTimer *debounceTimer;
+    QTimer *loadCardsTimer;
 
     int debounceTime = 300;
     int currentPage = 0;    // Current page index
