@@ -994,3 +994,19 @@ void DeckList::refreshDeckHash()
     cachedDeckHash = QString();
     emit deckHashChanged();
 }
+
+/**
+ * Calls a given function on each card in the deck.
+ */
+void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+{
+    // Support for this is only possible if the internal structure
+    // doesn't get more complicated.
+    for (int i = 0; i < root->size(); i++) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            func(node, card);
+        }
+    }
+}
