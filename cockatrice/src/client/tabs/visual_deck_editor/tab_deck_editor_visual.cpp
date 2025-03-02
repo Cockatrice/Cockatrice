@@ -48,6 +48,7 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     TabDeckEditorVisual::refreshShortcuts();
 
     TabDeckEditorVisual::loadLayout();
+    databaseDisplayDockWidget->setHidden(true);
 }
 
 void TabDeckEditorVisual::createCentralFrame()
