@@ -1,6 +1,7 @@
 #include "picture_to_load.h"
 
 #include "../../../settings/cache_settings.h"
+#include "../../../utility/card_set_comparator.h"
 
 #include <QCoreApplication>
 #include <QDate>
@@ -20,7 +21,7 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
         if (sortedSets.empty()) {
             sortedSets << CardSet::newInstance("", "", "", QDate());
         }
-        std::sort(sortedSets.begin(), sortedSets.end(), SetDownloadPriorityComparator());
+        std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
         // If the user hasn't disabled arts other than their personal preference...
         if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
