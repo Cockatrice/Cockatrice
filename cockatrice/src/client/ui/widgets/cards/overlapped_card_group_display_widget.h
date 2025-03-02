@@ -24,7 +24,7 @@ public:
                                      QString activeSortCriteria,
                                      int bannerOpacity);
 
-    QList<CardInfoPtr> getCardsMatchingGroup(QList<CardInfoPtr> *cardsToSort);
+    QList<CardInfoPtr> getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort);
     void resizeEvent(QResizeEvent *event) override;
 
     DeckListModel *deckListModel;
@@ -34,7 +34,7 @@ public:
     QString activeSortCriteria;
 
 public slots:
-    void sortCardList(QList<CardInfoPtr> *cardsToSort, QStringList properties, Qt::SortOrder order);
+    void sortCardList(QList<CardInfoPtr> cardsToSort, QStringList properties, Qt::SortOrder order);
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
     void updateCardDisplays();
