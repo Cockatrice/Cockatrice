@@ -41,6 +41,8 @@ public:
     void sortCardList(QStringList properties, Qt::SortOrder order);
     void setDeckList(const DeckList &new_deck_list_model);
 
+    QWidget *searchContainer;
+    QHBoxLayout *searchLayout;
     SearchLineEdit *searchEdit;
     FilterTreeModel *filterModel;
     VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
@@ -68,17 +70,17 @@ private:
     CardDatabaseDisplayModel *databaseDisplayModel;
     QTreeView *databaseView;
     QList<CardInfoPtr> *cards;
-    QVBoxLayout *main_layout;
+    QVBoxLayout *mainLayout;
     QScrollArea *scrollArea;
-    FlowWidget *flow_widget;
+    FlowWidget *flowWidget;
     QWidget *overlap_categories;
     QVBoxLayout *overlap_categories_layout;
     OverlapControlWidget *overlap_control_widget;
     CardSizeWidget *cardSizeWidget;
     QWidget *container;
-    QTimer *debounce_timer;
+    QTimer *debounceTimer;
 
-    int debounce_time = 300;
+    int debounceTime = 300;
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
 

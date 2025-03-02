@@ -25,8 +25,9 @@ private:
     DeckListModel *deckListModel;
     std::unordered_map<int, int> manaCurveMap;
     QVBoxLayout *layout;
-    QHBoxLayout *barLayout;
     BannerWidget *bannerWidget;
+    QWidget *barContainer;
+    QHBoxLayout *barLayout;
 };
 
 #endif // MANA_CURVE_WIDGET_H
