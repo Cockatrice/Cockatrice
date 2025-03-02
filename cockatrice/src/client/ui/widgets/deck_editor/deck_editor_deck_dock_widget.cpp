@@ -200,20 +200,19 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
-    deckEditor->setModified(true);
-    deckEditor->deckMenu->setSaveStatus(true);
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
-    deckEditor->setModified(true);
-    deckEditor->deckMenu->setSaveStatus(true);
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::updateHash()
 {
     hashLabel->setText(deckModel->getDeckList()->getDeckHash());
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
@@ -287,6 +286,7 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    emit deckChanged();
 }
 
 void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
