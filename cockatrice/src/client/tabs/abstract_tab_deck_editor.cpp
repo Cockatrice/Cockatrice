@@ -76,8 +76,8 @@ void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 
 void AbstractTabDeckEditor::onDeckChanged()
 {
-    setModified(true);
-    deckMenu->setSaveStatus(!getDeckList()->isEmpty());
+    setModified(isBlankNewDeck());
+    deckMenu->setSaveStatus(!isBlankNewDeck());
 }
 
 void AbstractTabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
