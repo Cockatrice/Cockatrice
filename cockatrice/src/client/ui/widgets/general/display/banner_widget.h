@@ -31,7 +31,7 @@ private:
     QLabel *bannerLabel;
     Qt::Orientation gradientOrientation;
     int transparency; // Transparency percentage for the gradient
-    QWidget *buddy;
+    QWidget *buddy = nullptr;
     bool clickable = true;
 signals:
     void buddyVisibilityChanged();
