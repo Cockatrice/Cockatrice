@@ -82,6 +82,9 @@ set(cockatrice_SOURCES
     src/utility/logger.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/client/ui/widgets/cards/additional_info/color_identity_widget.cpp
+    src/client/ui/widgets/cards/additional_info/mana_cost_widget.cpp
+    src/client/ui/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
@@ -182,7 +185,6 @@ set(cockatrice_SOURCES
     src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp
-    src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp

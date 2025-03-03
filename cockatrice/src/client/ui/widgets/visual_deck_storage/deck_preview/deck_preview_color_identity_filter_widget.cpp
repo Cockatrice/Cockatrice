@@ -1,88 +1,10 @@
 #include "deck_preview_color_identity_filter_widget.h"
 
+#include "../../cards/additional_info/mana_symbol_widget.h"
 #include "deck_preview_widget.h"
 
 #include <QMouseEvent>
 #include <QPainter>
-
-DeckPreviewColorIdentityFilterCircleWidget::DeckPreviewColorIdentityFilterCircleWidget(QChar color, QWidget *parent)
-    : QWidget(parent), colorChar(color), isActive(false), circleDiameter(30)
-{
-    setFixedSize(circleDiameter, circleDiameter);
-}
-
-void DeckPreviewColorIdentityFilterCircleWidget::setColorActive(bool active)
-{
-    if (isActive != active) {
-        isActive = active;
-        update();
-    }
-}
-
-bool DeckPreviewColorIdentityFilterCircleWidget::isColorActive() const
-{
-    return isActive;
-}
-
-QChar DeckPreviewColorIdentityFilterCircleWidget::getColorChar() const
-{
-    return colorChar;
-}
-
-void DeckPreviewColorIdentityFilterCircleWidget::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QColor circleColor;
-    switch (colorChar.unicode()) {
-        case 'W':
-            circleColor = Qt::white;
-            break;
-        case 'U':
-            circleColor = QColor(0, 115, 230);
-            break;
-        case 'B':
-            circleColor = QColor(50, 50, 50);
-            break;
-        case 'R':
-            circleColor = QColor(230, 30, 30);
-            break;
-        case 'G':
-            circleColor = QColor(30, 180, 30);
-            break;
-        default:
-            circleColor = Qt::transparent;
-            break;
-    }
-
-    if (!isActive) {
-        circleColor.setAlpha(100); // Dim inactive circles
-    }
-
-    painter.setBrush(circleColor);
-    painter.setPen(Qt::black);
-    painter.drawEllipse(rect());
-
-    if (isActive) {
-        QFont font = painter.font();
-        font.setBold(true);
-        font.setPointSize(circleDiameter / 3);
-        painter.setFont(font);
-        painter.setPen(colorChar.unicode() == 'B' ? Qt::white : Qt::black);
-        painter.drawText(rect(), Qt::AlignCenter, colorChar);
-    }
-}
-
-void DeckPreviewColorIdentityFilterCircleWidget::mousePressEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event);
-    isActive = !isActive;
-    emit colorToggled(colorChar, isActive);
-    update();
-}
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent)
     : QWidget(parent), layout(new QHBoxLayout(this))
@@ -93,7 +15,9 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
 
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
-        auto *circle = new DeckPreviewColorIdentityFilterCircleWidget(color, this);
+        // auto *circle = new DeckPreviewColorIdentityFilterCircleWidget(color, this);
+        auto *circle = new ManaSymbolWidget(this, color, false, true);
+        circle->setMaximumWidth(25);
 
         layout->addWidget(circle);
 
@@ -101,7 +25,7 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
         activeColors[color] = false;
 
         // Connect the color toggled signal
-        connect(circle, &DeckPreviewColorIdentityFilterCircleWidget::colorToggled, this,
+        connect(circle, &ManaSymbolWidget::colorToggled, this,
                 &DeckPreviewColorIdentityFilterWidget::handleColorToggled);
     }
 

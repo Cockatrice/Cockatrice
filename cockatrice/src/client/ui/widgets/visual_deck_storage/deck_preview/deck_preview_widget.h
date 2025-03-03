@@ -2,9 +2,9 @@
 #define DECK_PREVIEW_WIDGET_H
 
 #include "../../../../../deck/deck_loader.h"
+#include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_widget.h"
-#include "deck_preview_color_identity_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include <QComboBox>
@@ -31,7 +31,7 @@ public:
     QString filePath;
     DeckLoader *deckLoader;
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget = nullptr;
-    DeckPreviewColorIdentityWidget *colorIdentityWidget = nullptr;
+    ColorIdentityWidget *colorIdentityWidget = nullptr;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget = nullptr;
     QLabel *bannerCardLabel = nullptr;
     QComboBox *bannerCardComboBox = nullptr;
