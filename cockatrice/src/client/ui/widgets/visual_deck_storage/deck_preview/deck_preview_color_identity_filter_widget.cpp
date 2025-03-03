@@ -15,17 +15,16 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
 
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
-        // auto *circle = new DeckPreviewColorIdentityFilterCircleWidget(color, this);
-        auto *circle = new ManaSymbolWidget(this, color, false, true);
-        circle->setMaximumWidth(25);
+        auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
+        manaSymbol->setMaximumWidth(25);
 
-        layout->addWidget(circle);
+        layout->addWidget(manaSymbol);
 
         // Initialize the activeColors map
         activeColors[color] = false;
 
         // Connect the color toggled signal
-        connect(circle, &ManaSymbolWidget::colorToggled, this,
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this,
                 &DeckPreviewColorIdentityFilterWidget::handleColorToggled);
     }
 

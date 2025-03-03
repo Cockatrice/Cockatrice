@@ -40,70 +40,11 @@
         <file>resources/icons/update.png</file>
         <file>resources/icons/view.svg</file>
 
-        <file>resources/icons/mana/0.svg</file>
-        <file>resources/icons/mana/1.svg</file>
-        <file>resources/icons/mana/2.svg</file>
-        <file>resources/icons/mana/3.svg</file>
-        <file>resources/icons/mana/4.svg</file>
-        <file>resources/icons/mana/5.svg</file>
-        <file>resources/icons/mana/6.svg</file>
-        <file>resources/icons/mana/7.svg</file>
-        <file>resources/icons/mana/8.svg</file>
-        <file>resources/icons/mana/9.svg</file>
-        <file>resources/icons/mana/10.svg</file>
-        <file>resources/icons/mana/11.svg</file>
-        <file>resources/icons/mana/12.svg</file>
-        <file>resources/icons/mana/13.svg</file>
-        <file>resources/icons/mana/14.svg</file>
-        <file>resources/icons/mana/15.svg</file>
-        <file>resources/icons/mana/16.svg</file>
-        <file>resources/icons/mana/17.svg</file>
-        <file>resources/icons/mana/18.svg</file>
-        <file>resources/icons/mana/19.svg</file>
-        <file>resources/icons/mana/20.svg</file>
-        <file>resources/icons/mana/2B.svg</file>
-        <file>resources/icons/mana/2G.svg</file>
-        <file>resources/icons/mana/2R.svg</file>
-        <file>resources/icons/mana/2U.svg</file>
-        <file>resources/icons/mana/2W.svg</file>
         <file>resources/icons/mana/B.svg</file>
-        <file>resources/icons/mana/BG.svg</file>
-        <file>resources/icons/mana/BGP.svg</file>
-        <file>resources/icons/mana/BP.svg</file>
-        <file>resources/icons/mana/BR.svg</file>
-        <file>resources/icons/mana/BRP.svg</file>
-        <file>resources/icons/mana/C.svg</file>
-        <file>resources/icons/mana/CB.svg</file>
-        <file>resources/icons/mana/CG.svg</file>
-        <file>resources/icons/mana/CR.svg</file>
-        <file>resources/icons/mana/CU.svg</file>
-        <file>resources/icons/mana/CW.svg</file>
         <file>resources/icons/mana/G.svg</file>
-        <file>resources/icons/mana/GP.svg</file>
-        <file>resources/icons/mana/GU.svg</file>
-        <file>resources/icons/mana/GUP.svg</file>
-        <file>resources/icons/mana/GW.svg</file>
-        <file>resources/icons/mana/GWP.svg</file>
         <file>resources/icons/mana/R.svg</file>
-        <file>resources/icons/mana/RG.svg</file>
-        <file>resources/icons/mana/RGP.svg</file>
-        <file>resources/icons/mana/RP.svg</file>
-        <file>resources/icons/mana/RW.svg</file>
-        <file>resources/icons/mana/RWP.svg</file>
-        <file>resources/icons/mana/S.svg</file>
         <file>resources/icons/mana/U.svg</file>
-        <file>resources/icons/mana/UB.svg</file>
-        <file>resources/icons/mana/UBP.svg</file>
-        <file>resources/icons/mana/UP.svg</file>
-        <file>resources/icons/mana/UR.svg</file>
-        <file>resources/icons/mana/URP.svg</file>
         <file>resources/icons/mana/W.svg</file>
-        <file>resources/icons/mana/WB.svg</file>
-        <file>resources/icons/mana/WBP.svg</file>
-        <file>resources/icons/mana/WP.svg</file>
-        <file>resources/icons/mana/WU.svg</file>
-        <file>resources/icons/mana/WUP.svg</file>
-        <file>resources/icons/mana/X.svg</file>
 
         <file>resources/config/general.svg</file>
         <file>resources/config/appearance.svg</file>

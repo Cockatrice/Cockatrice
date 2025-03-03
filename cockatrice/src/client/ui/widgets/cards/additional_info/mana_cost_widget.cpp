@@ -27,9 +27,6 @@ ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(par
             layout->addWidget(manaSymbol);
         }
     }
-
-    // Set minimum width based on number of icons
-    // setMinimumWidth(symbols.size() * 50 + (symbols.size() - 1) * 5);
 }
 
 void ManaCostWidget::resizeEvent(QResizeEvent *event)

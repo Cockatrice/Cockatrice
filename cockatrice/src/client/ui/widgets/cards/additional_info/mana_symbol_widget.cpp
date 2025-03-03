@@ -48,22 +48,10 @@ void ManaSymbolWidget::resizeEvent(QResizeEvent *event)
 
 void ManaSymbolWidget::loadManaIcon()
 {
-    qDebug() << "Symbol: " << symbol;
     QString filename = "theme:icons/mana/";
 
-    if (symbol == "W" || symbol == "U" || symbol == "B" || symbol == "R" || symbol == "G" || symbol == "C" ||
-        symbol == "S" || symbol == "X") {
+    if (symbol == "W" || symbol == "U" || symbol == "B" || symbol == "R" || symbol == "G") {
         filename += symbol + ".svg";
-    } else if (symbol.toInt() >= 0 && symbol.toInt() <= 20) {
-        filename += symbol + ".svg"; // Handle generic mana costs
-        qDebug() << "ManaIcon: " << filename;
-    } else if (symbol.contains('/')) {
-        QString cleanSymbol = symbol;
-        cleanSymbol.remove('{').remove('}').remove('/'); // Clean up hybrid & Phyrexian mana
-        filename += cleanSymbol + ".svg";
-    } else {
-        qDebug() << "ManaIcon: " << symbol << " was not a number.";
-        filename += symbol + ".svg"; // Fallback
     }
 
     manaIcon = QPixmap(filename);
