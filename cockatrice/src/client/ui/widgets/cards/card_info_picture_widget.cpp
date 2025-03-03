@@ -166,21 +166,36 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    // Adjust scaling after rotation
-    const QSize availableSize = size(); // Size of the widget
-    const QSize scaledSize = transformedPixmap.size().scaled(availableSize, Qt::KeepAspectRatio);
+    // Handle DPI scaling
+    qreal dpr = devicePixelRatio();     // Get the actual scaling factor
+    QSize availableSize = size() * dpr; // Convert to physical pixel size
 
-    const QRect targetRect{(availableSize.width() - scaledSize.width()) / 2,
-                           (availableSize.height() - scaledSize.height()) / 2, scaledSize.width(), scaledSize.height()};
+    // Compute final scaled size
+    QSize pixmapSize = transformedPixmap.size();
+    QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
 
-    const qreal radius = 0.05 * scaledSize.width();
+    // Pre-scale the pixmap once before drawing
+    QPixmap finalPixmap = transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    finalPixmap.setDevicePixelRatio(dpr); // Ensure correct display on high-DPI screens
+
+    // Compute target rectangle with explicit integer conversion
+    int targetX = static_cast<int>((availableSize.width() - scaledSize.width()) / (2 * dpr));
+    int targetY = static_cast<int>((availableSize.height() - scaledSize.height()) / (2 * dpr));
+    int targetW = static_cast<int>(scaledSize.width() / dpr);
+    int targetH = static_cast<int>(scaledSize.height() / dpr);
+    QRect targetRect{targetX, targetY, targetW, targetH};
+
+    // Compute rounded corner radius
+    qreal radius = 0.05 * static_cast<qreal>(targetRect.width()); // Ensure consistent rounding
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);
     QPainterPath shape;
     shape.addRoundedRect(targetRect, radius, radius);
     painter.setClipPath(shape);
-    painter.drawPixmap(targetRect, transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    // Draw the pre-scaled pixmap directly
+    painter.drawPixmap(targetRect, finalPixmap);
 }
 
 /**
