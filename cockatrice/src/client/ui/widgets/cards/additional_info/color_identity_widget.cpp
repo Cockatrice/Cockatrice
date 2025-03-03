@@ -18,7 +18,7 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, CardInfoPtr _card) : Q
     setLayout(layout);
 
     if (card) {
-        QString manaCost = card->getColors(); // Get mana cost string
+        QString manaCost = card->getColors();               // Get mana cost string
         QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
 
         for (const QString &symbol : symbols) {
