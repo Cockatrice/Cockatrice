@@ -2,6 +2,7 @@
 
 #include "../deck/deck_loader.h"
 #include "../settings/cache_settings.h"
+#include "dlg_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -16,17 +17,17 @@
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window
  */
-void DlgLoadDeckFromClipboard::createMainLayout()
+AbstractDlgDeckTextEdit::AbstractDlgDeckTextEdit(QWidget *parent) : QDialog(parent)
 {
     contentsEdit = new QPlainTextEdit;
 
     refreshButton = new QPushButton(tr("&Refresh"));
-    connect(refreshButton, SIGNAL(clicked()), this, SLOT(actRefresh()));
+    connect(refreshButton, &QPushButton::clicked, this, &AbstractDlgDeckTextEdit::actRefresh);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttonBox->addButton(refreshButton, QDialogButtonBox::ActionRole);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &AbstractDlgDeckTextEdit::actOK);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &AbstractDlgDeckTextEdit::reject);
 
     loadSetNameAndNumberCheckBox = new QCheckBox(tr("Parse Set Name and Number (if available)"));
     loadSetNameAndNumberCheckBox->setChecked(true);
@@ -43,9 +44,62 @@ void DlgLoadDeckFromClipboard::createMainLayout()
 
     resize(500, 500);
 
-    actRefresh();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &AbstractDlgDeckTextEdit::refreshShortcuts);
     refreshShortcuts();
+}
+
+void AbstractDlgDeckTextEdit::refreshShortcuts()
+{
+    refreshButton->setShortcut(
+        SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
+}
+
+/**
+ * Replaces the contents of the contentsEdit with the given text.
+ * @param text The text
+ */
+void AbstractDlgDeckTextEdit::setText(const QString &text)
+{
+    contentsEdit->setPlainText(text);
+}
+
+/**
+ * Tries to load the current contents of the contentsEdit into the DeckLoader
+ *
+ * @param deckLoader The DeckLoader to load the deck into
+ * @return Whether the loading was successful
+ */
+bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
+{
+    QString buffer = contentsEdit->toPlainText();
+
+    if (buffer.contains("<cockatrice_deck version=\"1\">")) {
+        return deckLoader->loadFromString_Native(buffer);
+    }
+
+    QTextStream stream(&buffer);
+
+    if (deckLoader->loadFromStream_Plain(stream)) {
+        if (loadSetNameAndNumberCheckBox->isChecked()) {
+            deckLoader->resolveSetNameAndNumberToProviderID();
+        } else {
+            deckLoader->clearSetNamesAndNumbers();
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void AbstractDlgDeckTextEdit::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
+        event->accept();
+        actOK();
+        return;
+    }
+    QDialog::keyPressEvent(event);
 }
 
 /**
@@ -53,11 +107,45 @@ void DlgLoadDeckFromClipboard::createMainLayout()
  *
  * @param parent The parent widget
  */
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : QDialog(parent), deckList(nullptr)
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : AbstractDlgDeckTextEdit(parent), deckList(nullptr)
 {
-    createMainLayout();
-
     setWindowTitle(tr("Load deck from clipboard"));
+
+    DlgLoadDeckFromClipboard::actRefresh();
+}
+
+void DlgLoadDeckFromClipboard::actRefresh()
+{
+    setText(QApplication::clipboard()->text());
+}
+
+void DlgLoadDeckFromClipboard::actOK()
+{
+    deckList = new DeckLoader;
+    deckList->setParent(this);
+
+    if (loadIntoDeck(deckList)) {
+        accept();
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
+    }
+}
+
+/**
+ * Creates the dialog window for the "Edit deck in clipboard" action
+ *
+ * @param deckList The existing deck in the deck editor.
+ * @param parent The parent widget
+ */
+DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, QWidget *parent)
+    : AbstractDlgDeckTextEdit(parent)
+{
+    setWindowTitle(tr("Edit deck in clipboard"));
+
+    deckLoader = new DeckLoader(deckList);
+    deckLoader->setParent(this);
+
+    DlgEditDeckInClipboard::actRefresh();
 }
 
 /**
@@ -73,74 +161,16 @@ static QString deckListToString(const DeckLoader *deckList)
     return buffer;
 }
 
-/**
- * Creates the dialog window for the "Edit deck in clipboard" action
- *
- * @param deck The existing deck in the deck editor
- * @param parent The parent widget
- */
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(const DeckLoader &deck, QWidget *parent)
-    : DlgLoadDeckFromClipboard(parent)
+void DlgEditDeckInClipboard::actRefresh()
 {
-    createMainLayout();
-
-    setWindowTitle(tr("Edit deck in clipboard"));
-
-    deckList = new DeckLoader(deck);
-    deckList->setParent(this);
-
-    contentsEdit->setPlainText(deckListToString(deckList));
+    setText(deckListToString(deckLoader));
 }
 
-void DlgLoadDeckFromClipboard::actRefresh()
+void DlgEditDeckInClipboard::actOK()
 {
-    if (deckList) {
-        contentsEdit->setPlainText(deckListToString(deckList));
-    } else {
-        contentsEdit->setPlainText(QApplication::clipboard()->text());
-    }
-}
-
-void DlgLoadDeckFromClipboard::refreshShortcuts()
-{
-    refreshButton->setShortcut(
-        SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
-}
-
-void DlgLoadDeckFromClipboard::actOK()
-{
-    QString buffer = contentsEdit->toPlainText();
-    QTextStream stream(&buffer);
-
-    if (!deckList) {
-        deckList = new DeckLoader;
-        deckList->setParent(this);
-    }
-
-    if (buffer.contains("<cockatrice_deck version=\"1\">")) {
-        if (deckList->loadFromString_Native(buffer)) {
-            accept();
-        } else {
-            QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
-        }
-    } else if (deckList->loadFromStream_Plain(stream)) {
-        if (loadSetNameAndNumberCheckBox->isChecked()) {
-            deckList->resolveSetNameAndNumberToProviderID();
-        } else {
-            deckList->clearSetNamesAndNumbers();
-        }
+    if (loadIntoDeck(deckLoader)) {
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));
     }
-}
-
-void DlgLoadDeckFromClipboard::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
-        event->accept();
-        actOK();
-        return;
-    }
-    QDialog::keyPressEvent(event);
 }

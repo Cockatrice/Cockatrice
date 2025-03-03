@@ -9,31 +9,21 @@ class QPlainTextEdit;
 class QPushButton;
 
 /**
- * Dialog window for actions that involve loading decks from text input.
+ * Base class for dialog windows for actions that involve loading decks from text input.
  */
-class DlgLoadDeckFromClipboard : public QDialog
+class AbstractDlgDeckTextEdit : public QDialog
 {
     Q_OBJECT
-private slots:
-    void actOK();
-    void actRefresh();
-    void refreshShortcuts();
-
 private:
-    /**
-     * before actOK has been called, null deckList indicates "load deck from clipboard" action, and nonnull deckList
-     * indicates "edit deck in clipboard" action
-     */
-    DeckLoader *deckList;
     QPlainTextEdit *contentsEdit;
     QPushButton *refreshButton;
     QCheckBox *loadSetNameAndNumberCheckBox;
 
-    void createMainLayout();
+private slots:
+    void refreshShortcuts();
 
 public:
-    explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
-    explicit DlgLoadDeckFromClipboard(const DeckLoader &deck, QWidget *parent = nullptr);
+    explicit AbstractDlgDeckTextEdit(QWidget *parent = nullptr);
 
     /**
      * Gets the loaded deck. Only call this method after this dialog window has been successfully exec'd.
@@ -42,13 +32,60 @@ public:
      * to use it, since otherwise it will get destroyed once this dlg is destroyed
      * @return The DeckLoader
      */
-    DeckLoader *getDeckList() const
+    virtual DeckLoader *getDeckList() const = 0;
+
+protected:
+    void setText(const QString &text);
+    bool loadIntoDeck(DeckLoader *deckLoader) const;
+    void keyPressEvent(QKeyEvent *event) override;
+
+protected slots:
+    virtual void actOK() = 0;
+    virtual void actRefresh() = 0;
+};
+
+/**
+ * Dialog window for the "Load deck from clipboard" action
+ */
+class DlgLoadDeckFromClipboard : public AbstractDlgDeckTextEdit
+{
+    Q_OBJECT
+protected slots:
+    void actOK() override;
+    void actRefresh() override;
+
+private:
+    DeckLoader *deckList;
+
+public:
+    explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
+
+    DeckLoader *getDeckList() const override
     {
         return deckList;
     }
+};
 
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
+/**
+ * Dialog window for the "Edit deck in clipboard" action
+ */
+class DlgEditDeckInClipboard : public AbstractDlgDeckTextEdit
+{
+    Q_OBJECT
+protected slots:
+    void actOK() override;
+    void actRefresh() override;
+
+private:
+    DeckLoader *deckLoader;
+
+public:
+    explicit DlgEditDeckInClipboard(const DeckLoader &deckList, QWidget *parent = nullptr);
+
+    DeckLoader *getDeckList() const override
+    {
+        return deckLoader;
+    }
 };
 
 #endif

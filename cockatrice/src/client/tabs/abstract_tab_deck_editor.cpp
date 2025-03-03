@@ -374,7 +374,7 @@ void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
 
 void AbstractTabDeckEditor::actEditDeckInClipboard()
 {
-    DlgLoadDeckFromClipboard dlg(*getDeckList(), this);
+    DlgEditDeckInClipboard dlg(*getDeckList(), this);
     if (!dlg.exec())
         return;
 
