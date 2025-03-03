@@ -7,7 +7,9 @@
 
 #include <QClipboard>
 #include <QFileInfo>
+#include <QInputDialog>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QSet>
 #include <QVBoxLayout>
@@ -71,9 +73,8 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
                                 deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
 
     bannerCardDisplayWidget->setCard(bannerCard);
-    bannerCardDisplayWidget->setOverlayText(
-        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
     bannerCardDisplayWidget->setFontSize(24);
+    refreshBannerCardText();
     setFilePath(deckLoader->getLastFileName());
 
     colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
@@ -291,6 +292,8 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     menu->addSeparator();
 
+    connect(menu->addAction(tr("Rename Deck")), &QAction::triggered, this, &DeckPreviewWidget::actRenameDeck);
+
     auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
@@ -302,5 +305,80 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set name or number)")), &QAction::triggered, this,
             [this] { deckLoader->saveToClipboard(false, false); });
 
+    menu->addSeparator();
+
+    connect(menu->addAction(tr("Rename File")), &QAction::triggered, this, &DeckPreviewWidget::actRenameFile);
+
+    connect(menu->addAction(tr("Delete File")), &QAction::triggered, this, &DeckPreviewWidget::actDeleteFile);
+
     return menu;
+}
+
+void DeckPreviewWidget::actRenameDeck()
+{
+    // read input
+    const QString oldName = deckLoader->getName();
+
+    bool ok;
+    QString newName = QInputDialog::getText(this, "Rename deck", tr("New name:"), QLineEdit::Normal, oldName, &ok);
+    if (!ok || oldName == newName) {
+        return;
+    }
+
+    // write change
+    deckLoader->setName(newName);
+    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+
+    // update VDS
+    refreshBannerCardText();
+}
+
+void DeckPreviewWidget::actRenameFile()
+{
+    // read input
+    const auto info = QFileInfo(filePath);
+    const QString oldName = info.baseName();
+
+    bool ok;
+    QString newName = QInputDialog::getText(this, "Rename file", tr("New name:"), QLineEdit::Normal, oldName, &ok);
+    if (!ok || newName.isEmpty() || oldName == newName) {
+        return;
+    }
+
+    QString newFileName = newName;
+    if (!info.suffix().isEmpty()) {
+        newFileName += "." + info.suffix();
+    }
+
+    // write change
+    const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
+    if (!QFile::rename(info.filePath(), newFilePath)) {
+        QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
+        return;
+    }
+
+    deckLoader->setLastFileName(newFilePath);
+
+    // update VDS
+    setFilePath(newFilePath);
+    refreshBannerCardText();
+}
+
+void DeckPreviewWidget::actDeleteFile()
+{
+    // read input
+    auto res = QMessageBox::warning(this, tr("Delete file"), tr("Are you sure you want to delete the selected file?"),
+                                    QMessageBox::Yes | QMessageBox::No);
+    if (res != QMessageBox::Yes) {
+        return;
+    }
+
+    // write change
+    if (!QFile::remove(QFileInfo(filePath).filePath())) {
+        QMessageBox::critical(this, tr("Error"), tr("Delete failed"));
+        return;
+    }
+
+    // update VDS
+    this->deleteLater();
 }
