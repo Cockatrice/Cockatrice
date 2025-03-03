@@ -28,7 +28,7 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     connect(aSaveDeckAs, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckAs()));
 
     aEditDeckInClipboard = new QAction(QString(), this);
-    connect(aEditDeckInClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actEditDeckInClipboard);
+    connect(aEditDeckInClipboard, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboard()));
 
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeckFromClipboard()));
