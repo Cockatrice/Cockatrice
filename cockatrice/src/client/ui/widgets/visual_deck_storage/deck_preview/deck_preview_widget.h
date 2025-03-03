@@ -60,6 +60,11 @@ public slots:
 
 private:
     QMenu *createRightClickMenu();
+
+private slots:
+    void actRenameDeck();
+    void actRenameFile();
+    void actDeleteFile();
 };
 
 class NoScrollFilter : public QObject

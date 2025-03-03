@@ -36,6 +36,10 @@ public:
     {
         return lastFileName;
     }
+    void setLastFileName(const QString &_lastFileName)
+    {
+        lastFileName = _lastFileName;
+    }
     FileFormat getLastFileFormat() const
     {
         return lastFileFormat;
