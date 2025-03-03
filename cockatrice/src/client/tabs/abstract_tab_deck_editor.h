@@ -91,8 +91,8 @@ protected slots:
     virtual void actLoadDeck();
     bool actSaveDeck();
     bool actSaveDeckAs();
-    void actEditDeckInClipboard();
     virtual void actLoadDeckFromClipboard();
+    void actEditDeckInClipboard();
     void actSaveDeckToClipboard();
     void actSaveDeckToClipboardNoSetNameAndNumber();
     void actSaveDeckToClipboardRaw();

@@ -27,11 +27,11 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aSaveDeckAs = new QAction(QString(), this);
     connect(aSaveDeckAs, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckAs()));
 
-    aEditDeckInClipboard = new QAction(QString(), this);
-    connect(aEditDeckInClipboard, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboard()));
-
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeckFromClipboard()));
+
+    aEditDeckInClipboard = new QAction(QString(), this);
+    connect(aEditDeckInClipboard, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboard()));
 
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboard()));
@@ -79,8 +79,8 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     addAction(aSaveDeck);
     addAction(aSaveDeckAs);
     addSeparator();
-    addAction(aEditDeckInClipboard);
     addAction(aLoadDeckFromClipboard);
+    addAction(aEditDeckInClipboard);
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
     addAction(aPrintDeck);
@@ -138,8 +138,8 @@ void DeckEditorMenu::retranslateUi()
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
 
-    aEditDeckInClipboard->setText(tr("Edit deck in clipboard"));
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
+    aEditDeckInClipboard->setText(tr("Edit deck in clipboard"));
 
     saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
     aSaveDeckToClipboard->setText(tr("Annotated"));
@@ -165,8 +165,8 @@ void DeckEditorMenu::refreshShortcuts()
     aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));
     aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
-    aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
+    aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
     aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
