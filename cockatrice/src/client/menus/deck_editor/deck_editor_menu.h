@@ -14,11 +14,11 @@ public:
 
     AbstractTabDeckEditor *deckEditor;
 
-    QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aEditDeckInClipboard,
-        *aLoadDeckFromClipboard, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber,
+    QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
+        *aEditDeckInClipboard, *aEditDeckInClipboardRaw, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber,
         *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetNameAndNumber, *aPrintDeck, *aExportDeckDecklist,
         *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
-    QMenu *loadRecentDeckMenu, *analyzeDeckMenu, *saveDeckToClipboardMenu;
+    QMenu *loadRecentDeckMenu, *analyzeDeckMenu, *editDeckInClipboardMenu, *saveDeckToClipboardMenu;
 
     void setSaveStatus(bool newStatus);
 

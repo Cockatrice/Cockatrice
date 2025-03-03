@@ -93,6 +93,7 @@ protected slots:
     bool actSaveDeckAs();
     virtual void actLoadDeckFromClipboard();
     void actEditDeckInClipboard();
+    void actEditDeckInClipboardRaw();
     void actSaveDeckToClipboard();
     void actSaveDeckToClipboardNoSetNameAndNumber();
     void actSaveDeckToClipboardRaw();
@@ -114,6 +115,9 @@ protected slots:
     bool eventFilter(QObject *o, QEvent *e) override;
     virtual void dockVisibleTriggered() = 0;
     virtual void dockFloatingTriggered() = 0;
+
+private:
+    void editDeckInClipboard(bool annotated);
 
 protected:
     /**

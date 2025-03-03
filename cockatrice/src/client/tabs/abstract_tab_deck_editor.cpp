@@ -394,9 +394,9 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
     deckMenu->setSaveStatus(true);
 }
 
-void AbstractTabDeckEditor::actEditDeckInClipboard()
+void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(*getDeckList(), this);
+    DlgEditDeckInClipboard dlg(*getDeckList(), annotated, this);
     if (!dlg.exec())
         return;
 
@@ -404,6 +404,16 @@ void AbstractTabDeckEditor::actEditDeckInClipboard()
     setModified(true);
 
     deckMenu->setSaveStatus(true);
+}
+
+void AbstractTabDeckEditor::actEditDeckInClipboard()
+{
+    editDeckInClipboard(true);
+}
+
+void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
+{
+    editDeckInClipboard(false);
 }
 
 void AbstractTabDeckEditor::actSaveDeckToClipboard()

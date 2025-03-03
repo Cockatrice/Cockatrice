@@ -134,11 +134,12 @@ void DlgLoadDeckFromClipboard::actOK()
 /**
  * Creates the dialog window for the "Edit deck in clipboard" action
  *
- * @param deckList The existing deck in the deck editor.
+ * @param deckList The existing deck in the deck editor. Copies the instance
+ * @param _annotated Whether to add annotations to the text that is loaded from the deck
  * @param parent The parent widget
  */
-DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, QWidget *parent)
-    : AbstractDlgDeckTextEdit(parent)
+DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, bool _annotated, QWidget *parent)
+    : AbstractDlgDeckTextEdit(parent), annotated(_annotated)
 {
     setWindowTitle(tr("Edit deck in clipboard"));
 
@@ -149,21 +150,22 @@ DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, QWidg
 }
 
 /**
- * Loads the contents of the DeckList into a String
+ * Loads the contents of the DeckList into a String. Always loads it with addSetNameAndNumber=true
  * @param deckList The deck to load
+ * @param addComments Whether to add annotations
  * @return A QString
  */
-static QString deckListToString(const DeckLoader *deckList)
+static QString deckListToString(const DeckLoader *deckList, bool addComments)
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckList->saveToStream_Plain(stream);
+    deckList->saveToStream_Plain(stream, addComments);
     return buffer;
 }
 
 void DlgEditDeckInClipboard::actRefresh()
 {
-    setText(deckListToString(deckLoader));
+    setText(deckListToString(deckLoader, annotated));
 }
 
 void DlgEditDeckInClipboard::actOK()

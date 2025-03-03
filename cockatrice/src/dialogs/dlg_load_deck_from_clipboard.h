@@ -78,9 +78,10 @@ protected slots:
 
 private:
     DeckLoader *deckLoader;
+    bool annotated;
 
 public:
-    explicit DlgEditDeckInClipboard(const DeckLoader &deckList, QWidget *parent = nullptr);
+    explicit DlgEditDeckInClipboard(const DeckLoader &deckList, bool _annotated, QWidget *parent = nullptr);
 
     DeckLoader *getDeckList() const override
     {
