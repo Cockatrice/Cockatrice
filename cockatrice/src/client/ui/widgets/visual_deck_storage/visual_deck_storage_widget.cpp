@@ -11,6 +11,7 @@
 
 #include <QComboBox>
 #include <QDirIterator>
+#include <QFileSystemWatcher>
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
@@ -125,12 +126,28 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
     }
+
+    addRecursiveWatch(watcher, SettingsCache::instance().getDeckPath());
+
+    // Signals for changes
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
+    connect(&watcher, &QFileSystemWatcher::directoryChanged, this, &VisualDeckStorageWidget::refreshIfPossible);
 }
 
 void VisualDeckStorageWidget::refreshIfPossible()
 {
     if (scrollArea->widget() != databaseLoadIndicator) {
         createRootFolderWidget();
+    }
+}
+
+void VisualDeckStorageWidget::addRecursiveWatch(QFileSystemWatcher &watcher, const QString &dirPath)
+{
+    QDir dir(dirPath);
+    watcher.addPath(dirPath); // Watch the root directory
+
+    for (const QFileInfo &entry : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        addRecursiveWatch(watcher, entry.absoluteFilePath());
     }
 }
 
