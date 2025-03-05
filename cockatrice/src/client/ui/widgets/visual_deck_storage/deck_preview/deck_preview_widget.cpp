@@ -2,6 +2,7 @@
 
 #include "../../../../../game/cards/card_database_manager.h"
 #include "../../../../../settings/cache_settings.h"
+#include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
@@ -77,7 +78,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     refreshBannerCardText();
     setFilePath(deckLoader->getLastFileName());
 
-    colorIdentityWidget = new DeckPreviewColorIdentityWidget(this, getColorIdentity());
+    colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
 
     bannerCardLabel = new QLabel();

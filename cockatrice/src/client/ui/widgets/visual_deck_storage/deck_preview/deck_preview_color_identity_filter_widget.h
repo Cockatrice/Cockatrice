@@ -12,29 +12,6 @@
 class DeckPreviewWidget;
 class VisualDeckStorageWidget;
 
-class DeckPreviewColorIdentityFilterCircleWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit DeckPreviewColorIdentityFilterCircleWidget(QChar color, QWidget *parent = nullptr);
-    void setColorActive(bool active);
-    bool isColorActive() const;
-    QChar getColorChar() const;
-
-protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-
-signals:
-    void colorToggled(QChar color, bool active);
-
-private:
-    QChar colorChar;
-    bool isActive;
-    int circleDiameter;
-};
-
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {
     Q_OBJECT
