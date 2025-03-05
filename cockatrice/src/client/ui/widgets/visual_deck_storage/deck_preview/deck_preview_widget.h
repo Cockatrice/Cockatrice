@@ -59,6 +59,7 @@ public slots:
 
 private:
     QMenu *createRightClickMenu();
+    void addSetBannerCardMenu(QMenu *menu);
 
 private slots:
     void actRenameDeck();

@@ -288,6 +288,8 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     connect(menu->addAction(tr("Edit Tags")), &QAction::triggered, deckTagsDisplayWidget,
             &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
 
+    addSetBannerCardMenu(menu);
+
     menu->addSeparator();
 
     connect(menu->addAction(tr("Rename Deck")), &QAction::triggered, this, &DeckPreviewWidget::actRenameDeck);
@@ -310,6 +312,28 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     connect(menu->addAction(tr("Delete File")), &QAction::triggered, this, &DeckPreviewWidget::actDeleteFile);
 
     return menu;
+}
+
+/**
+ * Adds the "Set Banner Card" submenu to the given menu. Does nothing if bannerCardComboBox is null.
+ * @param menu The menu to add the submenu to
+ */
+void DeckPreviewWidget::addSetBannerCardMenu(QMenu *menu)
+{
+    if (!bannerCardComboBox) {
+        return;
+    }
+
+    auto bannerCardMenu = menu->addMenu(tr("Set Banner Card"));
+
+    for (int i = 0; i < bannerCardComboBox->count(); ++i) {
+        auto action = bannerCardMenu->addAction(bannerCardComboBox->itemText(i));
+        connect(action, &QAction::triggered, this, [this, i] { bannerCardComboBox->setCurrentIndex(i); });
+
+        // the checkability is purely for visuals
+        action->setCheckable(true);
+        action->setChecked(bannerCardComboBox->currentIndex() == i);
+    }
 }
 
 void DeckPreviewWidget::actRenameDeck()
