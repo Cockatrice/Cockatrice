@@ -20,6 +20,7 @@ set(oracle_SOURCES
     ../cockatrice/src/game/cards/card_database_manager.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader_worker.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader_worker_work.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp
     ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
