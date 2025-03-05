@@ -164,6 +164,17 @@ void VisualDeckStorageWidget::retranslateUi()
     searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
 }
 
+/**
+ * Reapplies all sort and filter options by calling the appropriate update methods.
+ */
+void VisualDeckStorageWidget::reapplySortAndFilters()
+{
+    updateSortOrder();
+    updateTagFilter();
+    updateColorFilter();
+    updateSearchFilter();
+}
+
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
     folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
@@ -172,14 +183,14 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
-    updateSortOrder();
+    reapplySortAndFilters();
 }
 
 void VisualDeckStorageWidget::updateShowFolders(bool enabled)
 {
     if (folderWidget) {
         folderWidget->updateShowFolders(enabled);
-        updateSortOrder();
+        reapplySortAndFilters();
     }
 }
 
