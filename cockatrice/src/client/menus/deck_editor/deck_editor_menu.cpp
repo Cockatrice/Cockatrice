@@ -30,6 +30,12 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aLoadDeckFromClipboard = new QAction(QString(), this);
     connect(aLoadDeckFromClipboard, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeckFromClipboard()));
 
+    aEditDeckInClipboard = new QAction(QString(), this);
+    connect(aEditDeckInClipboard, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboard()));
+
+    aEditDeckInClipboardRaw = new QAction(QString(), this);
+    connect(aEditDeckInClipboardRaw, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboardRaw()));
+
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboard()));
 
@@ -64,6 +70,10 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aClose = new QAction(QString(), this);
     connect(aClose, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::closeRequest);
 
+    editDeckInClipboardMenu = new QMenu(this);
+    editDeckInClipboardMenu->addAction(aEditDeckInClipboard);
+    editDeckInClipboardMenu->addAction(aEditDeckInClipboardRaw);
+
     saveDeckToClipboardMenu = new QMenu(this);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardNoSetNameAndNumber);
@@ -77,6 +87,7 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     addAction(aSaveDeckAs);
     addSeparator();
     addAction(aLoadDeckFromClipboard);
+    addMenu(editDeckInClipboardMenu);
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
     addAction(aPrintDeck);
@@ -133,7 +144,12 @@ void DeckEditorMenu::retranslateUi()
     aClearRecents->setText(tr("Clear"));
     aSaveDeck->setText(tr("&Save deck"));
     aSaveDeckAs->setText(tr("Save deck &as..."));
+
     aLoadDeckFromClipboard->setText(tr("Load deck from cl&ipboard..."));
+
+    editDeckInClipboardMenu->setTitle(tr("Edit deck in clipboard"));
+    aEditDeckInClipboard->setText(tr("Annotated"));
+    aEditDeckInClipboardRaw->setText(tr("Not Annotated"));
 
     saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
     aSaveDeckToClipboard->setText(tr("Annotated"));
@@ -160,6 +176,8 @@ void DeckEditorMenu::refreshShortcuts()
     aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
     aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
+    aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
+    aEditDeckInClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboardRaw"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
     aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
