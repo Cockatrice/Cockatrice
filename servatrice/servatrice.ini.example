@@ -20,7 +20,8 @@ id=1
 
 host=any
 
-; The TCP port number servatrice will listen on for clients; default is 4747
+; The TCP port number Servatrice will listen on for clients; default is 4747;
+; Will be removed in the future, use websocket connection instead
 port=4747
 
 ; Servatrice can scale up to serve big number of users using more than one parallel thread of execution;
@@ -421,7 +422,7 @@ enable_forgotpassword_audit=true
 ; "servers" table of the database. Default is 0 (disabled)
 active=0
 
-; The TCP port number servatrice will listen on for other servers; default is 14747
+; The TCP port number Servatrice will listen on for other servers; default is 14747
 port=14747
 
 ; Server-to-server communication needs a valid certificate in PEM format. Enter its filename in this setting
