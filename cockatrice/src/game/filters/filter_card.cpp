@@ -1,5 +1,44 @@
 #include "filter_card.h"
 
+#include <QJsonObject>
+
+QJsonObject CardFilter::toJson() const
+{
+    QJsonObject obj;
+    obj["term"] = trm;
+    obj["type"] = typeName(t);
+    obj["attr"] = attrName(a);
+    return obj;
+}
+
+CardFilter *CardFilter::fromJson(const QJsonObject &obj)
+{
+    QString term = obj["term"].toString();
+    QString typeStr = obj["type"].toString();
+    QString attrStr = obj["attr"].toString();
+
+    Type type = TypeEnd;
+    Attr attr = AttrEnd;
+
+    // Convert type string back to enum
+    for (int i = 0; i < TypeEnd; i++) {
+        if (typeName(static_cast<Type>(i)) == typeStr) {
+            type = static_cast<Type>(i);
+            break;
+        }
+    }
+
+    // Convert attr string back to enum
+    for (int i = 0; i < AttrEnd; i++) {
+        if (attrName(static_cast<Attr>(i)) == attrStr) {
+            attr = static_cast<Attr>(i);
+            break;
+        }
+    }
+
+    return new CardFilter(term, type, attr);
+}
+
 const QString CardFilter::typeName(Type t)
 {
     switch (t) {
