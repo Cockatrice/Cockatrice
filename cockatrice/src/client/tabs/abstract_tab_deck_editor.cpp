@@ -129,6 +129,19 @@ void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
 }
 
 /**
+ * Opens the deck in this tab.
+ * @param deck The deck. Takes ownership of the object
+ */
+void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
+{
+    setDeck(deck);
+
+    if (!deck->getLastFileName().isEmpty()) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
+    }
+}
+
+/**
  * Sets the currently active deck for this tab
  * @param _deck The deck. Takes ownership of the object
  */
@@ -290,13 +303,12 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt, true)) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
             l->deleteLater();
         } else {
             deckMenu->setSaveStatus(false);
-            setDeck(l);
+            openDeck(l);
         }
     } else {
         l->deleteLater();

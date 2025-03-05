@@ -772,7 +772,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
 {
     auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
-        tab->setDeck(new DeckLoader(*deckToOpen));
+        tab->openDeck(new DeckLoader(*deckToOpen));
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
