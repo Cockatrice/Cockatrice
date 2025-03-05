@@ -28,7 +28,7 @@ public:
     };
 
 public slots:
-    void updateVisibility();
+    void updateVisibility(bool recursive = true);
     bool checkVisibility();
     void updateShowFolders(bool enabled);
 

@@ -33,13 +33,6 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
 
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::tagFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::colorFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::searchFilterUpdated, this,
-            &VisualDeckStorageFolderDisplayWidget::updateVisibility);
-
     createWidgetsForFiles();
     createWidgetsForFolders();
 
@@ -104,7 +97,12 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
     }
 }
 
-void VisualDeckStorageFolderDisplayWidget::updateVisibility()
+/**
+ * Updates the visibility of this folder and all its DeckPreviewWidgets
+ *
+ * @param recursive Also update the visibility of all subfolders and their DeckPreviewWidgets.
+ */
+void VisualDeckStorageFolderDisplayWidget::updateVisibility(bool recursive)
 {
     bool atLeastOneWidgetVisible = checkVisibility();
     if (atLeastOneWidgetVisible) {
@@ -112,8 +110,10 @@ void VisualDeckStorageFolderDisplayWidget::updateVisibility()
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             display->updateVisibility();
         }
-        for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-            subFolder->updateVisibility();
+        if (recursive) {
+            for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+                subFolder->updateVisibility(false);
+            }
         }
     } else {
         setVisible(false);
@@ -181,32 +181,13 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
 }
 
 /**
- * Recursively gets all DeckPreviewWidgets in this folder and its subfolders
- */
-static QList<DeckPreviewWidget *> getAllDecksRecursive(VisualDeckStorageFolderDisplayWidget *folder)
-{
-    QList<DeckPreviewWidget *> allDecks;
-
-    if (auto *flowWidget = folder->getFlowWidget()) {
-        // Iterate through all DeckPreviewWidgets in this folder
-        allDecks << flowWidget->findChildren<DeckPreviewWidget *>();
-    }
-
-    for (auto *subFolder : folder->findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-        allDecks << getAllDecksRecursive(subFolder);
-    }
-
-    return allDecks;
-}
-
-/**
- * Recursively steals all DeckPreviewWidgets from this widget's subfolders, and deletes all subfolders
+ * Steals all DeckPreviewWidgets from this widget's nested subfolders, and deletes those subfolders
  */
 void VisualDeckStorageFolderDisplayWidget::flattenFolderStructure()
 {
-    for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-        // steal all DeckPreviewWidgets from the subfolder and all its subfolders
-        for (auto *deck : getAllDecksRecursive(subFolder)) {
+    for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
+        // steal all DeckPreviewWidgets from the subfolder
+        for (auto *deck : subFolder->getFlowWidget()->findChildren<DeckPreviewWidget *>()) {
             flowWidget->addWidget(deck);
         }
 
