@@ -81,7 +81,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
 
-    bannerCardLabel = new QLabel();
+    bannerCardLabel = new QLabel(this);
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardComboBox = new QComboBox(this);
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
