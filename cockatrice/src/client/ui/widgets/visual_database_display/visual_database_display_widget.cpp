@@ -257,7 +257,7 @@ void VisualDatabaseDisplayWidget::sortCardList(const QStringList &properties,
                                                Qt::SortOrder order = Qt::AscendingOrder) const
 {
     CardInfoComparator comparator(properties, order);
-    std::ranges::sort(*cards, comparator);
+    std::sort(cards->begin(), cards->end(), comparator);
 }
 
 void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
