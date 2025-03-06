@@ -68,7 +68,7 @@ void ManaBaseWidget::updateDisplay()
     manaColors.insert("C", QColor(150, 150, 150));
 
     for (auto manaColor : manaBaseMap.keys()) {
-        QColor barColor = manaColors.contains(manaColor) ? manaColors[manaColor] : Qt::gray;
+        QColor barColor = manaColors.value(manaColor, Qt::gray);
         BarWidget *barWidget = new BarWidget(QString(manaColor), manaBaseMap[manaColor], highestEntry, barColor, this);
         barLayout->addWidget(barWidget);
     }
