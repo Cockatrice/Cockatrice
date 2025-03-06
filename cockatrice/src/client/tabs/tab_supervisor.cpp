@@ -816,7 +816,7 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *dec
 {
     auto *tab = new TabDeckEditorVisual(this);
     if (deckToOpen)
-        tab->setDeck(new DeckLoader(*deckToOpen));
+        tab->openDeck(new DeckLoader(*deckToOpen));
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);
