@@ -43,7 +43,7 @@ public:
     void populateCards();
     void loadNextPage();
     void loadCurrentPage();
-    void sortCardList(QStringList properties, Qt::SortOrder order);
+    void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
     void setDeckList(const DeckList &new_deck_list_model);
 
     QWidget *searchContainer;
@@ -61,12 +61,12 @@ signals:
 
 protected slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void onHover(CardInfoPtr hoveredCard);
-    void addCard(CardInfoPtr cardToAdd);
-    void databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
+    void onHover(const CardInfoPtr &hoveredCard);
+    void addCard(const CardInfoPtr &cardToAdd);
+    void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void wheelEvent(QWheelEvent *event) override;
-    void modelDirty();
-    void updateSearch(const QString &search);
+    void modelDirty() const;
+    void updateSearch(const QString &search) const;
 
 private:
     SettingsButtonWidget *quickFilterWidget;

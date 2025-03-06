@@ -19,6 +19,7 @@
 #include <QHeaderView>
 #include <QScrollBar>
 #include <qpropertyanimation.h>
+#include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
                                                          AbstractTabDeckEditor *_deckEditor,
@@ -136,15 +137,15 @@ void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWit
     emit cardClickedDatabaseDisplay(event, instance);
 }
 
-void VisualDatabaseDisplayWidget::onHover(CardInfoPtr hoveredCard)
+void VisualDatabaseDisplayWidget::onHover(const CardInfoPtr &hoveredCard)
 {
     emit cardHoveredDatabaseDisplay(hoveredCard);
 }
 
-void VisualDatabaseDisplayWidget::addCard(CardInfoPtr cardToAdd)
+void VisualDatabaseDisplayWidget::addCard(const CardInfoPtr &cardToAdd)
 {
     cards->append(cardToAdd);
-    CardInfoPictureWithTextOverlayWidget *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
+    auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
     display->setScaleFactor(cardSizeWidget->getSlider()->value());
     display->setCard(cardToAdd);
     flowWidget->addWidget(display);
@@ -174,8 +175,7 @@ void VisualDatabaseDisplayWidget::populateCards()
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         qCDebug(VisualDatabaseDisplayLog) << name.toString();
-        CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
-        if (info) {
+        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
             addCard(info);
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
@@ -184,7 +184,7 @@ void VisualDatabaseDisplayWidget::populateCards()
     currentPage++;
 }
 
-void VisualDatabaseDisplayWidget::updateSearch(const QString &search)
+void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 {
     databaseDisplayModel->setStringFilter(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
@@ -199,8 +199,7 @@ void VisualDatabaseDisplayWidget::searchModelChanged()
     flowWidget->clearLayout(); // Clear existing cards
     cards->clear();            // Clear the card list
     // Reset scrollbar position to the top after loading new cards
-    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
-    if (scrollBar) {
+    if (QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar()) {
         scrollBar->setValue(0); // Reset scrollbar to top
     }
 
@@ -225,8 +224,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
     for (int row = start; row < end; ++row) {
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
-        CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString());
-        if (info) {
+        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
             addCard(info);
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
@@ -250,18 +248,19 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
     }
 }
 
-void VisualDatabaseDisplayWidget::modelDirty()
+void VisualDatabaseDisplayWidget::modelDirty() const
 {
     debounceTimer->start(debounceTime);
 }
 
-void VisualDatabaseDisplayWidget::sortCardList(const QStringList properties, Qt::SortOrder order = Qt::AscendingOrder)
+void VisualDatabaseDisplayWidget::sortCardList(const QStringList &properties,
+                                               Qt::SortOrder order = Qt::AscendingOrder) const
 {
     CardInfoComparator comparator(properties, order);
-    std::sort(cards->begin(), cards->end(), comparator);
+    std::ranges::sort(*cards, comparator);
 }
 
-void VisualDatabaseDisplayWidget::databaseDataChanged(QModelIndex topLeft, QModelIndex bottomRight)
+void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     (void)topLeft;
     (void)bottomRight;
