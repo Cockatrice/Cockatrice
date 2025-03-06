@@ -91,7 +91,6 @@ private:
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
     QList<AbstractTabDeckEditor *> deckEditorTabs;
-    QList<AbstractTabDeckEditor *> visualDeckEditorTabs;
     bool isLocalGame;
 
     QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage,
@@ -188,7 +187,6 @@ private slots:
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
     void deckEditorClosed(AbstractTabDeckEditor *tab);
-    void visualDeckEditorClosed(AbstractTabDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

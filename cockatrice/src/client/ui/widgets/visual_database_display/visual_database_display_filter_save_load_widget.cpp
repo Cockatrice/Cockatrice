@@ -40,7 +40,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
     if (filename.isEmpty())
         return;
 
-    QString filePath = saveDirectory + "/" + filename + ".json";
+    QString filePath = saveDirectory + QDir::separator() + filename + ".json";
 
     // Serialize the filter model to JSON
     QJsonArray filtersArray;
