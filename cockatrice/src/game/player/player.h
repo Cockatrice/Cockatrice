@@ -161,6 +161,8 @@ public slots:
     void actCreateToken();
     void actCreateAnotherToken();
     void actShuffle();
+    void actShuffleTop();
+    void actShuffleBottom();
     void actDrawCard();
     void actDrawCards();
     void actUndoDraw();
@@ -251,8 +253,8 @@ private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
         *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
-    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
-        *bottomLibraryMenu, *rfgMenu, *playerMenu;
+    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *shuffleMenu,
+        *topLibraryMenu, *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
     QList<QMenu *> singlePlayerLists;
     QList<QAction *> allPlayersActions;
@@ -263,10 +265,10 @@ private:
         *aViewBottomCards, *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor,
         *aMoveTopCardToGraveyard, *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile,
         *aMoveTopCardsUntil, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard,
-        *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aMoveTopToPlay, *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie,
-        *aCreateToken, *aCreateAnotherToken, *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop,
-        *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile,
-        *aDrawBottomCard, *aDrawBottomCards;
+        *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aShuffleTop, *aShuffleBottom, *aMoveTopToPlay,
+        *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aMoveBottomToPlay,
+        *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile,
+        *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard, *aDrawBottomCards;
 
     QAction *aCardMenu;
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
