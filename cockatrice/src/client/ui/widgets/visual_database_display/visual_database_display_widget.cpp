@@ -91,8 +91,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     quickFilterWidget = new SettingsButtonWidget(this);
 
-    saveLoadWidget =
-        new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel, "/home/ascor/Cockatrice_presets/");
+    saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
     mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);

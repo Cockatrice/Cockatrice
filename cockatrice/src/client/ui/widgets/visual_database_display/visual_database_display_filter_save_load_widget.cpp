@@ -1,15 +1,15 @@
 #include "visual_database_display_filter_save_load_widget.h"
 
 #include "../../../../game/filters/filter_tree.h"
+#include "../../../../settings/cache_settings.h"
 
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonObject>
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,
-                                                                                     FilterTreeModel *_filterModel,
-                                                                                     const QString &savePath)
-    : QWidget(parent), filterModel(_filterModel), saveDirectory(savePath)
+                                                                                     FilterTreeModel *_filterModel)
+    : QWidget(parent), filterModel(_filterModel)
 {
     setMinimumWidth(300);
     setMaximumHeight(300);
@@ -40,7 +40,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
     if (filename.isEmpty())
         return;
 
-    QString filePath = saveDirectory + QDir::separator() + filename + ".json";
+    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename + ".json";
 
     // Serialize the filter model to JSON
     QJsonArray filtersArray;
@@ -65,7 +65,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filename)
 {
-    QString filePath = saveDirectory + "/" + filename;
+    QString filePath = SettingsCache::instance().getFiltersPath() + "/" + filename;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
@@ -111,7 +111,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
     }
     fileButtons.clear();
 
-    QDir dir(saveDirectory);
+    QDir dir(SettingsCache::instance().getFiltersPath());
     QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Time);
 
     for (const QString &filename : filterFiles) {
