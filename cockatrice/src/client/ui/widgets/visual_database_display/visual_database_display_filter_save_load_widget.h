@@ -19,9 +19,7 @@ class VisualDatabaseDisplayFilterSaveLoadWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,
-                                                       FilterTreeModel *filterModel,
-                                                       const QString &savePath);
+    explicit VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent, FilterTreeModel *filterModel);
 
     void saveFilter();
     void loadFilter(const QString &filename);
@@ -29,7 +27,6 @@ public:
 
 private:
     FilterTreeModel *filterModel;
-    QString saveDirectory;
 
     QVBoxLayout *layout;
     QLineEdit *filenameInput;
