@@ -101,6 +101,11 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 
+    filtersPathEdit = new QLineEdit(settings.getFiltersPath());
+    filtersPathEdit->setReadOnly(true);
+    QPushButton *filtersPathButton = new QPushButton("...");
+    connect(filtersPathButton, SIGNAL(clicked()), this, SLOT(filtersPathButtonClicked()));
+
     replaysPathEdit = new QLineEdit(settings.getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
@@ -132,6 +137,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
+        filtersPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
         cardDatabasePathEdit->setEnabled(false);
@@ -154,24 +160,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
     pathsGrid->addWidget(deckPathButton, 0, 2);
-    pathsGrid->addWidget(&replaysPathLabel, 1, 0);
-    pathsGrid->addWidget(replaysPathEdit, 1, 1);
-    pathsGrid->addWidget(replaysPathButton, 1, 2);
-    pathsGrid->addWidget(&picsPathLabel, 2, 0);
-    pathsGrid->addWidget(picsPathEdit, 2, 1);
-    pathsGrid->addWidget(picsPathButton, 2, 2);
-    pathsGrid->addWidget(&cardDatabasePathLabel, 3, 0);
-    pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
-    pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
-    pathsGrid->addWidget(&customCardDatabasePathLabel, 4, 0);
-    pathsGrid->addWidget(customCardDatabasePathEdit, 4, 1);
-    pathsGrid->addWidget(customCardDatabasePathButton, 4, 2);
-    pathsGrid->addWidget(&tokenDatabasePathLabel, 5, 0);
-    pathsGrid->addWidget(tokenDatabasePathEdit, 5, 1);
-    pathsGrid->addWidget(tokenDatabasePathButton, 5, 2);
+    pathsGrid->addWidget(&filtersPathLabel, 1, 0);
+    pathsGrid->addWidget(filtersPathEdit, 1, 1);
+    pathsGrid->addWidget(filtersPathButton, 1, 2);
+    pathsGrid->addWidget(&replaysPathLabel, 2, 0);
+    pathsGrid->addWidget(replaysPathEdit, 2, 1);
+    pathsGrid->addWidget(replaysPathButton, 2, 2);
+    pathsGrid->addWidget(&picsPathLabel, 3, 0);
+    pathsGrid->addWidget(picsPathEdit, 3, 1);
+    pathsGrid->addWidget(picsPathButton, 3, 2);
+    pathsGrid->addWidget(&cardDatabasePathLabel, 4, 0);
+    pathsGrid->addWidget(cardDatabasePathEdit, 4, 1);
+    pathsGrid->addWidget(cardDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(&customCardDatabasePathLabel, 5, 0);
+    pathsGrid->addWidget(customCardDatabasePathEdit, 5, 1);
+    pathsGrid->addWidget(customCardDatabasePathButton, 5, 2);
+    pathsGrid->addWidget(&tokenDatabasePathLabel, 6, 0);
+    pathsGrid->addWidget(tokenDatabasePathEdit, 6, 1);
+    pathsGrid->addWidget(tokenDatabasePathButton, 6, 2);
     if (!isPortable) {
-        pathsGrid->addWidget(resetAllPathsButton, 6, 0);
-        pathsGrid->addWidget(allPathsResetLabel, 6, 1);
+        pathsGrid->addWidget(resetAllPathsButton, 7, 0);
+        pathsGrid->addWidget(allPathsResetLabel, 7, 1);
     }
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
@@ -224,6 +233,16 @@ void GeneralSettingsPage::deckPathButtonClicked()
 
     deckPathEdit->setText(path);
     SettingsCache::instance().setDeckPath(path);
+}
+
+void GeneralSettingsPage::filtersPathButtonClicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
+    if (path.isEmpty())
+        return;
+
+    filtersPathEdit->setText(path);
+    SettingsCache::instance().setFiltersPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -307,6 +326,7 @@ void GeneralSettingsPage::retranslateUi()
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
     deckPathLabel.setText(tr("Decks directory:"));
+    filtersPathLabel.setText(tr("Filters directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));
     cardDatabasePathLabel.setText(tr("Card database:"));
