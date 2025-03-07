@@ -1139,9 +1139,9 @@ void Player::actViewBottomCards()
     bool ok;
     int number =
         QInputDialog::getInt(game, tr("View bottom cards of library"), tr("Number of cards: (max. %1)").arg(deckSize),
-                             defaultNumberTopCards, 1, deckSize, 1, &ok);
+                             defaultNumberBottomCards, 1, deckSize, 1, &ok);
     if (ok) {
-        defaultNumberTopCards = number;
+        defaultNumberBottomCards = number;
         static_cast<GameScene *>(scene())->toggleZoneView(this, "deck", number, true);
     }
 }
