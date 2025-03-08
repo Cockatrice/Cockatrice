@@ -27,6 +27,11 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     mainLayout = new QVBoxLayout();
     this->setLayout(mainLayout);
 
+    groupAndSortContainer = new QWidget(this);
+    groupAndSortLayout = new QHBoxLayout(groupAndSortContainer);
+    groupAndSortLayout->setAlignment(Qt::AlignLeft);
+    groupAndSortContainer->setLayout(groupAndSortLayout);
+
     groupByComboBox = new QComboBox();
     QStringList groupProperties;
     groupProperties << "maintype"
@@ -34,20 +39,34 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
                     << "cmc"
                     << "name";
     groupByComboBox->addItems(groupProperties);
+    groupByComboBox->setMinimumWidth(300);
     connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
             &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
     actChangeActiveGroupCriteria();
 
-    sortByComboBox = new QComboBox();
-    QStringList sortProperties;
-    sortProperties << "name"
-                   << "cmc"
-                   << "colors"
-                   << "maintype";
-    sortByComboBox->addItems(sortProperties);
-    connect(sortByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
+    sortCriteriaButton = new SettingsButtonWidget(this);
+
+    QStringList sortProperties = {"colors", "cmc", "name", "maintype"};
+    sortByListWidget = new QListWidget();
+    sortByListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    sortByListWidget->setDragDropMode(QAbstractItemView::InternalMove);
+    sortByListWidget->setDefaultDropAction(Qt::MoveAction);
+
+    for (const QString &property : sortProperties) {
+        QListWidgetItem *item = new QListWidgetItem(property, sortByListWidget);
+        item->setFlags(item->flags() | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    }
+
+    connect(sortByListWidget->model(), &QAbstractItemModel::rowsMoved, this,
             &VisualDeckEditorWidget::actChangeActiveSortCriteria);
+    // connect(sortByListWidget, &QListWidget::itemChanged, this, &VisualDeckEditorWidget::actChangeActiveSortCriteria);
     actChangeActiveSortCriteria();
+
+    sortByListWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    sortCriteriaButton->addSettingsWidget(sortByListWidget);
+
+    groupAndSortLayout->addWidget(groupByComboBox);
+    groupAndSortLayout->addWidget(sortCriteriaButton);
 
     scrollArea = new QScrollArea();
     scrollArea->setWidgetResizable(true);
@@ -67,8 +86,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
 
-    mainLayout->addWidget(groupByComboBox);
-    mainLayout->addWidget(sortByComboBox);
+    mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(overlapControlWidget);
 }
@@ -139,8 +157,16 @@ void VisualDeckEditorWidget::actChangeActiveGroupCriteria()
 
 void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
-    activeSortCriteria = sortByComboBox->currentText();
-    emit activeSortCriteriaChanged(activeSortCriteria);
+    qDebug() << "lol lmao, triggered";
+    QStringList selectedCriteria;
+    for (int i = 0; i < sortByListWidget->count(); ++i) {
+        QListWidgetItem *item = sortByListWidget->item(i);
+        selectedCriteria.append(item->text()); // Collect user-defined sort order
+    }
+
+    activeSortCriteria = selectedCriteria;
+
+    emit activeSortCriteriaChanged(selectedCriteria);
 }
 
 void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight)

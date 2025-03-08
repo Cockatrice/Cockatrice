@@ -6,7 +6,9 @@
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
+#include "../quick_settings/settings_button_widget.h"
 
+#include <QListWidget>
 #include <QWidget>
 #include <qscrollarea.h>
 
@@ -29,7 +31,7 @@ public slots:
 signals:
     void activeCardChanged(CardInfoPtr activeCard);
     void activeGroupCriteriaChanged(QString activeGroupCriteria);
-    void activeSortCriteriaChanged(QString activeSortCriteria);
+    void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
 
 protected slots:
@@ -41,10 +43,13 @@ protected slots:
 private:
     DeckListModel *deckListModel;
     QVBoxLayout *mainLayout;
+    QWidget *groupAndSortContainer;
+    QHBoxLayout *groupAndSortLayout;
     QComboBox *groupByComboBox;
     QString activeGroupCriteria = "maintype";
-    QComboBox *sortByComboBox;
-    QString activeSortCriteria = "name";
+    SettingsButtonWidget *sortCriteriaButton;
+    QListWidget *sortByListWidget;
+    QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;

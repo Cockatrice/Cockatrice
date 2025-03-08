@@ -12,7 +12,7 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
                                                                    QString _zoneName,
                                                                    QString _cardGroupCategory,
                                                                    QString _activeGroupCriteria,
-                                                                   QString _activeSortCriteria,
+                                                                   QStringList _activeSortCriteria,
                                                                    int bannerOpacity)
     : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), cardGroupCategory(_cardGroupCategory),
       activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria)
@@ -33,69 +33,70 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
 
 void OverlappedCardGroupDisplayWidget::updateCardDisplays()
 {
+    // Retrieve and sort cards
     QList<CardInfoPtr> cardsInZone = getCardsMatchingGroup(deckListModel->getCardsAsCardInfoPtrsForZone(zoneName));
 
+    // Show or hide widget
     bool shouldBeVisible = !cardsInZone.isEmpty();
     if (shouldBeVisible != isVisible()) {
         setVisible(shouldBeVisible);
     }
 
+    // Retrieve existing widgets
     QList<CardInfoPictureWithTextOverlayWidget *> existingWidgets =
         overlapWidget->findChildren<CardInfoPictureWithTextOverlayWidget *>();
-
-    QHash<QString, int> requiredCounts;
-    for (const CardInfoPtr &card : cardsInZone) {
-        requiredCounts[card->getName()]++;
-    }
 
     QHash<QString, QList<CardInfoPictureWithTextOverlayWidget *>> widgetMap;
     for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
         widgetMap[widget->getInfo()->getName()].append(widget);
     }
 
-    // Remove excess widgets
-    for (auto it = widgetMap.begin(); it != widgetMap.end(); ++it) {
-        QString name = it.key();
-        QList<CardInfoPictureWithTextOverlayWidget *> &widgets = it.value();
-
-        int neededCount = requiredCounts.value(name, 0);
-        while (widgets.size() > neededCount) {
-            CardInfoPictureWithTextOverlayWidget *widgetToRemove = widgets.takeLast();
-            overlapWidget->layout()->removeWidget(widgetToRemove); // Remove from layout
-            delete widgetToRemove;
-        }
-    }
-
-    // Add missing widgets and reorder existing ones
     QList<CardInfoPictureWithTextOverlayWidget *> sortedWidgets;
+    QSet<CardInfoPictureWithTextOverlayWidget *> usedWidgets;
+
+    // Ensure widgets are ordered to match the sorted cards
     for (const CardInfoPtr &card : cardsInZone) {
         QString name = card->getName();
+        CardInfoPictureWithTextOverlayWidget *widget = nullptr;
 
         if (!widgetMap[name].isEmpty()) {
-            // Use existing widget
-            CardInfoPictureWithTextOverlayWidget *widget = widgetMap[name].takeFirst();
-            sortedWidgets.append(widget);
+            // Reuse an existing widget
+            widget = widgetMap[name].takeFirst();
         } else {
-            // Create new widget if needed
-            auto *display = new CardInfoPictureWithTextOverlayWidget(overlapWidget, true);
-            display->setCard(card);
+            // Create a new widget if needed
+            widget = new CardInfoPictureWithTextOverlayWidget(overlapWidget, true);
+            widget->setCard(card);
 
-            connect(display, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
+            connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
                     &OverlappedCardGroupDisplayWidget::onClick);
-            connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
+            connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
                     &OverlappedCardGroupDisplayWidget::onHover);
 
-            sortedWidgets.append(display);
-            overlapWidget->addWidget(display);
+            overlapWidget->addWidget(widget);
+        }
+
+        // Store in sorted order
+        sortedWidgets.append(widget);
+        usedWidgets.insert(widget);
+    }
+
+    // Remove extra widgets
+    for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
+        if (!usedWidgets.contains(widget)) {
+            overlapWidget->layout()->removeWidget(widget);
+            delete widget;
         }
     }
 
-    // **Reorder Widgets in Layout**
-    for (CardInfoPictureWithTextOverlayWidget *widget : sortedWidgets) {
-        overlapWidget->removeWidget(widget);
-        overlapWidget->addWidget(widget);
+    // **Reorder widgets in place**
+    for (int i = 0; i < sortedWidgets.size(); ++i) {
+        sortedWidgets[i]->setParent(nullptr); // Temporarily detach
+    }
+    for (int i = 0; i < sortedWidgets.size(); ++i) {
+        overlapWidget->addWidget(sortedWidgets[i]); // Reattach in correct order
     }
 
+    // Ensure proper layering
     for (CardInfoPictureWithTextOverlayWidget *widget : sortedWidgets) {
         widget->raise();
     }
@@ -105,35 +106,29 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
 
 QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort)
 {
+    cardsToSort = sortCardList(cardsToSort, activeSortCriteria, Qt::SortOrder::AscendingOrder);
+
     QList<CardInfoPtr> activeList;
-
-    QStringList sortCriteria;
-    sortCriteria.append(activeSortCriteria);
-    sortCardList(cardsToSort, sortCriteria, Qt::SortOrder::AscendingOrder);
-
-    for (int i = 0; i < cardsToSort.size(); ++i) {
-        CardInfoPtr info = cardsToSort.at(i);
-        if (info) {
-            if (info->getProperty(activeGroupCriteria) == cardGroupCategory) {
-                activeList.append(info);
-            }
-        } else {
-            qDebug() << "Card not found in database!";
+    for (const CardInfoPtr &info : cardsToSort) {
+        if (info && info->getProperty(activeGroupCriteria) == cardGroupCategory) {
+            activeList.append(info);
         }
     }
 
     return activeList;
 }
 
-void OverlappedCardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
-                                                    const QStringList properties,
-                                                    Qt::SortOrder order = Qt::AscendingOrder)
+QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
+                                                                  const QStringList properties,
+                                                                  Qt::SortOrder order = Qt::AscendingOrder)
 {
     CardInfoComparator comparator(properties, order);
     std::sort(cardsToSort.begin(), cardsToSort.end(), comparator);
+
+    return cardsToSort;
 }
 
-void OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged(QString _activeSortCriteria)
+void OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
 {
     if (activeSortCriteria != _activeSortCriteria) {
         activeSortCriteria = _activeSortCriteria;

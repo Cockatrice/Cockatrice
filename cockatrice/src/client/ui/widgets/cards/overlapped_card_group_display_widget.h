@@ -21,7 +21,7 @@ public:
                                      QString zoneName,
                                      QString cardGroupCategory,
                                      QString activeGroupCriteria,
-                                     QString activeSortCriteria,
+                                     QStringList activeSortCriteria,
                                      int bannerOpacity);
 
     QList<CardInfoPtr> getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort);
@@ -31,14 +31,14 @@ public:
     QString zoneName;
     QString cardGroupCategory;
     QString activeGroupCriteria;
-    QString activeSortCriteria;
+    QStringList activeSortCriteria;
 
 public slots:
-    void sortCardList(QList<CardInfoPtr> cardsToSort, QStringList properties, Qt::SortOrder order);
+    QList<CardInfoPtr> sortCardList(QList<CardInfoPtr> cardsToSort, QStringList properties, Qt::SortOrder order);
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
     void updateCardDisplays();
-    void onActiveSortCriteriaChanged(QString activeSortCriteria);
+    void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
