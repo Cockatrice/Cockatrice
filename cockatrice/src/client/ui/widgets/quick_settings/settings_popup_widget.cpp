@@ -44,7 +44,6 @@ void SettingsPopupWidget::adjustSizeToFitScreen()
         if (!scrollArea) {
             scrollArea = new QScrollArea(this);
             scrollArea->setWidgetResizable(true);
-            scrollArea->setFrameShape(QFrame::NoFrame);
             scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // No horizontal scrollbar
             scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);    // Enable vertical scrollbar when needed
         }
