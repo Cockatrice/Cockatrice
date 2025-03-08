@@ -18,6 +18,7 @@ class VisualDeckEditorWidget : public QWidget
 
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
+    void retranslateUi();
     void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
@@ -48,6 +49,7 @@ private:
     QComboBox *groupByComboBox;
     QString activeGroupCriteria = "maintype";
     SettingsButtonWidget *sortCriteriaButton;
+    QLabel *sortLabel;
     QListWidget *sortByListWidget;
     QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
     QScrollArea *scrollArea;
