@@ -348,7 +348,7 @@ maintainer can manually trigger a CI run to extract all strings on demand.
 
 <details>
 <summary><b>Manually trigger CI run (Workflow Dispatch)</b></summary>
-    
+
 Maintainers can always request the CI to run on demand if it's required.
 
 Go to the `Actions` tab and select our dedicated translation workflow:
@@ -359,12 +359,12 @@ the list.<br>
 Select `Run workflow` on the right and trigger a run from master branch.
 
 The CI will now check for changed strings and create a PR if there are any updates.
-  
+
 </details>
 
 <details>
 <summary><b>Manually update source strings locally</b></summary>
-    
+
 To update the english source files for translation, re-run cmake enabling the appropriate
 parameter and then run make:
 ```sh
@@ -388,8 +388,8 @@ It is recommended to disable the parameter afterwards using:
 ```sh
 cmake .. -DUPDATE_TRANSLATIONS=OFF
 ```
-Now you are ready to commit the changes and open a PR.
-    
+Now you are ready to commit your changes and open a PR.
+
 </details>
 
 Once the changes get merged, Transifex will pick up the modified files
