@@ -246,8 +246,10 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aDrawCards, &QAction::triggered, this, &Player::actDrawCards);
         aUndoDraw = new QAction(this);
         connect(aUndoDraw, &QAction::triggered, this, &Player::actUndoDraw);
+
         aShuffle = new QAction(this);
         connect(aShuffle, &QAction::triggered, this, &Player::actShuffle);
+
         aMulligan = new QAction(this);
         connect(aMulligan, &QAction::triggered, this, &Player::actMulligan);
 
@@ -268,6 +270,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aMoveTopCardToBottom = new QAction(this);
         connect(aMoveTopCardToBottom, &QAction::triggered, this, &Player::actMoveTopCardToBottom);
 
+        aShuffleTopCards = new QAction(this);
+        connect(aShuffleTopCards, &QAction::triggered, this, &Player::actShuffleTop);
+
         aDrawBottomCard = new QAction(this);
         connect(aDrawBottomCard, &QAction::triggered, this, &Player::actDrawBottomCard);
         aDrawBottomCards = new QAction(this);
@@ -286,6 +291,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveBottomCardsToExile, &QAction::triggered, this, &Player::actMoveBottomCardsToExile);
         aMoveBottomCardToTop = new QAction(this);
         connect(aMoveBottomCardToTop, &QAction::triggered, this, &Player::actMoveBottomCardToTop);
+
+        aShuffleBottomCards = new QAction(this);
+        connect(aShuffleBottomCards, &QAction::triggered, this, &Player::actShuffleBottom);
     }
 
     playerMenu = new TearOffMenu();
@@ -330,7 +338,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
         _deck->setMenu(libraryMenu, aDrawCard);
-
         topLibraryMenu->addAction(aMoveTopToPlay);
         topLibraryMenu->addAction(aMoveTopToPlayFaceDown);
         topLibraryMenu->addAction(aMoveTopCardToBottom);
@@ -340,6 +347,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         topLibraryMenu->addAction(aMoveTopCardToExile);
         topLibraryMenu->addAction(aMoveTopCardsToExile);
         topLibraryMenu->addAction(aMoveTopCardsUntil);
+        topLibraryMenu->addSeparator();
+        topLibraryMenu->addAction(aShuffleTopCards);
 
         bottomLibraryMenu->addAction(aDrawBottomCard);
         bottomLibraryMenu->addAction(aDrawBottomCards);
@@ -352,6 +361,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         bottomLibraryMenu->addAction(aMoveBottomCardsToGraveyard);
         bottomLibraryMenu->addAction(aMoveBottomCardToExile);
         bottomLibraryMenu->addAction(aMoveBottomCardsToExile);
+        bottomLibraryMenu->addSeparator();
+        bottomLibraryMenu->addAction(aShuffleBottomCards);
     }
 
     graveMenu = playerMenu->addTearOffMenu(QString());
@@ -792,7 +803,8 @@ void Player::retranslateUi()
         aDrawCards->setText(tr("D&raw cards..."));
         aUndoDraw->setText(tr("&Undo last draw"));
         aMulligan->setText(tr("Take &mulligan"));
-        aShuffle->setText(tr("&Shuffle"));
+
+        aShuffle->setText(tr("Shuffle"));
 
         aMoveTopToPlay->setText(tr("&Play top card"));
         aMoveTopToPlayFaceDown->setText(tr("Play top card &face down"));
@@ -802,6 +814,7 @@ void Player::retranslateUi()
         aMoveTopCardsToGraveyard->setText(tr("Move top cards to &graveyard..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
         aMoveTopCardsUntil->setText(tr("Put top cards on stack &until..."));
+        aShuffleTopCards->setText(tr("Shuffle top cards..."));
 
         aDrawBottomCard->setText(tr("&Draw bottom card"));
         aDrawBottomCards->setText(tr("D&raw bottom cards..."));
@@ -812,6 +825,7 @@ void Player::retranslateUi()
         aMoveBottomCardsToGraveyard->setText(tr("Move bottom cards to &graveyard..."));
         aMoveBottomCardsToExile->setText(tr("Move bottom cards to &exile..."));
         aMoveBottomCardToTop->setText(tr("Put bottom card on &top"));
+        aShuffleBottomCards->setText(tr("Shuffle bottom cards..."));
 
         handMenu->setTitle(tr("&Hand"));
         mRevealHand->setTitle(tr("&Reveal hand to..."));
@@ -979,6 +993,8 @@ void Player::setShortcutsActive()
     aUndoDraw->setShortcut(shortcuts.getSingleShortcut("Player/aUndoDraw"));
     aMulligan->setShortcut(shortcuts.getSingleShortcut("Player/aMulligan"));
     aShuffle->setShortcut(shortcuts.getSingleShortcut("Player/aShuffle"));
+    aShuffleTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aShuffleTopCards"));
+    aShuffleBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aShuffleBottomCards"));
     aUntapAll->setShortcut(shortcuts.getSingleShortcut("Player/aUntapAll"));
     aRollDie->setShortcut(shortcuts.getSingleShortcut("Player/aRollDie"));
     aCreateToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateToken"));
@@ -1029,6 +1045,8 @@ void Player::setShortcutsInactive()
     aUndoDraw->setShortcut(QKeySequence());
     aMulligan->setShortcut(QKeySequence());
     aShuffle->setShortcut(QKeySequence());
+    aShuffleTopCards->setShortcut(QKeySequence());
+    aShuffleBottomCards->setShortcut(QKeySequence());
     aUntapAll->setShortcut(QKeySequence());
     aRollDie->setShortcut(QKeySequence());
     aCreateToken->setShortcut(QKeySequence());
@@ -1200,6 +1218,64 @@ void Player::actViewSideboard()
 void Player::actShuffle()
 {
     sendGameCommand(Command_Shuffle());
+}
+
+void Player::actShuffleTop()
+{
+    const int maxCards = zones.value("deck")->getCards().size();
+    if (maxCards == 0) {
+        return;
+    }
+
+    bool ok;
+    int number =
+        QInputDialog::getInt(game, tr("Shuffle top cards of library"), tr("Number of cards: (max. %1)").arg(maxCards),
+                             defaultNumberTopCards, 1, maxCards, 1, &ok);
+    if (!ok) {
+        return;
+    }
+
+    if (number > maxCards) {
+        number = maxCards;
+    }
+
+    defaultNumberTopCards = number;
+
+    Command_Shuffle cmd;
+    cmd.set_zone_name("deck");
+    cmd.set_start(0);
+    cmd.set_end(number - 1); // inclusive, the indexed card at end will be shuffled
+
+    sendGameCommand(cmd);
+}
+
+void Player::actShuffleBottom()
+{
+    const int maxCards = zones.value("deck")->getCards().size();
+    if (maxCards == 0) {
+        return;
+    }
+
+    bool ok;
+    int number = QInputDialog::getInt(game, tr("Shuffle bottom cards of library"),
+                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
+                                      maxCards, 1, &ok);
+    if (!ok) {
+        return;
+    }
+
+    if (number > maxCards) {
+        number = maxCards;
+    }
+
+    defaultNumberBottomCards = number;
+
+    Command_Shuffle cmd;
+    cmd.set_zone_name("deck");
+    cmd.set_start(-number);
+    cmd.set_end(-1);
+
+    sendGameCommand(cmd);
 }
 
 void Player::actDrawCard()
