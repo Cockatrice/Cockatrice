@@ -184,10 +184,10 @@ void DeckEditorMenu::refreshShortcuts()
 
     aSaveDeckToClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
     aSaveDeckToClipboardNoSetNameAndNumber->setShortcuts(
-        shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardNoSetNameAndNumber"));
+        shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardNoSetInfo"));
     aSaveDeckToClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
     aSaveDeckToClipboardRawNoSetNameAndNumber->setShortcuts(
-        shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRawNoSetNameAndNumber"));
+        shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRawNoSetInfo"));
 
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
 }
