@@ -76,7 +76,7 @@ void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 
 void AbstractTabDeckEditor::onDeckChanged()
 {
-    setModified(isBlankNewDeck());
+    setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());
 }
 
