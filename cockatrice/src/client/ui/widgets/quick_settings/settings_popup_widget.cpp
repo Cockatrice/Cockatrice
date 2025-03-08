@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QFocusEvent>
 #include <QPainter>
+#include <QScreen>
 #include <QScrollArea>
 
 SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
@@ -44,13 +45,16 @@ void SettingsPopupWidget::adjustSizeToFitScreen()
         if (!scrollArea) {
             scrollArea = new QScrollArea(this);
             scrollArea->setWidgetResizable(true);
+            scrollArea->setFrameShape(QFrame::NoFrame);
             scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // No horizontal scrollbar
             scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);    // Enable vertical scrollbar when needed
         }
 
         // Set maximum height for the scroll area and show vertical scrollbar
         scrollArea->setMaximumHeight(maxHeight);
-        setFixedHeight(maxHeight); // Set the popup height to maxHeight
+
+        // Resize the popup widget without squishing the content
+        resize(sizeHint().width(), maxHeight); // Ensure content width is kept intact
 
         // Add scrollArea to layout if not already added
         if (layout->count() == 1) { // We only have one widget (containerWidget) at the start
@@ -68,7 +72,7 @@ void SettingsPopupWidget::adjustSizeToFitScreen()
         }
 
         // Set the containerWidget directly without scrollArea and adjust its height
-        setFixedHeight(contentHeight);
+        resize(sizeHint().width(), contentHeight); // Resize the widget based on content height
         layout->addWidget(containerWidget); // Re-add the containerWidget without scroll area
     }
 
