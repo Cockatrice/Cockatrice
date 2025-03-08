@@ -10,7 +10,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,
                                                      QString _zoneName,
                                                      QString _activeGroupCriteria,
-                                                     QString _activeSortCriteria,
+                                                     QStringList _activeSortCriteria,
                                                      int bannerOpacity,
                                                      int subBannerOpacity)
     : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
@@ -108,7 +108,7 @@ void DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged(QString _activeGrou
     displayCards();
 }
 
-void DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged(QString _activeSortCriteria)
+void DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
 {
     activeSortCriteria = _activeSortCriteria;
     emit activeSortCriteriaChanged(activeSortCriteria);

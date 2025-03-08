@@ -19,7 +19,7 @@ public:
                               DeckListModel *deckListModel,
                               QString zoneName,
                               QString activeGroupCriteria,
-                              QString activeSortCriteria,
+                              QStringList activeSortCriteria,
                               int bannerOpacity,
                               int subBannerOpacity);
     DeckListModel *deckListModel;
@@ -34,17 +34,17 @@ public slots:
     void addCardGroupIfItDoesNotExist();
     void deleteCardGroupIfItDoesNotExist();
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
-    void onActiveSortCriteriaChanged(QString activeSortCriteria);
+    void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
     QList<QString> getGroupCriteriaValueList();
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
     void cardHovered(CardInfoPtr card);
-    void activeSortCriteriaChanged(QString activeSortCriteria);
+    void activeSortCriteriaChanged(QStringList activeSortCriteria);
 
 private:
     QString activeGroupCriteria;
-    QString activeSortCriteria;
+    QStringList activeSortCriteria;
     QVBoxLayout *layout;
     BannerWidget *banner;
     QWidget *cardGroupContainer;
