@@ -10,6 +10,7 @@
 
 #include <QMenu>
 #include <QMouseEvent>
+#include <QScreen>
 #include <QStylePainter>
 #include <QWidget>
 #include <utility>
