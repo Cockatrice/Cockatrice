@@ -157,7 +157,6 @@ void VisualDeckEditorWidget::actChangeActiveGroupCriteria()
 
 void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
-    qDebug() << "lol lmao, triggered";
     QStringList selectedCriteria;
     for (int i = 0; i < sortByListWidget->count(); ++i) {
         QListWidgetItem *item = sortByListWidget->item(i);
