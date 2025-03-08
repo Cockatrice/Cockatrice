@@ -46,6 +46,8 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     sortCriteriaButton = new SettingsButtonWidget(this);
 
+    sortLabel = new QLabel(sortCriteriaButton);
+
     QStringList sortProperties = {"colors", "cmc", "name", "maintype"};
     sortByListWidget = new QListWidget();
     sortByListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -63,6 +65,8 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     actChangeActiveSortCriteria();
 
     sortByListWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    sortCriteriaButton->addSettingsWidget(sortLabel);
     sortCriteriaButton->addSettingsWidget(sortByListWidget);
 
     groupAndSortLayout->addWidget(groupByComboBox);
@@ -89,6 +93,13 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(overlapControlWidget);
+
+    retranslateUi();
+}
+
+void VisualDeckEditorWidget::retranslateUi()
+{
+    sortLabel->setText(tr("Click and drag to change\nthe sort order within the groups"));
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
