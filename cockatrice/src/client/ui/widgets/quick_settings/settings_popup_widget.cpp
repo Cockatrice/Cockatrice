@@ -73,7 +73,7 @@ void SettingsPopupWidget::adjustSizeToFitScreen()
 
         // Set the containerWidget directly without scrollArea and adjust its height
         resize(sizeHint().width(), contentHeight); // Resize the widget based on content height
-        layout->addWidget(containerWidget); // Re-add the containerWidget without scroll area
+        layout->addWidget(containerWidget);        // Re-add the containerWidget without scroll area
     }
 
     // Ensure layout updates after changes
