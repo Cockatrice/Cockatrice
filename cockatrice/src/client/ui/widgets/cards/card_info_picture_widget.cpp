@@ -248,10 +248,24 @@ void CardInfoPictureWidget::leaveEvent(QEvent *event)
 void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
+
     if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
-        const QPointF cursorPos = QCursor::pos();
-        enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
-                                          static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
+        const QPoint cursorPos = QCursor::pos();
+        const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
+        const QSize widgetSize = enlargedPixmapWidget->size();
+
+        int newX = cursorPos.x() + enlargedPixmapOffset;
+        int newY = cursorPos.y() + enlargedPixmapOffset;
+
+        // Adjust if out of bounds
+        if (newX + widgetSize.width() > screenGeometry.right()) {
+            newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+        }
+        if (newY + widgetSize.height() > screenGeometry.bottom()) {
+            newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+        }
+
+        enlargedPixmapWidget->move(newX, newY);
     }
 }
 
@@ -353,9 +367,22 @@ void CardInfoPictureWidget::showEnlargedPixmap() const
                              static_cast<int>(size().width() * aspectRatio * scaleFactor));
     enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
 
-    const QPointF cursorPos = QCursor::pos();
-    enlargedPixmapWidget->move(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
-                               static_cast<int>(cursorPos.y()) + enlargedPixmapOffset);
+    const QPoint cursorPos = QCursor::pos();
+    const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
+    const QSize widgetSize = enlargedPixmapWidget->size();
+
+    int newX = cursorPos.x() + enlargedPixmapOffset;
+    int newY = cursorPos.y() + enlargedPixmapOffset;
+
+    // Adjust if out of bounds
+    if (newX + widgetSize.width() > screenGeometry.right()) {
+        newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+    }
+    if (newY + widgetSize.height() > screenGeometry.bottom()) {
+        newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+    }
+
+    enlargedPixmapWidget->move(newX, newY);
 
     enlargedPixmapWidget->show();
 }
