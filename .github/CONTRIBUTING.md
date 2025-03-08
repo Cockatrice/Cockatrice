@@ -410,9 +410,9 @@ As an alternative, you can install the [Transifex CLI](https://developers.transi
 You'll then be able to use a git-like cli command to push and pull translations
 from Transifex to the source code and vice versa.
 
-### Adding Translations (for "translators") ###
+### Adding Translations (for translators) ###
 
-As a "translator", you can help to translate new strings on [Transifex](
+As a translator, you can help to translate new strings on [Transifex](
 https://www.transifex.com/projects/p/cockatrice/) to your native language.
 Please have a look at the specific [FAQ for translators](
 https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
