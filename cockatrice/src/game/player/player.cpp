@@ -294,12 +294,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aMoveBottomCardToTop, &QAction::triggered, this, &Player::actMoveBottomCardToTop);
     }
 
-    aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, &QAction::triggered, this, &Player::actViewGraveyard);
-
-    aViewRfg = new QAction(this);
-    connect(aViewRfg, &QAction::triggered, this, &Player::actViewRfg);
-
     playerMenu = new TearOffMenu();
     table->setMenu(playerMenu);
 
