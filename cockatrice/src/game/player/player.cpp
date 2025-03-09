@@ -2594,8 +2594,12 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
         auto cardId = event.card_id_size() == 0 ? -1 : event.card_id(0);
         if (cardList.size() == 1) {
             cardName = QString::fromStdString(cardList.first()->name());
-            if ((cardId == 0) && dynamic_cast<PileZone *>(zone)) {
-                zone->getCards().first()->setName(cardName);
+
+            // Handle case of revealing top card of library in-place
+            if (cardId == 0 && dynamic_cast<PileZone *>(zone)) {
+                auto card = zone->getCards().first();
+                card->setName(cardName);
+                card->setProviderId(QString::fromStdString(cardList.first()->provider_id()));
                 zone->update();
                 showZoneView = false;
             }
