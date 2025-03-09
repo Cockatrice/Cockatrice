@@ -1,8 +1,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
-#include <QMap>
-#include <QVector>
+#include "../cockatrice/src/game/cards/card_database.h"
 
 // Required on Mac. Forward declaration doesn't work. Don't ask why.
 #include <QtCore/QXmlStreamReader>

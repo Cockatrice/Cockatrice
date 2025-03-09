@@ -22,6 +22,7 @@ public:
     CardDatabaseDisplayModel *databaseDisplayModel;
 
 public slots:
+    void showSearchSyntaxHelp();
     CardInfoPtr currentCardInfo() const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();
@@ -42,7 +43,6 @@ private:
     QWidget *centralWidget;
 
 private slots:
-    void showSearchSyntaxHelp();
     void retranslateUi();
     void updateSearch(const QString &search);
     void updateCard(const QModelIndex &current, const QModelIndex &);

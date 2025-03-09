@@ -61,6 +61,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
 
     setViewMode(SettingsCache::instance().getCardInfoViewMode());
 
+    // TODO: Change this to be by UUID
     setCard(CardDatabaseManager::getInstance()->getCard(cardName));
 }
 

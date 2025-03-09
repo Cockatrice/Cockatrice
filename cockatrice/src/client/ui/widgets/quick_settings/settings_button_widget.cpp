@@ -31,34 +31,30 @@ void SettingsButtonWidget::togglePopup()
     if (popup->isVisible()) {
         popup->close();
     } else {
-        // Ensure popup size is known before positioning
-        popup->adjustSize();
-        QSize popupSize = popup->size();
+        popup->adjustSizeToFitScreen(); // Ensure proper size
 
-        // Get button position
+        QSize popupSize = popup->size();
         QPoint buttonGlobalPos = button->mapToGlobal(QPoint(0, button->height()));
 
-        // Get screen geometry
         QScreen *screen = QApplication::screenAt(buttonGlobalPos);
         QRect screenGeom = screen ? screen->availableGeometry() : QApplication::primaryScreen()->availableGeometry();
 
         int x = buttonGlobalPos.x();
         int y = buttonGlobalPos.y();
 
-        // Adjust X position if popup overflows the right side of the screen
+        // Adjust position to stay within screen bounds
         if (x + popupSize.width() > screenGeom.right()) {
-            x = buttonGlobalPos.x() - popupSize.width() + button->width(); // Move left
+            x = buttonGlobalPos.x() - popupSize.width() + button->width();
         }
 
-        // Adjust Y position if popup overflows the bottom of the screen
         if (y + popupSize.height() > screenGeom.bottom()) {
-            y = buttonGlobalPos.y() - popupSize.height() - button->height(); // Move up
+            y = buttonGlobalPos.y() - popupSize.height() - button->height();
         }
 
         popup->move(x, y);
         popup->show();
         popup->setFocus();
-        button->setChecked(true); // Ensure button is checked when popup is visible
+        button->setChecked(true);
     }
 }
 
