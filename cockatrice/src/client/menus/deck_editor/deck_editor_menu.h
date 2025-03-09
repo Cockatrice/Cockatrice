@@ -15,8 +15,8 @@ public:
     AbstractTabDeckEditor *deckEditor;
 
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
-        *aEditDeckInClipboard, *aEditDeckInClipboardRaw, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetNameAndNumber,
-        *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetNameAndNumber, *aPrintDeck, *aExportDeckDecklist,
+        *aEditDeckInClipboard, *aEditDeckInClipboardRaw, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetInfo,
+        *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetInfo, *aPrintDeck, *aExportDeckDecklist,
         *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QMenu *loadRecentDeckMenu, *analyzeDeckMenu, *editDeckInClipboardMenu, *saveDeckToClipboardMenu;
 
