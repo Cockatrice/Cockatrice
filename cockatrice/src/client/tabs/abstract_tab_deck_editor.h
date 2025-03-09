@@ -95,9 +95,9 @@ protected slots:
     void actEditDeckInClipboard();
     void actEditDeckInClipboardRaw();
     void actSaveDeckToClipboard();
-    void actSaveDeckToClipboardNoSetNameAndNumber();
+    void actSaveDeckToClipboardNoSetInfo();
     void actSaveDeckToClipboardRaw();
-    void actSaveDeckToClipboardRawNoSetNameAndNumber();
+    void actSaveDeckToClipboardRawNoSetInfo();
     void actPrintDeck();
     void actExportDeckDecklist();
     void actAnalyzeDeckDeckstats();

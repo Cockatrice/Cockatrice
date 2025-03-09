@@ -433,7 +433,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboard()
     getDeckList()->saveToClipboard(true, true);
 }
 
-void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
     getDeckList()->saveToClipboard(true, false);
 }
@@ -443,7 +443,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
     getDeckList()->saveToClipboard(false, true);
 }
 
-void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
     getDeckList()->saveToClipboard(false, false);
 }
