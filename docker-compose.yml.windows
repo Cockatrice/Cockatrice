@@ -20,7 +20,6 @@ services:
     depends_on:
       - mysql
     ports:
-      - "4747:4747"
       - "4748:4748"
     entrypoint: "/bin/bash -c 'sleep 10; servatrice --config /tmp/servatrice.ini --log-to-console'"
     restart: always
