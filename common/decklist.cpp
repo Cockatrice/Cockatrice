@@ -368,7 +368,8 @@ DeckList::DeckList() : QObject(), deckHashDirty(true)
 
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
-    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash), deckHashDirty(other.deckHashDirty), lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags)
+    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash),
+      deckHashDirty(other.deckHashDirty), lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags)
 {
     root = new InnerDecklistNode(other.getRoot());
 
