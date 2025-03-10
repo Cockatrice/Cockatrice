@@ -253,6 +253,7 @@ private:
     QString name, comments;
     QPair<QString, QString> bannerCard;
     QString deckHash;
+    bool deckHashDirty;
     QString lastLoadedTimestamp;
     QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
@@ -363,10 +364,7 @@ public:
 
     int getSideboardSize() const;
 
-    QString getDeckHash() const
-    {
-        return deckHash;
-    }
+    QString getDeckHash();
     void updateDeckHash();
 
     InnerDecklistNode *getRoot() const
