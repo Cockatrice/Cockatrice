@@ -252,7 +252,6 @@ class DeckList : public QObject
 private:
     QString name, comments;
     QPair<QString, QString> bannerCard;
-    QString deckHash;
     QString lastLoadedTimestamp;
     QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
@@ -260,6 +259,11 @@ private:
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
     void getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const;
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
+
+    /**
+     * Empty string indicates invalid cache.
+     */
+    mutable QString cachedDeckHash;
 
 protected:
     virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
@@ -363,12 +367,6 @@ public:
 
     int getSideboardSize() const;
 
-    QString getDeckHash() const
-    {
-        return deckHash;
-    }
-    void updateDeckHash();
-
     InnerDecklistNode *getRoot() const
     {
         return root;
@@ -379,6 +377,9 @@ public:
                               const QString &cardSetCollectorNumber = QString(),
                               const QString &cardProviderId = QString());
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
+
+    QString getDeckHash() const;
+    void refreshDeckHash();
 
     /**
      * Calls a given function object for each card in the deck. It must
