@@ -102,10 +102,10 @@ void ChatView::appendHtml(const QString &html)
 void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
+    QString htmlText;
 
-    QString htmlText =
-        "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
-        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+    htmlText = "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
+               QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
 
     if (optionalIsBold)
         htmlText = "<b>" + htmlText + "</b>";
@@ -457,6 +457,20 @@ bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> u
             (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin));
 }
 
+QString ChatView::getCurrentTime()
+{
+
+    int seconds = *elapsedSeconds;
+    int minutes = seconds / 60;
+    seconds -= minutes * 60;
+    int hours = minutes / 60;
+    minutes -= hours * 60;
+    return QString("[%1:%2:%3] ")
+        .arg(QString::number(hours).rightJustified(2, '0'))
+        .arg(QString::number(minutes).rightJustified(2, '0'))
+        .arg(QString::number(seconds).rightJustified(2, '0'));
+}
+
 void ChatView::actMessageClicked()
 {
     emit messageClickedSignal();
@@ -533,6 +547,11 @@ void ChatView::enterEvent(QEvent * /*event*/)
 void ChatView::leaveEvent(QEvent * /*event*/)
 {
     setMouseTracking(false);
+}
+
+void ChatView::setTime(int *time)
+{
+    elapsedSeconds = time;
 }
 
 QTextFragment ChatView::getFragmentUnderMouse(const QPoint &pos) const
