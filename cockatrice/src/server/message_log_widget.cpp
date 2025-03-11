@@ -879,6 +879,6 @@ MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game
 {
     elapsedSeconds = seconds;
     ChatView::setTime(seconds);
-    s
+    std::cout << "TEST";
 
 }
