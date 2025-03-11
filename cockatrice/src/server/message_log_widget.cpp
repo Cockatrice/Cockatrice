@@ -875,8 +875,9 @@ void MessageLogWidget::connectToPlayer(Player *player)
 }
 
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, int *seconds, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, true,seconds, parent), mulliganNumber(0), currentContext(MessageContext_None)
+    : ChatView(_tabSupervisor, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
 {
     elapsedSeconds = seconds;
+    ChatView::setTime(seconds);
 
 }
