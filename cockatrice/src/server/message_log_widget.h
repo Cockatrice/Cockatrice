@@ -25,7 +25,9 @@ private:
     Player *mulliganPlayer;
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
+    int *elapsedSeconds;
 
+    const QString getCurrentTime();
     const QString &tableConstant() const;
     const QString &graveyardConstant() const;
     const QString &exileConstant() const;
@@ -102,7 +104,7 @@ public slots:
 
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = nullptr);
+    MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, int* elapsedSeconds, QWidget *parent = nullptr);
 };
 
 #endif
