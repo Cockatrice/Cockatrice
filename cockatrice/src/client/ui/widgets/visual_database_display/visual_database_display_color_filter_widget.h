@@ -17,10 +17,6 @@ public:
     bool isColorActive() const;
     QChar getColorChar() const;
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-
 signals:
     void colorToggled(QChar color, bool active);
 
