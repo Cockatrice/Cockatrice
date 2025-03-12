@@ -23,16 +23,26 @@
  */
 bool parseCipt(const QString &name, const QString &text)
 {
-    // try to split shortname on all non-alphanumeric characters (including _)
-    static auto SHORTNAME_DIVIDERS = QRegularExpression("[^\\w]|_");
+    // Try to split shortname on most non-alphanumeric characters (including _)
+    static QSet<QChar> exceptions = {'\'', '\"'};
+    static auto isShortnameDivider = [](const QChar &c) {
+        return c == '_' || (!c.isLetterOrNumber() && !exceptions.contains(c));
+    };
 
     // Try all possible shortnames.
     // This also handles the case of extra text appended at end.
     QStringList possibleNames;
-    qsizetype i = 0;
-    while ((i = name.indexOf(SHORTNAME_DIVIDERS, i)) != -1) {
-        possibleNames.append(QRegularExpression::escape(name.first(i)));
-        ++i;
+    bool inAlphanumericPart = true;
+    for (int i = 0; i < name.length(); ++i) {
+        if (isShortnameDivider(name.at(i))) {
+            if (inAlphanumericPart) {
+                // only add to names on a "falling edge", in order to reduce the amount of redundant splits
+                possibleNames.append(QRegularExpression::escape(name.first(i)));
+                inAlphanumericPart = false;
+            }
+        } else {
+            inAlphanumericPart = true;
+        }
     }
 
     // and the full name
