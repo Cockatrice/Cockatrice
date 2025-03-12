@@ -88,6 +88,9 @@ void SettingsCache::setStackCardOverlapPercent(const int /* _verticalCardOverlap
 void SettingsCache::setShowMessagePopups(const QT_STATE_CHANGED_T /* _showMessagePopups */)
 {
 }
+void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _showMessagePopups /*_LocalTime*/)
+{
+}
 void SettingsCache::setShowMentionPopups(const QT_STATE_CHANGED_T /* _showMentionPopus */)
 {
 }

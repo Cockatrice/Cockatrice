@@ -420,6 +420,12 @@ void SettingsCache::setRoomHistory(const QT_STATE_CHANGED_T _roomHistory)
     settings->setValue("chat/roomhistory", roomHistory);
 }
 
+void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _showMessagePopups)
+{
+    localTime = (bool)_showMessagePopups;
+    settings->setValue("chat/localtime", localTime);
+}
+
 void SettingsCache::setLang(const QString &_lang)
 {
     lang = _lang;

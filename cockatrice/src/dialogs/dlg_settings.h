@@ -239,6 +239,7 @@ private:
     QCheckBox invertHighlightForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
+    QCheckBox localTimeCheckBox;
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
     QCheckBox roomHistory;
@@ -252,7 +253,7 @@ private:
     QLabel hexHighlightLabel;
     QLabel customAlertStringLabel;
     QLabel explainMessagesLabel;
-
+    
     void storeSettings();
     void updateMentionPreview();
     void updateHighlightPreview();
