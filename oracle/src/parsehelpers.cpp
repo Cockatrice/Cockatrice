@@ -1,5 +1,6 @@
 #include "parsehelpers.h"
 
+#include <QChar>
 #include <QRegularExpression>
 
 /**
@@ -24,9 +25,8 @@
 bool parseCipt(const QString &name, const QString &text)
 {
     // Try to split shortname on most non-alphanumeric characters (including _)
-    static QSet<QChar> exceptions = {'\'', '\"'};
-    static auto isShortnameDivider = [](const QChar &c) {
-        return c == '_' || (!c.isLetterOrNumber() && !exceptions.contains(c));
+    auto isShortnameDivider = [](const QChar &c) {
+        return c == '_' || (!c.isLetterOrNumber() && c != '\'' && c != '\"');
     };
 
     // Try all possible shortnames.
@@ -37,7 +37,7 @@ bool parseCipt(const QString &name, const QString &text)
         if (isShortnameDivider(name.at(i))) {
             if (inAlphanumericPart) {
                 // only add to names on a "falling edge", in order to reduce the amount of redundant splits
-                possibleNames.append(QRegularExpression::escape(name.first(i)));
+                possibleNames.append(QRegularExpression::escape(name.left(i)));
                 inAlphanumericPart = false;
             }
         } else {
