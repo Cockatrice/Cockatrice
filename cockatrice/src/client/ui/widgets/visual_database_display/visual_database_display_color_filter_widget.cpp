@@ -2,6 +2,8 @@
 
 #include "../cards/additional_info/mana_symbol_widget.h"
 
+#include <QSet>
+
 VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(QWidget *parent,
                                                                                FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel), layout(new QHBoxLayout(this))
@@ -24,7 +26,8 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
         activeColors[color] = false;
 
         // Connect the color toggled signal
-        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this,
+                &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
     }
 
     toggleButton = new QPushButton(this);
@@ -35,7 +38,8 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
     connect(this, &VisualDatabaseDisplayColorFilterWidget::activeColorsChanged, this,
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
-    connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this, &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
+    connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this,
+            &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
 
     // Call retranslateUi to set the initial text
     retranslateUi();
