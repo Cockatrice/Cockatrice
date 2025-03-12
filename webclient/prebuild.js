@@ -86,7 +86,7 @@ async function createI18NDefault() {
       return acc;
     }, {});
 
-    fse.outputFile(i18nDefaultFile, JSON.stringify(rollup));
+    fse.outputFile(i18nDefaultFile, JSON.stringify(rollup, null, 2));
   } catch (e) {
     console.error(e);
     process.exitCode = 1;
