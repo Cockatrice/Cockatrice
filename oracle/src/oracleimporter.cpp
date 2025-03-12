@@ -107,6 +107,19 @@ QString OracleImporter::getMainCardType(const QStringList &typeList)
     return typeList.first();
 }
 
+/**
+ * Parses the card text to determine if the card enters the battlefield tapped.
+ *
+ * @param name The name of the card
+ * @param text The full oracle text of the card
+ */
+static bool parseCipt(const QString &name, const QString &text)
+{
+    QRegularExpression ciptRegex("( it|" + QRegularExpression::escape(name) +
+                                 ") enters( the battlefield)? tapped(?! unless)");
+    return ciptRegex.match(text).hasMatch();
+}
+
 CardInfoPtr OracleImporter::addCard(QString name,
                                     QString text,
                                     bool isToken,
@@ -157,9 +170,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    QRegularExpression ciptRegex("( it|" + QRegularExpression::escape(name) +
-                                 ") enters( the battlefield)? tapped(?! unless)");
-    bool cipt = ciptRegex.match(text).hasMatch();
+    bool cipt = parseCipt(name, text);
 
     bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
                                 properties.value("layout").toString() == "split" ||
