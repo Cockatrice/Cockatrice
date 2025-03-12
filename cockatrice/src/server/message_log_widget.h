@@ -26,6 +26,7 @@ private:
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
     int *elapsedSeconds;
+    bool showInGameTime;
 
     const QString getCurrentTime();
     const QString &tableConstant() const;

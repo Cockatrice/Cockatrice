@@ -57,6 +57,7 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool showInGameTime;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;

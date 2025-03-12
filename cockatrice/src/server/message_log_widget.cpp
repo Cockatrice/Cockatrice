@@ -14,15 +14,19 @@
 
 const QString MessageLogWidget::getCurrentTime()
 {
-    int seconds = *elapsedSeconds;
-    int minutes = seconds / 60;
-    seconds -= minutes * 60;
-    int hours = minutes / 60;
-    minutes -= hours * 60;
-    return QString("[%1:%2:%3] ")
-        .arg(QString::number(hours).rightJustified(2, '0'))
-        .arg(QString::number(minutes).rightJustified(2, '0'))
-        .arg(QString::number(seconds).rightJustified(2, '0'));
+    if (showInGameTime) {
+        int seconds = *elapsedSeconds;
+        int minutes = seconds / 60;
+        seconds -= minutes * 60;
+        int hours = minutes / 60;
+        minutes -= hours * 60;
+        return QString("[%1:%2:%3] ")
+            .arg(QString::number(hours).rightJustified(2, '0'))
+            .arg(QString::number(minutes).rightJustified(2, '0'))
+            .arg(QString::number(seconds).rightJustified(2, '0'));
+    } else {
+        return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+    }
 }
 
 const QString &MessageLogWidget::tableConstant() const
@@ -628,13 +632,13 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 
     soundEngine->playSound(phase.soundFileName);
 
-    appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() +
                phase.name + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
+    appendHtml("<br><font color=\"green\"><b>" + getCurrentTime() +
                QString(tr("%1's turn.")).arg(player->getName()) + "</b></font><br>");
 }
 
@@ -874,6 +878,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, int *seconds, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
 {
+    showInGameTime = SettingsCache::instance().getLocalTime();
     elapsedSeconds = seconds;
     ChatView::setTime(seconds);
 }
