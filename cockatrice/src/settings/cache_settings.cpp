@@ -420,9 +420,9 @@ void SettingsCache::setRoomHistory(const QT_STATE_CHANGED_T _roomHistory)
     settings->setValue("chat/roomhistory", roomHistory);
 }
 
-void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _showMessagePopups)
+void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _localTime)
 {
-    localTime = (bool)_showMessagePopups;
+    localTime = (bool)_localTime;
     settings->setValue("chat/localtime", localTime);
 }
 
