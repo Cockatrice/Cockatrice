@@ -1,90 +1,6 @@
 #include "visual_database_display_color_filter_widget.h"
 
-#include "../../../../game/filters/filter_card.h"
-#include "../../../../game/filters/filter_tree_model.h"
-
-#include <QJsonObject>
-#include <QMouseEvent>
-#include <QPainter>
-
-VisualDatabaseDisplayColorFilterCircleWidget::VisualDatabaseDisplayColorFilterCircleWidget(QChar color, QWidget *parent)
-    : QWidget(parent), colorChar(color), isActive(false), circleDiameter(30)
-{
-    setFixedSize(circleDiameter, circleDiameter);
-}
-
-void VisualDatabaseDisplayColorFilterCircleWidget::setColorActive(bool active)
-{
-    if (isActive != active) {
-        isActive = active;
-        update();
-    }
-}
-
-bool VisualDatabaseDisplayColorFilterCircleWidget::isColorActive() const
-{
-    return isActive;
-}
-
-QChar VisualDatabaseDisplayColorFilterCircleWidget::getColorChar() const
-{
-    return colorChar;
-}
-
-void VisualDatabaseDisplayColorFilterCircleWidget::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    QColor circleColor;
-    switch (colorChar.unicode()) {
-        case 'W':
-            circleColor = Qt::white;
-            break;
-        case 'U':
-            circleColor = QColor(0, 115, 230);
-            break;
-        case 'B':
-            circleColor = QColor(50, 50, 50);
-            break;
-        case 'R':
-            circleColor = QColor(230, 30, 30);
-            break;
-        case 'G':
-            circleColor = QColor(30, 180, 30);
-            break;
-        default:
-            circleColor = Qt::transparent;
-            break;
-    }
-
-    if (!isActive) {
-        circleColor.setAlpha(100); // Dim inactive circles
-    }
-
-    painter.setBrush(circleColor);
-    painter.setPen(Qt::black);
-    painter.drawEllipse(rect());
-
-    if (isActive) {
-        QFont font = painter.font();
-        font.setBold(true);
-        font.setPointSize(circleDiameter / 3);
-        painter.setFont(font);
-        painter.setPen(colorChar.unicode() == 'B' ? Qt::white : Qt::black);
-        painter.drawText(rect(), Qt::AlignCenter, colorChar);
-    }
-}
-
-void VisualDatabaseDisplayColorFilterCircleWidget::mousePressEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event);
-    isActive = !isActive;
-    emit colorToggled(colorChar, isActive);
-    update();
-}
+#include "../cards/additional_info/mana_symbol_widget.h"
 
 VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(QWidget *parent,
                                                                                FilterTreeModel *_filterModel)
@@ -93,19 +9,22 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     setLayout(layout);
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
+    setMaximumHeight(50);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
-        auto *circle = new VisualDatabaseDisplayColorFilterCircleWidget(color, this);
+        auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
+        manaSymbol->setMaximumHeight(25);
+        manaSymbol->setMaximumWidth(25);
 
-        layout->addWidget(circle);
+        layout->addWidget(manaSymbol);
 
         // Initialize the activeColors map
         activeColors[color] = false;
 
         // Connect the color toggled signal
-        connect(circle, &VisualDatabaseDisplayColorFilterCircleWidget::colorToggled, this,
-                &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
     }
 
     toggleButton = new QPushButton(this);
@@ -116,8 +35,7 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
     connect(this, &VisualDatabaseDisplayColorFilterWidget::activeColorsChanged, this,
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
-    connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this,
-            &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
+    connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this, &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
 
     // Call retranslateUi to set the initial text
     retranslateUi();
