@@ -54,7 +54,7 @@ public:
     virtual void retranslateUi() override = 0;
 
     // Deck Management
-    virtual void setDeck(DeckLoader *_deckLoader);
+    void openDeck(DeckLoader *deck);
     DeckLoader *getDeckList() const;
     void setModified(bool _windowModified);
 
@@ -95,9 +95,9 @@ protected slots:
     void actEditDeckInClipboard();
     void actEditDeckInClipboardRaw();
     void actSaveDeckToClipboard();
-    void actSaveDeckToClipboardNoSetNameAndNumber();
+    void actSaveDeckToClipboardNoSetInfo();
     void actSaveDeckToClipboardRaw();
-    void actSaveDeckToClipboardRawNoSetNameAndNumber();
+    void actSaveDeckToClipboardRawNoSetInfo();
     void actPrintDeck();
     void actExportDeckDecklist();
     void actAnalyzeDeckDeckstats();
@@ -117,6 +117,7 @@ protected slots:
     virtual void dockFloatingTriggered() = 0;
 
 private:
+    virtual void setDeck(DeckLoader *_deck);
     void editDeckInClipboard(bool annotated);
 
 protected:

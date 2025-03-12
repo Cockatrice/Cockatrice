@@ -76,7 +76,7 @@ void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 
 void AbstractTabDeckEditor::onDeckChanged()
 {
-    setModified(isBlankNewDeck());
+    setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());
 }
 
@@ -126,6 +126,19 @@ void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
     QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
     deckDockWidget->swapCard(
         deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
+}
+
+/**
+ * Opens the deck in this tab.
+ * @param deck The deck. Takes ownership of the object
+ */
+void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
+{
+    setDeck(deck);
+
+    if (!deck->getLastFileName().isEmpty()) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
+    }
 }
 
 /**
@@ -290,13 +303,12 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 
     auto *l = new DeckLoader;
     if (l->loadFromFile(fileName, fmt, true)) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
             l->deleteLater();
         } else {
             deckMenu->setSaveStatus(false);
-            setDeck(l);
+            openDeck(l);
         }
     } else {
         l->deleteLater();
@@ -421,7 +433,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboard()
     getDeckList()->saveToClipboard(true, true);
 }
 
-void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
     getDeckList()->saveToClipboard(true, false);
 }
@@ -431,7 +443,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
     getDeckList()->saveToClipboard(false, true);
 }
 
-void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetNameAndNumber()
+void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
     getDeckList()->saveToClipboard(false, false);
 }

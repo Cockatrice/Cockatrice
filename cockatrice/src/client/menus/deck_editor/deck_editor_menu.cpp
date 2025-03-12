@@ -39,16 +39,15 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aSaveDeckToClipboard = new QAction(QString(), this);
     connect(aSaveDeckToClipboard, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboard()));
 
-    aSaveDeckToClipboardNoSetNameAndNumber = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardNoSetNameAndNumber, SIGNAL(triggered()), deckEditor,
-            SLOT(actSaveDeckToClipboardNoSetNameAndNumber()));
+    aSaveDeckToClipboardNoSetInfo = new QAction(QString(), this);
+    connect(aSaveDeckToClipboardNoSetInfo, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboardNoSetInfo()));
 
     aSaveDeckToClipboardRaw = new QAction(QString(), this);
     connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboardRaw()));
 
-    aSaveDeckToClipboardRawNoSetNameAndNumber = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardRawNoSetNameAndNumber, SIGNAL(triggered()), deckEditor,
-            SLOT(actSaveDeckToClipboardRawNoSetNameAndNumber()));
+    aSaveDeckToClipboardRawNoSetInfo = new QAction(QString(), this);
+    connect(aSaveDeckToClipboardRawNoSetInfo, SIGNAL(triggered()), deckEditor,
+            SLOT(actSaveDeckToClipboardRawNoSetInfo()));
 
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, SIGNAL(triggered()), deckEditor, SLOT(actPrintDeck()));
@@ -76,9 +75,9 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
 
     saveDeckToClipboardMenu = new QMenu(this);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboard);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardNoSetNameAndNumber);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardNoSetInfo);
     saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRaw);
-    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRawNoSetNameAndNumber);
+    saveDeckToClipboardMenu->addAction(aSaveDeckToClipboardRawNoSetInfo);
 
     addAction(aNewDeck);
     addAction(aLoadDeck);
@@ -108,9 +107,9 @@ void DeckEditorMenu::setSaveStatus(bool newStatus)
     aSaveDeck->setEnabled(newStatus);
     aSaveDeckAs->setEnabled(newStatus);
     aSaveDeckToClipboard->setEnabled(newStatus);
-    aSaveDeckToClipboardNoSetNameAndNumber->setEnabled(newStatus);
+    aSaveDeckToClipboardNoSetInfo->setEnabled(newStatus);
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
-    aSaveDeckToClipboardRawNoSetNameAndNumber->setEnabled(newStatus);
+    aSaveDeckToClipboardRawNoSetInfo->setEnabled(newStatus);
     saveDeckToClipboardMenu->setEnabled(newStatus);
     aPrintDeck->setEnabled(newStatus);
     analyzeDeckMenu->setEnabled(newStatus);
@@ -153,9 +152,9 @@ void DeckEditorMenu::retranslateUi()
 
     saveDeckToClipboardMenu->setTitle(tr("Save deck to clipboard"));
     aSaveDeckToClipboard->setText(tr("Annotated"));
-    aSaveDeckToClipboardNoSetNameAndNumber->setText(tr("Annotated (No set name or number)"));
+    aSaveDeckToClipboardNoSetInfo->setText(tr("Annotated (No set info)"));
     aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
-    aSaveDeckToClipboardRawNoSetNameAndNumber->setText(tr("Not Annotated (No set name or number)"));
+    aSaveDeckToClipboardRawNoSetInfo->setText(tr("Not Annotated (No set info)"));
 
     aPrintDeck->setText(tr("&Print deck..."));
 
@@ -183,7 +182,10 @@ void DeckEditorMenu::refreshShortcuts()
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
 
     aSaveDeckToClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
+    aSaveDeckToClipboardNoSetInfo->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardNoSetInfo"));
     aSaveDeckToClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRaw"));
+    aSaveDeckToClipboardRawNoSetInfo->setShortcuts(
+        shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboardRawNoSetInfo"));
 
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
 }
