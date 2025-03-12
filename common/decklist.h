@@ -261,7 +261,7 @@ private:
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
     /**
-     * Empty string indicates invalid cache.
+     * Empty string indicates invalidated cache.
      */
     mutable QString cachedDeckHash;
 

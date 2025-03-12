@@ -927,7 +927,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
     return false;
 }
 
-static QString calculateDeckHash(const InnerDecklistNode *root)
+static QString computeDeckHash(const InnerDecklistNode *root)
 {
     QStringList cardList;
     QSet<QString> hashZones, optionalZones;
@@ -958,7 +958,7 @@ static QString calculateDeckHash(const InnerDecklistNode *root)
 
 /**
  * Gets the deck hash.
- * The hash is calculated on the first call to this method, and will be cached until the decklist is modified.
+ * The hash is computed on the first call to this method, and is cached until the decklist is modified.
  *
  * @return The deck hash
  */
@@ -968,7 +968,7 @@ QString DeckList::getDeckHash() const
         return cachedDeckHash;
     }
 
-    cachedDeckHash = calculateDeckHash(root);
+    cachedDeckHash = computeDeckHash(root);
     return cachedDeckHash;
 }
 
