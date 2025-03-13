@@ -1,4 +1,4 @@
-#include "card_database.h"
+#include "card_info.h"
 
 #include "../../client/network/spoiler_background_updater.h"
 #include "../../client/ui/picture_loader/picture_loader.h"
