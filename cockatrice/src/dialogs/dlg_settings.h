@@ -253,7 +253,7 @@ private:
     QLabel hexHighlightLabel;
     QLabel customAlertStringLabel;
     QLabel explainMessagesLabel;
-    
+
     void storeSettings();
     void updateMentionPreview();
     void updateHighlightPreview();

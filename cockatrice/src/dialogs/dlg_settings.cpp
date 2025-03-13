@@ -1101,8 +1101,7 @@ MessagesSettingsPage::MessagesSettingsPage()
             &SettingsCache::setShowMessagePopups);
 
     localTimeCheckBox.setChecked(SettingsCache::instance().getLocalTime());
-    connect(&localTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setLocalTime);
+    connect(&localTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(), &SettingsCache::setLocalTime);
 
     mentionPopups.setChecked(SettingsCache::instance().getShowMentionPopup());
     connect(&mentionPopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
@@ -1115,9 +1114,6 @@ MessagesSettingsPage::MessagesSettingsPage()
     customAlertString->setText(SettingsCache::instance().getHighlightWords());
     connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
             SLOT(setHighlightWords(QString)));
-
-
-
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);

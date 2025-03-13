@@ -632,14 +632,13 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 
     soundEngine->playSound(phase.soundFileName);
 
-    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() +
-               phase.name + "</b></font>");
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() + phase.name + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-    appendHtml("<br><font color=\"green\"><b>" + getCurrentTime() +
-               QString(tr("%1's turn.")).arg(player->getName()) + "</b></font><br>");
+    appendHtml("<br><font color=\"green\"><b>" + getCurrentTime() + QString(tr("%1's turn.")).arg(player->getName()) +
+               "</b></font><br>");
 }
 
 void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)
