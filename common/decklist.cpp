@@ -368,8 +368,8 @@ DeckList::DeckList()
 
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
-    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard), deckHash(other.deckHash),
-      lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags)
+    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard),
+      lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags), cachedDeckHash(other.cachedDeckHash)
 {
     root = new InnerDecklistNode(other.getRoot());
 
@@ -378,7 +378,6 @@ DeckList::DeckList(const DeckList &other)
         spIterator.next();
         sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), spIterator.value()->getMoveList()));
     }
-    updateDeckHash();
 }
 
 DeckList::DeckList(const QString &nativeString)
@@ -507,7 +506,7 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
             }
         }
     }
-    updateDeckHash();
+    refreshDeckHash();
     if (xml->error()) {
         qDebug() << "Error loading deck from xml: " << xml->errorString();
         return false;
@@ -734,7 +733,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
         new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), setCode, collectorNumber);
     }
 
-    updateDeckHash();
+    refreshDeckHash();
     return true;
 }
 
@@ -808,8 +807,7 @@ void DeckList::cleanList()
     setName();
     setComments();
     setTags();
-    deckHash = QString();
-    emit deckHashChanged();
+    refreshDeckHash();
 }
 
 void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const
@@ -881,7 +879,7 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
     }
 
     auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber, cardProviderId);
-    updateDeckHash();
+    refreshDeckHash();
 
     return node;
 }
@@ -907,7 +905,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
         }
 
         if (updateHash) {
-            updateDeckHash();
+            refreshDeckHash();
         }
 
         return true;
@@ -918,7 +916,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
         if (inner) {
             if (deleteNode(node, inner)) {
                 if (updateHash) {
-                    updateDeckHash();
+                    refreshDeckHash();
                 }
 
                 return true;
@@ -929,7 +927,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
     return false;
 }
 
-void DeckList::updateDeckHash()
+static QString computeDeckHash(const InnerDecklistNode *root)
 {
     QStringList cardList;
     QSet<QString> hashZones, optionalZones;
@@ -955,7 +953,30 @@ void DeckList::updateDeckHash()
                      (((quint64)(unsigned char)deckHashArray[1]) << 24) +
                      (((quint64)(unsigned char)deckHashArray[2] << 16)) +
                      (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
-    deckHash = QString::number(number, 32).rightJustified(8, '0');
+    return QString::number(number, 32).rightJustified(8, '0');
+}
 
+/**
+ * Gets the deck hash.
+ * The hash is computed on the first call to this method, and is cached until the decklist is modified.
+ *
+ * @return The deck hash
+ */
+QString DeckList::getDeckHash() const
+{
+    if (!cachedDeckHash.isEmpty()) {
+        return cachedDeckHash;
+    }
+
+    cachedDeckHash = computeDeckHash(root);
+    return cachedDeckHash;
+}
+
+/**
+ * Invalidates the cached deckHash and emits the deckHashChanged signal.
+ */
+void DeckList::refreshDeckHash()
+{
+    cachedDeckHash = QString();
     emit deckHashChanged();
 }

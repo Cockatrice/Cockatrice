@@ -262,7 +262,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     emitRecursiveUpdates(index);
-    deckList->updateDeckHash();
+    deckList->refreshDeckHash();
     return true;
 }
 
@@ -398,7 +398,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
         cardNode->setCardSetShortName(cardSetName);
         cardNode->setCardCollectorNumber(cardInfoSet.getProperty("num"));
         cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
-        deckList->updateDeckHash();
+        deckList->refreshDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);
