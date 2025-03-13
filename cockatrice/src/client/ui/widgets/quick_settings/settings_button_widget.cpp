@@ -6,7 +6,7 @@
 #include <QScreen>
 
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
-    : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(this))
+    : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
 
     button->setIcon(QPixmap("theme:icons/cogwheel"));
