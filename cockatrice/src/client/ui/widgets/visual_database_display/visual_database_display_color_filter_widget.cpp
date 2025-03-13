@@ -3,6 +3,7 @@
 #include "../cards/additional_info/mana_symbol_widget.h"
 
 #include <QSet>
+#include <QTimer>
 
 VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(QWidget *parent,
                                                                                FilterTreeModel *_filterModel)
@@ -40,6 +41,8 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
     connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this,
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
 
     // Call retranslateUi to set the initial text
     retranslateUi();
@@ -106,4 +109,53 @@ void VisualDatabaseDisplayColorFilterWidget::updateFilterMode(bool checked)
     exactMatchMode = checked; // Toggle between modes
     retranslateUi();          // Update the button text
     emit filterModeChanged(exactMatchMode);
+}
+
+void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
+{
+    QSet<QString> currentFilters;
+
+    // Get current filters of type color
+    for (const auto &filter : filterModel->getFiltersOfType(CardFilter::Attr::AttrColor)) {
+        if (filter->type() == CardFilter::Type::TypeAnd || filter->type() == CardFilter::Type::TypeAndNot) {
+            currentFilters.insert(filter->term());
+        }
+    }
+
+    QSet<QString> activeFilterList;
+
+    // Iterate over the activeColors map and collect the active colors as strings
+    for (auto it = activeColors.constBegin(); it != activeColors.constEnd(); ++it) {
+        if (it.value()) { // Only add active colors
+            activeFilterList.insert(QString(it.key()));
+        }
+    }
+
+    // Check if the filters in the model match the active filters
+    if (currentFilters == activeFilterList) {
+        return;
+    }
+
+    // Remove filters that are in the UI but not in the model
+    for (const auto &color : activeFilterList) {
+        if (!currentFilters.contains(color)) {
+            activeColors[color[0]] = false; // Disable the color
+        }
+    }
+
+    // Add filters that are in the model but not in the UI
+    for (const auto &color : currentFilters) {
+        if (!activeFilterList.contains(color)) {
+            qDebug() << "Enabling" << color;
+            activeColors[color[0]] = true; // Enable the color
+        }
+    }
+
+    QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+
+    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+        manaSymbolWidget->setColorActive(activeColors[manaSymbolWidget->getSymbolChar()]);
+    }
+
+    updateColorFilter();
 }
