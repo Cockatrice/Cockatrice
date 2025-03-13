@@ -67,7 +67,7 @@ private:
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;
-    OverlapControlWidget *overlapControlWidget;
+    // OverlapControlWidget *overlapControlWidget;
     QWidget *container;
 };
 

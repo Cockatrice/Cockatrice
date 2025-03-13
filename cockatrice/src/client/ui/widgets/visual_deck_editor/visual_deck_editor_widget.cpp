@@ -32,7 +32,8 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(9, 0, 9, 5);
+    mainLayout->setSpacing(0);
 
     searchContainer = new QWidget(this);
     searchLayout = new QHBoxLayout(searchContainer);
@@ -169,11 +170,11 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     updateZoneWidgets();
 
-    overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
+    // overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
 
     mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
-    mainLayout->addWidget(overlapControlWidget);
+    // mainLayout->addWidget(overlapControlWidget);
 
     retranslateUi();
 }
