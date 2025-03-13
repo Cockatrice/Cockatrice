@@ -146,7 +146,6 @@ void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
     // Add filters that are in the model but not in the UI
     for (const auto &color : currentFilters) {
         if (!activeFilterList.contains(color)) {
-            qDebug() << "Enabling" << color;
             activeColors[color[0]] = true; // Enable the color
         }
     }

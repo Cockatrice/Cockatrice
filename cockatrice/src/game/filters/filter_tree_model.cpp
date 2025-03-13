@@ -95,12 +95,9 @@ QList<const CardFilter *> FilterTreeModel::getFiltersOfType(CardFilter::Attr fil
         return filters;
     }
 
-    qDebug() << filterType;
-
     std::function<void(const FilterTreeNode *)> traverse;
     traverse = [&](const FilterTreeNode *node) {
         if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
-            qDebug() << filterItem->attr();
             if (filterItem->attr() == filterType) {
                 QString text = filterItem->text();
                 filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
