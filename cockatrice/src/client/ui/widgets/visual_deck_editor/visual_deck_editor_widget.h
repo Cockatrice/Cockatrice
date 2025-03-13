@@ -2,13 +2,16 @@
 #define VISUAL_DECK_EDITOR_H
 
 #include "../../../../deck/deck_list_model.h"
+#include "../../../../game/cards/card_completer_proxy_model.h"
 #include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_database_model.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 
 #include <QListWidget>
+#include <QPushButton>
 #include <QWidget>
 #include <qscrollarea.h>
 
@@ -34,6 +37,7 @@ signals:
     void activeGroupCriteriaChanged(QString activeGroupCriteria);
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void cardAdditionRequested(CardInfoPtr card);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);
@@ -44,6 +48,14 @@ protected slots:
 private:
     DeckListModel *deckListModel;
     QVBoxLayout *mainLayout;
+    QWidget *searchContainer;
+    QHBoxLayout *searchLayout;
+    QLineEdit *searchBar;
+    CardDatabaseModel *cardDatabaseModel;
+    CardDatabaseDisplayModel *cardDatabaseDisplayModel;
+    CardCompleterProxyModel *proxyModel;
+    QCompleter *completer;
+    QPushButton *searchPushButton;
     QWidget *groupAndSortContainer;
     QHBoxLayout *groupAndSortLayout;
     QComboBox *groupByComboBox;
