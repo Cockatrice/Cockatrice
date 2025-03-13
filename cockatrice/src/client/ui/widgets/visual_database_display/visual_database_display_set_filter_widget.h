@@ -21,6 +21,7 @@ public:
     void handleSetToggled(const QString &setShortName, bool active);
 
     void updateSetFilter();
+    void syncWithFilterModel();
     void updateFilterMode(bool checked);
 
 private:

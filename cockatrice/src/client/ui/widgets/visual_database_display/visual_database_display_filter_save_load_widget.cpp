@@ -89,11 +89,14 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
     filterModel->blockSignals(true);
     filterModel->filterTree()->blockSignals(true);
     for (const QJsonValue &value : filtersArray) {
+        qDebug() << value;
         if (value.isObject()) {
             QJsonObject filterObj = value.toObject();
             CardFilter *filter = CardFilter::fromJson(filterObj);
-            if (filter)
+            if (filter) {
+                qDebug() << "Adding filter " << filter->type() << filter->attr() << filter->term();
                 filterModel->addFilter(filter);
+            }
         }
     }
     filterModel->blockSignals(false);

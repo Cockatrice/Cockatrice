@@ -88,6 +88,33 @@ void FilterTreeModel::clearFiltersOfType(CardFilter::Attr filterType)
     emit layoutChanged();
 }
 
+QList<const CardFilter *> FilterTreeModel::getFiltersOfType(CardFilter::Attr filterType) const
+{
+    QList<const CardFilter *> filters;
+    if (!fTree) {
+        return filters;
+    }
+
+    qDebug() << filterType;
+
+    std::function<void(const FilterTreeNode *)> traverse;
+    traverse = [&](const FilterTreeNode *node) {
+        if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
+            qDebug() << filterItem->attr();
+            if (filterItem->attr() == filterType) {
+                QString text = filterItem->text();
+                filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
+            }
+        }
+        for (int i = 0; i < node->childCount(); ++i) {
+            traverse(node->nodeAt(i));
+        }
+    };
+
+    traverse(fTree);
+    return filters;
+}
+
 QList<const CardFilter *> FilterTreeModel::allFilters() const
 {
     QList<const CardFilter *> filters;

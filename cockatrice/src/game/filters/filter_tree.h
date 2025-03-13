@@ -199,6 +199,8 @@ public:
 
     bool acceptName(CardInfoPtr info) const;
     bool acceptType(CardInfoPtr info) const;
+    bool acceptMainType(CardInfoPtr info) const;
+    bool acceptSubType(CardInfoPtr info) const;
     bool acceptColor(CardInfoPtr info) const;
     bool acceptText(CardInfoPtr info) const;
     bool acceptSet(CardInfoPtr info) const;

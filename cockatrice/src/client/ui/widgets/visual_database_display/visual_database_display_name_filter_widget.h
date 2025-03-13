@@ -23,6 +23,7 @@ public:
     void removeNameFilter(const QString &name);
     void updateFilterList();
     void updateFilterModel();
+    void syncWithFilterModel();
 
 private:
     AbstractTabDeckEditor *deckEditor;

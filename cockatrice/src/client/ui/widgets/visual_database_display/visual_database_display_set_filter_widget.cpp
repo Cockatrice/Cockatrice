@@ -5,6 +5,7 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QTimer>
 #include <algorithm>
 
 VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidget *parent,
@@ -32,6 +33,8 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
     createSetButtons();      // Populate buttons initially
     updateFilterMode(false); // Initialize toggle button text
@@ -127,6 +130,43 @@ void VisualDatabaseDisplaySetFilterWidget::updateSetFilter()
                 filterModel->addFilter(new CardFilter(setString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrSet));
             }
         }
+    }
+}
+
+void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
+{
+    // Clear activeSets
+    activeSets.clear();
+
+    // Read the current filters in filterModel
+    auto currentFilters = filterModel->getFiltersOfType(CardFilter::Attr::AttrSet);
+
+    // Determine if we're in Exact Match mode or Includes mode
+    QSet<QString> selectedSets;
+    QSet<QString> excludedSets;
+    for (const auto &filter : currentFilters) {
+        if (filter->type() == CardFilter::Type::TypeAnd) {
+            selectedSets.insert(filter->term());
+        } else if (filter->type() == CardFilter::Type::TypeAndNot) {
+            excludedSets.insert(filter->term());
+        } else if (filter->type() == CardFilter::Type::TypeOr) {
+            selectedSets.insert(filter->term());
+        }
+    }
+
+    // Determine exact match mode based on filter structure
+    bool newExactMatchMode = !excludedSets.isEmpty();
+
+    if (newExactMatchMode != exactMatchMode) {
+        exactMatchMode = newExactMatchMode;
+        toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
+    }
+
+    // Sync button states with selected sets
+    for (auto it = setButtons.begin(); it != setButtons.end(); ++it) {
+        bool active = selectedSets.contains(it.key());
+        activeSets[it.key()] = active;
+        it.value()->setChecked(active);
     }
 }
 
