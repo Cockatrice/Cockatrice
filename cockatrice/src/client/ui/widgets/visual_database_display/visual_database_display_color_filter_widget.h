@@ -42,6 +42,7 @@ private slots:
     void handleColorToggled(QChar color, bool active);
     void updateColorFilter();
     void updateFilterMode(bool checked);
+    void syncWithFilterModel();
 
 private:
     FilterTreeModel *filterModel;
