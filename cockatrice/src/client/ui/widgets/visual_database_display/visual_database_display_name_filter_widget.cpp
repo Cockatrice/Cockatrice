@@ -38,6 +38,8 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
     layout->addWidget(loadFromDeckButton);
 
     connect(loadFromDeckButton, &QPushButton::clicked, this, &VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck);
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel); });
 }
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
@@ -86,9 +88,11 @@ void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name
 void VisualDatabaseDisplayNameFilterWidget::removeNameFilter(const QString &name)
 {
     if (activeFilters.contains(name)) {
-        delete activeFilters[name]; // Remove button
+        activeFilters[name]->deleteLater(); // Safe deletion
         activeFilters.remove(name);
-        updateFilterModel();
+
+        QTimer::singleShot(0, this,
+                           &VisualDatabaseDisplayNameFilterWidget::updateFilterModel); // Avoid concurrent modification
     }
 }
 
@@ -111,4 +115,38 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
 
     filterModel->filterTree()->nodeAt(0)->nodeChanged();
     emit filterModel->layoutChanged();
+}
+
+void VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel()
+{
+    QStringList currentFilters;
+    for (const auto &filter : filterModel->getFiltersOfType(CardFilter::Attr::AttrName)) {
+        if (filter->type() == CardFilter::Type::TypeOr) {
+            currentFilters.append(filter->term());
+        }
+    }
+
+    QStringList activeFilterList = activeFilters.keys();
+
+    // Sort lists for efficient comparison
+    std::sort(currentFilters.begin(), currentFilters.end());
+    std::sort(activeFilterList.begin(), activeFilterList.end());
+
+    if (currentFilters == activeFilterList) {
+        return;
+    }
+
+    // Remove filters that are in the UI but not in the model
+    for (const auto &name : activeFilterList) {
+        if (!currentFilters.contains(name)) {
+            removeNameFilter(name);
+        }
+    }
+
+    // Add filters that are in the model but not in the UI
+    for (const auto &name : currentFilters) {
+        if (!activeFilters.contains(name)) {
+            createNameFilter(name);
+        }
+    }
 }

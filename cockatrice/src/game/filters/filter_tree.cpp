@@ -158,6 +158,18 @@ bool FilterItem::acceptType(const CardInfoPtr info) const
     return info->getCardType().contains(term, Qt::CaseInsensitive);
 }
 
+bool FilterItem::acceptMainType(const CardInfoPtr info) const
+{
+    const QStringList typeParts = info->getCardType().split(" — ");
+    return !typeParts.isEmpty() && typeParts[0].contains(term, Qt::CaseInsensitive);
+}
+
+bool FilterItem::acceptSubType(const CardInfoPtr info) const
+{
+    const QStringList typeParts = info->getCardType().split(" — ");
+    return typeParts.size() > 1 && typeParts[1].contains(term, Qt::CaseInsensitive);
+}
+
 bool FilterItem::acceptColor(const CardInfoPtr info) const
 {
     QString converted_term = term.trimmed();
@@ -411,6 +423,10 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
             return acceptLoyalty(info);
         case CardFilter::AttrFormat:
             return acceptFormat(info);
+        case CardFilter::AttrMainType:
+            return acceptMainType(info);
+        case CardFilter::AttrSubType:
+            return acceptSubType(info);
         default:
             return true; /* ignore this attribute */
     }

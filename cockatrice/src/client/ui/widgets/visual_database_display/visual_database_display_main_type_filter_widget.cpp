@@ -5,6 +5,7 @@
 
 #include <QPushButton>
 #include <QSpinBox>
+#include <QTimer>
 
 VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)
@@ -35,6 +36,9 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
     connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode);
+    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
+        QTimer::singleShot(100, this, &VisualDatabaseDisplayMainTypeFilterWidget::syncWithFilterModel);
+    });
 
     createMainTypeButtons(); // Populate buttons initially
     updateFilterMode(false); // Initialize toggle button text
@@ -94,7 +98,7 @@ void VisualDatabaseDisplayMainTypeFilterWidget::handleMainTypeToggled(const QStr
 void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
 {
     // Clear existing filters related to main type
-    filterModel->clearFiltersOfType(CardFilter::Attr::AttrType);
+    filterModel->clearFiltersOfType(CardFilter::Attr::AttrMainType);
 
     if (exactMatchMode) {
         // Exact Match: Only selected main types are allowed
@@ -110,7 +114,7 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
             for (const auto &type : selectedTypes) {
                 QString typeString = type;
                 filterModel->addFilter(
-                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
+                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrMainType));
             }
 
             // Exclude any other types (TypeAndNot)
@@ -118,7 +122,7 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
                 if (!selectedTypes.contains(type)) {
                     QString typeString = type;
                     filterModel->addFilter(
-                        new CardFilter(typeString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrType));
+                        new CardFilter(typeString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrMainType));
                 }
             }
         }
@@ -128,7 +132,7 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
             if (activeMainTypes[type]) {
                 QString typeString = type;
                 filterModel->addFilter(
-                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrType));
+                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrMainType));
             }
         }
     }
@@ -139,4 +143,41 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode(bool checked)
     exactMatchMode = checked;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateMainTypeFilter();
+}
+
+void VisualDatabaseDisplayMainTypeFilterWidget::syncWithFilterModel()
+{
+    // Temporarily block signals for each button to prevent toggling while updating button states
+    for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
+        it.value()->blockSignals(true);
+    }
+
+    // Uncheck all buttons
+    for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
+        it.value()->setChecked(false);
+    }
+
+    // Get active filters for main types
+    QSet<QString> activeTypes;
+    for (const auto &filter : filterModel->getFiltersOfType(CardFilter::AttrMainType)) {
+        if (filter->type() == CardFilter::Type::TypeAnd) {
+            activeTypes.insert(filter->term());
+        }
+    }
+
+    // Check the buttons for active types
+    for (const auto &type : activeTypes) {
+        activeMainTypes[type] = true;
+        if (typeButtons.contains(type)) {
+            typeButtons[type]->setChecked(true);
+        }
+    }
+
+    // Re-enable signal emissions for each button
+    for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
+        it.value()->blockSignals(false);
+    }
+
+    // Update the visibility of buttons
+    updateMainTypeButtonsVisibility();
 }

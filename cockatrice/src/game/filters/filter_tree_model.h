@@ -18,6 +18,7 @@ private:
 public slots:
     void addFilter(const CardFilter *f);
     void clearFiltersOfType(CardFilter::Attr filterType);
+    QList<const CardFilter *> getFiltersOfType(CardFilter::Attr filterType) const;
     QList<const CardFilter *> allFilters() const;
 
 private slots:

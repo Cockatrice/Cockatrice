@@ -23,6 +23,7 @@ public:
     void handleMainTypeToggled(const QString &mainType, bool active);
     void updateMainTypeFilter();
     void updateFilterMode(bool checked);
+    void syncWithFilterModel();
 
 private:
     FilterTreeModel *filterModel;
