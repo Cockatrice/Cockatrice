@@ -2,8 +2,11 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_loader.h"
+#include "../../../../game/cards/card_completer_proxy_model.h"
 #include "../../../../game/cards/card_database.h"
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/cards/card_database_model.h"
+#include "../../../../game/cards/card_search_model.h"
 #include "../../../../main.h"
 #include "../../../../utility/card_info_comparator.h"
 #include "../../layouts/overlap_layout.h"
@@ -12,7 +15,10 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 
+#include <QCompleter>
 #include <QHBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QResizeEvent>
 #include <qscrollarea.h>
 
@@ -22,10 +28,85 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
 
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
-    this->setMinimumSize(0, 0);
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    mainLayout = new QVBoxLayout();
-    this->setLayout(mainLayout);
+    setMinimumSize(0, 0);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mainLayout = new QVBoxLayout(this);
+    setLayout(mainLayout);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+
+    searchContainer = new QWidget(this);
+    searchLayout = new QHBoxLayout(searchContainer);
+    searchContainer->setLayout(searchLayout);
+
+    searchBar = new QLineEdit(this);
+    connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
+        CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(searchBar->text());
+        if (card) {
+            emit cardAdditionRequested(card);
+        }
+    });
+    cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
+    cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
+    cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
+    CardSearchModel *searchModel = new CardSearchModel(cardDatabaseDisplayModel, this);
+
+    proxyModel = new CardCompleterProxyModel(this);
+    proxyModel->setSourceModel(searchModel);
+    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxyModel->setFilterRole(Qt::DisplayRole);
+
+    completer = new QCompleter(proxyModel, this);
+    completer->setCompletionRole(Qt::DisplayRole);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+    completer->setMaxVisibleItems(15);
+    searchBar->setCompleter(completer);
+
+    // Update suggestions dynamically
+    connect(searchBar, &QLineEdit::textEdited, searchModel, &CardSearchModel::updateSearchResults);
+    connect(searchBar, &QLineEdit::textEdited, this, [=, this](const QString &text) {
+        // Ensure substring matching
+        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
+
+        if (!text.isEmpty()) {
+            completer->complete(); // Force the dropdown to appear
+        }
+    });
+
+    connect(completer, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
+            [=, this](const QString &completion) {
+                // Prevent the text from changing automatically when navigating with arrow keys
+                if (searchBar->text() != completion) {
+                    searchBar->setText(completion);                           // Set the completion explicitly
+                    searchBar->setCursorPosition(searchBar->text().length()); // Move cursor to the end
+                }
+            });
+
+    // Ensure that the text stays consistent during selection
+    connect(searchBar, &QLineEdit::textEdited, this, [=, this](const QString &text) {
+        if (searchBar->hasFocus() && !searchBar->completer()->popup()->isVisible()) {
+            // Allow text to change when typing, but not when navigating the completer
+            QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+            proxyModel->setFilterRegularExpression(
+                QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
+        }
+    });
+
+    // Search button functionality
+    searchPushButton = new QPushButton(this);
+    connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
+        CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(searchBar->text());
+        if (card) {
+            emit cardAdditionRequested(card);
+        }
+    });
+
+    searchLayout->addWidget(searchBar);
+    searchLayout->addWidget(searchPushButton);
+
+    mainLayout->addWidget(searchContainer);
 
     groupAndSortContainer = new QWidget(this);
     groupAndSortLayout = new QHBoxLayout(groupAndSortContainer);
@@ -100,6 +181,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 void VisualDeckEditorWidget::retranslateUi()
 {
     sortLabel->setText(tr("Click and drag to change\nthe sort order within the groups"));
+    searchPushButton->setText(tr("Quick search and add card"));
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()

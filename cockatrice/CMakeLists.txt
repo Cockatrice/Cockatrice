@@ -17,6 +17,8 @@ set(cockatrice_SOURCES
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp
+    src/game/cards/card_search_model.cpp
+    src/game/cards/card_completer_proxy_model.cpp
     src/game/cards/card_database_parser/card_database_parser.cpp
     src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
@@ -83,6 +85,7 @@ set(cockatrice_SOURCES
     src/server/local_server.cpp
     src/server/local_server_interface.cpp
     src/utility/logger.cpp
+    src/utility/levenshtein.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/client/ui/widgets/cards/additional_info/color_identity_widget.cpp

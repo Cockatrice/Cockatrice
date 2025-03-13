@@ -1,0 +1,16 @@
+#ifndef CARD_COMPLETER_PROXY_MODEL_H
+#define CARD_COMPLETER_PROXY_MODEL_H
+
+#include <QSortFilterProxyModel>
+
+class CardCompleterProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    explicit CardCompleterProxyModel(QObject *parent = nullptr);
+
+protected:
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+};
+
+#endif // CARD_COMPLETER_PROXY_MODEL_H

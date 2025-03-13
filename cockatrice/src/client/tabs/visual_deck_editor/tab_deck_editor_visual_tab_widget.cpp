@@ -24,6 +24,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             &TabDeckEditorVisualTabWidget::onCardChanged);
     connect(visualDeckView, &VisualDeckEditorWidget::cardClicked, this,
             &TabDeckEditorVisualTabWidget::onCardClickedDeckEditor);
+    connect(visualDeckView, &VisualDeckEditorWidget::cardAdditionRequested, deckEditor,
+            &AbstractTabDeckEditor::actAddCard);
 
     visualDatabaseDisplay =
         new VisualDatabaseDisplayWidget(this, deckEditor, cardDatabaseModel, cardDatabaseDisplayModel);
