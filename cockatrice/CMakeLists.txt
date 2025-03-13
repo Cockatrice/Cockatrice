@@ -6,10 +6,7 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 
 file(GLOB_RECURSE cockatrice_CPP_FILES ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
 
-set(cockatrice_SOURCES
-    ${cockatrice_CPP_FILES}
-    ${VERSION_STRING_CPP}
-)
+set(cockatrice_SOURCES ${cockatrice_CPP_FILES} ${VERSION_STRING_CPP})
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
