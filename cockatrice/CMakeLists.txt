@@ -26,6 +26,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_text_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
     src/client/ui/widgets/cards/card_size_widget.cpp
+    src/game/cards/card_info.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
     src/game/zones/card_zone.cpp
