@@ -12,10 +12,13 @@ set(cockatrice_SOURCES
     src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
+    src/client/ui/widgets/general/display/bar_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp
+    src/game/cards/card_search_model.cpp
+    src/game/cards/card_completer_proxy_model.cpp
     src/game/cards/card_database_parser/card_database_parser.cpp
     src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
@@ -25,6 +28,8 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_info_picture_widget.cpp
     src/client/ui/widgets/cards/card_info_text_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
+    src/client/ui/widgets/cards/deck_card_zone_display_widget.cpp
+    src/client/ui/widgets/cards/overlapped_card_group_display_widget.cpp
     src/client/ui/widgets/cards/card_size_widget.cpp
     src/game/cards/card_info.cpp
     src/game/cards/card_item.cpp
@@ -81,6 +86,7 @@ set(cockatrice_SOURCES
     src/server/local_server.cpp
     src/server/local_server_interface.cpp
     src/utility/logger.cpp
+    src/utility/levenshtein.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
     src/client/ui/widgets/cards/additional_info/color_identity_widget.cpp
@@ -91,6 +97,8 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
     src/client/ui/widgets/general/display/shadow_background_label.cpp
+    src/client/ui/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/utility/card_info_comparator.cpp
     src/main.cpp
     src/server/message_log_widget.cpp
     src/client/ui/layouts/overlap_layout.cpp
@@ -183,6 +191,20 @@ set(cockatrice_SOURCES
     src/client/ui/window_main.cpp
     src/game/zones/view_zone_widget.cpp
     src/game/zones/view_zone.cpp
+    src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp

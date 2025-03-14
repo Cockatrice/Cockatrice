@@ -99,7 +99,7 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+    QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
@@ -226,6 +226,10 @@ public:
     QString getDeckPath() const
     {
         return deckPath;
+    }
+    QString getFiltersPath() const
+    {
+        return filtersPath;
     }
     QString getReplaysPath() const
     {
@@ -740,6 +744,7 @@ public slots:
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
+    void setFiltersPath(const QString &_filtersPath);
     void setReplaysPath(const QString &_replaysPath);
     void setThemesPath(const QString &_themesPath);
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);

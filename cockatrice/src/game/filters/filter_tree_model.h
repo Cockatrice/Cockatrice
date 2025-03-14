@@ -1,6 +1,8 @@
 #ifndef FILTERTREEMODEL_H
 #define FILTERTREEMODEL_H
 
+#include "filter_card.h"
+
 #include <QAbstractItemModel>
 
 class FilterTree;
@@ -15,6 +17,9 @@ private:
 
 public slots:
     void addFilter(const CardFilter *f);
+    void clearFiltersOfType(CardFilter::Attr filterType);
+    QList<const CardFilter *> getFiltersOfType(CardFilter::Attr filterType) const;
+    QList<const CardFilter *> allFilters() const;
 
 private slots:
     void proxyBeginInsertRow(const FilterTreeNode *, int);
@@ -41,6 +46,7 @@ public:
     QModelIndex parent(const QModelIndex &ind) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
+    void clear();
 };
 
 #endif

@@ -110,6 +110,9 @@ void SettingsCache::setSeenTips(const QList<int> & /* _seenTips */)
 void SettingsCache::setDeckPath(const QString & /* _deckPath */)
 {
 }
+void SettingsCache::setFiltersPath(const QString & /*_filtersPath */)
+{
+}
 void SettingsCache::setReplaysPath(const QString & /* _replaysPath */)
 {
 }
