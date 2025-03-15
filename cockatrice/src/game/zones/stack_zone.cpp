@@ -49,12 +49,7 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getStackBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraStackBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 

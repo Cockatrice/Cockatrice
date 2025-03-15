@@ -54,12 +54,7 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getTableBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraTableBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 
     if (active) {

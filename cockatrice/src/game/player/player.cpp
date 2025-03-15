@@ -93,12 +93,7 @@ void PlayerArea::updateBg()
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getPlayerBgBrush();
-
-    if (playerZoneId > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraPlayerBgBrush(QString::number(playerZoneId), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Player, playerZoneId);
     painter->fillRect(boundingRect(), brush);
 }
 
