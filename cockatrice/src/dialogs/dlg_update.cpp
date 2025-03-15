@@ -165,10 +165,12 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
                 "</a>)<br><br>" +
-                tr("Unfortunately there are no download packages available for your operating system. \nYou may have "
-                   "to build from source yourself.") +
+                tr("Unfortunately, the automatic updater failed to find a compatible download. \nYou may have to "
+                   "manually download the new version.") +
                 "<br><br>" +
-                tr("Please check the download page manually and visit the wiki for instructions on compiling."));
+                tr("Please check the <a href=\"%1\">releases page</a> on our Github and download the build for your "
+                   "system.")
+                    .arg(release->getDescriptionUrl()));
     }
 }
 
