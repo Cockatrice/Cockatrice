@@ -24,7 +24,6 @@ protected:
     QColor bgColor;
 
 private:
-    bool isHovered;
     qreal realZValue;
 private slots:
     void pixmapUpdated();
@@ -86,7 +85,6 @@ public:
         return realZValue;
     }
     void setRealZValue(qreal _zValue);
-    void setHovered(bool _hovered);
     QString getColor() const
     {
         return color;
@@ -102,7 +100,6 @@ public:
         return facedown;
     }
     void setFaceDown(bool _facedown);
-    void processHoverEvent();
     void deleteCardInfoPopup()
     {
         emit deleteCardInfoPopup(name);
@@ -114,6 +111,9 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
     void cacheBgColor();
+
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 #endif
