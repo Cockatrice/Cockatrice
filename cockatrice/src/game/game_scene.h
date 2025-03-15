@@ -30,11 +30,9 @@ private:
     QList<QList<Player *>> playersByColumn;
     QList<ZoneViewWidget *> zoneViews;
     QSize viewSize;
-    QPointer<CardItem> hoveredCard;
     QBasicTimer *animationTimer;
     QSet<CardItem *> cardsToAnimate;
     int playerRotation;
-    void updateHover(const QPointF &scenePos);
 
 public:
     explicit GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
@@ -65,7 +63,6 @@ public slots:
     void rearrange();
 
 protected:
-    bool event(QEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
 signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);

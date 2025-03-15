@@ -2392,7 +2392,6 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
     card->setFaceDown(event.face_down());
     if (startZone != targetZone) {
         card->setBeingPointedAt(false);
-        card->setHovered(false);
 
         const QList<CardItem *> &attachedCards = card->getAttachedCards();
         for (auto attachedCard : attachedCards) {
