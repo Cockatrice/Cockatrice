@@ -10,8 +10,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <algorithm>
 #include <QStyleOption>
+#include <algorithm>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
                                    const QString &_name,
