@@ -26,14 +26,10 @@ CardZone::CardZone(Player *_p,
                    bool _hasCardAttr,
                    bool _isShufflable,
                    bool _contentsKnown,
-                   QGraphicsItem *parent,
-                   bool _isView)
+                   QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), views{}, menu(nullptr),
-      doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable), isView(_isView)
+      doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
-    if (!isView)
-        player->addZone(this);
-
     // If we join a game before the card db finishes loading, the cards might have the wrong printings.
     // Force refresh all cards in the zone when db finishes loading to fix that.
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
