@@ -70,7 +70,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
     if (!cardList.isEmpty()) {
         for (int i = 0; i < cardList.size(); ++i)
             addCard(new CardItem(player, this, QString::fromStdString(cardList[i]->name()),
-                                 QString::fromStdString(cardList[i]->provider_id()), cardList[i]->id(), revealZone),
+                                 QString::fromStdString(cardList[i]->provider_id()), cardList[i]->id()),
                     false, i);
         reorganizeCards();
     } else if (!origZone->contentsKnown()) {
@@ -88,8 +88,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
-            addCard(new CardItem(player, this, card->getName(), card->getProviderId(), card->getId(), revealZone),
-                    false, i);
+            addCard(new CardItem(player, this, card->getName(), card->getProviderId(), card->getId()), false, i);
         }
         reorganizeCards();
     }
@@ -103,7 +102,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
         auto cardName = QString::fromStdString(cardInfo.name());
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
-        auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), revealZone, this);
+        auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), this);
         cards.insert(i, card);
     }
 
