@@ -336,8 +336,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
             2 * QApplication::startDragDistance())
             return;
-        if (zone->getIsView()) {
-            const ZoneViewZone *view = static_cast<const ZoneViewZone *>(zone);
+        if (const ZoneViewZone *view = qobject_cast<const ZoneViewZone *>(zone)) {
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
         } else if (!owner->getLocalOrJudge())
@@ -394,10 +393,8 @@ void CardItem::playCard(bool faceDown)
  */
 static bool isUnwritableRevealZone(CardZone *zone)
 {
-    if (zone && zone->getIsView()) {
-        if (auto *view = static_cast<ZoneViewZone *>(zone)) {
-            return view->getRevealZone() && !view->getWriteableRevealZone();
-        }
+    if (auto *view = qobject_cast<ZoneViewZone *>(zone)) {
+        return view->getRevealZone() && !view->getWriteableRevealZone();
     }
     return false;
 }
