@@ -11,7 +11,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <algorithm>
-#include <qstyleoption.h>
+#include <QStyleOption>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
                                    const QString &_name,
