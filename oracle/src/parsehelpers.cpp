@@ -24,6 +24,12 @@
  */
 bool parseCipt(const QString &name, const QString &text)
 {
+    // Use precompiled regex to check if text is a possible candidate, and early return if not
+    static auto prelimCheck = QRegularExpression(" enters( the battlefield)? tapped(?! unless)");
+    if (!prelimCheck.match(text).hasMatch()) {
+        return false;
+    }
+
     // Try to split shortname on most non-alphanumeric characters (including _)
     auto isShortnameDivider = [](const QChar &c) {
         return c == '_' || (!c.isLetterOrNumber() && c != '\'' && c != '\"');
