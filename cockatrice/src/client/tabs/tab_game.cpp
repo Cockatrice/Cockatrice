@@ -1681,7 +1681,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    messageLog = new MessageLogWidget(tabSupervisor, this);
+    messageLog = new MessageLogWidget(tabSupervisor, this, &secondsElapsed);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));

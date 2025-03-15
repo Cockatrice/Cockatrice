@@ -1100,6 +1100,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     connect(&messagePopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setShowMessagePopups);
 
+    localTimeCheckBox.setChecked(SettingsCache::instance().getLocalTime());
+    connect(&localTimeCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(), &SettingsCache::setLocalTime);
+
     mentionPopups.setChecked(SettingsCache::instance().getShowMentionPopup());
     connect(&mentionPopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setShowMentionPopups);
@@ -1123,6 +1126,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&messagePopups, 4, 0);
     chatGrid->addWidget(&mentionPopups, 5, 0);
     chatGrid->addWidget(&roomHistory, 6, 0);
+    chatGrid->addWidget(&localTimeCheckBox, 7, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -1305,6 +1309,7 @@ void MessagesSettingsPage::retranslateUi()
     aAdd->setText(tr("Add New Message"));
     aEdit->setText(tr("Edit Message"));
     aRemove->setText(tr("Remove Message"));
+    localTimeCheckBox.setText(tr("Enable In-Game Time"));
 }
 
 SoundSettingsPage::SoundSettingsPage()
