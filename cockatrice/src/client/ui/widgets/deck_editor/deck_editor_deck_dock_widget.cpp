@@ -314,12 +314,17 @@ DeckLoader *DeckEditorDeckDockWidget::getDeckList()
     return deckModel->getDeckList();
 }
 
+/**
+ * Resets the tab to the state for a blank new tab.
+ */
 void DeckEditorDeckDockWidget::cleanDeck()
 {
     deckModel->cleanList();
     nameEdit->setText(QString());
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
+    updateBannerCardComboBox();
+    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
 }
 
 void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)
