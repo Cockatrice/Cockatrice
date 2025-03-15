@@ -1,5 +1,6 @@
 #include "color_identity_widget.h"
 
+#include "../../../../../settings/cache_settings.h"
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>
@@ -17,18 +18,21 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, CardInfoPtr _card) : Q
     layout->setAlignment(Qt::AlignCenter); // Ensure icons are centered
     setLayout(layout);
 
+    // Define the full WUBRG set (White, Blue, Black, Red, Green)
+    QString fullColorIdentity = "WUBRG";
+
     if (card) {
-        QString manaCost = card->getColors();               // Get mana cost string
+        manaCost = card->getColors();                       // Get mana cost string
         QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
 
-        for (const QString &symbol : symbols) {
-            ManaSymbolWidget *manaSymbol = new ManaSymbolWidget(this, symbol, true);
-            layout->addWidget(manaSymbol);
-        }
+        populateManaSymbolWidgets();
     }
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+            &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
-ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, QString manaCost) : QWidget(parent), card(nullptr)
+ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, QString _manaCost)
+    : QWidget(parent), card(nullptr), manaCost(_manaCost)
 {
     layout = new QHBoxLayout(this);
     layout->setSpacing(5); // Small spacing between icons
@@ -36,12 +40,41 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, QString manaCost) : QW
     layout->setAlignment(Qt::AlignCenter); // Ensure icons are centered
     setLayout(layout);
 
+    populateManaSymbolWidgets();
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+            &ColorIdentityWidget::toggleUnusedVisibility);
+}
+
+void ColorIdentityWidget::populateManaSymbolWidgets()
+{
+    // Define the full WUBRG set (White, Blue, Black, Red, Green)
+    QString fullColorIdentity = "WUBRG";
     QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
 
-    for (const QString &symbol : symbols) {
-        ManaSymbolWidget *manaSymbol = new ManaSymbolWidget(this, symbol);
-        layout->addWidget(manaSymbol);
+    if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
+        for (const QString symbol : fullColorIdentity) {
+            auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
+            layout->addWidget(manaSymbol);
+        }
+    } else {
+        for (const QString &symbol : symbols) {
+            auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
+            layout->addWidget(manaSymbol);
+        }
     }
+}
+
+void ColorIdentityWidget::toggleUnusedVisibility()
+{
+    if (layout != nullptr) {
+        QLayoutItem *item;
+        while ((item = layout->takeAt(0)) != nullptr) {
+            item->widget()->deleteLater(); // Delete the widget
+            delete item;                   // Delete the layout item
+        }
+    }
+    populateManaSymbolWidgets();
 }
 
 void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
