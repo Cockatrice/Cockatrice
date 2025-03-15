@@ -206,8 +206,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 {
     // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
-        {"manaCost", "manacost"}, {"manaValue", "cmc"}, {"type", "type"},
-        {"loyalty", "loyalty"},   {"layout", "layout"}, {"side", "side"},
+        {"manaCost", "manacost"},     {"manaValue", "cmc"}, {"type", "type"},
+        {"loyalty", "loyalty"},       {"layout", "layout"}, {"side", "side"},
+        {"convertedManaCost", "cmc"}, // old name for manaValue, for backwards compatibility
     };
 
     // mtgjson name => xml name
@@ -349,7 +350,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
             // add other face for split cards as card relation
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
-                properties["cmc"] = getStringPropertyFromMap(card, "faceManaValue");
+                auto faceManaValue = getStringPropertyFromMap(card, "faceManaValue");
+                if (faceManaValue.isEmpty()) {
+                    // check the old name for the property, for backwards compatibility purposes
+                    faceManaValue = getStringPropertyFromMap(card, "faceConvertedManaCost");
+                }
+                properties["cmc"] = faceManaValue;
+
                 if (layout == "meld") { // meld cards don't work
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
