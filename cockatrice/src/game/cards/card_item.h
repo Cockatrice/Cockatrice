@@ -22,7 +22,6 @@ class CardItem : public AbstractCardItem
     Q_OBJECT
 private:
     CardZone *zone;
-    bool revealedCard;
     bool attacking;
     QMap<int, int> counters;
     QString annotation;
@@ -55,7 +54,6 @@ public:
                       const QString &_name = QString(),
                       const QString &_providerId = QString(),
                       int _cardid = -1,
-                      bool revealedCard = false,
                       CardZone *_zone = nullptr);
     ~CardItem() override;
     void retranslateUi();
@@ -84,10 +82,6 @@ public:
     void setOwner(Player *_owner)
     {
         owner = _owner;
-    }
-    bool getRevealedCard() const
-    {
-        return revealedCard;
     }
     bool getAttacking() const
     {
