@@ -131,6 +131,7 @@ void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!cards.isEmpty())
-        cards[0]->processHoverEvent();
+        emit cards[0]->hovered(cards[0]);
+
     QGraphicsItem::hoverEnterEvent(event);
 }

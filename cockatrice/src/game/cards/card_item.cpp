@@ -470,7 +470,6 @@ bool CardItem::animationEvent()
                      .translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF)
                      .rotate(tapAngle)
                      .translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
-    setHovered(false);
     update();
 
     return animationIncomplete;
