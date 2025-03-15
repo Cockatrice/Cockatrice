@@ -320,6 +320,7 @@ void DeckEditorDeckDockWidget::cleanDeck()
     nameEdit->setText(QString());
     commentsEdit->setText(QString());
     hashLabel->setText(QString());
+    updateBannerCardComboBox();
 }
 
 void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)
