@@ -7,32 +7,33 @@
 <br>
 
 # Contributing to Cockatrice #
-First off, thanks for taking the time to contribute to our project! 🎉 ❤ ️✨
 
-The following is a set of guidelines for contributing to Cockatrice. These are
-mostly guidelines, not rules. Use your best judgment, and feel free to propose
-changes to this document in a pull request.
+First off, thanks for taking the time and considering to lend a helping hand to our project! 🎉 ❤ ️✨
+
+> [!NOTE]
+> The following is a set of guidelines for contributing to Cockatrice.  
+> These are mostly guidelines, not rules. Use your best judgment, and feel free to
+> propose changes to this document in a pull request.
+>
+> [![Discord](
+> https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](
+> https://discord.gg/3Z9yzmA)  
+> If you'd like to ask questions, get advice, or just want to say "Hi",
+> the Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
+> for communications and you can reach out in the `#dev` channel.
 
 
 # Recommended Setups #
 
-For those developers who like the Linux or MacOS environment, many of our
+For those developers on **Linux** or **macOS** environment, many of our
 developers like working with a nifty program called [CLion](
-https://www.jetbrains.com/clion/). The program's a great asset and one of the
-best tools you'll find on these systems, but you're welcomed to use any IDE
-you most enjoy.
+https://www.jetbrains.com/clion/). The program is a great asset and one of the
+best tools you'll find on these systems.
 
-Developers who like Windows development tend to find [Visual Studio](
+Developers on **Windows** systems tend to find [Visual Studio](
 https://www.visualstudio.com/) the best tool for the job.
 
-[![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white&color=7289da)](https://discord.gg/ZASRzKu)
-[![Gitter Chat](https://img.shields.io/gitter/room/Cockatrice/Cockatrice.svg)](https://gitter.im/Cockatrice/Cockatrice)
-
-If you'd like to ask questions, get advice, or just want to say hi,
-the Cockatrice Development Team uses [Discord](https://discord.gg/ZASRzKu)
-for communications in the #dev channel. If you're not into Discord, we also
-have a [Gitter](https://gitter.im/Cockatrice/Cockatrice) channel available,
-albeit slightly less active.
+But you're welcomed to use any IDE you enjoy most of course!
 
 
 # Code Style Guide #
@@ -54,7 +55,7 @@ The message will look like this:
 ***  Then commit and push those changes to this branch. ***
 ***   Check our CONTRIBUTING.md file for more details.  ***
 ***                                                     ***
-***                    Thank you ❤️                      ***
+***                    Thank you ❤️                     ***
 ***                                                     ***
 ***********************************************************
 ```
@@ -64,7 +65,7 @@ information on our formatting guidelines.
 
 ### Compatibility ###
 
-Cockatrice is currently compiled on all platforms using <kbd>C++11</kbd>.
+Cockatrice is currently compiled on all platforms using <kbd>C++20</kbd>.
 You'll notice <kbd>C++03</kbd> code throughout the codebase. Please feel free
 to help convert it over!
 
@@ -78,11 +79,12 @@ or other appropriate conversion.
 ### Formatting ###
 
 The handy tool `clang-format` can format your code for you, it is available for
-almost any environment. A special `.clang-format` configuration file is
+almost any environment. A special [`.clang-format`](
+https://github.com/Cockatrice/Cockatrice/blob/master/.clang-format) configuration file is
 included in the project and is used to format your code.
 
 We've also included a bash script, `format.sh`, that will use clang-format to
-format all files in your pr in one go. Use `./format.sh --help` to show a full
+format all files in your PR in one go. Use `./format.sh --help` to show a full
 help page.
 
 To run clang-format on a single source file simply use the command
@@ -90,10 +92,10 @@ To run clang-format on a single source file simply use the command
 clang-format with a specific version number appended,
 `find /usr/bin -name clang-format*` should find it for you)
 
-See [the clang-format documentation](
+See the [clang-format documentation](
 https://clang.llvm.org/docs/ClangFormat.html) for more information about the tool.
 
-#### Header files ####
+#### Header Files ####
 
 Use header files with the extension `.h` and source files with the extension
 `.cpp`.
@@ -168,10 +170,10 @@ braces around single line statements is preferred.
 See the following example:
 ```c++
 int main()
-{                                     // function or class: own line
-    if (someCondition) {              // control statement: same line
-        doSomething();                // single line statement, braces preferred
-    } else if (someOtherCondition1) { // else goes on the same line as a closing brace
+{                                        // function or class: own line
+    if (someCondition) {                 // control statement: same line
+        doSomething();                   // single line statement, braces preferred
+    } else if (someOtherCondition1) {    // else goes on the same line as a closing brace
         for (int i = 0; i < 100; i++) {
             doSomethingElse();
         }
@@ -234,7 +236,7 @@ mutating objects.)
 When pointers can't be avoided, try to use a smart pointer of some sort, such
 as `QScopedPointer`, or, less preferably, `QSharedPointer`.
 
-### Database migrations ###
+### Database Migrations ###
 
 The servatrice database's schema can be found at `servatrice/servatrice.sql`.
 Everytime the schema gets modified, some other steps are due:
@@ -255,7 +257,7 @@ Ensure that the migration produces the expected effects; e.g. if you add a
 new column, make sure the migration places it in the same order as
 servatrice.sql.
 
-### Protocol buffer ###
+### Protocol Buffer ###
 
 Cockatrice and Servatrice exchange data using binary messages. The syntax of
 these messages is defined in the `proto` files in the `common/pb` folder. These
@@ -267,6 +269,7 @@ new clients incompatible to the old server and vice versa.
 
 You can find more information on how we use Protobuf on [our wiki!](
 https://github.com/Cockatrice/Cockatrice/wiki/Client-server-protocol)
+
 
 # Reviewing Pull Requests #
 
@@ -286,6 +289,7 @@ all changes have been approved your pull request will be squashed into a single
 commit and merged into the master branch by a team member. Your change will then
 be included in the next release 👍
 
+
 # Translations #
 
 Basic workflow for translations:
@@ -294,16 +298,16 @@ Basic workflow for translations:
  3. Maintainer verifies and merges the change;
  4. Transifex picks up the new files from GitHub automatically;
  5. Translators translate the new untranslated strings on Transifex;
- 6. Before a release, a maintainer fetches the updated translations from Transifex.
+ 6. Before a release, a maintainer fetches the newest translations from Transifex.
 
 ### Using Translations (for developers) ###
 
 All user interface strings inside Cockatrice's source code must be written
 in English (US).
 Translations to other languages are managed using [Transifex](
-https://www.transifex.com/projects/p/cockatrice/).
+https://transifex.com/cockatrice/cockatrice/).
 
-Adding a new string to translate is as easy as adding the string in the
+Adding a new string for translation is as easy as adding the string in the
 `tr("")` function, the string will be picked up as translatable automatically
 and translated as needed.
 For example, setting the text of a label in the way that the string
@@ -315,9 +319,9 @@ nameLabel.setText(tr("My name is:"));
 To translate a string that would have plural forms you can add the amount to
 the tr() call, also you can add an extra string as a hint for translators:
 ```c++
-QString message = tr("Everyone draws %n cards", "pop up message", amount);
+QString message = tr("Everyone draws %n cards", "english hint for translators", amount);
 ```
-See [QT's wiki on translations](
+See [Qt's wiki on translations](
 https://doc.qt.io/qt-5/i18n-source-translation.html#handling-plurals)
 
 If you're about to propose a change that adds or modifies any translatable
@@ -325,7 +329,7 @@ string in the code, you don't need to take care of adding the new strings to
 the translation files.<br>
 We have an automated process to update our language source files on a schedule
 and provide the translators on Transifex with the new contents.<br>
-Maintainers can also manually trigger this on demand.
+Maintainers can also manually trigger this workflow on demand via GitHub Actions.
 
 ### Maintaining Translations (for maintainers) ###
 
@@ -389,27 +393,27 @@ Now you are ready to commit your changes and open a PR.
 </details>
 
 Once the changes get merged, Transifex will pick up the modified files
-automatically (checked every few hours) and update their online editor where
+automatically (checked every few hours) and update the web editor where
 translators will be able to translate the new strings right in the browser.
 
 ### Releasing Translations (for maintainers) ###
 
-Before rushing out a new release, a maintainer should fetch the most up to date
+Before publishing a new release, a maintainer should fetch the most up to date
 translations from Transifex and commit them into the Cockatrice source code.
-This can be done manually from the Transifex web interface, but it's quite time
-consuming.
+We utilize the official GitHub integration to push all languages that are 100%
+translated from Transifex to our GitHub repo automatically.
+On top, it runs on a quarterly schedule to update changes for incomplete languages.
+A synchronisation/update can also be triggered manually from the Transifex web interface
+and a translation treshold can be set.
 
-As an alternative, you can install the Transifex CLI:
-
-    http://docs.transifex.com/developer/client/
-
+As an alternative, you can install the [Transifex CLI](https://developers.transifex.com/docs/cli).
 You'll then be able to use a git-like cli command to push and pull translations
 from Transifex to the source code and vice versa.
 
 ### Adding Translations (for translators) ###
 
-As a translator you can help translate the new strings on [Transifex](
-https://www.transifex.com/projects/p/cockatrice/).
+As a translator, you can help to translate new strings on [Transifex](
+https://www.transifex.com/projects/p/cockatrice/) to your native language.
 Please have a look at the specific [FAQ for translators](
 https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 
@@ -419,9 +423,9 @@ https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ).
 ### Publishing A New Release ###
 
 We use [GitHub Releases](https://github.com/Cockatrice/Cockatrice/releases) to
-publish new stable versions and betas.
-Whenever a git tag is pushed to the repository github will create a draft
-release and upload binaries automatically.
+publish new stable versions and beta releases.
+Whenever a git tag is pushed to the repository, GitHub will create a draft
+release and upload binaries from our CI automatically.
 
 To create a tag, simply do the following:
 ```bash
@@ -433,18 +437,16 @@ git push $UPSTREAM $TAG_NAME
 ```
 
 You should define the variables as such:
-```
-`$UPSTREAM` - the remote for git@github.com:Cockatrice/Cockatrice.git
-`$TAG_NAME` should be formatted as:
-  - `YYYY-MM-DD-Release-MAJ.MIN.PATCH` for **stable releases**
-  - `YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X` for **beta releases**<br>
-    With *MAJ.MIN.PATCH* being the NEXT release version!
-```
+ - `$UPSTREAM`: the remote for `git@github.com:Cockatrice/Cockatrice.git`
+ - `$TAG_NAME` should be formatted as:
+     - `YYYY-MM-DD-Release-MAJ.MIN.PATCH` for **stable releases**
+     - `YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X` for **beta releases**<br>
+       With <kbd>MAJ</kbd>.<kbd>MIN</kbd>.<kbd>PATCH</kbd> being the NEXT release version!
 
 This will cause a tagged release to be established on the GitHub repository,
-with the binaries being added to the release whenever they are ready.
-The release is initially a draft, where the path notes can be edited and after
-all is good and ready it can be published on GitHub.
+with the binaries being added to the release whenever they are done building in CI.
+The release is initially a draft, where the release notes can be edited and after
+all is checked and ready, it can be published as GitHub release.
 If you use a SemVer tag including "beta", the release that will be created at
 GitHub will be marked as a "Pre-release" automatically.
 The target of the `.../latest` URL will not be changed in that case, it always
@@ -457,7 +459,7 @@ revoke the tag by doing the following:
 git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
 ```
-You can also do this on GitHub, you'll also want to delete the new release.
+You can also do this on GitHub, you'll also want to delete the false release.
 
 In the first lines of [CMakeLists.txt](
 https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt)
@@ -468,25 +470,24 @@ coming from the tag title, it's good practice to increment the ones at CMake
 after every full release to stress that master is ahead of the last stable
 release.
 The preferred flow of operation is:
- * Just before a release, make sure the version number in CMakeLists.txt is set
- to the same release version you are about to tag.
- * This is also the time to change the pretty name in CMakeLists.txt called
- GIT_TAG_RELEASENAME and commit and push these changes.
- * Tag the release following the previously described syntax in order to get it
- correctly built and deployed by CI.
- * Wait for the configure step to create the release and update the patch
- notes.
- * Check on the github actions page for build progress which should be the top
- listed [here](
+ - Just before a release, make sure the version number in CMakeLists.txt is set
+   to the same release version you are about to tag.
+ - This is also the time to change the pretty name in CMakeLists.txt called
+   `GIT_TAG_RELEASENAME` and commit and push these changes.
+ - Tag the release following the previously described syntax in order to get it
+   correctly built and deployed by CI.
+ - Wait for the configuration step to create the release and update the patch
+   notes.
+ - Check on the GitHub Actions page for build progress which should be the top
+   listed [here](
  https://github.com/Cockatrice/Cockatrice/actions?query=event%3Apush+-branch%3Amaster
  ).
- * When the build has been completed you can verify all uploaded files on the
- release are in order and hit the publish button.
- * After the release is complete, update the CMake version number again to the
- next targeted beta version, typically increasing `PROJECT_VERSION_PATCH` by
- one.
+ - When the build has been completed, you can verify if all uploaded files on the
+   draft release are included and hit the publish button.
+ - After the release is complete, update the CMake version number again to the
+   next targeted beta version, typically increasing `PROJECT_VERSION_PATCH` by
+   one.
 
 When releasing a new stable version, all previous beta releases (and tags)
-should be deleted. This is needed for Cockatrice to update users of the "Beta"
-release channel correctly to the latest stable version as well.
+should be deleted as well.
 This can be done the same way as revoking tags, mentioned above.
