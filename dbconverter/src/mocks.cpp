@@ -227,6 +227,9 @@ void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T /* value 
 void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T /* _showTags */)
 {
 }
+void SettingsCache::setVisualDeckStorageDefaultTagsList(QStringList /* _defaultTagsList */)
+{
+}
 void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T /* value */)
 {
 }

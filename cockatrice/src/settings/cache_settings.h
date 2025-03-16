@@ -42,6 +42,86 @@ constexpr int NETWORK_CACHE_SIZE_MAX = 1024 * 1024;  // 1 TB
 
 #define DEFAULT_FONT_SIZE 12
 
+inline QStringList defaultTags = {
+    // Strategies
+    "🏃️ Aggro",
+    "🧙‍️ Control",
+    "⚔️ Midrange",
+    "🌀 Combo",
+    "🪓 Mill",
+    "🔒 Stax",
+    "🗺️ Landfall",
+    "🛡️ Pillowfort",
+    "🌱 Ramp",
+    "⚡ Storm",
+    "💀 Aristocrats",
+    "☠️ Reanimator",
+    "👹 Sacrifice",
+    "🔥 Burn",
+    "🌟 Lifegain",
+    "🔮 Spellslinger",
+    "👥 Tokens",
+    "🎭 Blink",
+    "⏳ Time Manipulation",
+    "🌍 Domain",
+    "💫 Proliferate",
+    "📜 Saga",
+    "🎲 Chaos",
+    "🪄 Auras",
+    "🔫 Pingers",
+
+    // Themes
+    "👑 Monarch",
+    "🚀 Vehicles",
+    "💉 Infect",
+    "🩸 Madness",
+    "🌀 Morph",
+
+    // Card Types
+    "⚔️ Creature",
+    "💎 Artifact",
+    "🌔 Enchantment",
+    "📖 Sorcery",
+    "⚡ Instant",
+    "🌌 Planeswalker",
+    "🌏 Land",
+    "🪄 Aura",
+
+    // Kindred Types
+    "🐉 Kindred",
+    "🧙 Humans",
+    "⚔️ Soldiers",
+    "🛡️ Knights",
+    "🎻 Bards",
+    "🧝 Elves",
+    "🌲 Dryads",
+    "😇 Angels",
+    "🎩 Wizards",
+    "🧛 Vampires",
+    "🦴 Skeletons",
+    "💀 Zombies",
+    "👹 Demons",
+    "👾 Eldrazi",
+    "🐉 Dragons",
+    "🐠 Merfolk",
+    "🦁 Cats",
+    "🐺 Wolves",
+    "🐺 Werewolves",
+    "🦇 Bats",
+    "🐀 Rats",
+    "🦅 Birds",
+    "🦗 Insects",
+    "🍄 Fungus",
+    "🐚 Sea Creatures",
+    "🐗 Boars",
+    "🦊 Foxes",
+    "🦄 Unicorns",
+    "🐘 Elephants",
+    "🐻 Bears",
+    "🦏 Rhinos",
+    "🦂 Scorpions",
+};
+
 class QSettings;
 
 class SettingsCache : public QObject
@@ -64,6 +144,7 @@ signals:
     void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
+    void visualDeckStorageDefaultTagsListChanged();
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
@@ -146,6 +227,7 @@ private:
     bool visualDeckStorageShowBannerCardComboBox;
     bool visualDeckStorageShowTagsOnDeckPreviews;
     bool visualDeckStorageShowTagFilter;
+    QStringList visualDeckStorageDefaultTagsList;
     bool visualDeckStorageSearchFolderNames;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
@@ -452,6 +534,10 @@ public:
     bool getVisualDeckStorageShowTagFilter() const
     {
         return visualDeckStorageShowTagFilter;
+    }
+    QStringList getVisualDeckStorageDefaultTagsList() const
+    {
+        return visualDeckStorageDefaultTagsList;
     }
     bool getVisualDeckStorageSearchFolderNames() const
     {
@@ -851,6 +937,7 @@ public slots:
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageDefaultTagsList(QStringList _defaultTagsList);
     void setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
