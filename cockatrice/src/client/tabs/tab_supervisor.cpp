@@ -251,9 +251,9 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
 
     // Close the game tabs in order to make sure they store their layout.
     QSet<int> gameTabsToRemove;
-    for (auto it = gameTabs.keyValueBegin(), end = gameTabs.keyValueEnd(); it != end; ++it) {
-        if (it->second->close()) {
-            gameTabsToRemove.insert(it->first);
+    for (auto it = gameTabs.begin(), end = gameTabs.end(); it != end; ++it) {
+        if (it.value()->close()) {
+            gameTabsToRemove.insert(it.key());
         } else {
             event->ignore();
         }
