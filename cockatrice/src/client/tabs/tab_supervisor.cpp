@@ -234,6 +234,9 @@ void TabSupervisor::refreshShortcuts()
 
 void TabSupervisor::closeEvent(QCloseEvent *event)
 {
+    // This will accept the event, which we may then override.
+    QTabWidget::closeEvent(event);
+
     if (getGameCount()) {
         if (QMessageBox::question(this, tr("Are you sure?"),
                                   tr("There are still open games. Are you sure you want to quit?"),

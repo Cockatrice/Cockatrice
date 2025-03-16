@@ -1751,10 +1751,8 @@ void TabGame::createMessageDock(bool bReplay)
     connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
 }
 
-void TabGame::closeEvent(QCloseEvent *event)
+void TabGame::hideEvent(QHideEvent *event)
 {
-    Q_UNUSED(event);
-
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
     if (replay) {
         layouts.setReplayPlayAreaState(saveState());
@@ -1770,6 +1768,8 @@ void TabGame::closeEvent(QCloseEvent *event)
         layouts.setGameMessageLayoutSize(messageLayoutDock->size());
         layouts.setGamePlayerListSize(playerListDock->size());
     }
+
+    Tab::hideEvent(event);
 }
 
 // Method uses to sync docks state with menu items state
