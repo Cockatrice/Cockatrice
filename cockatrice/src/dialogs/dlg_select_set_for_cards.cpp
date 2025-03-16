@@ -103,6 +103,15 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+    clearButton = new QPushButton(buttonBox);
+    connect(clearButton, &QPushButton::clicked, this, &DlgSelectSetForCards::actClear);
+
+    setAllToPreferredButton = new QPushButton(buttonBox);
+    connect(setAllToPreferredButton, &QPushButton::clicked, this, &DlgSelectSetForCards::actSetAllToPreferred);
+
+    buttonBox->addButton(clearButton, QDialogButtonBox::ActionRole);
+    buttonBox->addButton(setAllToPreferredButton, QDialogButtonBox::ActionRole);
+
     // Set stretch factors
     splitter->setStretchFactor(0, 6); // Scroll area gets more space
     splitter->setStretchFactor(1, 2); // Bottom part gets less space
@@ -125,6 +134,8 @@ void DlgSelectSetForCards::retranslateUi()
 {
     instructionLabel->setText(tr("Check Sets to enable them. Drag-and-Drop to reorder them and change their "
                                  "priority. Cards will use the printing of the highest priority enabled set."));
+    clearButton->setText(tr("Clear all set information"));
+    setAllToPreferredButton->setText(tr("Set all to preferred"));
 }
 
 void DlgSelectSetForCards::actOK()
@@ -141,6 +152,19 @@ void DlgSelectSetForCards::actOK()
                            DECK_ZONE_MAIN);
         }
     }
+    accept();
+}
+
+void DlgSelectSetForCards::actClear()
+{
+    model->getDeckList()->clearSetNamesAndNumbers();
+    accept();
+}
+
+void DlgSelectSetForCards::actSetAllToPreferred()
+{
+    model->getDeckList()->clearSetNamesAndNumbers();
+    model->getDeckList()->setProviderIdToPreferredPrinting();
     accept();
 }
 

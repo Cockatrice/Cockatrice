@@ -63,6 +63,7 @@ public:
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
     QString exportDeckToDecklist();
+    void setProviderIdToPreferredPrinting();
 
     void resolveSetNameAndNumberToProviderID();
 

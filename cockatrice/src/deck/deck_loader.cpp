@@ -235,7 +235,7 @@ struct FormatDeckListForExport
     QString &sideBoardCards;
     // create main operator for struct, allowing the foreachcard to work.
     FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards) {};
 
     void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
     {
@@ -300,6 +300,44 @@ QString DeckLoader::exportDeckToDecklist()
 }
 
 // This struct is here to support the forEachCard function call, defined in decklist.
+// It requires a function to be called for each card, and it will set the providerId to the preferred printing.
+struct SetProviderIdToPreferred
+{
+    // Main operator for struct, allowing the foreachcard to work.
+    SetProviderIdToPreferred()
+    {
+    }
+
+    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
+    {
+        Q_UNUSED(node);
+        CardInfoPerSet preferredSet = CardDatabaseManager::getInstance()->getSpecificSetForCard(
+            card->getName(),
+            CardDatabaseManager::getInstance()->getPreferredPrintingProviderIdForCard(card->getName()));
+        QString providerId = preferredSet.getProperty("uuid");
+        QString setShortName = preferredSet.getPtr()->getShortName();
+        QString collectorNumber = preferredSet.getProperty("num");
+
+        card->setCardProviderId(providerId);
+        card->setCardCollectorNumber(collectorNumber);
+        card->setCardSetShortName(setShortName);
+    }
+};
+
+/**
+ * This function iterates through each card in the decklist and sets the providerId
+ * on each card based on its set name and collector number.
+ */
+void DeckLoader::setProviderIdToPreferredPrinting()
+{
+    // Set up the struct to call.
+    SetProviderIdToPreferred setProviderIdToPreferred;
+
+    // Call the forEachCard method for each card in the deck
+    forEachCard(setProviderIdToPreferred);
+}
+
+// This struct is here to support the forEachCard function call, defined in decklist.
 // It requires a function to be called for each card, and it will set the providerId.
 struct SetProviderId
 {
@@ -337,10 +375,10 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
 
 // This struct is here to support the forEachCard function call, defined in decklist.
 // It requires a function to be called for each card, and it will set the providerId.
-struct ClearSetNameAndNumber
+struct ClearSetNameNumberAndProviderId
 {
     // Main operator for struct, allowing the foreachcard to work.
-    ClearSetNameAndNumber()
+    ClearSetNameNumberAndProviderId()
     {
     }
 
@@ -350,6 +388,7 @@ struct ClearSetNameAndNumber
         // Set the providerId on the card
         card->setCardSetShortName(nullptr);
         card->setCardCollectorNumber(nullptr);
+        card->setCardProviderId(nullptr);
     }
 };
 
@@ -360,10 +399,10 @@ struct ClearSetNameAndNumber
 void DeckLoader::clearSetNamesAndNumbers()
 {
     // Set up the struct to call.
-    ClearSetNameAndNumber clearSetNameAndNumber;
+    ClearSetNameNumberAndProviderId clearSetNameNumberAndProviderId;
 
     // Call the forEachCard method for each card in the deck
-    forEachCard(clearSetNameAndNumber);
+    forEachCard(clearSetNameNumberAndProviderId);
 }
 
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)

@@ -34,6 +34,8 @@ signals:
 
 public slots:
     void actOK();
+    void actClear();
+    void actSetAllToPreferred();
     void updateLayoutOrder();
     void updateCardLists();
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -53,6 +55,8 @@ private:
     QListWidget *listWidget;
     DeckListModel *model;
     QMap<QString, SetEntryWidget *> setEntries;
+    QPushButton *clearButton;
+    QPushButton *setAllToPreferredButton;
 
     QMap<QString, int> getSetsForCards();
     void updateCardAvailability();
