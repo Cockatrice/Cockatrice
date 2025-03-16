@@ -351,13 +351,13 @@ public:
     QString writeToString_Native();
     bool loadFromFile_Native(QIODevice *device);
     bool saveToFile_Native(QIODevice *device);
-    bool loadFromStream_Plain(QTextStream &stream);
+    bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata);
     bool loadFromFile_Plain(QIODevice *device);
     bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards);
     bool saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
     QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
 
-    void cleanList();
+    void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
     {
         return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();

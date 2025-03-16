@@ -548,7 +548,14 @@ bool DeckList::saveToFile_Native(QIODevice *device)
     return true;
 }
 
-bool DeckList::loadFromStream_Plain(QTextStream &in)
+/**
+ * Clears the decklist and loads in a new deck from text
+ *
+ * @param in The text to load
+ * @param preserveMetadata If true, don't clear the existing metadata
+ * @return False if the input was empty, true otherwise.
+ */
+bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
 {
     const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reEmpty("^\\s*$");
@@ -577,7 +584,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in)
                                                          {QRegularExpression("æ"), QString("ae")},
                                                          {QRegularExpression(" ?[|/]+ ?"), QString(" // ")}};
 
-    cleanList();
+    cleanList(preserveMetadata);
 
     auto inputs = in.readAll().trimmed().split('\n');
     auto max_line = inputs.size();
@@ -752,7 +759,7 @@ InnerDecklistNode *DeckList::getZoneObjFromName(const QString &zoneName)
 bool DeckList::loadFromFile_Plain(QIODevice *device)
 {
     QTextStream in(device);
-    return loadFromStream_Plain(in);
+    return loadFromStream_Plain(in, false);
 }
 
 struct WriteToStream
@@ -801,12 +808,19 @@ QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappe
     return result;
 }
 
-void DeckList::cleanList()
+/**
+ * Clears all cards and other data from the decklist
+ *
+ * @param preserveMetadata If true, only clear the cards
+ */
+void DeckList::cleanList(bool preserveMetadata)
 {
     root->clearTree();
-    setName();
-    setComments();
-    setTags();
+    if (!preserveMetadata) {
+        setName();
+        setComments();
+        setTags();
+    }
     refreshDeckHash();
 }
 
