@@ -56,7 +56,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     newTagInput_ = new QLineEdit(this);
     addTagButton_ = new QPushButton(this);
     editButton = new QPushButton(this);
-    connect(editButton, &QPushButton::clicked, this, [=, this]() {
+    connect(editButton, &QPushButton::clicked, this, [=]() {
         auto defaultTagsEditor = new DlgDefaultTagsEditor(nullptr);
         defaultTagsEditor->exec();
     });
