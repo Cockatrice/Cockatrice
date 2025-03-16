@@ -2,10 +2,12 @@
 
 #include "../../../../game/filters/filter_tree.h"
 #include "../../../../settings/cache_settings.h"
+#include "visual_database_filter_display_widget.h"
 
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QMessageBox>
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)
@@ -28,7 +30,7 @@ VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWi
     connect(saveButton, &QPushButton::clicked, this, &VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter);
 
     // File list container
-    fileListWidget = new FlowWidget(this, Qt::Vertical, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    fileListWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(fileListWidget);
 
     refreshFilterList(); // Populate the file list on startup
@@ -106,20 +108,40 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
 {
-    // Clear existing file buttons
-    for (auto button : fileButtons) {
-        delete button;
+    fileListWidget->clearLayout();
+    // Clear existing widgets
+    for (auto buttonPair : fileButtons) {
+        buttonPair.first->deleteLater();
+        buttonPair.second->deleteLater();
     }
-    fileButtons.clear();
+    fileButtons.clear(); // Clear the list of buttons
 
+    // Refresh the filter file list
     QDir dir(SettingsCache::instance().getFiltersPath());
     QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Time);
 
+    // Loop through the filter files and create widgets for them
     for (const QString &filename : filterFiles) {
-        auto *button = new QPushButton(filename, fileListWidget);
-        fileListWidget->addWidget(button);
-        fileButtons[filename] = button;
+        bool alreadyAdded = false;
 
-        connect(button, &QPushButton::clicked, this, [this, filename]() { loadFilter(filename); });
+        // Check if the widget for this filter file already exists to avoid duplicates
+        for (const auto &pair : fileButtons) {
+            if (pair.first->text() == filename) {
+                alreadyAdded = true;
+                break;
+            }
+        }
+
+        if (!alreadyAdded) {
+            // Create a new custom widget for the filter
+            FilterDisplayWidget *filterWidget = new FilterDisplayWidget(this, filename, filterModel);
+            fileListWidget->addWidget(filterWidget);
+
+            // Connect signals to handle loading and deletion
+            connect(filterWidget, &FilterDisplayWidget::filterLoadRequested, this,
+                    &VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter);
+            connect(filterWidget, &FilterDisplayWidget::filterDeleted, this,
+                    &VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList);
+        }
     }
 }
