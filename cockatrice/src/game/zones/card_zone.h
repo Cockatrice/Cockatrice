@@ -132,10 +132,7 @@ public:
         return views;
     }
     virtual void reorganizeCards() = 0;
-    bool getIsView() const
-    {
-        return isView;
-    }
+    virtual QPointF closestGridPoint(const QPointF &point);
     bool getAlwaysRevealTopCard() const
     {
         return alwaysRevealTopCard;
