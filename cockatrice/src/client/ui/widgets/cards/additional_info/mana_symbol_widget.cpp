@@ -1,5 +1,7 @@
 #include "mana_symbol_widget.h"
 
+#include "../../../../../settings/cache_settings.h"
+
 #include <QResizeEvent>
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
@@ -26,7 +28,14 @@ void ManaSymbolWidget::setColorActive(bool active)
 
 void ManaSymbolWidget::updateOpacity()
 {
-    qreal opacity = isActive ? 1.0 : 0.5;
+    qreal opacity;
+    if (mayBeToggled) {
+        // UI elements that users can click on shouldn't be transparent.
+        opacity = isActive ? 1.0 : 0.5;
+    } else {
+        // It's just for display, they can do whatever they want.
+        opacity = isActive ? 1.0 : SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity() / 100.0;
+    }
     opacityEffect->setOpacity(opacity);
 }
 
