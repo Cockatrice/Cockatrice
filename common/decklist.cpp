@@ -745,7 +745,7 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
 
 bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
-    auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
+    auto writeToStream = [stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
             stream << "SB: ";
         }
