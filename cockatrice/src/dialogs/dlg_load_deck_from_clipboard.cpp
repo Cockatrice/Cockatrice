@@ -80,7 +80,7 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
 
     QTextStream stream(&buffer);
 
-    if (deckLoader->loadFromStream_Plain(stream)) {
+    if (deckLoader->loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
             deckLoader->resolveSetNameAndNumberToProviderID();
         } else {

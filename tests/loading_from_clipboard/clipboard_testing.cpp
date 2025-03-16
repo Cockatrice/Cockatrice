@@ -18,7 +18,7 @@ void testEmpty(const QString &clipboard)
     QString cp(clipboard);
     DeckList deckList;
     QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream);
+    deckList.loadFromStream_Plain(stream, false);
 
     ASSERT_TRUE(deckList.getCardList().isEmpty());
 }
@@ -28,7 +28,7 @@ void testDeck(const QString &clipboard, const Result &result)
     QString cp(clipboard);
     DeckList deckList;
     QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream);
+    deckList.loadFromStream_Plain(stream, false);
 
     ASSERT_EQ(result.name, deckList.getName().toStdString());
     ASSERT_EQ(result.comments, deckList.getComments().toStdString());
