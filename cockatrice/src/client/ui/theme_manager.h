@@ -9,6 +9,8 @@
 #include <QPixmap>
 #include <QString>
 
+#include <array>
+
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
 typedef QMap<QString, QString> QStringMap;
