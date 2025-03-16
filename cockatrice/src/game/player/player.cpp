@@ -124,7 +124,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
-    auto *_deck = addZone<PileZone>(this, "deck", true, false, playerArea);
+    auto *_deck = addZone(new PileZone(this, "deck", true, false, playerArea));
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
                            10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
     _deck->setPos(base);
@@ -135,23 +135,23 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     handCounter->setPos(base + QPointF(0, h + 10));
     qreal h2 = handCounter->boundingRect().height();
 
-    PileZone *grave = addZone<PileZone>(this, "grave", false, true, playerArea);
+    PileZone *grave = addZone(new PileZone(this, "grave", false, true, playerArea));
     grave->setPos(base + QPointF(0, h + h2 + 10));
 
-    PileZone *rfg = addZone<PileZone>(this, "rfg", false, true, playerArea);
+    PileZone *rfg = addZone(new PileZone(this, "rfg", false, true, playerArea));
     rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
-    PileZone *sb = addZone<PileZone>(this, "sb", false, false, playerArea);
+    PileZone *sb = addZone(new PileZone(this, "sb", false, false, playerArea));
     sb->setVisible(false);
 
-    table = addZone<TableZone>(this, this);
+    table = addZone(new TableZone(this, this));
     connect(table, &TableZone::sizeChanged, this, &Player::updateBoundingRect);
 
-    stack = addZone<StackZone>(this, (int)table->boundingRect().height(), this);
+    stack = addZone(new StackZone(this, (int)table->boundingRect().height(), this));
 
-    hand =
-        addZone<HandZone>(this, _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
-                          (int)table->boundingRect().height(), this);
+    hand = addZone(new HandZone(this,
+                                _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
+                                (int)table->boundingRect().height(), this));
     connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
 

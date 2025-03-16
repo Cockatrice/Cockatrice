@@ -410,9 +410,8 @@ public:
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
 
-    template <typename T, typename... Args> T *addZone(Args &&...args)
+    template <typename T> T *addZone(T *zone)
     {
-        T *zone = new T(std::forward<Args>(args)...);
         zones.insert(zone->getName(), zone);
         return zone;
     }
