@@ -172,7 +172,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 {
     qreal totalTextWidth = getCardTypeTextWidth();
 
-    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
+    painter->fillRect(boundingRect(), themeManager->getBgBrush(ThemeManager::Table));
     painter->setPen(QColor(255, 255, 255, 100));
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 

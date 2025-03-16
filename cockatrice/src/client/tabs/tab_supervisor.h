@@ -138,7 +138,7 @@ public:
         return deckEditorTabs;
     }
     bool getAdminLocked() const;
-    bool closeRequest();
+    void closeEvent(QCloseEvent *event) override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
     static void actShowPopup(const QString &message);
 signals:

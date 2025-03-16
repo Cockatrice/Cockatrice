@@ -119,7 +119,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     refreshShortcuts();
     messageLog->logReplayStarted(gameInfo.game_id());
 
-    this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
@@ -164,7 +163,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
         gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 
-    this->installEventFilter(this);
     QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
@@ -1753,6 +1751,27 @@ void TabGame::createMessageDock(bool bReplay)
     connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
 }
 
+void TabGame::hideEvent(QHideEvent *event)
+{
+    LayoutsSettings &layouts = SettingsCache::instance().layouts();
+    if (replay) {
+        layouts.setReplayPlayAreaState(saveState());
+        layouts.setReplayPlayAreaGeometry(saveGeometry());
+        layouts.setReplayCardInfoSize(cardInfoDock->size());
+        layouts.setReplayMessageLayoutSize(messageLayoutDock->size());
+        layouts.setReplayPlayerListSize(playerListDock->size());
+        layouts.setReplayReplaySize(replayDock->size());
+    } else {
+        layouts.setGamePlayAreaState(saveState());
+        layouts.setGamePlayAreaGeometry(saveGeometry());
+        layouts.setGameCardInfoSize(cardInfoDock->size());
+        layouts.setGameMessageLayoutSize(messageLayoutDock->size());
+        layouts.setGamePlayerListSize(playerListDock->size());
+    }
+
+    Tab::hideEvent(event);
+}
+
 // Method uses to sync docks state with menu items state
 bool TabGame::eventFilter(QObject *o, QEvent *e)
 {
@@ -1772,23 +1791,6 @@ bool TabGame::eventFilter(QObject *o, QEvent *e)
         }
     }
 
-    if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        if (replay) {
-            layouts.setReplayPlayAreaState(saveState());
-            layouts.setReplayPlayAreaGeometry(saveGeometry());
-            layouts.setReplayCardInfoSize(cardInfoDock->size());
-            layouts.setReplayMessageLayoutSize(messageLayoutDock->size());
-            layouts.setReplayPlayerListSize(playerListDock->size());
-            layouts.setReplayReplaySize(replayDock->size());
-        } else {
-            layouts.setGamePlayAreaState(saveState());
-            layouts.setGamePlayAreaGeometry(saveGeometry());
-            layouts.setGameCardInfoSize(cardInfoDock->size());
-            layouts.setGameMessageLayoutSize(messageLayoutDock->size());
-            layouts.setGamePlayerListSize(playerListDock->size());
-        }
-    }
     return false;
 }
 

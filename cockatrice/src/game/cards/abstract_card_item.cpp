@@ -331,5 +331,5 @@ QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, 
         update();
         return value;
     } else
-        return QGraphicsItem::itemChange(change, value);
+        return ArrowTarget::itemChange(change, value);
 }

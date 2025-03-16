@@ -180,6 +180,12 @@ QMap<QString, QPixmap> CountryPixmapGenerator::pmCache;
  * @param idName id that the tag has to match
  * @param attrValue the value to update the attribute to
  */
+static void setAttrRecur(QDomElement &elem,
+                         const QString &tagName,
+                         const QString &attrName,
+                         const QString &idName,
+                         const QString &attrValue);
+
 void setAttrRecur(QDomElement &elem,
                   const QString &tagName,
                   const QString &attrName,

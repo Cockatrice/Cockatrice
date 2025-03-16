@@ -54,12 +54,7 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getTableBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraTableBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 
     if (active) {
@@ -123,9 +118,66 @@ void TableZone::addCardImpl(CardItem *card, int _x, int _y)
     card->update();
 }
 
+bool TableZone::dragEnter(CardDragItem *dragItem, const QPointF &pos)
+{
+    if (!SelectZone::dragEnter(dragItem, pos)) {
+        return false;
+    }
+
+    if (m_feedbackItem) {
+        scene()->removeItem(m_feedbackItem);
+        delete m_feedbackItem;
+    }
+
+    m_feedbackItem = new QGraphicsPathItem(dragItem->getItem()->shape(), this);
+    m_feedbackItem->setBrush(QColor(176, 196, 222)); // lightsteelblue
+    m_feedbackItem->setPen(QColor(119, 136, 153));   // lightslategray
+    m_feedbackItem->setZValue(2000000005);
+    m_feedbackItem->setTransform(dragItem->getItem()->transform());
+    updateFeedback(dragItem, pos);
+
+    return true;
+}
+
+void TableZone::dragMove(CardDragItem *dragItem, const QPointF &pos)
+{
+    if (m_feedbackItem) {
+        updateFeedback(dragItem, pos);
+    }
+
+    SelectZone::dragMove(dragItem, pos);
+}
+
+void TableZone::dragAccept(CardDragItem *dragItem, const QPointF &pos)
+{
+    SelectZone::dragAccept(dragItem, pos);
+
+    if (m_feedbackItem) {
+        scene()->removeItem(m_feedbackItem);
+        delete m_feedbackItem;
+        m_feedbackItem = nullptr;
+    }
+}
+
+void TableZone::dragLeave(CardDragItem *dragItem)
+{
+    SelectZone::dragLeave(dragItem);
+
+    if (m_feedbackItem) {
+        scene()->removeItem(m_feedbackItem);
+        delete m_feedbackItem;
+        m_feedbackItem = nullptr;
+    }
+}
+
 void TableZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
-    handleDropEventByGrid(dragItems, startZone, mapToGrid(dropPoint));
+    Q_UNUSED(dropPoint);
+
+    // Always use the position of the feedback item for consistency
+    if (m_feedbackItem && m_feedbackItem->isVisible()) {
+        handleDropEventByGrid(dragItems, startZone, mapToGrid(m_feedbackItem->pos()));
+    }
 }
 
 void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
@@ -157,8 +209,6 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
 
 void TableZone::reorganizeCards()
 {
-    QSet<ArrowItem *> arrowsToUpdate;
-
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
@@ -189,23 +239,7 @@ void TableZone::reorganizeCards()
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
-            for (ArrowItem *item : attachedCard->getArrowsFrom()) {
-                arrowsToUpdate.insert(item);
-            }
-            for (ArrowItem *item : attachedCard->getArrowsTo()) {
-                arrowsToUpdate.insert(item);
-            }
         }
-
-        for (ArrowItem *item : cards[i]->getArrowsFrom()) {
-            arrowsToUpdate.insert(item);
-        }
-        for (ArrowItem *item : cards[i]->getArrowsTo()) {
-            arrowsToUpdate.insert(item);
-        }
-    }
-    for (ArrowItem *item : arrowsToUpdate) {
-        item->updatePath();
     }
 
     resizeToContents();
@@ -281,12 +315,6 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
         if (cards.at(i)->getGridPoint() == gridPoint)
             return cards.at(i);
     return 0;
-}
-
-CardItem *TableZone::getCardFromCoords(const QPointF &point) const
-{
-    QPoint gridPoint = mapToGrid(point);
-    return getCardFromGrid(gridPoint);
 }
 
 void TableZone::computeCardStackWidths()
@@ -389,18 +417,36 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     int xDiff = x - xStack;
     int gridPointX = stackCol * 3 + qMin(xDiff / STACKED_CARD_OFFSET_X, 2);
 
-    return QPoint(gridPointX, gridPointY);
+    return QPoint((gridPointX / 3) * 3, gridPointY);
 }
 
-QPointF TableZone::closestGridPoint(const QPointF &point)
+void TableZone::updateFeedback(CardDragItem *dragItem, const QPointF &point)
 {
     QPoint gridPoint = mapToGrid(point);
-    gridPoint.setX((gridPoint.x() / 3) * 3);
-    if (getCardFromGrid(gridPoint))
-        gridPoint.setX(gridPoint.x() + 1);
-    if (getCardFromGrid(gridPoint))
-        gridPoint.setX(gridPoint.x() + 1);
-    return mapFromGrid(gridPoint);
+
+    for (int i = 0; i < 3; ++i) {
+        if (CardItem *existingCard = getCardFromGrid(gridPoint)) {
+            if (existingCard == dragItem->getItem()) {
+                // Dropping the card onto its existing position is a no-op, and
+                // we don't want to display the feedback item, but we don't want
+                // to display an invalid state either, because that'd be
+                // confusing.
+                dragItem->setValid(true);
+                m_feedbackItem->hide();
+                return;
+            }
+
+            gridPoint.setX(gridPoint.x() + 1);
+        } else {
+            dragItem->setValid(true);
+            m_feedbackItem->show();
+            m_feedbackItem->setPos(mapFromGrid(gridPoint));
+            return;
+        }
+    }
+
+    dragItem->setValid(false);
+    m_feedbackItem->hide();
 }
 
 int TableZone::clampValidTableRow(const int row)

@@ -57,5 +57,8 @@ public:
     {
         arrowsTo.removeOne(arrow);
     }
+
+protected:
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 };
 #endif

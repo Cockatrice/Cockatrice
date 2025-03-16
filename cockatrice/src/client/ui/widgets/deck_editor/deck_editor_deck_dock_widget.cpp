@@ -105,6 +105,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     auto *upperLayout = new QGridLayout;
     upperLayout->setObjectName("upperLayout");
+    upperLayout->setContentsMargins(11, 11, 11, 0);
+
     upperLayout->addWidget(nameLabel, 0, 0);
     upperLayout->addWidget(nameEdit, 0, 1);
 

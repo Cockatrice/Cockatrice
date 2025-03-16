@@ -120,10 +120,10 @@ void ThemeManager::themeChangedSlot()
     if (dirPath.isEmpty()) {
         // set default values
         QDir::setSearchPaths("theme", DEFAULT_RESOURCE_PATHS);
-        handBgBrush = HANDZONE_BG_DEFAULT;
-        tableBgBrush = TABLEZONE_BG_DEFAULT;
-        playerBgBrush = PLAYERZONE_BG_DEFAULT;
-        stackBgBrush = STACKZONE_BG_DEFAULT;
+        brushes[Role::Hand] = HANDZONE_BG_DEFAULT;
+        brushes[Role::Table] = TABLEZONE_BG_DEFAULT;
+        brushes[Role::Player] = PLAYERZONE_BG_DEFAULT;
+        brushes[Role::Stack] = STACKZONE_BG_DEFAULT;
     } else {
         // resources
         QStringList resources;
@@ -132,73 +132,58 @@ void ThemeManager::themeChangedSlot()
 
         // zones bg
         dir.cd("zones");
-        handBgBrush = loadBrush(HANDZONE_BG_NAME, HANDZONE_BG_DEFAULT);
-        tableBgBrush = loadBrush(TABLEZONE_BG_NAME, TABLEZONE_BG_DEFAULT);
-        playerBgBrush = loadBrush(PLAYERZONE_BG_NAME, PLAYERZONE_BG_DEFAULT);
-        stackBgBrush = loadBrush(STACKZONE_BG_NAME, STACKZONE_BG_DEFAULT);
+        brushes[Role::Hand] = loadBrush(HANDZONE_BG_NAME, HANDZONE_BG_DEFAULT);
+        brushes[Role::Table] = loadBrush(TABLEZONE_BG_NAME, TABLEZONE_BG_DEFAULT);
+        brushes[Role::Player] = loadBrush(PLAYERZONE_BG_NAME, PLAYERZONE_BG_DEFAULT);
+        brushes[Role::Stack] = loadBrush(STACKZONE_BG_NAME, STACKZONE_BG_DEFAULT);
     }
-    tableBgBrushesCache.clear();
-    stackBgBrushesCache.clear();
-    playerBgBrushesCache.clear();
-    handBgBrushesCache.clear();
+    for (auto &brushCache : brushesCache) {
+        brushCache.clear();
+    }
 
     QPixmapCache::clear();
 
     emit themeChanged();
 }
 
-QBrush ThemeManager::getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush)
+static QString roleBgName(ThemeManager::Role role)
 {
-    QBrush returnBrush;
+    switch (role) {
+        case ThemeManager::Hand:
+            return HANDZONE_BG_NAME;
 
-    if (!tableBgBrushesCache.contains(extraNumber.toInt())) {
-        returnBrush = loadExtraBrush(TABLEZONE_BG_NAME + extraNumber, fallbackBrush);
-        tableBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
-    } else {
-        returnBrush = tableBgBrushesCache.value(extraNumber.toInt());
+        case ThemeManager::Player:
+            return PLAYERZONE_BG_NAME;
+
+        case ThemeManager::Stack:
+            return STACKZONE_BG_NAME;
+
+        case ThemeManager::Table:
+            return TABLEZONE_BG_NAME;
+
+        default:
+            Q_ASSERT(false);
     }
-
-    return returnBrush;
 }
 
-QBrush ThemeManager::getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush)
+QBrush &ThemeManager::getBgBrush(Role role)
 {
-    QBrush returnBrush;
-
-    if (!stackBgBrushesCache.contains(extraNumber.toInt())) {
-        returnBrush = loadExtraBrush(STACKZONE_BG_NAME + extraNumber, fallbackBrush);
-        stackBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
-    } else {
-        returnBrush = stackBgBrushesCache.value(extraNumber.toInt());
-    }
-
-    return returnBrush;
+    return brushes[role];
 }
 
-QBrush ThemeManager::getExtraPlayerBgBrush(QString extraNumber, QBrush &fallbackBrush)
+QBrush ThemeManager::getExtraBgBrush(Role role, int zoneId)
 {
-    QBrush returnBrush;
-
-    if (!playerBgBrushesCache.contains(extraNumber.toInt())) {
-        returnBrush = loadExtraBrush(PLAYERZONE_BG_NAME + extraNumber, fallbackBrush);
-        playerBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
-    } else {
-        returnBrush = playerBgBrushesCache.value(extraNumber.toInt());
+    if (zoneId <= 0) {
+        return getBgBrush(role);
     }
 
-    return returnBrush;
-}
+    QBrushMap &brushCache = brushesCache[role];
 
-QBrush ThemeManager::getExtraHandBgBrush(QString extraNumber, QBrush &fallbackBrush)
-{
-    QBrush returnBrush;
-
-    if (!handBgBrushesCache.contains(extraNumber.toInt())) {
-        returnBrush = loadExtraBrush(HANDZONE_BG_NAME + extraNumber, fallbackBrush);
-        handBgBrushesCache.insert(extraNumber.toInt(), returnBrush);
-    } else {
-        returnBrush = handBgBrushesCache.value(extraNumber.toInt());
+    if (!brushCache.contains(zoneId)) {
+        QBrush brush = loadExtraBrush(roleBgName(role) + QString::number(zoneId), getBgBrush(role));
+        brushCache.insert(zoneId, brush);
+        return brush;
     }
 
-    return returnBrush;
+    return brushCache.value(zoneId);
 }
