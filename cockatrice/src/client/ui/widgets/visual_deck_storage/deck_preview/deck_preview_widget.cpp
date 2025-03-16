@@ -298,11 +298,11 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
             [this] { deckLoader->saveToClipboard(true, true); });
-    connect(saveToClipboardMenu->addAction(tr("Annotated (No set name or number)")), &QAction::triggered, this,
+    connect(saveToClipboardMenu->addAction(tr("Annotated (No set info)")), &QAction::triggered, this,
             [this] { deckLoader->saveToClipboard(true, false); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated")), &QAction::triggered, this,
             [this] { deckLoader->saveToClipboard(false, true); });
-    connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set name or number)")), &QAction::triggered, this,
+    connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set info)")), &QAction::triggered, this,
             [this] { deckLoader->saveToClipboard(false, false); });
 
     menu->addSeparator();
