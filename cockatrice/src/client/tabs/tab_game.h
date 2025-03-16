@@ -208,6 +208,7 @@ private slots:
     void actResetLayout();
     void freeDocksSize();
 
+    void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
     void dockVisibleTriggered();
     void dockFloatingTriggered();

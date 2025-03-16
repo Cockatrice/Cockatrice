@@ -1018,7 +1018,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     bClosingDown = true;
 
-    if (!tabSupervisor->closeRequest()) {
+    if (!tabSupervisor->close()) {
         event->ignore();
         bClosingDown = false;
         return;
