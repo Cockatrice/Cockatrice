@@ -50,7 +50,6 @@ private:
     QCheckBox *navigationCheckBox;
     QLabel *warningLabel;
     PrintingSelectorCardSortingWidget *sortToolBar;
-    QHBoxLayout *searchAndSetLayout;
     PrintingSelectorCardSearchWidget *searchBar;
     QPushButton *selectSetForCardsButton;
     FlowWidget *flowWidget;

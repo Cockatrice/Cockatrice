@@ -114,6 +114,7 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 void PrintingSelector::retranslateUi()
 {
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
+    selectSetForCardsButton->setText(tr("Bulk Selection"));
 
     if (warningLabel) {
         warningLabel->setText(
