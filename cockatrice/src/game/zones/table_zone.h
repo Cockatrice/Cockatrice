@@ -77,6 +77,8 @@ private:
      */
     bool active;
 
+    QGraphicsPathItem *m_feedbackItem = nullptr;
+
     bool isInverted() const;
 
 private slots:
@@ -118,6 +120,14 @@ public:
      */
     void toggleTapped();
 
+    bool dragEnter(CardDragItem *dragItem, const QPointF &pos) override;
+
+    void dragMove(CardDragItem *dragItem, const QPointF &pos) override;
+
+    void dragAccept(CardDragItem *dragItem, const QPointF &pos) override;
+
+    void dragLeave(CardDragItem *dragItem) override;
+
     /**
        See HandleDropEventByGrid
      */
@@ -132,13 +142,6 @@ public:
        @return CardItem from grid location
      */
     CardItem *getCardFromGrid(const QPoint &gridPoint) const;
-
-    /**
-       @return CardItem from coordinate location
-     */
-    CardItem *getCardFromCoords(const QPointF &point) const;
-
-    QPointF closestGridPoint(const QPointF &point) override;
 
     static int clampValidTableRow(const int row);
 
@@ -183,6 +186,8 @@ protected:
 private:
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+
+    void updateFeedback(CardDragItem *dragItem, const QPointF &point);
 
     /*
     Calculates card stack widths so mapping functions work properly
