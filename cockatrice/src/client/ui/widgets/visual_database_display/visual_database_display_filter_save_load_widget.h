@@ -24,6 +24,7 @@ public:
     void saveFilter();
     void loadFilter(const QString &filename);
     void refreshFilterList();
+    void deleteFilter(const QString &filename, QPushButton *deleteButton);
 
 private:
     FilterTreeModel *filterModel;
@@ -33,7 +34,7 @@ private:
     QPushButton *saveButton;
     FlowWidget *fileListWidget;
 
-    QMap<QString, QPushButton *> fileButtons;
+QMap<QString, QPair<QPushButton *, QPushButton *>> fileButtons;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
