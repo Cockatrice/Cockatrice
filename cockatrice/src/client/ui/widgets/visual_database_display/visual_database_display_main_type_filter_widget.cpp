@@ -14,10 +14,17 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     allMainCardTypesWithCount = CardDatabaseManager::getInstance()->getAllMainCardTypesWithCount();
     // Get all main card types with their count
 
-    setMinimumWidth(300);
+    setMaximumHeight(75);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
-    layout = new QVBoxLayout(this);
+    layout = new QHBoxLayout(this);
     setLayout(layout);
+    layout->setContentsMargins(0, 1, 0, 1);
+    layout->setSpacing(1);
+    layout->setAlignment(Qt::AlignTop);
+
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+    layout->addWidget(flowWidget);
 
     // Create the spinbox
     spinBox = new QSpinBox(this);
@@ -27,9 +34,6 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     layout->addWidget(spinBox);
     connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility);
-
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
-    layout->addWidget(flowWidget);
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);

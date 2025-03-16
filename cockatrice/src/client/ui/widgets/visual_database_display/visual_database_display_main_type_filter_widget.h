@@ -29,7 +29,7 @@ private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allMainCardTypesWithCount;
     QSpinBox *spinBox;
-    QVBoxLayout *layout;
+    QHBoxLayout *layout;
     FlowWidget *flowWidget;
     QPushButton *toggleButton; // Mode switch button
 
