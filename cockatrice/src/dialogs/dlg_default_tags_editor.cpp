@@ -2,23 +2,17 @@
 
 #include "../settings/cache_settings.h"
 
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QListWidget>
-#include <QListWidgetItem>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QVBoxLayout>
-#include <QWidget>
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)
 {
     setWindowModality(Qt::WindowModal); // Steals focus from parent dialog
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    auto *mainLayout = new QVBoxLayout(this);
 
     // Input field + Add button (horizontal layout)
-    QHBoxLayout *inputLayout = new QHBoxLayout();
+    auto *inputLayout = new QHBoxLayout();
     inputField = new QLineEdit(this);
     addButton = new QPushButton(this);
     inputLayout->addWidget(inputField);

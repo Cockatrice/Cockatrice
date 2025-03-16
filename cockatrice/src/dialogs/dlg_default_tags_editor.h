@@ -2,10 +2,9 @@
 #define DLG_DEFAULT_TAGS_EDITOR_H
 
 #include <QDialog>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
-#include <QHBoxLayout>
-#include <QLineEdit>
 
 class DlgDefaultTagsEditor : public QDialog {
     Q_OBJECT
