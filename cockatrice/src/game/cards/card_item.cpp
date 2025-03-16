@@ -487,5 +487,5 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->getGame()->setActiveCard(nullptr);
         }
     }
-    return QGraphicsItem::itemChange(change, value);
+    return AbstractCardItem::itemChange(change, value);
 }
