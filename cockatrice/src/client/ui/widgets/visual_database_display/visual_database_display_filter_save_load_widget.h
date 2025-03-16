@@ -34,7 +34,7 @@ private:
     QPushButton *saveButton;
     FlowWidget *fileListWidget;
 
-QMap<QString, QPair<QPushButton *, QPushButton *>> fileButtons;
+    QMap<QString, QPair<QPushButton *, QPushButton *>> fileButtons;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
