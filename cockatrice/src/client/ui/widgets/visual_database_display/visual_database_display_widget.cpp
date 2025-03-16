@@ -37,6 +37,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
+    mainLayout->setSpacing(1);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
@@ -99,7 +101,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     quickFilterWidget->addSettingsWidget(saveLoadWidget);
     quickFilterWidget->addSettingsWidget(nameFilterWidget);
-    quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
+    // quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
     quickFilterWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterWidget->addSettingsWidget(setFilterWidget);
 
@@ -108,6 +110,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchLayout->addWidget(searchEdit);
 
     mainLayout->addWidget(searchContainer);
+
+    mainLayout->addWidget(mainTypeFilterWidget);
 
     mainLayout->addWidget(flowWidget);
 
