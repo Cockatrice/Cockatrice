@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QPixmap>
 #include <QString>
-
 #include <array>
 
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
