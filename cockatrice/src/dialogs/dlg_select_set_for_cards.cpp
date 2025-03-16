@@ -25,12 +25,14 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     setMinimumSize(500, 500);
     setAcceptDrops(true);
 
+    instructionLabel = new QLabel(this);
+    instructionLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
 
     // Main vertical splitter
     QSplitter *splitter = new QSplitter(Qt::Vertical, this);
-    mainLayout->addWidget(splitter);
 
     // Top scroll area
     scrollArea = new QScrollArea(this);
@@ -100,7 +102,6 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    splitter->addWidget(buttonBox);
 
     // Set stretch factors
     splitter->setStretchFactor(0, 6); // Scroll area gets more space
@@ -112,6 +113,18 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
 
     connect(this, &DlgSelectSetForCards::orderChanged, this, &DlgSelectSetForCards::updateLayoutOrder);
     connect(this, &DlgSelectSetForCards::widgetOrderChanged, this, &DlgSelectSetForCards::updateCardLists);
+
+    mainLayout->addWidget(instructionLabel);
+    mainLayout->addWidget(splitter);
+    mainLayout->addWidget(buttonBox);
+
+    retranslateUi();
+}
+
+void DlgSelectSetForCards::retranslateUi()
+{
+    instructionLabel->setText(tr("Check Sets to enable them. Drag-and-Drop to reorder them and change their "
+                                 "priority. Cards will use the printing of the highest priority enabled set."));
 }
 
 void DlgSelectSetForCards::actOK()

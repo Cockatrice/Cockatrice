@@ -63,15 +63,12 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     searchBar = new PrintingSelectorCardSearchWidget(this);
 
-    sortAndOptionsLayout->addWidget(searchBar);
-    sortAndOptionsLayout->addWidget(displayOptionsWidget);
-    searchAndSetLayout->addWidget(searchBar);
-
     selectSetForCardsButton = new QPushButton(this);
     connect(selectSetForCardsButton, &QPushButton::clicked, this, &PrintingSelector::selectSetForCards);
-    searchAndSetLayout->addWidget(selectSetForCardsButton);
 
-    layout->addLayout(searchAndSetLayout);
+    sortAndOptionsLayout->addWidget(searchBar);
+    sortAndOptionsLayout->addWidget(selectSetForCardsButton);
+    sortAndOptionsLayout->addWidget(displayOptionsWidget);
 
     layout->addWidget(sortAndOptionsContainer);
 
@@ -91,6 +88,7 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 void PrintingSelector::retranslateUi()
 {
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
+    selectSetForCardsButton->setText(tr("Bulk Selection"));
 }
 
 void PrintingSelector::printingsInDeckChanged()

@@ -49,7 +49,6 @@ private:
     QHBoxLayout *sortAndOptionsLayout;
     QCheckBox *navigationCheckBox;
     PrintingSelectorCardSortingWidget *sortToolBar;
-    QHBoxLayout *searchAndSetLayout;
     PrintingSelectorCardSearchWidget *searchBar;
     QPushButton *selectSetForCardsButton;
     FlowWidget *flowWidget;
