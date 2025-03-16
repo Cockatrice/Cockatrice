@@ -1,5 +1,7 @@
 #include "deck_preview_tag_dialog.h"
 
+#include "../../../../../dialogs/dlg_default_tags_editor.h"
+#include "../../../../../settings/cache_settings.h"
 #include "deck_preview_tag_item_widget.h"
 
 #include <QCheckBox>
@@ -11,89 +13,11 @@
 #include <QVBoxLayout>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const QStringList &activeTags, QWidget *parent)
-    : QDialog(parent), activeTags_(activeTags)
+    : QDialog(parent), activeTags_(activeTags), knownTags_(knownTags)
 {
     resize(400, 500);
 
-    QStringList defaultTags = {
-        // Strategies
-        "🏃️ Aggro",
-        "🧙‍️ Control",
-        "⚔️ Midrange",
-        "🌀 Combo",
-        "🪓 Mill",
-        "🔒 Stax",
-        "🗺️ Landfall",
-        "🛡️ Pillowfort",
-        "🌱 Ramp",
-        "⚡ Storm",
-        "💀 Aristocrats",
-        "☠️ Reanimator",
-        "👹 Sacrifice",
-        "🔥 Burn",
-        "🌟 Lifegain",
-        "🔮 Spellslinger",
-        "👥 Tokens",
-        "🎭 Blink",
-        "⏳ Time Manipulation",
-        "🌍 Domain",
-        "💫 Proliferate",
-        "📜 Saga",
-        "🎲 Chaos",
-        "🪄 Auras",
-        "🔫 Pingers",
-
-        // Themes
-        "👑 Monarch",
-        "🚀 Vehicles",
-        "💉 Infect",
-        "🩸 Madness",
-        "🌀 Morph",
-
-        // Card Types
-        "⚔️ Creature",
-        "💎 Artifact",
-        "🌔 Enchantment",
-        "📖 Sorcery",
-        "⚡ Instant",
-        "🌌 Planeswalker",
-        "🌏 Land",
-        "🪄 Aura",
-
-        // Kindred Types
-        "🐉 Kindred",
-        "🧙 Humans",
-        "⚔️ Soldiers",
-        "🛡️ Knights",
-        "🎻 Bards",
-        "🧝 Elves",
-        "🌲 Dryads",
-        "😇 Angels",
-        "🎩 Wizards",
-        "🧛 Vampires",
-        "🦴 Skeletons",
-        "💀 Zombies",
-        "👹 Demons",
-        "👾 Eldrazi",
-        "🐉 Dragons",
-        "🐠 Merfolk",
-        "🦁 Cats",
-        "🐺 Wolves",
-        "🐺 Werewolves",
-        "🦇 Bats",
-        "🐀 Rats",
-        "🦅 Birds",
-        "🦗 Insects",
-        "🍄 Fungus",
-        "🐚 Sea Creatures",
-        "🐗 Boars",
-        "🦊 Foxes",
-        "🦄 Unicorns",
-        "🐘 Elephants",
-        "🐻 Bears",
-        "🦏 Rhinos",
-        "🦂 Scorpions",
-    };
+    QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
 
     // Merge knownTags with defaultTags, ensuring no duplicates
     QStringList combinedTags = defaultTags + knownTags + activeTags;
@@ -131,8 +55,14 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     auto *addTagLayout = new QHBoxLayout();
     newTagInput_ = new QLineEdit(this);
     addTagButton_ = new QPushButton(this);
+    editButton = new QPushButton(this);
+    connect(editButton, &QPushButton::clicked, this, [=, this]() {
+        auto defaultTagsEditor = new DlgDefaultTagsEditor(nullptr);
+        defaultTagsEditor->exec();
+    });
     addTagLayout->addWidget(newTagInput_);
     addTagLayout->addWidget(addTagButton_);
+    addTagLayout->addWidget(editButton);
     mainLayout->addLayout(addTagLayout);
 
     connect(addTagButton_, &QPushButton::clicked, this, &DeckPreviewTagDialog::addTag);
@@ -141,6 +71,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     auto *buttonLayout = new QHBoxLayout();
     okButton = new QPushButton(this);
     cancelButton = new QPushButton(this);
+
     buttonLayout->addStretch();
     buttonLayout->addWidget(okButton);
     buttonLayout->addWidget(cancelButton);
@@ -148,6 +79,10 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
 
     connect(okButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::accept);
     connect(cancelButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::reject);
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDefaultTagsListChanged, this,
+            &DeckPreviewTagDialog::refreshTagList);
+
     retranslateUi();
 }
 
@@ -159,7 +94,29 @@ void DeckPreviewTagDialog::retranslateUi()
     addTagButton_->setText(tr("Add Tag"));
     filterInput_->setPlaceholderText(tr("Filter tags..."));
     okButton->setText(tr("OK"));
+    editButton->setText(tr("Edit default tags"));
     cancelButton->setText(tr("Cancel"));
+}
+
+void DeckPreviewTagDialog::refreshTagList()
+{
+    // First, clear the current tags in the list view
+    tagListView_->clear();
+
+    // Get the updated list of tags from SettingsCache
+    QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
+    QStringList combinedTags = defaultTags + knownTags_ + activeTags_;
+    combinedTags.removeDuplicates();
+
+    // Re-populate the tag list view
+    for (const auto &tag : combinedTags) {
+        auto *item = new QListWidgetItem(tagListView_);
+        auto *tagWidget = new DeckPreviewTagItemWidget(tag, activeTags_.contains(tag), this);
+        tagListView_->addItem(item);
+        tagListView_->setItemWidget(item, tagWidget);
+
+        connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
+    }
 }
 
 QStringList DeckPreviewTagDialog::getActiveTags() const

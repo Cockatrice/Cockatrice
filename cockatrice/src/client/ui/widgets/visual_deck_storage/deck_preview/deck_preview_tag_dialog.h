@@ -24,6 +24,7 @@ private slots:
     void addTag();
     void onCheckboxStateChanged();
     void retranslateUi();
+    void refreshTagList();
 
 private:
     QLabel *instructionLabel;
@@ -32,8 +33,10 @@ private:
     QLineEdit *newTagInput_;
     QPushButton *addTagButton_;
     QPushButton *okButton;
+    QPushButton *editButton;
     QPushButton *cancelButton;
     QStringList activeTags_;
+    QStringList knownTags_;
 };
 
 #endif // DECK_PREVIEW_TAG_DIALOG_H
