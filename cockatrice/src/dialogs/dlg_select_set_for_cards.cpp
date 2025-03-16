@@ -53,7 +53,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
     leftLayout->setContentsMargins(0, 0, 0, 0);
 
-    uneditedCardsLabel = new QLabel("Unmodified Cards:", this);
+    uneditedCardsLabel = new QLabel(this);
     uneditedCardsArea = new QScrollArea(this);
     uneditedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     uneditedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -72,7 +72,7 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
     rightLayout->setContentsMargins(0, 0, 0, 0);
 
-    modifiedCardsLabel = new QLabel("Modified Cards:", this);
+    modifiedCardsLabel = new QLabel(this);
     modifiedCardsArea = new QScrollArea(this);
     modifiedCardsArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     modifiedCardsArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -132,6 +132,8 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
 
 void DlgSelectSetForCards::retranslateUi()
 {
+    uneditedCardsLabel->setText(tr("Unmodified Cards:"));
+    modifiedCardsLabel->setText(tr("Modified Cards:"));
     instructionLabel->setText(tr("Check Sets to enable them. Drag-and-Drop to reorder them and change their "
                                  "priority. Cards will use the printing of the highest priority enabled set."));
     clearButton->setText(tr("Clear all set information"));
