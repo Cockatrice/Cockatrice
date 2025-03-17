@@ -147,7 +147,7 @@ protected:
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating;
     QAction *aFilterDockVisible, *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
 
-    bool modified;
+    bool modified = false;
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H
