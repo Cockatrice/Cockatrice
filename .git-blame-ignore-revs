@@ -1,0 +1,12 @@
+# This file lists commits that should be ignored in `git blame` output
+# (typically commits that reformat large amount of code).
+#
+# When adding commits to this file, please include the short (one-liner)
+# description of the commit along with its hash for readability.
+#
+# Use it with:
+#
+# $ git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Convert rest of source to 4-space indent
+1bc48a78491d8a666d1a833930dc3ab4a5741fb2
