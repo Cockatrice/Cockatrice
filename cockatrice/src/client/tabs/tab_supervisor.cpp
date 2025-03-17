@@ -265,6 +265,9 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
     for (auto tabId : gameTabsToRemove) {
         gameTabs.remove(tabId);
     }
+
+    // Prevent segfaults caused by trying to set menu while the app is in the middle of destructing everything
+    disconnect(this, &TabSupervisor::setMenu, nullptr, nullptr);
 }
 
 AbstractClient *TabSupervisor::getClient() const
