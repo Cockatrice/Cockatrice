@@ -256,6 +256,12 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
     QSet<int> gameTabsToRemove;
     for (auto it = gameTabs.begin(), end = gameTabs.end(); it != end; ++it) {
         if (it.value()->close()) {
+            // Hotfix: the tab owns the `QMenu`s so they need to be cleared,
+            // otherwise we end up with use-after-free bugs.
+            if (it.value() == currentWidget()) {
+                emit setMenu();
+            }
+
             gameTabsToRemove.insert(it.key());
         } else {
             event->ignore();
