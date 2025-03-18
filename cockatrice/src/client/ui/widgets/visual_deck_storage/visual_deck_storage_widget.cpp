@@ -187,8 +187,8 @@ void VisualDeckStorageWidget::retranslateUi()
     tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
     bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
     searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
-    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
-    unusedColorIdentitiesOpacityLabel->setText(tr("Not contained Color Identities Opacity"));
+    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
+    unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
     unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
 }
 
