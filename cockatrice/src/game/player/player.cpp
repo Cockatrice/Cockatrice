@@ -2064,7 +2064,6 @@ void Player::createCard(const CardItem *sourceCard,
             cmd.set_target_zone("table"); // We currently only support creating tokens on the table
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
-            cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
             break;
 
         case CardRelation::TransformInto:
