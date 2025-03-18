@@ -721,6 +721,7 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
     settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
+    emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
 void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)

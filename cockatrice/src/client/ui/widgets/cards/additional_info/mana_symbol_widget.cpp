@@ -15,6 +15,9 @@ ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isAct
     opacityEffect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(opacityEffect);
     updateOpacity();
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageUnusedColorIdentitiesOpacityChanged, this,
+            &ManaSymbolWidget::updateOpacity);
 }
 
 void ManaSymbolWidget::setColorActive(bool active)
