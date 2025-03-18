@@ -13,12 +13,6 @@ class Tab : public QMainWindow
 signals:
     void userEvent(bool globalEvent = true);
     void tabTextChanged(Tab *tab, const QString &newTabText);
-    /**
-     * Emitted when the tab is closed (because Qt doesn't provide a built-in close signal)
-     * This signal is emitted from this class's overridden Tab::closeEvent method.
-     * Make sure any subclasses that override closeEvent still emit this signal from there.
-     */
-    void closed();
 
 protected:
     TabSupervisor *tabSupervisor;
@@ -29,7 +23,6 @@ protected:
 protected slots:
     void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
     void deleteCardInfoPopup(const QString &cardName);
-    void closeEvent(QCloseEvent *event) override;
 
 private:
     QString currentCardName, currentProviderId;

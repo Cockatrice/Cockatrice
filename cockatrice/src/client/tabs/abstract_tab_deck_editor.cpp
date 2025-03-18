@@ -554,5 +554,5 @@ void AbstractTabDeckEditor::closeRequest(bool forced)
     }
 
     emit deckEditorClosing(this);
-    close();
+    deleteLater();
 }

@@ -89,7 +89,7 @@ QString TabMessage::getTabText() const
 void TabMessage::closeRequest(bool /*forced*/)
 {
     emit talkClosing(this);
-    close();
+    deleteLater();
 }
 
 void TabMessage::sendMessage()

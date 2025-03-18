@@ -175,7 +175,7 @@ void TabRoom::closeRequest(bool /*forced*/)
 {
     sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
     emit roomClosing(this);
-    close();
+    deleteLater();
 }
 
 void TabRoom::tabActivated()
