@@ -25,7 +25,11 @@ public:
      * Supported file extensions for decklist files
      */
     static const QStringList ACCEPTED_FILE_EXTENSIONS;
-    static const QStringList fileNameFilters;
+
+    /**
+     * For use with `QFileDialog::setNameFilters`
+     */
+    static const QStringList FILE_NAME_FILTERS;
 
 private:
     QString lastFileName;

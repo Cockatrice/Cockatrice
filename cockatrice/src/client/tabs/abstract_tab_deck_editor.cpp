@@ -355,7 +355,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
+    dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
     dialog.selectFile(getDeckList()->getName().trimmed());
     if (!dialog.exec())
         return false;

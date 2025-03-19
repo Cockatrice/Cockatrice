@@ -18,8 +18,8 @@
 
 const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.dek", "*.txt", "*.mwDeck"};
 
-const QStringList DeckLoader::fileNameFilters = {tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")),
-                                                 tr("All files (*.*)")};
+const QStringList DeckLoader::FILE_NAME_FILTERS = {
+    tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
 DeckLoader::DeckLoader() : DeckList(), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {

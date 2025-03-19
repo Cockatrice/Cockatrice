@@ -11,7 +11,7 @@ DlgLoadDeck::DlgLoadDeck(QWidget *parent) : QFileDialog(parent, tr("Load Deck"))
     }
 
     setDirectory(startingDir);
-    setNameFilters(DeckLoader::fileNameFilters);
+    setNameFilters(DeckLoader::FILE_NAME_FILTERS);
 
     connect(this, &DlgLoadDeck::accepted, this, &DlgLoadDeck::actAccepted);
 }
