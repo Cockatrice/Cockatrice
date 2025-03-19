@@ -20,7 +20,16 @@ public:
         PlainTextFormat,
         CockatriceFormat
     };
-    static const QStringList fileNameFilters;
+
+    /**
+     * Supported file extensions for decklist files
+     */
+    static const QStringList ACCEPTED_FILE_EXTENSIONS;
+
+    /**
+     * For use with `QFileDialog::setNameFilters`
+     */
+    static const QStringList FILE_NAME_FILTERS;
 
 private:
     QString lastFileName;
