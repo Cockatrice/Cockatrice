@@ -20,6 +20,11 @@ public:
         PlainTextFormat,
         CockatriceFormat
     };
+
+    /**
+     * Supported file extensions for decklist files
+     */
+    static const QStringList ACCEPTED_FILE_EXTENSIONS;
     static const QStringList fileNameFilters;
 
 private:

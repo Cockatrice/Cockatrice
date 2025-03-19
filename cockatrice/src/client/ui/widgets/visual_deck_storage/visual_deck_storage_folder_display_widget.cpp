@@ -71,7 +71,7 @@ static QStringList getAllFiles(const QString &filePath, bool recursive)
     // QDirIterator with QDir::Files ensures only files are listed (no directories)
     auto flags =
         recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
-    QDirIterator it(filePath, {"*.txt", "*.cod"}, QDir::Files, flags);
+    QDirIterator it(filePath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files, flags);
 
     while (it.hasNext()) {
         allFiles << it.next(); // Add each file path to the list
