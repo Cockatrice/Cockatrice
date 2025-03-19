@@ -66,26 +66,25 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
     cmd.set_target_zone(getName().toStdString());
 
     int index = 0;
-    if (cards.isEmpty()) {
-        index = 0;
-    } else {
+
+    if (!cards.isEmpty()) {
         const auto cardCount = static_cast<int>(cards.size());
         const auto &card = cards.at(0);
 
-        if (card == nullptr) {
-            qCWarning(StackZoneLog) << "Attempted to move card from" << startZone->getName() << ", but was null";
-            return;
-        }
-
         index = qRound(divideCardSpaceInZone(dropPoint.y(), cardCount, boundingRect().height(),
                                              card->boundingRect().height(), true));
-    }
 
-    if (startZone == this) {
-        const auto &dragItem = dragItems.at(0);
-        const auto &card = cards.at(index);
-        if (card != nullptr && dragItem != nullptr && card->getId() == dragItem->getId()) {
-            return;
+        // divideCardSpaceInZone is not guaranteed to return a valid index
+        // currently, so clamp it to avoid crashes.
+        index = qBound(0, index, cardCount - 1);
+
+        if (startZone == this) {
+            const auto &dragItem = dragItems.at(0);
+            const auto &card = cards.at(index);
+
+            if (card->getId() == dragItem->getId()) {
+                return;
+            }
         }
     }
 
