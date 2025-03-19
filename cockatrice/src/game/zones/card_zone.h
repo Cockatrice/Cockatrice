@@ -58,26 +58,6 @@ public:
     {
         return Type;
     }
-
-    /* Called when a card is dragged on top of the zone.
-
-       Return `true` to accept the drag, `false` otherwise.
-    */
-    virtual bool dragEnter(CardDragItem *dragItem, const QPointF &pos);
-
-    /* Called when a card that has been accepted by `dragEnter` is moved over
-       the zone.
-    */
-    virtual void dragMove(CardDragItem *dragItem, const QPointF &pos);
-
-    /* Called when a card that has been accepted by `dragEnter` is dropped onto
-       the zone. */
-    virtual void dragAccept(CardDragItem *dragItem, const QPointF &pos);
-
-    /* Called when a card that has been accepted by `dragEnter` leaves the zone.
-     */
-    virtual void dragLeave(CardDragItem *dragItem);
-
     virtual void
     handleDropEvent(const QList<CardDragItem *> &dragItem, CardZone *startZone, const QPoint &dropPoint) = 0;
     CardZone(Player *_player,
@@ -134,6 +114,7 @@ public:
         return views;
     }
     virtual void reorganizeCards() = 0;
+    virtual QPointF closestGridPoint(const QPointF &point);
     bool getIsView() const
     {
         return isView;
