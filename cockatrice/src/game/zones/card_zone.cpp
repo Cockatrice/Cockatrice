@@ -1,10 +1,11 @@
 #include "card_zone.h"
 
 #include "../cards/card_database_manager.h"
-#include "../cards/card_drag_item.h"
 #include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
+#include "pb/serverinfo_user.pb.h"
+#include "pile_zone.h"
 #include "view_zone.h"
 
 #include <QAction>
@@ -232,26 +233,7 @@ void CardZone::moveAllToZone()
     player->sendGameCommand(cmd);
 }
 
-bool CardZone::dragEnter(CardDragItem *dragItem, const QPointF &pos)
+QPointF CardZone::closestGridPoint(const QPointF &point)
 {
-    Q_UNUSED(dragItem);
-    Q_UNUSED(pos);
-
-    return true;
-}
-
-void CardZone::dragMove(CardDragItem *dragItem, const QPointF &pos)
-{
-    Q_UNUSED(dragItem);
-    Q_UNUSED(pos);
-}
-
-void CardZone::dragAccept(CardDragItem *dragItem, const QPointF &pos)
-{
-    handleDropEvent(dragItem->getValidItems(), dragItem->getStartZone(), pos.toPoint());
-}
-
-void CardZone::dragLeave(CardDragItem *dragItem)
-{
-    Q_UNUSED(dragItem);
+    return point;
 }

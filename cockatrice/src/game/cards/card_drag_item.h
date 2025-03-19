@@ -11,7 +11,7 @@ class CardDragItem : public AbstractCardDragItem
 private:
     int id;
     bool faceDown;
-    bool isValid = true;
+    bool occupied;
     CardZone *currentZone;
 
 public:
@@ -20,7 +20,6 @@ public:
                  const QPointF &_hotSpot,
                  bool _faceDown,
                  AbstractCardDragItem *parentDrag = 0);
-    virtual ~CardDragItem();
     int getId() const
     {
         return id;
@@ -31,18 +30,6 @@ public:
     }
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void updatePosition(const QPointF &cursorScenePos) override;
-
-    void setValid(bool _valid)
-    {
-        if (_valid != isValid) {
-            isValid = _valid;
-            update();
-        }
-    }
-
-    CardZone *getStartZone() const;
-
-    QList<CardDragItem *> getValidItems();
 
 protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
