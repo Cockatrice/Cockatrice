@@ -1309,7 +1309,7 @@ void MessagesSettingsPage::retranslateUi()
     aAdd->setText(tr("Add New Message"));
     aEdit->setText(tr("Edit Message"));
     aRemove->setText(tr("Remove Message"));
-    localTimeCheckBox.setText(tr("Enable In-Game Time"));
+    localTimeCheckBox.setText(tr("Use Room Time over Real-Life Time"));
 }
 
 SoundSettingsPage::SoundSettingsPage()
