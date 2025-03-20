@@ -1443,19 +1443,20 @@ void Player::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExpr, movingCardsUntilNumberOfHits, movingCardsUntilAutoPlay);
+    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExprs, movingCardsUntilNumberOfHits, movingCardsUntilAutoPlay);
     if (!dlg.exec()) {
         return;
     }
 
-    movingCardsUntilExpr = dlg.getExpr();
+    auto expr = dlg.getExpr();
+    movingCardsUntilExprs = dlg.getExprs();
     movingCardsUntilNumberOfHits = dlg.getNumberOfHits();
     movingCardsUntilAutoPlay = dlg.isAutoPlay();
 
     if (zones.value("deck")->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
-        movingCardsUntilFilter = FilterString(movingCardsUntilExpr);
+        movingCardsUntilFilter = FilterString(expr);
         movingCardsUntilCounter = movingCardsUntilNumberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
