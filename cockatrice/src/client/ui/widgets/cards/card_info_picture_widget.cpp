@@ -3,7 +3,6 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
-#include "../../../tabs/tab_deck_editor.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../picture_loader/picture_loader.h"
 #include "../../window_main.h"
@@ -44,6 +43,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverTo
     hoverTimer = new QTimer(this);
     hoverTimer->setSingleShot(true);
     connect(hoverTimer, &QTimer::timeout, this, &CardInfoPictureWidget::showEnlargedPixmap);
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        update();
+    });
 }
 
 /**
@@ -186,7 +191,8 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     QRect targetRect{targetX, targetY, targetW, targetH};
 
     // Compute rounded corner radius
-    qreal radius = 0.05 * static_cast<qreal>(targetRect.width()); // Ensure consistent rounding
+    qreal radius = SettingsCache::instance().getCardCornerRadius() *
+                   static_cast<qreal>(targetRect.width()); // Ensure consistent rounding
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);

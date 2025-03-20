@@ -47,6 +47,7 @@ class QSettings;
 class SettingsCache : public QObject
 {
     Q_OBJECT
+
 signals:
     void langChanged();
     void picsPathChanged();
@@ -82,6 +83,8 @@ signals:
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
+    void roundCardCornersChanged(bool roundCardCorners);
+    void cardCornerRadiusChanged(qreal cardCornerRadius);
 
 private:
     QSettings *settings;
@@ -201,6 +204,7 @@ private:
     bool rememberGameSettings;
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
+    bool roundCardCorners;
 
 public:
     SettingsCache();
@@ -727,6 +731,14 @@ public:
     {
         return mbDownloadSpoilers;
     }
+    bool getRoundCardCorners() const
+    {
+        return roundCardCorners;
+    }
+    qreal getCardCornerRadius() const
+    {
+        return roundCardCorners ? 0.05 : 0.;
+    }
 
     static SettingsCache &instance();
     void resetPaths();
@@ -834,6 +846,7 @@ public slots:
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
+    void setRoundCardCorners(bool _roundCardCorners);
 };
 
 #endif

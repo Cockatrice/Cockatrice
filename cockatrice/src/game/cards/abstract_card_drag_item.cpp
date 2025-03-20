@@ -1,6 +1,6 @@
 #include "abstract_card_drag_item.h"
 
-#include "card_database.h"
+#include "../../settings/cache_settings.h"
 
 #include <QCursor>
 #include <QDebug>
@@ -32,6 +32,13 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
                          .translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
 
     setCacheMode(DeviceCoordinateCache);
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        prepareGeometryChange();
+        update();
+    });
 }
 
 AbstractCardDragItem::~AbstractCardDragItem()
@@ -43,7 +50,8 @@ AbstractCardDragItem::~AbstractCardDragItem()
 QPainterPath AbstractCardDragItem::shape() const
 {
     QPainterPath shape;
-    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    qreal cardCornerRadius = SettingsCache::instance().getCardCornerRadius() * CARD_WIDTH;
+    shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
 
