@@ -388,6 +388,9 @@ void SettingsCache::setUpdateReleaseChannelIndex(int /* value */)
 void SettingsCache::setMaxFontSize(int /* _max */)
 {
 }
+void SettingsCache::setRoundCardCorners(bool /* _roundCardCorners */)
+{
+}
 
 void PictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 {
