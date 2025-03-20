@@ -75,7 +75,6 @@ DeckViewCard::DeckViewCard(QGraphicsItem *parent,
 {
     setAcceptHoverEvents(true);
 
-
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
 
