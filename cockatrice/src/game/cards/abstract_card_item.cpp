@@ -10,7 +10,6 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <QStyleOption>
 #include <algorithm>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
@@ -19,7 +18,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
                                    Player *_owner,
                                    int _id)
     : ArrowTarget(_owner, parent), id(_id), name(_name), providerId(_providerId), tapped(false), facedown(false),
-      tapAngle(0), bgColor(Qt::transparent), realZValue(0)
+      tapAngle(0), bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -27,8 +26,6 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
 
     connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
     refreshCardInfo();
-
-    setAcceptHoverEvents(true);
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -160,7 +157,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     painter->restore();
 }
 
-void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * /*widget*/)
+void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     painter->save();
 
@@ -169,7 +166,6 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, false);
 
-    bool isHovered = option->state.testFlag(QStyle::State_MouseOver);
     if (isSelected() || isHovered) {
         QPen pen;
         if (isHovered)
@@ -212,24 +208,17 @@ void AbstractCardItem::setProviderId(const QString &_providerId)
     refreshCardInfo();
 }
 
-void AbstractCardItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void AbstractCardItem::setHovered(bool _hovered)
 {
-    Q_UNUSED(event);
+    if (isHovered == _hovered)
+        return;
 
-    emit hovered(this);
-    setZValue(2000000004);
-    setScale(SettingsCache::instance().getScaleCards() ? 1.1 : 1);
-    setTransformOriginPoint(CARD_WIDTH / 2, CARD_HEIGHT / 2);
-    update();
-}
-
-void AbstractCardItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    Q_UNUSED(event);
-
-    setZValue(realZValue);
-    setScale(1);
-    setTransformOriginPoint(0, 0);
+    if (_hovered)
+        processHoverEvent();
+    isHovered = _hovered;
+    setZValue(_hovered ? 2000000004 : realZValue);
+    setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
+    setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
 }
 
@@ -323,6 +312,11 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     // This function ensures the parent function doesn't mess around with our selection.
     event->accept();
+}
+
+void AbstractCardItem::processHoverEvent()
+{
+    emit hovered(this);
 }
 
 QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
