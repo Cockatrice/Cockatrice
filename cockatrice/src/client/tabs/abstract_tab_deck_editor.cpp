@@ -476,7 +476,7 @@ void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite 
         QDesktopServices::openUrl(decklistUrlString);
     } else {
         // if there's no deck loader object, return an error
-        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be saved."));
+        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be exported."));
     }
 }
 
