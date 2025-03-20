@@ -21,6 +21,7 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <algorithm>
+#include <qcheckbox.h>
 
 #define SORT_RESET -1
 
@@ -162,6 +163,16 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
+    includeOnlineOnlyCards = SettingsCache::instance().getIncludeOnlineOnlyCards();
+    QCheckBox *onlineOnly = new QCheckBox(tr("Include online-only (Arena) cards [requires restart]"));
+    onlineOnly->setChecked(includeOnlineOnlyCards);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(onlineOnly, &QCheckBox::checkStateChanged, this, &WndSets::onlineOnlyCheckStateChanged);
+#else
+    connect(onlineOnly, &QCheckBox::stateChanged, this,
+            [this](int state) { onlineOnlyCheckStateChanged(static_cast<Qt::CheckState>(state)); });
+#endif
+
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
@@ -175,8 +186,9 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(hintsGroupBox, 4, 1, 1, 2);
-    mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
+    mainLayout->addWidget(onlineOnly, 4, 1, 1, 2);
+    mainLayout->addWidget(hintsGroupBox, 5, 1, 1, 2);
+    mainLayout->addWidget(buttonBox, 6, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
 
@@ -239,9 +251,23 @@ void WndSets::rebuildMainLayout(int actionToTake)
     }
 }
 
+void WndSets::onlineOnlyCheckStateChanged(Qt::CheckState state)
+{
+    switch (state) {
+        case Qt::Unchecked:
+            includeOnlineOnlyCards = false;
+            break;
+
+        default:
+            includeOnlineOnlyCards = true;
+            break;
+    }
+}
+
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
+    SettingsCache::instance().setIncludeOnlineOnlyCards(includeOnlineOnlyCards);
     PictureLoader::clearPixmapCache();
     close();
 }

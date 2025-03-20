@@ -7882,128 +7882,133 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>WndSets</name>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="39"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="40"/>
         <source>Move selected set to the top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="46"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="47"/>
         <source>Move selected set up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="53"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="54"/>
         <source>Move selected set down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="60"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="61"/>
         <source>Move selected set to the bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="68"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="69"/>
         <source>Search by set name, code, or type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="73"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="74"/>
         <source>Default order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="74"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="75"/>
         <source>Restore original art priority order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="111"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="112"/>
         <source>Enable all sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="112"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="113"/>
         <source>Disable all sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="113"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="114"/>
         <source>Enable selected set(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="114"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="115"/>
         <source>Disable selected set(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="135"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="136"/>
         <source>Deck Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="135"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="136"/>
         <source>Use CTRL+A to select all sets in the view.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="136"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="137"/>
         <source>Only cards in enabled sets will appear in the card list of the deck editor.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="137"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="138"/>
         <source>Image priority is decided in the following order:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="138"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="139"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="137"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="138"/>
         <source>Card Art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="142"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="143"/>
         <source>How to use custom card art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="146"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="147"/>
         <source>Hints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="149"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="150"/>
         <source>Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="153"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="154"/>
         <source>Sorting by column allows you to find a set while not changing set priority.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="154"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="155"/>
         <source>To enable ordering again, click the column header until this message disappears.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="157"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="158"/>
         <source>Use the current sorting as the set priority instead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="158"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="159"/>
         <source>Sorts the set priority using the same column</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_manage_sets.cpp" line="190"/>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="167"/>
+        <source>Include online-only (Arena) cards [requires restart]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_manage_sets.cpp" line="202"/>
         <source>Manage sets</source>
         <translation type="unfinished"></translation>
     </message>
