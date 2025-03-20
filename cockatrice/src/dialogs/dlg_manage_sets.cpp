@@ -166,12 +166,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     includeOnlineOnlyCards = SettingsCache::instance().getIncludeOnlineOnlyCards();
     QCheckBox *onlineOnly = new QCheckBox(tr("Include online-only (Arena) cards [requires restart]"));
     onlineOnly->setChecked(includeOnlineOnlyCards);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-    connect(onlineOnly, &QCheckBox::checkStateChanged, this, &WndSets::onlineOnlyCheckStateChanged);
-#else
-    connect(onlineOnly, &QCheckBox::stateChanged, this,
-            [this](int state) { onlineOnlyCheckStateChanged(static_cast<Qt::CheckState>(state)); });
-#endif
+    connect(onlineOnly, &QAbstractButton::toggled, this, &WndSets::includeOnlineOnlyCardsChanged);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
@@ -251,17 +246,9 @@ void WndSets::rebuildMainLayout(int actionToTake)
     }
 }
 
-void WndSets::onlineOnlyCheckStateChanged(Qt::CheckState state)
+void WndSets::includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCards)
 {
-    switch (state) {
-        case Qt::Unchecked:
-            includeOnlineOnlyCards = false;
-            break;
-
-        default:
-            includeOnlineOnlyCards = true;
-            break;
-    }
+    includeOnlineOnlyCards = _includeOnlineOnlyCards;
 }
 
 void WndSets::actSave()

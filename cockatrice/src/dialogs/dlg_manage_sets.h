@@ -74,7 +74,7 @@ private slots:
     void actDisableResetButton(const QString &filterText);
     void actSort(int index);
     void actIgnoreWarning();
-    void onlineOnlyCheckStateChanged(Qt::CheckState state);
+    void includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCardsChanged);
 };
 
 #endif
