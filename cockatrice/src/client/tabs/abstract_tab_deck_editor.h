@@ -100,6 +100,7 @@ protected slots:
     void actSaveDeckToClipboardRawNoSetInfo();
     void actPrintDeck();
     void actExportDeckDecklist();
+    void actExportDeckDecklistXyz();
     void actAnalyzeDeckDeckstats();
     void actAnalyzeDeckTappedout();
 
@@ -119,6 +120,7 @@ protected slots:
 private:
     virtual void setDeck(DeckLoader *_deck);
     void editDeckInClipboard(bool annotated);
+    void exportToDecklistWebsite(DeckLoader::DecklistWebsite website);
 
 protected:
     /**

@@ -55,6 +55,9 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
     aExportDeckDecklist = new QAction(QString(), this);
     connect(aExportDeckDecklist, SIGNAL(triggered()), deckEditor, SLOT(actExportDeckDecklist()));
 
+    aExportDeckDecklistXyz = new QAction(QString(), this);
+    connect(aExportDeckDecklistXyz, SIGNAL(triggered()), deckEditor, SLOT(actExportDeckDecklistXyz()));
+
     aAnalyzeDeckDeckstats = new QAction(QString(), this);
     connect(aAnalyzeDeckDeckstats, SIGNAL(triggered()), deckEditor, SLOT(actAnalyzeDeckDeckstats()));
 
@@ -63,6 +66,8 @@ DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEdit
 
     analyzeDeckMenu = new QMenu(this);
     analyzeDeckMenu->addAction(aExportDeckDecklist);
+    analyzeDeckMenu->addAction(aExportDeckDecklistXyz);
+    analyzeDeckMenu->addSeparator();
     analyzeDeckMenu->addAction(aAnalyzeDeckDeckstats);
     analyzeDeckMenu->addAction(aAnalyzeDeckTappedout);
 
@@ -160,6 +165,7 @@ void DeckEditorMenu::retranslateUi()
 
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
     aExportDeckDecklist->setText(tr("Create decklist (decklist.org)"));
+    aExportDeckDecklistXyz->setText(tr("Create decklist (decklist.xyz)"));
     aAnalyzeDeckDeckstats->setText(tr("Analyze deck (deckstats.net)"));
     aAnalyzeDeckTappedout->setText(tr("Analyze deck (tappedout.net)"));
 
