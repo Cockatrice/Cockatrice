@@ -8,6 +8,7 @@
 #include "../settings/cache_settings.h"
 
 #include <QAction>
+#include <QCheckbox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -21,7 +22,6 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <algorithm>
-#include <qcheckbox.h>
 
 #define SORT_RESET -1
 
