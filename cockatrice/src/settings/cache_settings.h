@@ -54,7 +54,7 @@ signals:
     void themeChanged();
     void picDownloadChanged();
     void displayCardNamesChanged();
-    void overrideAllCardArtWithPersonalPreferenceChanged();
+    void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
