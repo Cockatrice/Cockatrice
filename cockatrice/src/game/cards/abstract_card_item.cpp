@@ -48,7 +48,7 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getCardCornerRadius() * CARD_WIDTH;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }

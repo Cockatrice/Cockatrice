@@ -332,14 +332,6 @@ SettingsCache::SettingsCache()
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
-
-    connect(this, &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCornersChanged) {
-        if (_roundCardCornersChanged) {
-            emit cardCornerRadiusChanged(0.05);
-        } else {
-            emit cardCornerRadiusChanged(0.);
-        }
-    });
 }
 
 void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)

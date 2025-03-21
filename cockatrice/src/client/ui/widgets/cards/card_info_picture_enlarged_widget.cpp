@@ -86,8 +86,8 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
     QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
 
     // Define the radius for rounded corners
-    qreal radius = SettingsCache::instance().getCardCornerRadius() *
-                   scaledSize.width(); // Adjust the radius as needed for rounded corners
+    // Adjust the radius as needed for rounded corners
+    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * scaledSize.width() : 0.;
 
     QStylePainter painter(this);
     // Fill the background with transparent color to ensure rounded corners are rendered properly

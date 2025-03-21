@@ -84,7 +84,6 @@ signals:
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
     void roundCardCornersChanged(bool roundCardCorners);
-    void cardCornerRadiusChanged(qreal cardCornerRadius);
 
 private:
     QSettings *settings;
@@ -734,10 +733,6 @@ public:
     bool getRoundCardCorners() const
     {
         return roundCardCorners;
-    }
-    qreal getCardCornerRadius() const
-    {
-        return roundCardCorners ? 0.05 : 0.;
     }
 
     static SettingsCache &instance();

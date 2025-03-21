@@ -191,8 +191,8 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     QRect targetRect{targetX, targetY, targetW, targetH};
 
     // Compute rounded corner radius
-    qreal radius = SettingsCache::instance().getCardCornerRadius() *
-                   static_cast<qreal>(targetRect.width()); // Ensure consistent rounding
+    // Ensure consistent rounding
+    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);
