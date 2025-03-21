@@ -164,6 +164,12 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+void DeckViewCard::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    event->accept();
+    processHoverEvent();
+}
+
 DeckViewCardContainer::DeckViewCardContainer(const QString &_name) : QGraphicsItem(), name(_name), width(0), height(0)
 {
     setCacheMode(DeviceCoordinateCache);

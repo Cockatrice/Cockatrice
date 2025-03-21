@@ -279,7 +279,7 @@ private:
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
-    QString movingCardsUntilExpr = {};
+    QStringList movingCardsUntilExprs = {};
     int movingCardsUntilNumberOfHits = 1;
     bool movingCardsUntilAutoPlay = false;
     FilterString movingCardsUntilFilter;

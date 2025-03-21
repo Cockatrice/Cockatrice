@@ -14,7 +14,7 @@
 #include <QLabel>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
-    : QWidget(_parent), deckList(_deckList)
+    : QWidget(_parent), deckList(nullptr)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -27,8 +27,8 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
-    if (deckList) {
-        connectDeckList(deckList);
+    if (_deckList) {
+        connectDeckList(_deckList);
     }
 
     layout->addWidget(flowWidget);
@@ -36,9 +36,19 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
 void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
 {
-    flowWidget->clearLayout();
+    if (deckList) {
+        disconnect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
+    }
+
     deckList = _deckList;
     connect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
+
+    refreshTags();
+}
+
+void DeckPreviewDeckTagsDisplayWidget::refreshTags()
+{
+    flowWidget->clearLayout();
 
     for (const QString &tag : deckList->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
@@ -48,16 +58,6 @@ void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
     connect(tagAdditionWidget, &DeckPreviewTagAdditionWidget::tagClicked, this,
             &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
     flowWidget->addWidget(tagAdditionWidget);
-}
-
-void DeckPreviewDeckTagsDisplayWidget::refreshTags()
-{
-    flowWidget->clearLayout();
-    QStringList tags = deckList->getTags();
-    for (const QString &tag : tags) {
-        flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
-    }
-    flowWidget->addWidget(new DeckPreviewTagAdditionWidget(this, tr("Edit tags ...")));
 }
 
 /**
