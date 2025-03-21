@@ -178,13 +178,17 @@ void DeckEditorMenu::refreshShortcuts()
     aNewDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aNewDeck"));
     aLoadDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeck"));
     aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));
-    aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aSaveDeckAs->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckAs"));
     aLoadDeckFromClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromClipboard"));
     aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aEditDeckInClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboardRaw"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
+
+    aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
+    aExportDeckDecklistXyz->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklistXyz"));
     aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));
+    aAnalyzeDeckTappedout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeckTappedout"));
+
     aClose->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClose"));
 
     aSaveDeckToClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeckToClipboard"));
