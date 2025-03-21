@@ -8,7 +8,7 @@
 #include "../settings/cache_settings.h"
 
 #include <QAction>
-#include <QCheckbox>
+#include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
