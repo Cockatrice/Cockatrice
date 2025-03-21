@@ -59,7 +59,7 @@ void VisualDeckStorageFolderDisplayWidget::refreshUi()
 }
 
 /**
- * Gets all files in the directory that have a .txt or .cod extension
+ * Gets all files in the directory that have an accepted decklist file extension
  *
  * @param filePath The directory to search through
  * @param recursive Whether to search through subdirectories
