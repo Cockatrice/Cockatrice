@@ -31,6 +31,12 @@ public:
      */
     static const QStringList FILE_NAME_FILTERS;
 
+    enum DecklistWebsite
+    {
+        DecklistOrg,
+        DecklistXyz
+    };
+
 private:
     QString lastFileName;
     FileFormat lastFileFormat;
@@ -71,7 +77,7 @@ public:
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
-    QString exportDeckToDecklist();
+    QString exportDeckToDecklist(DecklistWebsite website);
 
     void resolveSetNameAndNumberToProviderID();
 

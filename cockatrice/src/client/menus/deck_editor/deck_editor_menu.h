@@ -17,7 +17,7 @@ public:
     QAction *aNewDeck, *aLoadDeck, *aClearRecents, *aSaveDeck, *aSaveDeckAs, *aLoadDeckFromClipboard,
         *aEditDeckInClipboard, *aEditDeckInClipboardRaw, *aSaveDeckToClipboard, *aSaveDeckToClipboardNoSetInfo,
         *aSaveDeckToClipboardRaw, *aSaveDeckToClipboardRawNoSetInfo, *aPrintDeck, *aExportDeckDecklist,
-        *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
+        *aExportDeckDecklistXyz, *aAnalyzeDeckDeckstats, *aAnalyzeDeckTappedout, *aClose;
     QMenu *loadRecentDeckMenu, *analyzeDeckMenu, *editDeckInClipboardMenu, *saveDeckToClipboardMenu;
 
     void setSaveStatus(bool newStatus);
