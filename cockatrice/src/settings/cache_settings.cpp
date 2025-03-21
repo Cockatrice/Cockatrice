@@ -632,7 +632,7 @@ void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED
 {
     overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
     settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
-    emit overrideAllCardArtWithPersonalPreferenceChanged();
+    emit overrideAllCardArtWithPersonalPreferenceChanged(overrideAllCardArtWithPersonalPreference);
 }
 
 void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop)

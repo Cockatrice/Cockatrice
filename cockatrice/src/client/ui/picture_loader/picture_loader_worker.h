@@ -42,8 +42,16 @@ private:
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
+    bool overrideAllCardArtWithPersonalPreference;
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
+
+    /** Emit the `imageLoaded` signal and return `true` if a picture is found on
+        disk, return `false` otherwise.
+
+        If `searchCustomPics` is `true`, the CUSTOM folder is searched for a
+        matching image first; otherwise, only the set-based folders are used. */
+    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName, bool searchCustomPics);
+
     bool imageIsBlackListed(const QByteArray &);
     QNetworkReply *makeRequest(const QUrl &url);
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
@@ -58,6 +66,7 @@ private slots:
 
     void picDownloadChanged();
     void picsPathChanged();
+    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
 public slots:
     void processLoadQueue();
 
