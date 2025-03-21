@@ -253,6 +253,51 @@ void GameScene::processViewSizeChange(const QSize &newSize)
     }
 }
 
+void GameScene::updateHover(const QPointF &scenePos)
+{
+    QList<QGraphicsItem *> itemList =
+        items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
+
+    // Search for the topmost zone and ignore all cards not belonging to that zone.
+    CardZone *zone = 0;
+    for (int i = 0; i < itemList.size(); ++i)
+        if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
+            break;
+
+    CardItem *maxZCard = 0;
+    if (zone) {
+        qreal maxZ = -1;
+        for (int i = 0; i < itemList.size(); ++i) {
+            CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
+            if (!card)
+                continue;
+            if (card->getAttachedTo()) {
+                if (card->getAttachedTo()->getZone() != zone)
+                    continue;
+            } else if (card->getZone() != zone)
+                continue;
+
+            if (card->getRealZValue() > maxZ) {
+                maxZ = card->getRealZValue();
+                maxZCard = card;
+            }
+        }
+    }
+    if (hoveredCard && (maxZCard != hoveredCard))
+        hoveredCard->setHovered(false);
+    if (maxZCard && (maxZCard != hoveredCard))
+        maxZCard->setHovered(true);
+    hoveredCard = maxZCard;
+}
+
+bool GameScene::event(QEvent *event)
+{
+    if (event->type() == QEvent::GraphicsSceneMouseMove)
+        updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
+
+    return QGraphicsScene::event(event);
+}
+
 void GameScene::timerEvent(QTimerEvent * /*event*/)
 {
     QMutableSetIterator<CardItem *> i(cardsToAnimate);

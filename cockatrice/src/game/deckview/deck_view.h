@@ -37,6 +37,7 @@ public:
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 class DeckViewCardDragItem : public AbstractCardDragItem
