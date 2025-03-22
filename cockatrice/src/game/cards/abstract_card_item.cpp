@@ -26,6 +26,13 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
 
     connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
     refreshCardInfo();
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        prepareGeometryChange();
+        update();
+    });
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -41,7 +48,8 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
 
