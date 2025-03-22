@@ -259,6 +259,7 @@ SettingsCache::SettingsCache()
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
+    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", false).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
@@ -652,6 +653,13 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
     printingSelectorCardSize = _printingSelectorCardSize;
     settings->setValue("cards/printingselectorcardsize", printingSelectorCardSize);
     emit printingSelectorCardSizeChanged();
+}
+
+void SettingsCache::setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards)
+{
+    includeOnlineOnlyCards = _includeOnlineOnlyCards;
+    settings->setValue("cards/includeonlineonlycards", includeOnlineOnlyCards);
+    emit includeOnlineOnlyCardsChanged(includeOnlineOnlyCards);
 }
 
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)

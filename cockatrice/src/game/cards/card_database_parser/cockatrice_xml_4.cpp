@@ -1,5 +1,7 @@
 #include "cockatrice_xml_4.h"
 
+#include "../../../settings/cache_settings.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -124,6 +126,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
+    bool includeOnlineOnlyCards = SettingsCache::instance().getIncludeOnlineOnlyCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -183,7 +186,17 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                 attrName = "picurl";
                             setInfo.setProperty(attrName, attr.value().toString());
                         }
-                        _sets[setName].append(setInfo);
+
+                        // This is very much a hack and not the right place to
+                        // put this check, as it requires a reload of Cockatrice
+                        // to be apply.
+                        //
+                        // However, this is also true of the `set->getEnabled()`
+                        // check above (which is currently bugged as well), so
+                        // we'll fix both at the same time.
+                        if (includeOnlineOnlyCards || setInfo.getProperty("isOnlineOnly") != "true") {
+                            _sets[setName].append(setInfo);
+                        }
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
