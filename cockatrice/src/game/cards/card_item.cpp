@@ -475,6 +475,17 @@ bool CardItem::animationEvent()
     return animationIncomplete;
 }
 
+/**
+ * Checks if any of the items is a CardItem that is owned by the given player.
+ */
+static bool hasCardsOwnedBy(const QList<QGraphicsItem *> &items, const Player *owner)
+{
+    return std::any_of(items.cbegin(), items.cend(), [owner](QGraphicsItem *item) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        return card && card->getOwner() == owner;
+    });
+}
+
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if ((change == ItemSelectedHasChanged) && owner != nullptr) {
@@ -482,9 +493,14 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
         } else if (owner->getCardMenu() == cardMenu) {
-            if (scene() && scene()->selectedItems().isEmpty()) {
-                owner->setCardMenu(nullptr);
-            }
+            // If selection is cleared while multiple cards are selected, there might still be items in the selection
+            // when this itemChange triggers.
+            // Delay empty check by 1 frame to ensure the entire selection is cleared first.
+            QTimer::singleShot(1, this, [this] {
+                if (scene() && !hasCardsOwnedBy(scene()->selectedItems(), owner)) {
+                    owner->setCardMenu(nullptr);
+                }
+            });
             owner->getGame()->setActiveCard(nullptr);
         }
     }
