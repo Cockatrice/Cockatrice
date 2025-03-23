@@ -496,6 +496,7 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             // If selection is cleared while multiple cards are selected, there might still be items in the selection
             // when this itemChange triggers.
             // Delay empty check by 1 frame to ensure the entire selection is cleared first.
+            // TODO: This is a temp fix that still leaves bugs (see #5764). We need to rework card menu logic
             QTimer::singleShot(1, this, [this] {
                 if (scene() && !hasCardsOwnedBy(scene()->selectedItems(), owner)) {
                     owner->setCardMenu(nullptr);
