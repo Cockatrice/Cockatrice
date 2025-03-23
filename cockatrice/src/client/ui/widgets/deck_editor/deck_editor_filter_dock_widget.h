@@ -28,10 +28,9 @@ private:
     KeySignals filterViewKeySignals;
     QWidget *filterBox;
 
-    void filterRemove(const QAction *action);
-
 private slots:
     void filterViewCustomContextMenu(const QPoint &point);
+    void filterRemove(const QAction *action);
     void actClearFilterAll();
     void actClearFilterOne();
     void refreshShortcuts();
