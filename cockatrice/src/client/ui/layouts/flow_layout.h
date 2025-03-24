@@ -7,7 +7,7 @@
 #include <QWidget>
 #include <qstyle.h>
 
-inline Q_LOGGING_CATEGORY(FlowLayoutLog, "flow_layout");
+inline Q_LOGGING_CATEGORY(FlowLayoutLog, "flow_layout", QtInfoMsg);
 
 class FlowLayout : public QLayout
 {
