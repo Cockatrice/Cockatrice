@@ -204,7 +204,13 @@ bool PictureLoader::hasCustomArt()
     // Check if there is at least one non-directory file in the pics path, other
     // than in the "downloadedPics" subdirectory.
     while (it.hasNext()) {
-        QFileInfo dir = it.nextFileInfo();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
+        QFileInfo dir(it.nextFileInfo());
+#else
+        // nextFileInfo() is only available in Qt 6.3+, for previous versions, we build
+        // the QFileInfo from a QString which requires more system calls.
+        QFileInfo dir(it.next());
+#endif
 
         if (it.fileName() == "downloadedPics")
             continue;
