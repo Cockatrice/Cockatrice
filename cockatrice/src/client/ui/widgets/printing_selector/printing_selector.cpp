@@ -36,10 +36,8 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
         QFrame *warningFrame = new QFrame(this);
         warningFrame->setFrameShape(QFrame::StyledPanel);
 
-        QLabel *warningLabel = new QLabel(this);
+        warningLabel = new QLabel(this);
         warningLabel->setTextFormat(Qt::RichText);
-        warningLabel->setText("<b>Warning:</b> You appear to be using custom card art, which has known bugs when also "
-                              "using the printing selector in this version of Cockatrice.");
         warningLabel->setWordWrap(true);
 
         auto *warningLayout = new QVBoxLayout(warningFrame);
@@ -48,6 +46,8 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
         warningLayout->addWidget(warningLabel);
 
         layout->addWidget(warningFrame);
+    } else {
+        warningLabel = nullptr;
     }
 
     widgetLoadingBufferTimer = new QTimer(this);
@@ -104,6 +104,12 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 void PrintingSelector::retranslateUi()
 {
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
+
+    if (warningLabel) {
+        warningLabel->setText(
+            tr("<b>Warning:</b> You appear to be using custom card art, which has known bugs when also "
+               "using the printing selector in this version of Cockatrice."));
+    }
 }
 
 void PrintingSelector::printingsInDeckChanged()
