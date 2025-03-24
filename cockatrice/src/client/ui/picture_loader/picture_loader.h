@@ -36,6 +36,7 @@ public:
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);
+    static bool hasCustomArt();
 
 public slots:
     static void clearNetworkCache();

@@ -195,3 +195,25 @@ void PictureLoader::picsPathChanged()
 {
     QPixmapCache::clear();
 }
+
+bool PictureLoader::hasCustomArt()
+{
+    auto picsPath = SettingsCache::instance().getPicsPath();
+    QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    // Check if there is at least one non-directory file in the pics path, other
+    // than in the "downloadedPics" subdirectory.
+    while (it.hasNext()) {
+        QFileInfo dir = it.nextFileInfo();
+
+        if (it.fileName() == "downloadedPics")
+            continue;
+
+        QDirIterator subIt(it.filePath(), QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+        if (subIt.hasNext()) {
+            return true;
+        }
+    }
+
+    return false;
+}
