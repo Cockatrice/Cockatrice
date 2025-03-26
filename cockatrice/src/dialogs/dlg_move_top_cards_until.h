@@ -2,10 +2,10 @@
 #define DLG_MOVE_TOP_CARDS_UNTIL_H
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QLabel>
-#include <QLineEdit>
 #include <QSpinBox>
 
 class FilterString;
@@ -15,7 +15,7 @@ class DlgMoveTopCardsUntil : public QDialog
     Q_OBJECT
 
     QLabel *exprLabel, *numberOfHitsLabel;
-    QLineEdit *exprEdit;
+    QComboBox *exprComboBox;
     QSpinBox *numberOfHitsEdit;
     QDialogButtonBox *buttonBox;
     QCheckBox *autoPlayCheckBox;
@@ -25,10 +25,11 @@ class DlgMoveTopCardsUntil : public QDialog
 
 public:
     explicit DlgMoveTopCardsUntil(QWidget *parent = nullptr,
-                                  QString expr = QString(),
+                                  QStringList exprs = QStringList(),
                                   uint numberOfHits = 1,
                                   bool autoPlay = false);
     QString getExpr() const;
+    QStringList getExprs() const;
     uint getNumberOfHits() const;
     bool isAutoPlay() const;
 };

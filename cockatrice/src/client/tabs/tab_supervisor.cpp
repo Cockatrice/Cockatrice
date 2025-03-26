@@ -232,22 +232,45 @@ void TabSupervisor::refreshShortcuts()
     aTabLog->setShortcuts(shortcuts.getShortcut("Tabs/aTabLog"));
 }
 
-bool TabSupervisor::closeRequest()
+void TabSupervisor::closeEvent(QCloseEvent *event)
 {
+    // This will accept the event, which we may then override.
+    QTabWidget::closeEvent(event);
+
     if (getGameCount()) {
         if (QMessageBox::question(this, tr("Are you sure?"),
                                   tr("There are still open games. Are you sure you want to quit?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
-            return false;
+            event->ignore();
+            return;
         }
     }
 
     for (AbstractTabDeckEditor *tab : deckEditorTabs) {
-        if (!tab->confirmClose())
-            return false;
+        if (!tab->confirmClose()) {
+            event->ignore();
+        }
     }
 
-    return true;
+    // Close the game tabs in order to make sure they store their layout.
+    QSet<int> gameTabsToRemove;
+    for (auto it = gameTabs.begin(), end = gameTabs.end(); it != end; ++it) {
+        if (it.value()->close()) {
+            // Hotfix: the tab owns the `QMenu`s so they need to be cleared,
+            // otherwise we end up with use-after-free bugs.
+            if (it.value() == currentWidget()) {
+                emit setMenu();
+            }
+
+            gameTabsToRemove.insert(it.key());
+        } else {
+            event->ignore();
+        }
+    }
+
+    for (auto tabId : gameTabsToRemove) {
+        gameTabs.remove(tabId);
+    }
 }
 
 AbstractClient *TabSupervisor::getClient() const

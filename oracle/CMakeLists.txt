@@ -15,9 +15,11 @@ set(oracle_SOURCES
     src/oraclewizard.cpp
     src/oracleimporter.cpp
     src/pagetemplates.cpp
+    src/parsehelpers.cpp
     src/qt-json/json.cpp
     ../cockatrice/src/game/cards/card_database.cpp
     ../cockatrice/src/game/cards/card_database_manager.cpp
+    ../cockatrice/src/game/cards/card_info.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader_worker.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp

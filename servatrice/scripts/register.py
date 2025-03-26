@@ -9,7 +9,7 @@ from pypb.event_server_identification_pb2 import Event_ServerIdentification as S
 from pypb.response_pb2 import Response
 
 HOST = "localhost"
-PORT = 4747
+PORT = 4748
 
 CMD_ID = 1
 

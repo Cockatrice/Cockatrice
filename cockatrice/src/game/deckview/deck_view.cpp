@@ -74,6 +74,12 @@ DeckViewCard::DeckViewCard(QGraphicsItem *parent,
     : AbstractCardItem(parent, _name, _providerId, 0, -1), originZone(_originZone), dragItem(0)
 {
     setAcceptHoverEvents(true);
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        update();
+    });
 }
 
 DeckViewCard::~DeckViewCard()
@@ -91,7 +97,7 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = 0.05 * (CARD_WIDTH - 3);
+    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CARD_WIDTH - 3) : 0.0;
     painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 3., CARD_HEIGHT - 3.), cardRadius, cardRadius);
     painter->restore();
 }
@@ -178,7 +184,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 {
     qreal totalTextWidth = getCardTypeTextWidth();
 
-    painter->fillRect(boundingRect(), themeManager->getTableBgBrush());
+    painter->fillRect(boundingRect(), themeManager->getBgBrush(ThemeManager::Table));
     painter->setPen(QColor(255, 255, 255, 100));
     painter->drawLine(QPointF(0, separatorY), QPointF(width, separatorY));
 

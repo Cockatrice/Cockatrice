@@ -355,8 +355,8 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
-    dialog.selectFile(getDeckList()->getName().trimmed() + ".cod");
+    dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
+    dialog.selectFile(getDeckList()->getName().trimmed());
     if (!dialog.exec())
         return false;
 
@@ -455,17 +455,12 @@ void AbstractTabDeckEditor::actPrintDeck()
     dlg->exec();
 }
 
-// Action called when export deck to decklist menu item is pressed.
-void AbstractTabDeckEditor::actExportDeckDecklist()
+void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    // Get the decklist class for the deck.
-    DeckLoader *const deck = getDeckList();
-    // create a string to load the decklist url into.
-    QString decklistUrlString;
     // check if deck is not null
-    if (deck) {
+    if (DeckLoader *const deck = getDeckList()) {
         // Get the decklist url string from the deck loader class.
-        decklistUrlString = deck->exportDeckToDecklist();
+        QString decklistUrlString = deck->exportDeckToDecklist(website);
         // Check to make sure the string isn't empty.
         if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0) {
             // Show an error if the deck is empty, and return.
@@ -481,8 +476,24 @@ void AbstractTabDeckEditor::actExportDeckDecklist()
         QDesktopServices::openUrl(decklistUrlString);
     } else {
         // if there's no deck loader object, return an error
-        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be saved."));
+        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be exported."));
     }
+}
+
+/**
+ * Exports the deck to www.decklist.org (the old website)
+ */
+void AbstractTabDeckEditor::actExportDeckDecklist()
+{
+    exportToDecklistWebsite(DeckLoader::DecklistOrg);
+}
+
+/**
+ * Exports the deck to www.decklist.xyz (the new website)
+ */
+void AbstractTabDeckEditor::actExportDeckDecklistXyz()
+{
+    exportToDecklistWebsite(DeckLoader::DecklistXyz);
 }
 
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()

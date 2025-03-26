@@ -51,3 +51,4 @@ target_link_libraries(password_hash_test cockatrice_common Threads::Threads ${GT
 
 add_subdirectory(carddatabase)
 add_subdirectory(loading_from_clipboard)
+add_subdirectory(oracle)

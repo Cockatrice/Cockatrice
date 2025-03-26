@@ -20,7 +20,22 @@ public:
         PlainTextFormat,
         CockatriceFormat
     };
-    static const QStringList fileNameFilters;
+
+    /**
+     * Supported file extensions for decklist files
+     */
+    static const QStringList ACCEPTED_FILE_EXTENSIONS;
+
+    /**
+     * For use with `QFileDialog::setNameFilters`
+     */
+    static const QStringList FILE_NAME_FILTERS;
+
+    enum DecklistWebsite
+    {
+        DecklistOrg,
+        DecklistXyz
+    };
 
 private:
     QString lastFileName;
@@ -62,7 +77,7 @@ public:
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
-    QString exportDeckToDecklist();
+    QString exportDeckToDecklist(DecklistWebsite website);
 
     void resolveSetNameAndNumberToProviderID();
 

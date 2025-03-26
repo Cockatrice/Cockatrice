@@ -12,6 +12,7 @@
 #include <QComboBox>
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <QSpinBox>
 #include <QVBoxLayout>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
@@ -40,6 +41,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     refreshButton->setFixedSize(32, 32);
     connect(refreshButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::refreshIfPossible);
 
+    // quick settings menu
     showFoldersCheckBox = new QCheckBox(this);
     showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &VisualDeckStorageWidget::updateShowFolders);
@@ -77,6 +79,29 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageSearchFolderNames);
 
+    // color identity opacity selector
+    auto unusedColorIdentityOpacityWidget = new QWidget(this);
+
+    unusedColorIdentitiesOpacityLabel = new QLabel(unusedColorIdentityOpacityWidget);
+    unusedColorIdentitiesOpacitySpinBox = new QSpinBox(unusedColorIdentityOpacityWidget);
+
+    unusedColorIdentitiesOpacitySpinBox->setMinimum(0);
+    unusedColorIdentitiesOpacitySpinBox->setMaximum(100);
+    unusedColorIdentitiesOpacitySpinBox->setValue(
+        SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
+    connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            &SettingsCache::instance(), &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
+
+    unusedColorIdentitiesOpacityLabel->setBuddy(unusedColorIdentitiesOpacitySpinBox);
+
+    unusedColorIdentitiesOpacitySpinBox->setValue(
+        SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
+
+    auto unusedColorIdentityOpacityLayout = new QHBoxLayout(unusedColorIdentityOpacityWidget);
+    unusedColorIdentityOpacityLayout->setContentsMargins(11, 0, 11, 0);
+    unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacityLabel);
+    unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacitySpinBox);
+
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
 
@@ -84,9 +109,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);
     quickSettingsWidget->addSettingsWidget(tagFilterVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(tagsOnWidgetsVisibilityCheckBox);
-    quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
     quickSettingsWidget->addSettingsWidget(bannerCardComboBoxVisibilityCheckBox);
     quickSettingsWidget->addSettingsWidget(searchFolderNamesCheckBox);
+    quickSettingsWidget->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
+    quickSettingsWidget->addSettingsWidget(unusedColorIdentityOpacityWidget);
     quickSettingsWidget->addSettingsWidget(cardSizeWidget);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
@@ -159,9 +185,11 @@ void VisualDeckStorageWidget::retranslateUi()
     showFoldersCheckBox->setText(tr("Show Folders"));
     tagFilterVisibilityCheckBox->setText(tr("Show Tag Filter"));
     tagsOnWidgetsVisibilityCheckBox->setText(tr("Show Tags On Deck Previews"));
-    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw not contained Color Identities"));
     bannerCardComboBoxVisibilityCheckBox->setText(tr("Show Banner Card Selection Option"));
     searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
+    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
+    unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
+    unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
 }
 
 /**

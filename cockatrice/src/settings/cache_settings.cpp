@@ -254,11 +254,13 @@ SettingsCache::SettingsCache()
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
+    roundCardCorners = settings->value("cards/roundcardcorners", true).toBool();
     overrideAllCardArtWithPersonalPreference =
         settings->value("cards/overrideallcardartwithpersonalpreference", false).toBool();
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
+    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", false).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
@@ -661,6 +663,13 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
     emit printingSelectorCardSizeChanged();
 }
 
+void SettingsCache::setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards)
+{
+    includeOnlineOnlyCards = _includeOnlineOnlyCards;
+    settings->setValue("cards/includeonlineonlycards", includeOnlineOnlyCards);
+    emit includeOnlineOnlyCardsChanged(includeOnlineOnlyCards);
+}
+
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)
 {
     printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
@@ -728,6 +737,7 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
     settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
+    emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
 void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
@@ -1290,6 +1300,16 @@ void SettingsCache::setMaxFontSize(int _max)
 {
     maxFontSize = _max;
     settings->setValue("game/maxfontsize", maxFontSize);
+}
+
+void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
+{
+    if (_roundCardCorners == roundCardCorners)
+        return;
+
+    roundCardCorners = _roundCardCorners;
+    settings->setValue("cards/roundcardcorners", _roundCardCorners);
+    emit roundCardCornersChanged(roundCardCorners);
 }
 
 void SettingsCache::loadPaths()

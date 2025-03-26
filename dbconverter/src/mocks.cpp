@@ -202,6 +202,9 @@ void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrd
 void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
 {
 }
+void SettingsCache::setIncludeOnlineOnlyCards(bool /* _includeOnlineOnlyCards */)
+{
+}
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
 {
 }
@@ -385,6 +388,9 @@ void SettingsCache::setUpdateReleaseChannelIndex(int /* value */)
 {
 }
 void SettingsCache::setMaxFontSize(int /* _max */)
+{
+}
+void SettingsCache::setRoundCardCorners(bool /* _roundCardCorners */)
 {
 }
 

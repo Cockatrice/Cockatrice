@@ -22,10 +22,9 @@ CardItem::CardItem(Player *_owner,
                    const QString &_name,
                    const QString &_providerId,
                    int _cardid,
-                   bool _revealedCard,
                    CardZone *_zone)
-    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), revealedCard(_revealedCard),
-      attacking(false), destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), attacking(false),
+      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
@@ -483,11 +482,9 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
         } else if (owner->getCardMenu() == cardMenu) {
-            if (scene() && scene()->selectedItems().isEmpty()) {
-                owner->setCardMenu(nullptr);
-            }
+            owner->setCardMenu(nullptr);
             owner->getGame()->setActiveCard(nullptr);
         }
     }
-    return QGraphicsItem::itemChange(change, value);
+    return AbstractCardItem::itemChange(change, value);
 }

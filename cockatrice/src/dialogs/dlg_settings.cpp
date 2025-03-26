@@ -41,6 +41,7 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QTranslator>
+#include <qabstractbutton.h>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
@@ -358,25 +359,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
 
-    visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setChecked(
-        settings.getVisualDeckStorageDrawUnusedColorIdentities());
-    connect(&visualDeckStorageDrawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
-
-    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMinimum(0);
-    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setMaximum(100);
-    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setValue(
-        settings.getVisualDeckStorageUnusedColorIdentitiesOpacity());
-    connect(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-            &settings, &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
-
-    visualDeckStorageUnusedColorIdentitiesOpacityLabel.setBuddy(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox);
-
     auto *menuGrid = new QGridLayout;
     menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
-    menuGrid->addWidget(&visualDeckStorageDrawUnusedColorIdentitiesCheckBox, 1, 0);
-    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacityLabel, 2, 0);
-    menuGrid->addWidget(&visualDeckStorageUnusedColorIdentitiesOpacitySpinBox, 2, 1);
 
     menuGroupBox = new QGroupBox;
     menuGroupBox->setLayout(menuGrid);
@@ -400,6 +384,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
 
+    roundCardCornersCheckBox.setChecked(settings.getRoundCardCorners());
+    connect(&roundCardCornersCheckBox, &QAbstractButton::toggled, &settings, &SettingsCache::setRoundCardCorners);
+
     verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
     verticalCardOverlapPercentBox.setRange(0, 80);
     connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
@@ -419,14 +406,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
     cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
-    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 3, 0, 1, 2);
-    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 4, 0, 1, 2);
-    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 5, 0, 1, 1);
-    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 5, 1, 1, 1);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 6, 0);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 6, 1);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 7, 0);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 7, 1);
+    cardsGrid->addWidget(&roundCardCornersCheckBox, 3, 0, 1, 2);
+    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 4, 0, 1, 2);
+    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 5, 0, 1, 2);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 6, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 6, 1, 1, 1);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 7, 0);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 7, 1);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 8, 0);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 8, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -547,10 +535,6 @@ void AppearanceSettingsPage::retranslateUi()
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
-    visualDeckStorageDrawUnusedColorIdentitiesCheckBox.setText(
-        tr("Draw missing color identities in visual deck storage without color label"));
-    visualDeckStorageUnusedColorIdentitiesOpacityLabel.setText(tr("Missing color identity opacity"));
-    visualDeckStorageUnusedColorIdentitiesOpacitySpinBox.setSuffix("%");
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
@@ -561,6 +545,7 @@ void AppearanceSettingsPage::retranslateUi()
     bumpSetsWithCardsInDeckToTopCheckBox.setText(
         tr("Bump sets that the deck contains cards from to the top in the printing selector"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
+    roundCardCornersCheckBox.setText(tr("Use rounded card corners"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
     cardViewInitialRowsMaxLabel.setText(tr("Maximum initial height for card view window:"));

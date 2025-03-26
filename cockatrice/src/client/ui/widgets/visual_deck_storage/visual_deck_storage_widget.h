@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QFileSystemModel>
 
+class QSpinBox;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
 class VisualDeckStorageTagFilterWidget;
@@ -64,6 +65,8 @@ private:
     QCheckBox *tagFilterVisibilityCheckBox;
     QCheckBox *tagsOnWidgetsVisibilityCheckBox;
     QCheckBox *searchFolderNamesCheckBox;
+    QLabel *unusedColorIdentitiesOpacityLabel;
+    QSpinBox *unusedColorIdentitiesOpacitySpinBox;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
 

@@ -47,6 +47,7 @@ class QSettings;
 class SettingsCache : public QObject
 {
     Q_OBJECT
+
 signals:
     void langChanged();
     void picsPathChanged();
@@ -58,12 +59,14 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
+    void includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
     void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
+    void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
@@ -81,6 +84,7 @@ signals:
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
+    void roundCardCornersChanged(bool roundCardCorners);
 
 private:
     QSettings *settings;
@@ -127,6 +131,7 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
+    bool includeOnlineOnlyCards;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
@@ -201,6 +206,7 @@ private:
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
     bool localTime;
+    bool roundCardCorners;
 
 public:
     SettingsCache();
@@ -400,6 +406,10 @@ public:
     int getPrintingSelectorCardSize() const
     {
         return printingSelectorCardSize;
+    }
+    bool getIncludeOnlineOnlyCards() const
+    {
+        return includeOnlineOnlyCards;
     }
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
@@ -731,6 +741,10 @@ public:
     {
         return mbDownloadSpoilers;
     }
+    bool getRoundCardCorners() const
+    {
+        return roundCardCorners;
+    }
 
     static SettingsCache &instance();
     void resetPaths();
@@ -778,6 +792,7 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
+    void setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
@@ -839,6 +854,7 @@ public slots:
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
+    void setRoundCardCorners(bool _roundCardCorners);
 };
 
 #endif

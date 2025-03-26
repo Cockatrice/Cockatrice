@@ -3,8 +3,6 @@
 
 #include "select_zone.h"
 
-inline Q_LOGGING_CATEGORY(StackZoneLog, "stack_zone");
-
 class StackZone : public SelectZone
 {
     Q_OBJECT
