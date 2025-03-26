@@ -128,9 +128,9 @@ First, create an image from the Dockerfile<br>
 `cd /path/to/Cockatrice-Repo/`
 `docker build -t servatrice .`<br>
 And then run it<br>
-`docker run -i -p 4747:4747/tcp -t servatrice:latest`<br>
+`docker run -i -p 4748:4748 -t servatrice:latest`<br>
 
->Note: Running this command exposes the TCP port 4747 of the docker container<br>
+>Note: Running this command exposes the port 4748 of the docker container<br>
 to permit connections to the server.
 
 Find more information on how to use Servatrice with Docker in our [wiki](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).
@@ -145,7 +145,7 @@ docker-compose build    # Build the Servatrice image using the same Dockerfile a
 docker-compose up       # Setup and run both the MySQL server and Servatrice.
 ```
 
->Note: Similar to the above Docker setup, this will expose TCP ports 4747 and 4748.
+>Note: Similar to the above Docker setup, this will expose port 4748.
 
 >Note: The first time running the docker-compose setup, the MySQL server will take a little time to run the initial setup scripts. Due to this, the Servatrice instance may fail the first few attempts to connect to the database. Servatrice is set to `restart: always` in the docker-compose.yml, which will allow it to continue attempting to start up. Once the MySQL scripts have completed, Servatrice should then connect automatically on the next attempt.
 

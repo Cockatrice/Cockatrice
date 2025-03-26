@@ -16,9 +16,10 @@
 #include <QStringList>
 #include <QtConcurrentRun>
 
-const QStringList DeckLoader::fileNameFilters = QStringList()
-                                                << QObject::tr("Common deck formats (*.cod *.dec *.dek *.txt *.mwDeck)")
-                                                << QObject::tr("All files (*.*)");
+const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.dek", "*.txt", "*.mwDeck"};
+
+const QStringList DeckLoader::FILE_NAME_FILTERS = {
+    tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
 DeckLoader::DeckLoader() : DeckList(), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {
@@ -225,6 +226,19 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
     return result;
 }
 
+static QString getDomainForWebsite(DeckLoader::DecklistWebsite website)
+{
+    switch (website) {
+        case DeckLoader::DecklistOrg:
+            return "www.decklist.org";
+        case DeckLoader::DecklistXyz:
+            return "www.decklist.xyz";
+        default:
+            qCWarning(DeckLoaderLog) << "Invalid decklist website enum:" << website;
+            return "";
+    }
+}
+
 // This struct is here to support the forEachCard function call, defined in decklist. It
 // requires a function to be called for each card, and passes an inner node and a card for
 // each card in the decklist.
@@ -274,11 +288,14 @@ struct FormatDeckListForExport
     }
 };
 
-// Export deck to decklist function, called to format the deck in a way to be sent to a server
-QString DeckLoader::exportDeckToDecklist()
+/**
+ * Export deck to decklist function, called to format the deck in a way to be sent to a server
+ * @param website The website we're sending the deck to
+ */
+QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
 {
     // Add the base url
-    QString deckString = "https://www.decklist.org/?";
+    QString deckString = "https://" + getDomainForWebsite(website) + "/?";
     // Create two strings to pass to function
     QString mainBoardCards, sideBoardCards;
     // Set up the struct to call.

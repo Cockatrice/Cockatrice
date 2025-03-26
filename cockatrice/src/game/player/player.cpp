@@ -93,12 +93,7 @@ void PlayerArea::updateBg()
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getPlayerBgBrush();
-
-    if (playerZoneId > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraPlayerBgBrush(QString::number(playerZoneId), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Player, playerZoneId);
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -1448,19 +1443,20 @@ void Player::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExpr, movingCardsUntilNumberOfHits, movingCardsUntilAutoPlay);
+    DlgMoveTopCardsUntil dlg(game, movingCardsUntilExprs, movingCardsUntilNumberOfHits, movingCardsUntilAutoPlay);
     if (!dlg.exec()) {
         return;
     }
 
-    movingCardsUntilExpr = dlg.getExpr();
+    auto expr = dlg.getExpr();
+    movingCardsUntilExprs = dlg.getExprs();
     movingCardsUntilNumberOfHits = dlg.getNumberOfHits();
     movingCardsUntilAutoPlay = dlg.isAutoPlay();
 
     if (zones.value("deck")->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
-        movingCardsUntilFilter = FilterString(movingCardsUntilExpr);
+        movingCardsUntilFilter = FilterString(expr);
         movingCardsUntilCounter = movingCardsUntilNumberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
@@ -2069,7 +2065,6 @@ void Player::createCard(const CardItem *sourceCard,
             cmd.set_target_zone("table"); // We currently only support creating tokens on the table
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
-            cmd.set_card_provider_id(sourceCard->getProviderId().toStdString());
             break;
 
         case CardRelation::TransformInto:

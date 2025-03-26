@@ -96,11 +96,11 @@ void DeckEditorFilterDockWidget::filterViewCustomContextMenu(const QPoint &point
 
     action = menu.addAction(QString("delete"));
     action->setData(point);
-    connect(&menu, SIGNAL(triggered(QAction *)), this, SLOT(filterRemove(QAction *)));
+    connect(&menu, &QMenu::triggered, this, &DeckEditorFilterDockWidget::filterRemove);
     menu.exec(filterView->mapToGlobal(point));
 }
 
-void DeckEditorFilterDockWidget::filterRemove(QAction *action)
+void DeckEditorFilterDockWidget::filterRemove(const QAction *action)
 {
     QPoint point;
     QModelIndex idx;

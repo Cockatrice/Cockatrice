@@ -58,6 +58,12 @@ void VisualDeckStorageFolderDisplayWidget::refreshUi()
     header->setText(bannerText);
 }
 
+/**
+ * Gets all files in the directory that have an accepted decklist file extension
+ *
+ * @param filePath The directory to search through
+ * @param recursive Whether to search through subdirectories
+ */
 static QStringList getAllFiles(const QString &filePath, bool recursive)
 {
     QStringList allFiles;
@@ -65,7 +71,7 @@ static QStringList getAllFiles(const QString &filePath, bool recursive)
     // QDirIterator with QDir::Files ensures only files are listed (no directories)
     auto flags =
         recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
-    QDirIterator it(filePath, QDir::Files, flags);
+    QDirIterator it(filePath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files, flags);
 
     while (it.hasNext()) {
         allFiles << it.next(); // Add each file path to the list

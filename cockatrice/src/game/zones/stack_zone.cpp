@@ -49,12 +49,7 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getStackBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraStackBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -71,26 +66,25 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
     cmd.set_target_zone(getName().toStdString());
 
     int index = 0;
-    if (cards.isEmpty()) {
-        index = 0;
-    } else {
+
+    if (!cards.isEmpty()) {
         const auto cardCount = static_cast<int>(cards.size());
         const auto &card = cards.at(0);
 
-        if (card == nullptr) {
-            qCWarning(StackZoneLog) << "Attempted to move card from" << startZone->getName() << ", but was null";
-            return;
-        }
-
         index = qRound(divideCardSpaceInZone(dropPoint.y(), cardCount, boundingRect().height(),
                                              card->boundingRect().height(), true));
-    }
 
-    if (startZone == this) {
-        const auto &dragItem = dragItems.at(0);
-        const auto &card = cards.at(index);
-        if (card != nullptr && dragItem != nullptr && card->getId() == dragItem->getId()) {
-            return;
+        // divideCardSpaceInZone is not guaranteed to return a valid index
+        // currently, so clamp it to avoid crashes.
+        index = qBound(0, index, cardCount - 1);
+
+        if (startZone == this) {
+            const auto &dragItem = dragItems.at(0);
+            const auto &card = cards.at(index);
+
+            if (card->getId() == dragItem->getId()) {
+                return;
+            }
         }
     }
 
@@ -109,8 +103,6 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
 void StackZone::reorganizeCards()
 {
     if (!cards.isEmpty()) {
-        QSet<ArrowItem *> arrowsToUpdate;
-
         const auto cardCount = static_cast<int>(cards.size());
         qreal totalWidth = boundingRect().width();
         qreal cardWidth = cards.at(0)->boundingRect().width();
@@ -125,16 +117,6 @@ void StackZone::reorganizeCards()
                 divideCardSpaceInZone(i, cardCount, boundingRect().height(), cards.at(0)->boundingRect().height());
             card->setPos(x, y);
             card->setRealZValue(i);
-
-            for (ArrowItem *item : card->getArrowsFrom()) {
-                arrowsToUpdate.insert(item);
-            }
-            for (ArrowItem *item : card->getArrowsTo()) {
-                arrowsToUpdate.insert(item);
-            }
-        }
-        for (ArrowItem *item : arrowsToUpdate) {
-            item->updatePath();
         }
     }
     update();

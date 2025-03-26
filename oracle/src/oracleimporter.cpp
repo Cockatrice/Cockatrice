@@ -1,6 +1,7 @@
 #include "oracleimporter.h"
 
 #include "game/cards/card_database_parser/cockatrice_xml_4.h"
+#include "parsehelpers.h"
 #include "qt-json/json.h"
 
 #include <QDebug>
@@ -157,9 +158,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    QRegularExpression ciptRegex("( it|" + QRegularExpression::escape(name) +
-                                 ") enters( the battlefield)? tapped(?! unless)");
-    bool cipt = ciptRegex.match(text).hasMatch();
+    bool cipt = parseCipt(name, text);
 
     bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
                                 properties.value("layout").toString() == "split" ||
@@ -207,12 +206,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 {
     // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
-        {"manaCost", "manacost"}, {"manaValue", "cmc"}, {"type", "type"},
-        {"loyalty", "loyalty"},   {"layout", "layout"}, {"side", "side"},
+        {"manaCost", "manacost"},     {"manaValue", "cmc"}, {"type", "type"},
+        {"loyalty", "loyalty"},       {"layout", "layout"}, {"side", "side"},
+        {"convertedManaCost", "cmc"}, // old name for manaValue, for backwards compatibility
     };
 
     // mtgjson name => xml name
-    static const QMap<QString, QString> setInfoProperties{{"number", "num"}, {"rarity", "rarity"}};
+    static const QMap<QString, QString> setInfoProperties{
+        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
@@ -350,7 +351,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
             // add other face for split cards as card relation
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
-                properties["cmc"] = getStringPropertyFromMap(card, "faceManaValue");
+                auto faceManaValue = getStringPropertyFromMap(card, "faceManaValue");
+                if (faceManaValue.isEmpty()) {
+                    // check the old name for the property, for backwards compatibility purposes
+                    faceManaValue = getStringPropertyFromMap(card, "faceConvertedManaCost");
+                }
+                properties["cmc"] = faceManaValue;
+
                 if (layout == "meld") { // meld cards don't work
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);

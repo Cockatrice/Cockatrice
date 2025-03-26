@@ -3,7 +3,6 @@
 #include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
 #include "../game/filters/filter_string.h"
-#include "trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -14,15 +13,17 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint _numberOfHits, bool autoPlay)
+DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QStringList exprs, uint _numberOfHits, bool autoPlay)
     : QDialog(parent)
 {
     exprLabel = new QLabel(tr("Card name (or search expressions):"));
 
-    exprEdit = new QLineEdit(this);
-    exprEdit->setFocus();
-    exprEdit->setText(_expr);
-    exprLabel->setBuddy(exprEdit);
+    exprComboBox = new QComboBox(this);
+    exprComboBox->setFocus();
+    exprComboBox->setEditable(true);
+    exprComboBox->setInsertPolicy(QComboBox::InsertAtTop);
+    exprComboBox->insertItems(0, exprs);
+    exprLabel->setBuddy(exprComboBox);
 
     numberOfHitsLabel = new QLabel(tr("Number of hits:"));
     numberOfHitsEdit = new QSpinBox(this);
@@ -43,7 +44,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QString _expr, uint 
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(exprLabel);
-    mainLayout->addWidget(exprEdit);
+    mainLayout->addWidget(exprComboBox);
     mainLayout->addItem(grid);
     mainLayout->addWidget(autoPlayCheckBox);
     mainLayout->addWidget(buttonBox);
@@ -92,7 +93,7 @@ bool DlgMoveTopCardsUntil::validateMatchExists(const FilterString &filterString)
 
 void DlgMoveTopCardsUntil::validateAndAccept()
 {
-    auto movingCardsUntilFilter = FilterString(exprEdit->text());
+    auto movingCardsUntilFilter = FilterString(exprComboBox->currentText());
     if (!movingCardsUntilFilter.valid()) {
         QMessageBox::warning(this, tr("Invalid filter"), movingCardsUntilFilter.error(), QMessageBox::Ok);
         return;
@@ -102,12 +103,29 @@ void DlgMoveTopCardsUntil::validateAndAccept()
         return;
     }
 
+    // move currently selected text to top of history list
+    if (exprComboBox->currentIndex() != 0) {
+        QString currentExpr = exprComboBox->currentText();
+        exprComboBox->removeItem(exprComboBox->currentIndex());
+        exprComboBox->insertItem(0, currentExpr);
+        exprComboBox->setCurrentIndex(0);
+    }
+
     accept();
 }
 
 QString DlgMoveTopCardsUntil::getExpr() const
 {
-    return exprEdit->text();
+    return exprComboBox->currentText();
+}
+
+QStringList DlgMoveTopCardsUntil::getExprs() const
+{
+    QStringList exprs;
+    for (int i = 0; i < exprComboBox->count(); ++i) {
+        exprs.append(exprComboBox->itemText(i));
+    }
+    return exprs;
 }
 
 uint DlgMoveTopCardsUntil::getNumberOfHits() const
