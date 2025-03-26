@@ -290,7 +290,7 @@ void SettingsCache::setZoneViewGroupByIndex(int /* _zoneViewGroupByIndex */)
 void SettingsCache::setZoneViewSortByIndex(int /* _zoneViewSortByIndex */)
 {
 }
-void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _showMessagePopups /*_LocalTime*/)
+void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T /*_LocalTime*/)
 {
 }
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T /* _zoneViewPileView */)
