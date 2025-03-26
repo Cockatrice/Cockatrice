@@ -312,11 +312,26 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     return viewRelatedCards;
 }
 
+/**
+ * Finds the single instance of the MainWindow in this application.
+ */
+static MainWindow *findMainWindow()
+{
+    for (auto widget : QApplication::topLevelWidgets()) {
+        if (auto mainWindow = qobject_cast<MainWindow *>(widget)) {
+            return mainWindow;
+        }
+    }
+    // This code should be unreachable
+    qCritical() << "Could not find MainWindow in QApplication::topLevelWidgets";
+    return nullptr;
+}
+
 QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
 {
     auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
 
-    auto *mainWindow = qobject_cast<MainWindow *>(window());
+    auto mainWindow = findMainWindow();
     QList<AbstractTabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     if (deckEditorTabs.isEmpty()) {
