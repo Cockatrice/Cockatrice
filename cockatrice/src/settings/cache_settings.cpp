@@ -331,6 +331,7 @@ SettingsCache::SettingsCache()
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
+    localTime = settings->value("chat/localtime", false).toBool();
 }
 
 void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
