@@ -1,12 +1,15 @@
 #include "printing_selector.h"
 
 #include "../../../../settings/cache_settings.h"
+#include "../../picture_loader/picture_loader.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 
+#include <QFrame>
 #include <QScrollBar>
+#include <qboxlayout.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.
@@ -28,6 +31,24 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);
     setLayout(layout);
+
+    if (PictureLoader::hasCustomArt()) {
+        QFrame *warningFrame = new QFrame(this);
+        warningFrame->setFrameShape(QFrame::StyledPanel);
+
+        warningLabel = new QLabel(this);
+        warningLabel->setTextFormat(Qt::RichText);
+        warningLabel->setWordWrap(true);
+
+        auto *warningLayout = new QVBoxLayout(warningFrame);
+        warningFrame->setLayout(warningLayout);
+
+        warningLayout->addWidget(warningLabel);
+
+        layout->addWidget(warningFrame);
+    } else {
+        warningLabel = nullptr;
+    }
 
     widgetLoadingBufferTimer = new QTimer(this);
 
@@ -83,6 +104,12 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 void PrintingSelector::retranslateUi()
 {
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
+
+    if (warningLabel) {
+        warningLabel->setText(
+            tr("<b>Warning:</b> You appear to be using custom card art, which has known bugs when also "
+               "using the printing selector in this version of Cockatrice."));
+    }
 }
 
 void PrintingSelector::printingsInDeckChanged()
