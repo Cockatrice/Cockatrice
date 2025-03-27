@@ -7,6 +7,8 @@
 #include <QTimer>
 #include <QWidget>
 
+inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
+
 class AbstractCardItem;
 class QMenu;
 
