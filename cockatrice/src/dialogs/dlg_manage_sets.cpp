@@ -165,7 +165,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
     QCheckBox *includeRebalancedCardsCheckBox =
-        new QCheckBox(tr("Include rebalanced (Arena) cards in regular sets [requires restart]"));
+        new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
     includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
     connect(includeRebalancedCardsCheckBox, &QAbstractButton::toggled, this, &WndSets::includeRebalancedCardsChanged);
 
