@@ -44,7 +44,7 @@ private:
     void saveHeaderState();
     void rebuildMainLayout(int actionToTake);
     bool setOrderIsSorted;
-    bool includeOnlineOnlyCards;
+    bool includeRebalancedCards;
     enum
     {
         NO_SETS_SELECTED,
@@ -74,7 +74,7 @@ private slots:
     void actDisableResetButton(const QString &filterText);
     void actSort(int index);
     void actIgnoreWarning();
-    void includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCardsChanged);
+    void includeRebalancedCardsChanged(bool _includeRebalancedCardsChanged);
 };
 
 #endif

@@ -199,7 +199,7 @@ void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrd
 void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
 {
 }
-void SettingsCache::setIncludeOnlineOnlyCards(bool /* _includeOnlineOnlyCards */)
+void SettingsCache::setIncludeRebalancedCards(bool /* _includeRebalancedCards */)
 {
 }
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
