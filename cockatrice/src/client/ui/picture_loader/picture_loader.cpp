@@ -115,7 +115,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         if (bigPixmap.isNull()) {
-            qCWarning(PictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
+            qCDebug(PictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
             return;
         }
 

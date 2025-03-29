@@ -136,7 +136,7 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
-        qCDebug(CardZoneLog) << "CardZone::addCard() card is null, this shouldn't normally happen";
+        qCWarning(CardZoneLog) << "CardZone::addCard() card is null; this shouldn't normally happen";
         return;
     }
 
@@ -160,7 +160,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
     CardItem *c = cards.findCard(cardId);
     if (!c) {
-        qCDebug(CardZoneLog) << "CardZone::getCard: card id=" << cardId << "not found";
+        qCWarning(CardZoneLog) << "CardZone::getCard: card id=" << cardId << "not found";
         return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
@@ -205,7 +205,7 @@ CardItem *CardZone::takeCard(int position, int cardId, bool toNewZone)
 void CardZone::removeCard(CardItem *card)
 {
     if (!card) {
-        qCDebug(CardZoneLog) << "CardZone::removeCard: card is null, this shouldn't normally happen";
+        qCWarning(CardZoneLog) << "CardZone::removeCard: card is null, this shouldn't normally happen";
         return;
     }
 

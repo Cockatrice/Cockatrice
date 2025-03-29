@@ -140,7 +140,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // ensure that the defaut path exists and return it
     if (tmp.isEmpty() || !QDir(tmp).exists()) {
         if (!QDir().mkpath(defaultPath))
-            qCDebug(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
+            qCInfo(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
     }
     return tmp;
@@ -161,7 +161,7 @@ SettingsCache::SettingsCache()
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
     if (isPortableBuild)
-        qCDebug(SettingsCacheLog) << "Portable mode enabled";
+        qCInfo(SettingsCacheLog) << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");

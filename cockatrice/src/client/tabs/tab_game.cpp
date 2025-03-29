@@ -753,7 +753,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont,
                 default: {
                     Player *player = players.value(playerId, 0);
                     if (!player) {
-                        qCDebug(TabGameLog) << "unhandled game event: invalid player id";
+                        qCWarning(TabGameLog) << "unhandled game event: invalid player id";
                         break;
                     }
                     player->processGameEvent(eventType, event, context, options);

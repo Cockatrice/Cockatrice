@@ -46,7 +46,7 @@ void GameScene::retranslateUi()
 
 void GameScene::addPlayer(Player *player)
 {
-    qCDebug(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getName();
     players << player;
     addItem(player);
     connect(player, &Player::sizeChanged, this, &GameScene::rearrange);
@@ -55,7 +55,7 @@ void GameScene::addPlayer(Player *player)
 
 void GameScene::removePlayer(Player *player)
 {
-    qCDebug(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getName();
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();

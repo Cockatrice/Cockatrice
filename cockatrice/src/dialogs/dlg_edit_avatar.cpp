@@ -61,7 +61,7 @@ void DlgEditAvatar::actBrowse()
     imgReader.setDecideFormatFromContent(true);
     imgReader.setFileName(fileName);
     if (!imgReader.read(&image)) {
-        qCDebug(DlgEditAvatarLog) << "Avatar image loading failed for file:" << fileName;
+        qCWarning(DlgEditAvatarLog) << "Avatar image loading failed for file:" << fileName;
         imageLabel->setText(tr("Invalid image chosen."));
         return;
     }
