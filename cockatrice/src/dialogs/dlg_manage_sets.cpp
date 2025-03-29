@@ -163,10 +163,11 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
-    includeOnlineOnlyCards = SettingsCache::instance().getIncludeOnlineOnlyCards();
-    QCheckBox *onlineOnly = new QCheckBox(tr("Include online-only (Arena) cards [requires restart]"));
-    onlineOnly->setChecked(includeOnlineOnlyCards);
-    connect(onlineOnly, &QAbstractButton::toggled, this, &WndSets::includeOnlineOnlyCardsChanged);
+    includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
+    QCheckBox *includeRebalancedCardsCheckBox =
+        new QCheckBox(tr("Include rebalanced (Arena) cards in regular sets [requires restart]"));
+    includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
+    connect(includeRebalancedCardsCheckBox, &QAbstractButton::toggled, this, &WndSets::includeRebalancedCardsChanged);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
@@ -181,7 +182,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(onlineOnly, 4, 1, 1, 2);
+    mainLayout->addWidget(includeRebalancedCardsCheckBox, 4, 1, 1, 2);
     mainLayout->addWidget(hintsGroupBox, 5, 1, 1, 2);
     mainLayout->addWidget(buttonBox, 6, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
@@ -246,15 +247,15 @@ void WndSets::rebuildMainLayout(int actionToTake)
     }
 }
 
-void WndSets::includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCards)
+void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
 {
-    includeOnlineOnlyCards = _includeOnlineOnlyCards;
+    includeRebalancedCards = _includeRebalancedCards;
 }
 
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
-    SettingsCache::instance().setIncludeOnlineOnlyCards(includeOnlineOnlyCards);
+    SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
     PictureLoader::clearPixmapCache();
     close();
 }

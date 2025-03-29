@@ -260,7 +260,7 @@ SettingsCache::SettingsCache()
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
-    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", false).toBool();
+    includeRebalancedCards = settings->value("cards/includerebalancedcards", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
@@ -656,11 +656,14 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
     emit printingSelectorCardSizeChanged();
 }
 
-void SettingsCache::setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards)
+void SettingsCache::setIncludeRebalancedCards(bool _includeRebalancedCards)
 {
-    includeOnlineOnlyCards = _includeOnlineOnlyCards;
-    settings->setValue("cards/includeonlineonlycards", includeOnlineOnlyCards);
-    emit includeOnlineOnlyCardsChanged(includeOnlineOnlyCards);
+    if (includeRebalancedCards == _includeRebalancedCards)
+        return;
+
+    includeRebalancedCards = _includeRebalancedCards;
+    settings->setValue("cards/includerebalancedcards", includeRebalancedCards);
+    emit includeRebalancedCardsChanged(includeRebalancedCards);
 }
 
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)

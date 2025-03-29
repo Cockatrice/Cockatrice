@@ -59,7 +59,7 @@ signals:
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCards);
+    void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
@@ -131,7 +131,7 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
-    bool includeOnlineOnlyCards;
+    bool includeRebalancedCards;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
@@ -406,9 +406,9 @@ public:
     {
         return printingSelectorCardSize;
     }
-    bool getIncludeOnlineOnlyCards() const
+    bool getIncludeRebalancedCards() const
     {
-        return includeOnlineOnlyCards;
+        return includeRebalancedCards;
     }
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
@@ -787,7 +787,7 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards);
+    void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);

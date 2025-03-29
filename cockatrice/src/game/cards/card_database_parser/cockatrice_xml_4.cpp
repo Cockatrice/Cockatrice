@@ -126,7 +126,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeOnlineOnlyCards = SettingsCache::instance().getIncludeOnlineOnlyCards();
+    bool includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -194,7 +194,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         // However, this is also true of the `set->getEnabled()`
                         // check above (which is currently bugged as well), so
                         // we'll fix both at the same time.
-                        if (includeOnlineOnlyCards || setInfo.getProperty("isOnlineOnly") != "true") {
+                        if (includeRebalancedCards || setInfo.getProperty("isRebalanced") != "true") {
                             _sets[setName].append(setInfo);
                         }
                     }
