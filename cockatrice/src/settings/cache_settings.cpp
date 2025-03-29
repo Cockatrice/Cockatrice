@@ -260,7 +260,7 @@ SettingsCache::SettingsCache()
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
-    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", false).toBool();
+    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
