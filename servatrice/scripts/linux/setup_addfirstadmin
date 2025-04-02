@@ -5,4 +5,4 @@
 DBNAME="servatrice"					#set this to the database name used
 TABLEPREFIX="cockatrice"			#set this to the prefix used for the table names in the database (do not inclue the _)
 SQLCONFFILE="./mysql.cnf" 			#set this to the path that contains the mysql.cnf file
-mysql --defaults-file=$SQLCONFFILE -h localhost -e "insert into ""$DBNAME"".""$TABLEPREFIX""_users (admin,name,password_sha512,active) values (1,'servatrice','jbB4kSWDmjaVzMNdU13n73SpdBCJTCJ/JYm5ZBZvfxlzbISbXir+e/aSvMz86KzOoaBfidxO0s6GVd8t00qC0TNPl+udHfECaF7MsA==',1);"
+mysql --defaults-file=$SQLCONFFILE -h localhost -e "insert into ""$DBNAME"".""$TABLEPREFIX""_users ((admin,name,password_sha512,active,realname,email,country,avatar_bmp,registrationDate,clientID,adminnotes,privlevelStartDate,privlevelEndDate) values (1,'servatrice','jbB4kSWDmjaVzMNdU13n73SpdBCJTCJ/JYm5ZBZvfxlzbISbXir+e/aSvMz86KzOoaBfidxO0s6GVd8t00qC0TNPl+udHfECaF7MsA==',1,'servatrice','servatrice@localhost','us','null.bmp','1970-01-01 10:00:00','','','1970-01-01 10:00:00','9999-01-01 10:00:00');
