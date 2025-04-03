@@ -147,7 +147,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
     tipTextContent->setTextFormat(Qt::RichText);
 
     if (!image->load(imagePath)) {
-        qCDebug(DlgTipOfTheDayLog) << "Image failed to load from" << imagePath;
+        qCWarning(DlgTipOfTheDayLog) << "Image failed to load from" << imagePath;
         imageLabel->clear();
     } else {
         int h = std::min(std::max(imageLabel->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);

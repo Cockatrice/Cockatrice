@@ -209,8 +209,8 @@ QString GeneralSettingsPage::languageName(const QString &lang)
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qCDebug(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
-                                << translationPath;
+        qCWarning(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
+                                  << translationPath;
     }
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
@@ -1615,7 +1615,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     bool showLoadError = true;
     QString loadErrorMessage = tr("Unknown Error loading card database");
     LoadStatus loadStatus = CardDatabaseManager::getInstance()->getLoadStatus();
-    qCDebug(DlgSettingsLog) << "Card Database load status: " << loadStatus;
+    qCInfo(DlgSettingsLog) << "Card Database load status: " << loadStatus;
     switch (loadStatus) {
         case Ok:
             showLoadError = false;

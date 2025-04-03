@@ -568,7 +568,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
 Player::~Player()
 {
-    qCDebug(PlayerLog) << "Player destructor:" << getName();
+    qCInfo(PlayerLog) << "Player destructor:" << getName();
 
     QMapIterator<QString, CardZone *> i(zones);
     while (i.hasNext())

@@ -213,7 +213,7 @@ void PictureLoaderWorker::picDownloadFailed()
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qCDebug(PictureLoaderWorkerLog).nospace()
+        qCWarning(PictureLoaderWorkerLog).nospace()
             << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
@@ -424,7 +424,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     }
 
     if (logSuccessMessage) {
-        qCDebug(PictureLoaderWorkerLog).nospace()
+        qCInfo(PictureLoaderWorkerLog).nospace()
             << "[card: " << cardBeingDownloaded.getCard()->getName() << " set: " << cardBeingDownloaded.getSetName()
             << "]: Image successfully " << (isFromCache ? "loaded from cached" : "downloaded from") << " url "
             << reply->url().toDisplayString();

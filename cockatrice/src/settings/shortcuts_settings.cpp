@@ -74,7 +74,7 @@ void ShortcutsSettings::migrateShortcuts()
         shortCutsFile.beginGroup(custom);
 
         if (shortCutsFile.contains("Textbox/unfocusTextBox")) {
-            qCDebug(ShortcutsSettingsLog)
+            qCInfo(ShortcutsSettingsLog)
                 << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
             QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
             this->setShortcuts("Player/unfocusTextBox", unfocusTextBox);
@@ -82,7 +82,7 @@ void ShortcutsSettings::migrateShortcuts()
         }
 
         if (shortCutsFile.contains("tab_game/aFocusChat")) {
-            qCDebug(ShortcutsSettingsLog)
+            qCInfo(ShortcutsSettingsLog)
                 << "[ShortcutsSettings] tab_game/aFocusChat shortcut found. Migrating to Player/aFocusChat.";
             QString aFocusChat = shortCutsFile.value("tab_game/aFocusChat", "").toString();
             this->setShortcuts("Player/aFocusChat", aFocusChat);
@@ -91,7 +91,7 @@ void ShortcutsSettings::migrateShortcuts()
 
         // PR #5564 changes "MainWindow/aDeckEditor" to "Tabs/aTabDeckEditor"
         if (shortCutsFile.contains("MainWindow/aDeckEditor")) {
-            qCDebug(ShortcutsSettingsLog) << "MainWindow/aDeckEditor shortcut found. Migrating to Tabs/aTabDeckEditor.";
+            qCInfo(ShortcutsSettingsLog) << "MainWindow/aDeckEditor shortcut found. Migrating to Tabs/aTabDeckEditor.";
             QString keySequence = shortCutsFile.value("MainWindow/aDeckEditor", "").toString();
             this->setShortcuts("Tabs/aTabDeckEditor", keySequence);
             shortCutsFile.remove("MainWindow/aDeckEditor");

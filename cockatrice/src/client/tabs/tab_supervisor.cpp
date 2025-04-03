@@ -856,7 +856,7 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
     if (tab)
         tab->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()), {});
     else
-        qCDebug(TabSupervisorLog) << "gameEvent: invalid gameId";
+        qCInfo(TabSupervisorLog) << "gameEvent: invalid gameId" << cont.game_id();
 }
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)

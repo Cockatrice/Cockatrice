@@ -141,20 +141,20 @@ void installNewTranslator()
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
-        qCDebug(QtTranslatorDebug) << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
+        qCWarning(QtTranslatorDebug) << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
     } else {
-        qCDebug(QtTranslatorDebug) << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
+        qCInfo(QtTranslatorDebug) << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
     }
     qApp->installTranslator(qtTranslator);
 
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qCDebug(QtTranslatorDebug) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
-                                   << translationPath;
+        qCWarning(QtTranslatorDebug) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
+                                     << translationPath;
     } else {
-        qCDebug(QtTranslatorDebug) << "Loaded" << translationPrefix << "translation" << appNameHint << "at"
-                                   << translationPath;
+        qCInfo(QtTranslatorDebug) << "Loaded" << translationPrefix << "translation" << appNameHint << "at"
+                                  << translationPath;
     }
     qApp->installTranslator(translator);
 }
@@ -251,13 +251,13 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
-    qCDebug(MainLog) << "Starting main program";
+    qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
-    qCDebug(MainLog) << "MainWindow constructor finished";
+    qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
-    qCDebug(MainLog) << "ui.show() finished";
+    qCInfo(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
 #endif
     app.exec();
 
-    qDebug("Event loop finished, terminating...");
+    qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();
