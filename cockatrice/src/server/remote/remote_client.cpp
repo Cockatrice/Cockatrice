@@ -339,6 +339,11 @@ void RemoteClient::registerResponse(const Response &response)
             emit registerAcceptedNeedsActivate();
             doLogin();
             break;
+        case Response::RespNotConnected:
+            // this response is created by the client from doDisconnectFromServer, do not call it again!
+            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
+                               static_cast<quint32>(resp.denied_end_time()));
+            break;
         default:
             emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
                                static_cast<quint32>(resp.denied_end_time()));
