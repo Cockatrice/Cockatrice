@@ -31,8 +31,8 @@ QUERY(Typing, cat, "t", true)
 
 QUERY(NonMatchingType, cat, "t:kithkin", false)
 QUERY(MatchingType, cat, "t:creature", true)
-QUERY(Not1, cat, "not t:kithkin", true)
-QUERY(Not2, cat, "not t:creature", false)
+QUERY(Not1, cat, "NOT t:kithkin", true)
+QUERY(Not2, cat, "NOT t:creature", false)
 QUERY(Case, cat, "t:cReAtUrE", true)
 
 QUERY(And, cat, "t:creature t:creature", true)
