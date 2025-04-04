@@ -1,28 +1,5 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it">
 <context>
-    <name>BetaReleaseChannel</name>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="210"/>
-        <source>Beta</source>
-        <translation>Beta</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="236"/>
-        <source>No reply received from the release update server.</source>
-        <translation>Nessuna risposta ricevuta dal server degli aggiornamenti di versione.</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="245"/>
-        <source>Invalid reply received from the release update server.</source>
-        <translation>Ricevuta risposta non valida dal server degli aggiornamenti.</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="278"/>
-        <source>No reply received from the file update server.</source>
-        <translation>Nessuna risposta ricevuta dal server degli aggiornamenti.</translation>
-    </message>
-</context>
-<context>
     <name>IntroPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="200"/>
@@ -307,15 +284,6 @@ e pedine che verranno usate da Cockatrice.</translation>
     </message>
 </context>
 <context>
-    <name>PictureLoader</name>
-    <message>
-        <location filename="../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp" line="219"/>
-        <source>en</source>
-        <comment>code for scryfall's language property, not available for all languages</comment>
-        <translation>it</translation>
-    </message>
-</context>
-<context>
     <name>SaveSetsPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="618"/>
@@ -390,23 +358,6 @@ e pedine che verranno usate da Cockatrice.</translation>
     </message>
 </context>
 <context>
-    <name>ShortcutsSettings</name>
-    <message>
-        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="54"/>
-        <source>Your configuration file contained invalid shortcuts.
-Please check your shortcut settings!</source>
-        <translation>Il file di configurazione conteneva combinazioni di tasti non valide.
-Controlla le impostazioni delle combinazioni!</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="56"/>
-        <source>The following shortcuts have been set to default:
-</source>
-        <translation>Le seguenti combinazioni di tasti sono state reimpostate al valore predefinito:
-</translation>
-    </message>
-</context>
-<context>
     <name>SimpleDownloadFilePage</name>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
@@ -439,34 +390,6 @@ Controlla le impostazioni delle combinazioni!</translation>
         <location filename="src/pagetemplates.cpp" line="169"/>
         <source>The file could not be saved to %1</source>
         <translation>Impossibile salvare il file su %1</translation>
-    </message>
-</context>
-<context>
-    <name>StableReleaseChannel</name>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="104"/>
-        <source>Default</source>
-        <translation>Predefinito</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="120"/>
-        <source>No reply received from the release update server.</source>
-        <translation>Nessuna risposta ricevuta dal server degli aggiornamenti di versione.</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="128"/>
-        <source>Invalid reply received from the release update server.</source>
-        <translation>Ricevuta risposta non valida dal server degli aggiornamenti.</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="176"/>
-        <source>No reply received from the tag update server.</source>
-        <translation>Nessuna risposta ricevuta dal server dei tag di aggiornamento.</translation>
-    </message>
-    <message>
-        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="183"/>
-        <source>Invalid reply received from the tag update server.</source>
-        <translation>Ricevuta risposta non valida dal server dei tag di aggiornamento.</translation>
     </message>
 </context>
 <context>
@@ -614,7 +537,6 @@ Controlla le impostazioni delle combinazioni!</translation>
     <name>i18n</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="58"/>
-        <location filename="../cockatrice/src/settings/cache_settings.cpp" line="167"/>
         <source>English</source>
         <translation>Italiano (Italian)</translation>
     </message>
