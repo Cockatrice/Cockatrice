@@ -44,6 +44,7 @@ private:
         HoveredCard,
         HoveredUser
     };
+    int *elapsedSeconds{};
     const UserListProxy *const userListProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
@@ -56,6 +57,7 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool showInGameTime;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
@@ -77,7 +79,7 @@ private:
     QColor otherUserColor = QColor(0, 65, 255); // dark blue
     QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
     QColor linkColor;
-
+    QString getCurrentTime();
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
@@ -103,6 +105,7 @@ protected:
     void enterEvent(QEvent *event) override;
 #endif
     void leaveEvent(QEvent *event) override;
+    void setTime(int *time);
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;

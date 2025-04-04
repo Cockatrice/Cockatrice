@@ -205,6 +205,7 @@ private:
     bool rememberGameSettings;
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
+    bool localTime;
     bool roundCardCorners;
 
 public:
@@ -568,6 +569,10 @@ public:
     {
         return showMessagePopups;
     }
+    bool getLocalTime() const
+    {
+        return localTime;
+    }
     bool getShowMentionPopup() const
     {
         return showMentionPopups;
@@ -825,6 +830,7 @@ public slots:
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);
+    void setLocalTime(const QT_STATE_CHANGED_T _showMessagePopups);
     void setShowMentionPopups(const QT_STATE_CHANGED_T _showMentionPopups);
     void setRoomHistory(const QT_STATE_CHANGED_T _roomHistory);
     void setLeftJustified(const QT_STATE_CHANGED_T _leftJustified);
