@@ -10,7 +10,7 @@
 peg::parser search(R"(
 Start <- QueryPartList
 ~ws <- [ ]+
-QueryPartList <- ComplexQueryPart ( ws ("and" ws)? ComplexQueryPart)* ws*
+QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 
 ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[O][R]> ws ComplexQueryPart / SomewhatComplexQueryPart
 
