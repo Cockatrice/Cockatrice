@@ -38,7 +38,7 @@ QUERY(Case, cat, "t:cReAtUrE", true)
 QUERY(And, cat, "t:creature t:creature", true)
 QUERY(And2, cat, "t:creature t:sorcery", false)
 
-QUERY(Or, cat, "t:bat or t:creature", true)
+QUERY(Or, cat, "t:bat OR t:creature", true)
 
 QUERY(Cmc1, cat, "cmc=2", true)
 QUERY(Cmc2, cat, "cmc>3", false)
