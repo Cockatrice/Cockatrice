@@ -11,7 +11,7 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
 {
     setBackgroundBrush(QBrush(QColor(0, 0, 0)));
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
-    setFocusPolicy(Qt::NoFocus);
+    setFocusPolicy(Qt::ClickFocus);
     setViewportUpdateMode(BoundingRectViewportUpdate);
 
     connect(scene, &GameScene::sceneRectChanged, this, &GameView::updateSceneRect);
