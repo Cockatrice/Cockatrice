@@ -140,7 +140,11 @@ void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());
     } else {
         if (card->getUpsideDownArt()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+            QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
+#else
             QImage mirrorImage = image.mirrored(true, true);
+#endif
             QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
         } else {
             QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(image));
