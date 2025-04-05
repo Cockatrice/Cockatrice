@@ -6,8 +6,8 @@
    <a href="#cockatrice"><b>Cockatrice</b></a> <b>|</b>
    <a href="#download-">Download</a> <b>|</b>
    <a href="#related-repositories">Related</a> <b>|</b>
-   <a href="#community-resources">Community</a> <b>|</b>
-   <a href="#contribute-">Contribute</a> <b>|</b>
+   <a href="#community-resources-">Community</a> <b>|</b>
+   <a href="#contribute">Contribute</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
    <a href="#run">Run</a>
 </p>
@@ -50,11 +50,14 @@ Downloads are available for full releases and the current beta version in develo
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
 - [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official webpage of the Cockatrice project
 <!-- TODO
-- [flathub/io.github.Cockatrice.cockatrice](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration to enable *flatpak* package of the app at [Flathub](https://flathub.org/apps/io.github.Cockatrice.cockatrice)
+- [flathub/io.github.Cockatrice.cockatrice](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration to manage *flatpak* package of the app at [Flathub](https://flathub.org/apps/io.github.Cockatrice.cockatrice)
 -->
 
 
-# Community Resources
+# Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
+
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.<br>
+**For support regarding specific servers, please contact that server's admin or communication channels for support rather than asking here.**<br>
 
 - [Cockatrice Official Site](https://cockatrice.github.io)
 - [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
@@ -62,29 +65,26 @@ Downloads are available for full releases and the current beta version in develo
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
 
-# Contribute [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
-
-Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.<br>
-For support regarding specific servers, please contact that server's admin or communication channels for support rather than asking here.<br>
+# Contribute
 
 ### Code
 
-To contribute code to the project, please review [the guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md).
-We maintain two tags for contributors to find issues to work on:
+To contribute code to the project, please review our [guidelines](https://github.com/Cockatrice/Cockatrice/blob/master/.github/CONTRIBUTING.md) first.<br>
+We maintain two tags for contributors to easier find issues to potentially work on:
 - [![Good first issue](https://img.shields.io/github/issues/cockatrice/cockatrice/Good%20First%20Issue)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Good%20first%20issue%22%20)<br>
 Issues tagged in this way provide a simple way to get started. They don't require much experience to be worked on.
 - [![Help wanted](https://img.shields.io/github/issues/cockatrice/cockatrice/Help%20Wanted)](https://github.com/Cockatrice/Cockatrice/issues?utf8=%E2%9C%93&q=is%3Aopen%20is%3Aissue%20label%3A%22Help%20Wanted%22%20)<br>
-This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we are willing to accept, but don't have the time to work on ourselves.
+This tag is used for issues that we are looking for a contributor to work on. Often this is for feature suggestions we support, but don't have the time to work on ourselves.
 
-For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.
+For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code review for changes they submit.<br>
 
 We try to be responsive to new issues. We'll provide advice on how best to implement a feature; alternately, we can show you where the codebase is doing something similar before you get too far along.
 
-Cockatrice uses the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
+Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
 ### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
 
-Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Oracle and Webatrice to your language or just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
+Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
