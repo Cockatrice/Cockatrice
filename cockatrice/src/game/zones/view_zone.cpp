@@ -148,7 +148,16 @@ void ZoneViewZone::updateCardIds(CardAction action)
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {
-    CardList cardsToDisplay(cards);
+    // filter cards
+    CardList cardsToDisplay = CardList(cards.getContentsKnown());
+    for (auto card : cards) {
+        if (filterString.check(card->getInfo())) {
+            card->show();
+            cardsToDisplay.append(card);
+        } else {
+            card->hide();
+        }
+    }
 
     // sort cards
     QList<CardList::SortOption> sortOptions;
@@ -261,6 +270,12 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 
         return GridSize{rows, qMax(cols, 1)};
     }
+}
+
+void ZoneViewZone::setFilterString(const QString &_filterString)
+{
+    filterString = FilterString(_filterString);
+    reorganizeCards();
 }
 
 void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)
