@@ -9,22 +9,23 @@
    <a href="#community-resources">Community</a> <b>|</b>
    <a href="#contribute-">Contribute</a> <b>|</b>
    <a href="#build--">Build</a> <b>|</b>
-   <a href="#run">Run</a> <b>|</b>
-   <a href="#license-">License</a>
+   <a href="#run">Run</a>
 </p>
 
 ---
 
 <br><pre><p align='center'>
-<b>To get started &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
-<b>To get support or suggest changes &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
-<b>To help with development &#8674; check [how to contribute](#contribute-)</b>
+<b>To get started with Cockatrice &#8674; [view our webpage](https://cockatrice.github.io/)</b><br>
+<b>To get support, or suggest changes to the app &#8674; [file an issue](https://github.com/Cockatrice/Cockatrice/issues) ([How?](https://github.com/Cockatrice/Cockatrice/wiki/How-to-Create-a-GitHub-Ticket-Regarding-Cockatrice))</b>
+<b>To help with development &#8674; learn [how to contribute](#contribute-)</b>
 </pre><p><br>
 
 
 # Cockatrice
 
-Cockatrice is an open-source, multiplatform program for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline. This project uses <kbd>C++</kbd> and the <kbd>Qt</kbd> libraries.<br>
+Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline.<br><br>
+This project uses <kbd>C++</kbd> and the <kbd>Qt</kbd> libraries.<br>
+First work on a webclient with <kbd>Typescript</kbd> was started as well.<br>
 
 
 # Download [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice)
@@ -64,7 +65,7 @@ Downloads are available for full releases and the current beta version in develo
 # Contribute [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
 
 Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.<br>
-For support regarding specific servers, please contact that server's admin or forum for support rather than asking here.<br>
+For support regarding specific servers, please contact that server's admin or communication channels for support rather than asking here.<br>
 
 ### Code
 
@@ -87,16 +88,8 @@ Cockatrice uses Transifex for translations. You can help us bring Cockatrice, Or
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
 
-<!-- TODO?
-### Sponsor
-
-x
--->
-
 
 # Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
-
-**Detailed compiling instructions can be found on the Cockatrice wiki under [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
 
 Dependencies: *(for minimum versions search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
@@ -107,7 +100,9 @@ Oracle can *optionally* use some packages to load compressed card files:
 - [xz](https://tukaani.org/xz/)
 - [zlib](https://www.zlib.net/)
 
-To compile:
+<br>
+
+**Basic compilation steps:**
 ```bash
 mkdir build
 cd build
@@ -115,16 +110,19 @@ cmake ..
 make
 ```
 
-You can then run
-```bash
-make install
-```
+You can then
+ - Create a Cockatrice installation inside the `release` folder:
+    ```bash
+    make install
+    ```
+ - Or make a system-specific installation package:
+    ```bash
+    make package
+    ```
 
-to get a cockatrice installation inside the `release` folder, or:
-```bash
-make package
-```
-to create a system-specific installation package.
+**Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
+
+<br>
 
 The following flags can be passed to `cmake`:
 | Flag | Description | Default Value |
@@ -141,9 +139,9 @@ The following flags can be passed to `cmake`:
 
 # Run
 
-`Cockatrice` is the game client<br>
-`Oracle` fetches card data<br>
-`Servatrice` is the server<br>
+<kbd>Cockatrice</kbd> is the game client<br>
+<kbd>Oracle</kbd> fetches card data<br>
+<kbd>Servatrice</kbd> is the server<br>
 
 **Servatrice Docker container**
 
