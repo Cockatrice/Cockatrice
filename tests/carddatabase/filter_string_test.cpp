@@ -31,14 +31,14 @@ QUERY(Typing, cat, "t", true)
 
 QUERY(NonMatchingType, cat, "t:kithkin", false)
 QUERY(MatchingType, cat, "t:creature", true)
-QUERY(Not1, cat, "not t:kithkin", true)
-QUERY(Not2, cat, "not t:creature", false)
+QUERY(Not1, cat, "NOT t:kithkin", true)
+QUERY(Not2, cat, "NOT t:creature", false)
 QUERY(Case, cat, "t:cReAtUrE", true)
 
 QUERY(And, cat, "t:creature t:creature", true)
 QUERY(And2, cat, "t:creature t:sorcery", false)
 
-QUERY(Or, cat, "t:bat or t:creature", true)
+QUERY(Or, cat, "t:bat OR t:creature", true)
 
 QUERY(Cmc1, cat, "cmc=2", true)
 QUERY(Cmc2, cat, "cmc>3", false)
