@@ -42,7 +42,6 @@ private:
     QWidget *centralWidget;
 
 private slots:
-    void showSearchSyntaxHelp();
     void retranslateUi();
     void updateSearch(const QString &search);
     void updateCard(const QModelIndex &current, const QModelIndex &);
