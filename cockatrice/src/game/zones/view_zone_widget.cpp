@@ -145,6 +145,8 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
         }
+
+        connect(&searchEdit, &QLineEdit::textChanged, zone, &ZoneViewZone::setFilterString);
     }
 
     setLayout(vbox);
