@@ -30,16 +30,17 @@ First work on a webclient with <kbd>Typescript</kbd> was started as well.<br>
 
 # Download [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0)
 
-Downloads are available for full releases and the current beta version in development. There is no strict release schedule for either of them.
+Downloads are available for **stable releases** and the current **beta version** in development.  
+There is no strict release schedule for either of them.
 <br><pre>
 Latest <kbd>stable</kbd> release:
-[![Download Stable Release](https://img.shields.io/github/release/cockatrice/cockatrice.svg?label=download&colorB=0d7ebf "Download Latest Stable Release")](https://github.com/cockatrice/cockatrice/releases/latest) ![](https://img.shields.io/github/release-date/Cockatrice/Cockatrice.svg?label=released&colorB=0d7ebf "Release Date") [![](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=count&colorB=0d7ebf "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0)
+[![Download Stable Release](https://img.shields.io/github/release/cockatrice/cockatrice.svg?label=version&colorB=0d7ebf "Download Latest Stable Release")](https://github.com/cockatrice/cockatrice/releases/latest) ![](https://img.shields.io/github/release-date/Cockatrice/Cockatrice.svg?label=released&colorB=0d7ebf "Release Date") [![](https://img.shields.io/github/downloads/cockatrice/cockatrice/latest/total.svg?label=downloads&colorB=0d7ebf "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0)
+</pre><pre>
+Latest <kbd>beta</kbd> version:
+[![Download Beta Release](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg?label=version&colorB=f37f40 "Download Latest Beta Release")](https://github.com/cockatrice/cockatrice/releases) ![](https://img.shields.io/github/release-date-pre/Cockatrice/Cockatrice.svg?label=released&colorB=f37f40 "Release Date") [![](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads&colorB=f37f40 "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0) [![](https://img.shields.io/github/commits-since/Cockatrice/Cockatrice/latest.svg?label=changes&colorB=f37f40 "Changes over Stable Release")](https://github.com/Cockatrice/Cockatrice/pulls?q=is%3Apr+is%3Aclosed)
+<sub><i>While incorporating the latest fixes and features, beta builds may not be stable and/or contain new bugs!</i></sub>
+<sub><b><i>Please report any findings when testing them!</i></b></sub>
 </pre>
-> Latest <kbd>beta</kbd> version:<br>
-[![Download Beta Release](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg?label=download&colorB=f37f40 "Download Latest Beta Release")](https://github.com/cockatrice/cockatrice/releases) ![](https://img.shields.io/github/release-date-pre/Cockatrice/Cockatrice.svg?label=released&colorB=f37f40 "Release Date") [![](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=count&colorB=f37f40 "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0) [![](https://img.shields.io/github/commits-since/Cockatrice/Cockatrice/latest.svg?label=changes&colorB=f37f40 "Changes over Stable Release")](https://github.com/Cockatrice/Cockatrice/pulls?q=is%3Apr+is%3Aclosed)<br>
-> <sub>*While incorporating the latest fixes and features, beta builds may not be stable and/or contain new bugs!*</sub><br>
-> <sub><b>*Please report any findings when testing them!*</b></sub>
-
 
 # Related Repositories
 
@@ -50,13 +51,14 @@ Latest <kbd>stable</kbd> release:
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
 
-Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.<br>
-**For support regarding specific servers, please contact that server's admin or communication channels for support rather than asking here.**<br>
-
-- [Cockatrice Official Site](https://cockatrice.github.io)
-- [Cockatrice Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
-- [Cockatrice Official Discord](https://discord.gg/3Z9yzmA)
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
+- [Official Website](https://cockatrice.github.io)
+- [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+- [Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
+
+>[!IMPORTANT]
+>For support regarding specific servers, please contact that server's admin/mods and use their dedicated communication channels rather than contacting the team building the software.
 
 
 # Contribute
@@ -71,16 +73,23 @@ Issues tagged in this way provide a simple way to get started. They don't requir
 This tag is used for issues that we are looking for somebody to pick up. Often this is for feature suggestions we support, but don't have the time to work on ourselves.
 
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code reviews for submitted changes.<br>
-We'll provide advice on how best to implement a feature - put a note on an issue you want to discuss more on!<br>
-Alternately, we can show you where the codebase is doing something similar before you get too far along.
+We'll happily advice on how best to implement a feature, or we can show you where the codebase is doing something similar before you get too far along - put a note on an issue you want to discuss more on!
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
+
+<details>
+<summary><b>Kudos to our amazing contributors ❤️</b></summary>
+   <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
+      <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
+   </a><br>
+   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a>.</i></sub>
+</details>
 
 ### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
 
 Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
 
-Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about contributing!<br>
+Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting invovled, and join a group of hundreds of others!<br>
 
 
 # Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
@@ -109,12 +118,13 @@ You can then
     ```bash
     make install
     ```
- - Or make a system-specific installation package:
+ - Or make an installation package specific to your system:
     ```bash
     make package
     ```
 
-**Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)**
+>[!NOTE]
+>Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)
 
 <br>
 
@@ -138,9 +148,9 @@ The following flags (with their non-default values) can be passed to `cmake`:
 <kbd>Oracle</kbd> fetches card data<br>
 <kbd>Servatrice</kbd> is the server<br>
 
-#### Docker (Servatrice)
+#### Docker
 
-You can run an instance of Servatrice (the Cockatrice server) using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile.<br>
+You can run an instance of <kbd>Servatrice</kbd> (the Cockatrice server) using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile.<br>
 
 For more information, have a look in our wiki section on [Setting up Servatrice](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).<br>
 There, you'll also find more hints on our **docker-compose** file which will configure and run both a MySQL server and Servatrice.
