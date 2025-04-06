@@ -1855,6 +1855,7 @@ void Player::actCreateAnotherToken()
     cmd.set_pt(lastTokenInfo.pt.toStdString());
     cmd.set_annotation(lastTokenInfo.annotation.toStdString());
     cmd.set_destroy_on_zone_change(lastTokenInfo.destroy);
+    cmd.set_face_down(lastTokenInfo.faceDown);
     cmd.set_x(-1);
     cmd.set_y(lastTokenTableRow);
 
