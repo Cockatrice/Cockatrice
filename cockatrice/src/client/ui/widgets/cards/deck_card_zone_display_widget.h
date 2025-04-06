@@ -6,6 +6,7 @@
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
 #include "card_info_picture_with_text_overlay_widget.h"
+#include "card_size_widget.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
@@ -21,7 +22,8 @@ public:
                               QString activeGroupCriteria,
                               QStringList activeSortCriteria,
                               int bannerOpacity,
-                              int subBannerOpacity);
+                              int subBannerOpacity,
+                              CardSizeWidget *_cardSizeWidget);
     DeckListModel *deckListModel;
     QString zoneName;
     void addCardsToOverlapWidget();
@@ -31,6 +33,7 @@ public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
     void displayCards();
+    void refreshDisplayType(const QString &displayType);
     void addCardGroupIfItDoesNotExist();
     void deleteCardGroupIfItDoesNotExist();
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
@@ -45,12 +48,14 @@ signals:
 private:
     QString activeGroupCriteria;
     QStringList activeSortCriteria;
+    int bannerOpacity = 20;
+    int subBannerOpacity = 10;
+    CardSizeWidget *cardSizeWidget;
     QVBoxLayout *layout;
     BannerWidget *banner;
     QWidget *cardGroupContainer;
     QVBoxLayout *cardGroupLayout;
-    int bannerOpacity = 20;
-    int subBannerOpacity = 10;
+    QString displayType = "flat";
     OverlapWidget *overlapWidget;
 };
 

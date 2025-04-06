@@ -1,9 +1,9 @@
 #include "overlapped_card_group_display_widget.h"
 
-#include "../../../../deck/deck_list_model.h"
-#include "../../../../game/cards/card_database_manager.h"
-#include "../../../../utility/card_info_comparator.h"
-#include "card_info_picture_with_text_overlay_widget.h"
+#include "../../../../../deck/deck_list_model.h"
+#include "../../../../../game/cards/card_database_manager.h"
+#include "../../../../../utility/card_info_comparator.h"
+#include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>
 
@@ -13,22 +13,25 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
                                                                    QString _cardGroupCategory,
                                                                    QString _activeGroupCriteria,
                                                                    QStringList _activeSortCriteria,
-                                                                   int bannerOpacity)
-    : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), cardGroupCategory(_cardGroupCategory),
-      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria)
+                                                                   int bannerOpacity,
+                                                                   CardSizeWidget *_cardSizeWidget)
+    : CardGroupDisplayWidget(parent,
+                             _deckListModel,
+                             _zoneName,
+                             _cardGroupCategory,
+                             _activeGroupCriteria,
+                             _activeSortCriteria,
+                             bannerOpacity,
+                             _cardSizeWidget)
 {
-    layout = new QVBoxLayout(this);
-    setLayout(layout);
-    setMinimumSize(QSize(0, 0));
-
-    banner = new BannerWidget(this, cardGroupCategory, Qt::Orientation::Vertical, bannerOpacity);
     overlapWidget = new OverlapWidget(this, 80, 1, 1, Qt::Vertical, true);
     banner->setBuddy(overlapWidget);
 
-    layout->addWidget(banner);
     layout->addWidget(overlapWidget);
-    updateCardDisplays();
+    OverlappedCardGroupDisplayWidget::updateCardDisplays();
     connect(deckListModel, &DeckListModel::dataChanged, this, &OverlappedCardGroupDisplayWidget::updateCardDisplays);
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
+            [this]() { overlapWidget->adjustMaxColumnsAndRows(); });
 }
 
 void OverlappedCardGroupDisplayWidget::updateCardDisplays()
@@ -65,12 +68,15 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
         } else {
             // Create a new widget if needed
             widget = new CardInfoPictureWithTextOverlayWidget(overlapWidget, true);
+            widget->setScaleFactor(cardSizeWidget->getSlider()->value());
             widget->setCard(card);
 
             connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
                     &OverlappedCardGroupDisplayWidget::onClick);
             connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
                     &OverlappedCardGroupDisplayWidget::onHover);
+            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget,
+                    &CardInfoPictureWidget::setScaleFactor);
 
             overlapWidget->addWidget(widget);
         }
@@ -102,48 +108,6 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
     }
 
     overlapWidget->adjustMaxColumnsAndRows();
-}
-
-QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort)
-{
-    cardsToSort = sortCardList(cardsToSort, activeSortCriteria, Qt::SortOrder::AscendingOrder);
-
-    QList<CardInfoPtr> activeList;
-    for (const CardInfoPtr &info : cardsToSort) {
-        if (info && info->getProperty(activeGroupCriteria) == cardGroupCategory) {
-            activeList.append(info);
-        }
-    }
-
-    return activeList;
-}
-
-QList<CardInfoPtr> OverlappedCardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
-                                                                  const QStringList properties,
-                                                                  Qt::SortOrder order = Qt::AscendingOrder)
-{
-    CardInfoComparator comparator(properties, order);
-    std::sort(cardsToSort.begin(), cardsToSort.end(), comparator);
-
-    return cardsToSort;
-}
-
-void OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
-{
-    if (activeSortCriteria != _activeSortCriteria) {
-        activeSortCriteria = _activeSortCriteria;
-        updateCardDisplays(); // Refresh display with new sorting
-    }
-}
-
-void OverlappedCardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
-{
-    emit cardClicked(event, card);
-}
-
-void OverlappedCardGroupDisplayWidget::onHover(CardInfoPtr card)
-{
-    emit cardHovered(card);
 }
 
 void OverlappedCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)

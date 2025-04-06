@@ -6,10 +6,12 @@
 #include "../../../../game/cards/card_database.h"
 #include "../../../../game/cards/card_database_model.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 
+#include <QCheckBox>
 #include <QListWidget>
 #include <QPushButton>
 #include <QWidget>
@@ -26,9 +28,12 @@ public:
 
     void setDeckList(const DeckList &_deckListModel);
 
+    CardSizeWidget *cardSizeWidget;
+
 public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void updateZoneWidgets();
+    void updateDisplayType();
     void addZoneIfDoesNotExist();
     void deleteZoneIfDoesNotExist();
 
@@ -38,6 +43,7 @@ signals:
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void cardAdditionRequested(CardInfoPtr card);
+    void displayTypeChanged(QString displayType);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);
@@ -56,6 +62,7 @@ private:
     CardCompleterProxyModel *proxyModel;
     QCompleter *completer;
     QPushButton *searchPushButton;
+    QCheckBox *displayTypeButton;
     QWidget *groupAndSortContainer;
     QHBoxLayout *groupAndSortLayout;
     QComboBox *groupByComboBox;

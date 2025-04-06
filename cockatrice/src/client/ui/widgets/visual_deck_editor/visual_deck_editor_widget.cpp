@@ -15,6 +15,7 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 
+#include <QCheckBox>
 #include <QCompleter>
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -151,8 +152,12 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     sortCriteriaButton->addSettingsWidget(sortLabel);
     sortCriteriaButton->addSettingsWidget(sortByListWidget);
 
+    displayTypeButton = new QCheckBox(this);
+    connect(displayTypeButton, &QCheckBox::toggled, this, &VisualDeckEditorWidget::updateDisplayType);
+
     groupAndSortLayout->addWidget(groupByComboBox);
     groupAndSortLayout->addWidget(sortCriteriaButton);
+    groupAndSortLayout->addWidget(displayTypeButton);
 
     scrollArea = new QScrollArea();
     scrollArea->setWidgetResizable(true);
@@ -170,11 +175,11 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     updateZoneWidgets();
 
-    // overlapControlWidget = new OverlapControlWidget(80, 1, 1, Qt::Vertical, this);
+    cardSizeWidget = new CardSizeWidget(this);
 
     mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
-    // mainLayout->addWidget(overlapControlWidget);
+    mainLayout->addWidget(cardSizeWidget);
 
     retranslateUi();
 }
@@ -191,6 +196,16 @@ void VisualDeckEditorWidget::updateZoneWidgets()
     deleteZoneIfDoesNotExist();
 }
 
+void VisualDeckEditorWidget::updateDisplayType()
+{
+    if (displayTypeButton->checkState() == Qt::Checked) {
+        emit displayTypeChanged("flat");
+    } else {
+        qDebug() << displayTypeButton->checkState();
+        emit displayTypeChanged("overlap");
+    }
+}
+
 void VisualDeckEditorWidget::addZoneIfDoesNotExist()
 {
     QList<DeckCardZoneDisplayWidget *> cardZoneDisplayWidgets =
@@ -205,7 +220,7 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
 
         if (!found) {
             DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-                zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10);
+                zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10, cardSizeWidget);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this,
                     &VisualDeckEditorWidget::onCardClick);
@@ -213,6 +228,8 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
                     &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
             connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
                     &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
+            connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::refreshDisplayType);
             zoneContainerLayout->addWidget(zoneDisplayWidget);
         }
     }

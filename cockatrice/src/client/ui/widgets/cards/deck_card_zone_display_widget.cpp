@@ -2,7 +2,8 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../utility/card_info_comparator.h"
-#include "overlapped_card_group_display_widget.h"
+#include "card_group_display_widgets/flat_card_group_display_widget.h"
+#include "card_group_display_widgets/overlapped_card_group_display_widget.h"
 
 #include <QResizeEvent>
 
@@ -12,9 +13,11 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      QString _activeGroupCriteria,
                                                      QStringList _activeSortCriteria,
                                                      int bannerOpacity,
-                                                     int subBannerOpacity)
+                                                     int subBannerOpacity,
+                                                     CardSizeWidget *_cardSizeWidget)
     : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
-      activeSortCriteria(_activeSortCriteria), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity)
+      activeSortCriteria(_activeSortCriteria), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity),
+      cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -57,43 +60,76 @@ void DeckCardZoneDisplayWidget::displayCards()
     deleteCardGroupIfItDoesNotExist();
 }
 
+void DeckCardZoneDisplayWidget::refreshDisplayType(const QString &_displayType)
+{
+    displayType = _displayType;
+    QLayoutItem *item;
+    while ((item = cardGroupLayout->takeAt(0)) != nullptr) {
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        } else if (item->layout()) {
+            delete item->layout();
+        }
+        delete item;
+    }
+
+    // We gotta wait for all the deleteLater's to finish so we fire after the next event cycle
+
+    auto timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [this]() { displayCards(); });
+    timer->start();
+}
+
 void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
 {
-    QList<OverlappedCardGroupDisplayWidget *> cardGroupsDisplayWidgets =
-        cardGroupContainer->findChildren<OverlappedCardGroupDisplayWidget *>();
+    QList<CardGroupDisplayWidget *> cardGroupsDisplayWidgets =
+        cardGroupContainer->findChildren<CardGroupDisplayWidget *>();
 
     QList<QString> cardGroups = getGroupCriteriaValueList();
 
     for (QString cardGroup : cardGroups) {
         bool found = false;
-        for (OverlappedCardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
+        for (CardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
             if (cardGroupDisplayWidget->cardGroupCategory == cardGroup) {
                 found = true;
             }
         }
 
         if (!found) {
-            OverlappedCardGroupDisplayWidget *display_widget =
-                new OverlappedCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName, cardGroup,
-                                                     activeGroupCriteria, activeSortCriteria, subBannerOpacity);
-            connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-            connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
-                    &OverlappedCardGroupDisplayWidget::onActiveSortCriteriaChanged);
-            cardGroupLayout->addWidget(display_widget);
+            if (displayType == "overlap") {
+                auto *display_widget = new OverlappedCardGroupDisplayWidget(
+                    cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
+                    subBannerOpacity, cardSizeWidget);
+                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
+                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+                cardGroupLayout->addWidget(display_widget);
+            } else if (displayType == "flat") {
+                auto *display_widget = new FlatCardGroupDisplayWidget(
+                    cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
+                    subBannerOpacity, cardSizeWidget);
+                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
+                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+                cardGroupLayout->addWidget(display_widget);
+            }
         }
     }
 }
 
 void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
 {
-    QList<OverlappedCardGroupDisplayWidget *> cardGroupsDisplayWidgets =
-        cardGroupContainer->findChildren<OverlappedCardGroupDisplayWidget *>();
+    QList<CardGroupDisplayWidget *> cardGroupsDisplayWidgets =
+        cardGroupContainer->findChildren<CardGroupDisplayWidget *>();
 
     QList<QString> validGroups = getGroupCriteriaValueList();
 
-    for (OverlappedCardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
+    for (CardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
         if (!validGroups.contains(cardGroupDisplayWidget->cardGroupCategory)) {
             cardGroupLayout->removeWidget(cardGroupDisplayWidget);
             cardGroupDisplayWidget->deleteLater(); // Properly delete the widget after the event loop cycles
