@@ -148,8 +148,8 @@ private:
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
-    QCheckBox visualDeckStoragePromptForConversionCheckBox;
-    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
+    QLabel visualDeckStoragePromptForConversionLabel;
+    QComboBox visualDeckStoragePromptForConversionSelector;
     QCheckBox visualDeckStorageInGameCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;

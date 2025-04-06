@@ -238,11 +238,10 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
     int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
 {
 }
-void SettingsCache::setVisualDeckStoragePromptForConversion(
-    QT_STATE_CHANGED_T /* _visualDeckStoragePromptForConversion */)
+void SettingsCache::setVisualDeckStoragePromptForConversion(bool /* _visualDeckStoragePromptForConversion */)
 {
 }
-void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T /* _visualDeckStorageAlwaysConvert */)
+void SettingsCache::setVisualDeckStorageAlwaysConvert(bool /* _visualDeckStorageAlwaysConvert */)
 {
 }
 void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
