@@ -82,6 +82,7 @@
 #include "trice_limits.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <algorithm>
 
 struct MoveCardStruct
@@ -178,7 +179,7 @@ void Server_Player::setupZones()
     addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
     addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
 
-    addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, 20));
+    addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, game->getStartingLifeTotal()));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
     addCounter(new Server_Counter(2, "u", makeColor(150, 150, 255), 20, 0));
     addCounter(new Server_Counter(3, "b", makeColor(150, 150, 150), 20, 0));
@@ -391,6 +392,7 @@ static Event_CreateToken makeCreateTokenEvent(Server_CardZone *zone, Server_Card
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
     event.set_card_name(card->getName().toStdString());
+    event.set_card_provider_id(card->getProviderId().toStdString());
     event.set_color(card->getColor().toStdString());
     event.set_pt(card->getPT().toStdString());
     event.set_annotation(card->getAnnotation().toStdString());
@@ -422,7 +424,8 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                                int xCoord,
                                                int yCoord,
                                                bool fixFreeSpaces,
-                                               bool undoingDraw)
+                                               bool undoingDraw,
+                                               bool isReversed)
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
@@ -449,9 +452,13 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
         if (!card) {
             return Response::RespNameNotFound;
         }
-        if (card->getParentCard()) {
+
+        // do not allow attached cards to move around on the table
+        if (card->getParentCard() && targetzone->getName() == "table") {
             continue;
         }
+
+        // do not allow cards with attachments to stack with other cards
         if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
             continue;
         }
@@ -536,18 +543,18 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 
         if (card) {
             ++xIndex;
-            int newX = xCoord + xIndex;
+            int newX = isReversed ? targetzone->getCards().size() - xCoord + xIndex : xCoord + xIndex;
 
             if (targetzone->hasCoords()) {
                 newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
             } else {
                 yCoord = 0;
-                card->resetState();
+                card->resetState(targetzone->getName() == "stack");
             }
 
             targetzone->insertCard(card, newX, yCoord);
             int targetLookedCards = targetzone->getCardsBeingLookedAt();
-            bool sourceKnownToPlayer = sourceBeingLookedAt && !card->getFaceDown();
+            bool sourceKnownToPlayer = isReversed || (sourceBeingLookedAt && !card->getFaceDown());
             if (targetzone->getType() == ServerInfo_Zone::HiddenZone && targetLookedCards >= newX) {
                 if (sourceKnownToPlayer) {
                     targetLookedCards += 1;
@@ -639,6 +646,17 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                   AttrPT, ptString);
             }
 
+            // If card is transferring to a different player, leave an annotation of who actually "owns" the card
+            const auto &priorAnnotation = card->getAnnotation();
+            if (startzone->getPlayer() != targetzone->getPlayer() && !priorAnnotation.contains("Owner:")) {
+                const auto &ownerAnnotation =
+                    "Owner: " + QString::fromStdString(startzone->getPlayer()->getUserInfo()->name());
+                const auto &newAnnotation =
+                    priorAnnotation.isEmpty() ? ownerAnnotation : ownerAnnotation + "\n\n" + priorAnnotation;
+                setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(),
+                                  AttrAnnotation, newAnnotation, card);
+            }
+
             if (originalPosition == 0) {
                 revealTopStart = true;
             }
@@ -689,7 +707,8 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges,
                                                         const QString &zoneName,
                                                         int cardId,
                                                         CardAttribute attribute,
-                                                        const QString &attrValue)
+                                                        const QString &attrValue,
+                                                        Server_Card *unzonedCard)
 {
     Server_CardZone *zone = getZones().value(zoneName);
     if (!zone) {
@@ -709,7 +728,7 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges,
             }
         }
     } else {
-        Server_Card *card = zone->getCard(cardId);
+        Server_Card *card = unzonedCard == nullptr ? zone->getCard(cardId) : unzonedCard;
         if (!card) {
             return Response::RespNameNotFound;
         }
@@ -868,6 +887,47 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
     setConceded(true);
     game->removeArrowsRelatedToPlayer(ges, this);
     game->unattachCards(ges, this);
+
+    // Return cards to their rightful owners before conceding the game
+    static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
+    for (const auto &card : zones.value("table")->getCards()) {
+        if (card == nullptr) {
+            continue;
+        }
+
+        const auto &regexResult = ownerRegex.match(card->getAnnotation());
+        if (!regexResult.hasMatch()) {
+            continue;
+        }
+
+        CardToMove cardToMove;
+        cardToMove.set_card_id(card->getId());
+
+        for (const auto &player : game->getPlayers()) {
+            if (player == nullptr || player->getUserInfo() == nullptr) {
+                continue;
+            }
+
+            const auto &ownerToReturnTo = regexResult.captured(1);
+            const auto &correctOwner = QString::compare(QString::fromStdString(player->getUserInfo()->name()),
+                                                        ownerToReturnTo, Qt::CaseInsensitive) == 0;
+            if (!correctOwner) {
+                continue;
+            }
+
+            const auto &startZone = zones.value("table");
+            const auto &targetZone = player->getZones().value("table");
+
+            if (startZone == nullptr || targetZone == nullptr) {
+                continue;
+            }
+
+            moveCard(ges, startZone, QList<const CardToMove *>() << &cardToMove, targetZone, 0, 0, false);
+            break;
+        }
+    }
+
+    // All borrowed cards have been returned, can now continue cleanup process
     clearZones();
 
     Event_PlayerPropertiesChanged event;
@@ -939,7 +999,7 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    if (readyStart == cmd.ready()) {
+    if (readyStart == cmd.ready() && !cmd.force_start()) {
         return Response::RespContextError;
     }
 
@@ -950,8 +1010,13 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
     ges.enqueueGameEvent(event, playerId);
     ges.setGameEventContext(Context_ReadyStart());
 
-    if (cmd.ready()) {
-        game->startGameIfReady();
+    if (cmd.force_start()) {
+        if (game->getHostId() != playerId) {
+            return Response::RespFunctionNotAllowed;
+        }
+        game->startGameIfReady(true);
+    } else if (cmd.ready()) {
+        game->startGameIfReady(false);
     }
 
     return Response::RespOk;
@@ -1183,7 +1248,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         cardsToMove.append(&cmd.cards_to_move().card(i));
     }
 
-    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y());
+    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y(), true, false, cmd.is_reversed());
 }
 
 Response::ResponseCode
@@ -1293,6 +1358,9 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
             return Response::RespNameNotFound;
         }
     }
+
+    // prevent attaching from non-table zones
+    // (attaching from non-table zones is handled client-side by moving the card to table zone first)
     if (!startzone->hasCoords()) {
         return Response::RespContextError;
     }
@@ -1400,7 +1468,8 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         }
     }
 
-    QString cardName = nameFromStdString(cmd.card_name());
+    const QString cardName = nameFromStdString(cmd.card_name());
+    const QString cardProviderId = nameFromStdString(cmd.card_provider_id());
     if (zone->hasCoords()) {
         xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, false);
     }
@@ -1411,7 +1480,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         yCoord = 0;
     }
 
-    auto *card = new Server_Card(cardName, QString(), newCardId(), xCoord, yCoord);
+    auto *card = new Server_Card(cardName, cardProviderId, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
     card->setPT(nameFromStdString(cmd.pt()));
     card->setColor(nameFromStdString(cmd.color()));
@@ -1943,13 +2012,14 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
     zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
 
     for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
-        Server_Card *card = cards[i];
+        const auto &findId = cmd.is_reversed() ? cards.size() - numberCards + i : i;
+        Server_Card *card = cards[findId];
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
         cardInfo->set_provider_id(card->getProviderId().toStdString());
         cardInfo->set_name(displayedName.toStdString());
         if (zone->getType() == ServerInfo_Zone::HiddenZone) {
-            cardInfo->set_id(i);
+            cardInfo->set_id(findId);
         } else {
             cardInfo->set_id(card->getId());
             cardInfo->set_x(card->getX());
@@ -1985,6 +2055,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
         event.set_zone_owner_id(otherPlayer->getPlayerId());
         event.set_zone_name(zone->getName().toStdString());
         event.set_number_cards(numberCards);
+        event.set_is_reversed(cmd.is_reversed());
         ges.enqueueGameEvent(event, playerId);
     }
     rc.setResponseExtension(re);

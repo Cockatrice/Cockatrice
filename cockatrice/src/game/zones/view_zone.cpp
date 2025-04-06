@@ -16,28 +16,41 @@
 #include <QPainter>
 #include <QtMath>
 
+/**
+ * @param _p the player that the cards are revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ * @param parent the parent QGraphicsWidget containing the reveal zone
+ */
 ZoneViewZone::ZoneViewZone(Player *_p,
                            CardZone *_origZone,
                            int _numberCards,
                            bool _revealZone,
                            bool _writeableRevealZone,
-                           QGraphicsItem *parent)
+                           QGraphicsItem *parent,
+                           bool _isReversed)
     : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), sortByName(false), sortByType(false)
+      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
+      isReversed(_isReversed)
 {
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().append(this);
     }
 }
 
-ZoneViewZone::~ZoneViewZone()
+/**
+ * Deletes this ZoneView and removes it from the origZone's views.
+ * You should normally call this method instead of deleteLater()
+ */
+void ZoneViewZone::close()
 {
-    emit beingDeleted();
-    qDebug("ZoneViewZone destructor");
+    emit closed();
     if (!(revealZone && !writeableRevealZone)) {
         origZone->getViews().removeOne(this);
     }
+    deleteLater();
 }
 
 QRectF ZoneViewZone::boundingRect() const
@@ -57,7 +70,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
     if (!cardList.isEmpty()) {
         for (int i = 0; i < cardList.size(); ++i)
             addCard(new CardItem(player, this, QString::fromStdString(cardList[i]->name()),
-                                 QString::fromStdString(cardList[i]->provider_id()), cardList[i]->id(), revealZone),
+                                 QString::fromStdString(cardList[i]->provider_id()), cardList[i]->id()),
                     false, i);
         reorganizeCards();
     } else if (!origZone->contentsKnown()) {
@@ -65,18 +78,17 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         cmd.set_player_id(player->getId());
         cmd.set_zone_name(name.toStdString());
         cmd.set_number_cards(numberCards);
+        cmd.set_is_reversed(isReversed);
 
         PendingCommand *pend = player->prepareGameCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(zoneDumpReceived(const Response &)));
+        connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
         player->sendGameCommand(pend);
     } else {
         const CardList &c = origZone->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
-            addCard(new CardItem(player, this, card->getName(), card->getProviderId(), card->getId(), revealZone),
-                    false, i);
+            addCard(new CardItem(player, this, card->getName(), card->getProviderId(), card->getId()), false, i);
         }
         reorganizeCards();
     }
@@ -90,100 +102,176 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
         auto cardName = QString::fromStdString(cardInfo.name());
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
-        auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), revealZone, this);
+        auto *card = new CardItem(player, this, cardName, cardProviderId, cardInfo.id(), this);
         cards.insert(i, card);
     }
+
+    updateCardIds(INITIALIZE);
     reorganizeCards();
     emit cardCountChanged();
+}
+
+void ZoneViewZone::updateCardIds(CardAction action)
+{
+    if (origZone->contentsKnown()) {
+        return;
+    }
+
+    if (cards.isEmpty()) {
+        return;
+    }
+
+    int cardCount = cards.size();
+
+    auto startId = 0;
+
+    if (isReversed) {
+        // the card has not been added to origZone's cardList at this point
+        startId = origZone->getCards().size() - cardCount;
+        switch (action) {
+            case INITIALIZE:
+                break;
+            case ADD_CARD:
+                startId += 1;
+                break;
+            case REMOVE_CARD:
+                startId -= 1;
+                break;
+        }
+    }
+
+    for (int i = 0; i < cardCount; ++i) {
+        cards[i]->setId(i + startId);
+    }
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {
-    int cardCount = cards.size();
-    if (!origZone->contentsKnown())
-        for (int i = 0; i < cardCount; ++i)
-            cards[i]->setId(i);
-
-    int cols = qFloor(qSqrt((double)cardCount / 2));
-    if (cols > 7)
-        cols = 7;
-    int rows = qCeil((double)cardCount / cols);
-    if (rows < 1)
-        rows = 1;
-    if (minRows == 0)
-        minRows = rows;
-    else if (rows < minRows) {
-        rows = minRows;
-        cols = qCeil((double)cardCount / minRows);
-    }
-    if (cols < 2)
-        cols = 2;
-
-    qDebug() << "reorganizeCards: rows=" << rows << "cols=" << cols;
-
     CardList cardsToDisplay(cards);
-    if (sortByName || sortByType)
-        cardsToDisplay.sort((sortByName ? CardList::SortByName : 0) | (sortByType ? CardList::SortByType : 0));
 
-    int typeColumn = 0;
-    int longestRow = 0;
-    if (pileView && sortByType) { // we need sort by type enabled for the feature to work
-        int typeRow = 0;
-        QString lastCardType;
-        for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cardsToDisplay.at(i);
-            QString cardType = c->getInfo() ? c->getInfo()->getMainCardType() : "";
-
-            if (i) { // if not the first card
-                if (cardType == lastCardType)
-                    typeRow++; // add below current card
-                else {         // if no match then move card to next column
-                    typeColumn++;
-                    typeRow = 0;
-                }
-            }
-
-            lastCardType = cardType;
-            qreal x = 7 + (typeColumn * CARD_WIDTH);
-            qreal y = typeRow * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
-            c->setRealZValue(i);
-            longestRow = qMax(typeRow, longestRow);
-        }
-    } else {
-        for (int i = 0; i < cardCount; i++) {
-            CardItem *c = cardsToDisplay.at(i);
-            qreal x = 7 + ((i / rows) * CARD_WIDTH);
-            qreal y = (i % rows) * CARD_HEIGHT / 3;
-            c->setPos(x + 5, y + 5);
-            c->setRealZValue(i);
-        }
+    // sort cards
+    QList<CardList::SortOption> sortOptions;
+    if (groupBy != CardList::NoSort) {
+        sortOptions << groupBy;
     }
 
+    if (sortBy != CardList::NoSort) {
+        sortOptions << sortBy;
+
+        // implicitly sort by name at the end so that cards with the same name appear together
+        if (sortBy != CardList::SortByName) {
+            sortOptions << CardList::SortByName;
+        }
+
+        // group printings together
+        sortOptions << CardList::SortByPrinting;
+    }
+
+    cardsToDisplay.sortBy(sortOptions);
+
+    // position cards
+    GridSize gridSize;
+    if (pileView) {
+        gridSize = positionCardsForDisplay(cardsToDisplay, groupBy);
+    } else {
+        gridSize = positionCardsForDisplay(cardsToDisplay);
+    }
+
+    // determine bounding rect
     qreal aleft = 0;
     qreal atop = 0;
-    qreal awidth = (pileView && sortByType) ? qMax(typeColumn + 1, 3) * CARD_WIDTH + (CARD_WIDTH / 2)
-                                            : qMax(cols, 1) * CARD_WIDTH + (CARD_WIDTH / 2);
-    qreal aheight = (pileView && sortByType) ? (longestRow * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3
-                                             : (rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
+    qreal awidth = gridSize.cols * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
+    qreal aheight = (gridSize.rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
     optimumRect = QRectF(aleft, atop, awidth, aheight);
 
     updateGeometry();
     emit optimumRectChanged();
 }
 
-void ZoneViewZone::setSortByName(int _sortByName)
+/**
+ * @brief Sets the position of each card to the proper position for the view
+ *
+ * @param cards The cards to reposition. Will modify the cards in the list.
+ * @param pileOption Property used to group cards for the piles. Expects `cards` to be sorted by that property. Pass in
+ * NoSort to not make piles.
+ *
+ * @returns The number of rows and columns to display
+ */
+ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption)
 {
-    sortByName = _sortByName;
+    int cardCount = cards.size();
+
+    if (pileOption != CardList::NoSort) {
+        int row = 0;
+        int col = 0;
+        int longestRow = 0;
+
+        QString lastColumnProp;
+
+        const auto extractor = CardList::getExtractorFor(pileOption);
+
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cards.at(i);
+            QString columnProp = extractor(c);
+
+            if (i) { // if not the first card
+                if (columnProp == lastColumnProp)
+                    row++; // add below current card
+                else {     // if no match then move card to next column
+                    col++;
+                    row = 0;
+                }
+            }
+
+            lastColumnProp = columnProp;
+            qreal x = col * CARD_WIDTH;
+            qreal y = row * CARD_HEIGHT / 3;
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            c->setRealZValue(i);
+            longestRow = qMax(row, longestRow);
+        }
+
+        // +1 because the row/col variables used in the calculations are 0-indexed but
+        // GridSize expects the actual row/col count
+        return GridSize{longestRow + 1, qMax(col + 1, 3)};
+
+    } else {
+        int cols = qBound(1, qFloor(qSqrt((double)cardCount / 2)), 7);
+        int rows = qMax(qCeil((double)cardCount / cols), 1);
+        if (minRows == 0) {
+            minRows = rows;
+        } else if (rows < minRows) {
+            rows = minRows;
+            cols = qCeil((double)cardCount / minRows);
+        }
+
+        if (cols < 2)
+            cols = 2;
+
+        qCDebug(ViewZoneLog) << "reorganizeCards: rows=" << rows << "cols=" << cols;
+
+        for (int i = 0; i < cardCount; i++) {
+            CardItem *c = cards.at(i);
+            qreal x = (i / rows) * CARD_WIDTH;
+            qreal y = (i % rows) * CARD_HEIGHT / 3;
+            c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
+            c->setRealZValue(i);
+        }
+
+        return GridSize{rows, qMax(cols, 1)};
+    }
+}
+
+void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)
+{
+    groupBy = _groupBy;
     reorganizeCards();
 }
 
-void ZoneViewZone::setSortByType(int _sortByType)
+void ZoneViewZone::setSortBy(CardList::SortOption _sortBy)
 {
-    sortByType = _sortByType;
-    if (!sortByType)
-        pileView = false;
+    sortBy = _sortBy;
     reorganizeCards();
 }
 
@@ -193,15 +281,72 @@ void ZoneViewZone::setPileView(int _pileView)
     reorganizeCards();
 }
 
+/**
+ * Checks if inserting a card at the given position requires an actual new card to be created and added to the view.
+ * Also does any cardId updates that would be required if a card is inserted in that position.
+ *
+ * Note that this method can end up modifying the cardIds despite returning false.
+ * (for example, if the card is inserted into a hidden portion of the deck while the view is reversed)
+ *
+ * Make sure to call this method once before calling addCard(), so that you skip creating a new CardItem and calling
+ * addCard() if it's not required.
+ *
+ * @param x The position to insert the card at.
+ * @return Whether to proceed with calling addCard.
+ */
+bool ZoneViewZone::prepareAddCard(int x)
+{
+    bool doInsert = false;
+    if (!isReversed) {
+        if (x <= cards.size() || cards.size() == -1) {
+            doInsert = true;
+        }
+    } else {
+        // map x (which is in origZone indexes) to this viewZone's cardList index
+        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        int insertionIndex = x - firstId;
+        if (insertionIndex >= 0) {
+            // card was put into a portion of the deck that's in the view
+            doInsert = true;
+        } else {
+            // card was put into a portion of the deck that's not in the view; update ids but don't insert card
+            updateCardIds(ADD_CARD);
+        }
+    }
+
+    // autoclose check is done both here and in removeCard
+    if (cards.isEmpty() && !doInsert && SettingsCache::instance().getCloseEmptyCardView()) {
+        close();
+    }
+
+    return doInsert;
+}
+
+/**
+ * Make sure prepareAddCard() was called before calling addCard().
+ * This method assumes we already checked that the card is being inserted into the visible portion
+ */
 void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    // if x is negative set it to add at end
-    if (x < 0 || x >= cards.size()) {
-        x = cards.size();
+    if (!isReversed) {
+        // if x is negative set it to add at end
+        // if x is out-of-bounds then also set it to add at the end
+        if (x < 0 || x >= cards.size()) {
+            x = cards.size();
+        }
+        cards.insert(x, card);
+    } else {
+        // map x (which is in origZone indexes) to this viewZone's cardList index
+        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        int insertionIndex = x - firstId;
+        // qMin to prevent out-of-bounds error when bottoming a card that is already in the view
+        cards.insert(qMin(insertionIndex, cards.size()), card);
     }
-    cards.insert(x, card);
+
     card->setParentItem(this);
     card->update();
+
+    updateCardIds(ADD_CARD);
     reorganizeCards();
 }
 
@@ -216,6 +361,7 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_target_zone(getName().toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
+    cmd.set_is_reversed(isReversed);
 
     for (int i = 0; i < dragItems.size(); ++i)
         cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
@@ -223,13 +369,33 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     player->sendGameCommand(cmd);
 }
 
-void ZoneViewZone::removeCard(int position)
+void ZoneViewZone::removeCard(int position, bool toNewZone)
 {
-    if (position >= cards.size())
+    if (isReversed) {
+        position -= cards.first()->getId();
+        if (position < 0 || position >= cards.size()) {
+            updateCardIds(REMOVE_CARD);
+            return;
+        }
+    }
+
+    if (position >= cards.size()) {
         return;
+    }
 
     CardItem *card = cards.takeAt(position);
     card->deleteLater();
+
+    // The toNewZone check is to prevent the view from auto-closing if the view contains only a single card and that
+    // card gets dragged within the view.
+    // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
+    // unrevealed portion of the same zone.
+    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView() && toNewZone) {
+        close();
+        return;
+    }
+
+    updateCardIds(REMOVE_CARD);
     reorganizeCards();
 }
 

@@ -1,13 +1,11 @@
 #include "deck_list_model.h"
 
-#include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "deck_loader.h"
 
 #include <QBrush>
-#include <QFile>
 #include <QFont>
 #include <QPrinter>
 #include <QProgressDialog>
@@ -20,15 +18,15 @@ DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
     deckList = new DeckLoader;
-    connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
-    connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
+    deckList->setParent(this);
+    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
+    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     root = new InnerDecklistNode;
 }
 
 DeckListModel::~DeckListModel()
 {
     delete root;
-    delete deckList;
 }
 
 void DeckListModel::rebuildTree()
@@ -264,7 +262,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     emitRecursiveUpdates(index);
-    deckList->updateDeckHash();
+    deckList->refreshDeckHash();
     return true;
 }
 
@@ -309,8 +307,10 @@ InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerD
     return newNode;
 }
 
-DecklistModelCardNode *
-DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, const QString &providerId) const
+DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
+                                                   const QString &zoneName,
+                                                   const QString &providerId,
+                                                   const QString &cardNumber) const
 {
     InnerDecklistNode *zoneNode, *typeNode;
     CardInfoPtr info;
@@ -332,17 +332,18 @@ DeckListModel::findCardNode(const QString &cardName, const QString &zoneName, co
         return nullptr;
     }
 
-    if (providerId.isEmpty()) {
-        return dynamic_cast<DecklistModelCardNode *>(typeNode->findChild(cardName));
-    }
-    return dynamic_cast<DecklistModelCardNode *>(typeNode->findCardChildByNameAndProviderId(cardName, providerId));
+    return dynamic_cast<DecklistModelCardNode *>(
+        typeNode->findCardChildByNameProviderIdAndNumber(cardName, providerId, cardNumber));
 }
 
-QModelIndex DeckListModel::findCard(const QString &cardName, const QString &zoneName, const QString &providerId) const
+QModelIndex DeckListModel::findCard(const QString &cardName,
+                                    const QString &zoneName,
+                                    const QString &providerId,
+                                    const QString &cardNumber) const
 {
     DecklistModelCardNode *cardNode;
 
-    cardNode = findCardNode(cardName, zoneName, providerId);
+    cardNode = findCardNode(cardName, zoneName, providerId, cardNumber);
     if (!cardNode) {
         return {};
     }
@@ -357,7 +358,7 @@ QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, con
 }
 
 QModelIndex DeckListModel::addCard(const QString &cardName,
-                                   const CardInfoPerSet cardInfoSet,
+                                   const CardInfoPerSet &cardInfoSet,
                                    const QString &zoneName,
                                    bool abAddAnyway)
 {
@@ -382,21 +383,22 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
 
     const QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(
-        cardTypeNode->findCardChildByNameAndProviderId(cardName, cardInfoSet.getProperty("uuid")));
+    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findCardChildByNameProviderIdAndNumber(
+        cardName, cardInfoSet.getProperty("uuid"), cardInfoSet.getProperty("num")));
+    const auto cardSetName = cardInfoSet.getPtr().isNull() ? "" : cardInfoSet.getPtr()->getCorrectedShortName();
+
     if (!cardNode) {
-        auto *decklistCard =
-            deckList->addCard(cardInfo->getName(), zoneName, cardInfoSet.getPtr()->getCorrectedShortName(),
-                              cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, cardSetName,
+                                               cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
         beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
-        cardNode->setCardSetShortName(cardInfoSet.getPtr()->getCorrectedShortName());
+        cardNode->setCardSetShortName(cardSetName);
         cardNode->setCardCollectorNumber(cardInfoSet.getProperty("num"));
         cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
-        deckList->updateDeckHash();
+        deckList->refreshDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);
@@ -468,12 +470,16 @@ void DeckListModel::cleanList()
     setDeckList(new DeckLoader);
 }
 
+/**
+ * @param _deck The deck. Takes ownership of the object
+ */
 void DeckListModel::setDeckList(DeckLoader *_deck)
 {
-    delete deckList;
+    deckList->deleteLater();
     deckList = _deck;
-    connect(deckList, SIGNAL(deckLoaded()), this, SLOT(rebuildTree()));
-    connect(deckList, SIGNAL(deckHashChanged()), this, SIGNAL(deckHashChanged()));
+    deckList->setParent(this);
+    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
+    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     rebuildTree();
 }
 

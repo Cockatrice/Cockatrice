@@ -62,6 +62,7 @@ message Response {
         VIEW_LOG = 1015;
         FORGOT_PASSWORD_REQUEST = 1016;
         PASSWORD_SALT = 1017;
+        GET_ADMIN_NOTES = 1018;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
     }

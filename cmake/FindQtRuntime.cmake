@@ -23,6 +23,7 @@ if(WITH_CLIENT)
       Svg
       WebSockets
       Widgets
+      Xml
   )
 endif()
 if(WITH_ORACLE)

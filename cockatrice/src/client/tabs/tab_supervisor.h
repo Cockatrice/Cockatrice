@@ -2,14 +2,21 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck/deck_loader.h"
-#include "../../server/chat_view/user_list_proxy.h"
+#include "../../server/user/user_list_proxy.h"
+#include "abstract_tab_deck_editor.h"
+#include "api/edhrec/tab_edhrec.h"
+#include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
 #include <QCommonStyle>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
 
+inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
+
+class UserListManager;
 class QMenu;
 class AbstractClient;
 class Tab;
@@ -20,7 +27,7 @@ class TabDeckStorage;
 class TabReplays;
 class TabAdmin;
 class TabMessage;
-class TabUserLists;
+class TabAccount;
 class TabDeckEditor;
 class TabLog;
 class RoomEvent;
@@ -37,39 +44,42 @@ class MacOSTabFixStyle : public QProxyStyle
 {
     Q_OBJECT
 public:
-    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const;
+    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const override;
 };
 
 class CloseButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    CloseButton(QWidget *parent = nullptr);
-    QSize sizeHint() const;
-    inline QSize minimumSizeHint() const
+    explicit CloseButton(QWidget *parent = nullptr);
+    QSize sizeHint() const override;
+    inline QSize minimumSizeHint() const override
     {
         return sizeHint();
     }
 
 protected:
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    void enterEvent(QEnterEvent *event);
+    void enterEvent(QEnterEvent *event) override;
 #else
-    void enterEvent(QEvent *event);
+    void enterEvent(QEvent *event) override;
 #endif
-    void leaveEvent(QEvent *event);
-    void paintEvent(QPaintEvent *event);
+    void leaveEvent(QEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 };
 
-class TabSupervisor : public QTabWidget, public UserlistProxy
+class TabSupervisor : public QTabWidget
 {
     Q_OBJECT
 private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
+    UserListManager *userListManager;
     QList<AbstractClient *> localClients;
+    QMenu *tabsMenu;
+    TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
-    TabUserLists *tabUserLists;
+    TabAccount *tabAccount;
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
@@ -78,17 +88,23 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
-    QList<TabDeckEditor *> deckEditorTabs;
-    int myAddTab(Tab *tab);
-    void addCloseButtonToTab(Tab *tab, int tabIndex);
-    QString sanitizeTabName(QString dirty) const;
-    QString sanitizeHtml(QString dirty) const;
+    QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
+    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
+        *aTabAdmin, *aTabLog;
+
+    int myAddTab(Tab *tab, QAction *manager = nullptr);
+    void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
+    static QString sanitizeTabName(QString dirty);
+    static QString sanitizeHtml(QString dirty);
+    void resetTabsMenu();
+
 public:
-    TabSupervisor(AbstractClient *_client, QWidget *parent = nullptr);
-    ~TabSupervisor();
+    explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
+    ~TabSupervisor() override;
     void retranslateUi();
+    void initStartupTabs();
     void start(const ServerInfo_User &userInfo);
     void startLocal(const QList<AbstractClient *> &_clients);
     void stop();
@@ -100,28 +116,31 @@ public:
     {
         return gameTabs.size();
     }
-    TabUserLists *getUserListsTab() const
+    TabAccount *getTabAccount() const
     {
-        return tabUserLists;
+        return tabAccount;
     }
     ServerInfo_User *getUserInfo() const
     {
         return userInfo;
     }
     AbstractClient *getClient() const;
+    const UserListManager *getUserListManager() const
+    {
+        return userListManager;
+    }
     const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;
     }
+    QList<AbstractTabDeckEditor *> getDeckEditorTabs() const
+    {
+        return deckEditorTabs;
+    }
     bool getAdminLocked() const;
-    bool closeRequest();
-    bool isOwnUserRegistered() const;
-    QString getOwnUsername() const;
-    bool isUserBuddy(const QString &userName) const;
-    bool isUserIgnored(const QString &userName) const;
-    const ServerInfo_User *getOnlineUser(const QString &userName) const;
+    void closeEvent(QCloseEvent *event) override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
-    void actShowPopup(const QString &message);
+    static void actShowPopup(const QString &message);
 signals:
     void setMenu(const QList<QMenu *> &newMenuList = QList<QMenu *>());
     void localGameEnded();
@@ -130,10 +149,28 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
 private slots:
-    void closeButtonPressed();
+    void refreshShortcuts();
+
+    void actTabVisualDeckStorage(bool checked);
+    void actTabServer(bool checked);
+    void actTabAccount(bool checked);
+    void actTabDeckStorage(bool checked);
+    void actTabReplays(bool checked);
+    void actTabAdmin(bool checked);
+    void actTabLog(bool checked);
+
+    void openTabVisualDeckStorage();
+    void openTabServer();
+    void openTabAccount();
+    void openTabDeckStorage();
+    void openTabReplays();
+    void openTabAdmin();
+    void openTabLog();
+
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
     void gameJoined(const Event_GameJoined &event);
@@ -146,7 +183,7 @@ private slots:
     void processUserLeft(const QString &userName);
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
-    void deckEditorClosed(TabDeckEditor *tab);
+    void deckEditorClosed(AbstractTabDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
     void processRoomEvent(const RoomEvent &event);

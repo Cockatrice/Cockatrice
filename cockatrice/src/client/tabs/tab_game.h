@@ -3,25 +3,28 @@
 
 #include "../../client/tearoff_menu.h"
 #include "../../game/player/player.h"
+#include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
 #include "tab.h"
 
 #include <QCompleter>
+#include <QLoggingCategory>
 #include <QMap>
-#include <QPushButton>
 
+inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
+
+class UserListProxy;
+class DeckViewContainer;
 class AbstractClient;
 class CardDatabase;
 class GameView;
-class DeckView;
 class GameScene;
 class CardInfoFrameWidget;
 class MessageLogWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
-class QPushButton;
 class QToolButton;
 class QMenu;
 class ZoneViewLayout;
@@ -51,7 +54,6 @@ class Event_ReverseTurn;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
-class TabGame;
 class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -62,63 +64,13 @@ class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
 
-class ToggleButton : public QPushButton
-{
-    Q_OBJECT
-private:
-    bool state;
-signals:
-    void stateChanged();
-
-public:
-    ToggleButton(QWidget *parent = nullptr);
-    bool getState() const
-    {
-        return state;
-    }
-    void setState(bool _state);
-
-protected:
-    void paintEvent(QPaintEvent *event);
-};
-
-class DeckViewContainer : public QWidget
-{
-    Q_OBJECT
-private:
-    QPushButton *loadLocalButton, *loadRemoteButton;
-    ToggleButton *readyStartButton, *sideboardLockButton;
-    DeckView *deckView;
-    TabGame *parentGame;
-    int playerId;
-private slots:
-    void loadLocalDeck();
-    void loadRemoteDeck();
-    void readyStart();
-    void deckSelectFinished(const Response &r);
-    void sideboardPlanChanged();
-    void sideboardLockButtonClicked();
-    void updateSideboardLockButtonText();
-    void refreshShortcuts();
-signals:
-    void newCardAdded(AbstractCardItem *card);
-    void notIdle();
-
-public:
-    DeckViewContainer(int _playerId, TabGame *parent);
-    void retranslateUi();
-    void setButtonsVisible(bool _visible);
-    void setReadyStart(bool ready);
-    void setSideboardLocked(bool locked);
-    void setDeck(const DeckLoader &deck);
-};
-
 class TabGame : public Tab
 {
     Q_OBJECT
 private:
     QTimer *gameTimer;
     int secondsElapsed;
+    const UserListProxy *userListProxy;
     QList<AbstractClient *> clients;
     ServerInfo_Game gameInfo;
     QMap<int, QString> roomGameTypes;
@@ -176,9 +128,12 @@ private:
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
+    bool isMainPlayerConceded() const;
+
     void startGame(bool resuming);
     void stopGame();
     void closeGame();
+    bool leaveGame();
 
     void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
     void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
@@ -232,7 +187,6 @@ private slots:
 
     void actGameInfo();
     void actConcede();
-    void actLeaveGame();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();
@@ -254,6 +208,7 @@ private slots:
     void actResetLayout();
     void freeDocksSize();
 
+    void hideEvent(QHideEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
     void dockVisibleTriggered();
     void dockFloatingTriggered();
@@ -268,7 +223,7 @@ public:
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest() override;
+    void closeRequest(bool forced = false) override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;
@@ -313,7 +268,7 @@ public:
 public slots:
     void sendGameCommand(PendingCommand *pend, int playerId = -1);
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
-    void viewCardInfo(const QString &cardName);
+    void viewCardInfo(const QString &cardName, const QString &providerId = "") const;
 };
 
 #endif

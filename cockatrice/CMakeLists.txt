@@ -4,145 +4,15 @@
 
 project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-set(cockatrice_SOURCES
-    src/game/cards/abstract_card_drag_item.cpp
-    src/game/cards/abstract_card_item.cpp
-    src/client/game_logic/abstract_client.cpp
-    src/game/board/abstract_counter.cpp
-    src/game/board/abstract_graphics_item.cpp
-    src/game/board/arrow_item.cpp
-    src/game/board/arrow_target.cpp
-    src/game/cards/card_database.cpp
-    src/game/cards/card_database_manager.cpp
-    src/game/cards/card_database_model.cpp
-    src/game/cards/card_database_parser/card_database_parser.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    src/game/cards/card_drag_item.cpp
-    src/game/filters/filter_card.cpp
-    src/client/ui/widgets/cards/card_info_frame_widget.cpp
-    src/client/ui/widgets/cards/card_info_picture_widget.cpp
-    src/client/ui/widgets/cards/card_info_text_widget.cpp
-    src/client/ui/widgets/cards/card_info_display_widget.cpp
-    src/game/cards/card_item.cpp
-    src/game/cards/card_list.cpp
-    src/game/zones/card_zone.cpp
-    src/server/chat_view/chat_view.cpp
-    src/game/board/counter_general.cpp
-    src/deck/custom_line_edit.cpp
-    src/deck/deck_loader.cpp
-    src/deck/deck_list_model.cpp
-    src/deck/deck_stats_interface.cpp
-    src/deck/deck_view.cpp
-    src/dialogs/dlg_connect.cpp
-    src/dialogs/dlg_create_token.cpp
-    src/dialogs/dlg_create_game.cpp
-    src/dialogs/dlg_edit_avatar.cpp
-    src/dialogs/dlg_edit_password.cpp
-    src/dialogs/dlg_edit_tokens.cpp
-    src/dialogs/dlg_edit_user.cpp
-    src/dialogs/dlg_filter_games.cpp
-    src/dialogs/dlg_forgot_password_challenge.cpp
-    src/dialogs/dlg_forgot_password_request.cpp
-    src/dialogs/dlg_forgot_password_reset.cpp
-    src/dialogs/dlg_load_deck_from_clipboard.cpp
-    src/dialogs/dlg_load_remote_deck.cpp
-    src/dialogs/dlg_manage_sets.cpp
-    src/dialogs/dlg_register.cpp
-    src/dialogs/dlg_roll_dice.cpp
-    src/dialogs/dlg_settings.cpp
-    src/dialogs/dlg_tip_of_the_day.cpp
-    src/dialogs/dlg_update.cpp
-    src/dialogs/dlg_view_log.cpp
-    src/game/filters/filter_string.cpp
-    src/game/filters/filter_builder.cpp
-    src/game/filters/filter_tree.cpp
-    src/game/filters/filter_tree_model.cpp
-    src/client/ui/layouts/flow_layout.cpp
-    src/client/ui/layouts/horizontal_flow_layout.cpp
-    src/client/ui/layouts/vertical_flow_layout.cpp
-    src/client/ui/widgets/general/layout_containers/flow_widget.cpp
-    src/game/game_scene.cpp
-    src/game/game_selector.cpp
-    src/game/games_model.cpp
-    src/game/game_view.cpp
-    src/client/get_text_with_max.cpp
-    src/game/hand_counter.cpp
-    src/server/handle_public_servers.cpp
-    src/game/zones/hand_zone.cpp
-    src/client/game_logic/key_signals.cpp
-    src/client/ui/line_edit_completer.cpp
-    src/server/local_client.cpp
-    src/server/local_server.cpp
-    src/server/local_server_interface.cpp
-    src/utility/logger.cpp
-    src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
-    src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
-    src/client/ui/widgets/general/display/labeled_input.cpp
-    src/main.cpp
-    src/server/message_log_widget.cpp
-    src/client/ui/layouts/overlap_layout.cpp
-    src/client/ui/widgets/general/layout_containers/overlap_widget.cpp
-    src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp
-    src/server/pending_command.cpp
-    src/game/phase.cpp
-    src/client/ui/phases_toolbar.cpp
-    src/client/ui/picture_loader.cpp
-    src/game/zones/pile_zone.cpp
-    src/client/ui/pixel_map_generator.cpp
-    src/game/player/player.cpp
-    src/game/player/player_list_widget.cpp
-    src/game/player/player_target.cpp
-    src/client/network/release_channel.cpp
-    src/server/remote/remote_client.cpp
-    src/server/remote/remote_decklist_tree_widget.cpp
-    src/server/remote/remote_replay_list_tree_widget.cpp
-    src/client/network/replay_timeline_widget.cpp
-    src/game/zones/select_zone.cpp
-    src/utility/sequence_edit.cpp
-    src/client/network/sets_model.cpp
-    src/settings/card_database_settings.cpp
-    src/settings/download_settings.cpp
-    src/settings/game_filters_settings.cpp
-    src/settings/layouts_settings.cpp
-    src/settings/message_settings.cpp
-    src/settings/servers_settings.cpp
-    src/settings/settings_manager.cpp
-    src/settings/cache_settings.cpp
-    src/settings/shortcuts_settings.cpp
-    src/client/sound_engine.cpp
-    src/client/network/spoiler_background_updater.cpp
-    src/game/zones/stack_zone.cpp
-    src/client/tabs/tab.cpp
-    src/client/tabs/tab_account.cpp
-    src/client/tabs/tab_admin.cpp
-    src/client/tabs/tab_deck_editor.cpp
-    src/client/tabs/tab_deck_storage.cpp
-    src/client/tabs/tab_game.cpp
-    src/client/tabs/tab_logs.cpp
-    src/client/tabs/tab_message.cpp
-    src/client/tabs/tab_replays.cpp
-    src/client/tabs/tab_room.cpp
-    src/client/tabs/tab_server.cpp
-    src/client/tabs/tab_supervisor.cpp
-    src/game/zones/table_zone.cpp
-    src/client/tapped_out_interface.cpp
-    src/client/ui/theme_manager.cpp
-    src/client/ui/tip_of_the_day.cpp
-    src/client/translate_counter_name.cpp
-    src/client/update_downloader.cpp
-    src/server/user/user_context_menu.cpp
-    src/server/user/user_info_connection.cpp
-    src/server/user/user_info_box.cpp
-    src/server/user/user_list.cpp
-    src/client/ui/window_main.cpp
-    src/game/zones/view_zone_widget.cpp
-    src/game/zones/view_zone.cpp
-    ${VERSION_STRING_CPP}
-)
+file(GLOB_RECURSE cockatrice_CPP_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
+
+set(cockatrice_SOURCES ${cockatrice_CPP_FILES} ${VERSION_STRING_CPP})
 
 add_subdirectory(sounds)
 add_subdirectory(themes)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/cockatrice/resources/config/qtlogging.ini ${CMAKE_BINARY_DIR}/cockatrice/qtlogging.ini COPYONLY
+)
 
 set(cockatrice_RESOURCES cockatrice.qrc)
 
@@ -263,7 +133,7 @@ if(APPLE)
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
   set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6), platforms, printsupport (Qt5), styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -274,10 +144,18 @@ if(APPLE)
     PATTERN "audio/*.dylib"
     PATTERN "iconengines/*.dylib"
     PATTERN "imageformats/*.dylib"
+    PATTERN "multimedia/*.dylib"
     PATTERN "platforms/*.dylib"
     PATTERN "printsupport/*.dylib"
     PATTERN "styles/*.dylib"
     PATTERN "tls/*.dylib"
+  )
+
+  install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+    DESTINATION ${qtconf_dest_dir}/
+    FILES_MATCHING
+    PATTERN "*.ini"
   )
 
   install(
@@ -314,7 +192,14 @@ if(WIN32)
     PATTERN "*.dll"
   )
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, platforms, printsupport (Qt5), styles, tls (Qt6)
+  install(
+    DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.ini"
+  )
+
+  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6) platforms, printsupport (Qt5), styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -326,6 +211,7 @@ if(WIN32)
     PATTERN "imageformats/*.dll"
     PATTERN "mediaservice/dsengine.dll"
     PATTERN "mediaservice/wmfengine.dll"
+    PATTERN "multimedia/*.dll"
     PATTERN "platforms/qdirect2d.dll"
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"

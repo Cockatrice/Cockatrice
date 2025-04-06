@@ -1,5 +1,7 @@
 #include "cockatrice_xml_4.h"
 
+#include "../../../settings/cache_settings.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -13,10 +15,10 @@
 
 bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
-    qDebug() << "[CockatriceXml4Parser] Trying to parse: " << fileName;
+    qCInfo(CockatriceXml4Log) << "Trying to parse: " << fileName;
 
     if (!fileName.endsWith(".xml", Qt::CaseInsensitive)) {
-        qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong extension";
+        qCInfo(CockatriceXml4Log) << "Parsing failed: wrong extension";
         return false;
     }
 
@@ -28,12 +30,12 @@ bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &d
                 if (version == COCKATRICE_XML4_TAGVER) {
                     return true;
                 } else {
-                    qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong version" << version;
+                    qCInfo(CockatriceXml4Log) << "Parsing failed: wrong version" << version;
                     return false;
                 }
 
             } else {
-                qDebug() << "[CockatriceXml4Parser] Parsing failed: wrong element tag" << xml.name();
+                qCInfo(CockatriceXml4Log) << "Parsing failed: wrong element tag" << xml.name();
                 return false;
             }
         }
@@ -58,7 +60,7 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
                 } else if (xmlName == "cards") {
                     loadCardsFromXml(xml);
                 } else if (!xmlName.isEmpty()) {
-                    qDebug() << "[CockatriceXml4Parser] Unknown item" << xmlName << ", trying to continue anyway";
+                    qCInfo(CockatriceXml4Log) << "Unknown item" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -77,6 +79,7 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
         if (xmlName == "set") {
             QString shortName, longName, setType;
             QDate releaseDate;
+            short priority;
             while (!xml.atEnd()) {
                 if (xml.readNext() == QXmlStreamReader::EndElement) {
                     break;
@@ -92,14 +95,15 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
                 } else if (xmlName == "releasedate") {
                     releaseDate =
                         QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
+                } else if (xmlName == "priority") {
+                    priority = xml.readElementText(QXmlStreamReader::IncludeChildElements).toShort();
                 } else if (!xmlName.isEmpty()) {
-                    qDebug() << "[CockatriceXml4Parser] Unknown set property" << xmlName
-                             << ", trying to continue anyway";
+                    qCInfo(CockatriceXml4Log) << "Unknown set property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
-            internalAddSet(shortName, longName, setType, releaseDate);
+            internalAddSet(shortName, longName, setType, releaseDate, static_cast<CardSet::Priority>(priority));
         }
     }
 }
@@ -122,6 +126,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
+    bool includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -137,6 +142,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
+            bool landscapeOrientation = false;
             bool isToken = false;
             bool upsideDown = false;
 
@@ -162,6 +168,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
                 } else if (xmlName == "cipt") {
                     cipt = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                } else if (xmlName == "landscapeOrientation") {
+                    landscapeOrientation = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                 } else if (xmlName == "upsidedown") {
                     upsideDown = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                     // sets
@@ -178,7 +186,17 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                 attrName = "picurl";
                             setInfo.setProperty(attrName, attr.value().toString());
                         }
-                        _sets.insert(setName, setInfo);
+
+                        // This is very much a hack and not the right place to
+                        // put this check, as it requires a reload of Cockatrice
+                        // to be apply.
+                        //
+                        // However, this is also true of the `set->getEnabled()`
+                        // check above (which is currently bugged as well), so
+                        // we'll fix both at the same time.
+                        if (includeRebalancedCards || setInfo.getProperty("isRebalanced") != "true") {
+                            _sets[setName].append(setInfo);
+                        }
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
@@ -224,14 +242,14 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         relatedCards << relation;
                     }
                 } else if (!xmlName.isEmpty()) {
-                    qDebug() << "[CockatriceXml4Parser] Unknown card property" << xmlName
-                             << ", trying to continue anyway";
+                    qCInfo(CockatriceXml4Log) << "Unknown card property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
+                                      landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -240,7 +258,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
     if (set.isNull()) {
-        qDebug() << "&operator<< set is nullptr";
+        qCWarning(CockatriceXml4Log) << "&operator<< set is nullptr";
         return xml;
     }
 
@@ -249,6 +267,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set
     xml.writeTextElement("longname", set->getLongName());
     xml.writeTextElement("settype", set->getSetType());
     xml.writeTextElement("releasedate", set->getReleaseDate().toString(Qt::ISODate));
+    xml.writeTextElement("priority", QString::number(set->getPriority()));
     xml.writeEndElement();
 
     return xml;
@@ -257,7 +276,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
 {
     if (info.isNull()) {
-        qDebug() << "operator<< info is nullptr";
+        qCWarning(CockatriceXml4Log) << "operator<< info is nullptr";
         return xml;
     }
 
@@ -280,14 +299,16 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeEndElement();
 
     // sets
-    for (CardInfoPerSet set : info->getSets()) {
-        xml.writeStartElement("set");
-        for (QString propName : set.getProperties()) {
-            xml.writeAttribute(propName, set.getProperty(propName));
-        }
+    for (const auto &cardInfoPerSetList : info->getSets()) {
+        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+            xml.writeStartElement("set");
+            for (const QString &propName : set.getProperties()) {
+                xml.writeAttribute(propName, set.getProperty(propName));
+            }
 
-        xml.writeCharacters(set.getPtr()->getShortName());
-        xml.writeEndElement();
+            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeEndElement();
+        }
     }
 
     // related cards
@@ -346,6 +367,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
+    }
+    if (info->getLandscapeOrientation()) {
+        xml.writeTextElement("landscapeOrientation", "1");
     }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");

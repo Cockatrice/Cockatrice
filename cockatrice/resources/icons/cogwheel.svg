@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" width="102.5024mm" height="102.24421mm"
+     viewBox="0 0 102.5024 102.24421" version="1.1"
+     id="svg1"
+     inkscape:version="1.4 (e7c3feb100, 2024-10-09)" sodipodi:docname="cog_wheel.svg"
+     xmlns="http://www.w3.org/2000/svg">
+    <sodipodi:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25"
+                        inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0"
+                        inkscape:deskcolor="#d1d1d1" inkscape:document-units="mm" inkscape:zoom="0.66101291"
+                        inkscape:cx="146.74449" inkscape:cy="193.64221" inkscape:window-width="1829"
+                        inkscape:window-height="951" inkscape:window-x="0" inkscape:window-y="0"
+                        inkscape:window-maximized="1" inkscape:current-layer="layer1"/>
+    <defs id="defs1"/>
+    <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1" transform="translate(-66.148059,-97.377896)">
+        <g id="g1" transform="translate(-165.09777,-82.009607)">
+            <g id="g2" transform="matrix(0.26458333,0,0,0.26458333,64.983323,161.37858)">
+                <path style="fill:#333333;stroke-width:94.4882"
+                      d="m 721.34301,94.413051 40.00966,29.763289 29.51933,-9.27053 14.63768,-46.840589 36.83817,0.48792 13.41787,46.108699 28.29952,9.5145 40.74155,-28.299519 29.0314,21.468599 -15.85748,47.08454 16.58937,23.66426 48.30432,-2.68358 12.93,34.88648 -41.71741,27.07971 -0.48792,29.27536 40.49763,26.10387 -10.2464,34.15459 -48.54834,-0.97584 -18.78502,23.42029 15.85749,45.37681 -28.29952,21.71256 -41.22947,-29.27536 -28.54348,9.75846 -13.66184,47.57246 -38.30194,-0.73188 -14.63768,-48.30435 -27.07971,-9.27054 -40.00966,29.27537 -30.25121,-20.49276 17.32125,-46.35266 -17.80918,-24.64009 -49.76812,3.17149 -11.22222,-34.64251 40.74155,-27.07971 0.48792,-30.00725 -41.71739,-27.32367 12.19807,-32.93479 48.30435,2.68358 20.24879,-24.6401 -17.32126,-47.08455 z"
+                      id="path1"/>
+                <circle style="fill:#f9f9f9;stroke-width:72.1317" id="path2" cx="822.09906" cy="261.28262"
+                        r="83.434792"/>
+                <circle style="fill:#4d4d4d;stroke-width:40.5147" id="circle2" cx="822.09906" cy="261.28262"
+                        r="46.863361"/>
+            </g>
+        </g>
+    </g>
+</svg>

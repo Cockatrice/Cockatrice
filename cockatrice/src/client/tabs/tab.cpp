@@ -1,25 +1,29 @@
 #include "tab.h"
 
 #include "../ui/widgets/cards/card_info_display_widget.h"
+#include "./tab_supervisor.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QDebug>
 #include <QScreen>
 
-Tab::Tab(TabSupervisor *_tabSupervisor, QWidget *parent)
-    : QMainWindow(parent), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
+Tab::Tab(TabSupervisor *_tabSupervisor)
+    : QMainWindow(_tabSupervisor), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName)
+void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId)
 {
     if (infoPopup) {
         infoPopup->deleteLater();
     }
     currentCardName = cardName;
-    infoPopup = new CardInfoDisplayWidget(
-        cardName, 0, Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint);
+    currentProviderId = providerId;
+    infoPopup = new CardInfoDisplayWidget(cardName, providerId, nullptr,
+                                          Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint |
+                                              Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     auto screenRect = qApp->primaryScreen()->geometry();
@@ -38,4 +42,18 @@ void Tab::deleteCardInfoPopup(const QString &cardName)
             infoPopup = 0;
         }
     }
+}
+
+/**
+ * Overrides the closeEvent in order to emit a close signal
+ */
+void Tab::closeEvent(QCloseEvent *event)
+{
+    emit closed();
+    event->accept();
+}
+
+void Tab::closeRequest(bool /*forced*/)
+{
+    close();
 }

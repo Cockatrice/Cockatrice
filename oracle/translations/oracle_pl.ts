@@ -1,5 +1,28 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
 <context>
+    <name>BetaReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="210"/>
+        <source>Beta</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="236"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="245"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="278"/>
+        <source>No reply received from the file update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>IntroPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="200"/>
@@ -9,12 +32,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="201"/>
         <source>This wizard will import the list of sets, cards, and tokens that will be used by Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>Ten kreator zaimportuje listę dodatków, kart oraz tokenów które zostaną użyte przez Cockatrice.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="203"/>
         <source>Interface language:</source>
-        <translation type="unfinished"/>
+        <translation>Język interfejsu:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="204"/>
@@ -32,7 +55,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="260"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Proszę podać źródło listy edycji i kart. Można podać adres URL, z którego zostanie pobrana, lub istniejący plik na komputerze.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="264"/>
@@ -61,7 +84,8 @@
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
-        <source>Sets JSON file (%1)</source>
+        <source>Sets file (%1)</source>
+        <oldsource>Sets JSON file (%1)</oldsource>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -113,12 +137,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="469"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Rozpakowanie XZ nie udało się.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="476"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Przepraszamy, ta wersja Oracle nie obsługuje plików spakowanych w archiwum xz.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="496"/>
@@ -143,12 +167,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="540"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>Interpretacja pobranych danych nie udała się.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="553"/>
         <source>Do you want to download the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Czy chcesz zamiast tego pobrać plik nieskompresowany?</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="575"/>
@@ -161,42 +185,42 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="749"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz bazę danych spoilerów.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="754"/>
         <source>XML; spoiler database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; baza danych spoilerów (*.xml)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="759"/>
         <source>Spoilers import</source>
-        <translation type="unfinished"/>
+        <translation>Import spoilerów</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="760"/>
         <source>Please specify a compatible source for spoiler data.</source>
-        <translation type="unfinished"/>
+        <translation>Proszę wybrać kompatybilne źródło danych ze spoilerami.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="762"/>
         <source>Download URL:</source>
-        <translation type="unfinished"/>
+        <translation>URL pobierania: </translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="763"/>
         <source>Restore default URL</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć domyślny URL</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="764"/>
         <source>The spoiler database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Baza danych spoilerów zostanie zapisana w tym miejscu:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="766"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz do niestandardowej ścieżki (niezalecane)</translation>
     </message>
 </context>
 <context>
@@ -204,22 +228,22 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="712"/>
         <source>Save token database</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz bazę danych tokenów.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="717"/>
         <source>XML; token database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; baza danych tokenów (*.xml)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="722"/>
         <source>Tokens import</source>
-        <translation type="unfinished"/>
+        <translation>Import tokenów</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="723"/>
         <source>Please specify a compatible source for token data.</source>
-        <translation type="unfinished"/>
+        <translation>Proszę wybrać kompatybilne źródło danych z tokenami.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="725"/>
@@ -234,18 +258,18 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="727"/>
         <source>The token database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Baza danych tokenów zostanie zapisana w tym miejscu:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="729"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz do niestandardowej ścieżki (niezalecane)</translation>
     </message>
 </context>
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="472"/>
         <source>Dummy set containing tokens</source>
         <translation>Dodatek-atrapa, zawierający tokeny.</translation>
     </message>
@@ -263,21 +287,30 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="209"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>Zakończone</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="210"/>
         <source>The wizard has finished.</source>
-        <translation type="unfinished"/>
+        <translation>Kreator zakończył swoją pracę.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="211"/>
         <source>You can now start using Cockatrice with the newly updated cards.</source>
-        <translation type="unfinished"/>
+        <translation>Możesz teraz korzystać z Cockatrice z nowo zaktualizowanymi kartami.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="212"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
+        <translation>Jeżeli bazy kart nie przeładują się automatycznie, zrestartuj klienta Cockatrice.</translation>
+    </message>
+</context>
+<context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp" line="219"/>
+        <source>en</source>
+        <comment>code for scryfall's language property, not available for all languages</comment>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -302,32 +335,32 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="626"/>
         <source>A cockatrice database file of %1 MB has been downloaded.</source>
-        <translation type="unfinished"/>
+        <translation>Baza danych Cockatrice mająca %1 MB została pobrana.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="629"/>
         <source>The following sets have been found:</source>
-        <translation type="unfinished"/>
+        <translation>Następujące dodatki zostały znalezione:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="632"/>
         <source>Press &quot;Save&quot; to store the imported cards in the Cockatrice database.</source>
-        <translation type="unfinished"/>
+        <translation>Kliknij &quot;Zapisz&quot; aby zapisać zaimportowane karty w bazie danych Cockatrice.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="633"/>
         <source>The card database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>Baza danych kart zostanie zapisana w tym miejscu:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="635"/>
         <source>Save to a custom path (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz do niestandardowej ścieżki (niezalecane)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="637"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="643"/>
@@ -356,37 +389,80 @@
     </message>
 </context>
 <context>
+    <name>ShortcutsSettings</name>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="54"/>
+        <source>Your configuration file contained invalid shortcuts.
+Please check your shortcut settings!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="56"/>
+        <source>The following shortcuts have been set to default:
+</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SimpleDownloadFilePage</name>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <location filename="src/pagetemplates.cpp" line="113"/>
         <location filename="src/pagetemplates.cpp" line="169"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid.</source>
-        <translation type="unfinished"/>
+        <translation>Podano nieprawidłowy URL.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>
         <source>Downloading (0MB)</source>
-        <translation type="unfinished"/>
+        <translation>Pobieranie (0MB)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="104"/>
         <source>Downloading (%1MB)</source>
-        <translation type="unfinished"/>
+        <translation>Pobieranie (%1MB)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="113"/>
         <source>Network error: %1.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd sieci: %1.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="169"/>
         <source>The file could not be saved to %1</source>
+        <translation>Plik nie mógł zostać zapisany do %1</translation>
+    </message>
+</context>
+<context>
+    <name>StableReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="104"/>
+        <source>Default</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="120"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="128"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="176"/>
+        <source>No reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="183"/>
+        <source>Invalid reply received from the tag update server.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -395,87 +471,87 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operacja ZIP zakończona powodzeniem.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Nieudana inicjalizacja lub załadowanie biblioteki zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Bląd biblioteki zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Nie można utworzyć lub otworzyć pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Archiwum częściowo uszkodzone. Część plików mogła zostać wypakowana.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archiwum uszkodzone.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowe hasło.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Nie utworzono jeszcze archiwum.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1183"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Katalog lub plik nie istnieją.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd odczytu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd zapisu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd wyszukania w czasie odczytu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Nie można utworzyć katalogu.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1188"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowe urządzenie.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1189"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowe lub niezgodne archiwum zip.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1190"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Niespójne nagłówki. Archiwum może być uszkodzone.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Nieznany błąd.</translation>
     </message>
 </context>
 <context>
@@ -483,58 +559,59 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operacja ZIP zakończona powodzeniem.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Nieudana inicjalizacja lub załadowanie biblioteki zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd biblioteki zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Nie można utworzyć lub otworzyć pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Nie utworzono jeszcze archiwum.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Katalog lub plik nie istnieją.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd odczytu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd zapisu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Błąd wyszukania w czasie odczytu pliku.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Nieznany błąd.</translation>
     </message>
 </context>
 <context>
     <name>i18n</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="58"/>
+        <location filename="../cockatrice/src/settings/cache_settings.cpp" line="167"/>
         <source>English</source>
         <translation>Polski (Polish)</translation>
     </message>
@@ -544,7 +621,7 @@
     <message>
         <location filename="src/main.cpp" line="60"/>
         <source>Only run in spoiler mode</source>
-        <translation type="unfinished"/>
+        <translation>Tylko działaj w trybie spoilerów</translation>
     </message>
 </context>
 </TS>

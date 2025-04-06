@@ -22,8 +22,9 @@ const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 TableZone::TableZone(Player *_p, QGraphicsItem *parent)
     : SelectZone(_p, "table", true, false, true, parent), active(false)
 {
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
-    connect(&SettingsCache::instance(), SIGNAL(invertVerticalCoordinateChanged()), this, SLOT(reorganizeCards()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
+    connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
+            &TableZone::reorganizeCards);
 
     updateBg();
 
@@ -53,12 +54,7 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getTableBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraTableBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 
     if (active) {
@@ -156,8 +152,6 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
 
 void TableZone::reorganizeCards()
 {
-    QSet<ArrowItem *> arrowsToUpdate;
-
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
@@ -188,23 +182,7 @@ void TableZone::reorganizeCards()
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
-            for (ArrowItem *item : attachedCard->getArrowsFrom()) {
-                arrowsToUpdate.insert(item);
-            }
-            for (ArrowItem *item : attachedCard->getArrowsTo()) {
-                arrowsToUpdate.insert(item);
-            }
         }
-
-        for (ArrowItem *item : cards[i]->getArrowsFrom()) {
-            arrowsToUpdate.insert(item);
-        }
-        for (ArrowItem *item : cards[i]->getArrowsTo()) {
-            arrowsToUpdate.insert(item);
-        }
-    }
-    for (ArrowItem *item : arrowsToUpdate) {
-        item->updatePath();
     }
 
     resizeToContents();
@@ -213,16 +191,24 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
-    bool tapAll = false;
-    for (int i = 0; i < selectedItems.size(); i++)
-        if (!qgraphicsitem_cast<CardItem *>(selectedItems[i])->getTapped()) {
-            tapAll = true;
-            break;
+    QList<QGraphicsItem *> selectedItemsRaw = scene()->selectedItems();
+    QList<QGraphicsItem *> selectedItems;
+
+    auto isCardOnTable = [](const QGraphicsItem *item) {
+        if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
+            return card->getZone()->getName() == "table";
         }
+        return false;
+    };
+
+    std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
+
+    bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
+        return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
+    });
     QList<const ::google::protobuf::Message *> cmdList;
-    for (int i = 0; i < selectedItems.size(); i++) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItems[i]);
+    for (const auto &selectedItem : selectedItems) {
+        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
         if (temp->getTapped() != tapAll) {
             Command_SetCardAttr *cmd = new Command_SetCardAttr;
             cmd->set_zone(name.toStdString());
@@ -235,10 +221,10 @@ void TableZone::toggleTapped()
     player->sendGameCommand(player->prepareGameCommand(cmdList));
 }
 
-CardItem *TableZone::takeCard(int position, int cardId, bool canResize)
+CardItem *TableZone::takeCard(int position, int cardId, bool toNewZone)
 {
     CardItem *result = CardZone::takeCard(position, cardId);
-    if (canResize)
+    if (toNewZone)
         resizeToContents();
     return result;
 }

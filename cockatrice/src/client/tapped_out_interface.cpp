@@ -14,7 +14,7 @@ TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *par
     : QObject(parent), cardDatabase(_cardDatabase)
 {
     manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryFinished(QNetworkReply *)));
+    connect(manager, &QNetworkAccessManager::finished, this, &TappedOutInterface::queryFinished);
 }
 
 void TappedOutInterface::queryFinished(QNetworkReply *reply)
@@ -33,7 +33,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
          * can be extracted from the header. The http status is a 302 "redirect".
          */
         QString deckUrl = reply->rawHeader("Location");
-        qDebug() << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
+        qCInfo(TappedOutInterfaceLog) << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
         QDesktopServices::openUrl("https://tappedout.net" + deckUrl);
     } else {
         /*
@@ -57,8 +57,8 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         }
 
         QString errorMessage = errorMessageList.join("\n");
-        qDebug() << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size() << "message"
-                 << errorMessage;
+        qCWarning(TappedOutInterfaceLog) << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size()
+                                         << "message" << errorMessage;
 
         QMessageBox::critical(nullptr, tr("Error"), errorMessage);
     }
@@ -115,7 +115,7 @@ struct CopyMainOrSide
     }
 };
 
-void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
+void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     CopyMainOrSide copyMainOrSide(cardDatabase, mainboard, sideboard);
     source.forEachCard(copyMainOrSide);

@@ -6,10 +6,11 @@ mysql.cnf
 .DS_Store
 .idea/
 *.aps
-cmake-build-debug*
+cmake-build*
 preferences
 compile_commands.json
 .vs/
 .vscode/
 .cache
 .gdb_history
+cockatrice/resources/config/qtlogging.ini

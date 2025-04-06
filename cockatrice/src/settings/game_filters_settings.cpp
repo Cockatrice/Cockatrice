@@ -3,7 +3,7 @@
 #include <QCryptographicHash>
 #include <QTime>
 
-GameFiltersSettings::GameFiltersSettings(QString settingPath, QObject *parent)
+GameFiltersSettings::GameFiltersSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "gamefilters.ini", parent)
 {
 }
@@ -17,48 +17,48 @@ QString GameFiltersSettings::hashGameType(const QString &gameType) const
     return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
 }
 
-void GameFiltersSettings::setShowBuddiesOnlyGames(bool show)
+void GameFiltersSettings::setHideBuddiesOnlyGames(bool hide)
 {
-    setValue(show, "show_buddies_only_games", "filter_games");
+    setValue(hide, "hide_buddies_only_games", "filter_games");
 }
 
-bool GameFiltersSettings::isShowBuddiesOnlyGames()
+bool GameFiltersSettings::isHideBuddiesOnlyGames()
 {
-    QVariant previous = getValue("show_buddies_only_games", "filter_games");
-    return previous == QVariant() ? true : previous.toBool();
+    QVariant previous = getValue("hide_buddies_only_games", "filter_games");
+    return previous == QVariant() || previous.toBool();
 }
 
-void GameFiltersSettings::setShowFullGames(bool show)
+void GameFiltersSettings::setHideFullGames(bool hide)
 {
-    setValue(show, "show_full_games", "filter_games");
+    setValue(hide, "hide_full_games", "filter_games");
 }
 
-bool GameFiltersSettings::isShowFullGames()
+bool GameFiltersSettings::isHideFullGames()
 {
-    QVariant previous = getValue("show_full_games", "filter_games");
-    return previous == QVariant() ? false : previous.toBool();
+    QVariant previous = getValue("hide_full_games", "filter_games");
+    return !(previous == QVariant()) && previous.toBool();
 }
 
-void GameFiltersSettings::setShowGamesThatStarted(bool show)
+void GameFiltersSettings::setHideGamesThatStarted(bool hide)
 {
-    setValue(show, "show_games_that_started", "filter_games");
+    setValue(hide, "hide_games_that_started", "filter_games");
 }
 
-bool GameFiltersSettings::isShowGamesThatStarted()
+bool GameFiltersSettings::isHideGamesThatStarted()
 {
-    QVariant previous = getValue("show_games_that_started", "filter_games");
-    return previous == QVariant() ? false : previous.toBool();
+    QVariant previous = getValue("hide_games_that_started", "filter_games");
+    return !(previous == QVariant()) && previous.toBool();
 }
 
-void GameFiltersSettings::setShowPasswordProtectedGames(bool show)
+void GameFiltersSettings::setHidePasswordProtectedGames(bool hide)
 {
-    setValue(show, "show_password_protected_games", "filter_games");
+    setValue(hide, "hide_password_protected_games", "filter_games");
 }
 
-bool GameFiltersSettings::isShowPasswordProtectedGames()
+bool GameFiltersSettings::isHidePasswordProtectedGames()
 {
-    QVariant previous = getValue("show_password_protected_games", "filter_games");
-    return previous == QVariant() ? true : previous.toBool();
+    QVariant previous = getValue("hide_password_protected_games", "filter_games");
+    return previous == QVariant() || previous.toBool();
 }
 
 void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
@@ -69,7 +69,7 @@ void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
 bool GameFiltersSettings::isHideIgnoredUserGames()
 {
     QVariant previous = getValue("hide_ignored_user_games", "filter_games");
-    return previous == QVariant() ? false : previous.toBool();
+    return !(previous == QVariant()) && previous.toBool();
 }
 
 void GameFiltersSettings::setGameNameFilter(QString gameName)

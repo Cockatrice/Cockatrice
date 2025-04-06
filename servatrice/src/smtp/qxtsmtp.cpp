@@ -273,7 +273,7 @@ void QxtSmtpPrivate::socketRead()
 void QxtSmtpPrivate::ehlo()
 {
     QByteArray address = "127.0.0.1";
-    foreach (const QHostAddress &addr, QNetworkInterface::allAddresses()) {
+    for (const QHostAddress &addr : QNetworkInterface::allAddresses()) {
         if (addr == QHostAddress::LocalHost || addr == QHostAddress::LocalHostIPv6)
             continue;
         address = addr.toString().toLatin1();
@@ -469,7 +469,7 @@ void QxtSmtpPrivate::sendNext()
     socket->write("mail from:<" + qxt_extract_address(msg.sender()) + ">\r\n");
     if (extensions.contains("PIPELINING")) // almost all do nowadays
     {
-        foreach (const QString &rcpt, recipients) {
+        for (const QString &rcpt : recipients) {
             socket->write("rcpt to:<" + qxt_extract_address(rcpt) + ">\r\n");
         }
         state = RcptAckPending;

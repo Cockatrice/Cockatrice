@@ -15,6 +15,7 @@
             <xs:element type="xs:string" name="longname" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:string" name="settype" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:string" name="releasedate" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:integer" name="priority" minOccurs="0" maxOccurs="1"/>
         </xs:all>
     </xs:complexType>
     <xs:complexType name="cardInSetType">
@@ -27,6 +28,8 @@
                 <xs:attribute type="xs:anyURI" name="picURL" use="optional" />
                 <xs:attribute type="xs:string" name="num" use="optional" />
                 <xs:attribute type="xs:string" name="rarity" use="optional" />
+                <xs:attribute type="xs:boolean" name="isOnlineOnly" use="optional" />
+                <xs:attribute type="xs:boolean" name="isRebalanced" use="optional" />
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

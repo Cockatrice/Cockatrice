@@ -8,9 +8,16 @@
 #include <QDialog>
 #include <QGroupBox>
 #include <QLabel>
+#include <QLoggingCategory>
 #include <QPushButton>
 #include <QSpinBox>
 
+inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
+
+class ShortcutTreeView;
+class SearchLineEdit;
+class QTreeView;
+class QStandardItemModel;
 class CardDatabase;
 class QCloseEvent;
 class QGridLayout;
@@ -21,8 +28,6 @@ class QListWidgetItem;
 class QRadioButton;
 class QSlider;
 class QStackedWidget;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QVBoxLayout;
 class SequenceEdit;
 
@@ -63,6 +68,7 @@ private:
     QGroupBox *personalGroupBox;
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
+    QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
@@ -74,6 +80,7 @@ private:
     QLabel customCardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
     QLabel updateReleaseChannelLabel;
+    QLabel advertiseTranslationPageLabel;
     QCheckBox showTipsOnStartup;
 };
 
@@ -83,6 +90,10 @@ class AppearanceSettingsPage : public AbstractSettingsPage
 private slots:
     void themeBoxChanged(int index);
     void openThemeLocation();
+    void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
+
+    void cardViewInitialRowsMaxChanged(int value);
+    void cardViewExpandedRowsMaxChanged(int value);
 
 private:
     QLabel themeLabel;
@@ -90,14 +101,24 @@ private:
     QPushButton openThemeButton;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
+    QCheckBox showShortcutsCheckBox;
     QCheckBox displayCardNamesCheckBox;
+    QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
+    QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
+    QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
     QCheckBox cardScalingCheckBox;
+    QCheckBox roundCardCornersCheckBox;
     QLabel verticalCardOverlapPercentLabel;
     QSpinBox verticalCardOverlapPercentBox;
+    QLabel cardViewInitialRowsMaxLabel;
+    QSpinBox cardViewInitialRowsMaxBox;
+    QLabel cardViewExpandedRowsMaxLabel;
+    QSpinBox cardViewExpandedRowsMaxBox;
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *themeGroupBox;
+    QGroupBox *menuGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
@@ -113,22 +134,30 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
 {
     Q_OBJECT
 private slots:
-    void setNotificationEnabled(int);
+    void setNotificationEnabled(QT_STATE_CHANGED_T);
 
 private:
     QCheckBox notificationsEnabledCheckBox;
     QCheckBox specNotificationsEnabledCheckBox;
     QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
+    QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
+    QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox annotateTokensCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
+    QCheckBox visualDeckStoragePromptForConversionCheckBox;
+    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
+    QCheckBox visualDeckStorageInGameCheckBox;
+    QLabel rewindBufferingMsLabel;
+    QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
     QGroupBox *deckEditorGroupBox;
+    QGroupBox *replayGroupBox;
 
 public:
     UserInterfaceSettingsPage();
@@ -162,6 +191,7 @@ private:
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
     QListWidget *urlList;
+    QAction *aAdd, *aEdit, *aRemove;
     QCheckBox mcDownloadSpoilersCheckBox;
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
@@ -256,7 +286,8 @@ public:
     void retranslateUi() override;
 
 private:
-    QTreeWidget *shortcutsTable;
+    SearchLineEdit *searchEdit;
+    ShortcutTreeView *shortcutsTable;
     QVBoxLayout *mainLayout;
     QHBoxLayout *buttonsLayout;
     QGroupBox *editShortcutGroupBox;
@@ -273,10 +304,8 @@ private:
 
 private slots:
     void resetShortcuts();
-    void refreshShortcuts();
-    void createShortcuts();
     void clearShortcuts();
-    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void currentItemChanged(const QString &key);
 };
 
 class DlgSettings : public QDialog
@@ -299,7 +328,6 @@ private:
     void retranslateUi();
 
 protected:
-    void changeEvent(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 };
 

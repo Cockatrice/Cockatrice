@@ -9,9 +9,10 @@
 CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromEnabledSets, QObject *parent)
     : QAbstractListModel(parent), db(_db), showOnlyCardsFromEnabledSets(_showOnlyCardsFromEnabledSets)
 {
-    connect(db, SIGNAL(cardAdded(CardInfoPtr)), this, SLOT(cardAdded(CardInfoPtr)));
-    connect(db, SIGNAL(cardRemoved(CardInfoPtr)), this, SLOT(cardRemoved(CardInfoPtr)));
-    connect(db, SIGNAL(cardDatabaseEnabledSetsChanged()), this, SLOT(cardDatabaseEnabledSetsChanged()));
+    connect(db, &CardDatabase::cardAdded, this, &CardDatabaseModel::cardAdded);
+    connect(db, &CardDatabase::cardRemoved, this, &CardDatabaseModel::cardRemoved);
+    connect(db, &CardDatabase::cardDatabaseEnabledSetsChanged, this,
+            &CardDatabaseModel::cardDatabaseEnabledSetsChanged);
 
     cardDatabaseEnabledSetsChanged();
 }
@@ -97,9 +98,11 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
     if (!showOnlyCardsFromEnabledSets)
         return true;
 
-    for (const auto &set : card->getSets()) {
-        if (set.getPtr()->getEnabled())
-            return true;
+    for (const auto &cardInfoPerSetList : card->getSets()) {
+        for (const auto &set : cardInfoPerSetList) {
+            if (set.getPtr()->getEnabled())
+                return true;
+        }
     }
 
     return false;
@@ -108,15 +111,17 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
 void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
 {
     // remove all the cards no more present in at least one enabled set
-    foreach (CardInfoPtr card, cardList) {
-        if (!checkCardHasAtLeastOneEnabledSet(card))
+    for (const CardInfoPtr &card : cardList) {
+        if (!checkCardHasAtLeastOneEnabledSet(card)) {
             cardRemoved(card);
+        }
     }
 
     // re-check all the card currently not shown, maybe their part of a newly-enabled set
-    foreach (CardInfoPtr card, db->getCardList()) {
-        if (!cardList.contains(card))
+    for (const CardInfoPtr &card : db->getCardList()) {
+        if (!cardListSet.contains(card)) {
             cardAdded(card);
+        }
     }
 }
 
@@ -126,7 +131,8 @@ void CardDatabaseModel::cardAdded(CardInfoPtr card)
         // add the card if it's present in at least one enabled set
         beginInsertRows(QModelIndex(), cardList.size(), cardList.size());
         cardList.append(card);
-        connect(card.data(), SIGNAL(cardInfoChanged(CardInfoPtr)), this, SLOT(cardInfoChanged(CardInfoPtr)));
+        cardListSet.insert(card);
+        connect(card.data(), &CardInfo::cardInfoChanged, this, &CardDatabaseModel::cardInfoChanged);
         endInsertRows();
     }
 }
@@ -140,6 +146,7 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
 
     beginRemoveRows(QModelIndex(), row, row);
     disconnect(card.data(), nullptr, this, nullptr);
+    cardListSet.remove(card);
     card.clear();
     cardList.removeAt(row);
     endRemoveRows();
@@ -168,7 +175,12 @@ void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
     int remainder = sourceModel()->rowCount(index) - loadedRowCount;
     int itemsToFetch = qMin(100, remainder);
 
-    beginInsertRows(QModelIndex(), loadedRowCount, loadedRowCount + itemsToFetch - 1);
+    if (itemsToFetch == 0) {
+        return;
+    }
+
+    const auto startIndex = qMin(rowCount(QModelIndex()), loadedRowCount);
+    beginInsertRows(QModelIndex(), startIndex, startIndex + itemsToFetch - 1);
 
     loadedRowCount += itemsToFetch;
     endInsertRows();
@@ -176,7 +188,7 @@ void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
 
 int CardDatabaseDisplayModel::rowCount(const QModelIndex &parent) const
 {
-    return qMin(QSortFilterProxyModel::rowCount(parent), loadedRowCount);
+    return QSortFilterProxyModel::rowCount(parent);
 }
 
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
@@ -332,7 +344,7 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
         disconnect(this->filterTree, nullptr, this, nullptr);
 
     this->filterTree = _filterTree;
-    connect(this->filterTree, SIGNAL(changed()), this, SLOT(filterTreeChanged()));
+    connect(this->filterTree, &FilterTree::changed, this, &CardDatabaseDisplayModel::filterTreeChanged);
     invalidate();
 }
 

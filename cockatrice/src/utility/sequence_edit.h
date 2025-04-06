@@ -11,7 +11,7 @@ class SequenceEdit : public QWidget
 {
     Q_OBJECT
 public:
-    SequenceEdit(const QString &_shortcutName, QWidget *parent = nullptr);
+    explicit SequenceEdit(const QString &_shortcutName, QWidget *parent = nullptr);
     QString getSequence();
     void setShortcutName(const QString &_shortcutName);
     void refreshShortcut();
@@ -23,7 +23,7 @@ private slots:
     void restoreDefault();
 
 protected:
-    bool eventFilter(QObject *, QEvent *event);
+    bool eventFilter(QObject *, QEvent *event) override;
 
 private:
     QString shortcutName;
@@ -36,6 +36,7 @@ private:
 
     void processKey(QKeyEvent *e);
     int translateModifiers(Qt::KeyboardModifiers state, const QString &text);
+    bool validateShortcut(const QKeySequence &sequence);
     void finishShortcut();
     void updateSettings();
 };

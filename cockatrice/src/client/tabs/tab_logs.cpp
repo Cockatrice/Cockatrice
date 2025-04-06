@@ -21,8 +21,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
-    : Tab(_tabSupervisor, parent), client(_client)
+TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
 {
     roomTable = new QTableWidget();
     roomTable->setColumnCount(6);

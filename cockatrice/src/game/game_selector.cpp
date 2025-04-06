@@ -9,6 +9,7 @@
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
 #include "../server/pending_command.h"
+#include "../server/user/user_list_manager.h"
 #include "games_model.h"
 #include "pb/response.pb.h"
 #include "pb/room_commands.pb.h"
@@ -37,15 +38,19 @@ GameSelector::GameSelector(AbstractClient *_client,
     : QGroupBox(parent), client(_client), tabSupervisor(_tabSupervisor), room(_room), showFilters(_showfilters)
 {
     gameListView = new QTreeView;
+    gameListView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(gameListView, &QTreeView::customContextMenuRequested, this, &GameSelector::customContextMenu);
+
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
     if (showFilters) {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor);
+        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserListManager());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
     } else {
         gameListView->setModel(gameListModel);
     }
+    gameListView->setIconSize(QSize(13, 13));
     gameListView->setSortingEnabled(true);
     gameListView->sortByColumn(gameListModel->startTimeColIndex(), Qt::AscendingOrder);
     gameListView->setAlternatingRowColors(true);
@@ -73,16 +78,16 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
-    connect(filterButton, SIGNAL(clicked()), this, SLOT(actSetFilter()));
+    connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
     clearFilterButton->setIcon(QPixmap("theme:icons/clearsearch"));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
-    connect(clearFilterButton, SIGNAL(clicked()), this, SLOT(actClearFilter()));
+    connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
 
     if (room) {
         createButton = new QPushButton;
-        connect(createButton, SIGNAL(clicked()), this, SLOT(actCreate()));
+        connect(createButton, &QPushButton::clicked, this, &GameSelector::actCreate);
     } else {
         createButton = nullptr;
     }
@@ -111,18 +116,15 @@ GameSelector::GameSelector(AbstractClient *_client,
     setMinimumWidth((qreal)(gameListView->columnWidth(0) * gameListModel->columnCount()) / 1.5);
     setMinimumHeight(200);
 
-    connect(joinButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(spectateButton, SIGNAL(clicked()), this, SLOT(actJoin()));
-    connect(gameListView->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)), this,
-            SLOT(actSelectedGameChanged(const QModelIndex &, const QModelIndex &)));
-    connect(gameListView, SIGNAL(activated(const QModelIndex &)), this, SLOT(actJoin()));
+    connect(joinButton, &QPushButton::clicked, this, &GameSelector::actJoin);
+    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actSpectate);
+    connect(gameListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &GameSelector::actSelectedGameChanged);
+    connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoin);
 
-    connect(client, SIGNAL(ignoreListReceived(const QList<ServerInfo_User> &)), this,
-            SLOT(ignoreListReceived(const QList<ServerInfo_User> &)));
-    connect(client, SIGNAL(addToListEventReceived(const Event_AddToList &)), this,
-            SLOT(processAddToListEvent(const Event_AddToList &)));
-    connect(client, SIGNAL(removeFromListEventReceived(const Event_RemoveFromList &)), this,
-            SLOT(processRemoveFromListEvent(const Event_RemoveFromList &)));
+    connect(client, &AbstractClient::ignoreListReceived, this, &GameSelector::ignoreListReceived);
+    connect(client, &AbstractClient::addToListEventReceived, this, &GameSelector::processAddToListEvent);
+    connect(client, &AbstractClient::removeFromListEventReceived, this, &GameSelector::processRemoveFromListEvent);
 }
 
 void GameSelector::ignoreListReceived(const QList<ServerInfo_User> &)
@@ -153,10 +155,10 @@ void GameSelector::actSetFilter()
     if (!dlg.exec())
         return;
 
-    gameListProxyModel->setShowBuddiesOnlyGames(dlg.getShowBuddiesOnlyGames());
-    gameListProxyModel->setShowFullGames(dlg.getShowFullGames());
-    gameListProxyModel->setShowGamesThatStarted(dlg.getShowGamesThatStarted());
-    gameListProxyModel->setShowPasswordProtectedGames(dlg.getShowPasswordProtectedGames());
+    gameListProxyModel->setHideBuddiesOnlyGames(dlg.getHideBuddiesOnlyGames());
+    gameListProxyModel->setHideFullGames(dlg.getHideFullGames());
+    gameListProxyModel->setHideGamesThatStarted(dlg.getHideGamesThatStarted());
+    gameListProxyModel->setHidePasswordProtectedGames(dlg.getHidePasswordProtectedGames());
     gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
@@ -243,21 +245,65 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    QModelIndex ind = gameListView->currentIndex();
-    if (!ind.isValid())
+    return joinGame(false);
+}
+
+void GameSelector::actSpectate()
+{
+    return joinGame(true);
+}
+
+void GameSelector::customContextMenu(const QPoint &point)
+{
+    const auto &index = gameListView->indexAt(point);
+    if (!index.isValid()) {
         return;
+    }
+
+    QAction joinGame(tr("Join Game"));
+    connect(&joinGame, &QAction::triggered, this, &GameSelector::actJoin);
+
+    QAction spectateGame(tr("Spectate Game"));
+    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actSpectate);
+
+    QAction getGameInfo(tr("Game Information"));
+    connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
+        const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
+        const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
+
+        DlgCreateGame dlg(gameInfo, gameTypes, this);
+        dlg.exec();
+    });
+
+    QMenu menu;
+    menu.addAction(&joinGame);
+    menu.addAction(&spectateGame);
+    menu.addAction(&getGameInfo);
+    menu.exec(gameListView->mapToGlobal(point));
+}
+
+void GameSelector::joinGame(const bool isSpectator)
+{
+    QModelIndex ind = gameListView->currentIndex();
+    if (!ind.isValid()) {
+        return;
+    }
+
     const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
     if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
         return;
     }
-    bool spectator = sender() == spectateButton || game.player_count() == game.max_players();
+
+    bool spectator = isSpectator || game.player_count() == game.max_players();
+
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
         password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
-        if (!ok)
+        if (!ok) {
             return;
+        }
     }
 
     Command_JoinGame cmd;
@@ -274,7 +320,7 @@ void GameSelector::actJoin()
     }
 
     PendingCommand *pend = r->prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &GameSelector::checkResponse);
     r->sendRoomCommand(pend);
 
     disableButtons();

@@ -88,7 +88,7 @@ public:
     AbstractCounterDialog(const QString &name, const QString &value, QWidget *parent = nullptr);
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
     void changeValue(int diff);
 };
 

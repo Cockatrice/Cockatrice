@@ -218,7 +218,7 @@ public:
         return oldStashedCard;
     }
 
-    void resetState();
+    void resetState(bool keepAnnotations = false);
     QString setAttribute(CardAttribute attribute, const QString &avalue, bool allCards);
     QString setAttribute(CardAttribute attribute, const QString &avalue, Event_SetCardAttr *event = nullptr);
 

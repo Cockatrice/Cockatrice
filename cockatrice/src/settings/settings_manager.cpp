@@ -1,11 +1,14 @@
 #include "settings_manager.h"
 
-SettingsManager::SettingsManager(QString settingPath, QObject *parent)
+SettingsManager::SettingsManager(const QString &settingPath, QObject *parent)
     : QObject(parent), settings(settingPath, QSettings::IniFormat)
 {
 }
 
-void SettingsManager::setValue(QVariant value, QString name, QString group, QString subGroup)
+void SettingsManager::setValue(const QVariant &value,
+                               const QString &name,
+                               const QString &group,
+                               const QString &subGroup)
 {
     if (!group.isEmpty()) {
         settings.beginGroup(group);
@@ -26,7 +29,7 @@ void SettingsManager::setValue(QVariant value, QString name, QString group, QStr
     }
 }
 
-void SettingsManager::deleteValue(QString name, QString group, QString subGroup)
+void SettingsManager::deleteValue(const QString &name, const QString &group, const QString &subGroup)
 {
     if (!group.isEmpty()) {
         settings.beginGroup(group);
@@ -47,7 +50,7 @@ void SettingsManager::deleteValue(QString name, QString group, QString subGroup)
     }
 }
 
-QVariant SettingsManager::getValue(QString name, QString group, QString subGroup)
+QVariant SettingsManager::getValue(const QString &name, const QString &group, const QString &subGroup)
 {
     if (!group.isEmpty()) {
         settings.beginGroup(group);
@@ -68,4 +71,12 @@ QVariant SettingsManager::getValue(QString name, QString group, QString subGroup
     }
 
     return value;
+}
+
+/**
+ * Calls sync on the underlying QSettings object
+ */
+void SettingsManager::sync()
+{
+    settings.sync();
 }

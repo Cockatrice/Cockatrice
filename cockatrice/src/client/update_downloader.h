@@ -14,7 +14,7 @@ class UpdateDownloader : public QObject
 {
     Q_OBJECT
 public:
-    UpdateDownloader(QObject *parent);
+    explicit UpdateDownloader(QObject *parent);
     void beginDownload(QUrl url);
 signals:
     void downloadSuccessful(QUrl filepath);

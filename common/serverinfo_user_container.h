@@ -9,8 +9,8 @@ protected:
     ServerInfo_User *userInfo;
 
 public:
-    ServerInfo_User_Container(ServerInfo_User *_userInfo = nullptr);
-    ServerInfo_User_Container(const ServerInfo_User &_userInfo);
+    explicit ServerInfo_User_Container(ServerInfo_User *_userInfo = nullptr);
+    explicit ServerInfo_User_Container(const ServerInfo_User &_userInfo);
     ServerInfo_User_Container(const ServerInfo_User_Container &other);
     ServerInfo_User_Container &operator=(const ServerInfo_User_Container &other) = default;
     virtual ~ServerInfo_User_Container();

@@ -24,12 +24,20 @@
 #include "pb/response.pb.h"
 
 #include <QList>
+#include <QLoggingCategory>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QProcess>
 #include <QSystemTrayIcon>
 #include <QtNetwork>
 
+inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");
+inline Q_LOGGING_CATEGORY(WindowMainStartupLog, "window_main.startup");
+inline Q_LOGGING_CATEGORY(WindowMainStartupVersionLog, "window_main.startup.version");
+inline Q_LOGGING_CATEGORY(WindowMainStartupShortcutsLog, "window_main.startup.shortcuts");
+inline Q_LOGGING_CATEGORY(WindowMainStartupAutoconnectLog, "window_main.startup.autoconnect");
+
+class Release;
 class DlgConnect;
 class DlgViewLog;
 class GameReplay;
@@ -49,6 +57,7 @@ class MainWindow : public QMainWindow
 public slots:
     void actCheckCardUpdates();
     void actCheckServerUpdates();
+    void actCheckClientUpdates();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -71,7 +80,6 @@ private slots:
     void actDisconnect();
     void actSinglePlayer();
     void actWatchReplay();
-    void actDeckEditor();
     void actFullScreen(bool checked);
     void actRegister();
     void actSettings();
@@ -81,6 +89,7 @@ private slots:
     void actTips();
     void actUpdate();
     void actViewLog();
+    void actOpenSettingsFolder();
     void forgotPasswordSuccess();
     void forgotPasswordError();
     void promptForgotPasswordReset();
@@ -95,9 +104,12 @@ private slots:
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
     void cardDatabaseAllNewSetsEnabled();
 
+    void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
     void actAddCustomSet();
+    void actReloadCardDatabase();
 
     void actManageSets();
     void actEditTokens();
@@ -121,11 +133,14 @@ private:
     };
     void exitCardDatabaseUpdate();
 
+    void startLocalGame(int numberPlayers);
+
     QList<QMenu *> tabMenus;
-    QMenu *cockatriceMenu, *dbMenu, *helpMenu, *trayIconMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aDeckEditor, *aFullScreen, *aSettings, *aExit,
-        *aAbout, *aTips, *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets,
-        *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aShow;
+    QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
+    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aFullScreen, *aSettings, *aExit, *aAbout, *aTips,
+        *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets, *aEditTokens,
+        *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase, *aShow, *aOpenSettingsFolder;
+
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
     RemoteClient *client;
@@ -147,6 +162,11 @@ public:
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
     ~MainWindow() override;
+
+    TabSupervisor *getTabSupervisor() const
+    {
+        return tabSupervisor;
+    }
 
 protected:
     void closeEvent(QCloseEvent *event) override;

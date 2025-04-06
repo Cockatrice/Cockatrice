@@ -6,6 +6,7 @@
 ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), owner(_owner), beingPointedAt(false)
 {
+    setFlag(ItemSendsScenePositionChanges);
 }
 
 ArrowTarget::~ArrowTarget()
@@ -24,4 +25,17 @@ void ArrowTarget::setBeingPointedAt(bool _beingPointedAt)
 {
     beingPointedAt = _beingPointedAt;
     update();
+}
+
+QVariant ArrowTarget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemScenePositionHasChanged && scene()) {
+        for (auto *arrow : arrowsFrom)
+            arrow->updatePath();
+
+        for (auto *arrow : arrowsTo)
+            arrow->updatePath();
+    }
+
+    return QGraphicsItem::itemChange(change, value);
 }

@@ -15,10 +15,14 @@ set(oracle_SOURCES
     src/oraclewizard.cpp
     src/oracleimporter.cpp
     src/pagetemplates.cpp
+    src/parsehelpers.cpp
     src/qt-json/json.cpp
     ../cockatrice/src/game/cards/card_database.cpp
     ../cockatrice/src/game/cards/card_database_manager.cpp
-    ../cockatrice/src/client/ui/picture_loader.cpp
+    ../cockatrice/src/game/cards/card_info.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader_worker.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp
     ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
@@ -28,9 +32,12 @@ set(oracle_SOURCES
     ../cockatrice/src/settings/servers_settings.cpp
     ../cockatrice/src/settings/settings_manager.cpp
     ../cockatrice/src/settings/message_settings.cpp
+    ../cockatrice/src/settings/recents_settings.cpp
     ../cockatrice/src/settings/game_filters_settings.cpp
     ../cockatrice/src/settings/layouts_settings.cpp
     ../cockatrice/src/settings/download_settings.cpp
+    ../cockatrice/src/settings/card_override_settings.cpp
+    ../cockatrice/src/settings/debug_settings.cpp
     ../cockatrice/src/client/ui/theme_manager.cpp
     ../cockatrice/src/client/network/release_channel.cpp
     ${VERSION_STRING_CPP}

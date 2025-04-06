@@ -134,6 +134,7 @@ set(PROTO_FILES
     response_viewlog_history.proto
     response_warn_history.proto
     response_warn_list.proto
+    response_get_admin_notes.proto
     response.proto
     room_commands.proto
     room_event.proto

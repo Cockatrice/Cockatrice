@@ -3,8 +3,12 @@
 
 #include <QGraphicsScene>
 #include <QList>
+#include <QLoggingCategory>
 #include <QPointer>
 #include <QSet>
+
+inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
+inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
 
 class Player;
 class ZoneViewWidget;
@@ -33,8 +37,8 @@ private:
     void updateHover(const QPointF &scenePos);
 
 public:
-    GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
-    ~GameScene();
+    explicit GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
+    ~GameScene() override;
     void retranslateUi();
     void processViewSizeChange(const QSize &newSize);
     QTransform getViewTransform() const;
@@ -47,7 +51,7 @@ public:
     void registerAnimationItem(AbstractCardItem *item);
     void unregisterAnimationItem(AbstractCardItem *card);
 public slots:
-    void toggleZoneView(Player *player, const QString &zoneName, int numberCards);
+    void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
     void addRevealedZoneView(Player *player,
                              CardZone *zone,
                              const QList<const ServerInfo_Card *> &cardList,
@@ -61,8 +65,8 @@ public slots:
     void rearrange();
 
 protected:
-    bool event(QEvent *event);
-    void timerEvent(QTimerEvent *event);
+    bool event(QEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint);

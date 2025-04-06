@@ -40,6 +40,8 @@
 #include "../../settings/cache_settings.h"
 #include "../../utility/logger.h"
 #include "../get_text_with_max.h"
+#include "../network/client_update_checker.h"
+#include "../network/release_channel.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "pb/event_connection_closed.pb.h"
@@ -80,6 +82,11 @@ const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 
+/**
+ * Replaces the tab-specific menus that are shown in the menuBar.
+ *
+ * @param newMenuList The tab-specific menus to show in the menuBar
+ */
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
     for (auto &tabMenu : tabMenus)
@@ -191,7 +198,7 @@ void MainWindow::activateAccepted()
 void MainWindow::actConnect()
 {
     dlgConnect = new DlgConnect(this);
-    connect(dlgConnect, SIGNAL(sigStartForgotPasswordRequest()), this, SLOT(actForgotPasswordRequest()));
+    connect(dlgConnect, &DlgConnect::sigStartForgotPasswordRequest, this, &MainWindow::actForgotPasswordRequest);
 
     if (dlgConnect->exec()) {
         client->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
@@ -221,6 +228,11 @@ void MainWindow::actSinglePlayer()
     if (!ok)
         return;
 
+    startLocalGame(numberPlayers);
+}
+
+void MainWindow::startLocalGame(int numberPlayers)
+{
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
     aForgotPassword->setEnabled(false);
@@ -276,11 +288,6 @@ void MainWindow::localGameEnded()
     aRegister->setEnabled(true);
     aForgotPassword->setEnabled(true);
     aSinglePlayer->setEnabled(true);
-}
-
-void MainWindow::actDeckEditor()
-{
-    tabSupervisor->addDeckEditorTab(nullptr);
 }
 
 void MainWindow::actFullScreen(bool checked)
@@ -352,6 +359,12 @@ void MainWindow::actViewLog()
     logviewDialog->show();
     logviewDialog->raise();
     logviewDialog->activateWindow();
+}
+
+void MainWindow::actOpenSettingsFolder()
+{
+    QString dir = SettingsCache::instance().getSettingsPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void MainWindow::serverTimeout()
@@ -646,7 +659,6 @@ void MainWindow::retranslateUi()
     aDisconnect->setText(tr("&Disconnect"));
     aSinglePlayer->setText(tr("Start &local game..."));
     aWatchReplay->setText(tr("&Watch replay..."));
-    aDeckEditor->setText(tr("&Deck editor"));
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
@@ -666,6 +678,9 @@ void MainWindow::retranslateUi()
     aOpenCustomFolder->setText(tr("Open custom image folder"));
     aOpenCustomsetsFolder->setText(tr("Open custom sets folder"));
     aAddCustomSet->setText(tr("Add custom sets/cards"));
+    aReloadCardDatabase->setText(tr("Reload card database"));
+
+    tabsMenu->setTitle(tr("Tabs"));
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
@@ -673,6 +688,7 @@ void MainWindow::retranslateUi()
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aViewLog->setText(tr("View &Debug Log"));
+    aOpenSettingsFolder->setText(tr("Open Settings Folder"));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -682,52 +698,54 @@ void MainWindow::retranslateUi()
 void MainWindow::createActions()
 {
     aConnect = new QAction(this);
-    connect(aConnect, SIGNAL(triggered()), this, SLOT(actConnect()));
+    connect(aConnect, &QAction::triggered, this, &MainWindow::actConnect);
     aDisconnect = new QAction(this);
     aDisconnect->setEnabled(false);
-    connect(aDisconnect, SIGNAL(triggered()), this, SLOT(actDisconnect()));
+    connect(aDisconnect, &QAction::triggered, this, &MainWindow::actDisconnect);
     aSinglePlayer = new QAction(this);
-    connect(aSinglePlayer, SIGNAL(triggered()), this, SLOT(actSinglePlayer()));
+    connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
-    connect(aWatchReplay, SIGNAL(triggered()), this, SLOT(actWatchReplay()));
-    aDeckEditor = new QAction(this);
-    connect(aDeckEditor, SIGNAL(triggered()), this, SLOT(actDeckEditor()));
+    connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
-    connect(aFullScreen, SIGNAL(toggled(bool)), this, SLOT(actFullScreen(bool)));
+    connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
     aRegister = new QAction(this);
-    connect(aRegister, SIGNAL(triggered()), this, SLOT(actRegister()));
+    connect(aRegister, &QAction::triggered, this, &MainWindow::actRegister);
     aForgotPassword = new QAction(this);
-    connect(aForgotPassword, SIGNAL(triggered()), this, SLOT(actForgotPasswordRequest()));
+    connect(aForgotPassword, &QAction::triggered, this, &MainWindow::actForgotPasswordRequest);
     aSettings = new QAction(this);
-    connect(aSettings, SIGNAL(triggered()), this, SLOT(actSettings()));
+    connect(aSettings, &QAction::triggered, this, &MainWindow::actSettings);
     aExit = new QAction(this);
-    connect(aExit, SIGNAL(triggered()), this, SLOT(actExit()));
+    connect(aExit, &QAction::triggered, this, &MainWindow::actExit);
 
     aManageSets = new QAction(QString(), this);
-    connect(aManageSets, SIGNAL(triggered()), this, SLOT(actManageSets()));
+    connect(aManageSets, &QAction::triggered, this, &MainWindow::actManageSets);
     aEditTokens = new QAction(QString(), this);
-    connect(aEditTokens, SIGNAL(triggered()), this, SLOT(actEditTokens()));
+    connect(aEditTokens, &QAction::triggered, this, &MainWindow::actEditTokens);
     aOpenCustomFolder = new QAction(QString(), this);
-    connect(aOpenCustomFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomFolder()));
+    connect(aOpenCustomFolder, &QAction::triggered, this, &MainWindow::actOpenCustomFolder);
     aOpenCustomsetsFolder = new QAction(QString(), this);
-    connect(aOpenCustomsetsFolder, SIGNAL(triggered()), this, SLOT(actOpenCustomsetsFolder()));
+    connect(aOpenCustomsetsFolder, &QAction::triggered, this, &MainWindow::actOpenCustomsetsFolder);
     aAddCustomSet = new QAction(QString(), this);
-    connect(aAddCustomSet, SIGNAL(triggered()), this, SLOT(actAddCustomSet()));
+    connect(aAddCustomSet, &QAction::triggered, this, &MainWindow::actAddCustomSet);
+    aReloadCardDatabase = new QAction(QString(), this);
+    connect(aReloadCardDatabase, &QAction::triggered, this, &MainWindow::actReloadCardDatabase);
 
     aAbout = new QAction(this);
-    connect(aAbout, SIGNAL(triggered()), this, SLOT(actAbout()));
+    connect(aAbout, &QAction::triggered, this, &MainWindow::actAbout);
     aTips = new QAction(this);
-    connect(aTips, SIGNAL(triggered()), this, SLOT(actTips()));
+    connect(aTips, &QAction::triggered, this, &MainWindow::actTips);
     aUpdate = new QAction(this);
-    connect(aUpdate, SIGNAL(triggered()), this, SLOT(actUpdate()));
+    connect(aUpdate, &QAction::triggered, this, &MainWindow::actUpdate);
     aCheckCardUpdates = new QAction(this);
-    connect(aCheckCardUpdates, SIGNAL(triggered()), this, SLOT(actCheckCardUpdates()));
+    connect(aCheckCardUpdates, &QAction::triggered, this, &MainWindow::actCheckCardUpdates);
     aViewLog = new QAction(this);
-    connect(aViewLog, SIGNAL(triggered()), this, SLOT(actViewLog()));
+    connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
+    aOpenSettingsFolder = new QAction(this);
+    connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
 
     aShow = new QAction(this);
-    connect(aShow, SIGNAL(triggered()), this, SLOT(actShow()));
+    connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
 
 #if defined(__APPLE__) /* For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
@@ -774,8 +792,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
-    cockatriceMenu->addAction(aDeckEditor);
-    cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
     cockatriceMenu->addAction(aSettings);
@@ -788,6 +804,10 @@ void MainWindow::createMenus()
     dbMenu->addAction(aOpenCustomFolder);
     dbMenu->addAction(aOpenCustomsetsFolder);
     dbMenu->addAction(aAddCustomSet);
+    dbMenu->addSeparator();
+    dbMenu->addAction(aReloadCardDatabase);
+
+    tabsMenu = menuBar()->addMenu(QString());
 
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->addAction(aAbout);
@@ -797,39 +817,37 @@ void MainWindow::createMenus()
     helpMenu->addAction(aCheckCardUpdates);
     helpMenu->addSeparator();
     helpMenu->addAction(aViewLog);
+    helpMenu->addAction(aOpenSettingsFolder);
 }
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
-    connect(&SettingsCache::instance(), SIGNAL(pixmapCacheSizeChanged(int)), this, SLOT(pixmapCacheSizeChanged(int)));
+    connect(&SettingsCache::instance(), &SettingsCache::pixmapCacheSizeChanged, this,
+            &MainWindow::pixmapCacheSizeChanged);
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
     client = new RemoteClient;
-    connect(client, SIGNAL(connectionClosedEventReceived(const Event_ConnectionClosed &)), this,
-            SLOT(processConnectionClosedEvent(const Event_ConnectionClosed &)));
-    connect(client, SIGNAL(serverShutdownEventReceived(const Event_ServerShutdown &)), this,
-            SLOT(processServerShutdownEvent(const Event_ServerShutdown &)));
-    connect(client, SIGNAL(loginError(Response::ResponseCode, QString, quint32, QList<QString>)), this,
-            SLOT(loginError(Response::ResponseCode, QString, quint32, QList<QString>)));
-    connect(client, SIGNAL(socketError(const QString &)), this, SLOT(socketError(const QString &)));
-    connect(client, SIGNAL(serverTimeout()), this, SLOT(serverTimeout()));
-    connect(client, SIGNAL(statusChanged(ClientStatus)), this, SLOT(statusChanged(ClientStatus)));
-    connect(client, SIGNAL(protocolVersionMismatch(int, int)), this, SLOT(protocolVersionMismatch(int, int)));
-    connect(client, SIGNAL(userInfoChanged(const ServerInfo_User &)), this,
-            SLOT(userInfoReceived(const ServerInfo_User &)), Qt::BlockingQueuedConnection);
-    connect(client, SIGNAL(notifyUserAboutUpdate()), this, SLOT(notifyUserAboutUpdate()));
-    connect(client, SIGNAL(registerAccepted()), this, SLOT(registerAccepted()));
-    connect(client, SIGNAL(registerAcceptedNeedsActivate()), this, SLOT(registerAcceptedNeedsActivate()));
-    connect(client, SIGNAL(registerError(Response::ResponseCode, QString, quint32)), this,
-            SLOT(registerError(Response::ResponseCode, QString, quint32)));
-    connect(client, SIGNAL(activateAccepted()), this, SLOT(activateAccepted()));
-    connect(client, SIGNAL(activateError()), this, SLOT(activateError()));
-    connect(client, SIGNAL(sigForgotPasswordSuccess()), this, SLOT(forgotPasswordSuccess()));
-    connect(client, SIGNAL(sigForgotPasswordError()), this, SLOT(forgotPasswordError()));
-    connect(client, SIGNAL(sigPromptForForgotPasswordReset()), this, SLOT(promptForgotPasswordReset()));
-    connect(client, SIGNAL(sigPromptForForgotPasswordChallenge()), this, SLOT(promptForgotPasswordChallenge()));
+    connect(client, &RemoteClient::connectionClosedEventReceived, this, &MainWindow::processConnectionClosedEvent);
+    connect(client, &RemoteClient::serverShutdownEventReceived, this, &MainWindow::processServerShutdownEvent);
+    connect(client, &RemoteClient::loginError, this, &MainWindow::loginError);
+    connect(client, &RemoteClient::socketError, this, &MainWindow::socketError);
+    connect(client, &RemoteClient::serverTimeout, this, &MainWindow::serverTimeout);
+    connect(client, &RemoteClient::statusChanged, this, &MainWindow::statusChanged);
+    connect(client, &RemoteClient::protocolVersionMismatch, this, &MainWindow::protocolVersionMismatch);
+    connect(client, &RemoteClient::userInfoChanged, this, &MainWindow::userInfoReceived, Qt::BlockingQueuedConnection);
+    connect(client, &RemoteClient::notifyUserAboutUpdate, this, &MainWindow::notifyUserAboutUpdate);
+    connect(client, &RemoteClient::registerAccepted, this, &MainWindow::registerAccepted);
+    connect(client, &RemoteClient::registerAcceptedNeedsActivate, this, &MainWindow::registerAcceptedNeedsActivate);
+    connect(client, &RemoteClient::registerError, this, &MainWindow::registerError);
+    connect(client, &RemoteClient::activateAccepted, this, &MainWindow::activateAccepted);
+    connect(client, &RemoteClient::activateError, this, &MainWindow::activateError);
+    connect(client, &RemoteClient::sigForgotPasswordSuccess, this, &MainWindow::forgotPasswordSuccess);
+    connect(client, &RemoteClient::sigForgotPasswordError, this, &MainWindow::forgotPasswordError);
+    connect(client, &RemoteClient::sigPromptForForgotPasswordReset, this, &MainWindow::promptForgotPasswordReset);
+    connect(client, &RemoteClient::sigPromptForForgotPasswordChallenge, this,
+            &MainWindow::promptForgotPasswordChallenge);
 
     clientThread = new QThread(this);
     client->moveToThread(clientThread);
@@ -838,11 +856,11 @@ MainWindow::MainWindow(QWidget *parent)
     createActions();
     createMenus();
 
-    tabSupervisor = new TabSupervisor(client);
-    connect(tabSupervisor, SIGNAL(setMenu(QList<QMenu *>)), this, SLOT(updateTabMenu(QList<QMenu *>)));
-    connect(tabSupervisor, SIGNAL(localGameEnded()), this, SLOT(localGameEnded()));
-    connect(tabSupervisor, SIGNAL(showWindowIfHidden()), this, SLOT(showWindowIfHidden()));
-    tabSupervisor->addDeckEditorTab(nullptr);
+    tabSupervisor = new TabSupervisor(client, tabsMenu, this);
+    connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
+    connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
+    connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
+    tabSupervisor->initStartupTabs();
 
     setCentralWidget(tabSupervisor);
 
@@ -857,14 +875,16 @@ MainWindow::MainWindow(QWidget *parent)
         createTrayIcon();
     }
 
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &MainWindow::refreshShortcuts);
     refreshShortcuts();
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseLoadingFailed()), this,
-            SLOT(cardDatabaseLoadingFailed()));
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseNewSetsFound(int, QStringList)), this,
-            SLOT(cardDatabaseNewSetsFound(int, QStringList)));
-    connect(CardDatabaseManager::getInstance(), SIGNAL(cardDatabaseAllNewSetsEnabled()), this,
-            SLOT(cardDatabaseAllNewSetsEnabled()));
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFailed, this,
+            &MainWindow::cardDatabaseLoadingFailed);
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseNewSetsFound, this,
+            &MainWindow::cardDatabaseNewSetsFound);
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseAllNewSetsEnabled, this,
+            &MainWindow::cardDatabaseAllNewSetsEnabled);
 
     tip = new DlgTipOfTheDay();
 
@@ -874,28 +894,39 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
+        startLocalGame(SettingsCache::instance().debug().getLocalGamePlayerCount());
+    }
+
+    if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+        actCheckClientUpdates();
+    }
+
     if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
-        qDebug() << "Startup: old client version empty, assuming first start after clean install";
+        qCInfo(WindowMainStartupVersionLog)
+            << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
+        SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
-        qDebug() << "Startup: old client version" << SettingsCache::instance().getClientVersion()
-                 << "differs, assuming first start after update";
+        qCInfo(WindowMainStartupVersionLog)
+            << "Startup: old client version" << SettingsCache::instance().getClientVersion()
+            << "differs, assuming first start after update";
         if (SettingsCache::instance().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
             const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
 
-        qDebug() << "[MainWindow] Migrating shortcuts after update detected.";
+        qCInfo(WindowMainStartupShortcutsLog) << "[MainWindow] Migrating shortcuts after update detected.";
         SettingsCache::instance().shortcuts().migrateShortcuts();
 
         SettingsCache::instance().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
-        qDebug() << "Startup: found config with current version";
+        qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
         const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
@@ -987,7 +1018,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     bClosingDown = true;
 
-    if (!tabSupervisor->closeRequest()) {
+    if (!tabSupervisor->close()) {
         event->ignore();
         bClosingDown = false;
         return;
@@ -1007,10 +1038,11 @@ void MainWindow::changeEvent(QEvent *event)
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
             if (!connectTo.isEmpty()) {
-                qDebug() << "Command line connect to " << connectTo;
+                qCInfo(WindowMainStartupAutoconnectLog) << "Command line connect to " << connectTo;
                 client->connectToServer(connectTo.host(), connectTo.port(), connectTo.userName(), connectTo.password());
-            } else if (SettingsCache::instance().servers().getAutoConnect()) {
-                qDebug() << "Attempting auto-connect...";
+            } else if (SettingsCache::instance().servers().getAutoConnect() &&
+                       !SettingsCache::instance().debug().getLocalGameOnStartup()) {
+                qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 client->connectToServer(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(),
                                         dlg.getPassword());
@@ -1113,8 +1145,8 @@ void MainWindow::actCheckCardUpdates()
 
     connect(cardUpdateProcess, &QProcess::errorOccurred, this, &MainWindow::cardUpdateError);
 
-    connect(cardUpdateProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(cardUpdateFinished(int, QProcess::ExitStatus)));
+    connect(cardUpdateProcess, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            &MainWindow::cardUpdateFinished);
 
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
@@ -1181,28 +1213,31 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     QString error;
     switch (err) {
         case QProcess::FailedToStart:
-            error = tr("failed to start.");
+            error = tr("Failed to start. The file might be missing, or permissions might be incorrect.");
             break;
         case QProcess::Crashed:
-            error = tr("crashed.");
+            error = tr("The process crashed some time after starting successfully.");
+            error += "\n\nError output:\n" + cardUpdateProcess->readAllStandardError();
             break;
         case QProcess::Timedout:
-            error = tr("timed out.");
+            error = tr("Timed out. The process took too long to respond. The last waitFor...() function timed out.");
             break;
         case QProcess::WriteError:
-            error = tr("write error.");
+            error = tr("An error occurred when attempting to write to the process. For example, the process may "
+                       "not be running, or it may have closed its input channel.");
             break;
         case QProcess::ReadError:
-            error = tr("read error.");
+            error = tr("An error occurred when attempting to read from the process. For example, the process may "
+                       "not be running.");
             break;
         case QProcess::UnknownError:
         default:
-            error = tr("unknown error.");
+            error = tr("Unknown error occurred.");
             break;
     }
 
     exitCardDatabaseUpdate();
-    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error: %1").arg(error));
+    QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
 }
 
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
@@ -1217,6 +1252,21 @@ void MainWindow::actCheckServerUpdates()
     connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, [=]() { hps->deleteLater(); });
 }
 
+void MainWindow::actCheckClientUpdates()
+{
+    auto checker = new ClientUpdateChecker(this);
+    connect(checker, &ClientUpdateChecker::finishedCheck, this, &MainWindow::checkClientUpdatesFinished);
+    checker->check();
+}
+
+void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompatible */, Release * /* release */)
+{
+    if (needToUpdate) {
+        DlgUpdate dlg(this);
+        dlg.exec();
+    }
+}
+
 void MainWindow::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
@@ -1224,7 +1274,6 @@ void MainWindow::refreshShortcuts()
     aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
     aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
     aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
-    aDeckEditor->setShortcuts(shortcuts.getShortcut("MainWindow/aDeckEditor"));
     aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
     aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));
@@ -1322,6 +1371,14 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     }
 
     return maxIndex + 1;
+}
+
+void MainWindow::actReloadCardDatabase()
+{
+    const auto reloadOk1 = QtConcurrent::run([] {
+        CardDatabaseManager::getInstance()->loadCardDatabases();
+        SettingsCache::instance().downloads().sync();
+    });
 }
 
 void MainWindow::actManageSets()

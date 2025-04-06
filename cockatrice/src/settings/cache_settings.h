@@ -3,16 +3,22 @@
 
 #include "../utility/macros.h"
 #include "card_database_settings.h"
+#include "card_override_settings.h"
+#include "debug_settings.h"
 #include "download_settings.h"
 #include "game_filters_settings.h"
 #include "layouts_settings.h"
 #include "message_settings.h"
+#include "recents_settings.h"
 #include "servers_settings.h"
 #include "shortcuts_settings.h"
 
+#include <QLoggingCategory>
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+
+inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
 class ReleaseChannel;
 
@@ -41,6 +47,7 @@ class QSettings;
 class SettingsCache : public QObject
 {
     Q_OBJECT
+
 signals:
     void langChanged();
     void picsPathChanged();
@@ -48,6 +55,19 @@ signals:
     void themeChanged();
     void picDownloadChanged();
     void displayCardNamesChanged();
+    void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);
+    void bumpSetsWithCardsInDeckToTopChanged();
+    void printingSelectorSortOrderChanged();
+    void printingSelectorCardSizeChanged();
+    void includeRebalancedCardsChanged(bool _includeRebalancedCards);
+    void printingSelectorNavigationButtonsVisibleChanged();
+    void visualDeckStorageShowTagFilterChanged(bool _visible);
+    void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
+    void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
+    void visualDeckStorageCardSizeChanged();
+    void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
+    void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
+    void visualDeckStorageInGameChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -64,6 +84,7 @@ signals:
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
+    void roundCardCornersChanged(bool roundCardCorners);
 
 private:
     QSettings *settings;
@@ -74,6 +95,9 @@ private:
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
     DownloadSettings *downloadSettings;
+    RecentsSettings *recentsSettings;
+    CardOverrideSettings *cardOverrideSettings;
+    DebugSettings *debugSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -81,6 +105,9 @@ private:
     QString lang;
     QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
+    bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
+        tabLogOpen;
+    bool checkUpdatesOnStartup;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -93,23 +120,46 @@ private:
     bool spectatorNotificationsEnabled;
     bool buddyConnectNotificationsEnabled;
     bool doubleClickToPlay;
+    bool clickPlaysAllSelected;
     bool playToStack;
     int startingHandSize;
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
+    bool showShortcuts;
     bool displayCardNames;
+    bool overrideAllCardArtWithPersonalPreference;
+    bool bumpSetsWithCardsInDeckToTop;
+    int printingSelectorSortOrder;
+    int printingSelectorCardSize;
+    bool includeRebalancedCards;
+    bool printingSelectorNavigationButtonsVisible;
+    int visualDeckStorageSortingOrder;
+    bool visualDeckStorageShowFolders;
+    bool visualDeckStorageShowBannerCardComboBox;
+    bool visualDeckStorageShowTagsOnDeckPreviews;
+    bool visualDeckStorageShowTagFilter;
+    bool visualDeckStorageSearchFolderNames;
+    int visualDeckStorageCardSize;
+    bool visualDeckStorageDrawUnusedColorIdentities;
+    int visualDeckStorageUnusedColorIdentitiesOpacity;
+    bool visualDeckStoragePromptForConversion;
+    bool visualDeckStorageAlwaysConvert;
+    bool visualDeckStorageInGame;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
     bool tapAnimation;
+    bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
+    int rewindBufferingMs;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
     QString chatHighlightColor;
     bool chatMentionForeground;
     bool chatHighlightForeground;
-    bool zoneViewSortByName, zoneViewSortByType, zoneViewPileView;
+    int zoneViewSortByIndex, zoneViewGroupByIndex;
+    bool zoneViewPileView;
     bool soundEnabled;
     QString soundThemeName;
     bool ignoreUnregisteredUsers;
@@ -120,6 +170,9 @@ private:
     QString clientVersion;
     QString knownMissingFeatures;
     bool useTearOffMenus;
+    int cardViewInitialRowsMax;
+    int cardViewExpandedRowsMax;
+    bool closeEmptyCardView;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -142,6 +195,7 @@ private:
     bool spectatorsCanTalk;
     bool spectatorsCanSeeEverything;
     bool createGameAsSpectator;
+    int defaultStartingLifeTotal;
     int keepalive;
     int timeout;
     void translateLegacySettings();
@@ -151,6 +205,7 @@ private:
     bool rememberGameSettings;
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
+    bool roundCardCorners;
 
 public:
     SettingsCache();
@@ -218,6 +273,34 @@ public:
     {
         return themeName;
     }
+    bool getTabVisualDeckStorageOpen() const
+    {
+        return tabVisualDeckStorageOpen;
+    }
+    bool getTabServerOpen() const
+    {
+        return tabServerOpen;
+    }
+    bool getTabAccountOpen() const
+    {
+        return tabAccountOpen;
+    }
+    bool getTabDeckStorageOpen() const
+    {
+        return tabDeckStorageOpen;
+    }
+    bool getTabReplaysOpen() const
+    {
+        return tabReplaysOpen;
+    }
+    bool getTabAdminOpen() const
+    {
+        return tabAdminOpen;
+    }
+    bool getTabLogOpen() const
+    {
+        return tabLogOpen;
+    }
     QString getChatMentionColor() const
     {
         return chatMentionColor;
@@ -242,6 +325,10 @@ public:
     {
         return buddyConnectNotificationsEnabled;
     }
+    bool getCheckUpdatesOnStartup() const
+    {
+        return checkUpdatesOnStartup;
+    }
     bool getNotifyAboutUpdates() const
     {
         return notifyAboutUpdates;
@@ -258,9 +345,13 @@ public:
     {
         return seenTips;
     }
+    int getUpdateReleaseChannelIndex() const
+    {
+        return updateReleaseChannel;
+    }
     ReleaseChannel *getUpdateReleaseChannel() const
     {
-        return releaseChannels.at(updateReleaseChannel);
+        return releaseChannels.at(qMax(0, updateReleaseChannel));
     }
     QList<ReleaseChannel *> getUpdateReleaseChannels() const
     {
@@ -270,6 +361,10 @@ public:
     bool getDoubleClickToPlay() const
     {
         return doubleClickToPlay;
+    }
+    bool getClickPlaysAllSelected() const
+    {
+        return clickPlaysAllSelected;
     }
     bool getPlayToStack() const
     {
@@ -287,9 +382,85 @@ public:
     {
         return tabGameSplitterSizes;
     }
+    bool getShowShortcuts() const
+    {
+        return showShortcuts;
+    }
     bool getDisplayCardNames() const
     {
         return displayCardNames;
+    }
+    bool getOverrideAllCardArtWithPersonalPreference() const
+    {
+        return overrideAllCardArtWithPersonalPreference;
+    }
+    bool getBumpSetsWithCardsInDeckToTop() const
+    {
+        return bumpSetsWithCardsInDeckToTop;
+    }
+    int getPrintingSelectorSortOrder() const
+    {
+        return printingSelectorSortOrder;
+    }
+    int getPrintingSelectorCardSize() const
+    {
+        return printingSelectorCardSize;
+    }
+    bool getIncludeRebalancedCards() const
+    {
+        return includeRebalancedCards;
+    }
+    bool getPrintingSelectorNavigationButtonsVisible() const
+    {
+        return printingSelectorNavigationButtonsVisible;
+    }
+    int getVisualDeckStorageSortingOrder() const
+    {
+        return visualDeckStorageSortingOrder;
+    }
+    bool getVisualDeckStorageShowFolders() const
+    {
+        return visualDeckStorageShowFolders;
+    }
+    bool getVisualDeckStorageShowTagFilter() const
+    {
+        return visualDeckStorageShowTagFilter;
+    }
+    bool getVisualDeckStorageSearchFolderNames() const
+    {
+        return visualDeckStorageSearchFolderNames;
+    }
+    bool getVisualDeckStorageShowBannerCardComboBox() const
+    {
+        return visualDeckStorageShowBannerCardComboBox;
+    }
+    bool getVisualDeckStorageShowTagsOnDeckPreviews() const
+    {
+        return visualDeckStorageShowTagsOnDeckPreviews;
+    }
+    int getVisualDeckStorageCardSize() const
+    {
+        return visualDeckStorageCardSize;
+    }
+    bool getVisualDeckStorageDrawUnusedColorIdentities() const
+    {
+        return visualDeckStorageDrawUnusedColorIdentities;
+    }
+    int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
+    {
+        return visualDeckStorageUnusedColorIdentitiesOpacity;
+    }
+    bool getVisualDeckStoragePromptForConversion() const
+    {
+        return visualDeckStoragePromptForConversion;
+    }
+    bool getVisualDeckStorageAlwaysConvert() const
+    {
+        return visualDeckStorageAlwaysConvert;
+    }
+    bool getVisualDeckStorageInGame() const
+    {
+        return visualDeckStorageInGame;
     }
     bool getHorizontalHand() const
     {
@@ -307,9 +478,17 @@ public:
     {
         return tapAnimation;
     }
+    bool getAutoRotateSidewaysLayoutCards() const
+    {
+        return autoRotateSidewaysLayoutCards;
+    }
     bool getOpenDeckInNewTab() const
     {
         return openDeckInNewTab;
+    }
+    int getRewindBufferingMs() const
+    {
+        return rewindBufferingMs;
     }
     bool getChatMention() const
     {
@@ -327,13 +506,19 @@ public:
     {
         return chatHighlightForeground;
     }
-    bool getZoneViewSortByName() const
+    /**
+     * Currently selected index for the `Group by X` QComboBox
+     */
+    int getZoneViewGroupByIndex() const
     {
-        return zoneViewSortByName;
+        return zoneViewGroupByIndex;
     }
-    bool getZoneViewSortByType() const
+    /**
+     * Currently selected index for the `Sort by X` QComboBox
+     */
+    int getZoneViewSortByIndex() const
     {
-        return zoneViewSortByType;
+        return zoneViewSortByIndex;
     }
     /**
        Returns if the view should be sorted into pile view.
@@ -444,6 +629,10 @@ public:
     {
         return spectatorsCanSeeEverything;
     }
+    int getDefaultStartingLifeTotal() const
+    {
+        return defaultStartingLifeTotal;
+    }
     bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
@@ -468,6 +657,9 @@ public:
     void setClientVersion(const QString &clientVersion);
     void setKnownMissingFeatures(const QString &_knownMissingFeatures);
     void setUseTearOffMenus(bool _useTearOffMenus);
+    void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
+    void setCardViewExpandedRowsMax(int value);
+    void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     QString getClientID()
     {
         return clientID;
@@ -483,6 +675,18 @@ public:
     bool getUseTearOffMenus()
     {
         return useTearOffMenus;
+    }
+    int getCardViewInitialRowsMax() const
+    {
+        return cardViewInitialRowsMax;
+    }
+    int getCardViewExpandedRowsMax() const
+    {
+        return cardViewExpandedRowsMax;
+    }
+    bool getCloseEmptyCardView() const
+    {
+        return closeEmptyCardView;
     }
     ShortcutsSettings &shortcuts() const
     {
@@ -512,6 +716,18 @@ public:
     {
         return *downloadSettings;
     }
+    RecentsSettings &recents() const
+    {
+        return *recentsSettings;
+    }
+    CardOverrideSettings &cardOverrides() const
+    {
+        return *cardOverrideSettings;
+    }
+    DebugSettings &debug() const
+    {
+        return *debugSettings;
+    }
     bool getIsPortableBuild() const
     {
         return isPortableBuild;
@@ -519,6 +735,10 @@ public:
     bool getDownloadSpoilersStatus() const
     {
         return mbDownloadSpoilers;
+    }
+    bool getRoundCardCorners() const
+    {
+        return roundCardCorners;
     }
 
     static SettingsCache &instance();
@@ -542,6 +762,13 @@ public slots:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
+    void setTabVisualDeckStorageOpen(bool value);
+    void setTabServerOpen(bool value);
+    void setTabAccountOpen(bool value);
+    void setTabDeckStorageOpen(bool value);
+    void setTabReplaysOpen(bool value);
+    void setTabAdminOpen(bool value);
+    void setTabLogOpen(bool value);
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(QT_STATE_CHANGED_T _picDownload);
@@ -549,22 +776,44 @@ public slots:
     void setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T _spectatorNotificationsEnabled);
     void setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T _buddyConnectNotificationsEnabled);
     void setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay);
+    void setClickPlaysAllSelected(QT_STATE_CHANGED_T _clickPlaysAllSelected);
     void setPlayToStack(QT_STATE_CHANGED_T _playToStack);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
+    void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
+    void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
+    void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
+    void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
+    void setPrintingSelectorCardSize(int _printingSelectorCardSize);
+    void setIncludeRebalancedCards(bool _includeRebalancedCards);
+    void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
+    void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
+    void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
+    void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
+    void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
+    void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
+    void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
+    void setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion);
+    void setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert);
+    void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setTapAnimation(QT_STATE_CHANGED_T _tapAnimation);
+    void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
+    void setRewindBufferingMs(int _rewindBufferingMs);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
     void setChatHighlightForeground(QT_STATE_CHANGED_T _chatHighlightForeground);
-    void setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName);
-    void setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType);
+    void setZoneViewGroupByIndex(const int _zoneViewGroupByIndex);
+    void setZoneViewSortByIndex(const int _zoneViewSortByIndex);
     void setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView);
     void setSoundEnabled(QT_STATE_CHANGED_T _soundEnabled);
     void setSoundThemeName(const QString &_soundThemeName);
@@ -592,11 +841,14 @@ public slots:
     void setSpectatorsCanTalk(const bool _spectatorsCanTalk);
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
+    void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
-    void setUpdateReleaseChannel(int _updateReleaseChannel);
+    void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
+    void setRoundCardCorners(bool _roundCardCorners);
 };
 
 #endif

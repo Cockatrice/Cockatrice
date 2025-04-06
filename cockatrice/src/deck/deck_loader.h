@@ -3,11 +3,16 @@
 
 #include "decklist.h"
 
-class DeckLoader : public DeckList
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
+
+    class DeckLoader : public DeckList
 {
     Q_OBJECT
 signals:
     void deckLoaded();
+    void loadFinished(bool success);
 
 public:
     enum FileFormat
@@ -15,7 +20,22 @@ public:
         PlainTextFormat,
         CockatriceFormat
     };
-    static const QStringList fileNameFilters;
+
+    /**
+     * Supported file extensions for decklist files
+     */
+    static const QStringList ACCEPTED_FILE_EXTENSIONS;
+
+    /**
+     * For use with `QFileDialog::setNameFilters`
+     */
+    static const QStringList FILE_NAME_FILTERS;
+
+    enum DecklistWebsite
+    {
+        DecklistOrg,
+        DecklistXyz
+    };
 
 private:
     QString lastFileName;
@@ -24,12 +44,16 @@ private:
 
 public:
     DeckLoader();
-    DeckLoader(const QString &nativeString);
-    DeckLoader(const DeckList &other);
+    explicit DeckLoader(const QString &nativeString);
+    explicit DeckLoader(const DeckList &other);
     DeckLoader(const DeckLoader &other);
     const QString &getLastFileName() const
     {
         return lastFileName;
+    }
+    void setLastFileName(const QString &_lastFileName)
+    {
+        lastFileName = _lastFileName;
     }
     FileFormat getLastFileFormat() const
     {
@@ -40,23 +64,40 @@ public:
         return lastRemoteDeckId;
     }
 
+    bool hasNotBeenLoaded() const
+    {
+        return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
+    }
+
+    void clearSetNamesAndNumbers();
     static FileFormat getFormatFromName(const QString &fileName);
 
-    bool loadFromFile(const QString &fileName, FileFormat fmt);
+    bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
-    QString exportDeckToDecklist();
+    bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
+    QString exportDeckToDecklist(DecklistWebsite website);
+
+    void resolveSetNameAndNumberToProviderID();
+
+    void saveToClipboard(bool addComments = true, bool addSetNameAndNumber = true) const;
 
     // overload
-    bool saveToStream_Plain(QTextStream &out, bool addComments = true);
+    bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
+    bool convertToCockatriceFormat(QString fileName);
 
 protected:
-    void saveToStream_DeckHeader(QTextStream &out);
-    void saveToStream_DeckZone(QTextStream &out, const InnerDecklistNode *zoneNode, bool addComments = true);
+    void saveToStream_DeckHeader(QTextStream &out) const;
+    void saveToStream_DeckZone(QTextStream &out,
+                               const InnerDecklistNode *zoneNode,
+                               bool addComments = true,
+                               bool addSetNameAndNumber = true) const;
     void saveToStream_DeckZoneCards(QTextStream &out,
                                     const InnerDecklistNode *zoneNode,
                                     QList<DecklistCardNode *> cards,
-                                    bool addComments = true);
+                                    bool addComments = true,
+                                    bool addSetNameAndNumber = true) const;
     [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
     [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
 };

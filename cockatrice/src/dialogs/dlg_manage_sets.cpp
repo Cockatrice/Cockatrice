@@ -1,13 +1,14 @@
 #include "dlg_manage_sets.h"
 
 #include "../client/network/sets_model.h"
-#include "../client/ui/picture_loader.h"
+#include "../client/ui/picture_loader/picture_loader.h"
 #include "../deck/custom_line_edit.h"
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 
 #include <QAction>
+#include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -102,6 +103,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
     view->setColumnHidden(SetsModel::IsKnownCol, true);
+    view->setColumnHidden(SetsModel::PriorityCol, true);
     view->setRootIsDecorated(false);
 
     connect(view->header(), SIGNAL(sectionClicked(int)), this, SLOT(actSort(int)));
@@ -161,6 +163,12 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
+    includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
+    QCheckBox *includeRebalancedCardsCheckBox =
+        new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
+    includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
+    connect(includeRebalancedCardsCheckBox, &QAbstractButton::toggled, this, &WndSets::includeRebalancedCardsChanged);
+
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
@@ -174,8 +182,9 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     mainLayout->addWidget(enableSomeButton, 2, 1);
     mainLayout->addWidget(disableSomeButton, 2, 2);
     mainLayout->addWidget(sortWarning, 3, 1, 1, 2);
-    mainLayout->addWidget(hintsGroupBox, 4, 1, 1, 2);
-    mainLayout->addWidget(buttonBox, 5, 1, 1, 2);
+    mainLayout->addWidget(includeRebalancedCardsCheckBox, 4, 1, 1, 2);
+    mainLayout->addWidget(hintsGroupBox, 5, 1, 1, 2);
+    mainLayout->addWidget(buttonBox, 6, 1, 1, 2);
     mainLayout->setColumnStretch(1, 1);
     mainLayout->setColumnStretch(2, 1);
 
@@ -238,9 +247,15 @@ void WndSets::rebuildMainLayout(int actionToTake)
     }
 }
 
+void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
+{
+    includeRebalancedCards = _includeRebalancedCards;
+}
+
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
+    SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
     PictureLoader::clearPixmapCache();
     close();
 }
@@ -254,7 +269,7 @@ void WndSets::actRestore()
 void WndSets::actRestoreOriginalOrder()
 {
     view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
-    model->sort(model->ReleaseDateCol, Qt::DescendingOrder);
+    model->restoreOriginalOrder();
     sortWarning->setVisible(false);
 }
 

@@ -4,7 +4,10 @@
 #include "../game/cards/card_database.h"
 #include "decklist.h"
 
+#include <QLoggingCategory>
 #include <QObject>
+
+inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
 class QByteArray;
 class QNetworkAccessManager;
@@ -24,13 +27,13 @@ private:
     QNetworkAccessManager *manager;
 
     CardDatabase &cardDatabase;
-    void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
+    void copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
 
 public:
-    TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
+    explicit TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
     void analyzeDeck(DeckList *deck);
 };
 

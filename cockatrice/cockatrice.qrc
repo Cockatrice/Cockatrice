@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
         <file>resources/hand.svg</file>
@@ -13,9 +13,12 @@
         <file>resources/icons/arrow_top_green.svg</file>
         <file>resources/icons/arrow_up_green.svg</file>
         <file>resources/icons/clearsearch.svg</file>
+        <file>resources/icons/cogwheel.svg</file>
         <file>resources/icons/conceded.svg</file>
         <file>resources/icons/decrement.svg</file>
         <file>resources/icons/delete.svg</file>
+        <file>resources/icons/dropdown_collapsed.svg</file>
+        <file>resources/icons/dropdown_expanded.svg</file>
         <file>resources/icons/forgot_password.svg</file>
         <file>resources/icons/increment.svg</file>
         <file>resources/icons/info.svg</file>
@@ -24,15 +27,24 @@
         <file>resources/icons/pencil.svg</file>
         <file>resources/icons/player.svg</file>
         <file>resources/icons/ready_start.svg</file>
+        <file>resources/icons/reload.svg</file>
         <file>resources/icons/remove_row.svg</file>
+        <file>resources/icons/rename.svg</file>
         <file>resources/icons/scales.svg</file>
         <file>resources/icons/search.svg</file>
         <file>resources/icons/settings.svg</file>
         <file>resources/icons/spectator.svg</file>
+        <file>resources/icons/swap.svg</file>
         <file>resources/icons/sync.svg</file>
         <file>resources/icons/tab_changed.svg</file>
         <file>resources/icons/update.png</file>
         <file>resources/icons/view.svg</file>
+
+        <file>resources/icons/mana/B.svg</file>
+        <file>resources/icons/mana/G.svg</file>
+        <file>resources/icons/mana/R.svg</file>
+        <file>resources/icons/mana/U.svg</file>
+        <file>resources/icons/mana/W.svg</file>
 
         <file>resources/config/general.svg</file>
         <file>resources/config/appearance.svg</file>
@@ -41,6 +53,8 @@
         <file>resources/config/deckeditor.svg</file>
         <file>resources/config/shorcuts.svg</file>
         <file>resources/config/sound.svg</file>
+        <file>resources/config/debug.ini</file>
+        <file>resources/config/qtlogging.ini</file>
 
         <file>resources/counters/w.svg</file>
         <file>resources/counters/w_highlight.svg</file>
@@ -326,39 +340,42 @@
         <file>resources/replay/fastforward.svg</file>
         <file>resources/replay/pause.svg</file>
 
-        <file>resources/userlevels/normal.svg</file>
-        <file>resources/userlevels/registered.svg</file>
-        <file>resources/userlevels/registered_buddy.svg</file>
-        <file>resources/userlevels/registered_vip.svg</file>
-        <file>resources/userlevels/registered_vip_buddy.svg</file>
-        <file>resources/userlevels/registered_donator.svg</file>
-        <file>resources/userlevels/registered_donator_buddy.svg</file>
-
-        <file>resources/userlevels/moderator.svg</file>
-        <file>resources/userlevels/moderator_buddy.svg</file>
-        <file>resources/userlevels/moderator_vip.svg</file>
-        <file>resources/userlevels/moderator_vip_buddy.svg</file>
-
-        <file>resources/userlevels/admin.svg</file>
-        <file>resources/userlevels/admin_buddy.svg</file>
-        <file>resources/userlevels/admin_vip.svg</file>
-        <file>resources/userlevels/admin_vip_buddy.svg</file>
+        <file>resources/usericons/pawn_single.svg</file>
+        <file>resources/usericons/pawn_double.svg</file>
+        <file>resources/usericons/pawn_donator_single.svg</file>
+        <file>resources/usericons/pawn_donator_double.svg</file>
+        <file>resources/usericons/pawn_judge_single.svg</file>
+        <file>resources/usericons/pawn_judge_double.svg</file>
+        <file>resources/usericons/pawn_vip_single.svg</file>
+        <file>resources/usericons/pawn_vip_double.svg</file>
+        <file>resources/usericons/star_single.svg</file>
+        <file>resources/usericons/star_double.svg</file>
 
         <!-- ADD TIP OF THE DAY IMAGES HERE -->
         <file>resources/tips/images/accounts_tab.png</file>
+        <file>resources/tips/images/add_card.png</file>
         <file>resources/tips/images/arrows.png</file>
+        <file>resources/tips/images/card_select.png</file>
         <file>resources/tips/images/cockatrice_register.png</file>
         <file>resources/tips/images/cockatrice_wiki.png</file>
         <file>resources/tips/images/coin_flip.png</file>
         <file>resources/tips/images/counter_expression.png</file>
         <file>resources/tips/images/discord.png</file>
+        <file>resources/tips/images/edhrec.png</file>
+        <file>resources/tips/images/expand_card_view.png</file>
         <file>resources/tips/images/face_down.png</file>
         <file>resources/tips/images/filter_games.png</file>
         <file>resources/tips/images/github_logo.png</file>
+        <file>resources/tips/images/highlight_cards.png</file>
+        <file>resources/tips/images/pawns.png</file>
         <file>resources/tips/images/setpt.png</file>
         <file>resources/tips/images/shortcuts.png</file>
+        <file>resources/tips/images/syntax_help.png</file>
         <file>resources/tips/images/themes.png</file>
         <file>resources/tips/images/tip_of_the_day.png</file>
+        <file>resources/tips/images/token.png</file>
+        <file>resources/tips/images/updates.png</file>
+        <file>resources/tips/images/visual_deck_tags.png</file>
         <file>resources/tips/tips_of_the_day.xml</file>
 
         <file>resources/help/search.md</file>

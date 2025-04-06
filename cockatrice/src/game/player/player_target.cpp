@@ -101,16 +101,21 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         grad.setColorAt(0, QColor(180, 180, 180));
         tempPainter.fillRect(QRectF(0, 0, translatedSize.width(), translatedSize.height()), grad);
 
-        QPixmap tempPixmap;
-        if (fullPixmap.isNull())
-            tempPixmap =
-                UserLevelPixmapGenerator::generatePixmap(translatedSize.height(), UserLevelFlags(info->user_level()),
-                                                         false, QString::fromStdString(info->privlevel()));
-        else
-            tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        if (fullPixmap.isNull()) {
+            int sideLength = translatedSize.height();
+            QPixmap tempPixmap = UserLevelPixmapGenerator::generatePixmap(
+                sideLength, UserLevelFlags(info->user_level()), info->pawn_colors(), false,
+                QString::fromStdString(info->privlevel()));
+            int x = (translatedSize.width() - sideLength) / 2;
+            int y = 0;
+            tempPainter.drawPixmap(x, y, tempPixmap);
+        } else {
+            QPixmap tempPixmap = fullPixmap.scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            int x = (translatedSize.width() - tempPixmap.width()) / 2;
+            int y = (translatedSize.height() - tempPixmap.height()) / 2;
+            tempPainter.drawPixmap(x, y, tempPixmap);
+        }
 
-        tempPainter.drawPixmap((translatedSize.width() - tempPixmap.width()) / 2,
-                               (translatedSize.height() - tempPixmap.height()) / 2, tempPixmap);
         QPixmapCache::insert(cacheKey, cachedPixmap);
     }
 
@@ -158,7 +163,7 @@ AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, 
     playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this, game);
     playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(),
                           boundingRect().height() - playerCounter->boundingRect().height());
-    connect(playerCounter, SIGNAL(destroyed()), this, SLOT(counterDeleted()));
+    connect(playerCounter, &PlayerCounter::destroyed, this, &PlayerTarget::counterDeleted);
 
     return playerCounter;
 }

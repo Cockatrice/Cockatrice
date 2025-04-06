@@ -1,7 +1,6 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
-#include "../client/tabs/tab_supervisor.h"
 #include "game_type_map.h"
 #include "pb/serverinfo_game.pb.h"
 
@@ -11,6 +10,8 @@
 #include <QSortFilterProxyModel>
 #include <QStringList>
 #include <QTime>
+
+class UserListProxy;
 
 class GamesModel : public QAbstractTableModel
 {
@@ -26,16 +27,16 @@ public:
     static const int SORT_ROLE = Qt::UserRole + 1;
 
     GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = nullptr);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
         return parent.isValid() ? 0 : gameList.size();
     }
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const
+    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override
     {
         return NUM_COLS;
     }
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     static const QString getGameCreatedString(const int secs);
     const ServerInfo_Game &getGame(int row);
 
@@ -65,8 +66,7 @@ class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 private:
-    bool ownUserIsRegistered;
-    const TabSupervisor *tabSupervisor;
+    const UserListProxy *userListProxy;
 
     // If adding any additional filters, make sure to update:
     // - GamesProxyModel()
@@ -75,11 +75,11 @@ private:
     // - loadFilterParameters()
     // - saveFilterParameters()
     // - filterAcceptsRow()
-    bool showBuddiesOnlyGames;
+    bool hideBuddiesOnlyGames;
     bool hideIgnoredUserGames;
-    bool showFullGames;
-    bool showGamesThatStarted;
-    bool showPasswordProtectedGames;
+    bool hideFullGames;
+    bool hideGamesThatStarted;
+    bool hidePasswordProtectedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
@@ -88,33 +88,33 @@ private:
         showOnlyIfSpectatorsCanSeeHands;
 
 public:
-    GamesProxyModel(QObject *parent = nullptr, const TabSupervisor *_tabSupervisor = nullptr);
+    explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
-    bool getShowBuddiesOnlyGames() const
+    bool getHideBuddiesOnlyGames() const
     {
-        return showBuddiesOnlyGames;
+        return hideBuddiesOnlyGames;
     }
-    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
+    void setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const
     {
         return hideIgnoredUserGames;
     }
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
-    bool getShowFullGames() const
+    bool getHideFullGames() const
     {
-        return showFullGames;
+        return hideFullGames;
     }
-    void setShowFullGames(bool _showFullGames);
-    bool getShowGamesThatStarted() const
+    void setHideFullGames(bool _showFullGames);
+    bool getHideGamesThatStarted() const
     {
-        return showGamesThatStarted;
+        return hideGamesThatStarted;
     }
-    void setShowGamesThatStarted(bool _showGamesThatStarted);
-    bool getShowPasswordProtectedGames() const
+    void setHideGamesThatStarted(bool _showGamesThatStarted);
+    bool getHidePasswordProtectedGames() const
     {
-        return showPasswordProtectedGames;
+        return hidePasswordProtectedGames;
     }
-    void setShowPasswordProtectedGames(bool _showPasswordProtectedGames);
+    void setHidePasswordProtectedGames(bool _showPasswordProtectedGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;
@@ -173,7 +173,7 @@ public:
     void refresh();
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     bool filterAcceptsRow(int sourceRow) const;
 };
 

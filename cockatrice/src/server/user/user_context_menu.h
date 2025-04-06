@@ -5,6 +5,7 @@
 
 #include <QObject>
 
+class UserListProxy;
 class AbstractClient;
 class ChatView;
 class CommandContainer;
@@ -22,6 +23,7 @@ class UserContextMenu : public QObject
 private:
     AbstractClient *client;
     TabSupervisor *tabSupervisor;
+    const UserListProxy *userListProxy;
     TabGame *game;
 
     QAction *aUserName;
@@ -35,6 +37,7 @@ private:
     QAction *aPromoteToMod, *aDemoteFromMod;
     QAction *aPromoteToJudge, *aDemoteFromJudge;
     QAction *aWarnUser, *aWarnHistory;
+    QAction *aGetAdminNotes;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 private slots:
@@ -43,9 +46,11 @@ private slots:
     void warnUser_processUserInfoResponse(const Response &resp);
     void banUserHistory_processResponse(const Response &resp);
     void warnUserHistory_processResponse(const Response &resp);
+    void getAdminNotes_processResponse(const Response &resp);
     void adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer);
     void banUser_dialogFinished();
     void warnUser_dialogFinished();
+    void updateAdminNotes_dialogFinished();
     void gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer);
 
 public:

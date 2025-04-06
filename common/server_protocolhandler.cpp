@@ -406,7 +406,11 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
         prepareDestroy();
 
-    if (!userInfo || QString::fromStdString(userInfo->privlevel()).toLower() == "none") {
+    // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
+    const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
+    const bool isModOrAdmin =
+        userInfo && (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
+    if (!hasPrivLevel && !isModOrAdmin) {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();
@@ -786,9 +790,6 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 {
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
-    const int gameId = databaseInterface->getNextGameId();
-    if (gameId == -1)
-        return Response::RespInternalError;
     if (cmd.password().length() > MAX_NAME_LENGTH)
         return Response::RespContextError;
 
@@ -815,13 +816,19 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     }
 
     QString description = nameFromStdString(cmd.description());
+    int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
+
+    const int gameId = databaseInterface->getNextGameId();
+    if (gameId == -1) {
+        return Response::RespInternalError;
+    }
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
     Server_Game *game = new Server_Game(
         copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
         cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
-        cmd.spectators_can_talk(), cmd.spectators_see_everything(), room);
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), startingLifeTotal, room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

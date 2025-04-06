@@ -11,7 +11,6 @@ class PendingCommand : public QObject
     Q_OBJECT
 signals:
     void finished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
-    void finished(Response::ResponseCode respCode);
 
 private:
     CommandContainer commandContainer;
@@ -19,7 +18,7 @@ private:
     int ticks;
 
 public:
-    PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
+    explicit PendingCommand(const CommandContainer &_commandContainer, QVariant _extraData = QVariant());
     CommandContainer &getCommandContainer();
     void setExtraData(const QVariant &_extraData);
     QVariant getExtraData() const;

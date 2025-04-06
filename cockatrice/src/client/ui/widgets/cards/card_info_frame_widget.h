@@ -3,6 +3,7 @@
 
 #include "../../../../game/cards/card_database.h"
 
+#include <QPushButton>
 #include <QTabWidget>
 
 class AbstractCardItem;
@@ -18,10 +19,14 @@ private:
     CardInfoPtr info;
     CardInfoPictureWidget *pic;
     CardInfoTextWidget *text;
+    QPushButton *viewTransformationButton;
     bool cardTextOnly;
     QWidget *tab1, *tab2, *tab3;
     QVBoxLayout *tab1Layout, *tab2Layout, *tab3Layout;
     QSplitter *splitter;
+
+    void setViewTransformationButtonVisibility(bool visible);
+    void refreshLayout();
 
 public:
     enum ViewMode
@@ -30,7 +35,12 @@ public:
         TextOnlyView,
         ImageAndTextView
     };
+
     explicit CardInfoFrameWidget(const QString &cardName = QString(), QWidget *parent = nullptr);
+    CardInfoPtr getInfo()
+    {
+        return info;
+    }
     void retranslateUi();
 
 public slots:
@@ -38,6 +48,7 @@ public slots:
     void setCard(const QString &cardName);
     void setCard(const QString &cardName, const QString &providerId);
     void setCard(AbstractCardItem *card);
+    void viewTransformation();
     void clearCard();
     void setViewMode(int mode);
 };

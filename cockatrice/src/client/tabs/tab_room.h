@@ -9,6 +9,8 @@
 #include <QKeyEvent>
 #include <QMap>
 
+class UserListProxy;
+class UserListManager;
 namespace google
 {
 namespace protobuf
@@ -17,7 +19,7 @@ class Message;
 }
 } // namespace google
 class AbstractClient;
-class UserList;
+class UserListWidget;
 class QLabel;
 class ChatView;
 class QPushButton;
@@ -48,7 +50,8 @@ private:
     QMap<int, QString> gameTypes;
 
     GameSelector *gameSelector;
-    UserList *userList;
+    UserListWidget *userList;
+    const UserListProxy *userListProxy;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
@@ -70,7 +73,6 @@ signals:
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
-    void actLeaveRoom();
     void actClearChat();
     void actOpenChatSettings();
     void addMentionTag(QString mentionTag);
@@ -91,10 +93,9 @@ public:
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
             const ServerInfo_Room &info);
-    ~TabRoom();
-    void retranslateUi();
-    void closeRequest();
-    void tabActivated();
+    void retranslateUi() override;
+    void closeRequest(bool forced = false) override;
+    void tabActivated() override;
     void processRoomEvent(const RoomEvent &event);
     int getRoomId() const
     {
@@ -108,7 +109,7 @@ public:
     {
         return roomName;
     }
-    QString getTabText() const
+    QString getTabText() const override
     {
         return roomName;
     }

@@ -2,10 +2,9 @@
 #define CHATVIEW_H
 
 #include "../../client/tabs/tab_supervisor.h"
-#include "../user/user_list.h"
+#include "../user/user_list_widget.h"
 #include "room_message_type.h"
 #include "user_level.h"
-#include "user_list_proxy.h"
 
 #include <QAction>
 #include <QColor>
@@ -16,6 +15,7 @@
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
+class UserListProxy;
 class TabGame;
 
 class UserMessagePosition
@@ -44,7 +44,7 @@ private:
         HoveredCard,
         HoveredUser
     };
-    const UserlistProxy *const userlistProxy;
+    const UserListProxy *const userListProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
     QString ownUserName;
@@ -83,11 +83,7 @@ private slots:
     void actMessageClicked();
 
 public:
-    ChatView(TabSupervisor *_tabSupervisor,
-             const UserlistProxy *_userlistProxy,
-             TabGame *_game,
-             bool _showTimestamps,
-             QWidget *parent = nullptr);
+    ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
     void virtual appendHtmlServerMessage(const QString &html,
@@ -95,27 +91,25 @@ public:
                                          QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
-                       const QString &userName = QString(),
-                       UserLevelFlags userLevel = UserLevelFlags(),
-                       QString UserPrivLevel = "NONE",
+                       const ServerInfo_User &userInfo = {},
                        bool playerBold = false);
     void clearChat();
     void redactMessages(const QString &userName, int amount);
 
 protected:
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    void enterEvent(QEnterEvent *event);
+    void enterEvent(QEnterEvent *event) override;
 #else
-    void enterEvent(QEvent *event);
+    void enterEvent(QEvent *event) override;
 #endif
-    void leaveEvent(QEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void leaveEvent(QEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void cardNameHovered(QString cardName);
-    void showCardInfoPopup(QPoint pos, QString cardName);
+    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();

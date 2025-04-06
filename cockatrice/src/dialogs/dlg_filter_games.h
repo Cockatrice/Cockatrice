@@ -21,10 +21,10 @@ class DlgFilterGames : public QDialog
     Q_OBJECT
 private:
     QGroupBox *generalGroupBox;
-    QCheckBox *showBuddiesOnlyGames;
-    QCheckBox *showFullGames;
-    QCheckBox *showGamesThatStarted;
-    QCheckBox *showPasswordProtectedGames;
+    QCheckBox *hideBuddiesOnlyGames;
+    QCheckBox *hideFullGames;
+    QCheckBox *hideGamesThatStarted;
+    QCheckBox *hidePasswordProtectedGames;
     QCheckBox *hideIgnoredUserGames;
     QLineEdit *gameNameFilterEdit;
     QLineEdit *creatorNameFilterEdit;
@@ -50,12 +50,12 @@ public:
                    const GamesProxyModel *_gamesProxyModel,
                    QWidget *parent = nullptr);
 
-    bool getShowFullGames() const;
-    bool getShowGamesThatStarted() const;
-    bool getShowPasswordProtectedGames() const;
+    bool getHideFullGames() const;
+    bool getHideGamesThatStarted() const;
+    bool getHidePasswordProtectedGames() const;
     void setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden);
-    bool getShowBuddiesOnlyGames() const;
-    void setShowBuddiesOnlyGames(bool _showBuddiesOnlyGames);
+    bool getHideBuddiesOnlyGames() const;
+    void setHideBuddiesOnlyGames(bool _hideBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const;
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
     QString getGameNameFilter() const;
@@ -67,7 +67,7 @@ public:
     int getMaxPlayersFilterMin() const;
     int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    const QTime &getMaxGameAge() const;
+    QTime getMaxGameAge() const;
     const QMap<QTime, QString> gameAgeMap;
     bool getShowOnlyIfSpectatorsCanWatch() const;
     bool getShowSpectatorPasswordProtected() const;

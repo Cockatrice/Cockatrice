@@ -2,8 +2,11 @@
 #define COCKATRICE_SPOILER_DOWNLOADER_H
 
 #include <QByteArray>
+#include <QLoggingCategory>
 #include <QObject>
 #include <QProcess>
+
+inline Q_LOGGING_CATEGORY(SpoilerBackgroundUpdaterLog, "spoiler_background_updater");
 
 class SpoilerBackgroundUpdater : public QObject
 {

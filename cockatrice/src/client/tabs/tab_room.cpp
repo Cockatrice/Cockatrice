@@ -6,7 +6,8 @@
 #include "../../main.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_manager.h"
+#include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "get_pb_extension.h"
 #include "pb/event_join_room.pb.h"
@@ -37,7 +38,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
                  ServerInfo_User *_ownUser,
                  const ServerInfo_Room &info)
     : Tab(_tabSupervisor), client(_client), roomId(info.room_id()), roomName(QString::fromStdString(info.name())),
-      ownUser(_ownUser)
+      ownUser(_ownUser), userListProxy(_tabSupervisor->getUserListManager())
 {
     const int gameTypeListSize = info.gametype_list_size();
     for (int i = 0; i < gameTypeListSize; ++i)
@@ -47,15 +48,15 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
-    userList = new UserList(tabSupervisor, client, UserList::RoomList);
+    userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
-    chatView = new ChatView(tabSupervisor, tabSupervisor, nullptr, true, this);
+    chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, SIGNAL(showMentionPopup(const QString &)), this, SLOT(actShowMentionPopup(const QString &)));
     connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
     connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
-    connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     connect(&SettingsCache::instance(), SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
@@ -101,7 +102,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     hbox->addWidget(userList, 1);
 
     aLeaveRoom = new QAction(this);
-    connect(aLeaveRoom, SIGNAL(triggered()), this, SLOT(actLeaveRoom()));
+    connect(aLeaveRoom, &QAction::triggered, this, [this] { closeRequest(); });
 
     roomMenu = new QMenu(this);
     roomMenu->addAction(aLeaveRoom);
@@ -133,11 +134,6 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QWidget *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
-}
-
-TabRoom::~TabRoom()
-{
-    emit roomClosing(this);
 }
 
 void TabRoom::retranslateUi()
@@ -175,9 +171,11 @@ void TabRoom::actShowPopup(const QString &message)
     }
 }
 
-void TabRoom::closeRequest()
+void TabRoom::closeRequest(bool /*forced*/)
 {
-    actLeaveRoom();
+    sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
+    emit roomClosing(this);
+    close();
 }
 
 void TabRoom::tabActivated()
@@ -214,12 +212,6 @@ void TabRoom::sayFinished(const Response &response)
 {
     if (response.response_code() == Response::RespChatFlood)
         chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
-}
-
-void TabRoom::actLeaveRoom()
-{
-    sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
-    deleteLater();
 }
 
 void TabRoom::actClearChat()
@@ -291,17 +283,15 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (tabSupervisor->getUserListsTab()->getIgnoreList()->getUsers().contains(senderName))
+    if (userListProxy->isUserIgnored(senderName))
         return;
 
     UserListTWI *twi = userList->getUsers().value(senderName);
-    UserLevelFlags userLevel;
-    QString userPrivLevel;
+    ServerInfo_User userInfo = {};
     if (twi) {
-        userLevel = UserLevelFlags(twi->getUserInfo().user_level());
-        userPrivLevel = QString::fromStdString(twi->getUserInfo().privlevel());
+        userInfo = twi->getUserInfo();
         if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
-            !userLevel.testFlag(ServerInfo_User::IsRegistered))
+            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered))
             return;
     }
 
@@ -314,7 +304,7 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
             QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) +
             "] " + message;
 
-    chatView->appendMessage(message, event.message_type(), senderName, userLevel, userPrivLevel, true);
+    chatView->appendMessage(message, event.message_type(), userInfo, true);
     emit userEvent(false);
 }
 

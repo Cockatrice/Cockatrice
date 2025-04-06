@@ -28,8 +28,6 @@ private:
 
     static constexpr int TIMER_INTERVAL_MS = 200;
     static constexpr int BIN_LENGTH = 5000;
-    static constexpr int BASE_REWIND_BUFFERING_TIMEOUT_MS = 180;
-    static constexpr int MAX_REWIND_BUFFERING_TIMEOUT_MS = 280;
 
     QTimer *replayTimer;
     QTimer *rewindBufferingTimer;
@@ -37,12 +35,13 @@ private:
     QList<int> histogram;
     int maxBinValue, maxTime;
     qreal timeScaleFactor;
-    int currentTime;
+    int currentVisualTime;    // time currently displayed by the timeline
+    int currentProcessedTime; // time that events are currently processed up to. Could differ from visual time due to
+                              // rewind buffering
     int currentEvent;
 
     void skipToTime(int newTime, bool doRewindBuffering);
     void handleBackwardsSkip(bool doRewindBuffering);
-    int calcRewindBufferingTimeout() const;
     void processRewind();
     void processNewEvents(PlaybackMode playbackMode);
 private slots:

@@ -81,8 +81,7 @@ void DlgCreateGame::sharedCtor()
 
     spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators can watch"));
     spectatorsAllowedCheckBox->setChecked(true);
-    connect(spectatorsAllowedCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(spectatorsAllowedChanged(QT_STATE_CHANGED_T)));
+    connect(spectatorsAllowedCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgCreateGame::spectatorsAllowedChanged);
     spectatorsNeedPasswordCheckBox = new QCheckBox(tr("Spectators &need a password to watch"));
     spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
     spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));
@@ -96,12 +95,26 @@ void DlgCreateGame::sharedCtor()
     spectatorsGroupBox = new QGroupBox(tr("Spectators"));
     spectatorsGroupBox->setLayout(spectatorsLayout);
 
+    startingLifeTotalLabel = new QLabel(tr("Starting life total:"));
+    startingLifeTotalEdit = new QSpinBox();
+    startingLifeTotalEdit->setMinimum(1);
+    startingLifeTotalEdit->setMaximum(99999); ///< Arbitrary but we can raise this when people start complaining.
+    startingLifeTotalEdit->setValue(20);
+    startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
+
+    QGridLayout *gameSetupOptionsLayout = new QGridLayout;
+    gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
+    gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
+    gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"));
+    gameSetupOptionsGroupBox->setLayout(gameSetupOptionsLayout);
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(generalGroupBox, 0, 0);
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
     grid->addWidget(gameTypeGroupBox, 1, 0);
     grid->addWidget(spectatorsGroupBox, 1, 1, Qt::AlignTop);
-    grid->addWidget(rememberGameSettings, 2, 0);
+    grid->addWidget(gameSetupOptionsGroupBox, 2, 0);
+    grid->addWidget(rememberGameSettings, 3, 0);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -135,6 +148,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     spectatorsCanTalkCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanTalk());
     spectatorsSeeEverythingCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanSeeEverything());
     createGameAsSpectatorCheckBox->setChecked(SettingsCache::instance().getCreateGameAsSpectator());
+    startingLifeTotalEdit->setValue(SettingsCache::instance().getDefaultStartingLifeTotal());
 
     if (!rememberGameSettings->isChecked()) {
         actReset();
@@ -166,6 +180,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsCanTalkCheckBox->setEnabled(false);
     spectatorsSeeEverythingCheckBox->setEnabled(false);
     createGameAsSpectatorCheckBox->setEnabled(false);
+    startingLifeTotalEdit->setEnabled(false);
 
     descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
     maxPlayersEdit->setValue(gameInfo.max_players());
@@ -209,6 +224,8 @@ void DlgCreateGame::actReset()
     spectatorsSeeEverythingCheckBox->setChecked(false);
     createGameAsSpectatorCheckBox->setChecked(false);
 
+    startingLifeTotalEdit->setValue(20);
+
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();
@@ -235,6 +252,7 @@ void DlgCreateGame::actOK()
     cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
     cmd.set_join_as_judge(QApplication::keyboardModifiers() & Qt::ShiftModifier);
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
+    cmd.set_starting_life_total(startingLifeTotalEdit->value());
 
     QString _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
@@ -257,6 +275,7 @@ void DlgCreateGame::actOK()
         SettingsCache::instance().setSpectatorsCanTalk(spectatorsCanTalkCheckBox->isChecked());
         SettingsCache::instance().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
         SettingsCache::instance().setCreateGameAsSpectator(createGameAsSpectatorCheckBox->isChecked());
+        SettingsCache::instance().setDefaultStartingLifeTotal(startingLifeTotalEdit->value());
         SettingsCache::instance().setGameTypes(_gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);

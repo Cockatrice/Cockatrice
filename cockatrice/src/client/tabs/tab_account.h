@@ -5,25 +5,25 @@
 #include "tab.h"
 
 class AbstractClient;
-class UserList;
-class UserInfoBox;
-class LineEditUnfocusable;
-
+class Event_AddToList;
 class Event_ListRooms;
+class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
+class LineEditUnfocusable;
 class Response;
 class ServerInfo_User;
-class Event_AddToList;
-class Event_RemoveFromList;
+class UserInfoBox;
+class UserListWidget;
 
-class TabUserLists : public Tab
+class TabAccount : public Tab
 {
     Q_OBJECT
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void userLeft(const QString &userName);
     void userJoined(const ServerInfo_User &userInfo);
+
 private slots:
     void processListUsersResponse(const Response &response);
     void processUserJoinedEvent(const Event_UserJoined &event);
@@ -37,35 +37,20 @@ private slots:
 
 private:
     AbstractClient *client;
-    UserList *allUsersList;
-    UserList *buddyList;
-    UserList *ignoreList;
+    UserListWidget *allUsersList;
+    UserListWidget *buddyList;
+    UserListWidget *ignoreList;
     UserInfoBox *userInfoBox;
     LineEditUnfocusable *addBuddyEdit;
     LineEditUnfocusable *addIgnoreEdit;
     void addToList(const std::string &listName, const QString &userName);
 
 public:
-    TabUserLists(TabSupervisor *_tabSupervisor,
-                 AbstractClient *_client,
-                 const ServerInfo_User &userInfo,
-                 QWidget *parent = nullptr);
-    void retranslateUi();
-    QString getTabText() const
+    explicit TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo);
+    void retranslateUi() override;
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Account");
-    }
-    const UserList *getAllUsersList() const
-    {
-        return allUsersList;
-    }
-    const UserList *getBuddyList() const
-    {
-        return buddyList;
-    }
-    const UserList *getIgnoreList() const
-    {
-        return ignoreList;
     }
 };
 

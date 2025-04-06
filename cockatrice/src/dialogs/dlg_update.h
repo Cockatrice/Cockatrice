@@ -4,20 +4,24 @@
 #include "../client/update_downloader.h"
 
 #include <QDialogButtonBox>
+#include <QLoggingCategory>
 #include <QProgressDialog>
 #include <QtNetwork>
+
+inline Q_LOGGING_CATEGORY(DlgUpdateLog, "dlg_update");
+
 class Release;
 
 class DlgUpdate : public QDialog
 {
     Q_OBJECT
 public:
-    DlgUpdate(QWidget *parent);
+    explicit DlgUpdate(QWidget *parent);
 
 private slots:
     void finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release);
     void gotoDownloadPage();
-    void downloadUpdate();
+    void downloadUpdate(const QString &releaseName);
     void cancelDownload();
     void updateCheckError(const QString &errorString);
     void downloadSuccessful(const QUrl &filepath);

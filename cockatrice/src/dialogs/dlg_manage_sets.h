@@ -44,6 +44,7 @@ private:
     void saveHeaderState();
     void rebuildMainLayout(int actionToTake);
     bool setOrderIsSorted;
+    bool includeRebalancedCards;
     enum
     {
         NO_SETS_SELECTED,
@@ -51,8 +52,8 @@ private:
     };
 
 public:
-    WndSets(QWidget *parent = nullptr);
-    ~WndSets();
+    explicit WndSets(QWidget *parent = nullptr);
+    ~WndSets() override;
 
 protected:
     void selectRows(QSet<int> rows);
@@ -73,6 +74,7 @@ private slots:
     void actDisableResetButton(const QString &filterText);
     void actSort(int index);
     void actIgnoreWarning();
+    void includeRebalancedCardsChanged(bool _includeRebalancedCardsChanged);
 };
 
 #endif

@@ -1,19 +1,20 @@
-FROM ubuntu:bionic
-MAINTAINER Zach Halpern <zahalpern+github@gmail.com>
+FROM ubuntu:24.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y\
-  build-essential\
-  cmake\
-  git\
-  libprotobuf-dev\
-  libqt5sql5-mysql\
-  libmysqlclient-dev\
-  libqt5websockets5-dev\
-  protobuf-compiler\
-  qt5-default\
-  qtbase5-dev\
-  qttools5-dev-tools\
-  qttools5-dev
+  build-essential \
+  cmake \
+  file \
+  g++ \
+  git \
+  libmariadb-dev-compat \
+  libprotobuf-dev \
+  libqt6sql6-mysql \
+  qt6-websockets-dev \
+  protobuf-compiler \
+  qt6-tools-dev \
+  qt6-tools-dev-tools
 
 COPY . /home/servatrice/code/
 WORKDIR /home/servatrice/code
@@ -25,7 +26,6 @@ RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 -DWITH_DBCONVERTER=
 
 WORKDIR /home/servatrice
 
-EXPOSE 4747
+EXPOSE 4748
 
 ENTRYPOINT [ "servatrice", "--log-to-console" ]
-

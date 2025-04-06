@@ -14,7 +14,7 @@ DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *par
     : QObject(parent), cardDatabase(_cardDatabase)
 {
     manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(queryFinished(QNetworkReply *)));
+    connect(manager, &QNetworkAccessManager::finished, this, &DeckStatsInterface::queryFinished);
 }
 
 void DeckStatsInterface::queryFinished(QNetworkReply *reply)
@@ -85,7 +85,7 @@ struct CopyIfNotAToken
     }
 };
 
-void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList &destination)
+void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
 {
     CopyIfNotAToken copyIfNotAToken(cardDatabase, destination);
     source.forEachCard(copyIfNotAToken);

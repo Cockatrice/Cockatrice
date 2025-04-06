@@ -25,7 +25,7 @@ signals:
 public slots:
 
 private:
-    explicit CardDatabaseSettings(QString settingPath, QObject *parent = nullptr);
+    explicit CardDatabaseSettings(const QString &settingPath, QObject *parent = nullptr);
     CardDatabaseSettings(const CardDatabaseSettings & /*other*/);
 };
 

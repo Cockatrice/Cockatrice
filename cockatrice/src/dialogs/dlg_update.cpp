@@ -1,5 +1,6 @@
 #include "dlg_update.h"
 
+#include "../client/network/client_update_checker.h"
 #include "../client/network/release_channel.h"
 #include "../client/ui/window_main.h"
 #include "../settings/cache_settings.h"
@@ -71,11 +72,6 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
     connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
 
-    ReleaseChannel *channel = SettingsCache::instance().getUpdateReleaseChannel();
-    connect(channel, SIGNAL(finishedCheck(bool, bool, Release *)), this,
-            SLOT(finishedUpdateCheck(bool, bool, Release *)));
-    connect(channel, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
-
     // Check for updates
     beginUpdateCheck();
 }
@@ -90,9 +86,9 @@ void DlgUpdate::gotoDownloadPage()
     QDesktopServices::openUrl(SettingsCache::instance().getUpdateReleaseChannel()->getManualDownloadUrl());
 }
 
-void DlgUpdate::downloadUpdate()
+void DlgUpdate::downloadUpdate(const QString &releaseName)
 {
-    setLabel(tr("Downloading update..."));
+    setLabel(tr("Downloading update: %1").arg(releaseName));
     addStopDownloadAndRemoveOthers(true); // Will remove all other buttons
     uDownloader->beginDownload(updateUrl);
 }
@@ -110,7 +106,12 @@ void DlgUpdate::beginUpdateCheck()
     progress->setMinimum(0);
     progress->setMaximum(0);
     setLabel(tr("Checking for updates..."));
-    SettingsCache::instance().getUpdateReleaseChannel()->checkForUpdates();
+
+    auto checker = new ClientUpdateChecker(this);
+    connect(checker, SIGNAL(finishedCheck(bool, bool, Release *)), this,
+            SLOT(finishedUpdateCheck(bool, bool, Release *)));
+    connect(checker, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
+    checker->check();
 }
 
 void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Release *release)
@@ -156,7 +157,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
             QMessageBox::Yes | QMessageBox::No);
 
         if (reply == QMessageBox::Yes)
-            downloadUpdate();
+            downloadUpdate(release->getName());
     } else {
         QMessageBox::information(
             this, tr("Update Available"),
@@ -164,10 +165,12 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
                 "</a>)<br><br>" +
-                tr("Unfortunately there are no download packages available for your operating system. \nYou may have "
-                   "to build from source yourself.") +
+                tr("Unfortunately, the automatic updater failed to find a compatible download. \nYou may have to "
+                   "manually download the new version.") +
                 "<br><br>" +
-                tr("Please check the download page manually and visit the wiki for instructions on compiling."));
+                tr("Please check the <a href=\"%1\">releases page</a> on our Github and download the build for your "
+                   "system.")
+                    .arg(release->getDescriptionUrl()));
     }
 }
 
@@ -220,7 +223,7 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     // Try to open the installer. If it opens, quit Cockatrice
     if (QDesktopServices::openUrl(filepath)) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
-        qDebug() << "Opened downloaded update file successfully - closing Cockatrice";
+        qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
         close();
     } else {
         setLabel(tr("Error"));

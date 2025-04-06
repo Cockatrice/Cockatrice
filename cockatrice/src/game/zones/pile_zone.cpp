@@ -21,6 +21,13 @@ PileZone::PileZone(Player *_p, const QString &_name, bool _isShufflable, bool _c
                      .translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2)
                      .rotate(90)
                      .translate((float)-CARD_WIDTH / 2, (float)-CARD_HEIGHT / 2));
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        prepareGeometryChange();
+        update();
+    });
 }
 
 QRectF PileZone::boundingRect() const
@@ -31,7 +38,8 @@ QRectF PileZone::boundingRect() const
 QPainterPath PileZone::shape() const
 {
     QPainterPath shape;
-    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
 
@@ -50,7 +58,7 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    connect(card, SIGNAL(sigPixmapUpdated()), this, SLOT(callUpdate()));
+    connect(card, &CardItem::sigPixmapUpdated, this, &PileZone::callUpdate);
     // if x is negative set it to add at end
     if (x < 0 || x >= cards.size()) {
         x = cards.size();

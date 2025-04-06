@@ -1,8 +1,11 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
+#include "../../server/remote/remote_decklist_tree_widget.h"
+#include "../game_logic/abstract_client.h"
 #include "tab.h"
 
+class ServerInfo_User;
 class AbstractClient;
 class QTreeView;
 class QFileSystemModel;
@@ -10,7 +13,6 @@ class QToolBar;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
-class RemoteDeckList_TreeWidget;
 class CommandContainer;
 class Response;
 class DeckLoader;
@@ -26,16 +28,36 @@ private:
     RemoteDeckList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
-    QAction *aOpenLocalDeck, *aUpload, *aDeleteLocalDeck, *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
+    QAction *aOpenDecksFolder;
+    QAction *aOpenRemoteDeck, *aDownload, *aNewFolder, *aDeleteRemoteDeck;
     QString getTargetPath() const;
+
+    void setRemoteEnabled(bool enabled);
+
+    void uploadDeck(const QString &filePath, const QString &targetPath);
+    void deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *node);
+
+    void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
+
 private slots:
+    void handleConnected(const ServerInfo_User &userInfo);
+    void handleConnectionChanged(ClientStatus status);
+
+    void actLocalDoubleClick(const QModelIndex &curLeft);
     void actOpenLocalDeck();
+
+    void actRenameLocal();
 
     void actUpload();
     void uploadFinished(const Response &r, const CommandContainer &commandContainer);
 
+    void actNewLocalFolder();
     void actDeleteLocalDeck();
 
+    void actOpenDecksFolder();
+
+    void actRemoteDoubleClick(const QModelIndex &curRight);
     void actOpenRemoteDeck();
     void openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer);
 
@@ -50,11 +72,11 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 
 public:
-    TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client);
-    void retranslateUi();
-    QString getTabText() const
+    TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);
+    void retranslateUi() override;
+    QString getTabText() const override
     {
-        return tr("Deck storage");
+        return tr("Deck Storage");
     }
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);

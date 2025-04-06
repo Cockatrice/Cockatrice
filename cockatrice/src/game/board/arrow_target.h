@@ -19,8 +19,8 @@ private:
     QList<ArrowItem *> arrowsFrom, arrowsTo;
 
 public:
-    ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
-    ~ArrowTarget();
+    explicit ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
+    ~ArrowTarget() override;
 
     Player *getOwner() const
     {
@@ -57,5 +57,8 @@ public:
     {
         arrowsTo.removeOne(arrow);
     }
+
+protected:
+    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 };
 #endif

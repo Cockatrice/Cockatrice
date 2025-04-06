@@ -11,13 +11,16 @@
 #include "pb/commands.pb.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_ban_history.pb.h"
+#include "pb/response_get_admin_notes.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/response_warn_history.pb.h"
 #include "pb/response_warn_list.pb.h"
 #include "pb/session_commands.pb.h"
 #include "user_info_box.h"
-#include "user_list.h"
+#include "user_list_manager.h"
+#include "user_list_proxy.h"
+#include "user_list_widget.h"
 
 #include <QAction>
 #include <QMenu>
@@ -27,7 +30,8 @@
 #include <QtWidgets>
 
 UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
-    : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor), game(_game)
+    : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
+      userListProxy(_tabSupervisor->getUserListManager()), game(_game)
 {
     aUserName = new QAction(QString(), this);
     aUserName->setEnabled(false);
@@ -47,6 +51,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDemoteFromMod = new QAction(QString(), this);
     aPromoteToJudge = new QAction(QString(), this);
     aDemoteFromJudge = new QAction(QString(), this);
+    aGetAdminNotes = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -69,6 +74,7 @@ void UserContextMenu::retranslateUi()
     aDemoteFromMod->setText(tr("Dem&ote user from moderator"));
     aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
+    aGetAdminNotes->setText(tr("View admin notes"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -221,6 +227,21 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
                               tr("Failed to collect warning information."));
 }
 
+void UserContextMenu::getAdminNotes_processResponse(const Response &resp)
+{
+    const Response_GetAdminNotes &response = resp.GetExtension(Response_GetAdminNotes::ext);
+
+    if (resp.response_code() != Response::RespOk) {
+        QMessageBox::information(static_cast<QWidget *>(parent()), tr("Failed"), tr("Failed to get admin notes."));
+        return;
+    }
+
+    auto *dlg = new AdminNotesDialog(QString::fromStdString(response.user_name()),
+                                     QString::fromStdString(response.notes()), static_cast<QWidget *>(parent()));
+    connect(dlg, &AdminNotesDialog::accepted, this, &UserContextMenu::updateAdminNotes_dialogFinished);
+    dlg->show();
+}
+
 void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const CommandContainer &commandContainer)
 {
 
@@ -266,7 +287,7 @@ void UserContextMenu::warnUser_dialogFinished()
 {
     WarningDialog *dlg = static_cast<WarningDialog *>(sender());
 
-    if (dlg->getName().isEmpty() || tabSupervisor->getOwnUsername().simplified().isEmpty())
+    if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty())
         return;
 
     Command_WarnUser cmd;
@@ -277,6 +298,17 @@ void UserContextMenu::warnUser_dialogFinished()
     if (removeAmount != 0) {
         cmd.set_remove_messages(removeAmount);
     }
+
+    client->sendCommand(client->prepareModeratorCommand(cmd));
+}
+
+void UserContextMenu::updateAdminNotes_dialogFinished()
+{
+    auto *dlg = static_cast<AdminNotesDialog *>(sender());
+
+    Command_UpdateAdminNotes cmd;
+    cmd.set_user_name(dlg->getName().toStdString());
+    cmd.set_notes(dlg->getNotes().toStdString());
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 }
@@ -319,14 +351,14 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
-    if (userLevel.testFlag(ServerInfo_User::IsRegistered) && tabSupervisor->isOwnUserRegistered()) {
+    if (userLevel.testFlag(ServerInfo_User::IsRegistered) && userListProxy->isOwnUserRegistered()) {
         menu->addSeparator();
-        if (tabSupervisor->isUserBuddy(userName)) {
+        if (userListProxy->isUserBuddy(userName)) {
             menu->addAction(aRemoveFromBuddyList);
         } else {
             menu->addAction(aAddToBuddyList);
         }
-        if (tabSupervisor->isUserIgnored(userName)) {
+        if (userListProxy->isUserIgnored(userName)) {
             menu->addAction(aRemoveFromIgnoreList);
         } else {
             menu->addAction(aAddToIgnoreList);
@@ -347,6 +379,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         menu->addSeparator();
         menu->addAction(aBan);
         menu->addAction(aBanHistory);
+        menu->addSeparator();
+        menu->addAction(aGetAdminNotes);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
@@ -367,7 +401,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
             menu->addAction(aPromoteToJudge);
         }
     }
-    bool anotherUser = userName != tabSupervisor->getOwnUsername();
+    bool anotherUser = userName != userListProxy->getOwnUsername();
     aDetails->setEnabled(true);
     aChat->setEnabled(anotherUser && online);
     aShowGames->setEnabled(online);
@@ -380,6 +414,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aWarnHistory->setEnabled(anotherUser);
     aBan->setEnabled(anotherUser);
     aBanHistory->setEnabled(anotherUser);
+    aGetAdminNotes->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
 
@@ -478,6 +513,14 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
                 SLOT(warnUserHistory_processResponse(Response)));
         client->sendCommand(pend);
+    } else if (actionClicked == aGetAdminNotes) {
+        Command_GetAdminNotes cmd;
+        cmd.set_user_name(userName.toStdString());
+        auto *pend = client->prepareModeratorCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(getAdminNotes_processResponse(Response)));
+        client->sendCommand(pend);
+
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);

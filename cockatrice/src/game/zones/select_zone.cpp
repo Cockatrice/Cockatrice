@@ -58,11 +58,21 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             pos.setY(br.height());
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-        for (int i = 0; i < cards.size(); ++i) {
-            if (cards[i]->getAttachedTo())
-                if (cards[i]->getAttachedTo()->getZone() != this)
-                    continue;
-            cards[i]->setSelected(selectionRect.intersects(cards[i]->mapRectToParent(cards[i]->boundingRect())));
+        for (auto card : cards) {
+            if (card->getAttachedTo() && card->getAttachedTo()->getZone() != this) {
+                continue;
+            }
+
+            bool inRect = selectionRect.intersects(card->mapRectToParent(card->boundingRect()));
+            if (inRect && !cardsInSelectionRect.contains(card)) {
+                // selection has just expanded to cover the card
+                cardsInSelectionRect.insert(card);
+                card->setSelected(!card->isSelected());
+            } else if (!inRect && cardsInSelectionRect.contains(card)) {
+                // selection has just shrunk to no longer cover the card
+                cardsInSelectionRect.remove(card);
+                card->setSelected(!card->isSelected());
+            }
         }
         static_cast<GameScene *>(scene())->resizeRubberBand(
             deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
@@ -73,7 +83,9 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        scene()->clearSelection();
+        if (!event->modifiers().testFlag(Qt::ControlModifier)) {
+            scene()->clearSelection();
+        }
 
         selectionOrigin = event->pos();
         static_cast<GameScene *>(scene())->startRubberBand(event->scenePos());
@@ -85,6 +97,7 @@ void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void SelectZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     selectionOrigin = QPoint();
+    cardsInSelectionRect.clear();
     static_cast<GameScene *>(scene())->stopRubberBand();
     event->accept();
 }

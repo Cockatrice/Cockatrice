@@ -3,10 +3,14 @@
 
 #include <QBrush>
 #include <QDir>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
 #include <QPixmap>
 #include <QString>
+#include <array>
+
+inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
 typedef QMap<QString, QString> QStringMap;
 typedef QMap<int, QBrush> QBrushMap;
@@ -19,13 +23,23 @@ class ThemeManager : public QObject
 public:
     ThemeManager(QObject *parent = nullptr);
 
+    enum Role
+    {
+        MinRole = 0,
+        Hand = MinRole,
+        Stack,
+        Table,
+        Player,
+        MaxRole = Player,
+    };
+
 private:
-    QBrush handBgBrush, stackBgBrush, tableBgBrush, playerBgBrush;
+    std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
     /*
       Internal cache for multiple backgrounds
     */
-    QBrushMap tableBgBrushesCache, stackBgBrushesCache, playerBgBrushesCache, handBgBrushesCache;
+    std::array<QBrushMap, Role::MaxRole + 1> brushesCache;
 
 protected:
     void ensureThemeDirectoryExists();
@@ -33,27 +47,10 @@ protected:
     QBrush loadExtraBrush(QString fileName, QBrush &fallbackBrush);
 
 public:
-    QBrush &getHandBgBrush()
-    {
-        return handBgBrush;
-    }
-    QBrush &getStackBgBrush()
-    {
-        return stackBgBrush;
-    }
-    QBrush &getTableBgBrush()
-    {
-        return tableBgBrush;
-    }
-    QBrush &getPlayerBgBrush()
-    {
-        return playerBgBrush;
-    }
     QStringMap &getAvailableThemes();
-    QBrush getExtraTableBgBrush(QString extraNumber, QBrush &fallbackBrush);
-    QBrush getExtraStackBgBrush(QString extraNumber, QBrush &fallbackBrush);
-    QBrush getExtraPlayerBgBrush(QString extraNumber, QBrush &fallbackBrush);
-    QBrush getExtraHandBgBrush(QString extraNumber, QBrush &fallbackBrush);
+
+    QBrush &getBgBrush(Role zone);
+    QBrush getExtraBgBrush(Role zone, int zoneId = 0);
 protected slots:
     void themeChangedSlot();
 signals:

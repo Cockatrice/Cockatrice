@@ -1,99 +1,222 @@
 <tips>
-    <tip>
-        <title>Tip of the Day</title>
-        <text>Tip of the Day is a new feature to Cockatrice that allows users to get information about the newest features of the program and some of the most commonly asked questions!</text>
-        <image>tip_of_the_day.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Suggesting New Tips</title>
-        <text>You can suggest new Tips of the Day by reaching out to the development team on &lt;a href="https://discord.gg/3Z9yzmA"&gt;Discord&lt;/a&gt;!</text>
-        <image>discord.png</image>
-        <date>2023-10-18</date>
-    </tip>
-    <tip>
-        <title>Reporting Bugs</title>
-        <text>If you encounter a bug while using Cockatrice, you can report the bug to the development team via &lt;a href="https://github.com/cockatrice/cockatrice/issues"&gt;GitHub&lt;a&gt;</text>
-        <image>github_logo.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>FAQ/Troubleshooting Wiki</title>
-        <text>You can find answers to the most common questions and some helpful Cockatrice toubleshooting over on the &lt;a href="https://github.com/cockatrice/cockatrice/wiki"&gt;GitHub wiki&lt;a&gt;</text>
-        <image>cockatrice_wiki.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Register for a Server</title>
-        <text>Click on either Cockatrice (Windows) or Actions (Mac) and then Register to server...  When the dialogue appears, fill out the desired server information.</text>
-        <image>cockatrice_register.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Drawing Arrows</title>
-        <text>You can draw arrows of different color by holding a combination of keys!
-            Right Click: Red Arrow
-            Shift + Right Click: Green Arrow
-            Alt + Right Click: Blue Arrow
-            Cmd + Right Click: Yellow Arrow
-        </text>
-        <image>arrows.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Filtering Games</title>
-        <text>Don't see all the active games? Want to see a smaller selection? Use the Game Filters to change your horizon</text>
-        <image>filter_games.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Upload Custom Avatar</title>
-        <text>Want to show off your hippo avatar? Need to update your password? Check out the Accounts Tab for more info!</text>
-        <image>accounts_tab.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Common Shortcuts</title>
-        <text>You can find a full list of shortcuts &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"&gt;on the wiki&lt;/a&gt;, but a short list:
-            &lt;br&gt;Roll a die: CTRL + I
-            &lt;br&gt;Mulligan: CTRL + M
-            &lt;br&gt;Draw a card: CTRL + D
-            &lt;br&gt;Undo a draw: CTRL + SHIFT + D
-            &lt;br&gt;View Sideboard: CTRL + F3
-            &lt;br&gt;Change Life: CTRL + L
-            &lt;br&gt;All shortcuts can be customized via Settings->Shortcuts!
-        </text>
-        <image>shortcuts.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Changing Themes</title>
-        <text>Did you know Cockatrice has custom themes? You can either &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Themes"&gt;create one yourself&lt;/a&gt; or use one of the several pre-loaded ones! Go to Settings->Appearance and try them out!</text>
-        <image>themes.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Flip of the Coin</title>
-        <text>You can flip a coin instead of rolling a die by rolling a 2 sided die instead!</text>
-        <image>coin_flip.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Face Down Cards</title>
-        <text>You can hold Shift while dragging or clicking on a card to have it enter play face down</text>
-        <image>face_down.png</image>
-        <date>2018-03-01</date>
-    </tip>
-    <tip>
-        <title>Counter expressions</title>
-        <text>When setting a counter value, you can type a math expression in the box and the counter will be set to the result.&lt;br&gt;The "x" variable contains the current counter value.</text>
-        <image>counter_expression.png</image>
-        <date>2019-02-02</date>
-    </tip>
-    <tip>
-        <title>Power and Toughness</title>
-        <text>You can add and subtract to a creature's stats.&lt;br&gt;With a card selected, set the power and toughness ( default: ctrl + p ) and enter +3/-1 to increase power by three while decreasing toughness by one.&lt;br&gt;You can also reset it to the original value ( default: ctrl + alt + 0 ).</text>
-        <image>setpt.png</image>
-        <date>2019-03-02</date>
-    </tip>
+	<tip>
+		<title>Tip of the Day</title>
+		<text>Tip of the Day is a feature to Cockatrice that allows users to get information about the newest features of the program and some of the most commonly asked questions!
+Check back in with major updates for new tips to be added or old tips to be updated as features are added or expanded upon!
+		</text>
+		<image>tip_of_the_day.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>Join the Community</title>
+		<text>You can join the community to find games, interact with other players, suggest new 'Tips of the Day' and provide user feedback to the development or support teams on &lt;a href="https://discord.gg/3Z9yzmA"&gt;Discord&lt;/a&gt;!</text>
+		<image>discord.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Reporting Bugs and Requesting Features</title>
+		<text>If you encounter a bug while using Cockatrice, you can report the bug to and request the feature from the development team via &lt;a href="https://github.com/cockatrice/cockatrice/issues"&gt;GitHub&lt;a&gt;</text>
+		<image>github_logo.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>FAQ/Troubleshooting Wiki</title>
+		<text>You can find answers to the most common questions and some helpful Cockatrice troubleshooting over on the &lt;a href="https://github.com/cockatrice/cockatrice/wiki"&gt;GitHub wiki&lt;a&gt;</text>
+		<image>cockatrice_wiki.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>Register for a Server</title>
+		<text>Click on either Cockatrice (Windows) or Actions (Mac) and then Register to server...  When the dialogue appears, fill out the desired server information.</text>
+		<image>cockatrice_register.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>Filtering Games</title>
+		<text>Don't see an open game or want to see a smaller selection? Use the Game Filters to change your horizon!</text>
+		<image>filter_games.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Common Shortcuts</title>
+		<text>You can find a full list of default shortcuts &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"&gt;on the wiki&lt;/a&gt; or in Settings -> Shortcuts, but a short list:
+&lt;ul&gt;
+&lt;li&gt;Roll a die: CMD/CTRL + I&lt;/li&gt;
+&lt;li&gt;Mulligan: CMD/CTRL + M&lt;/li&gt;
+&lt;li&gt;Draw 1 / X card(s): CMD/CTRL + D / E&lt;/li&gt;
+&lt;li&gt;Undo a draw: CMD/CTRL + SHIFT + D&lt;/li&gt;
+&lt;li&gt;View Library / Sideboard: F3 / CMD/CTRL + F3&lt;/li&gt;
+&lt;li&gt;Change Life: CMD/CTRL + L&lt;/li&gt;
+&lt;li&gt;Show Card Info: Middle Mouse Click&lt;/li&gt;
+&lt;/ul&gt;
+All shortcuts can be customized via Cockatrice -> Settings -> Shortcuts!
+		</text>
+		<image>shortcuts.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Power and Toughness</title>
+		<text>You can add and subtract to a creature's stats.
+With a card selected, with the following keybindings:
+
+&lt;ul&gt;
+&lt;li&gt;Set P/T to any value: CTRL + P&lt;/li&gt;
+&lt;li&gt;+1 or -1 to both to P/T: CMD/CTRL + ALT + '+' or '-'&lt;/li&gt;
+&lt;li&gt;+1 or -1 to Power Only: CMD/CTRL + '+' or '-'&lt;/li&gt;
+&lt;li&gt;+1 or -1 to Toughness Only: ALT + '+' or '-'&lt;/li&gt;
+&lt;li&gt;Set P/T to Default: CMD/CTRL + ALT + 0&lt;/li&gt;
+&lt;/ul&gt;
+All shortcuts can be customized via Cockatrice -> Settings -> Shortcuts!
+		</text>
+		<image>setpt.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Drawing Arrows</title>
+		<text>You can draw arrows of different color by holding a combination of keys!
+
+&lt;ul&gt;
+&lt;li&gt;Right Click: Red Arrow&lt;/li&gt;
+&lt;li&gt;SHIFT + Right Click: Green Arrow&lt;/li&gt;
+&lt;li&gt;ALT + Right Click: Blue Arrow&lt;/li&gt;
+&lt;li&gt;CMD/CTRL + Right Click: Yellow Arrow&lt;/li&gt;
+&lt;/ul&gt;
+		</text>
+		<image>arrows.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>General Etiquette</title>
+		<text>When playing on Cockatrice there are general "rules of engagement" for a better play experience for all players.
+The following are some of the expectations a player should reasonably expect for how to operate smooth and enjoyable games:
+&lt;ul&gt;
+&lt;li&gt;Have a "Rule 0" conversation pre-game with your fellow players on the expectations of the game including deck strength, house rules (e.g. no take backs and "may is not must"), etc.&lt;/li&gt;
+&lt;li&gt;When rolling your die for turn order, it is often best to create a token with the text of your roll (using CTRL + T and typing the number into "Name") and then tap this token when created to show that you have resolved your mulligans and are ready to start the game.&lt;/li&gt;
+&lt;li&gt;Use the phases and steps trackers on the left of the client to show others where in the turn you are and announce when moving between them. (Double Click for the action of this button)&lt;/li&gt;
+&lt;li&gt;When your turn is over leave it on your end step and DO NOT HIT PASS. Allow other players to respond if they can, and then if not, let the next player pass to themselves.&lt;/li&gt;
+&lt;li&gt;Please treat others kindly and respect as per &lt;a href="https://cockatrice.us/terms.php"&gt;our Terms of Service&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+		</text>
+		<image>token.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>Flip of the Coin</title>
+		<text>You can flip a coin instead of rolling a die by rolling a 2 sided die instead!</text>
+		<image>coin_flip.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>Upload Custom Avatar</title>
+		<text>Want to show off your hippo avatar? Need to update your password? Check out the Accounts Tab for more info!</text>
+		<image>accounts_tab.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>Player Icon Key</title>
+		<text>Besides your name is a player icon, this is a key for what they mean:
+&lt;ul&gt;
+&lt;li&gt;Flag: Country of Origin Player Selected&lt;/li&gt;
+&lt;li&gt;Purple Heart: Donator (&lt;a href="https://cockatrice.us/donate"&gt;Help support us and donate here!&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Gold Star: VIP (Special Admin Given Role)&lt;/li&gt;
+&lt;li&gt;Brown Gavel (Hammer): Judge / Rule's Lawyer&lt;/li&gt;
+&lt;li&gt;Black/White Pawn: Moderator (Support for Client Issues)&lt;/li&gt;
+&lt;li&gt;Red: Administrator (Sever Operators)&lt;/li&gt;
+&lt;/ul&gt;
+		</text>
+		<image>pawns.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Changing Themes</title>
+		<text>Did you know Cockatrice has custom themes? You can either &lt;a href="https://github.com/Cockatrice/Cockatrice/wiki/Themes"&gt;create one yourself&lt;/a&gt; or use one of the several preloaded ones! Go to Settings->Appearance and try them out!</text>
+		<image>themes.png</image>
+		<date>2018-03-01</date>
+	</tip>
+	<tip>
+		<title>Face Down Cards</title>
+		<text>You can hold Shift while dragging or clicking on a card to have it enter play face down.
+You can also hold CTRL + SHIFT and click and drag from your library to move bottom card face down as well!
+		</text>
+		<image>face_down.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Counter expressions</title>
+		<text>When setting a counter value, you can type a math expression in the box and the counter will be set to the result.&lt;br&gt;The "x" variable contains the current counter value.</text>
+		<image>counter_expression.png</image>
+		<date>2019-02-02</date>
+	</tip>
+	<tip>
+		<title>Select Multiple Cards</title>
+		<text>You can click and drag in any zone in order to highlight all cards within the created box.
+You can also hold CMD/CTRL and clik or click and drag to maintain other previously selected cards while adding others!
+You can move, alter and attach multiple highlighted cards at the same time!
+Other useful multi-select keybindings:
+&lt;ul&gt;
+&lt;li&gt;Select All Cards in Zone: CMD/CTRL + A&lt;/li&gt;
+&lt;li&gt;Select All Cards in Column: CMD/CTRL + SHIFT + C&lt;/li&gt;
+&lt;li&gt;Select All Cards in Row: CMD/CTRL + SHIFT + X&lt;/li&gt;
+&lt;/ul&gt;
+		</text>
+		<image>highlight_cards.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Auto Cascade and Search Parameters</title>
+		<text>You can use the default keybind of CMD/CTRL + SHIFT + Y in order to perform auto cascade or similar effects from your library using Scryfall search syntax.
+If you are unfamiliar with the syntax you may find it by opening a deck in deck editor and clicking the "i" next to the search bar in order to pull up a list of syntax commands.
+This same syntax can be used in the deck editor search bar as well to help you find the best cards for your decks!
+		</text>
+		<image>syntax_help.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Visual Deck Storage and Tags</title>
+		<text>You can now view your saved decks visually with integrated folder,tags and filter support!
+Pro Tip: If you want to use emoji's press WinKey + '.' or CTRL + CMD + SPACE on Windows or Mac respectively!
+		</text>
+		<image>visual_deck_tags.png</image>
+		<date>2025-02-09</date>
+	</tip>
+	<tip>
+		<title>Card Selector And Card Preferences</title>
+		<text>Cockatrice's deck editor now has the ability for players to bling out their decks by selecting the arts for cards on a per-card basis!
+You can also have multiple printings of the same card in your deck if you so choose!
+Not only that, other players will see the arts you have chosen by default!
+If you want to disable this feature for other players: Settings -> Appearance -> Select "Override all card art with personal set preference"
+		</text>
+		<image>card_select.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>EDHREC Integration</title>
+		<text>We now have in-client integration for EDHREC, which allows you to right-click on any card name in the deck editor in order to bring up the contextual menu for the card.</text>
+		<image>edhrec.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>Add Cards to Deck</title>
+		<text>You can now right-click anywhere on a card in any card info view in order to add it to any decks you have open in your tabs.</text>
+		<image>add_card.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>Update Client and Card Database</title>
+		<text>You can update your client by going to Help and selecting whichever you wish to update.
+Client Update: Updates the client (if available) for new features, fixes and changes.
+Card Update: Updates card sources for spoilers and new card printings.
+Updating your card sources can often fix issues of cards not working or displaying properly, if not, go to Cockatrice -> Settings -> Card Sources -> Update Spoilers
+		</text>
+		<image>updates.png</image>
+		<date>2025-02-10</date>
+	</tip>
+	<tip>
+		<title>Expand Card View Window</title>
+		<text>Double click on the title bar of the card view window to expand it! Double click again to shrink it back down.
+			You can configure the initial and expanded heights of the window in the settings, under "Appearance".
+		</text>
+		<image>expand_card_view.png</image>
+		<date>2025-02-27</date>
+	</tip>
 </tips>

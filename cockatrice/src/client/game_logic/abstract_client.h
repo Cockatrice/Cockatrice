@@ -48,6 +48,7 @@ class AbstractClient : public QObject
     Q_OBJECT
 signals:
     void statusChanged(ClientStatus _status);
+    void maxPingTime(int seconds, int maxSeconds);
 
     // Room events
     void roomEventReceived(const RoomEvent &event);
@@ -97,8 +98,8 @@ protected:
     virtual void sendCommandContainer(const CommandContainer &cont) = 0;
 
 public:
-    AbstractClient(QObject *parent = nullptr);
-    ~AbstractClient();
+    explicit AbstractClient(QObject *parent = nullptr);
+    ~AbstractClient() override;
 
     ClientStatus getStatus() const
     {

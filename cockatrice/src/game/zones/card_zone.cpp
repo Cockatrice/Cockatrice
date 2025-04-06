@@ -1,9 +1,11 @@
 #include "card_zone.h"
 
+#include "../cards/card_database_manager.h"
 #include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "pile_zone.h"
 #include "view_zone.h"
 
 #include <QAction>
@@ -11,6 +13,14 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 
+/**
+ * @param _p the player that the zone belongs to
+ * @param _name internal name of the zone
+ * @param _isShufflable whether it makes sense to shuffle this zone by default after viewing it
+ * @param _contentsKnown whether the cards in the zone are known to the client
+ * @param parent the parent graphics object.
+ * @param _isView whether this zone is a view of another zone. Modifications to a view should modify the original
+ */
 CardZone::CardZone(Player *_p,
                    const QString &_name,
                    bool _hasCardAttr,
@@ -23,17 +33,11 @@ CardZone::CardZone(Player *_p,
 {
     if (!isView)
         player->addZone(this);
-}
 
-CardZone::~CardZone()
-{
-    qDebug() << "CardZone destructor: " << name;
-    for (auto *view : views) {
-        if (view != nullptr) {
-            view->deleteLater();
-        }
-    }
-    clearContents();
+    // If we join a game before the card db finishes loading, the cards might have the wrong printings.
+    // Force refresh all cards in the zone when db finishes loading to fix that.
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &CardZone::refreshCardInfos);
 }
 
 void CardZone::retranslateUi()
@@ -111,6 +115,13 @@ bool CardZone::showContextMenu(const QPoint &screenPos)
     return false;
 }
 
+void CardZone::refreshCardInfos()
+{
+    for (const auto &cardItem : cards) {
+        cardItem->refreshCardInfo();
+    }
+}
+
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
@@ -122,10 +133,15 @@ void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
         event->ignore();
 }
 
-void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
+void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
+    if (!card) {
+        qCWarning(CardZoneLog) << "CardZone::addCard() card is null; this shouldn't normally happen";
+        return;
+    }
+
     for (auto *view : views) {
-        if ((x <= view->getCards().size()) || (view->getNumberCards() == -1)) {
+        if (view->prepareAddCard(x)) {
             view->addCard(new CardItem(player, nullptr, card->getName(), card->getProviderId(), card->getId()),
                           reorganize, x, y);
         }
@@ -142,10 +158,10 @@ void CardZone::addCard(CardItem *card, bool reorganize, int x, int y)
 
 CardItem *CardZone::getCard(int cardId, const QString &cardName)
 {
-    CardItem *c = cards.findCard(cardId, false);
+    CardItem *c = cards.findCard(cardId);
     if (!c) {
-        qDebug() << "CardZone::getCard: card id=" << cardId << "not found";
-        return 0;
+        qCWarning(CardZoneLog) << "CardZone::getCard: card id=" << cardId << "not found";
+        return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
     // so we need to give the card an id and a name as it comes out.
@@ -157,7 +173,7 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     return c;
 }
 
-CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
+CardItem *CardZone::takeCard(int position, int cardId, bool toNewZone)
 {
     if (position == -1) {
         // position == -1 means either that the zone is indexed by card id
@@ -171,13 +187,13 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
             position = 0;
     }
     if (position >= cards.size())
-        return 0;
-
-    CardItem *c = cards.takeAt(position);
+        return nullptr;
 
     for (auto *view : views) {
-        view->removeCard(position);
+        view->removeCard(position, toNewZone);
     }
+
+    CardItem *c = cards.takeAt(position);
 
     c->setId(cardId);
 
@@ -188,6 +204,11 @@ CardItem *CardZone::takeCard(int position, int cardId, bool /*canResize*/)
 
 void CardZone::removeCard(CardItem *card)
 {
+    if (!card) {
+        qCWarning(CardZoneLog) << "CardZone::removeCard: card is null, this shouldn't normally happen";
+        return;
+    }
+
     cards.removeOne(card);
     reorganizeCards();
     emit cardCountChanged();

@@ -1,6 +1,6 @@
 #include "abstract_card_item.h"
 
-#include "../../client/ui/picture_loader.h"
+#include "../../client/ui/picture_loader/picture_loader.h"
 #include "../../settings/cache_settings.h"
 #include "../game_scene.h"
 #include "card_database.h"
@@ -24,8 +24,15 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent,
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(&SettingsCache::instance(), SIGNAL(displayCardNamesChanged()), this, SLOT(callUpdate()));
-    cardInfoUpdated();
+    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
+    refreshCardInfo();
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        prepareGeometryChange();
+        update();
+    });
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -41,7 +48,8 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    shape.addRoundedRect(boundingRect(), 0.05 * CARD_WIDTH, 0.05 * CARD_WIDTH);
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
 
@@ -51,7 +59,7 @@ void AbstractCardItem::pixmapUpdated()
     emit sigPixmapUpdated();
 }
 
-void AbstractCardItem::cardInfoUpdated()
+void AbstractCardItem::refreshCardInfo()
 {
     info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(name, providerId);
 
@@ -59,10 +67,10 @@ void AbstractCardItem::cardInfoUpdated()
         QVariantHash properties = QVariantHash();
 
         info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                                     CardInfoPerSetMap(), false, -1, false);
+                                     CardInfoPerSetMap(), false, false, -1, false);
     }
     if (info.data()) {
-        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(pixmapUpdated()));
+        connect(info.data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
     }
 
     cacheBgColor();
@@ -141,8 +149,13 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         QString nameStr;
         if (facedown)
             nameStr = "# " + QString::number(id);
-        else
-            nameStr = name;
+        else {
+            QString prefix = "";
+            if (SettingsCache::instance().debug().getShowCardId()) {
+                prefix = "#" + QString::number(id) + " ";
+            }
+            nameStr = prefix + name;
+        }
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
                                  translatedSize.height() - 6 * scaleFactor),
                           Qt::AlignTop | Qt::AlignLeft | Qt::TextWrapAnywhere, nameStr);
@@ -185,7 +198,7 @@ void AbstractCardItem::setName(const QString &_name)
         disconnect(info.data(), nullptr, this, nullptr);
     name = _name;
 
-    cardInfoUpdated();
+    refreshCardInfo();
 }
 
 void AbstractCardItem::setProviderId(const QString &_providerId)
@@ -200,7 +213,7 @@ void AbstractCardItem::setProviderId(const QString &_providerId)
     }
     providerId = _providerId;
 
-    cardInfoUpdated();
+    refreshCardInfo();
 }
 
 void AbstractCardItem::setHovered(bool _hovered)
@@ -296,7 +309,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton)
         setCursor(Qt::ClosedHandCursor);
     else if (event->button() == Qt::MiddleButton)
-        emit showCardInfoPopup(event->screenPos(), name);
+        emit showCardInfoPopup(event->screenPos(), name, providerId);
     event->accept();
 }
 
@@ -320,5 +333,5 @@ QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, 
         update();
         return value;
     } else
-        return QGraphicsItem::itemChange(change, value);
+        return ArrowTarget::itemChange(change, value);
 }

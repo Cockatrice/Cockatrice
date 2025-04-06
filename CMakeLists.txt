@@ -74,16 +74,16 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.10.0)
+project("Cockatrice" VERSION 2.11.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Rings of the Wild")
+  set(GIT_TAG_RELEASENAME "Omenpath")
 endif()
 
-# Use c++17 for all targets
+# Use c++20 for all targets
 set(CMAKE_CXX_STANDARD
-    17
+    20
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -140,10 +140,17 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # Visual Studio: Maximum optimization, disable warning C4251, establish C++17 compatibility
-  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /wd4251 /Zc:__cplusplus /std:c++17 /permissive- /W4")
-  # Generate complete debugging information
-  #set(CMAKE_CXX_FLAGS_DEBUG "/Zi")
+  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
+  # Visual Studio: Maximum Optimization, Multi-threaded DLL
+  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
+  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+  set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
+
+  # Generate PDB, even when in release (So developers can better analyze crash logs)
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
+
+  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
@@ -156,7 +163,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 
   if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
   endif()
 
   set(ADDITIONAL_DEBUG_FLAGS
@@ -264,6 +271,7 @@ if(UNIX)
     set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice/resources/appicon.icns")
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
+    set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
   else()
     # linux
     if(CPACK_GENERATOR STREQUAL "RPM")

@@ -378,7 +378,7 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
     }
 }
 
-void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards)
+void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed)
 {
     if (numberCards == -1) {
         appendHtmlServerMessage(tr("%1 is looking at %2.")
@@ -386,10 +386,11 @@ void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCar
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     } else {
         appendHtmlServerMessage(
-            tr("%1 is looking at the top %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
+            tr("%1 is looking at the %4 %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
                 .arg(sanitizeHtml(player->getName()))
                 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
-                .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>"));
+                .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>")
+                .arg(isReversed ? tr("bottom") : tr("top")));
     }
 }
 
@@ -605,8 +606,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(std::move(message), {}, player->getName(), UserLevelFlags(player->getUserInfo()->user_level()),
-                  QString::fromStdString(player->getUserInfo()->privlevel()), true);
+    appendMessage(std::move(message), {}, *player->getUserInfo(), true);
 }
 
 void MessageLogWidget::logSetActivePhase(int phaseNumber)
@@ -782,12 +782,9 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
     }
 }
 
-void MessageLogWidget::logSpectatorSay(QString spectatorName,
-                                       UserLevelFlags spectatorUserLevel,
-                                       QString userPrivLevel,
-                                       QString message)
+void MessageLogWidget::logSpectatorSay(const ServerInfo_User &spectator, QString message)
 {
-    appendMessage(std::move(message), {}, spectatorName, spectatorUserLevel, userPrivLevel, false);
+    appendMessage(std::move(message), {}, spectator, false);
 }
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
@@ -850,7 +847,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
             SLOT(logAttachCard(Player *, QString, Player *, QString)));
     connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
-    connect(player, SIGNAL(logDumpZone(Player *, CardZone *, int)), this, SLOT(logDumpZone(Player *, CardZone *, int)));
+    connect(player, &Player::logDumpZone, this, &MessageLogWidget::logDumpZone);
     connect(player, SIGNAL(logDrawCards(Player *, int, bool)), this, SLOT(logDrawCards(Player *, int, bool)));
     connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
     connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)), this,
@@ -861,11 +858,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logAlwaysLookAtTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor,
-                                   const UserlistProxy *_userlistProxy,
-                                   TabGame *_game,
-                                   QWidget *parent)
-    : ChatView(_tabSupervisor, _userlistProxy, _game, true, parent), mulliganNumber(0),
-      currentContext(MessageContext_None)
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
+    : ChatView(_tabSupervisor, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
 {
 }

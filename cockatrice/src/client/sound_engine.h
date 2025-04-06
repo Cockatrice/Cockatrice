@@ -1,12 +1,15 @@
 #ifndef SOUNDENGINE_H
 #define SOUNDENGINE_H
 
+#include <QAudioOutput>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QString>
 
-class QAudioOutput;
+inline Q_LOGGING_CATEGORY(SoundEngineLog, "sound_engine");
+
 class QBuffer;
 
 typedef QMap<QString, QString> QStringMap;
@@ -23,6 +26,7 @@ public:
 private:
     QStringMap availableThemes;
     QMap<QString, QString> audioData;
+    QAudioOutput *audioOutput;
     QMediaPlayer *player;
 
 protected:

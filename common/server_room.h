@@ -64,7 +64,7 @@ public:
                 const QString &_joinMessage,
                 const QStringList &_gameTypes,
                 Server *parent);
-    ~Server_Room();
+    ~Server_Room() override;
     int getId() const
     {
         return id;

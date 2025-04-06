@@ -4,6 +4,9 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(DlgEditAvatarLog, "dlg_edit_avatar");
 
 class QLabel;
 class QPushButton;
@@ -13,7 +16,7 @@ class DlgEditAvatar : public QDialog
 {
     Q_OBJECT
 public:
-    DlgEditAvatar(QWidget *parent = nullptr);
+    explicit DlgEditAvatar(QWidget *parent = nullptr);
     QByteArray getImage();
 private slots:
     void actOk();

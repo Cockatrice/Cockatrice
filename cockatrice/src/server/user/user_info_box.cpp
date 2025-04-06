@@ -9,6 +9,7 @@
 #include "../pending_command.h"
 #include "passwordhasher.h"
 #include "pb/response_get_user_info.pb.h"
+#include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"
 
 #include <QDateTime>
@@ -84,14 +85,27 @@ void UserInfoBox::retranslateUi()
     avatarButton.setText(tr("Change avatar"));
 }
 
+/**
+ * Creates the default profile pic that is used when the user doesn't have a custom pic
+ */
+static QPixmap createDefaultAvatar(int height, const ServerInfo_User &user)
+{
+    return UserLevelPixmapGenerator::generatePixmap(height, UserLevelFlags(user.user_level()), user.pawn_colors(),
+                                                    false, QString::fromStdString(user.privlevel()));
+}
+
 void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
+    currentUserInfo = &user;
+
     const UserLevelFlags userLevel(user.user_level());
 
     const std::string &bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
-        avatarPixmap =
-            UserLevelPixmapGenerator::generatePixmap(64, userLevel, false, QString::fromStdString(user.privlevel()));
+        avatarPixmap = createDefaultAvatar(64, user);
+        hasAvatar = false;
+    } else {
+        hasAvatar = true;
     }
 
     nameLabel.setText(QString::fromStdString(user.name()));
@@ -106,8 +120,8 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel3.setText("");
     }
 
-    userLevelIcon.setPixmap(
-        UserLevelPixmapGenerator::generatePixmap(15, userLevel, false, QString::fromStdString(user.privlevel())));
+    userLevelIcon.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, user.pawn_colors(), false,
+                                                                     QString::fromStdString(user.privlevel())));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin))
         userLevelText = tr("Administrator");
@@ -250,17 +264,14 @@ void UserInfoBox::actPassword()
         cmd.set_user_name(client->getUserName().toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend,
-                // we need qoverload here in order to select the right version of this function
-                QOverload<const Response &, const CommandContainer &, const QVariant &>::of(&PendingCommand::finished),
-                this, [=](const Response &response, const CommandContainer &, const QVariant &) {
-                    if (response.response_code() == Response::RespOk) {
-                        changePassword(oldPassword, newPassword);
-                    } else {
-                        QMessageBox::critical(this, tr("Error"),
-                                              tr("An error occurred while trying to update your user information."));
-                    }
-                });
+        connect(pend, &PendingCommand::finished, this, [=, this](const Response &response) {
+            if (response.response_code() == Response::RespOk) {
+                changePassword(oldPassword, newPassword);
+            } else {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("An error occurred while trying to update your user information."));
+            }
+        });
         client->sendCommand(pend);
     } else {
         changePassword(oldPassword, newPassword);
@@ -366,7 +377,14 @@ void UserInfoBox::processAvatarResponse(const Response &r)
 
 void UserInfoBox::resizeEvent(QResizeEvent *event)
 {
-    QPixmap resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap resizedPixmap;
+    if (hasAvatar) {
+        resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    } else {
+        int height = qMin(avatarPic.size().width(), avatarPic.size().height());
+        resizedPixmap = createDefaultAvatar(height, *currentUserInfo);
+    }
     avatarPic.setPixmap(resizedPixmap);
+
     QWidget::resizeEvent(event);
 }

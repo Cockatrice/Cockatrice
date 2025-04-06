@@ -28,11 +28,11 @@ public:
     {
         return faceDown;
     }
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void updatePosition(const QPointF &cursorScenePos);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void updatePosition(const QPointF &cursorScenePos) override;
 
 protected:
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif

@@ -10,6 +10,7 @@
 
 class ICardDatabaseParser : public QObject
 {
+    Q_OBJECT
 public:
     ~ICardDatabaseParser() override = default;
 
@@ -32,10 +33,11 @@ protected:
     CardSetPtr internalAddSet(const QString &setName,
                               const QString &longName = "",
                               const QString &setType = "",
-                              const QDate &releaseDate = QDate());
+                              const QDate &releaseDate = QDate(),
+                              const CardSet::Priority priority = CardSet::PriorityFallback);
 signals:
-    virtual void addCard(CardInfoPtr card) = 0;
-    virtual void addSet(CardSetPtr set) = 0;
+    void addCard(CardInfoPtr card);
+    void addSet(CardSetPtr set);
 };
 
 Q_DECLARE_INTERFACE(ICardDatabaseParser, "ICardDatabaseParser")

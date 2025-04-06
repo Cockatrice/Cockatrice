@@ -5,7 +5,10 @@
 #include "../board/abstract_graphics_item.h"
 #include "../cards/card_list.h"
 
+#include <QLoggingCategory>
 #include <QString>
+
+inline Q_LOGGING_CATEGORY(CardZoneLog, "card_zone");
 
 class Player;
 class ZoneViewZone;
@@ -14,6 +17,12 @@ class QAction;
 class QPainter;
 class CardDragItem;
 
+/**
+ * A zone in the game that can contain cards.
+ * This class contains methods to get and modify the cards that are contained inside this zone.
+ *
+ * The cards are stored as a list of `CardItem*`.
+ */
 class CardZone : public AbstractGraphicsItem
 {
     Q_OBJECT
@@ -28,8 +37,8 @@ protected:
     bool isShufflable;
     bool isView;
     bool alwaysRevealTopCard;
-    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void addCardImpl(CardItem *card, int x, int y) = 0;
 signals:
     void cardCountChanged();
@@ -37,12 +46,15 @@ public slots:
     void moveAllToZone();
     bool showContextMenu(const QPoint &screenPos);
 
+private slots:
+    void refreshCardInfos();
+
 public:
     enum
     {
         Type = typeZone
     };
-    int type() const
+    int type() const override
     {
         return Type;
     }
@@ -55,7 +67,6 @@ public:
              bool _contentsKnown,
              QGraphicsItem *parent = nullptr,
              bool _isView = false);
-    ~CardZone();
     void retranslateUi();
     void clearContents();
     bool getHasCardAttr() const

@@ -1,43 +1,36 @@
 #include "tab_game.h"
 
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
-#include "../../deck/deck_loader.h"
-#include "../../deck/deck_view.h"
 #include "../../dialogs/dlg_create_game.h"
-#include "../../dialogs/dlg_load_remote_deck.h"
-#include "../../dialogs/dlg_manage_sets.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_item.h"
+#include "../../game/deckview/deck_view_container.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
 #include "../../game/player/player.h"
 #include "../../game/player/player_list_widget.h"
-#include "../../game/zones/view_zone.h"
-#include "../../game/zones/view_zone_widget.h"
+#include "../../game/zones/card_zone.h"
 #include "../../main.h"
 #include "../../server/message_log_widget.h"
 #include "../../server/pending_command.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../settings/cache_settings.h"
 #include "../game_logic/abstract_client.h"
 #include "../network/replay_timeline_widget.h"
 #include "../ui/line_edit_completer.h"
 #include "../ui/phases_toolbar.h"
-#include "../ui/picture_loader.h"
+#include "../ui/picture_loader/picture_loader.h"
 #include "../ui/window_main.h"
 #include "get_pb_extension.h"
 #include "pb/command_concede.pb.h"
-#include "pb/command_deck_select.pb.h"
 #include "pb/command_delete_arrow.pb.h"
 #include "pb/command_game_say.pb.h"
 #include "pb/command_leave_game.pb.h"
 #include "pb/command_next_turn.pb.h"
-#include "pb/command_ready_start.pb.h"
 #include "pb/command_reverse_turn.pb.h"
 #include "pb/command_set_active_phase.pb.h"
-#include "pb/command_set_sideboard_lock.pb.h"
-#include "pb/command_set_sideboard_plan.pb.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -55,7 +48,6 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_event_container.pb.h"
 #include "pb/game_replay.pb.h"
-#include "pb/response_deck_download.pb.h"
 #include "tab_supervisor.h"
 #include "trice_limits.h"
 
@@ -73,110 +65,237 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QWidget>
-#include <google/protobuf/descriptor.h>
 
-ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
+TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
+    : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
+      isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
+      resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
+      sayLabel(nullptr), sayEdit(nullptr)
 {
-}
+    // THIS CTOR IS USED ON REPLAY
+    gameInfo.CopyFrom(replay->game_info());
+    gameInfo.set_spectators_omniscient(true);
 
-void ToggleButton::paintEvent(QPaintEvent *event)
-{
-    QPushButton::paintEvent(event);
+    // Create list: event number -> time [ms]
+    // Distribute simultaneous events evenly across 1 second.
+    unsigned int lastEventTimestamp = 0;
+    const int eventCount = replay->event_list_size();
+    for (int i = 0; i < eventCount; ++i) {
+        int j = i + 1;
+        while ((j < eventCount) && (replay->event_list(j).seconds_elapsed() == lastEventTimestamp))
+            ++j;
 
-    QPainter painter(this);
-    QPen pen;
-    pen.setWidth(3);
-    pen.setJoinStyle(Qt::MiterJoin);
-    pen.setColor(state ? Qt::green : Qt::red);
-    painter.setPen(pen);
-    painter.drawRect(QRect(1, 1, width() - 3, height() - 3));
-}
+        const int numberEventsThisSecond = j - i;
+        for (int k = 0; k < numberEventsThisSecond; ++k)
+            replayTimeline.append(replay->event_list(i + k).seconds_elapsed() * 1000 +
+                                  (int)((qreal)k / (qreal)numberEventsThisSecond * 1000));
 
-void ToggleButton::setState(bool _state)
-{
-    state = _state;
-    emit stateChanged();
-    update();
-}
-
-DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
-    : QWidget(nullptr), parentGame(parent), playerId(_playerId)
-{
-    loadLocalButton = new QPushButton;
-    loadRemoteButton = new QPushButton;
-    readyStartButton = new ToggleButton;
-    readyStartButton->setEnabled(false);
-    sideboardLockButton = new ToggleButton;
-    sideboardLockButton->setEnabled(false);
-
-    connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
-    connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
-    connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
-    connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
-
-    if (parentGame->getIsLocalGame()) {
-        loadRemoteButton->setEnabled(false);
-    } else {
-        connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
+        if (j < eventCount)
+            lastEventTimestamp = replay->event_list(j).seconds_elapsed();
+        i += numberEventsThisSecond - 1;
     }
 
-    auto *buttonHBox = new QHBoxLayout;
-    buttonHBox->addWidget(loadLocalButton);
-    buttonHBox->addWidget(loadRemoteButton);
-    buttonHBox->addWidget(readyStartButton);
-    buttonHBox->addWidget(sideboardLockButton);
-    buttonHBox->setContentsMargins(0, 0, 0, 0);
-    buttonHBox->addStretch();
-    deckView = new DeckView;
-    connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
-    connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
+    createCardInfoDock(true);
+    createPlayerListDock(true);
+    createMessageDock(true);
+    createPlayAreaWidget(true);
+    createDeckViewContainerWidget(true);
+    createReplayDock();
 
-    auto *deckViewLayout = new QVBoxLayout;
-    deckViewLayout->addLayout(buttonHBox);
-    deckViewLayout->addWidget(deckView);
-    deckViewLayout->setContentsMargins(0, 0, 0, 0);
-    setLayout(deckViewLayout);
+    addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
+    addDockWidget(Qt::RightDockWidgetArea, playerListDock);
+    addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+    addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
+    mainWidget = new QStackedWidget(this);
+    mainWidget->addWidget(deckViewContainerWidget);
+    mainWidget->addWidget(gamePlayAreaWidget);
+    setCentralWidget(mainWidget);
+
+    createReplayMenuItems();
+    createViewMenuItems();
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
     refreshShortcuts();
+    messageLog->logReplayStarted(gameInfo.game_id());
+
+    QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
-void DeckViewContainer::retranslateUi()
+TabGame::TabGame(TabSupervisor *_tabSupervisor,
+                 QList<AbstractClient *> &_clients,
+                 const Event_GameJoined &event,
+                 const QMap<int, QString> &_roomGameTypes)
+    : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager()), clients(_clients),
+      gameInfo(event.game_info()), roomGameTypes(_roomGameTypes), hostId(event.host_id()),
+      localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(event.spectator()),
+      judge(event.judge()), gameStateKnown(false), resuming(event.resuming()), currentPhase(-1), activeCard(nullptr),
+      gameClosed(false), replay(nullptr), replayPlayButton(nullptr), replayFastForwardButton(nullptr),
+      aReplaySkipForward(nullptr), aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr),
+      aReplaySkipBackwardBig(nullptr), replayDock(nullptr)
 {
-    loadLocalButton->setText(tr("Load deck..."));
-    loadRemoteButton->setText(tr("Load remote deck..."));
-    readyStartButton->setText(tr("Ready to start"));
-    updateSideboardLockButtonText();
+    // THIS CTOR IS USED ON GAMES
+    gameInfo.set_started(false);
+
+    createCardInfoDock();
+    createPlayerListDock();
+    createMessageDock();
+    createPlayAreaWidget();
+    createDeckViewContainerWidget();
+
+    addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
+    addDockWidget(Qt::RightDockWidgetArea, playerListDock);
+    addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+
+    mainWidget = new QStackedWidget(this);
+    mainWidget->addWidget(deckViewContainerWidget);
+    mainWidget->addWidget(gamePlayAreaWidget);
+    mainWidget->setContentsMargins(0, 0, 0, 0);
+    setCentralWidget(mainWidget);
+
+    createMenuItems();
+    createViewMenuItems();
+    retranslateUi();
+    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    refreshShortcuts();
+
+    // append game to rooms game list for others to see
+    for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
+        gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
+
+    QTimer::singleShot(0, this, SLOT(loadLayout()));
 }
 
-void DeckViewContainer::setButtonsVisible(bool _visible)
+void TabGame::addMentionTag(const QString &value)
 {
-    loadLocalButton->setVisible(_visible);
-    loadRemoteButton->setVisible(_visible);
-    readyStartButton->setVisible(_visible);
-    sideboardLockButton->setVisible(_visible);
+    sayEdit->insert(value + " ");
+    sayEdit->setFocus();
 }
 
-void DeckViewContainer::updateSideboardLockButtonText()
+void TabGame::linkCardToChat(const QString &cardName)
 {
-    if (sideboardLockButton->getState()) {
-        sideboardLockButton->setText(tr("Sideboard unlocked"));
-    } else {
-        sideboardLockButton->setText(tr("Sideboard locked"));
+    sayEdit->insert("[[" + cardName + "]] ");
+    sayEdit->setFocus();
+}
+
+void TabGame::emitUserEvent()
+{
+    bool globalEvent = !spectator || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    emit userEvent(globalEvent);
+    updatePlayerListDockTitle();
+}
+
+TabGame::~TabGame()
+{
+    delete replay;
+}
+
+void TabGame::updatePlayerListDockTitle()
+{
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString userCountInfo = QString(" %1/%2").arg(players.size()).arg(gameInfo.max_players());
+    playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
+                                   (playerListDock->isWindow() ? tabText : QString()));
+}
+
+bool TabGame::isMainPlayerConceded() const
+{
+    Player *player = players.value(localPlayerId, nullptr);
+    return player && player->getConceded();
+}
+
+void TabGame::retranslateUi()
+{
+    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+
+    updatePlayerListDockTitle();
+    cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
+    messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
+    if (replayDock)
+        replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
+
+    if (phasesMenu) {
+        for (int i = 0; i < phaseActions.size(); ++i)
+            phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
+        phasesMenu->setTitle(tr("&Phases"));
     }
-    // setting text on a button removes its shortcut
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-    sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
-}
 
-void DeckViewContainer::refreshShortcuts()
-{
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-    loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
-    loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
-    readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
-    sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
+    gameMenu->setTitle(tr("&Game"));
+    if (aNextPhase) {
+        aNextPhase->setText(tr("Next &phase"));
+    }
+    if (aNextPhaseAction) {
+        aNextPhaseAction->setText(tr("Next phase with &action"));
+    }
+    if (aNextTurn) {
+        aNextTurn->setText(tr("Next &turn"));
+    }
+    if (aReverseTurn) {
+        aReverseTurn->setText(tr("Reverse turn order"));
+    }
+    if (aRemoveLocalArrows) {
+        aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
+    }
+    if (aRotateViewCW) {
+        aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
+    }
+    if (aRotateViewCCW) {
+        aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
+    }
+    if (aGameInfo)
+        aGameInfo->setText(tr("Game &information"));
+    if (aConcede) {
+        if (isMainPlayerConceded()) {
+            aConcede->setText(tr("Un&concede"));
+        } else {
+            aConcede->setText(tr("&Concede"));
+        }
+    }
+    if (aLeaveGame) {
+        aLeaveGame->setText(tr("&Leave game"));
+    }
+    if (aCloseReplay) {
+        aCloseReplay->setText(tr("C&lose replay"));
+    }
+    if (aFocusChat) {
+        aFocusChat->setText(tr("&Focus Chat"));
+    }
+    if (sayLabel) {
+        sayLabel->setText(tr("&Say:"));
+    }
+
+    viewMenu->setTitle(tr("&View"));
+    cardInfoDockMenu->setTitle(tr("Card Info"));
+    messageLayoutDockMenu->setTitle(tr("Messages"));
+    playerListDockMenu->setTitle(tr("Player List"));
+
+    aCardInfoDockVisible->setText(tr("Visible"));
+    aCardInfoDockFloating->setText(tr("Floating"));
+
+    aMessageLayoutDockVisible->setText(tr("Visible"));
+    aMessageLayoutDockFloating->setText(tr("Floating"));
+
+    aPlayerListDockVisible->setText(tr("Visible"));
+    aPlayerListDockFloating->setText(tr("Floating"));
+
+    if (replayDock) {
+        replayDockMenu->setTitle(tr("Replay Timeline"));
+        aReplayDockVisible->setText(tr("Visible"));
+        aReplayDockFloating->setText(tr("Floating"));
+    }
+
+    aResetLayout->setText(tr("Reset layout"));
+
+    cardInfoFrameWidget->retranslateUi();
+
+    QMapIterator<int, Player *> i(players);
+    while (i.hasNext())
+        i.next().value()->retranslateUi();
+    QMapIterator<int, DeckViewContainer *> j(deckViewContainers);
+    while (j.hasNext())
+        j.next().value()->retranslateUi();
+
+    scene->retranslateUi();
 }
 
 void TabGame::refreshShortcuts()
@@ -278,341 +397,15 @@ void TabGame::refreshShortcuts()
     }
 }
 
-void DeckViewContainer::loadLocalDeck()
+void TabGame::closeRequest(bool forced)
 {
-    QFileDialog dialog(this, tr("Load deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
-    dialog.setNameFilters(DeckLoader::fileNameFilters);
-    if (!dialog.exec())
-        return;
-
-    QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
-    QString deckString;
-    DeckLoader deck;
-
-    bool error = !deck.loadFromFile(fileName, fmt);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
-        QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
+    if (!forced && !leaveGame()) {
         return;
     }
-
-    Command_DeckSelect cmd;
-    cmd.set_deck(deckString.toStdString());
-    PendingCommand *pend = parentGame->prepareGameCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deckSelectFinished(const Response &)));
-    parentGame->sendGameCommand(pend, playerId);
-}
-
-void DeckViewContainer::loadRemoteDeck()
-{
-    DlgLoadRemoteDeck dlg(parentGame->getClientForPlayer(playerId), this);
-    if (dlg.exec()) {
-        Command_DeckSelect cmd;
-        cmd.set_deck_id(dlg.getDeckId());
-        PendingCommand *pend = parentGame->prepareGameCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(deckSelectFinished(const Response &)));
-        parentGame->sendGameCommand(pend, playerId);
-    }
-}
-
-void DeckViewContainer::deckSelectFinished(const Response &r)
-{
-    const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
-    DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    // TODO CHANGE THIS TO BE SELECTED BY UUID
-    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
-    setDeck(newDeck);
-}
-
-void DeckViewContainer::readyStart()
-{
-    Command_ReadyStart cmd;
-    cmd.set_ready(!readyStartButton->getState());
-    parentGame->sendGameCommand(cmd, playerId);
-}
-
-void DeckViewContainer::sideboardLockButtonClicked()
-{
-    Command_SetSideboardLock cmd;
-    cmd.set_locked(sideboardLockButton->getState());
-
-    parentGame->sendGameCommand(cmd, playerId);
-}
-
-void DeckViewContainer::sideboardPlanChanged()
-{
-    Command_SetSideboardPlan cmd;
-    const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
-    for (const auto &i : newPlan)
-        cmd.add_move_list()->CopyFrom(i);
-    parentGame->sendGameCommand(cmd, playerId);
-}
-
-void DeckViewContainer::setReadyStart(bool ready)
-{
-    readyStartButton->setState(ready);
-    deckView->setLocked(ready || !sideboardLockButton->getState());
-    sideboardLockButton->setEnabled(!readyStartButton->getState() && readyStartButton->isEnabled());
-}
-
-void DeckViewContainer::setSideboardLocked(bool locked)
-{
-    sideboardLockButton->setState(!locked);
-    deckView->setLocked(readyStartButton->getState() || !sideboardLockButton->getState());
-    if (locked)
-        deckView->resetSideboardPlan();
-}
-
-void DeckViewContainer::setDeck(const DeckLoader &deck)
-{
-    deckView->setDeck(deck);
-    readyStartButton->setEnabled(true);
-    sideboardLockButton->setState(false);
-    sideboardLockButton->setEnabled(true);
-}
-
-TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
-      isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
-      resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
-      sayLabel(nullptr), sayEdit(nullptr)
-{
-    // THIS CTOR IS USED ON REPLAY
-    gameInfo.CopyFrom(replay->game_info());
-    gameInfo.set_spectators_omniscient(true);
-
-    // Create list: event number -> time [ms]
-    // Distribute simultaneous events evenly across 1 second.
-    unsigned int lastEventTimestamp = 0;
-    const int eventCount = replay->event_list_size();
-    for (int i = 0; i < eventCount; ++i) {
-        int j = i + 1;
-        while ((j < eventCount) && (replay->event_list(j).seconds_elapsed() == lastEventTimestamp))
-            ++j;
-
-        const int numberEventsThisSecond = j - i;
-        for (int k = 0; k < numberEventsThisSecond; ++k)
-            replayTimeline.append(replay->event_list(i + k).seconds_elapsed() * 1000 +
-                                  (int)((qreal)k / (qreal)numberEventsThisSecond * 1000));
-
-        if (j < eventCount)
-            lastEventTimestamp = replay->event_list(j).seconds_elapsed();
-        i += numberEventsThisSecond - 1;
-    }
-
-    createCardInfoDock(true);
-    createPlayerListDock(true);
-    createMessageDock(true);
-    createPlayAreaWidget(true);
-    createDeckViewContainerWidget(true);
-    createReplayDock();
-
-    addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
-    addDockWidget(Qt::RightDockWidgetArea, playerListDock);
-    addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
-    addDockWidget(Qt::BottomDockWidgetArea, replayDock);
-
-    mainWidget = new QStackedWidget(this);
-    mainWidget->addWidget(deckViewContainerWidget);
-    mainWidget->addWidget(gamePlayAreaWidget);
-    setCentralWidget(mainWidget);
-
-    createReplayMenuItems();
-    createViewMenuItems();
-    retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
-    refreshShortcuts();
-    messageLog->logReplayStarted(gameInfo.game_id());
-
-    this->installEventFilter(this);
-    QTimer::singleShot(0, this, SLOT(loadLayout()));
-}
-
-TabGame::TabGame(TabSupervisor *_tabSupervisor,
-                 QList<AbstractClient *> &_clients,
-                 const Event_GameJoined &event,
-                 const QMap<int, QString> &_roomGameTypes)
-    : Tab(_tabSupervisor), clients(_clients), gameInfo(event.game_info()), roomGameTypes(_roomGameTypes),
-      hostId(event.host_id()), localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()),
-      spectator(event.spectator()), judge(event.judge()), gameStateKnown(false), resuming(event.resuming()),
-      currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(nullptr), replayPlayButton(nullptr),
-      replayFastForwardButton(nullptr), aReplaySkipForward(nullptr), aReplaySkipBackward(nullptr),
-      aReplaySkipForwardBig(nullptr), aReplaySkipBackwardBig(nullptr), replayDock(nullptr)
-{
-    // THIS CTOR IS USED ON GAMES
-    gameInfo.set_started(false);
-
-    createCardInfoDock();
-    createPlayerListDock();
-    createMessageDock();
-    createPlayAreaWidget();
-    createDeckViewContainerWidget();
-
-    addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
-    addDockWidget(Qt::RightDockWidgetArea, playerListDock);
-    addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
-
-    mainWidget = new QStackedWidget(this);
-    mainWidget->addWidget(deckViewContainerWidget);
-    mainWidget->addWidget(gamePlayAreaWidget);
-    mainWidget->setContentsMargins(0, 0, 0, 0);
-    setCentralWidget(mainWidget);
-
-    createMenuItems();
-    createViewMenuItems();
-    retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
-    refreshShortcuts();
-
-    // append game to rooms game list for others to see
-    for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
-        gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
-
-    this->installEventFilter(this);
-    QTimer::singleShot(0, this, SLOT(loadLayout()));
-}
-
-void TabGame::addMentionTag(const QString &value)
-{
-    sayEdit->insert(value + " ");
-    sayEdit->setFocus();
-}
-
-void TabGame::linkCardToChat(const QString &cardName)
-{
-    sayEdit->insert("[[" + cardName + "]] ");
-    sayEdit->setFocus();
-}
-
-void TabGame::emitUserEvent()
-{
-    bool globalEvent = !spectator || SettingsCache::instance().getSpectatorNotificationsEnabled();
-    emit userEvent(globalEvent);
-    updatePlayerListDockTitle();
-}
-
-TabGame::~TabGame()
-{
-    delete replay;
-
-    QMapIterator<int, Player *> i(players);
-    while (i.hasNext()) {
-        delete i.next().value();
-    }
-
-    players.clear();
 
     emit gameClosing(this);
-}
 
-void TabGame::updatePlayerListDockTitle()
-{
-    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
-    QString userCountInfo = QString(" %1/%2").arg(players.size()).arg(gameInfo.max_players());
-    playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
-                                   (playerListDock->isWindow() ? tabText : QString()));
-}
-
-void TabGame::retranslateUi()
-{
-    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
-
-    updatePlayerListDockTitle();
-    cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
-    messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
-    if (replayDock)
-        replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
-
-    if (phasesMenu) {
-        for (int i = 0; i < phaseActions.size(); ++i)
-            phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
-        phasesMenu->setTitle(tr("&Phases"));
-    }
-
-    gameMenu->setTitle(tr("&Game"));
-    if (aNextPhase) {
-        aNextPhase->setText(tr("Next &phase"));
-    }
-    if (aNextPhaseAction) {
-        aNextPhaseAction->setText(tr("Next phase with &action"));
-    }
-    if (aNextTurn) {
-        aNextTurn->setText(tr("Next &turn"));
-    }
-    if (aReverseTurn) {
-        aReverseTurn->setText(tr("Reverse turn order"));
-    }
-    if (aRemoveLocalArrows) {
-        aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
-    }
-    if (aRotateViewCW) {
-        aRotateViewCW->setText(tr("Rotate View Cl&ockwise"));
-    }
-    if (aRotateViewCCW) {
-        aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
-    }
-    if (aGameInfo)
-        aGameInfo->setText(tr("Game &information"));
-    if (aConcede) {
-        aConcede->setText(tr("&Concede"));
-    }
-    if (aLeaveGame) {
-        aLeaveGame->setText(tr("&Leave game"));
-    }
-    if (aCloseReplay) {
-        aCloseReplay->setText(tr("C&lose replay"));
-    }
-    if (aFocusChat) {
-        aFocusChat->setText(tr("&Focus Chat"));
-    }
-    if (sayLabel) {
-        sayLabel->setText(tr("&Say:"));
-    }
-
-    viewMenu->setTitle(tr("&View"));
-    cardInfoDockMenu->setTitle(tr("Card Info"));
-    messageLayoutDockMenu->setTitle(tr("Messages"));
-    playerListDockMenu->setTitle(tr("Player List"));
-
-    aCardInfoDockVisible->setText(tr("Visible"));
-    aCardInfoDockFloating->setText(tr("Floating"));
-
-    aMessageLayoutDockVisible->setText(tr("Visible"));
-    aMessageLayoutDockFloating->setText(tr("Floating"));
-
-    aPlayerListDockVisible->setText(tr("Visible"));
-    aPlayerListDockFloating->setText(tr("Floating"));
-
-    if (replayDock) {
-        replayDockMenu->setTitle(tr("Replay Timeline"));
-        aReplayDockVisible->setText(tr("Visible"));
-        aReplayDockFloating->setText(tr("Floating"));
-    }
-
-    aResetLayout->setText(tr("Reset layout"));
-
-    cardInfoFrameWidget->retranslateUi();
-
-    QMapIterator<int, Player *> i(players);
-    while (i.hasNext())
-        i.next().value()->retranslateUi();
-    QMapIterator<int, DeckViewContainer *> j(deckViewContainers);
-    while (j.hasNext())
-        j.next().value()->retranslateUi();
-
-    scene->retranslateUi();
-}
-
-void TabGame::closeRequest()
-{
-    actLeaveGame();
+    close();
 }
 
 void TabGame::replayNextEvent(Player::EventProcessingOptions options)
@@ -703,25 +496,37 @@ void TabGame::actConcede()
     }
 }
 
-void TabGame::actLeaveGame()
+/**
+ * Confirms the leave game and sends the leave game command, if applicable.
+ *
+ * @return True if the leave game is confirmed
+ */
+bool TabGame::leaveGame()
 {
     if (!gameClosed) {
-        if (!spectator)
+        if (!spectator) {
+            tabSupervisor->setCurrentWidget(this);
             if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
-                return;
+                return false;
+        }
 
         if (!replay)
             sendGameCommand(Command_LeaveGame());
     }
-    scene->clearViews();
-    deleteLater();
+    return true;
 }
 
 void TabGame::actSay()
 {
     if (completer->popup()->isVisible())
         return;
+
+    if (sayEdit->text().startsWith("/card ")) {
+        cardInfoFrameWidget->setCard(sayEdit->text().mid(6));
+        sayEdit->clear();
+        return;
+    }
 
     if (!sayEdit->text().isEmpty()) {
         Command_GameSay cmd;
@@ -834,6 +639,15 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
         connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
         deckViewContainers.insert(playerId, deckView);
         deckViewContainerLayout->addWidget(deckView);
+
+        // auto load deck for player if that debug setting is enabled
+        QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getName());
+        if (!deckPath.isEmpty()) {
+            QTimer::singleShot(0, this, [deckView, deckPath] {
+                deckView->loadDeckFromFile(deckPath);
+                deckView->readyAndUpdate();
+            });
+        }
     }
 
     gameMenu->insertMenu(playersSeparator, newPlayer->getPlayerMenu());
@@ -857,6 +671,9 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
             }
         }
     }
+
+    // update menu text when player concedes so that "concede" gets updated to "unconcede"
+    connect(newPlayer, &Player::playerCountChanged, this, &TabGame::retranslateUi);
 
     emit playerAdded(newPlayer);
     return newPlayer;
@@ -936,7 +753,7 @@ void TabGame::processGameEventContainer(const GameEventContainer &cont,
                 default: {
                     Player *player = players.value(playerId, 0);
                     if (!player) {
-                        qDebug() << "unhandled game event: invalid player id";
+                        qCWarning(TabGameLog) << "unhandled game event: invalid player id";
                         break;
                     }
                     player->processGameEvent(eventType, event, context, options);
@@ -1019,6 +836,7 @@ void TabGame::startGame(bool _resuming)
     while (i.hasNext()) {
         i.next();
         i.value()->setReadyStart(false);
+        i.value()->setVisualDeckStorageExists(false);
         i.value()->hide();
     }
 
@@ -1065,8 +883,7 @@ void TabGame::closeGame()
 void TabGame::eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
     const ServerInfo_User &userInfo = spectators.value(eventPlayerId);
-    messageLog->logSpectatorSay(QString::fromStdString(userInfo.name()), UserLevelFlags(userInfo.user_level()),
-                                QString::fromStdString(userInfo.privlevel()), QString::fromStdString(event.message()));
+    messageLog->logSpectatorSay(userInfo, QString::fromStdString(event.message()));
 }
 
 void TabGame::eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext & /*context*/)
@@ -1112,8 +929,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    PictureLoader::cacheCardPixmaps(
-                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardList()));
+                    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(
+                        newDeck.getCardListWithProviderId()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }
@@ -1273,6 +1090,7 @@ void TabGame::eventLeave(const Event_Leave &event, int eventPlayerId, const Game
     players.remove(eventPlayerId);
     emit playerRemoved(player);
     player->clear();
+    scene->removePlayer(player);
     player->deleteLater();
 
     // Rearrange all remaining zones so that attachment relationship updates take place
@@ -1381,7 +1199,7 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event,
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
     connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfoFrameWidget, SLOT(setCard(AbstractCardItem *)));
-    connect(card, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    connect(card, &AbstractCardItem::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(card, SIGNAL(cardShiftClicked(QString)), this, SLOT(linkCardToChat(QString)));
 }
@@ -1489,7 +1307,7 @@ void TabGame::createMenuItems()
     aConcede = new QAction(this);
     connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
     aLeaveGame = new QAction(this);
-    connect(aLeaveGame, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+    connect(aLeaveGame, &QAction::triggered, this, [this] { closeRequest(); });
     aFocusChat = new QAction(this);
     connect(aFocusChat, SIGNAL(triggered()), sayEdit, SLOT(setFocus()));
     aCloseReplay = nullptr;
@@ -1539,7 +1357,7 @@ void TabGame::createReplayMenuItems()
     aFocusChat = nullptr;
     aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
-    connect(aCloseReplay, SIGNAL(triggered()), this, SLOT(actLeaveGame()));
+    connect(aCloseReplay, &QAction::triggered, this, [this] { closeRequest(); });
 
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);
@@ -1742,22 +1560,22 @@ void TabGame::createReplayDock()
     aReplaySkipForward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipForward);
     connect(aReplaySkipForward, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(ReplayTimelineWidget::SMALL_SKIP_MS); });
+            [this] { timelineWidget->skipByAmount(ReplayTimelineWidget::SMALL_SKIP_MS); });
 
     aReplaySkipBackward = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipBackward);
     connect(aReplaySkipBackward, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(-ReplayTimelineWidget::SMALL_SKIP_MS); });
+            [this] { timelineWidget->skipByAmount(-ReplayTimelineWidget::SMALL_SKIP_MS); });
 
     aReplaySkipForwardBig = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipForwardBig);
     connect(aReplaySkipForwardBig, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(ReplayTimelineWidget::BIG_SKIP_MS); });
+            [this] { timelineWidget->skipByAmount(ReplayTimelineWidget::BIG_SKIP_MS); });
 
     aReplaySkipBackwardBig = new QAction(timelineWidget);
     timelineWidget->addAction(aReplaySkipBackwardBig);
     connect(aReplaySkipBackwardBig, &QAction::triggered, this,
-            [=]() { timelineWidget->skipByAmount(-ReplayTimelineWidget::BIG_SKIP_MS); });
+            [this] { timelineWidget->skipByAmount(-ReplayTimelineWidget::BIG_SKIP_MS); });
 
     // buttons
     replayPlayButton = new QToolButton;
@@ -1807,9 +1625,9 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
-void TabGame::viewCardInfo(const QString &cardName)
+void TabGame::viewCardInfo(const QString &cardName, const QString &providerId) const
 {
-    cardInfoFrameWidget->setCard(cardName);
+    cardInfoFrameWidget->setCard(cardName, providerId);
 }
 
 void TabGame::createCardInfoDock(bool bReplay)
@@ -1861,9 +1679,9 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    messageLog = new MessageLogWidget(tabSupervisor, tabSupervisor, this);
+    messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
-    connect(messageLog, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
 
     if (!bReplay) {
@@ -1933,6 +1751,27 @@ void TabGame::createMessageDock(bool bReplay)
     connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
 }
 
+void TabGame::hideEvent(QHideEvent *event)
+{
+    LayoutsSettings &layouts = SettingsCache::instance().layouts();
+    if (replay) {
+        layouts.setReplayPlayAreaState(saveState());
+        layouts.setReplayPlayAreaGeometry(saveGeometry());
+        layouts.setReplayCardInfoSize(cardInfoDock->size());
+        layouts.setReplayMessageLayoutSize(messageLayoutDock->size());
+        layouts.setReplayPlayerListSize(playerListDock->size());
+        layouts.setReplayReplaySize(replayDock->size());
+    } else {
+        layouts.setGamePlayAreaState(saveState());
+        layouts.setGamePlayAreaGeometry(saveGeometry());
+        layouts.setGameCardInfoSize(cardInfoDock->size());
+        layouts.setGameMessageLayoutSize(messageLayoutDock->size());
+        layouts.setGamePlayerListSize(playerListDock->size());
+    }
+
+    Tab::hideEvent(event);
+}
+
 // Method uses to sync docks state with menu items state
 bool TabGame::eventFilter(QObject *o, QEvent *e)
 {
@@ -1952,23 +1791,6 @@ bool TabGame::eventFilter(QObject *o, QEvent *e)
         }
     }
 
-    if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        if (replay) {
-            layouts.setReplayPlayAreaState(saveState());
-            layouts.setReplayPlayAreaGeometry(saveGeometry());
-            layouts.setReplayCardInfoSize(cardInfoDock->size());
-            layouts.setReplayMessageLayoutSize(messageLayoutDock->size());
-            layouts.setReplayPlayerListSize(playerListDock->size());
-            layouts.setReplayReplaySize(replayDock->size());
-        } else {
-            layouts.setGamePlayAreaState(saveState());
-            layouts.setGamePlayAreaGeometry(saveGeometry());
-            layouts.setGameCardInfoSize(cardInfoDock->size());
-            layouts.setGameMessageLayoutSize(messageLayoutDock->size());
-            layouts.setGamePlayerListSize(playerListDock->size());
-        }
-    }
     return false;
 }
 

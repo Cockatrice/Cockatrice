@@ -1,6 +1,6 @@
 #include "layouts_settings.h"
 
-LayoutsSettings::LayoutsSettings(QString settingPath, QObject *parent)
+LayoutsSettings::LayoutsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "layouts.ini", parent)
 {
 }
@@ -25,7 +25,7 @@ void LayoutsSettings::setDeckEditorGeometry(const QByteArray &value)
     setValue(value, "layouts/deckEditor_geometry");
 }
 
-const QSize LayoutsSettings::getDeckEditorCardSize()
+QSize LayoutsSettings::getDeckEditorCardSize()
 {
     QVariant previous = getValue("layouts/deckEditor_CardSize");
     return previous == QVariant() ? QSize(250, 500) : previous.toSize();
@@ -36,7 +36,7 @@ void LayoutsSettings::setDeckEditorCardSize(const QSize &value)
     setValue(value, "layouts/deckEditor_CardSize");
 }
 
-const QSize LayoutsSettings::getDeckEditorDeckSize()
+QSize LayoutsSettings::getDeckEditorDeckSize()
 {
     QVariant previous = getValue("layouts/deckEditor_DeckSize");
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
@@ -47,7 +47,18 @@ void LayoutsSettings::setDeckEditorDeckSize(const QSize &value)
     setValue(value, "layouts/deckEditor_DeckSize");
 }
 
-const QSize LayoutsSettings::getDeckEditorFilterSize()
+QSize LayoutsSettings::getDeckEditorPrintingSelectorSize()
+{
+    QVariant previous = getValue("layouts/deckEditor_PrintingSelectorSize");
+    return previous == QVariant() ? QSize(525, 250) : previous.toSize();
+}
+
+void LayoutsSettings::setDeckEditorPrintingSelectorSize(const QSize &value)
+{
+    setValue(value, "layouts/deckEditor_PrintingSelectorSize");
+}
+
+QSize LayoutsSettings::getDeckEditorFilterSize()
 {
     QVariant previous = getValue("layouts/deckEditor_FilterSize");
     return previous == QVariant() ? QSize(250, 250) : previous.toSize();

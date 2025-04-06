@@ -15,6 +15,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -23,9 +24,11 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QUrl>
 #include <QVBoxLayout>
 
-TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
+TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
+    : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
@@ -36,16 +39,31 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     localDirView->setColumnHidden(1, true);
     localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
     localDirView->setSortingEnabled(true);
+    localDirView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     localDirView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     localDirView->header()->setSortIndicator(0, Qt::AscendingOrder);
 
-    leftToolBar = new QToolBar;
+    // Left side layout
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    leftToolBar = new QToolBar(this);
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *leftToolBarLayout = new QHBoxLayout;
-    leftToolBarLayout->addStretch();
-    leftToolBarLayout->addWidget(leftToolBar);
-    leftToolBarLayout->addStretch();
+
+    QToolBar *leftRightmostToolBar = new QToolBar(this);
+    leftRightmostToolBar->setOrientation(Qt::Horizontal);
+    leftRightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *leftToolBarLayout = new QGridLayout;
+    leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
+    leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *leftVbox = new QVBoxLayout;
     leftVbox->addWidget(localDirView);
@@ -53,6 +71,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     leftGroupBox = new QGroupBox;
     leftGroupBox->setLayout(leftVbox);
 
+    // Right side layout
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
@@ -69,17 +88,31 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
+    // combine layouts
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
+    // Left side actions
     aOpenLocalReplay = new QAction(this);
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
     connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
+    aRenameLocal = new QAction(this);
+    aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
+    connect(aRenameLocal, &QAction::triggered, this, &TabReplays::actRenameLocal);
+    aNewLocalFolder = new QAction(this);
+    aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
+    connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
     aDeleteLocalReplay = new QAction(this);
     aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
+
+    aOpenReplaysFolder = new QAction(this);
+    aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
+    connect(aOpenReplaysFolder, &QAction::triggered, this, &TabReplays::actOpenReplaysFolder);
+
+    // Right side actions
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
     connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
@@ -94,8 +127,14 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
 
+    // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalReplay);
+    leftToolBar->addAction(aRenameLocal);
+    leftToolBar->addAction(aNewLocalFolder);
     leftToolBar->addAction(aDeleteLocalReplay);
+
+    leftRightmostToolBar->addAction(aOpenReplaysFolder);
+
     rightToolBar->addAction(aOpenRemoteReplay);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aKeep);
@@ -109,6 +148,10 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client) :
 
     connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this,
             SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
+
+    connect(client, &AbstractClient::userInfoChanged, this, &TabReplays::handleConnected);
+    connect(client, &AbstractClient::statusChanged, this, &TabReplays::handleConnectionChanged);
+    setRemoteEnabled(currentUserInfo && currentUserInfo->user_level() & ServerInfo_User::IsRegistered);
 }
 
 void TabReplays::retranslateUi()
@@ -117,59 +160,173 @@ void TabReplays::retranslateUi()
     rightGroupBox->setTitle(tr("Server replay storage"));
 
     aOpenLocalReplay->setText(tr("Watch replay"));
+    aRenameLocal->setText(tr("Rename"));
+    aNewLocalFolder->setText(tr("New folder"));
     aDeleteLocalReplay->setText(tr("Delete"));
+    aOpenReplaysFolder->setText(tr("Open replays folder"));
     aOpenRemoteReplay->setText(tr("Watch replay"));
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
     aDeleteRemoteReplay->setText(tr("Delete"));
 }
 
+void TabReplays::handleConnected(const ServerInfo_User &userInfo)
+{
+    setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
+}
+
+/**
+ * This is only responsible for handling the disconnect. The connect is already handled elsewhere
+ */
+void TabReplays::handleConnectionChanged(ClientStatus status)
+{
+    if (status == StatusDisconnected) {
+        setRemoteEnabled(false);
+    }
+}
+
+void TabReplays::setRemoteEnabled(bool enabled)
+{
+    aOpenRemoteReplay->setEnabled(enabled);
+    aDownload->setEnabled(enabled);
+    aKeep->setEnabled(enabled);
+    aDeleteRemoteReplay->setEnabled(enabled);
+
+    if (enabled) {
+        serverDirView->refreshTree();
+    } else {
+        serverDirView->clearTree();
+    }
+}
+
+void TabReplays::actLocalDoubleClick(const QModelIndex &curLeft)
+{
+    if (!localDirModel->isDir(curLeft)) {
+        actOpenLocalReplay();
+    }
+}
+
 void TabReplays::actOpenLocalReplay()
 {
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        if (localDirModel->isDir(curLeft))
+            continue;
+        QString filePath = localDirModel->filePath(curLeft);
+
+        QFile f(filePath);
+        if (!f.open(QIODevice::ReadOnly))
+            continue;
+        QByteArray _data = f.readAll();
+        f.close();
+
+        GameReplay *replay = new GameReplay;
+        replay->ParseFromArray(_data.data(), _data.size());
+
+        emit openReplay(replay);
+    }
+}
+
+void TabReplays::actRenameLocal()
+{
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
+    for (const auto &curLeft : curLefts) {
+        const QFileInfo info = localDirModel->fileInfo(curLeft);
+
+        const QString oldName = info.baseName();
+        const QString title = info.isDir() ? tr("Rename local folder") : tr("Rename local file");
+
+        bool ok;
+        QString newName = QInputDialog::getText(this, title, tr("New name:"), QLineEdit::Normal, oldName, &ok);
+        if (!ok) { // terminate all remaining selections if user cancels
+            return;
+        }
+        if (newName.isEmpty() || oldName == newName) {
+            continue;
+        }
+
+        QString newFileName = newName;
+        if (!info.suffix().isEmpty()) {
+            newFileName += "." + info.suffix();
+        }
+        const QString newFilePath = QFileInfo(info.dir(), newFileName).filePath();
+
+        if (!QFile::rename(info.filePath(), newFilePath)) {
+            QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
+        }
+    }
+}
+
+void TabReplays::actNewLocalFolder()
+{
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (localDirModel->isDir(curLeft))
+
+    QModelIndex dirIndex;
+    if (curLeft.isValid() && !localDirModel->isDir(curLeft)) {
+        dirIndex = curLeft.parent();
+    } else {
+        dirIndex = curLeft;
+    }
+
+    bool ok;
+    QString folderName =
+        QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
+    if (!ok || folderName.isEmpty())
         return;
-    QString filePath = localDirModel->filePath(curLeft);
 
-    QFile f(filePath);
-    if (!f.open(QIODevice::ReadOnly))
-        return;
-    QByteArray _data = f.readAll();
-    f.close();
-
-    GameReplay *replay = new GameReplay;
-    replay->ParseFromArray(_data.data(), _data.size());
-
-    emit openReplay(replay);
+    localDirModel->mkdir(dirIndex, folderName);
 }
 
 void TabReplays::actDeleteLocalReplay()
 {
-    QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (!curLeft.isValid())
-        return;
+    QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
 
-    if (QMessageBox::warning(this, tr("Delete local file"),
-                             tr("Are you sure you want to delete \"%1\"?").arg(localDirModel->fileName(curLeft)),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+    if (curLefts.isEmpty()) {
         return;
+    }
 
-    localDirModel->remove(curLeft);
+    if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+
+    for (const auto &curLeft : curLefts) {
+        if (curLeft.isValid()) {
+            localDirModel->remove(curLeft);
+        }
+    }
+}
+
+void TabReplays::actOpenReplaysFolder()
+{
+    QString dir = localDirModel->rootPath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+}
+
+void TabReplays::actRemoteDoubleClick(const QModelIndex &curRight)
+{
+    if (serverDirView->getReplay(curRight)) {
+        actOpenRemoteReplay();
+    }
 }
 
 void TabReplays::actOpenRemoteReplay()
 {
-    ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
-    if (!curRight)
-        return;
+    auto const curRights = serverDirView->getSelectedReplays();
 
-    Command_ReplayDownload cmd;
-    cmd.set_replay_id(curRight->replay_id());
+    for (const auto curRight : curRights) {
+        if (!curRight) {
+            continue;
+        }
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(openRemoteReplayFinished(const Response &)));
-    client->sendCommand(pend);
+        Command_ReplayDownload cmd;
+        cmd.set_replay_id(curRight->replay_id());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(openRemoteReplayFinished(const Response &)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::openRemoteReplayFinished(const Response &r)
@@ -186,34 +343,46 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
 void TabReplays::actDownload()
 {
-    QString filePath;
     QModelIndex curLeft = localDirView->selectionModel()->currentIndex();
-    if (!curLeft.isValid())
-        filePath = localDirModel->rootPath();
-    else {
-        while (!localDirModel->isDir(curLeft))
-            curLeft = curLeft.parent();
-        filePath = localDirModel->filePath(curLeft);
+    while (!localDirModel->isDir(curLeft)) {
+        curLeft = curLeft.parent();
     }
 
-    ServerInfo_Replay const *curRight = serverDirView->getCurrentReplay();
-
-    if (!curRight) {
-        QMessageBox::information(this, tr("Downloading Replays"),
-                                 tr("Folder download is not yet supported. Please download replays individually."));
-        return;
+    for (const auto curRight : serverDirView->selectionModel()->selectedRows()) {
+        downloadNodeAtIndex(curLeft, curRight);
     }
+}
 
-    filePath += QString("/replay_%1.cor").arg(curRight->replay_id());
+void TabReplays::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight)
+{
+    if (const auto replayMatch = serverDirView->getReplayMatch(curRight)) {
+        // node at index is a folder
+        const QString name =
+            QString::number(replayMatch->game_id()) + "_" + QString::fromStdString(replayMatch->game_name());
 
-    Command_ReplayDownload cmd;
-    cmd.set_replay_id(curRight->replay_id());
+        const auto dirIndex = curLeft.isValid() ? curLeft : localDirModel->index(localDirModel->rootPath());
+        const auto newDirIndex = localDirModel->mkdir(dirIndex, name);
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(filePath);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(downloadFinished(Response, CommandContainer, QVariant)));
-    client->sendCommand(pend);
+        int rows = serverDirView->model()->rowCount(curRight);
+        for (int i = 0; i < rows; i++) {
+            const auto childIndex = serverDirView->model()->index(i, 0, curRight);
+            downloadNodeAtIndex(newDirIndex, childIndex);
+        }
+    } else if (const auto replay = serverDirView->getReplay(curRight)) {
+        // node at index is a replay
+        const QString dirPath = curLeft.isValid() ? localDirModel->filePath(curLeft) : localDirModel->rootPath();
+        const QString filePath = dirPath + QString("/replay_%1.cor").arg(replay->replay_id());
+
+        Command_ReplayDownload cmd;
+        cmd.set_replay_id(replay->replay_id());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        pend->setExtraData(filePath);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        client->sendCommand(pend);
+    }
+    // node at index was invalid
 }
 
 void TabReplays::downloadFinished(const Response &r,
@@ -235,18 +404,22 @@ void TabReplays::downloadFinished(const Response &r,
 
 void TabReplays::actKeepRemoteReplay()
 {
-    ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
-    if (!curRight)
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+
+    if (curRights.isEmpty()) {
         return;
+    }
 
-    Command_ReplayModifyMatch cmd;
-    cmd.set_game_id(curRight->game_id());
-    cmd.set_do_not_hide(!curRight->do_not_hide());
+    for (const auto curRight : curRights) {
+        Command_ReplayModifyMatch cmd;
+        cmd.set_game_id(curRight->game_id());
+        cmd.set_do_not_hide(!curRight->do_not_hide());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
@@ -265,21 +438,27 @@ void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContai
 
 void TabReplays::actDeleteRemoteReplay()
 {
-    ServerInfo_ReplayMatch const *curRight = serverDirView->getCurrentReplayMatch();
-    if (!curRight)
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+
+    if (curRights.isEmpty()) {
         return;
+    }
+
     if (QMessageBox::warning(this, tr("Delete remote replay"),
-                             tr("Are you sure you want to delete the replay of game %1?").arg(curRight->game_id()),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+                             tr("Are you sure you want to delete the selected replays?"),
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
+    }
 
-    Command_ReplayDeleteMatch cmd;
-    cmd.set_game_id(curRight->game_id());
+    for (const auto curRight : curRights) {
+        Command_ReplayDeleteMatch cmd;
+        cmd.set_game_id(curRight->game_id());
 
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
-    client->sendCommand(pend);
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
+                SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
+        client->sendCommand(pend);
+    }
 }
 
 void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
@@ -294,5 +473,11 @@ void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandCont
 
 void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
 {
-    serverDirView->addMatchInfo(event.match_info());
+    if (event.has_match_info()) {
+        // 99.9% of events will have match info (Normal Workflow)
+        serverDirView->addMatchInfo(event.match_info());
+    } else {
+        // When a Moderator force adds a replay, we need to refresh their view
+        serverDirView->refreshTree();
+    }
 }

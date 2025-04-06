@@ -37,13 +37,11 @@ RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, 
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
     lockIcon = QPixmap("theme:icons/lock");
-
-    refreshTree();
 }
 
 RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()
 {
-    clearTree();
+    clearAll();
 }
 
 int RemoteReplayList_TreeModel::rowCount(const QModelIndex &parent) const
@@ -192,7 +190,7 @@ QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
         return QModelIndex();
     else {
         ReplayNode *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(ind.internalPointer()));
-        return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode);
+        return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode->getParent());
     }
 }
 
@@ -221,6 +219,18 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getReplayMatch(const Q
         return nullptr;
 
     auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
+    if (!node)
+        return nullptr;
+
+    return &node->getMatchInfo();
+}
+
+ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatch(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return nullptr;
+
+    auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node) {
         auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
         if (!_node)
@@ -230,7 +240,10 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getReplayMatch(const Q
     return &node->getMatchInfo();
 }
 
-void RemoteReplayList_TreeModel::clearTree()
+/**
+ * Deletes all items in the model
+ */
+void RemoteReplayList_TreeModel::clearAll()
 {
     for (int i = 0; i < replayMatches.size(); ++i)
         delete replayMatches[i];
@@ -244,6 +257,13 @@ void RemoteReplayList_TreeModel::refreshTree()
             SLOT(replayListFinished(const Response &)));
 
     client->sendCommand(pend);
+}
+
+void RemoteReplayList_TreeModel::clearTree()
+{
+    beginResetModel();
+    clearAll();
+    endResetModel();
 }
 
 void RemoteReplayList_TreeModel::addMatchInfo(const ServerInfo_ReplayMatch &matchInfo)
@@ -282,7 +302,7 @@ void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
     const Response_ReplayList &resp = r.GetExtension(Response_ReplayList::ext);
 
     beginResetModel();
-    clearTree();
+    clearAll();
 
     for (int i = 0; i < resp.match_list_size(); ++i)
         replayMatches.append(new MatchNode(resp.match_list(i)));
@@ -306,14 +326,60 @@ RemoteReplayList_TreeWidget::RemoteReplayList_TreeWidget(AbstractClient *_client
     setSortingEnabled(true);
     proxyModel->sort(0, Qt::AscendingOrder);
     header()->setSortIndicator(0, Qt::AscendingOrder);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
-ServerInfo_Replay const *RemoteReplayList_TreeWidget::getCurrentReplay() const
+/**
+ * Gets the replay at the given index
+ * @return The replay. Returns nullptr if there is no replay at the index.
+ */
+ServerInfo_Replay const *RemoteReplayList_TreeWidget::getReplay(const QModelIndex &ind) const
 {
-    return treeModel->getReplay(proxyModel->mapToSource(selectionModel()->currentIndex()));
+    return treeModel->getReplay(proxyModel->mapToSource(ind));
 }
 
-ServerInfo_ReplayMatch const *RemoteReplayList_TreeWidget::getCurrentReplayMatch() const
+/**
+ * Gets the replay match at the given index
+ * @return The replay match. Returns nullptr if there is no replay match at the index.
+ */
+ServerInfo_ReplayMatch const *RemoteReplayList_TreeWidget::getReplayMatch(const QModelIndex &ind) const
 {
-    return treeModel->getReplayMatch(proxyModel->mapToSource(selectionModel()->currentIndex()));
+    return treeModel->getReplayMatch(proxyModel->mapToSource(ind));
+}
+
+/**
+ * Gets all currently selected replays.
+ * Any selection that isn't a replay file (e.g. a folder) will appear as a nullptr in the list.
+ * Make sure to check the list for nullptr before using it.
+ *
+ * @return A List of pointers to the selected replays, as well as nullptr for any selection that isn't a replay.
+ */
+QList<ServerInfo_Replay const *> RemoteReplayList_TreeWidget::getSelectedReplays() const
+{
+    const auto selection = selectionModel()->selectedRows();
+    auto replays = QList<ServerInfo_Replay const *>();
+    for (const auto &row : selection) {
+        replays << treeModel->getReplay(proxyModel->mapToSource(row));
+    }
+
+    return replays;
+}
+
+/**
+ * Gets all currently selected replayMatches.
+ * If a non-folder node is selected, it will return the parent folder of that node.
+ *
+ * @return A Set of pointers to the selected replayMatches.
+ */
+QSet<ServerInfo_ReplayMatch const *> RemoteReplayList_TreeWidget::getSelectedReplayMatches() const
+{
+    const auto selection = selectionModel()->selectedRows();
+    auto replayMatches = QSet<ServerInfo_ReplayMatch const *>();
+    for (const auto &row : selection) {
+        if (const auto replayMatch = treeModel->getEnclosingReplayMatch(proxyModel->mapToSource(row))) {
+            replayMatches << replayMatch;
+        }
+    }
+
+    return replayMatches;
 }

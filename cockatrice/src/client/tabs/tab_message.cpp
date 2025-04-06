@@ -4,6 +4,7 @@
 #include "../../main.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
+#include "../../server/user/user_list_manager.h"
 #include "../../settings/cache_settings.h"
 #include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
@@ -25,8 +26,8 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)),
       otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
 {
-    chatView = new ChatView(tabSupervisor, tabSupervisor, 0, true);
-    connect(chatView, SIGNAL(showCardInfoPopup(QPoint, QString)), this, SLOT(showCardInfoPopup(QPoint, QString)));
+    chatView = new ChatView(tabSupervisor, 0, true);
+    connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
     sayEdit = new LineEditUnfocusable;
@@ -38,7 +39,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     vbox->addWidget(sayEdit);
 
     aLeave = new QAction(this);
-    connect(aLeave, SIGNAL(triggered()), this, SLOT(actLeave()));
+    connect(aLeave, &QAction::triggered, this, [this] { closeRequest(); });
 
     messageMenu = new QMenu(this);
     messageMenu->addAction(aLeave);
@@ -53,7 +54,6 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
 
 TabMessage::~TabMessage()
 {
-    emit talkClosing(this);
     delete ownUserInfo;
     delete otherUserInfo;
 }
@@ -86,9 +86,10 @@ QString TabMessage::getTabText() const
     return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
-void TabMessage::closeRequest()
+void TabMessage::closeRequest(bool /*forced*/)
 {
-    actLeave();
+    emit talkClosing(this);
+    close();
 }
 
 void TabMessage::sendMessage()
@@ -114,19 +115,11 @@ void TabMessage::messageSent(const Response &response)
             "This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
 }
 
-void TabMessage::actLeave()
-{
-    deleteLater();
-}
-
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 {
     auto userInfo = event.sender_name() == otherUserInfo->name() ? otherUserInfo : ownUserInfo;
-    const UserLevelFlags userLevel(userInfo->user_level());
-    const QString userPriv = QString::fromStdString(userInfo->privlevel());
 
-    chatView->appendMessage(QString::fromStdString(event.message()), {}, QString::fromStdString(event.sender_name()),
-                            userLevel, userPriv, true);
+    chatView->appendMessage(QString::fromStdString(event.message()), {}, *userInfo, true);
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
         soundEngine->playSound("private_message");
     if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event))
@@ -152,7 +145,7 @@ void TabMessage::showSystemPopup(const Event_UserMessage &event)
                               event.message().c_str());
         connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
     } else {
-        qDebug() << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
+        qCWarning(TabMessageLog) << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
     }
 }
 

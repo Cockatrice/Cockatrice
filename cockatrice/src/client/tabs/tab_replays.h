@@ -1,8 +1,10 @@
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 
+#include "../game_logic/abstract_client.h"
 #include "tab.h"
 
+class ServerInfo_User;
 class Response;
 class AbstractClient;
 class QTreeView;
@@ -25,12 +27,27 @@ private:
     RemoteReplayList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
-    QAction *aOpenLocalReplay, *aDeleteLocalReplay, *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
-private slots:
-    void actOpenLocalReplay();
+    QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
+    QAction *aOpenReplaysFolder;
+    QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
 
+    void setRemoteEnabled(bool enabled);
+
+    void downloadNodeAtIndex(const QModelIndex &curLeft, const QModelIndex &curRight);
+
+private slots:
+    void handleConnected(const ServerInfo_User &userInfo);
+    void handleConnectionChanged(ClientStatus status);
+
+    void actLocalDoubleClick(const QModelIndex &curLeft);
+    void actRenameLocal();
+    void actOpenLocalReplay();
+    void actNewLocalFolder();
     void actDeleteLocalReplay();
 
+    void actOpenReplaysFolder();
+
+    void actRemoteDoubleClick(const QModelIndex &curLeft);
     void actOpenRemoteReplay();
     void openRemoteReplayFinished(const Response &r);
 
@@ -48,11 +65,11 @@ signals:
     void openReplay(GameReplay *replay);
 
 public:
-    TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client);
-    void retranslateUi();
-    QString getTabText() const
+    TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);
+    void retranslateUi() override;
+    QString getTabText() const override
     {
-        return tr("Game replays");
+        return tr("Game Replays");
     }
 };
 

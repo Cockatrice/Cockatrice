@@ -12,7 +12,7 @@
 HandZone::HandZone(Player *_p, bool _contentsKnown, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "hand", false, false, _contentsKnown, parent), zoneHeight(_zoneHeight)
 {
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &HandZone::updateBg);
     updateBg();
     setCacheMode(DeviceCoordinateCache);
 }
@@ -78,12 +78,7 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getHandBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraHandBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Hand, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 

@@ -1,5 +1,28 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt_BR">
 <context>
+    <name>BetaReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="210"/>
+        <source>Beta</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="236"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="245"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="278"/>
+        <source>No reply received from the file update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>IntroPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="200"/>
@@ -61,8 +84,9 @@
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
-        <source>Sets JSON file (%1)</source>
-        <translation>Salvar em arquivo JSON (%1)</translation>
+        <source>Sets file (%1)</source>
+        <oldsource>Sets JSON file (%1)</oldsource>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
@@ -245,7 +269,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="472"/>
         <source>Dummy set containing tokens</source>
         <translation>Esta expansão contém fichas.</translation>
     </message>
@@ -279,6 +303,15 @@
         <location filename="src/oraclewizard.cpp" line="212"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
         <translation>Se a base de dados das cartas não for atualizada automaticamente, reinicie o cliente do Cockatrice.</translation>
+    </message>
+</context>
+<context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp" line="219"/>
+        <source>en</source>
+        <comment>code for scryfall's language property, not available for all languages</comment>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -356,6 +389,21 @@
     </message>
 </context>
 <context>
+    <name>ShortcutsSettings</name>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="54"/>
+        <source>Your configuration file contained invalid shortcuts.
+Please check your shortcut settings!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="56"/>
+        <source>The following shortcuts have been set to default:
+</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SimpleDownloadFilePage</name>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
@@ -391,91 +439,119 @@
     </message>
 </context>
 <context>
+    <name>StableReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="104"/>
+        <source>Default</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="120"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="128"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="176"/>
+        <source>No reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="183"/>
+        <source>Invalid reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>UnZip</name>
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operação de compactação concluída.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao inicializar ou carregar a biblioteca zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na biblioteca zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível criar ou abrir o arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo parcialmente corrompido. Alguns arquivos podem ter sido extraídos.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo corrompido.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Senha incorreta.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum arquivo foi criado ainda.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1183"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo ou diretório não existe.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro de leitura do arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro de gravação do arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro ao buscar no arquivo</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível criar um diretório.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1188"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Dispositivo inválido.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1189"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo ZIP inválido ou incompatível.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1190"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Cabeçalhos inconsistentes. O arquivo pode estar corrompido.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro desconhecido.</translation>
     </message>
 </context>
 <context>
@@ -483,58 +559,59 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Operação de compactação concluída com sucesso.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao inicializar ou carregar a biblioteca zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro na biblioteca zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível criar ou abrir o arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum arquivo foi criado ainda.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo ou diretório não existe.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro de leitura do arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro de gravação do arquivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro ao buscar no arquivo</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erro desconhecido.</translation>
     </message>
 </context>
 <context>
     <name>i18n</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="58"/>
+        <location filename="../cockatrice/src/settings/cache_settings.cpp" line="167"/>
         <source>English</source>
         <translation>Português do Brasil (Brazilian Portuguese)</translation>
     </message>

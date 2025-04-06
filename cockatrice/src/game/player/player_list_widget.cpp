@@ -6,7 +6,8 @@
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../server/user/user_context_menu.h"
-#include "../../server/user/user_list.h"
+#include "../../server/user/user_list_manager.h"
+#include "../../server/user/user_list_widget.h"
 #include "pb/command_kick_from_game.pb.h"
 #include "pb/serverinfo_playerproperties.pb.h"
 #include "pb/session_commands.pb.h"
@@ -72,8 +73,7 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
         setItemDelegate(itemDelegate);
 
         userContextMenu = new UserContextMenu(tabSupervisor, this, game);
-        connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this,
-                SIGNAL(openMessageDialog(QString, bool)));
+        connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &PlayerListWidget::openMessageDialog);
     } else {
         userContextMenu = nullptr;
     }
@@ -140,9 +140,9 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     }
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
-        player->setIcon(
-            3, QIcon(UserLevelPixmapGenerator::generatePixmap(12, UserLevelFlags(prop.user_info().user_level()), false,
-                                                              QString::fromStdString(prop.user_info().privlevel()))));
+        player->setIcon(3, UserLevelPixmapGenerator::generateIcon(
+                               12, UserLevelFlags(prop.user_info().user_level()), prop.user_info().pawn_colors(), false,
+                               QString::fromStdString(prop.user_info().privlevel())));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
         const QString country = QString::fromStdString(prop.user_info().country());
         if (!country.isEmpty())

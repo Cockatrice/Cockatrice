@@ -161,7 +161,7 @@ void QxtMailAttachment::setExtraHeaders(const QHash<QString, QString>& a)
 {
     QHash<QString, QString>& headers = qxt_d->extraHeaders;
     headers.clear();
-    foreach(const QString& key, a.keys())
+    for (const QString& key: a.keys())
     {
         headers[key.toLower()] = a[key];
     }
@@ -187,7 +187,7 @@ QByteArray QxtMailAttachment::mimeData()
     }
 
     QByteArray rv = "Content-Type: " + qxt_d->contentType.toLatin1() + "\r\nContent-Transfer-Encoding: base64\r\n";
-    foreach(const QString& r, qxt_d->extraHeaders.keys())
+    for(const QString& r: qxt_d->extraHeaders.keys())
     {
         rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r));
     }

@@ -58,8 +58,75 @@ QString translationPath;
 
 static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, const QString &message)
 {
-    Logger::getInstance().log(type, ctx, message);
+    QString logMessage = qFormatLogMessage(type, ctx, message);
+
+    // Regular expression to match the full path in the square brackets and extract only the filename and line number
+    QRegularExpression regex(R"(\[(?:.:)?[\/\\].*[\/\\]([^\/\\]+\:\d+)\])");
+    QRegularExpressionMatch match = regex.match(logMessage);
+
+    if (match.hasMatch()) {
+        // Extract the filename and line number (e.g., "main.cpp:211")
+        QString filenameLine = match.captured(1);
+
+        // Replace the full path in square brackets with just the filename and line number
+        logMessage.replace(match.captured(0), QString("[%1]").arg(filenameLine));
+    }
+
+    Logger::getInstance().log(type, ctx, logMessage);
 }
+
+#ifdef Q_OS_WIN
+// clang-format off
+#include <Windows.h>
+#include <DbgHelp.h>
+#include <ShlObj.h>
+#include <ctime>
+#include <filesystem>
+#pragma comment(lib, "DbgHelp.lib") // Link the DbgHelp library
+// clang-format on
+
+LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPointers)
+{
+    std::filesystem::path path;
+
+    // Find %LOCALAPPDATA% (or cheat at finding it)
+    wchar_t *localAppDataFolder;
+    if (SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &localAppDataFolder) != S_OK) {
+        path = std::filesystem::temp_directory_path().parent_path().parent_path();
+    } else {
+        path = std::filesystem::path(localAppDataFolder);
+    }
+
+    // Plan on writing crash files into %LOCALAPPDATA%/CrashDumps/Cockatrice/cockatrice.crash.*.dmp
+    path /= "CrashDumps";
+    path /= "Cockatrice";
+    if (!std::filesystem::exists(path)) {
+        std::filesystem::create_directories(path);
+    }
+    path /= "cockatrice.crash." + std::to_string(std::time(0)) + ".dmp";
+
+    // Create and write crash files
+#ifdef UNICODE
+    HANDLE hDumpFile =
+        CreateFile(path.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+#else
+    HANDLE hDumpFile =
+        CreateFile(path.string().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+#endif
+
+    MINIDUMP_EXCEPTION_INFORMATION mei;
+    mei.ExceptionPointers = exceptionPointers;
+    mei.ThreadId = GetCurrentThreadId();
+    mei.ClientPointers = 1;
+
+    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpWithFullMemory, &mei, nullptr,
+                      nullptr);
+
+    CloseHandle(hDumpFile);
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
 
 void installNewTranslator()
 {
@@ -74,18 +141,20 @@ void installNewTranslator()
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
-        qDebug() << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
+        qCWarning(QtTranslatorDebug) << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
     } else {
-        qDebug() << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
+        qCInfo(QtTranslatorDebug) << "Loaded qt translation" << qtNameHint << "at" << qtTranslationPath;
     }
     qApp->installTranslator(qtTranslator);
 
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qDebug() << "Unable to load" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+        qCWarning(QtTranslatorDebug) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
+                                     << translationPath;
     } else {
-        qDebug() << "Loaded" << translationPrefix << "translation" << appNameHint << "at" << translationPath;
+        qCInfo(QtTranslatorDebug) << "Loaded" << translationPrefix << "translation" << appNameHint << "at"
+                                  << translationPath;
     }
     qApp->installTranslator(translator);
 }
@@ -93,10 +162,10 @@ void installNewTranslator()
 QString const generateClientID()
 {
     QString macList;
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-        if (interface.hardwareAddress() != "")
-            if (interface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
-                macList += interface.hardwareAddress() + ".";
+    for (const QNetworkInterface &networkInterface : QNetworkInterface::allInterfaces()) {
+        if (networkInterface.hardwareAddress() != "")
+            if (networkInterface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
+                macList += networkInterface.hardwareAddress() + ".";
     }
     QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return strClientID;
@@ -104,9 +173,34 @@ QString const generateClientID()
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
+    SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
+#endif
+
+#ifdef Q_OS_APPLE
+    // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
+    const QByteArray configPath = "../../../qtlogging.ini";
+#elif defined(Q_OS_UNIX)
+    // <build>/cockatrice/cockatrice
+    const QByteArray configPath = "./qtlogging.ini";
+#elif defined(Q_OS_WIN)
+    // <build>/cockatrice/Debug/cockatrice.exe
+    const QByteArray configPath = "../qtlogging.ini";
+#else
+    const QByteArray configPath = "";
+#endif
+
+    if (!qEnvironmentVariableIsSet(("QT_LOGGING_CONF"))) {
+        // Set the QT_LOGGING_CONF environment variable
+        qputenv("QT_LOGGING_CONF", configPath);
+    }
+    qSetMessagePattern(
+        "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
+        "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
+        "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
-    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
 #ifdef Q_OS_WIN
@@ -157,13 +251,13 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
-    qDebug("main(): starting main program");
+    qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
-    qDebug("main(): MainWindow constructor finished");
+    qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
 #if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
@@ -178,14 +272,17 @@ int main(int argc, char *argv[])
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     ui.show();
-    qDebug("main(): ui.show() finished");
+    qCInfo(MainLog) << "ui.show() finished";
+
+    // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
     app.exec();
 
-    qDebug("Event loop finished, terminating...");
+    qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();

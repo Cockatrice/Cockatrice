@@ -24,14 +24,14 @@ private:
      * closest non-token card instead. So we construct a new deck which has no
      * tokens.
      */
-    void copyDeckWithoutTokens(const DeckList &source, DeckList &destination);
+    void copyDeckWithoutTokens(DeckList &source, DeckList &destination);
 
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
 
 public:
-    DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
+    explicit DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
     void analyzeDeck(DeckList *deck);
 };
 

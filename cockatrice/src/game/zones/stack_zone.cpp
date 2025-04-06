@@ -14,7 +14,7 @@
 StackZone::StackZone(Player *_p, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_p, "stack", false, false, true, parent), zoneHeight(_zoneHeight)
 {
-    connect(themeManager, SIGNAL(themeChanged()), this, SLOT(updateBg()));
+    connect(themeManager, &ThemeManager::themeChanged, this, &StackZone::updateBg);
     updateBg();
     setCacheMode(DeviceCoordinateCache);
 }
@@ -28,7 +28,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
 {
     // if x is negative set it to add at end
     if (x < 0 || x >= cards.size()) {
-        x = cards.size();
+        x = static_cast<int>(cards.size());
     }
     cards.insert(x, card);
 
@@ -37,52 +37,64 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
         card->setName();
     }
     card->setParentItem(this);
-    card->resetState();
+    card->resetState(true);
     card->setVisible(true);
     card->update();
 }
 
 QRectF StackZone::boundingRect() const
 {
-    return QRectF(0, 0, 100, zoneHeight);
+    return {0, 0, 100, zoneHeight};
 }
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getStackBgBrush();
-
-    if (player->getZoneId() > 0) {
-        // If the extra image is not found, load the default one
-        brush = themeManager->getExtraStackBgBrush(QString::number(player->getZoneId()), brush);
-    }
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, player->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint)
 {
+    if (startZone == nullptr || startZone->getPlayer() == nullptr) {
+        return;
+    }
+
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getId());
     cmd.set_start_zone(startZone->getName().toStdString());
     cmd.set_target_player_id(player->getId());
     cmd.set_target_zone(getName().toStdString());
-    int index;
-    if (cards.isEmpty()) {
-        index = 0;
-    } else {
-        const int cardCount = cards.size();
+
+    int index = 0;
+
+    if (!cards.isEmpty()) {
+        const auto cardCount = static_cast<int>(cards.size());
+        const auto &card = cards.at(0);
+
         index = qRound(divideCardSpaceInZone(dropPoint.y(), cardCount, boundingRect().height(),
-                                             cards.at(0)->boundingRect().height(), true));
-    }
-    if (startZone == this) {
-        if (cards.at(index)->getId() == dragItems.at(0)->getId()) {
-            return;
+                                             card->boundingRect().height(), true));
+
+        // divideCardSpaceInZone is not guaranteed to return a valid index
+        // currently, so clamp it to avoid crashes.
+        index = qBound(0, index, cardCount - 1);
+
+        if (startZone == this) {
+            const auto &dragItem = dragItems.at(0);
+            const auto &card = cards.at(index);
+
+            if (card->getId() == dragItem->getId()) {
+                return;
+            }
         }
     }
+
     cmd.set_x(index);
     cmd.set_y(0);
 
     for (CardDragItem *item : dragItems) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
+        if (item) {
+            cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
+        }
     }
 
     player->sendGameCommand(cmd);
@@ -91,9 +103,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone
 void StackZone::reorganizeCards()
 {
     if (!cards.isEmpty()) {
-        QSet<ArrowItem *> arrowsToUpdate;
-
-        const int cardCount = cards.size();
+        const auto cardCount = static_cast<int>(cards.size());
         qreal totalWidth = boundingRect().width();
         qreal cardWidth = cards.at(0)->boundingRect().width();
         qreal xspace = 5;
@@ -107,16 +117,6 @@ void StackZone::reorganizeCards()
                 divideCardSpaceInZone(i, cardCount, boundingRect().height(), cards.at(0)->boundingRect().height());
             card->setPos(x, y);
             card->setRealZValue(i);
-
-            for (ArrowItem *item : card->getArrowsFrom()) {
-                arrowsToUpdate.insert(item);
-            }
-            for (ArrowItem *item : card->getArrowsTo()) {
-                arrowsToUpdate.insert(item);
-            }
-        }
-        for (ArrowItem *item : arrowsToUpdate) {
-            item->updatePath();
         }
     }
     update();

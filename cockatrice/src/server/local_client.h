@@ -16,9 +16,9 @@ public:
                 const QString &_playerName,
                 const QString &_clientId,
                 QObject *parent = nullptr);
-    ~LocalClient();
+    ~LocalClient() override;
 
-    void sendCommandContainer(const CommandContainer &cont);
+    void sendCommandContainer(const CommandContainer &cont) override;
 private slots:
     void itemFromServer(const ServerMessage &item);
 };

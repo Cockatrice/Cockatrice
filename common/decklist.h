@@ -66,6 +66,7 @@ public:
     virtual QString getCardProviderId() const = 0;
     virtual QString getCardSetShortName() const = 0;
     virtual QString getCardCollectorNumber() const = 0;
+    [[nodiscard]] virtual bool isDeckHeader() const = 0;
     InnerDecklistNode *getParent() const
     {
         return parent;
@@ -128,10 +129,16 @@ public:
     {
         cardCollectorNumber = _cardCollectorNumber;
     }
+    [[nodiscard]] bool isDeckHeader() const override
+    {
+        return true;
+    }
 
     void clearTree();
     AbstractDecklistNode *findChild(const QString &_name);
-    AbstractDecklistNode *findCardChildByNameAndProviderId(const QString &_name, const QString &_providerId);
+    AbstractDecklistNode *findCardChildByNameProviderIdAndNumber(const QString &_name,
+                                                                 const QString &_providerId,
+                                                                 const QString &_cardNumber = "");
     int height() const override;
     int recursiveCount(bool countTotalCards = false) const;
     bool compare(AbstractDecklistNode *other) const override;
@@ -233,6 +240,10 @@ public:
     {
         cardSetNumber = _cardSetNumber;
     }
+    [[nodiscard]] bool isDeckHeader() const override
+    {
+        return false;
+    }
 };
 
 class DeckList : public QObject
@@ -240,11 +251,19 @@ class DeckList : public QObject
     Q_OBJECT
 private:
     QString name, comments;
-    QString deckHash;
+    QPair<QString, QString> bannerCard;
+    QString lastLoadedTimestamp;
+    QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
     void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
+    void getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const;
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
+
+    /**
+     * Empty string indicates invalidated cache.
+     */
+    mutable QString cachedDeckHash;
 
 protected:
     virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
@@ -258,6 +277,7 @@ protected:
 
 signals:
     void deckHashChanged();
+    void deckTagsChanged();
 
 public slots:
     void setName(const QString &_name = QString())
@@ -267,6 +287,29 @@ public slots:
     void setComments(const QString &_comments = QString())
     {
         comments = _comments;
+    }
+    void setTags(const QStringList &_tags = QStringList())
+    {
+        tags = _tags;
+        emit deckTagsChanged();
+    }
+    void addTag(const QString &_tag)
+    {
+        tags.append(_tag);
+        emit deckTagsChanged();
+    }
+    void clearTags()
+    {
+        tags.clear();
+        emit deckTagsChanged();
+    }
+    void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
+    {
+        bannerCard = _bannerCard;
+    }
+    void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
+    {
+        lastLoadedTimestamp = _lastLoadedTimestamp;
     }
 
 public:
@@ -282,6 +325,18 @@ public:
     {
         return comments;
     }
+    QStringList getTags() const
+    {
+        return tags;
+    }
+    QPair<QString, QString> getBannerCard() const
+    {
+        return bannerCard;
+    }
+    QString getLastLoadedTimestamp() const
+    {
+        return lastLoadedTimestamp;
+    }
     QList<MoveCard_ToZone> getCurrentSideboardPlan();
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
     const QMap<QString, SideboardPlan *> &getSideboardPlans() const
@@ -296,26 +351,21 @@ public:
     QString writeToString_Native();
     bool loadFromFile_Native(QIODevice *device);
     bool saveToFile_Native(QIODevice *device);
-    bool loadFromStream_Plain(QTextStream &stream);
+    bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata);
     bool loadFromFile_Plain(QIODevice *device);
     bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards);
     bool saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
     QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
 
-    void cleanList();
+    void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
     {
         return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
+    QMap<QString, QString> getCardListWithProviderId() const;
 
     int getSideboardSize() const;
-
-    QString getDeckHash() const
-    {
-        return deckHash;
-    }
-    void updateDeckHash();
 
     InnerDecklistNode *getRoot() const
     {
@@ -328,19 +378,22 @@ public:
                               const QString &cardProviderId = QString());
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
+    QString getDeckHash() const;
+    void refreshDeckHash();
+
     /**
      * Calls a given function object for each card in the deck. It must
      * take a InnerDecklistNode* as its first argument and a
      * DecklistCardNode* as its second.
      */
-    template <typename Callback> void forEachCard(Callback &callback) const
+    template <typename Callback> void forEachCard(Callback &callback)
     {
         // Support for this is only possible if the internal structure
         // doesn't get more complicated.
         for (int i = 0; i < root->size(); i++) {
-            const InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+            InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
             for (int j = 0; j < node->size(); j++) {
-                const DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+                DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
                 callback(node, card);
             }
         }

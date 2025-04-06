@@ -4,8 +4,11 @@
 #include "../../client/game_logic/abstract_client.h"
 #include "pb/commands.pb.h"
 
+#include <QLoggingCategory>
 #include <QTcpSocket>
 #include <QWebSocket>
+
+inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
 
 class QTimer;
 
@@ -13,7 +16,6 @@ class RemoteClient : public AbstractClient
 {
     Q_OBJECT
 signals:
-    void maxPingTime(int seconds, int maxSeconds);
     void serverTimeout();
     void loginError(Response::ResponseCode resp, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
     void registerError(Response::ResponseCode resp, QString reasonStr, quint32 endTime);

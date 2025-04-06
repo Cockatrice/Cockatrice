@@ -1,5 +1,28 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="es">
 <context>
+    <name>BetaReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="210"/>
+        <source>Beta</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="236"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="245"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="278"/>
+        <source>No reply received from the file update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>IntroPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="200"/>
@@ -61,8 +84,9 @@
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
-        <source>Sets JSON file (%1)</source>
-        <translation>Agregando archivos JSON (%1)</translation>
+        <source>Sets file (%1)</source>
+        <oldsource>Sets JSON file (%1)</oldsource>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
@@ -143,7 +167,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="540"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>No se pudieron interpretar los datos descargados.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="553"/>
@@ -245,7 +269,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="472"/>
         <source>Dummy set containing tokens</source>
         <translation>Set dedicado para tokens</translation>
     </message>
@@ -282,6 +306,15 @@
     </message>
 </context>
 <context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp" line="219"/>
+        <source>en</source>
+        <comment>code for scryfall's language property, not available for all languages</comment>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SaveSetsPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="618"/>
@@ -302,7 +335,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="626"/>
         <source>A cockatrice database file of %1 MB has been downloaded.</source>
-        <translation type="unfinished"/>
+        <translation>Se ha descargado un archivo de base de datos cockatrice de %1 MB.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="629"/>
@@ -356,6 +389,21 @@
     </message>
 </context>
 <context>
+    <name>ShortcutsSettings</name>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="54"/>
+        <source>Your configuration file contained invalid shortcuts.
+Please check your shortcut settings!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="56"/>
+        <source>The following shortcuts have been set to default:
+</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SimpleDownloadFilePage</name>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
@@ -391,91 +439,119 @@
     </message>
 </context>
 <context>
+    <name>StableReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="104"/>
+        <source>Default</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="120"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="128"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="176"/>
+        <source>No reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="183"/>
+        <source>Invalid reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>UnZip</name>
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation> La operación ZIP se completó con éxito</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>No se pudo inicializar o cargar la biblioteca zlib</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Error de biblioteca zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>No se puede crear o abrir el archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation> Archivo parcialmente dañado. Es posible que se extraigan algunos archivos.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archivo corrupto.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation> Contraseña incorrecta.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation> Aún no se ha creado ningún archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1183"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>El archivo o directorio no existe.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>error de lectura de archivo</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Error de escritura del archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation> Error de búsqueda de archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>No se puede crear un directorio</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1188"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation> Dispositivo no válido.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1189"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation> Archivo zip no válido o incompatible</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1190"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation> Encabezados inconsistentes. Es posible que el archivo esté dañado.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation> Encabezados inconsistentes. Es posible que el archivo esté dañado.</translation>
     </message>
 </context>
 <context>
@@ -535,6 +611,7 @@
     <name>i18n</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="58"/>
+        <location filename="../cockatrice/src/settings/cache_settings.cpp" line="167"/>
         <source>English</source>
         <translation>Español (Spanish)</translation>
     </message>

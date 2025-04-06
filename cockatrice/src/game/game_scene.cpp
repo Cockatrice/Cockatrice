@@ -20,7 +20,8 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), SIGNAL(minPlayersForMultiColumnLayoutChanged()), this, SLOT(rearrange()));
+    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+            &GameScene::rearrange);
 
     rearrange();
 }
@@ -28,6 +29,13 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 GameScene::~GameScene()
 {
     delete animationTimer;
+
+    // DO NOT call clearViews() here
+    // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
+    // deleteLater() deletes the zoneView without allowing it to send signals
+    for (const auto &zoneView : zoneViews) {
+        zoneView->deleteLater();
+    }
 }
 
 void GameScene::retranslateUi()
@@ -38,16 +46,16 @@ void GameScene::retranslateUi()
 
 void GameScene::addPlayer(Player *player)
 {
-    qDebug() << "GameScene::addPlayer name=" << player->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getName();
     players << player;
     addItem(player);
-    connect(player, SIGNAL(sizeChanged()), this, SLOT(rearrange()));
-    connect(player, SIGNAL(playerCountChanged()), this, SLOT(rearrange()));
+    connect(player, &Player::sizeChanged, this, &GameScene::rearrange);
+    connect(player, &Player::playerCountChanged, this, &GameScene::rearrange);
 }
 
 void GameScene::removePlayer(Player *player)
 {
-    qDebug() << "GameScene::removePlayer name=" << player->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getName();
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();
@@ -75,7 +83,7 @@ void GameScene::rearrange()
     QListIterator<Player *> playersIter(players);
     while (playersIter.hasNext()) {
         Player *p = playersIter.next();
-        if (!p->getConceded()) {
+        if (p && !p->getConceded()) {
             playersPlaying.append(p);
             if (!firstPlayerFound && (p->getLocal())) {
                 firstPlayerIndex = playersPlaying.size() - 1;
@@ -142,7 +150,7 @@ void GameScene::rearrange()
     processViewSizeChange(viewSize);
 }
 
-void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards)
+void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
 {
     for (auto &view : zoneViews) {
         ZoneViewZone *temp = view->getZone();
@@ -151,9 +159,10 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         }
     }
 
-    ZoneViewWidget *item = new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false);
+    ZoneViewWidget *item =
+        new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
     zoneViews.append(item);
-    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
     if (zoneName == "grave") {
         item->setPos(360, 100);
@@ -171,7 +180,7 @@ void GameScene::addRevealedZoneView(Player *player,
 {
     ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
     zoneViews.append(item);
-    connect(item, SIGNAL(closePressed(ZoneViewWidget *)), this, SLOT(removeZoneView(ZoneViewWidget *)));
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
     item->setPos(600, 80);
 }

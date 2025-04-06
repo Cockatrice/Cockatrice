@@ -61,15 +61,16 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          bool _spectatorsNeedPassword,
                          bool _spectatorsCanTalk,
                          bool _spectatorsSeeEverything,
+                         int _startingLifeTotal,
                          Server_Room *_room)
     : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(_creatorInfo)),
       gameStarted(false), gameClosed(false), gameId(_gameId), password(_password), maxPlayers(_maxPlayers),
       gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies),
       onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
-      spectatorsSeeEverything(_spectatorsSeeEverything), inactivityCounter(0), startTimeOfThisGame(0),
-      secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()),
-      pingClock(nullptr),
+      spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal), inactivityCounter(0),
+      startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false),
+      startTime(QDateTime::currentDateTime()), pingClock(nullptr),
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
 #else
@@ -80,7 +81,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
     description = _description.simplified();
 
-    connect(this, SIGNAL(sigStartGameIfReady()), this, SLOT(doStartGameIfReady()), Qt::QueuedConnection);
+    connect(this, &Server_Game::sigStartGameIfReady, this, &Server_Game::doStartGameIfReady, Qt::QueuedConnection);
 
     getInfo(*currentReplay->mutable_game_info());
 
@@ -310,20 +311,31 @@ void Server_Game::sendGameStateToPlayers()
     }
 }
 
-void Server_Game::doStartGameIfReady()
+void Server_Game::doStartGameIfReady(bool forceStartGame)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
     QMutexLocker locker(&gameMutex);
 
-    if (getPlayerCount() < maxPlayers)
+    if (getPlayerCount() < maxPlayers && !forceStartGame) {
         return;
-    for (Server_Player *player : players.values()) {
-        if (!player->getReadyStart() && !player->getSpectator())
-            return;
     }
+
     for (Server_Player *player : players.values()) {
-        if (!player->getSpectator())
+        if (!player->getReadyStart() && !player->getSpectator()) {
+            if (forceStartGame) {
+                // Player is not ready to start, so kick them
+                // TODO: Move them to Spectators instead
+                kickPlayer(player->getPlayerId());
+            } else {
+                return;
+            }
+        }
+    }
+
+    for (Server_Player *player : players.values()) {
+        if (!player->getSpectator()) {
             player->setupZones();
+        }
     }
 
     gameStarted = true;
@@ -368,9 +380,9 @@ void Server_Game::doStartGameIfReady()
     emit gameInfoChanged(gameInfo);
 }
 
-void Server_Game::startGameIfReady()
+void Server_Game::startGameIfReady(bool forceStartGame)
 {
-    emit sigStartGameIfReady();
+    emit sigStartGameIfReady(forceStartGame);
 }
 
 void Server_Game::stopGameIfFinished()

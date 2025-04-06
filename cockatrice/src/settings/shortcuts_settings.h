@@ -2,10 +2,11 @@
 #define SHORTCUTSSETTINGS_H
 
 #include <QApplication>
-#include <QHash>
 #include <QKeySequence>
-#include <QObject>
+#include <QLoggingCategory>
 #include <QSettings>
+
+inline Q_LOGGING_CATEGORY(ShortcutsSettingsLog, "shortcuts_settings");
 
 class ShortcutGroup
 {
@@ -29,7 +30,8 @@ public:
         Chat_room,
         Game_window,
         Load_deck,
-        Replays
+        Replays,
+        Tabs
     };
 
     static QString getGroupName(ShortcutGroup::Groups group)
@@ -71,6 +73,8 @@ public:
                 return QApplication::translate("shortcutsTab", "Load Deck from Clipboard");
             case Replays:
                 return QApplication::translate("shortcutsTab", "Replays");
+            case Tabs:
+                return QApplication::translate("shortcutsTab", "Tabs");
         }
 
         return {};
@@ -80,18 +84,18 @@ public:
 class ShortcutKey : public QList<QKeySequence>
 {
 public:
-    ShortcutKey(const QString &_name = QString(),
-                QList<QKeySequence> _sequence = QList<QKeySequence>(),
-                ShortcutGroup::Groups _group = ShortcutGroup::Main_Window);
-    void setSequence(QList<QKeySequence> _sequence)
+    explicit ShortcutKey(const QString &_name = QString(),
+                         QList _sequence = QList(),
+                         ShortcutGroup::Groups _group = ShortcutGroup::Main_Window);
+    void setSequence(const QList &_sequence)
     {
-        QList<QKeySequence>::operator=(_sequence);
+        QList::operator=(_sequence);
     };
-    const QString getName() const
+    QString getName() const
     {
         return QApplication::translate("shortcutsTab", name.toUtf8().data());
     };
-    const QString getGroupName() const
+    QString getGroupName() const
     {
         return ShortcutGroup::getGroupName(group);
     };
@@ -105,13 +109,14 @@ class ShortcutsSettings : public QObject
 {
     Q_OBJECT
 public:
-    ShortcutsSettings(const QString &settingsFilePath, QObject *parent = nullptr);
+    explicit ShortcutsSettings(const QString &settingsFilePath, QObject *parent = nullptr);
 
     ShortcutKey getDefaultShortcut(const QString &name) const;
     ShortcutKey getShortcut(const QString &name) const;
     QKeySequence getSingleShortcut(const QString &name) const;
     QString getDefaultShortcutString(const QString &name) const;
     QString getShortcutString(const QString &name) const;
+    QString getShortcutFriendlyName(const QString &shortcutName) const;
     QList<QString> getAllShortcutKeys() const
     {
         return shortCuts.keys();
@@ -119,10 +124,11 @@ public:
 
     void setShortcuts(const QString &name, const QList<QKeySequence> &Sequence);
     void setShortcuts(const QString &name, const QKeySequence &Sequence);
-    void setShortcuts(const QString &name, const QString &Sequences);
+    void setShortcuts(const QString &name, const QString &sequences);
 
-    bool isKeyAllowed(const QString &name, const QString &Sequences) const;
-    bool isValid(const QString &name, const QString &Sequences) const;
+    bool isKeyAllowed(const QString &name, const QString &sequences) const;
+    bool isValid(const QString &name, const QString &sequences) const;
+    QStringList findOverlaps(const QString &name, const QString &sequences) const;
 
     void resetAllShortcuts();
     void clearAllShortcuts();
@@ -147,9 +153,6 @@ private:
         {"MainWindow/aConnect", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Connect..."),
                                             parseSequenceString("Ctrl+L"),
                                             ShortcutGroup::Main_Window)},
-        {"MainWindow/aDeckEditor", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Editor"),
-                                               parseSequenceString(""),
-                                               ShortcutGroup::Main_Window)},
         {"MainWindow/aDisconnect", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Disconnect"),
                                                parseSequenceString(""),
                                                ShortcutGroup::Main_Window)},
@@ -170,9 +173,13 @@ private:
         {"MainWindow/aWatchReplay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Watch Replay..."),
                                                 parseSequenceString(""),
                                                 ShortcutGroup::Main_Window)},
-        {"TabDeckEditor/aAnalyzeDeck", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Analyze Deck"),
+        {"TabDeckEditor/aAnalyzeDeck", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Analyze Deck (deckstats.net)"),
                                                    parseSequenceString(""),
                                                    ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aAnalyzeDeckTappedout",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Analyze Deck (tappedout.net)"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aClearFilterAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Clear All Filters"),
                                                       parseSequenceString(""),
                                                       ShortcutGroup::Deck_Editor)},
@@ -190,9 +197,14 @@ private:
         {"TabDeckEditor/aEditTokens", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Edit Custom Tokens..."),
                                                   parseSequenceString(""),
                                                   ShortcutGroup::Deck_Editor)},
-        {"TabDeckEditor/aExportDeckDecklist", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Export Deck"),
-                                                          parseSequenceString(""),
-                                                          ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aExportDeckDecklist",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Export Deck (decklist.org)"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aExportDeckDecklistXyz",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Export Deck (decklist.xyz)"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aIncrement", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Add Card"),
                                                  parseSequenceString("+"),
                                                  ShortcutGroup::Deck_Editor)},
@@ -202,6 +214,14 @@ private:
         {"TabDeckEditor/aLoadDeckFromClipboard",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Load Deck from Clipboard..."),
                      parseSequenceString("Ctrl+Shift+V"),
+                     ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aEditDeckInClipboard",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Edit Deck in Clipboard, Annotated"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aEditDeckInClipboardRaw",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Edit Deck in Clipboard"),
+                     parseSequenceString(""),
                      ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aNewDeck", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "New Deck"),
                                                parseSequenceString("Ctrl+N"),
@@ -229,9 +249,17 @@ private:
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck to Clipboard, Annotated"),
                      parseSequenceString("Ctrl+Shift+C"),
                      ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aSaveDeckToClipboardNoSetInfo",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck to Clipboard, Annotated (No Set Info)"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Deck_Editor)},
         {"TabDeckEditor/aSaveDeckToClipboardRaw",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck to Clipboard"),
                      parseSequenceString("Ctrl+Shift+R"),
+                     ShortcutGroup::Deck_Editor)},
+        {"TabDeckEditor/aSaveDeckToClipboardRawNoSetInfo",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Save Deck to Clipboard (No Set Info)"),
+                     parseSequenceString(""),
                      ShortcutGroup::Deck_Editor)},
         {"DeckViewContainer/loadLocalButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Load Local Deck..."),
                                                           parseSequenceString("Ctrl+O"),
@@ -411,6 +439,9 @@ private:
         {"Player/aNextTurn", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Next Turn"),
                                          parseSequenceString("Ctrl+Return;Ctrl+Enter"),
                                          ShortcutGroup::Game_Phases)},
+        {"Player/aHide", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hide Card in Reveal Window"),
+                                     parseSequenceString("Alt+H"),
+                                     ShortcutGroup::Playing_Area)},
         {"Player/aTap", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Tap / Untap Card"),
                                     parseSequenceString(""),
                                     ShortcutGroup::Playing_Area)},
@@ -450,6 +481,15 @@ private:
         {"Player/aSetAnnotation", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Set Annotation..."),
                                               parseSequenceString("Alt+N"),
                                               ShortcutGroup::Playing_Area)},
+        {"Player/aSelectAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Zone"),
+                                          parseSequenceString("Ctrl+A"),
+                                          ShortcutGroup::Playing_Area)},
+        {"Player/aSelectRow", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Row"),
+                                          parseSequenceString("Ctrl+Shift+X"),
+                                          ShortcutGroup::Playing_Area)},
+        {"Player/aSelectColumn", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Column"),
+                                             parseSequenceString("Ctrl+Shift+C"),
+                                             ShortcutGroup::Playing_Area)},
         {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
                                                     parseSequenceString("Ctrl+B"),
                                                     ShortcutGroup::Move_selected)},
@@ -484,6 +524,9 @@ private:
         {"Player/aViewTopCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Top Cards of Library"),
                                              parseSequenceString("Ctrl+W"),
                                              ShortcutGroup::View)},
+        {"Player/aViewBottomCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom Cards of Library"),
+                                                parseSequenceString("Ctrl+Shift+W"),
+                                                ShortcutGroup::View)},
         {"Player/aCloseMostRecentZoneView", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Close Recent View"),
                                                         parseSequenceString("Esc"),
                                                         ShortcutGroup::View)},
@@ -536,7 +579,7 @@ private:
                                                 parseSequenceString(""),
                                                 ShortcutGroup::Move_bottom)},
         {"Player/aDrawArrow", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Draw Arrow..."),
-                                          parseSequenceString("Ctrl+A"),
+                                          parseSequenceString("Alt+A"),
                                           ShortcutGroup::Gameplay)},
         {"Player/aRemoveLocalArrows", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Remove Local Arrows"),
                                                   parseSequenceString("Ctrl+R"),
@@ -552,6 +595,12 @@ private:
         {"Player/aShuffle", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Shuffle Library"),
                                         parseSequenceString("Ctrl+S"),
                                         ShortcutGroup::Gameplay)},
+        {"Player/aShuffleTopCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Shuffle Top Cards of Library"),
+                                                parseSequenceString(""),
+                                                ShortcutGroup::Gameplay)},
+        {"Player/aShuffleBottomCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Shuffle Bottom Cards of Library"),
+                                                   parseSequenceString(""),
+                                                   ShortcutGroup::Gameplay)},
         {"Player/aMulligan", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Mulligan"),
                                          parseSequenceString("Ctrl+M"),
                                          ShortcutGroup::Drawing)},
@@ -608,7 +657,26 @@ private:
                                            ShortcutGroup::Replays)},
         {"Replays/fastForwardButton", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Fast Forward"),
                                                   parseSequenceString("Ctrl+P"),
-                                                  ShortcutGroup::Replays)}};
+                                                  ShortcutGroup::Replays)},
+        {"Tabs/aTabDeckEditor",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Editor"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabVisualDeckStorage", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Visual Deck Storage"),
+                                                   parseSequenceString(""),
+                                                   ShortcutGroup::Tabs)},
+        {"Tabs/aTabDeckStorage",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Storage"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabReplays",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Replays"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabServer",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Server"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabAccount",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Account"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabAdmin", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Administration"),
+                                       parseSequenceString(""),
+                                       ShortcutGroup::Tabs)},
+        {"Tabs/aTabLogs",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Logs"), parseSequenceString(""), ShortcutGroup::Tabs)},
+    };
 };
 
 #endif // SHORTCUTSSETTINGS_H

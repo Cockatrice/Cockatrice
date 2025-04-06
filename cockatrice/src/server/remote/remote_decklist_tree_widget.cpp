@@ -86,7 +86,6 @@ RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(AbstractClient *_client, QObj
     fileIcon = fip.icon(QFileIconProvider::File);
 
     root = new DirectoryNode;
-    refreshTree();
 }
 
 RemoteDeckList_TreeModel::~RemoteDeckList_TreeModel()
@@ -270,15 +269,18 @@ void RemoteDeckList_TreeModel::refreshTree()
     client->sendCommand(pend);
 }
 
+void RemoteDeckList_TreeModel::clearTree()
+{
+    beginResetModel();
+    root->clearTree();
+    endResetModel();
+}
+
 void RemoteDeckList_TreeModel::deckListFinished(const Response &r)
 {
     const Response_DeckList &resp = r.GetExtension(Response_DeckList::ext);
 
-    beginResetModel();
-
-    root->clearTree();
-
-    endResetModel();
+    clearTree();
 
     ServerInfo_DeckStorage_TreeItem tempRoot;
     tempRoot.set_id(0);
@@ -300,6 +302,7 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QW
 
     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     setUniformRowHeights(true);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
     setSortingEnabled(true);
     proxyModel->sort(0, Qt::AscendingOrder);
     header()->setSortIndicator(0, Qt::AscendingOrder);
@@ -313,6 +316,15 @@ RemoteDeckList_TreeModel::Node *RemoteDeckList_TreeWidget::getNode(const QModelI
 RemoteDeckList_TreeModel::Node *RemoteDeckList_TreeWidget::getCurrentItem() const
 {
     return getNode(selectionModel()->currentIndex());
+}
+
+QList<RemoteDeckList_TreeModel::Node *> RemoteDeckList_TreeWidget::getCurrentSelection() const
+{
+    auto list = QList<RemoteDeckList_TreeModel::Node *>();
+    for (const auto &row : selectionModel()->selectedRows()) {
+        list << getNode(row);
+    }
+    return list;
 }
 
 RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeWidget::getNodeByPath(const QString &path) const
@@ -350,4 +362,9 @@ void RemoteDeckList_TreeWidget::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeWidget::refreshTree()
 {
     treeModel->refreshTree();
+}
+
+void RemoteDeckList_TreeWidget::clearTree()
+{
+    treeModel->clearTree();
 }

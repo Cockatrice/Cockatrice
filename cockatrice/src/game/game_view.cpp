@@ -7,24 +7,25 @@
 #include <QResizeEvent>
 #include <QRubberBand>
 
-GameView::GameView(QGraphicsScene *scene, QWidget *parent) : QGraphicsView(scene, parent), rubberBand(0)
+GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, parent), rubberBand(0)
 {
     setBackgroundBrush(QBrush(QColor(0, 0, 0)));
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
     setFocusPolicy(Qt::NoFocus);
     setViewportUpdateMode(BoundingRectViewportUpdate);
 
-    connect(scene, SIGNAL(sceneRectChanged(const QRectF &)), this, SLOT(updateSceneRect(const QRectF &)));
+    connect(scene, &GameScene::sceneRectChanged, this, &GameView::updateSceneRect);
 
-    connect(scene, SIGNAL(sigStartRubberBand(const QPointF &)), this, SLOT(startRubberBand(const QPointF &)));
-    connect(scene, SIGNAL(sigResizeRubberBand(const QPointF &)), this, SLOT(resizeRubberBand(const QPointF &)));
-    connect(scene, SIGNAL(sigStopRubberBand()), this, SLOT(stopRubberBand()));
+    connect(scene, &GameScene::sigStartRubberBand, this, &GameView::startRubberBand);
+    connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
+    connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
 
     aCloseMostRecentZoneView = new QAction(this);
 
-    connect(aCloseMostRecentZoneView, SIGNAL(triggered()), scene, SLOT(closeMostRecentZoneView()));
+    connect(aCloseMostRecentZoneView, &QAction::triggered, scene, &GameScene::closeMostRecentZoneView);
     addAction(aCloseMostRecentZoneView);
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &GameView::refreshShortcuts);
     refreshShortcuts();
     rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
 }

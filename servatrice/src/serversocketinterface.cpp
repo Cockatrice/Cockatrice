@@ -46,6 +46,7 @@
 #include "pb/response_deck_list.pb.h"
 #include "pb/response_deck_upload.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"
+#include "pb/response_get_admin_notes.pb.h"
 #include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_download.pb.h"
@@ -224,6 +225,14 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetWarnList(cmd.GetExtension(Command_GetWarnList::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
             return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
+        case ModeratorCommand::GRANT_REPLAY_ACCESS:
+            return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
+        case ModeratorCommand::FORCE_ACTIVATE_USER:
+            return cmdForceActivateUser(cmd.GetExtension(Command_ForceActivateUser::ext), rc);
+        case ModeratorCommand::GET_ADMIN_NOTES:
+            return cmdGetAdminNotes(cmd.GetExtension(Command_GetAdminNotes::ext), rc);
+        case ModeratorCommand::UPDATE_ADMIN_NOTES:
+            return cmdUpdateAdminNotes(cmd.GetExtension(Command_UpdateAdminNotes::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -366,7 +375,7 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId, ServerInfo_Deck
     while (query->next())
         results[query->value(0).toInt()] = query->value(1).toString();
 
-    foreach (int key, results.keys()) {
+    for (int key : results.keys()) {
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
         newItem->set_id(key);
         newItem->set_name(results.value(key).toStdString());
@@ -831,7 +840,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
 #else
     QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
 #endif
-    foreach (QString warning, warningsList) {
+    for (const QString &warning : warningsList) {
         re->add_warning(warning.toStdString());
     }
     re->set_user_name(nameFromStdString(cmd.user_name()).toStdString());
@@ -1651,6 +1660,124 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
                 return Response::RespInternalError;
             }
         }
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd,
+                                                                           ResponseContainer & /*rc*/)
+{
+    // Determine if the replay actually exists already
+    auto *replayExistsQuery =
+        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
+    replayExistsQuery->bindValue(":idgame", cmd.replay_id());
+    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!replayExistsQuery->next()) {
+        return Response::RespInternalError;
+    }
+
+    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
+    if (!replayExists) {
+        return Response::RespContextError;
+    }
+
+    // Determine the Moderator's User ID (As it's not apart of client, only username is)
+    auto *getModeratorUserIdQuery = sqlInterface->prepareQuery("select id from {prefix}_users WHERE name = :name");
+    getModeratorUserIdQuery->bindValue(":name", QString::fromStdString(cmd.moderator_name()));
+    if (!sqlInterface->execSqlQuery(getModeratorUserIdQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!getModeratorUserIdQuery->next()) {
+        return Response::RespInternalError;
+    }
+
+    const auto &moderator_id = getModeratorUserIdQuery->value(0).toString();
+
+    // Grant the Moderator access to the replay
+    auto *grantReplayAccessQuery =
+        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                                   "values(:idgame, :idplayer, :replayname, 0)");
+    grantReplayAccessQuery->bindValue(":idgame", cmd.replay_id());
+    grantReplayAccessQuery->bindValue(":idplayer", moderator_id);
+    grantReplayAccessQuery->bindValue(":replayname", "Moderator Access Replay Grant");
+
+    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+        return Response::RespInternalError;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const Command_ForceActivateUser &cmd,
+                                                                           ResponseContainer &rc)
+{
+    // Determine if user exists
+    auto *getUserTokenQuery = sqlInterface->prepareQuery("select token from {prefix}_users WHERE name = :name");
+    getUserTokenQuery->bindValue(":name", QString::fromStdString(cmd.username_to_activate()));
+    if (!sqlInterface->execSqlQuery(getUserTokenQuery)) {
+        // Internal server error
+        return Response::RespInternalError;
+    }
+    if (!getUserTokenQuery->next()) {
+        // User doesn't exist
+        return Response::RespNameNotFound;
+    }
+    const auto &token = getUserTokenQuery->value(0).toString();
+
+    // Add audit log that Moderator activated account on behalf of user
+    const auto &msg = QString("Attempt Force Activation by %1").arg(QString::fromStdString(cmd.moderator_name()));
+    sqlInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
+                                 "ACTIVATE_ACCOUNT", msg, true);
+
+    // Build up activation request
+    Command_Activate cmdActivate;
+    cmdActivate.set_user_name(cmd.username_to_activate());
+    cmdActivate.set_token(token.toStdString());
+
+    // Send activation request -- Either User exists or User activated
+    return cmdActivateAccount(cmdActivate, rc);
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Command_GetAdminNotes &cmd,
+                                                                       ResponseContainer &rc)
+{
+    auto *getAdminNotesQuery = sqlInterface->prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
+    getAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
+    if (!sqlInterface->execSqlQuery(getAdminNotesQuery)) {
+        // Internal server error
+        return Response::RespInternalError;
+    }
+    if (!getAdminNotesQuery->next()) {
+        // User doesn't exist
+        return Response::RespNameNotFound;
+    }
+    const auto &adminNotes = getAdminNotesQuery->value(0).toString();
+
+    Response_GetAdminNotes *re = new Response_GetAdminNotes;
+    re->set_user_name(cmd.user_name());
+    re->set_notes(adminNotes.toStdString());
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd,
+                                                                          ResponseContainer & /*rc*/)
+{
+    auto *updateAdminNotesQuery =
+        sqlInterface->prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
+    updateAdminNotesQuery->bindValue(":adminnotes", QString::fromStdString(cmd.notes()));
+    updateAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
+
+    if (!sqlInterface->execSqlQuery(updateAdminNotesQuery)) {
+        return Response::RespInternalError;
+    }
+
+    if (updateAdminNotesQuery->numRowsAffected() == 0) {
+        return Response::RespNameNotFound;
     }
 
     return Response::RespOk;

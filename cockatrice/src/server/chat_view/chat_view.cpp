@@ -5,6 +5,8 @@
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../user/user_context_menu.h"
+#include "../user/user_list_manager.h"
+#include "../user/user_list_proxy.h"
 #include "user_level.h"
 
 #include <QApplication>
@@ -21,13 +23,10 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
     relativePosition = cursor.position() - block.position();
 }
 
-ChatView::ChatView(TabSupervisor *_tabSupervisor,
-                   const UserlistProxy *_userlistProxy,
-                   TabGame *_game,
-                   bool _showTimestamps,
-                   QWidget *parent)
-    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game), userlistProxy(_userlistProxy), evenNumber(true),
-      showTimestamps(_showTimestamps), hoveredItemType(HoveredNothing)
+ChatView::ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
+    : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game),
+      userListProxy(_tabSupervisor->getUserListManager()), evenNumber(true), showTimestamps(_showTimestamps),
+      hoveredItemType(HoveredNothing)
 {
     if (palette().windowText().color().lightness() > 200) {
         document()->setDefaultStyleSheet(R"(
@@ -48,7 +47,7 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor,
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
-    ownUserName = userlistProxy->getOwnUsername();
+    ownUserName = userListProxy->getOwnUsername();
     mention = "@" + ownUserName;
 
     mentionFormat.setFontWeight(QFont::Bold);
@@ -150,11 +149,12 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
-                             const QString &userName,
-                             UserLevelFlags userLevel,
-                             QString UserPrivLevel,
+                             const ServerInfo_User &userInfo,
                              bool playerBold)
 {
+    const QString userName = QString::fromStdString(userInfo.name());
+    const UserLevelFlags userLevel = UserLevelFlags(userInfo.user_level());
+
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
     bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
@@ -189,9 +189,11 @@ void ChatView::appendMessage(QString message,
             cursor.insertText("    ");
         } else {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            bool isBuddy = userlistProxy->isUserBuddy(userName);
-            cursor.insertImage(
-                UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, isBuddy, UserPrivLevel).toImage());
+            bool isBuddy = userListProxy->isUserBuddy(userName);
+            const QString privLevel = userInfo.has_privlevel() ? QString::fromStdString(userInfo.privlevel()) : "NONE";
+            cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, userInfo.pawn_colors(),
+                                                                        isBuddy, privLevel)
+                                   .toImage());
             cursor.insertText(" ");
             cursor.setCharFormat(senderFormat);
             cursor.insertText(userName);
@@ -328,7 +330,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
     QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
     while (fullMentionUpToSpaceOrEnd.size()) {
-        const ServerInfo_User *onlineUser = userlistProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
+        const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
         if (onlineUser) // Is there a user online named this?
         {
             if (ownUserName.toLower() == fullMentionUpToSpaceOrEnd.toLower()) // Is this user you?
@@ -402,7 +404,7 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
     }
 
     // check word mentions
-    foreach (QString word, highlightedWords) {
+    for (const QString &word : highlightedWords) {
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0) {
             // You have received a valid mention of custom word!!
             highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
@@ -580,9 +582,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
         case HoveredCard: {
             if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-                emit showCardInfoPopup(event->globalPosition().toPoint(), hoveredContent);
+                emit showCardInfoPopup(event->globalPosition().toPoint(), hoveredContent, QString());
 #else
-                emit showCardInfoPopup(event->globalPos(), hoveredContent);
+                emit showCardInfoPopup(event->globalPos(), hoveredContent, QString());
 #endif
             break;
         }

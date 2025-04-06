@@ -2,30 +2,48 @@
 #define CARDLIST_H
 
 #include <QList>
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(CardListLog, "card_list");
 
 class CardItem;
 
 class CardList : public QList<CardItem *>
 {
-private:
-    class compareFunctor;
-
 protected:
     bool contentsKnown;
 
 public:
-    enum SortFlags
+    enum SortOption
     {
-        SortByName = 1,
-        SortByType = 2
+        NoSort,
+
+        // Options that are used by groupBy
+        // Should partition all cards into a reasonable number of buckets
+        SortByMainType,
+        SortByManaValue,
+        SortByColorGrouping,
+
+        // Options that are used by sortBy
+        // We don't care about buckets; we want as many distinct values as possible.
+        SortByName,
+        SortByType,
+        SortByManaCost,
+        SortByColors,
+        SortByPt,
+        SortBySet,
+        SortByPrinting
     };
-    CardList(bool _contentsKnown);
-    CardItem *findCard(const int id, const bool remove, int *position = NULL);
+    explicit CardList(bool _contentsKnown);
+    CardItem *findCard(const int cardId) const;
     bool getContentsKnown() const
     {
         return contentsKnown;
     }
-    void sort(int flags = SortByName);
+
+    void sortBy(const QList<SortOption> &options);
+
+    static std::function<QString(CardItem *)> getExtractorFor(SortOption option);
 };
 
 #endif

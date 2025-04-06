@@ -88,8 +88,8 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     setLayout(mainLayout);
 
     setWindowTitle(tr("Tip of the Day"));
-    setMinimumWidth(500);
-    setMinimumHeight(300);
+    setMinimumWidth(700);
+    setMinimumHeight(500);
     successfulInit = true;
 }
 
@@ -144,9 +144,10 @@ void DlgTipOfTheDay::updateTip(int tipId)
 
     title->setText("<h2>" + titleText + "</h2>");
     tipTextContent->setText(contentText);
+    tipTextContent->setTextFormat(Qt::RichText);
 
     if (!image->load(imagePath)) {
-        qDebug() << "Image failed to load from" << imagePath;
+        qCWarning(DlgTipOfTheDayLog) << "Image failed to load from" << imagePath;
         imageLabel->clear();
     } else {
         int h = std::min(std::max(imageLabel->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
@@ -159,6 +160,8 @@ void DlgTipOfTheDay::updateTip(int tipId)
     tipNumber->setText("Tip " + QString::number(tipId + 1) + " / " + QString::number(tipDatabase->rowCount()));
 
     currentTip = static_cast<unsigned int>(tipId);
+
+    adjustSize();
 }
 
 void DlgTipOfTheDay::resizeEvent(QResizeEvent *event)

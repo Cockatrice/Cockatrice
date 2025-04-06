@@ -66,6 +66,7 @@ private:
     bool spectatorsNeedPassword;
     bool spectatorsCanTalk;
     bool spectatorsSeeEverything;
+    int startingLifeTotal;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -81,11 +82,11 @@ private:
                                      bool withUserInfo);
     void storeGameInformation();
 signals:
-    void sigStartGameIfReady();
+    void sigStartGameIfReady(bool override);
     void gameInfoChanged(ServerInfo_Game gameInfo);
 private slots:
     void pingClockTimeout();
-    void doStartGameIfReady();
+    void doStartGameIfReady(bool forceStartGame = false);
 
 public:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -105,8 +106,9 @@ public:
                 bool _spectatorsNeedPassword,
                 bool _spectatorsCanTalk,
                 bool _spectatorsSeeEverything,
+                int startingLifeTotal,
                 Server_Room *parent);
-    ~Server_Game();
+    ~Server_Game() override;
     Server_Room *getRoom() const
     {
         return room;
@@ -162,6 +164,10 @@ public:
     {
         return spectatorsSeeEverything;
     }
+    int getStartingLifeTotal() const
+    {
+        return startingLifeTotal;
+    }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);
     bool containsUser(const QString &userName) const;
@@ -174,7 +180,7 @@ public:
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
     void unattachCards(GameEventStorage &ges, Server_Player *player);
     bool kickPlayer(int playerId);
-    void startGameIfReady();
+    void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
     int getActivePlayer() const
     {

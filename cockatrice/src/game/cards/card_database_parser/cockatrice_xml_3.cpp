@@ -13,10 +13,10 @@
 
 bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
-    qDebug() << "[CockatriceXml3Parser] Trying to parse: " << fileName;
+    qCInfo(CockatriceXml3Log) << "Trying to parse: " << fileName;
 
     if (!fileName.endsWith(".xml", Qt::CaseInsensitive)) {
-        qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong extension";
+        qCInfo(CockatriceXml3Log) << "Parsing failed: wrong extension";
         return false;
     }
 
@@ -28,12 +28,12 @@ bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &d
                 if (version == COCKATRICE_XML3_TAGVER) {
                     return true;
                 } else {
-                    qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong version" << version;
+                    qCInfo(CockatriceXml3Log) << "Parsing failed: wrong version" << version;
                     return false;
                 }
 
             } else {
-                qDebug() << "[CockatriceXml3Parser] Parsing failed: wrong element tag" << xml.name();
+                qCInfo(CockatriceXml3Log) << "Parsing failed: wrong element tag" << xml.name();
                 return false;
             }
         }
@@ -58,7 +58,7 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
                 } else if (name == "cards") {
                     loadCardsFromXml(xml);
                 } else if (!name.isEmpty()) {
-                    qDebug() << "[CockatriceXml3Parser] Unknown item" << name << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown item" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -93,7 +93,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                     releaseDate =
                         QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
                 } else if (!name.isEmpty()) {
-                    qDebug() << "[CockatriceXml3Parser] Unknown set property" << name << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown set property" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -158,6 +158,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             auto _sets = CardInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
+            bool landscapeOrientation = false;
             bool isToken = false;
             bool upsideDown = false;
 
@@ -172,7 +173,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     name = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xmlName == "text") {
                     text = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                } else if (xmlName == "color") {
+                } else if (xmlName == "color" || xmlName == "colors") {
                     colors.append(xml.readElementText(QXmlStreamReader::IncludeChildElements));
                 } else if (xmlName == "token") {
                     isToken = static_cast<bool>(xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt());
@@ -194,6 +195,8 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
                 } else if (xmlName == "cipt") {
                     cipt = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                } else if (xmlName == "landscapeOrientation") {
+                    landscapeOrientation = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                 } else if (xmlName == "upsidedown") {
                     upsideDown = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
                     // sets
@@ -221,7 +224,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     if (attrs.hasAttribute("rarity")) {
                         setInfo.setProperty("rarity", attrs.value("rarity").toString());
                     }
-                    _sets.insert(setName, setInfo);
+                    _sets[setName].append(setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
                     CardRelation::AttachType attach = CardRelation::DoesNotAttach;
@@ -260,15 +263,15 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         relatedCards << relation;
                     }
                 } else if (!xmlName.isEmpty()) {
-                    qDebug() << "[CockatriceXml3Parser] Unknown card property" << xmlName
-                             << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown card property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
 
             properties.insert("colors", colors);
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, cipt, tableRow, upsideDown);
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
+                                      landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -277,7 +280,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
     if (set.isNull()) {
-        qDebug() << "&operator<< set is nullptr";
+        qCWarning(CockatriceXml3Log) << "&operator<< set is nullptr";
         return xml;
     }
 
@@ -294,7 +297,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
 {
     if (info.isNull()) {
-        qDebug() << "operator<< info is nullptr";
+        qCWarning(CockatriceXml3Log) << "operator<< info is nullptr";
         return xml;
     }
 
@@ -331,24 +334,26 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
 
     // sets
     const CardInfoPerSetMap sets = info->getSets();
-    for (CardInfoPerSet set : sets) {
-        xml.writeStartElement("set");
-        xml.writeAttribute("rarity", set.getProperty("rarity"));
-        xml.writeAttribute("muId", set.getProperty("muid"));
-        xml.writeAttribute("uuId", set.getProperty("uuid"));
+    for (const auto &cardInfoPerSetList : sets) {
+        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+            xml.writeStartElement("set");
+            xml.writeAttribute("rarity", set.getProperty("rarity"));
+            xml.writeAttribute("muId", set.getProperty("muid"));
+            xml.writeAttribute("uuId", set.getProperty("uuid"));
 
-        tmpString = set.getProperty("num");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("num", tmpString);
+            tmpString = set.getProperty("num");
+            if (!tmpString.isEmpty()) {
+                xml.writeAttribute("num", tmpString);
+            }
+
+            tmpString = set.getProperty("picurl");
+            if (!tmpString.isEmpty()) {
+                xml.writeAttribute("picURL", tmpString);
+            }
+
+            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeEndElement();
         }
-
-        tmpString = set.getProperty("picurl");
-        if (!tmpString.isEmpty()) {
-            xml.writeAttribute("picURL", tmpString);
-        }
-
-        xml.writeCharacters(set.getPtr()->getShortName());
-        xml.writeEndElement();
     }
 
     // related cards
@@ -402,6 +407,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
     if (info->getCipt()) {
         xml.writeTextElement("cipt", "1");
+    }
+    if (info->getLandscapeOrientation()) {
+        xml.writeTextElement("landscapeOrientation", "1");
     }
     if (info->getUpsideDownArt()) {
         xml.writeTextElement("upsidedown", "1");

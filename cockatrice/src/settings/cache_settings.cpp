@@ -1,6 +1,7 @@
 #include "cache_settings.h"
 
 #include "../client/network/release_channel.h"
+#include "card_override_settings.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -103,11 +104,7 @@ void SettingsCache::translateLegacySettings()
 
     // Game filters
     legacySetting.beginGroup("filter_games");
-    gameFilters().setShowFullGames(legacySetting.value("unavailable_games_visible").toBool());
-    gameFilters().setShowGamesThatStarted(legacySetting.value("unavailable_games_visible").toBool());
-    gameFilters().setShowPasswordProtectedGames(legacySetting.value("show_password_protected_games").toBool());
     gameFilters().setGameNameFilter(legacySetting.value("game_name_filter").toString());
-    gameFilters().setShowBuddiesOnlyGames(legacySetting.value("show_buddies_only_games").toBool());
     gameFilters().setHideIgnoredUserGames(legacySetting.value("hide_ignored_user_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
@@ -143,7 +140,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // ensure that the defaut path exists and return it
     if (tmp.isEmpty() || !QDir(tmp).exists()) {
         if (!QDir().mkpath(defaultPath))
-            qDebug() << "[SettingsCache] Could not create folder:" << defaultPath;
+            qCInfo(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
     }
     return tmp;
@@ -164,7 +161,7 @@ SettingsCache::SettingsCache()
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
     if (isPortableBuild)
-        qDebug() << "Portable mode enabled";
+        qCInfo(SettingsCacheLog) << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
@@ -178,6 +175,9 @@ SettingsCache::SettingsCache()
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
     layoutsSettings = new LayoutsSettings(settingsPath, this);
     downloadSettings = new DownloadSettings(settingsPath, this);
+    recentsSettings = new RecentsSettings(settingsPath, this);
+    cardOverrideSettings = new CardOverrideSettings(settingsPath, this);
+    debugSettings = new DebugSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
@@ -189,6 +189,7 @@ SettingsCache::SettingsCache()
 
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
+    checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
@@ -206,6 +207,14 @@ SettingsCache::SettingsCache()
     loadPaths();
 
     themeName = settings->value("theme/name").toString();
+
+    tabVisualDeckStorageOpen = settings->value("tabs/visualDeckStorage", true).toBool();
+    tabServerOpen = settings->value("tabs/server", true).toBool();
+    tabAccountOpen = settings->value("tabs/account", true).toBool();
+    tabDeckStorageOpen = settings->value("tabs/deckStorage", true).toBool();
+    tabReplaysOpen = settings->value("tabs/replays", true).toBool();
+    tabAdminOpen = settings->value("tabs/admin", true).toBool();
+    tabLogOpen = settings->value("tabs/log", true).toBool();
 
     // we only want to reset the cache once, then its up to the user
     bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
@@ -232,19 +241,53 @@ SettingsCache::SettingsCache()
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
+    clickPlaysAllSelected = settings->value("interface/clickPlaysAllSelected", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
+    cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
+    cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
+    closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
 
+    showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
+    roundCardCorners = settings->value("cards/roundcardcorners", true).toBool();
+    overrideAllCardArtWithPersonalPreference =
+        settings->value("cards/overrideallcardartwithpersonalpreference", false).toBool();
+    bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
+    printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
+    printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
+    includeRebalancedCards = settings->value("cards/includerebalancedcards", true).toBool();
+    printingSelectorNavigationButtonsVisible =
+        settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
+    visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
+    visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
+    visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
+    visualDeckStorageShowTagFilter = settings->value("interface/visualdeckstorageshowtagfilter", true).toBool();
+    visualDeckStorageSearchFolderNames = settings->value("interface/visualdeckstoragesearchfoldernames", true).toBool();
+    visualDeckStorageShowBannerCardComboBox =
+        settings->value("interface/visualdeckstorageshowbannercardcombobox", true).toBool();
+    visualDeckStorageShowTagsOnDeckPreviews =
+        settings->value("interface/visualdeckstorageshowtagsondeckpreviews", true).toBool();
+    visualDeckStorageDrawUnusedColorIdentities =
+        settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
+    visualDeckStorageUnusedColorIdentitiesOpacity =
+        settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
+    visualDeckStoragePromptForConversion =
+        settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
+    visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
+    visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
     tapAnimation = settings->value("cards/tapanimation", true).toBool();
+    autoRotateSidewaysLayoutCards = settings->value("cards/autorotatesidewayslayoutcards", true).toBool();
+
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
+    rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -252,8 +295,8 @@ SettingsCache::SettingsCache()
     chatMentionColor = settings->value("chat/mentioncolor", "A6120D").toString();
     chatHighlightColor = settings->value("chat/highlightcolor", "A6120D").toString();
 
-    zoneViewSortByName = settings->value("zoneview/sortbyname", true).toBool();
-    zoneViewSortByType = settings->value("zoneview/sortbytype", true).toBool();
+    zoneViewGroupByIndex = settings->value("zoneview/groupby", 1).toInt();
+    zoneViewSortByIndex = settings->value("zoneview/sortby", 1).toInt();
     zoneViewPileView = settings->value("zoneview/pileview", true).toBool();
 
     soundEnabled = settings->value("sound/enabled", false).toBool();
@@ -286,6 +329,7 @@ SettingsCache::SettingsCache()
     spectatorsCanTalk = settings->value("game/spectatorscantalk", false).toBool();
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
+    defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -296,6 +340,24 @@ void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
     useTearOffMenus = _useTearOffMenus;
     settings->setValue("interface/usetearoffmenus", useTearOffMenus);
     emit useTearOffMenusChanged(useTearOffMenus);
+}
+
+void SettingsCache::setCardViewInitialRowsMax(int _cardViewInitialRowsMax)
+{
+    cardViewInitialRowsMax = _cardViewInitialRowsMax;
+    settings->setValue("interface/cardViewInitialRowsMax", cardViewInitialRowsMax);
+}
+
+void SettingsCache::setCardViewExpandedRowsMax(int value)
+{
+    cardViewExpandedRowsMax = value;
+    settings->setValue("interface/cardViewExpandedRowsMax", cardViewExpandedRowsMax);
+}
+
+void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)
+{
+    closeEmptyCardView = value;
+    settings->setValue("interface/closeEmptyCardView", closeEmptyCardView);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -450,6 +512,48 @@ void SettingsCache::setThemeName(const QString &_themeName)
     emit themeChanged();
 }
 
+void SettingsCache::setTabVisualDeckStorageOpen(bool value)
+{
+    tabVisualDeckStorageOpen = value;
+    settings->setValue("tabs/visualDeckStorage", tabVisualDeckStorageOpen);
+}
+
+void SettingsCache::setTabServerOpen(bool value)
+{
+    tabServerOpen = value;
+    settings->setValue("tabs/server", tabServerOpen);
+}
+
+void SettingsCache::setTabAccountOpen(bool value)
+{
+    tabAccountOpen = value;
+    settings->setValue("tabs/account", tabAccountOpen);
+}
+
+void SettingsCache::setTabDeckStorageOpen(bool value)
+{
+    tabDeckStorageOpen = value;
+    settings->setValue("tabs/deckStorage", tabDeckStorageOpen);
+}
+
+void SettingsCache::setTabReplaysOpen(bool value)
+{
+    tabReplaysOpen = value;
+    settings->setValue("tabs/replays", tabReplaysOpen);
+}
+
+void SettingsCache::setTabAdminOpen(bool value)
+{
+    tabAdminOpen = value;
+    settings->setValue("tabs/admin", tabAdminOpen);
+}
+
+void SettingsCache::setTabLogOpen(bool value)
+{
+    tabLogOpen = value;
+    settings->setValue("tabs/log", tabLogOpen);
+}
+
 void SettingsCache::setPicDownload(QT_STATE_CHANGED_T _picDownload)
 {
     picDownload = static_cast<bool>(_picDownload);
@@ -481,6 +585,12 @@ void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay)
     settings->setValue("interface/doubleclicktoplay", doubleClickToPlay);
 }
 
+void SettingsCache::setClickPlaysAllSelected(QT_STATE_CHANGED_T _clickPlaysAllSelected)
+{
+    clickPlaysAllSelected = static_cast<bool>(_clickPlaysAllSelected);
+    settings->setValue("interface/clickPlaysAllSelected", clickPlaysAllSelected);
+}
+
 void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T _playToStack)
 {
     playToStack = static_cast<bool>(_playToStack);
@@ -505,11 +615,144 @@ void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSi
     settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
+void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
+{
+    showShortcuts = static_cast<bool>(_showShortcuts);
+    settings->setValue("menu/showshortcuts", showShortcuts);
+}
+
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)
 {
     displayCardNames = static_cast<bool>(_displayCardNames);
     settings->setValue("cards/displaycardnames", displayCardNames);
     emit displayCardNamesChanged();
+}
+
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt)
+{
+    overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
+    settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
+    emit overrideAllCardArtWithPersonalPreferenceChanged(overrideAllCardArtWithPersonalPreference);
+}
+
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop)
+{
+    bumpSetsWithCardsInDeckToTop = static_cast<bool>(_bumpSetsWithCardsInDeckToTop);
+    settings->setValue("cards/bumpsetswithcardsindecktotop", bumpSetsWithCardsInDeckToTop);
+    emit bumpSetsWithCardsInDeckToTopChanged();
+}
+
+void SettingsCache::setPrintingSelectorSortOrder(int _printingSelectorSortOrder)
+{
+    printingSelectorSortOrder = _printingSelectorSortOrder;
+    settings->setValue("cards/printingselectorsortorder", printingSelectorSortOrder);
+    emit printingSelectorSortOrderChanged();
+}
+
+void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
+{
+    printingSelectorCardSize = _printingSelectorCardSize;
+    settings->setValue("cards/printingselectorcardsize", printingSelectorCardSize);
+    emit printingSelectorCardSizeChanged();
+}
+
+void SettingsCache::setIncludeRebalancedCards(bool _includeRebalancedCards)
+{
+    if (includeRebalancedCards == _includeRebalancedCards)
+        return;
+
+    includeRebalancedCards = _includeRebalancedCards;
+    settings->setValue("cards/includerebalancedcards", includeRebalancedCards);
+    emit includeRebalancedCardsChanged(includeRebalancedCards);
+}
+
+void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)
+{
+    printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
+    settings->setValue("cards/printingselectornavigationbuttonsvisible", printingSelectorNavigationButtonsVisible);
+    emit printingSelectorNavigationButtonsVisibleChanged();
+}
+
+void SettingsCache::setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder)
+{
+    visualDeckStorageSortingOrder = _visualDeckStorageSortingOrder;
+    settings->setValue("interface/visualdeckstoragesortingorder", visualDeckStorageSortingOrder);
+}
+
+void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageShowFolders = value;
+    settings->setValue("interface/visualdeckstorageshowfolders", visualDeckStorageShowFolders);
+}
+
+void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags)
+{
+    visualDeckStorageShowTagFilter = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagfilter", visualDeckStorageShowTagFilter);
+    emit visualDeckStorageShowTagFilterChanged(visualDeckStorageShowTagFilter);
+}
+
+void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageSearchFolderNames = value;
+    settings->setValue("interface/visualdeckstoragesearchfoldernames", visualDeckStorageSearchFolderNames);
+}
+
+void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox)
+{
+    visualDeckStorageShowBannerCardComboBox = _showBannerCardComboBox;
+    settings->setValue("interface/visualdeckstorageshowbannercardcombobox", visualDeckStorageShowBannerCardComboBox);
+    emit visualDeckStorageShowBannerCardComboBoxChanged(visualDeckStorageShowBannerCardComboBox);
+}
+
+void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags)
+{
+    visualDeckStorageShowTagsOnDeckPreviews = _showTags;
+    settings->setValue("interface/visualdeckstorageshowtagsondeckpreviews", visualDeckStorageShowTagsOnDeckPreviews);
+    emit visualDeckStorageShowTagsOnDeckPreviewsChanged(visualDeckStorageShowTagsOnDeckPreviews);
+}
+
+void SettingsCache::setVisualDeckStorageCardSize(int _visualDeckStorageCardSize)
+{
+    visualDeckStorageCardSize = _visualDeckStorageCardSize;
+    settings->setValue("interface/visualdeckstoragecardsize", visualDeckStorageCardSize);
+    emit visualDeckStorageCardSizeChanged();
+}
+
+void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
+    QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities)
+{
+    visualDeckStorageDrawUnusedColorIdentities = _visualDeckStorageDrawUnusedColorIdentities;
+    settings->setValue("interface/visualdeckstoragedrawunusedcoloridentities",
+                       visualDeckStorageDrawUnusedColorIdentities);
+    emit visualDeckStorageDrawUnusedColorIdentitiesChanged(visualDeckStorageDrawUnusedColorIdentities);
+}
+
+void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity)
+{
+    visualDeckStorageUnusedColorIdentitiesOpacity = _visualDeckStorageUnusedColorIdentitiesOpacity;
+    settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
+                       visualDeckStorageUnusedColorIdentitiesOpacity);
+    emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
+}
+
+void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
+{
+    visualDeckStoragePromptForConversion = _visualDeckStoragePromptForConversion;
+    settings->setValue("interface/visualdeckstoragepromptforconversion", visualDeckStoragePromptForConversion);
+}
+
+void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert)
+{
+    visualDeckStorageAlwaysConvert = _visualDeckStorageAlwaysConvert;
+    settings->setValue("interface/visualdeckstoragealwaysconvert", visualDeckStorageAlwaysConvert);
+}
+
+void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageInGame = value;
+    settings->setValue("interface/visualdeckstorageingame", visualDeckStorageInGame);
+    emit visualDeckStorageInGameChanged(visualDeckStorageInGame);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)
@@ -539,10 +782,22 @@ void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T _tapAnimation)
     settings->setValue("cards/tapanimation", tapAnimation);
 }
 
+void SettingsCache::setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards)
+{
+    autoRotateSidewaysLayoutCards = static_cast<bool>(_autoRotateSidewaysLayoutCards);
+    settings->setValue("cards/autorotatesidewayslayoutcards", autoRotateSidewaysLayoutCards);
+}
+
 void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab)
 {
     openDeckInNewTab = static_cast<bool>(_openDeckInNewTab);
     settings->setValue("editor/openDeckInNewTab", openDeckInNewTab);
+}
+
+void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
+{
+    rewindBufferingMs = _rewindBufferingMs;
+    settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
 }
 
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)
@@ -582,16 +837,16 @@ void SettingsCache::setChatHighlightColor(const QString &_chatHighlightColor)
     settings->setValue("chat/highlightcolor", chatHighlightColor);
 }
 
-void SettingsCache::setZoneViewSortByName(QT_STATE_CHANGED_T _zoneViewSortByName)
+void SettingsCache::setZoneViewGroupByIndex(int _zoneViewGroupByIndex)
 {
-    zoneViewSortByName = static_cast<bool>(_zoneViewSortByName);
-    settings->setValue("zoneview/sortbyname", zoneViewSortByName);
+    zoneViewGroupByIndex = _zoneViewGroupByIndex;
+    settings->setValue("zoneview/groupby", zoneViewGroupByIndex);
 }
 
-void SettingsCache::setZoneViewSortByType(QT_STATE_CHANGED_T _zoneViewSortByType)
+void SettingsCache::setZoneViewSortByIndex(int _zoneViewSortByIndex)
 {
-    zoneViewSortByType = static_cast<bool>(_zoneViewSortByType);
-    settings->setValue("zoneview/sortbytype", zoneViewSortByType);
+    zoneViewSortByIndex = _zoneViewSortByIndex;
+    settings->setValue("zoneview/sortby", zoneViewSortByIndex);
 }
 
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T _zoneViewPileView)
@@ -994,6 +1249,18 @@ void SettingsCache::setCreateGameAsSpectator(const bool _createGameAsSpectator)
     settings->setValue("game/creategameasspectator", createGameAsSpectator);
 }
 
+void SettingsCache::setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal)
+{
+    defaultStartingLifeTotal = _defaultStartingLifeTotal;
+    settings->setValue("game/defaultstartinglifetotal", defaultStartingLifeTotal);
+};
+
+void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
+{
+    checkUpdatesOnStartup = static_cast<bool>(value);
+    settings->setValue("personal/startupUpdateCheck", checkUpdatesOnStartup);
+}
+
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
     rememberGameSettings = _rememberGameSettings;
@@ -1019,9 +1286,9 @@ void SettingsCache::setDownloadSpoilerStatus(bool _spoilerStatus)
     emit downloadSpoilerStatusChanged();
 }
 
-void SettingsCache::setUpdateReleaseChannel(int _updateReleaseChannel)
+void SettingsCache::setUpdateReleaseChannelIndex(int value)
 {
-    updateReleaseChannel = _updateReleaseChannel;
+    updateReleaseChannel = value;
     settings->setValue("personal/updatereleasechannel", updateReleaseChannel);
 }
 
@@ -1029,6 +1296,16 @@ void SettingsCache::setMaxFontSize(int _max)
 {
     maxFontSize = _max;
     settings->setValue("game/maxfontsize", maxFontSize);
+}
+
+void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
+{
+    if (_roundCardCorners == roundCardCorners)
+        return;
+
+    roundCardCorners = _roundCardCorners;
+    settings->setValue("cards/roundcardcorners", _roundCardCorners);
+    emit roundCardCornersChanged(roundCardCorners);
 }
 
 void SettingsCache::loadPaths()

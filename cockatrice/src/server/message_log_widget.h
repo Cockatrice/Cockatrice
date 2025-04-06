@@ -57,7 +57,7 @@ public slots:
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logDestroyCard(Player *player, QString cardName);
     void logDrawCards(Player *player, int number, bool deckIsEmpty);
-    void logDumpZone(Player *player, CardZone *zone, int numberCards);
+    void logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed = false);
     void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logGameClosed();
     void logGameStart();
@@ -92,8 +92,7 @@ public slots:
     void logSetSideboardLock(Player *player, bool locked);
     void logSetTapped(Player *player, CardItem *card, bool tapped);
     void logShuffle(Player *player, CardZone *zone, int start, int end);
-    void
-    logSpectatorSay(QString spectatorName, UserLevelFlags spectatorUserLevel, QString userPrivLevel, QString message);
+    void logSpectatorSay(const ServerInfo_User &spectator, QString message);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
     void setContextJudgeName(QString player);
@@ -103,10 +102,7 @@ public slots:
 
 public:
     void connectToPlayer(Player *player);
-    MessageLogWidget(TabSupervisor *_tabSupervisor,
-                     const UserlistProxy *_userlistProxy,
-                     TabGame *_game,
-                     QWidget *parent = nullptr);
+    MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = nullptr);
 };
 
 #endif

@@ -3,7 +3,10 @@
 
 #include "card_database_parser.h"
 
+#include <QLoggingCategory>
 #include <QXmlStreamReader>
+
+inline Q_LOGGING_CATEGORY(CockatriceXml4Log, "cockatrice_xml.xml_4_parser");
 
 class CockatriceXml4Parser : public ICardDatabaseParser
 {
@@ -24,9 +27,6 @@ private:
     QVariantHash loadCardPropertiesFromXml(QXmlStreamReader &xml);
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
-signals:
-    void addCard(CardInfoPtr card) override;
-    void addSet(CardSetPtr set) override;
 };
 
 #endif

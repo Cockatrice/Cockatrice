@@ -1,8 +1,13 @@
 #include "card_info_picture_widget.h"
 
+#include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_item.h"
-#include "../../picture_loader.h"
+#include "../../../../settings/cache_settings.h"
+#include "../../../tabs/tab_supervisor.h"
+#include "../../picture_loader/picture_loader.h"
+#include "../../window_main.h"
 
+#include <QMenu>
 #include <QMouseEvent>
 #include <QStylePainter>
 #include <QWidget>
@@ -38,6 +43,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverTo
     hoverTimer = new QTimer(this);
     hoverTimer->setSingleShot(true);
     connect(hoverTimer, &QTimer::timeout, this, &CardInfoPictureWidget::showEnlargedPixmap);
+
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
+
+        update();
+    });
 }
 
 /**
@@ -92,13 +103,15 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
  */
 void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    const int newWidth = baseWidth + scale * 20;
+    const int newWidth = baseWidth * scale / 100;
     const int newHeight = static_cast<int>(newWidth * aspectRatio);
 
     scaleFactor = scale;
 
     setFixedSize(newWidth, newHeight);
     updatePixmap();
+
+    emit cardScaleFactorChanged(scale);
 }
 
 /**
@@ -119,10 +132,11 @@ void CardInfoPictureWidget::updatePixmap()
  */
 void CardInfoPictureWidget::loadPixmap()
 {
+    PictureLoader::getCardBackLoadingInProgressPixmap(resizedPixmap, size());
     if (info) {
         PictureLoader::getPixmap(resizedPixmap, info, size());
     } else {
-        PictureLoader::getCardBackPixmap(resizedPixmap, size());
+        PictureLoader::getCardBackLoadingFailedPixmap(resizedPixmap, size());
     }
 
     pixmapDirty = false;
@@ -138,6 +152,7 @@ void CardInfoPictureWidget::loadPixmap()
 void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
+
     if (width() == 0 || height() == 0) {
         return;
     }
@@ -146,15 +161,47 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
         loadPixmap();
     }
 
-    const QSize scaledSize = resizedPixmap.size().scaled(size(), Qt::KeepAspectRatio);
-    const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
-    const qreal radius = 0.05 * scaledSize.width();
+    QPixmap transformedPixmap = resizedPixmap; // Default pixmap
+    if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
+        if (info && info->getLandscapeOrientation()) {
+            // Rotate pixmap 90 degrees to the left
+            QTransform transform;
+            transform.rotate(90);
+            transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
+        }
+    }
 
+    // Handle DPI scaling
+    qreal dpr = devicePixelRatio();     // Get the actual scaling factor
+    QSize availableSize = size() * dpr; // Convert to physical pixel size
+
+    // Compute final scaled size
+    QSize pixmapSize = transformedPixmap.size();
+    QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
+
+    // Pre-scale the pixmap once before drawing
+    QPixmap finalPixmap = transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    finalPixmap.setDevicePixelRatio(dpr); // Ensure correct display on high-DPI screens
+
+    // Compute target rectangle with explicit integer conversion
+    int targetX = static_cast<int>((availableSize.width() - scaledSize.width()) / (2 * dpr));
+    int targetY = static_cast<int>((availableSize.height() - scaledSize.height()) / (2 * dpr));
+    int targetW = static_cast<int>(scaledSize.width() / dpr);
+    int targetH = static_cast<int>(scaledSize.height() / dpr);
+    QRect targetRect{targetX, targetY, targetW, targetH};
+
+    // Compute rounded corner radius
+    // Ensure consistent rounding
+    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
+
+    // Draw the pixmap with rounded corners
     QStylePainter painter(this);
     QPainterPath shape;
-    shape.addRoundedRect(QRect(topLeft, scaledSize), radius, radius);
+    shape.addRoundedRect(targetRect, radius, radius);
     painter.setClipPath(shape);
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter, resizedPixmap);
+
+    // Draw the pre-scaled pixmap directly
+    painter.drawPixmap(targetRect, finalPixmap);
 }
 
 /**
@@ -212,6 +259,103 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
         enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
                                           static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
     }
+}
+
+void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    if (event->button() == Qt::RightButton) {
+        createRightClickMenu()->popup(QCursor::pos());
+    }
+}
+
+QMenu *CardInfoPictureWidget::createRightClickMenu()
+{
+    auto *cardMenu = new QMenu(this);
+
+    if (!info) {
+        return cardMenu;
+    }
+
+    cardMenu->addMenu(createViewRelatedCardsMenu());
+    cardMenu->addMenu(createAddToOpenDeckMenu());
+
+    return cardMenu;
+}
+
+QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
+{
+    auto viewRelatedCards = new QMenu(tr("View related cards"));
+
+    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
+
+    auto relatedCardExists = [](const CardRelation *cardRelation) {
+        return CardDatabaseManager::getInstance()->getCard(cardRelation->getName()) != nullptr;
+    };
+
+    bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
+
+    if (!atLeastOneGoodRelationFound) {
+        viewRelatedCards->setEnabled(false);
+        return viewRelatedCards;
+    }
+
+    for (const auto &relatedCard : relatedCards) {
+        const auto &relatedCardName = relatedCard->getName();
+        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+            emit cardChanged(CardDatabaseManager::getInstance()->getCard(relatedCardName));
+        });
+        viewRelatedCards->addAction(viewCard);
+    }
+
+    return viewRelatedCards;
+}
+
+/**
+ * Finds the single instance of the MainWindow in this application.
+ */
+static MainWindow *findMainWindow()
+{
+    for (auto widget : QApplication::topLevelWidgets()) {
+        if (auto mainWindow = qobject_cast<MainWindow *>(widget)) {
+            return mainWindow;
+        }
+    }
+    // This code should be unreachable
+    qCritical() << "Could not find MainWindow in QApplication::topLevelWidgets";
+    return nullptr;
+}
+
+QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
+{
+    auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
+
+    auto mainWindow = findMainWindow();
+    QList<AbstractTabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
+
+    if (deckEditorTabs.isEmpty()) {
+        addToOpenDeckMenu->setEnabled(false);
+        return addToOpenDeckMenu;
+    }
+
+    for (auto &deckEditorTab : deckEditorTabs) {
+        auto *addCardMenu = addToOpenDeckMenu->addMenu(deckEditorTab->getTabText());
+
+        QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
+        connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCard(info);
+            deckEditorTab->actAddCard(info);
+        });
+
+        QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
+        connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
+            deckEditorTab->updateCard(info);
+            deckEditorTab->actAddCardToSideboard(info);
+        });
+    }
+
+    return addToOpenDeckMenu;
 }
 
 /**

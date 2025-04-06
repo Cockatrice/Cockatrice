@@ -36,7 +36,7 @@ AbstractCounter::AbstractCounter(Player *_player,
         QString displayName = TranslateCounterName::getDisplayName(_name);
         menu = new TearOffMenu(displayName);
         aSet = new QAction(this);
-        connect(aSet, SIGNAL(triggered()), this, SLOT(setCounter()));
+        connect(aSet, &QAction::triggered, this, &AbstractCounter::setCounter);
         menu->addAction(aSet);
         menu->addSeparator();
         for (int i = 10; i >= -10; --i) {
@@ -49,7 +49,7 @@ AbstractCounter::AbstractCounter(Player *_player,
                 else if (i == 1)
                     aInc = aIncrement;
                 aIncrement->setData(i);
-                connect(aIncrement, SIGNAL(triggered()), this, SLOT(incrementCounter()));
+                connect(aIncrement, &QAction::triggered, this, &AbstractCounter::incrementCounter);
                 menu->addAction(aIncrement);
             }
         }
@@ -57,7 +57,8 @@ AbstractCounter::AbstractCounter(Player *_player,
         menu = nullptr;
     }
 
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &AbstractCounter::refreshShortcuts);
     refreshShortcuts();
     retranslateUi();
 }

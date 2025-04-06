@@ -4,6 +4,7 @@
 #include "../../utility/macros.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 
@@ -14,7 +15,6 @@ class ZoneViewZone;
 class Player;
 class CardDatabase;
 class QScrollBar;
-class QCheckBox;
 class GameScene;
 class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
@@ -31,6 +31,12 @@ public slots:
     }
 };
 
+/**
+ * A QGraphicsWidget that holds a ZoneViewZone.
+ *
+ * Some zone views allow sorting.
+ * This widget will display the sort options when relevant, and forward the values of the options to the ZoneViewZone.
+ */
 class ZoneViewWidget : public QGraphicsWidget
 {
     Q_OBJECT
@@ -41,24 +47,28 @@ private:
     QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
-    QCheckBox sortByNameCheckBox;
-    QCheckBox sortByTypeCheckBox;
+    QComboBox groupBySelector;
+    QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
 
     bool canBeShuffled;
     int extraHeight;
     Player *player;
+
+    void resizeScrollbar(qreal newZoneHeight);
 signals:
     void closePressed(ZoneViewWidget *zv);
 private slots:
-    void processSortByType(QT_STATE_CHANGED_T value);
-    void processSortByName(QT_STATE_CHANGED_T value);
+    void processGroupBy(int value);
+    void processSortBy(int value);
     void processSetPileView(QT_STATE_CHANGED_T value);
-    void resizeToZoneContents();
+    void resizeToZoneContents(bool forceInitialHeight = false);
     void handleScrollBarChange(int value);
     void zoneDeleted();
-    void moveEvent(QGraphicsSceneMoveEvent * /* event */);
+    void moveEvent(QGraphicsSceneMoveEvent * /* event */) override;
+    void resizeEvent(QGraphicsSceneResizeEvent * /* event */) override;
+    void expandWindow();
 
 public:
     ZoneViewWidget(Player *_player,
@@ -66,7 +76,8 @@ public:
                    int numberCards = 0,
                    bool _revealZone = false,
                    bool _writeableRevealZone = false,
-                   const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
+                   const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>(),
+                   bool _isReversed = false);
     ZoneViewZone *getZone() const
     {
         return zone;
@@ -78,8 +89,9 @@ public:
     void retranslateUi();
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void initStyleOption(QStyleOption *option) const;
+    void closeEvent(QCloseEvent *event) override;
+    void initStyleOption(QStyleOption *option) const override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif

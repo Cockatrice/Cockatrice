@@ -9,10 +9,10 @@ class GameFiltersSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    bool isShowBuddiesOnlyGames();
-    bool isShowFullGames();
-    bool isShowGamesThatStarted();
-    bool isShowPasswordProtectedGames();
+    bool isHideBuddiesOnlyGames();
+    bool isHideFullGames();
+    bool isHideGamesThatStarted();
+    bool isHidePasswordProtectedGames();
     bool isHideIgnoredUserGames();
     QString getGameNameFilter();
     QString getCreatorNameFilter();
@@ -25,11 +25,11 @@ public:
     bool isShowOnlyIfSpectatorsCanChat();
     bool isShowOnlyIfSpectatorsCanSeeHands();
 
-    void setShowBuddiesOnlyGames(bool show);
+    void setHideBuddiesOnlyGames(bool hide);
     void setHideIgnoredUserGames(bool hide);
-    void setShowFullGames(bool show);
-    void setShowGamesThatStarted(bool show);
-    void setShowPasswordProtectedGames(bool show);
+    void setHideFullGames(bool hide);
+    void setHideGamesThatStarted(bool hide);
+    void setHidePasswordProtectedGames(bool hide);
     void setGameNameFilter(QString gameName);
     void setCreatorNameFilter(QString creatorName);
     void setMinPlayers(int min);
@@ -46,7 +46,7 @@ signals:
 public slots:
 
 private:
-    explicit GameFiltersSettings(QString settingPath, QObject *parent = nullptr);
+    explicit GameFiltersSettings(const QString &settingPath, QObject *parent = nullptr);
     GameFiltersSettings(const GameFiltersSettings & /*other*/);
 
     QString hashGameType(const QString &gameType) const;

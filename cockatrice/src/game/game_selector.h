@@ -6,6 +6,7 @@
 #include <QGroupBox>
 #include <common/pb/event_add_to_list.pb.h>
 #include <common/pb/event_remove_from_list.pb.h>
+#include <pb/commands.pb.h>
 
 class QTreeView;
 class GamesModel;
@@ -26,7 +27,11 @@ private slots:
     void actSetFilter();
     void actClearFilter();
     void actCreate();
+
     void actJoin();
+    void actSpectate();
+    void customContextMenu(const QPoint &point);
+
     void actSelectedGameChanged(const QModelIndex &current, const QModelIndex &previous);
     void checkResponse(const Response &response);
 
@@ -52,6 +57,7 @@ private:
     void disableButtons();
     void enableButtons();
     void enableButtonsForIndex(const QModelIndex &current);
+    void joinGame(const bool isSpectator);
 
 public:
     GameSelector(AbstractClient *_client,

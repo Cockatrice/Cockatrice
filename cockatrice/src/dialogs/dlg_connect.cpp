@@ -1,8 +1,6 @@
 #include "dlg_connect.h"
 
-#include "../server/user/user_info_connection.h"
 #include "../settings/cache_settings.h"
-#include "../utility/macros.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>
@@ -22,7 +20,13 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {
     previousHostButton = new QRadioButton(tr("Known Hosts"), this);
     previousHosts = new QComboBox(this);
-    previousHosts->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
+
+    btnDeleteServer = new QPushButton(this);
+    btnDeleteServer->setIcon(QPixmap("theme:icons/remove_row"));
+    btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
+    btnDeleteServer->setFixedWidth(30);
+
+    connect(btnDeleteServer, &QPushButton::clicked, this, &DlgConnect::actRemoveSavedServer);
 
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(this);
@@ -80,8 +84,8 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
         autoConnectCheckBox->setEnabled(false);
     }
 
-    connect(savePasswordCheckBox, SIGNAL(QT_STATE_CHANGED(QT_STATE_CHANGED_T)), this,
-            SLOT(passwordSaved(QT_STATE_CHANGED_T)));
+    connect(savePasswordCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &DlgConnect::passwordSaved);
+    connect(autoConnectCheckBox, &QCheckBox::QT_STATE_CHANGED, &servers, &ServersSettings::setAutoConnect);
 
     serverIssuesLabel =
         new QLabel(tr("If you have any trouble connecting or registering then contact the server staff for help!"));
@@ -100,6 +104,9 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setFixedWidth(30);
     connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
 
+    forgotPasswordLabel = new QLabel(tr("Forgot password?"));
+    forgotPasswordLabel->setBuddy(btnForgotPassword);
+
     btnConnect = new QPushButton(tr("&Connect"));
     connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
 
@@ -109,6 +116,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 
     newHolderLayout = new QHBoxLayout;
     newHolderLayout->addWidget(previousHosts);
+    newHolderLayout->addWidget(btnDeleteServer);
     newHolderLayout->addWidget(btnRefreshServers);
 
     connectionLayout = new QGridLayout;
@@ -131,13 +139,17 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     serverInfoLayout->addWidget(serverContactLabel, 1, 0);
     serverInfoLayout->addWidget(serverContactLink, 1, 1, 1, 3);
 
+    forgotPasswordLayout = new QHBoxLayout;
+    forgotPasswordLayout->addWidget(forgotPasswordLabel, 0, Qt::AlignLeft);
+    forgotPasswordLayout->addWidget(btnForgotPassword, 0, Qt::AlignLeft);
+
     loginLayout = new QGridLayout;
     loginLayout->addWidget(playernameLabel, 0, 0);
     loginLayout->addWidget(playernameEdit, 0, 1, 1, 2);
     loginLayout->addWidget(passwordLabel, 1, 0);
-    loginLayout->addWidget(passwordEdit, 1, 1);
-    loginLayout->addWidget(btnForgotPassword, 1, 2);
+    loginLayout->addWidget(passwordEdit, 1, 1, 1, 2);
     loginLayout->addWidget(savePasswordCheckBox, 2, 1);
+    loginLayout->addLayout(forgotPasswordLayout, 3, 1);
 
     loginGroupBox = new QGroupBox(tr("Login"));
     loginGroupBox->setLayout(loginLayout);
@@ -249,6 +261,16 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     UserConnection_Information uci;
     QStringList _data = uci.getServerInfo(saveName);
 
+    if (_data.isEmpty()) {
+        _data << ""
+              << ""
+              << ""
+              << ""
+              << ""
+              << ""
+              << "";
+    }
+
     bool savePasswordStatus = (_data.at(5) == "1");
 
     saveEdit->setText(_data.at(0));
@@ -324,7 +346,6 @@ void DlgConnect::actOk()
     }
 
     servers.setPrevioushostName(saveEdit->text());
-    servers.setAutoConnect(autoConnectCheckBox->isChecked());
 
     if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Connect Warning"), tr("The player name can't be empty."));
@@ -339,21 +360,6 @@ QString DlgConnect::getHost() const
     return hostEdit->text().trimmed();
 }
 
-bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() == QEvent::KeyPress) {
-        auto *keyEvent = dynamic_cast<QKeyEvent *>(event);
-
-        if (keyEvent->key() == Qt::Key_Delete) {
-            auto *combobox = reinterpret_cast<QComboBox *>(obj);
-            combobox->removeItem(combobox->currentIndex());
-            return true;
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-
 void DlgConnect::actForgotPassword()
 {
     ServersSettings &servers = SettingsCache::instance().servers();
@@ -362,5 +368,10 @@ void DlgConnect::actForgotPassword()
     servers.setFPPlayerName(playernameEdit->text().trimmed());
 
     emit sigStartForgotPasswordRequest();
-    reject();
+}
+
+void DlgConnect::actRemoveSavedServer()
+{
+    SettingsCache::instance().servers().removeServer(hostEdit->text());
+    previousHosts->removeItem(previousHosts->currentIndex());
 }

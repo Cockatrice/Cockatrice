@@ -13,6 +13,9 @@ enum GraphicsItemType
     typeOther = QGraphicsItem::UserType + 6
 };
 
+/**
+ * Parent class of all objects that appear in a game.
+ */
 class AbstractGraphicsItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -21,7 +24,7 @@ protected:
     void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
 
 public:
-    AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QObject(), QGraphicsItem(parent)
+    explicit AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QGraphicsItem(parent)
     {
     }
 };

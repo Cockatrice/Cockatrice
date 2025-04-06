@@ -2,10 +2,13 @@
 #define RELEASECHANNEL_H
 
 #include <QDate>
+#include <QLoggingCategory>
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
 #include <utility>
+
+inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");
 
 class QNetworkReply;
 class QNetworkAccessManager;
@@ -82,9 +85,6 @@ public:
     ~ReleaseChannel() override;
 
 protected:
-    // shared by all instances
-    static int sharedIndex;
-    int index;
     QNetworkAccessManager *netMan;
     QNetworkReply *response;
     Release *lastRelease;
@@ -94,10 +94,6 @@ protected:
     virtual QString getReleaseChannelUrl() const = 0;
 
 public:
-    int getIndex() const
-    {
-        return index;
-    }
     Release *getLastRelease()
     {
         return lastRelease;

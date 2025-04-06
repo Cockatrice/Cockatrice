@@ -24,8 +24,8 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     layout->addWidget(clearButton);
     layout->addWidget(defaultButton);
 
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(removeLastShortcut()));
-    connect(defaultButton, SIGNAL(clicked()), this, SLOT(restoreDefault()));
+    connect(clearButton, &QPushButton::clicked, this, &SequenceEdit::removeLastShortcut);
+    connect(defaultButton, &QPushButton::clicked, this, &SequenceEdit::restoreDefault);
     lineEdit->installEventFilter(this);
 
     setShortcutName(_shortcutName);
@@ -40,12 +40,14 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         defaultButton->setEnabled(false);
         lineEdit->setEnabled(false);
         lineEdit->setText("");
+        // Correct as in-line translation
         lineEdit->setPlaceholderText(tr("Choose an action from the table"));
     } else {
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
         lineEdit->setEnabled(true);
         lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
+        // Correct as in-line translation
         lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
     }
 }
@@ -154,26 +156,49 @@ int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString 
     return result;
 }
 
+/**
+ *Validates that shortcut is valid (is a valid shortcut key sequence and doesn't conflict with any other shortcuts).
+ *Displays warning messages if it's not valid.
+ *
+ * @param sequence The shortcut key sequence
+ * @return True if the sequence isn't already self-contained
+ */
+bool SequenceEdit::validateShortcut(const QKeySequence &sequence)
+{
+    if (sequence.isEmpty() || !valid) {
+        return true;
+    }
+
+    const auto &shortcutsSettings = SettingsCache::instance().shortcuts();
+    const QString sequenceString = sequence.toString();
+
+    if (!shortcutsSettings.isKeyAllowed(shortcutName, sequenceString)) {
+        QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Invalid key"));
+        return true;
+    }
+
+    if (!shortcutsSettings.isValid(shortcutName, sequenceString)) {
+        auto overlaps = shortcutsSettings.findOverlaps(shortcutName, sequenceString);
+        QToolTip::showText(lineEdit->mapToGlobal(QPoint()),
+                           tr("Shortcut already in use by:") + " " + overlaps.join(", "));
+        return true;
+    }
+
+    if (!lineEdit->text().isEmpty()) {
+        if (lineEdit->text().contains(sequenceString)) {
+            return false;
+        }
+        lineEdit->setText(lineEdit->text() + ";");
+    }
+    lineEdit->setText(lineEdit->text() + sequenceString);
+
+    return true;
+}
+
 void SequenceEdit::finishShortcut()
 {
-    QKeySequence sequence(keys);
-    if (!sequence.isEmpty() && valid) {
-        QString sequenceString = sequence.toString();
-        if (SettingsCache::instance().shortcuts().isKeyAllowed(shortcutName, sequenceString)) {
-            if (SettingsCache::instance().shortcuts().isValid(shortcutName, sequenceString)) {
-                if (!lineEdit->text().isEmpty()) {
-                    if (lineEdit->text().contains(sequenceString)) {
-                        return;
-                    }
-                    lineEdit->setText(lineEdit->text() + ";");
-                }
-                lineEdit->setText(lineEdit->text() + sequenceString);
-            } else {
-                QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Shortcut already in use"));
-            }
-        } else {
-            QToolTip::showText(lineEdit->mapToGlobal(QPoint()), tr("Invalid key"));
-        }
+    if (!validateShortcut(QKeySequence(keys))) {
+        return;
     }
 
     currentKey = 0;

@@ -9,9 +9,12 @@
 #include "pb/game_event.pb.h"
 
 #include <QInputDialog>
+#include <QLoggingCategory>
 #include <QMap>
 #include <QPoint>
 #include <QTimer>
+
+inline Q_LOGGING_CATEGORY(PlayerLog, "player");
 
 namespace google
 {
@@ -68,6 +71,9 @@ class ZoneViewZone;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
+/**
+ * The entire graphical area belonging to a single player.
+ */
 class PlayerArea : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -135,7 +141,7 @@ signals:
     void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
     void logSetPT(Player *player, CardItem *card, QString newPT);
     void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
-    void logDumpZone(Player *player, CardZone *zone, int numberCards);
+    void logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed = false);
     void logRevealCards(Player *player,
                         CardZone *zone,
                         int cardId,
@@ -155,10 +161,17 @@ public slots:
     void actCreateToken();
     void actCreateAnotherToken();
     void actShuffle();
+    void actShuffleTop();
+    void actShuffleBottom();
     void actDrawCard();
     void actDrawCards();
     void actUndoDraw();
     void actMulligan();
+
+    void actPlay();
+    void actPlayFacedown();
+    void actHide();
+
     void actMoveTopCardToPlay();
     void actMoveTopCardToPlayFaceDown();
     void actMoveTopCardToGrave();
@@ -177,9 +190,14 @@ public slots:
     void actMoveBottomCardsToExile();
     void actMoveBottomCardToTop();
 
+    void actSelectAll();
+    void actSelectRow();
+    void actSelectColumn();
+
     void actViewLibrary();
     void actViewHand();
     void actViewTopCards();
+    void actViewBottomCards();
     void actAlwaysRevealTopCard();
     void actAlwaysLookAtTopCard();
     void actViewGraveyard();
@@ -218,9 +236,6 @@ private slots:
     void actFlowP();
     void actFlowT();
     void actSetAnnotation();
-    void actPlay();
-    void actHide();
-    void actPlayFacedown();
     void actReveal(QAction *action);
     void refreshShortcuts();
 
@@ -229,7 +244,8 @@ private slots:
 public:
     enum EventProcessingOption
     {
-        SKIP_REVEAL_WINDOW = 0x0001
+        SKIP_REVEAL_WINDOW = 0x0001,
+        SKIP_TAP_ANIMATION = 0x0002
     };
     Q_DECLARE_FLAGS(EventProcessingOptions, EventProcessingOption)
 
@@ -246,24 +262,29 @@ private:
     QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
         *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
         *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
-        *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor, *aMoveTopCardToGraveyard,
-        *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile, *aMoveTopCardsUntil,
-        *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard, *aDrawCards, *aUndoDraw,
-        *aMulligan, *aShuffle, *aMoveTopToPlay, *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken,
-        *aCreateAnotherToken, *aCardMenu, *aMoveBottomToPlay, *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop,
-        *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile, *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile,
-        *aDrawBottomCard, *aDrawBottomCards;
+        *aViewBottomCards, *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor,
+        *aMoveTopCardToGraveyard, *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile,
+        *aMoveTopCardsUntil, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard,
+        *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aShuffleTopCards, *aShuffleBottomCards, *aMoveTopToPlay,
+        *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aMoveBottomToPlay,
+        *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile,
+        *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard, *aDrawBottomCards;
 
+    QAction *aCardMenu;
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary;
+        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn;
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
-    QString previousMovingCardsUntilExpr = {};
+    QStringList movingCardsUntilExprs = {};
+    int movingCardsUntilNumberOfHits = 1;
+    bool movingCardsUntilAutoPlay = false;
     FilterString movingCardsUntilFilter;
+    int movingCardsUntilCounter = 0;
+    void stopMoveTopCardsUntil();
 
     bool shortcutsActive;
     int defaultNumberTopCards = 1;
@@ -301,7 +322,8 @@ private:
                            CardItem *card,
                            CardAttribute attribute,
                            const QString &avalue,
-                           bool allCards);
+                           bool allCards,
+                           EventProcessingOptions options);
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard,
@@ -309,9 +331,11 @@ private:
                     CardRelation::AttachType attach = CardRelation::DoesNotAttach,
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
-    void moveOneCardUntil(const CardInfoPtr card);
+    void moveOneCardUntil(CardItem *card);
     void addPlayerToList(QMenu *playerList, Player *player);
     static void removePlayerFromList(QMenu *playerList, Player *player);
+
+    void playSelectedCards(bool faceDown = false);
 
     QRectF bRect;
 
@@ -328,7 +352,8 @@ private:
     void eventCreateArrow(const Event_CreateArrow &event);
     void eventDeleteArrow(const Event_DeleteArrow &event);
     void eventCreateToken(const Event_CreateToken &event);
-    void eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context);
+    void
+    eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context, EventProcessingOptions options);
     void eventSetCardCounter(const Event_SetCardCounter &event);
     void eventCreateCounter(const Event_CreateCounter &event);
     void eventSetCounter(const Event_SetCounter &event);
@@ -378,7 +403,8 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    void playCard(CardItem *c, bool faceDown, bool tapped);
+    void playCard(CardItem *c, bool faceDown);
+    void playCardToTable(const CardItem *c, bool faceDown);
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
     void addZone(CardZone *z);
@@ -498,7 +524,7 @@ class AnnotationDialog : public QInputDialog
     void keyPressEvent(QKeyEvent *e) override;
 
 public:
-    AnnotationDialog(QWidget *parent) : QInputDialog(parent)
+    explicit AnnotationDialog(QWidget *parent) : QInputDialog(parent)
     {
     }
 };

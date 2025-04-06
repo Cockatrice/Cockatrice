@@ -1,7 +1,7 @@
 
 #include "mocks.h"
 
-CardDatabaseSettings::CardDatabaseSettings(QString settingPath, QObject *parent)
+CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "cardDatabase.ini", parent)
 {
 }
@@ -53,6 +53,15 @@ SettingsCache::SettingsCache()
 {
 }
 void SettingsCache::setUseTearOffMenus(bool /* _useTearOffMenus */)
+{
+}
+void SettingsCache::setCardViewInitialRowsMax(int /* _cardViewInitialRowsMax */)
+{
+}
+void SettingsCache::setCardViewExpandedRowsMax(int /* value */)
+{
+}
+void SettingsCache::setCloseEmptyCardView(const QT_STATE_CHANGED_T /* value */)
 {
 }
 void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
@@ -121,6 +130,27 @@ void SettingsCache::setTokenDatabasePath(const QString & /* _tokenDatabasePath *
 void SettingsCache::setThemeName(const QString & /* _themeName */)
 {
 }
+void SettingsCache::setTabVisualDeckStorageOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabServerOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabAccountOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabDeckStorageOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabReplaysOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabAdminOpen(bool /*value*/)
+{
+}
+void SettingsCache::setTabLogOpen(bool /*value*/)
+{
+}
 void SettingsCache::setPicDownload(QT_STATE_CHANGED_T /* _picDownload */)
 {
 }
@@ -136,6 +166,9 @@ void SettingsCache::setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T /* _b
 void SettingsCache::setDoubleClickToPlay(QT_STATE_CHANGED_T /* _doubleClickToPlay */)
 {
 }
+void SettingsCache::setClickPlaysAllSelected(QT_STATE_CHANGED_T /* _clickPlaysAllSelected */)
+{
+}
 void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T /* _playToStack */)
 {
 }
@@ -148,7 +181,67 @@ void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T /* _annotateTokens */)
 void SettingsCache::setTabGameSplitterSizes(const QByteArray & /* _tabGameSplitterSizes */)
 {
 }
+void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T /* _showShortcuts */)
+{
+}
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T /* _displayCardNames */)
+{
+}
+void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T /* _displayCardNames */)
+{
+}
+void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T /* _bumpSetsWithCardsInDeckToTop */)
+{
+}
+void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrder */)
+{
+}
+void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
+{
+}
+void SettingsCache::setIncludeRebalancedCards(bool /* _includeRebalancedCards */)
+{
+}
+void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
+{
+}
+void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSortingOrder */)
+{
+}
+void SettingsCache::setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T /* value */)
+{
+}
+void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T /* _showTags */)
+{
+}
+void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T /* value */)
+{
+}
+void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T /* _showBannerCardComboBox */)
+{
+}
+void SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T /* _showTags */)
+{
+}
+void SettingsCache::setVisualDeckStorageCardSize(int /* _visualDeckStorageCardSize */)
+{
+}
+void SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities(
+    QT_STATE_CHANGED_T /* _visualDeckStorageDrawUnusedColorIdentities */)
+{
+}
+void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
+    int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
+{
+}
+void SettingsCache::setVisualDeckStoragePromptForConversion(
+    QT_STATE_CHANGED_T /* _visualDeckStoragePromptForConversion */)
+{
+}
+void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T /* _visualDeckStorageAlwaysConvert */)
+{
+}
+void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
 {
 }
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
@@ -163,7 +256,13 @@ void SettingsCache::setMinPlayersForMultiColumnLayout(int /* _minPlayersForMulti
 void SettingsCache::setTapAnimation(QT_STATE_CHANGED_T /* _tapAnimation */)
 {
 }
+void SettingsCache::setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T /* _autoRotateSidewaysLayoutCards */)
+{
+}
 void SettingsCache::setOpenDeckInNewTab(QT_STATE_CHANGED_T /* _openDeckInNewTab */)
+{
+}
+void SettingsCache::setRewindBufferingMs(int /* _rewindBufferingMs */)
 {
 }
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T /* _chatMention */)
@@ -184,10 +283,10 @@ void SettingsCache::setChatMentionColor(const QString & /* _chatMentionColor */)
 void SettingsCache::setChatHighlightColor(const QString & /* _chatHighlightColor */)
 {
 }
-void SettingsCache::setZoneViewSortByName(QT_STATE_CHANGED_T /* _zoneViewSortByName */)
+void SettingsCache::setZoneViewGroupByIndex(int /* _zoneViewGroupByIndex */)
 {
 }
-void SettingsCache::setZoneViewSortByType(QT_STATE_CHANGED_T /* _zoneViewSortByType */)
+void SettingsCache::setZoneViewSortByIndex(int /* _zoneViewSortByIndex */)
 {
 }
 void SettingsCache::setZoneViewPileView(QT_STATE_CHANGED_T /* _zoneViewPileView */)
@@ -264,7 +363,13 @@ void SettingsCache::setSpectatorsCanSeeEverything(const bool /* _spectatorsCanSe
 void SettingsCache::setCreateGameAsSpectator(const bool /* _createGameAsSpectator */)
 {
 }
+void SettingsCache::setDefaultStartingLifeTotal(const int /* _startingLifeTotal */)
+{
+}
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)
+{
+}
+void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T /* value */)
 {
 }
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T /* _notifyaboutupdate */)
@@ -276,10 +381,13 @@ void SettingsCache::setNotifyAboutNewVersion(QT_STATE_CHANGED_T /* _notifyaboutn
 void SettingsCache::setDownloadSpoilerStatus(bool /* _spoilerStatus */)
 {
 }
-void SettingsCache::setUpdateReleaseChannel(int /* _updateReleaseChannel */)
+void SettingsCache::setUpdateReleaseChannelIndex(int /* value */)
 {
 }
 void SettingsCache::setMaxFontSize(int /* _max */)
+{
+}
+void SettingsCache::setRoundCardCorners(bool /* _roundCardCorners */)
 {
 }
 

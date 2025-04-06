@@ -1,5 +1,28 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr">
 <context>
+    <name>BetaReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="210"/>
+        <source>Beta</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="236"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="245"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="278"/>
+        <source>No reply received from the file update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>IntroPage</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="200"/>
@@ -61,8 +84,9 @@
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
-        <source>Sets JSON file (%1)</source>
-        <translation>Mettre le fichier JSON (%1)</translation>
+        <source>Sets file (%1)</source>
+        <oldsource>Sets JSON file (%1)</oldsource>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
@@ -245,7 +269,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="492"/>
+        <location filename="src/oracleimporter.cpp" line="472"/>
         <source>Dummy set containing tokens</source>
         <translation>Fausse édition contenant les jetons</translation>
     </message>
@@ -279,6 +303,15 @@
         <location filename="src/oraclewizard.cpp" line="212"/>
         <source>If the card databases don&apos;t reload automatically, restart the Cockatrice client.</source>
         <translation>Si les bases de données de cartes ne rechargent pas automatiquement, redémarrez le client Cockatrice.</translation>
+    </message>
+</context>
+<context>
+    <name>PictureLoader</name>
+    <message>
+        <location filename="../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp" line="219"/>
+        <source>en</source>
+        <comment>code for scryfall's language property, not available for all languages</comment>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -356,6 +389,21 @@
     </message>
 </context>
 <context>
+    <name>ShortcutsSettings</name>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="54"/>
+        <source>Your configuration file contained invalid shortcuts.
+Please check your shortcut settings!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/settings/shortcuts_settings.cpp" line="56"/>
+        <source>The following shortcuts have been set to default:
+</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>SimpleDownloadFilePage</name>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
@@ -391,11 +439,39 @@
     </message>
 </context>
 <context>
+    <name>StableReleaseChannel</name>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="104"/>
+        <source>Default</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="120"/>
+        <source>No reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="128"/>
+        <source>Invalid reply received from the release update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="176"/>
+        <source>No reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../cockatrice/src/client/network/release_channel.cpp" line="183"/>
+        <source>Invalid reply received from the tag update server.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>UnZip</name>
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Opération ZIP complétée avec succès.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
@@ -410,7 +486,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de créer ou ouvrir le fichier.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
@@ -420,12 +496,12 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Archive corrompue.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Mauvais mot de passe.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
@@ -475,7 +551,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Erreur inconnue.</translation>
     </message>
 </context>
 <context>
@@ -498,7 +574,7 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de créer ou d&apos;ouvrir le fichier.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
@@ -535,6 +611,7 @@
     <name>i18n</name>
     <message>
         <location filename="src/oraclewizard.cpp" line="58"/>
+        <location filename="../cockatrice/src/settings/cache_settings.cpp" line="167"/>
         <source>English</source>
         <translation>Français (French)</translation>
     </message>

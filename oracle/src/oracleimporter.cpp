@@ -1,9 +1,11 @@
 #include "oracleimporter.h"
 
 #include "game/cards/card_database_parser/cockatrice_xml_4.h"
+#include "parsehelpers.h"
 #include "qt-json/json.h"
 
-#include <QtWidgets>
+#include <QDebug>
+#include <QRegularExpression>
 #include <algorithm>
 #include <climits>
 
@@ -15,8 +17,22 @@ SplitCardPart::SplitCardPart(const QString &_name,
 {
 }
 
+const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^format-");
+
 OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : CardDatabase(parent), dataDir(_dataDir)
 {
+}
+
+CardSet::Priority OracleImporter::getSetPriority(QString &setType, QString &shortName)
+{
+    if (!setTypePriorities.contains(setType.toLower())) {
+        qDebug() << "warning: Set type" << setType << "unrecognized for prioritization";
+    }
+    CardSet::Priority priority = setTypePriorities.value(setType.toLower(), CardSet::PriorityOther);
+    if (nonEnglishSets.contains(shortName)) {
+        priority = CardSet::PriorityLowest;
+    }
+    return priority;
 }
 
 bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
@@ -30,7 +46,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         return false;
     }
 
-    QListIterator<QVariant> it(setsMap.values());
+    QListIterator it(setsMap.values());
     QVariantMap map;
 
     QString shortName;
@@ -38,6 +54,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QList<QVariant> setCards;
     QString setType;
     QDate releaseDate;
+    CardSet::Priority priority;
 
     while (it.hasNext()) {
         map = it.next().toMap();
@@ -45,6 +62,8 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         longName = map.value("name").toString();
         setCards = map.value("cards").toList();
         setType = map.value("type").toString();
+        releaseDate = map.value("releaseDate").toDate();
+        priority = getSetPriority(setType, shortName);
         // capitalize set type
         if (setType.length() > 0) {
             // basic grammar for words that aren't capitalized, like in "From the Vault"
@@ -62,12 +81,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             }
             setType = setType.trimmed();
         }
-        if (!nonEnglishSets.contains(shortName)) {
-            releaseDate = map.value("releaseDate").toDate();
-        } else {
-            releaseDate = QDate();
-        }
-        newSetList.append(SetToDownload(shortName, longName, setCards, setType, releaseDate));
+        newSetList.append(SetToDownload(shortName, longName, setCards, priority, setType, releaseDate));
     }
 
     std::sort(newSetList.begin(), newSetList.end());
@@ -107,6 +121,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     if (cards.contains(name)) {
         CardInfoPtr card = cards.value(name);
         card->addToSet(setInfo.getPtr(), setInfo);
+        if (card->getProperties().filter(formatRegex).empty()) {
+            card->combineLegalities(properties);
+        }
         return card;
     }
 
@@ -141,9 +158,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // DETECT CARD POSITIONING INFO
 
     // cards that enter the field tapped
-    QRegularExpression ciptRegex("( it|" + QRegularExpression::escape(name) +
-                                 ") enters( the battlefield)? tapped(?! unless)");
-    bool cipt = ciptRegex.match(text).hasMatch();
+    bool cipt = parseCipt(name, text);
+
+    bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
+                                properties.value("layout").toString() == "split" ||
+                                properties.value("layout").toString() == "planar";
 
     // table row
     int tableRow = 1;
@@ -166,9 +185,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
     CardInfoPerSetMap setsInfo;
-    setsInfo.insert(setInfo.getPtr()->getShortName(), setInfo);
+    setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
-                                                setsInfo, cipt, tableRow, upsideDown);
+                                                setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
 
     if (name.isEmpty()) {
         qDebug() << "warning: an empty card was added to set" << setInfo.getPtr()->getShortName();
@@ -183,18 +202,18 @@ QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const 
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
 
-int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
-                                       const QList<QVariant> &cardsList,
-                                       bool skipSpecialCards)
+int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList)
 {
     // mtgjson name => xml name
     static const QMap<QString, QString> cardProperties{
-        {"manaCost", "manacost"}, {"manaValue", "cmc"}, {"type", "type"},
-        {"loyalty", "loyalty"},   {"layout", "layout"}, {"side", "side"},
+        {"manaCost", "manacost"},     {"manaValue", "cmc"}, {"type", "type"},
+        {"loyalty", "loyalty"},       {"layout", "layout"}, {"side", "side"},
+        {"convertedManaCost", "cmc"}, // old name for manaValue, for backwards compatibility
     };
 
     // mtgjson name => xml name
-    static const QMap<QString, QString> setInfoProperties{{"number", "num"}, {"rarity", "rarity"}};
+    static const QMap<QString, QString> setInfoProperties{
+        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}, {"isRebalanced", "isRebalanced"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
@@ -203,22 +222,16 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
     QMap<QString, QList<SplitCardPart>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, maintype, faceName;
-    static const bool isToken = false;
+    QString layout, name, text, colors, colorIdentity, faceName;
+    static constexpr bool isToken = false;
+    static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
     QVariantHash properties;
     CardInfoPerSet setInfo;
     QList<CardRelation *> relatedCards;
-    static const QList<QString> specialNumChars = {"★", "s", "†"};
-    QMap<QString, QVariant> specialPromoCards;
     QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
         card = cardVar.toMap();
-
-        // skip alternatives
-        if (getStringPropertyFromMap(card, "isAlternative") == "true") {
-            continue;
-        }
 
         /* Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
@@ -241,7 +254,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // card properties
         properties.clear();
-        QMapIterator<QString, QString> it(cardProperties);
+        QMapIterator it(cardProperties);
         while (it.hasNext()) {
             it.next();
             QString mtgjsonProperty = it.key();
@@ -253,7 +266,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
         // per-set properties
         setInfo = CardInfoPerSet(currentSet);
-        QMapIterator<QString, QString> it2(setInfoProperties);
+        QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();
             QString mtgjsonProperty = it2.key();
@@ -264,7 +277,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         }
 
         // Identifiers
-        QMapIterator<QString, QString> it3(identifierProperties);
+        QMapIterator it3(identifierProperties);
         while (it3.hasNext()) {
             it3.next();
             auto mtgjsonProperty = it3.key();
@@ -275,43 +288,16 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
             }
         }
 
-        QString numComponent{};
-        if (skipSpecialCards) {
-            QString numProperty = setInfo.getProperty("num");
-            // skip promo cards if it's not the only print, cards with two faces are different cards
-            if (allNameProps.contains(faceName)) {
-                // check for alternative versions
-                if (layout != "normal")
-                    continue;
+        QString numComponent;
+        const QString numProperty = setInfo.getProperty("num");
+        const QChar lastChar = numProperty.isEmpty() ? QChar() : numProperty.back();
 
-                // alternative versions have a letter in the end of num like abc
-                // note this will also catch p and s, those will get removed later anyway
-                QChar lastChar = numProperty.at(numProperty.size() - 1);
-                if (!lastChar.isLetter())
-                    continue;
-
-                numComponent = " (" + QString(lastChar) + ")";
-                faceName += numComponent; // add to facename to make it unique
-            }
-            if (getStringPropertyFromMap(card, "isPromo") == "true") {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            }
-            bool skip = false;
-            // skip cards containing special stuff in the collectors number like promo cards
-            for (const QString &specialChar : specialNumChars) {
-                if (numProperty.contains(specialChar)) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip) {
-                specialPromoCards.insert(faceName, cardVar);
-                continue;
-            } else {
-                allNameProps.append(faceName);
-            }
+        // Un-Sets do some wonky stuff. Split up these cards as individual entries.
+        if (setsWithCardsWithSameNameButDifferentText.contains(currentSet->getShortName()) &&
+            allNameProps.contains(faceName) && layout == "normal" && lastChar.isLetter()) {
+            numComponent = " (" + QString(lastChar).toLower() + ")";
         }
+        allNameProps.append(faceName);
 
         // special handling properties
         colors = card.value("colors").toStringList().join("");
@@ -365,7 +351,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
 
             // add other face for split cards as card relation
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
-                properties["cmc"] = getStringPropertyFromMap(card, "faceManaValue");
+                auto faceManaValue = getStringPropertyFromMap(card, "faceManaValue");
+                if (faceManaValue.isEmpty()) {
+                    // check the old name for the property, for backwards compatibility purposes
+                    faceManaValue = getStringPropertyFromMap(card, "faceConvertedManaCost");
+                }
+                properties["cmc"] = faceManaValue;
+
                 if (layout == "meld") { // meld cards don't work
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
@@ -453,18 +445,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet,
         numCards++;
     }
 
-    // only add the unique promo cards that didn't already exist in the set
-    if (skipSpecialCards) {
-        QList<QVariant> nonDuplicatePromos;
-        for (auto cardIter = specialPromoCards.constBegin(); cardIter != specialPromoCards.constEnd(); ++cardIter) {
-            if (!allNameProps.contains(cardIter.key())) {
-                nonDuplicatePromos.append(cardIter.value());
-            }
-        }
-        if (!nonDuplicatePromos.isEmpty()) {
-            numCards += importCardsFromSet(currentSet, nonDuplicatePromos, false);
-        }
-    }
     return numCards;
 }
 
@@ -493,8 +473,9 @@ int OracleImporter::startImport()
     sets.insert(TOKENS_SETNAME, tokenSet);
 
     for (const SetToDownload &curSetToParse : allSets) {
-        CardSetPtr newSet = CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(),
-                                                 curSetToParse.getSetType(), curSetToParse.getReleaseDate());
+        CardSetPtr newSet =
+            CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(), curSetToParse.getSetType(),
+                                 curSetToParse.getReleaseDate(), curSetToParse.getPriority());
         if (!sets.contains(newSet->getShortName()))
             sets.insert(newSet->getShortName(), newSet);
 

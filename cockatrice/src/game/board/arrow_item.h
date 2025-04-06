@@ -21,19 +21,20 @@ protected:
     Player *player;
     int id;
     ArrowTarget *startItem, *targetItem;
+    bool targetLocked;
     QColor color;
     bool fullColor;
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 public:
     ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
-    ~ArrowItem();
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    QRectF boundingRect() const
+    ~ArrowItem() override;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QRectF boundingRect() const override
     {
         return path.boundingRect();
     }
-    QPainterPath shape() const
+    QPainterPath shape() const override
     {
         return path;
     }
@@ -64,6 +65,10 @@ public:
     {
         return targetItem;
     }
+    void setTargetLocked(bool _targetLocked)
+    {
+        targetLocked = _targetLocked;
+    }
     void delArrow();
 };
 
@@ -78,8 +83,8 @@ public:
     void addChildArrow(ArrowDragItem *childArrow);
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 class ArrowAttachItem : public ArrowItem
@@ -88,13 +93,15 @@ class ArrowAttachItem : public ArrowItem
 private:
     QList<ArrowAttachItem *> childArrows;
 
+    void attachCards(CardItem *startCard, const CardItem *targetCard);
+
 public:
-    ArrowAttachItem(ArrowTarget *_startItem);
+    explicit ArrowAttachItem(ArrowTarget *_startItem);
     void addChildArrow(ArrowAttachItem *childArrow);
 
 protected:
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
 #endif // ARROWITEM_H
