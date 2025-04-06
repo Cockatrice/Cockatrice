@@ -4,7 +4,7 @@
 
 project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-file(GLOB_RECURSE cockatrice_CPP_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
+file(GLOB_RECURSE cockatrice_CPP_FILES ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp)
 
 set(cockatrice_SOURCES ${cockatrice_CPP_FILES} ${VERSION_STRING_CPP})
 
