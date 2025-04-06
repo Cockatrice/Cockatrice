@@ -47,6 +47,7 @@ public slots:
     void
     processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void processCardClickDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    bool actSaveDeckAs() override;
 };
 
 #endif

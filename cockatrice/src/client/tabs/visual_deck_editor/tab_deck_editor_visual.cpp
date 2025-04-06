@@ -19,6 +19,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QCompleter>
 #include <QDir>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -191,6 +192,15 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
+}
+
+bool TabDeckEditorVisual::actSaveDeckAs()
+{
+    // We have to disable the quick-add search bar or else it'll steal focus after dialog creation.
+    tabContainer->visualDeckView->searchBar->setEnabled(false);
+    auto result = AbstractTabDeckEditor::actSaveDeckAs();
+    tabContainer->visualDeckView->searchBar->setEnabled(true);
+    return result;
 }
 
 void TabDeckEditorVisual::showPrintingSelector()

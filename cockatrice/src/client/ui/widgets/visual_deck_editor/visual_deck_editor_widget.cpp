@@ -42,11 +42,18 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     searchBar = new QLineEdit(this);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
+        if (!searchBar->hasFocus())
+            return;
+
         CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(searchBar->text());
         if (card) {
             emit cardAdditionRequested(card);
         }
     });
+
+    setFocusProxy(searchBar);
+    setFocusPolicy(Qt::ClickFocus);
+
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);

@@ -28,6 +28,7 @@ public:
 
     void setDeckList(const DeckList &_deckListModel);
 
+    QLineEdit *searchBar;
     CardSizeWidget *cardSizeWidget;
 
 public slots:
@@ -56,7 +57,6 @@ private:
     QVBoxLayout *mainLayout;
     QWidget *searchContainer;
     QHBoxLayout *searchLayout;
-    QLineEdit *searchBar;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
