@@ -12,7 +12,7 @@ Start <- QueryPartList
 ~ws <- [ ]+
 QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 
-ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[O][R]> ws ComplexQueryPart / SomewhatComplexQueryPart
+ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
