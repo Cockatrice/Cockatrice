@@ -131,9 +131,9 @@ And then run it<br>
 `docker run -i -p 4748:4748 -t servatrice:latest`<br>
 
 For versions after 2.10.2, there is also an official image available on the GitHub container registry. You can pull it using<br>
-`docker pull ghcr.io/Cockatrice/Cockatrice:latest`<br>
+`docker pull ghcr.io/cockatrice/servatrice:latest`<br>
 And then run it<br>
-`docker run -i -p 4748:4748 -t ghcr.io/Cockatrice/Cockatrice:latest`<br>
+`docker run -i -p 4748:4748 -t ghcr.io/cockatrice/servatrice:latest`<br>
 
 >Note: Running this command exposes the port 4748 of the docker container<br>
 to permit connections to the server.
