@@ -63,6 +63,9 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
     destroyCheckBox->setChecked(true);
 
+    faceDownCheckBox = new QCheckBox(tr("Create face-down token"));
+    faceDownCheckBox->setChecked(false);
+
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(nameLabel, 0, 0);
     grid->addWidget(nameEdit, 0, 1);
@@ -73,6 +76,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     grid->addWidget(annotationLabel, 3, 0);
     grid->addWidget(annotationEdit, 3, 1);
     grid->addWidget(destroyCheckBox, 4, 0, 1, 2);
+    grid->addWidget(faceDownCheckBox, 5, 0, 1, 2);
 
     QGroupBox *tokenDataGroupBox = new QGroupBox(tr("Token data"));
     tokenDataGroupBox->setLayout(grid);
@@ -230,5 +234,6 @@ TokenInfo DlgCreateToken::getTokenInfo() const
             .color = colorEdit->itemData(colorEdit->currentIndex()).toString(),
             .pt = ptEdit->text(),
             .annotation = annotationEdit->text(),
-            .destroy = destroyCheckBox->isChecked()};
+            .destroy = destroyCheckBox->isChecked(),
+            .faceDown = faceDownCheckBox->isChecked()};
 }
