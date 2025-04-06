@@ -24,6 +24,7 @@ struct TokenInfo
     QString pt;
     QString annotation;
     bool destroy = true;
+    bool faceDown = false;
 };
 
 class DlgCreateToken : public QDialog
@@ -51,6 +52,7 @@ private:
     QComboBox *colorEdit;
     QLineEdit *nameEdit, *ptEdit, *annotationEdit;
     QCheckBox *destroyCheckBox;
+    QCheckBox *faceDownCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
     CardInfoPictureWidget *pic;
     QTreeView *chooseTokenView;
