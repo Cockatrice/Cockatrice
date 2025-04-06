@@ -29,7 +29,7 @@ public:
     bool getDestroy() const;
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 private slots:
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
