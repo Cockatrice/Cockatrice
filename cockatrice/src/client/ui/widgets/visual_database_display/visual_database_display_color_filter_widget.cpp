@@ -12,14 +12,11 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
     setLayout(layout);
     layout->setSpacing(5);
     layout->setContentsMargins(0, 0, 0, 0);
-    setMaximumHeight(50);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
         auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
-        manaSymbol->setMaximumHeight(25);
-        manaSymbol->setMaximumWidth(25);
+        manaSymbol->setFixedWidth(25);
 
         layout->addWidget(manaSymbol);
 
