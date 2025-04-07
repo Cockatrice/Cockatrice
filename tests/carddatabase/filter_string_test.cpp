@@ -22,10 +22,10 @@ protected:
         notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead After All");
         truthOrTale = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth or Tale");
     }
-    }
-    // void TearDown() override {}
+}
+// void TearDown() override {}
 
-    CardData cat;
+CardData cat;
 };
 
 QUERY(Empty, cat, "", true)
