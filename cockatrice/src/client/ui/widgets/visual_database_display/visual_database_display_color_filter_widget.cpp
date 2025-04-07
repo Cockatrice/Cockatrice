@@ -41,8 +41,12 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
     connect(this, &VisualDatabaseDisplayColorFilterWidget::filterModeChanged, this,
             &VisualDatabaseDisplayColorFilterWidget::updateColorFilter);
-    connect(filterModel, &FilterTreeModel::layoutChanged, this,
-            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
+    connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
+        if (blockSync) {
+            return; // Skip sync if we're blocking it
+        }
+        QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel);
+    });
 
     // Call retranslateUi to set the initial text
     retranslateUi();
@@ -50,74 +54,152 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
 
 void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
 {
-    // Set the toggle button text based on the current mode
-    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
+    switch (currentMode) {
+        case FilterMode::ExactMatch:
+            toggleButton->setText(tr("Mode: Exact Match"));
+            break;
+        case FilterMode::Includes:
+            toggleButton->setText(tr("Mode: Includes"));
+            break;
+        case FilterMode::IncludeExclude:
+            toggleButton->setText(tr("Mode: Include/Exclude"));
+            break;
+    }
 }
 
 void VisualDatabaseDisplayColorFilterWidget::handleColorToggled(QChar color, bool active)
 {
-    activeColors[color] = active;
-    emit activeColorsChanged();
+    switch (currentMode) {
+        case FilterMode::ExactMatch:
+            // In Exact Match Mode, only allow the selected colors
+            if (active) {
+                activeColors[color] = true; // Add color to the selected list
+            } else {
+                activeColors[color] = false; // Remove color from the selected list
+            }
+            break;
+
+        case FilterMode::Includes:
+            // In Includes Mode, toggle the color freely (include selected colors)
+            activeColors[color] = active;
+            break;
+
+        case FilterMode::IncludeExclude:
+            // In Include/Exclude Mode, toggle the color freely (include selected, exclude unselected)
+            if (active) {
+                activeColors[color] = true; // Include the color
+            } else {
+                activeColors[color] = false; // Exclude the color
+            }
+            break;
+    }
+
+    emit activeColorsChanged(); // Notify listeners that the active colors have changed
 }
 
 void VisualDatabaseDisplayColorFilterWidget::updateColorFilter()
 {
-    // Clear existing filters related to color
+    blockSync = true;
+
+    // Clear previous filters
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
 
-    if (exactMatchMode) {
-        // Exact match: card must have ONLY the selected colors
-        QSet<QString> selectedColors;
-        for (const auto &color : activeColors.keys()) {
-            if (activeColors[color]) {
-                selectedColors.insert(color);
-            }
-        }
+    QSet<QString> selectedColors;
+    QSet<QString> excludedColors;
 
-        if (!selectedColors.isEmpty()) {
-            // Require all selected colors (TypeAnd)
-            for (const auto &color : selectedColors) {
-                QString colorString = color;
-                filterModel->addFilter(
-                    new CardFilter(colorString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrColor));
-            }
-
-            // Exclude any other colors (TypeAndNot)
-            QStringList allPossibleColors = {"W", "U", "B", "R", "G"};
-            for (const auto &color : allPossibleColors) {
-                if (!selectedColors.contains(color)) {
-                    QString colorString = color;
-                    filterModel->addFilter(
-                        new CardFilter(colorString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor));
-                }
-            }
-        }
-    } else {
-        // Default includes mode (TypeAnd) - match any selected colors
-        for (const auto &color : activeColors.keys()) {
-            if (activeColors[color]) { // If the color is active
-                QString colorString = color;
-                filterModel->addFilter(
-                    new CardFilter(colorString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrColor));
-            }
+    // Collect active colors in the selected and excluded sets
+    for (const auto &color : activeColors.keys()) {
+        if (activeColors[color]) {
+            selectedColors.insert(color); // Include this color
+        } else {
+            excludedColors.insert(color); // Exclude this color
         }
     }
+
+    switch (currentMode) {
+        case FilterMode::ExactMatch:
+            // Exact Match Mode: Only selected colors are allowed
+            if (!selectedColors.isEmpty()) {
+                // Require all selected colors (TypeAnd)
+                for (const auto &color : selectedColors) {
+                    QString colorString = color;
+                    filterModel->addFilter(
+                        new CardFilter(colorString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrColor));
+                }
+
+                // Exclude all other colors
+                QStringList allPossibleColors = {"W", "U", "B", "R", "G"};
+                for (const auto &color : allPossibleColors) {
+                    if (!selectedColors.contains(color)) {
+                        QString colorString = color;
+                        filterModel->addFilter(
+                            new CardFilter(colorString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor));
+                    }
+                }
+            }
+            break;
+
+        case FilterMode::Includes:
+            // Includes Mode: Just include selected colors without restrictions
+            for (const auto &color : selectedColors) {
+                QString colorString = color;
+                filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeOr,
+                                                      CardFilter::Attr::AttrColor)); // OR for selected colors
+            }
+            break;
+
+        case FilterMode::IncludeExclude:
+            // Include/Exclude Mode: Include selected colors and exclude unselected colors
+            for (const auto &color : selectedColors) {
+                QString colorString = color;
+                filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeOr,
+                                                      CardFilter::Attr::AttrColor)); // OR for selected colors
+            }
+            for (const auto &color : excludedColors) {
+                QString colorString = color;
+                filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeAndNot,
+                                                      CardFilter::Attr::AttrColor)); // AND NOT for excluded colors
+            }
+            break;
+    }
+
+    blockSync = false;
 }
 
 void VisualDatabaseDisplayColorFilterWidget::updateFilterMode(bool checked)
 {
-    exactMatchMode = checked; // Toggle between modes
-    retranslateUi();          // Update the button text
-    emit filterModeChanged(exactMatchMode);
+    blockSync = true;
+
+    if (checked) {
+        // Cycle through the modes in a clear manner
+        switch (currentMode) {
+            case FilterMode::ExactMatch:
+                currentMode = FilterMode::Includes; // Switch to Includes
+                break;
+            case FilterMode::Includes:
+                currentMode = FilterMode::IncludeExclude; // Switch to Include/Exclude
+                break;
+            case FilterMode::IncludeExclude:
+                currentMode = FilterMode::ExactMatch; // Switch to Exact Match
+                break;
+        }
+    }
+
+    retranslateUi();                     // Update button text based on the mode
+    emit filterModeChanged(currentMode); // Signal mode change
+    updateColorFilter();                 // Reapply the filter based on the new mode
+
+    blockSync = false;
 }
 
 void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
 {
+    blockSync = true;
     QSet<QString> currentFilters;
 
     // Get current filters of type color
     for (const auto &filter : filterModel->getFiltersOfType(CardFilter::Attr::AttrColor)) {
-        if (filter->type() == CardFilter::Type::TypeAnd || filter->type() == CardFilter::Type::TypeAndNot) {
+        if (filter->type() == CardFilter::Type::TypeAnd || filter->type() == CardFilter::Type::TypeOr) {
             currentFilters.insert(filter->term());
         }
     }
@@ -157,4 +239,5 @@ void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
     }
 
     updateColorFilter();
+    blockSync = false;
 }

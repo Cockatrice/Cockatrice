@@ -26,6 +26,13 @@ private:
     int circleDiameter;
 };
 
+enum class FilterMode
+{
+    ExactMatch,    // Only selected colors are included, all others are excluded.
+    Includes,      // Include selected colors (OR condition).
+    IncludeExclude // Include selected colors (OR) and exclude unselected colors (AND NOT).
+};
+
 class VisualDatabaseDisplayColorFilterWidget : public QWidget
 {
     Q_OBJECT
@@ -35,7 +42,7 @@ public:
     void retranslateUi();
 
 signals:
-    void filterModeChanged(bool exactMatchMode);
+    void filterModeChanged(FilterMode filterMode);
     void activeColorsChanged();
 
 private slots:
@@ -49,7 +56,8 @@ private:
     QHBoxLayout *layout;
     QPushButton *toggleButton;
     QMap<QChar, bool> activeColors;
-    bool exactMatchMode = false; // Default to "includes" mode
+    FilterMode currentMode = FilterMode::Includes; // Default mode
+    bool blockSync = false;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
