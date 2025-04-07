@@ -20,7 +20,7 @@ protected:
     {
         cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
         notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead After All");
-        truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth OR Tale");
+        truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth");
     }
 }
 // void TearDown() override {}
