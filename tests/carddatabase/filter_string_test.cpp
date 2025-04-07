@@ -20,7 +20,7 @@ protected:
     {
         cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
         notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead After All");
-        truthOrTale = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth or Tale");
+        truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth or Tale");
     }
 }
 // void TearDown() override {}
@@ -37,8 +37,8 @@ QUERY(Not1, cat, "NOT t:kithkin", true)
 QUERY(Not2, cat, "NOT t:creature", false)
 QUERY(NonKeyword1, cat, "not t:kithkin", false)
 QUERY(NonKeyword2, cat, "t:bat or t:creature", false)
-QUERY(NonKeyword3, notDeadAfterAll, "t:instant c:b", true)
-QUERY(NonKeyword4, truthOrTale, "t:instant c:u", true)
+QUERY(NonKeyword3, notDeadAfterAll, "not dead after all", true)
+QUERY(NonKeyword4, truth, "truth or tale", true)
 QUERY(Case, cat, "t:cReAtUrE", true)
 
 QUERY(And, cat, "t:creature t:creature", true)
