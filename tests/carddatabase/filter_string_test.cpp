@@ -23,7 +23,6 @@ protected:
         truthOrTale = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth or Tale");
     }
     }
-
     // void TearDown() override {}
 
     CardData cat;
