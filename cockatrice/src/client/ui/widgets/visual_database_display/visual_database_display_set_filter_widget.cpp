@@ -1,6 +1,7 @@
 #include "visual_database_display_set_filter_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/filters/filter_tree.h"
 #include "../../../../game/filters/filter_tree_model.h"
 
 #include <QLineEdit>
@@ -48,6 +49,9 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
     std::sort(shared_pointerses.begin(), shared_pointerses.end(),
               [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
 
+    int setsToPreactivate = 10;
+    int setsActivated = 0;
+
     for (const auto &shared_pointer : shared_pointerses) {
         QString shortName = shared_pointer->getShortName();
         QString longName = shared_pointer->getLongName();
@@ -63,7 +67,13 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
         // Connect toggle signal
         connect(button, &QPushButton::toggled, this,
                 [this, shortName](bool checked) { handleSetToggled(shortName, checked); });
+        if (setsActivated < setsToPreactivate) {
+            setsActivated++;
+            activeSets[shortName] = true;
+            button->setChecked(true);
+        }
     }
+    updateSetFilter();
     updateSetButtonsVisibility(); // Ensure visibility is updated initially
 }
 
@@ -95,6 +105,8 @@ void VisualDatabaseDisplaySetFilterWidget::handleSetToggled(const QString &setSh
 void VisualDatabaseDisplaySetFilterWidget::updateSetFilter()
 {
     // Clear existing filters related to sets
+    filterModel->blockSignals(true);
+    filterModel->filterTree()->blockSignals(true);
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrSet);
 
     if (exactMatchMode) {
@@ -131,6 +143,13 @@ void VisualDatabaseDisplaySetFilterWidget::updateSetFilter()
             }
         }
     }
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    if (filterModel->filterTree()->nodeAt(0)) {
+        filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    }
+    emit filterModel->layoutChanged();
 }
 
 void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()

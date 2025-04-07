@@ -1,6 +1,7 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/filters/filter_tree.h"
 #include "../../../../game/filters/filter_tree_model.h"
 
 #include <QPushButton>
@@ -102,6 +103,8 @@ void VisualDatabaseDisplayMainTypeFilterWidget::handleMainTypeToggled(const QStr
 void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
 {
     // Clear existing filters related to main type
+    filterModel->blockSignals(true);
+    filterModel->filterTree()->blockSignals(true);
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrMainType);
 
     if (exactMatchMode) {
@@ -140,6 +143,14 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
             }
         }
     }
+
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    if (filterModel->filterTree()->nodeAt(0)) {
+        filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    }
+    emit filterModel->layoutChanged();
 }
 
 void VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode(bool checked)

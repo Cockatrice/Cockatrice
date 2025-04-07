@@ -1,5 +1,6 @@
 #include "visual_database_display_color_filter_widget.h"
 
+#include "../../../../game/filters/filter_tree.h"
 #include "../cards/additional_info/mana_symbol_widget.h"
 
 #include <QSet>
@@ -99,6 +100,8 @@ void VisualDatabaseDisplayColorFilterWidget::updateColorFilter()
     blockSync = true;
 
     // Clear previous filters
+    filterModel->blockSignals(true);
+    filterModel->filterTree()->blockSignals(true);
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
 
     QSet<QString> selectedColors;
@@ -160,6 +163,13 @@ void VisualDatabaseDisplayColorFilterWidget::updateColorFilter()
             break;
     }
 
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    if (filterModel->filterTree()->nodeAt(0)) {
+        filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    }
+    emit filterModel->layoutChanged();
     blockSync = false;
 }
 

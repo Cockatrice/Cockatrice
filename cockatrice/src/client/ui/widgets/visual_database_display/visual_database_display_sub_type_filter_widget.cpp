@@ -110,6 +110,7 @@ void VisualDatabaseDisplaySubTypeFilterWidget::handleSubTypeToggled(const QStrin
 
 void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
 {
+    filterModel->blockSignals(true);
     // Clear existing filters related to sub types
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrSubType);
 
@@ -149,6 +150,8 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
             }
         }
     }
+    filterModel->blockSignals(false);
+    emit filterModel->layoutChanged();
 }
 
 void VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode(bool checked)
