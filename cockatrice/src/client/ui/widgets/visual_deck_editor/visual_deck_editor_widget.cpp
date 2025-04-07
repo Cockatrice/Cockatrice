@@ -159,8 +159,8 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     sortCriteriaButton->addSettingsWidget(sortLabel);
     sortCriteriaButton->addSettingsWidget(sortByListWidget);
 
-    displayTypeButton = new QCheckBox(this);
-    connect(displayTypeButton, &QCheckBox::toggled, this, &VisualDeckEditorWidget::updateDisplayType);
+    displayTypeButton = new QPushButton(this);
+    connect(displayTypeButton, &QPushButton::clicked, this, &VisualDeckEditorWidget::updateDisplayType);
 
     groupAndSortLayout->addWidget(groupByComboBox);
     groupAndSortLayout->addWidget(sortCriteriaButton);
@@ -195,6 +195,7 @@ void VisualDeckEditorWidget::retranslateUi()
 {
     sortLabel->setText(tr("Click and drag to change\nthe sort order within the groups"));
     searchPushButton->setText(tr("Quick search and add card"));
+    displayTypeButton->setText(tr("Flat Layout"));
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
@@ -205,11 +206,12 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 
 void VisualDeckEditorWidget::updateDisplayType()
 {
-    if (displayTypeButton->checkState() == Qt::Checked) {
+    if (displayTypeButton->text() == tr("Overlap Layout")) {
         emit displayTypeChanged("flat");
+        displayTypeButton->setText("Flat Layout");
     } else {
-        qDebug() << displayTypeButton->checkState();
         emit displayTypeChanged("overlap");
+        displayTypeButton->setText(tr("Overlap Layout"));
     }
 }
 

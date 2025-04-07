@@ -62,7 +62,7 @@ private:
     CardCompleterProxyModel *proxyModel;
     QCompleter *completer;
     QPushButton *searchPushButton;
-    QCheckBox *displayTypeButton;
+    QPushButton *displayTypeButton;
     QWidget *groupAndSortContainer;
     QHBoxLayout *groupAndSortLayout;
     QComboBox *groupByComboBox;
