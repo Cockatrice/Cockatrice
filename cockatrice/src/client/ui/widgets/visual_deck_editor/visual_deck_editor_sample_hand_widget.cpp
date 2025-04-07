@@ -34,7 +34,7 @@ void VisualDeckEditorSampleHandWidget::retranslateUi()
 void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)
 {
     deckListModel = deckModel;
-    connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorSampleHandWidget::updateDisplay);
+    // connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorSampleHandWidget::updateDisplay);
     updateDisplay();
 }
 
