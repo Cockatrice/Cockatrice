@@ -36,6 +36,7 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
 
 void OverlappedCardGroupDisplayWidget::updateCardDisplays()
 {
+    overlapWidget->setUpdatesEnabled(false);
     // Retrieve and sort cards
     QList<CardInfoPtr> cardsInZone = getCardsMatchingGroup(deckListModel->getCardsAsCardInfoPtrsForZone(zoneName));
 
@@ -108,6 +109,8 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
     }
 
     overlapWidget->adjustMaxColumnsAndRows();
+    overlapWidget->setUpdatesEnabled(true);
+    overlapWidget->update();
 }
 
 void OverlappedCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
