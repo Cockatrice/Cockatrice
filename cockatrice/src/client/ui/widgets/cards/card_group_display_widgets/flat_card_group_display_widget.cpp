@@ -8,14 +8,21 @@
 #include <QResizeEvent>
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
-                                                                   DeckListModel *_deckListModel,
-                                                                   QString _zoneName,
-                                                                   QString _cardGroupCategory,
-                                                                   QString _activeGroupCriteria,
-                                                                   QStringList _activeSortCriteria,
-                                                                   int bannerOpacity,
+                                                       DeckListModel *_deckListModel,
+                                                       QString _zoneName,
+                                                       QString _cardGroupCategory,
+                                                       QString _activeGroupCriteria,
+                                                       QStringList _activeSortCriteria,
+                                                       int bannerOpacity,
                                                        CardSizeWidget *_cardSizeWidget)
-    : CardGroupDisplayWidget(parent, _deckListModel, _zoneName, _cardGroupCategory, _activeGroupCriteria, _activeSortCriteria, bannerOpacity, _cardSizeWidget)
+    : CardGroupDisplayWidget(parent,
+                             _deckListModel,
+                             _zoneName,
+                             _cardGroupCategory,
+                             _activeGroupCriteria,
+                             _activeSortCriteria,
+                             bannerOpacity,
+                             _cardSizeWidget)
 {
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     banner->setBuddy(flowWidget);
@@ -66,7 +73,8 @@ void FlatCardGroupDisplayWidget::updateCardDisplays()
                     &FlatCardGroupDisplayWidget::onClick);
             connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
                     &FlatCardGroupDisplayWidget::onHover);
-            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
+            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget,
+                    &CardInfoPictureWidget::setScaleFactor);
 
             flowWidget->addWidget(widget);
         }

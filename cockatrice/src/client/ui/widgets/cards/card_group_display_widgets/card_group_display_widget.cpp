@@ -8,15 +8,16 @@
 #include <QResizeEvent>
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
-                                                                   DeckListModel *_deckListModel,
-                                                                   QString _zoneName,
-                                                                   QString _cardGroupCategory,
-                                                                   QString _activeGroupCriteria,
-                                                                   QStringList _activeSortCriteria,
-                                                                   int bannerOpacity,
-                                                                   CardSizeWidget *_cardSizeWidget)
+                                               DeckListModel *_deckListModel,
+                                               QString _zoneName,
+                                               QString _cardGroupCategory,
+                                               QString _activeGroupCriteria,
+                                               QStringList _activeSortCriteria,
+                                               int bannerOpacity,
+                                               CardSizeWidget *_cardSizeWidget)
     : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), cardGroupCategory(_cardGroupCategory),
-      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria), cardSizeWidget(_cardSizeWidget)
+      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria),
+      cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -28,8 +29,8 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     updateCardDisplays();
 }
 
-void CardGroupDisplayWidget::updateCardDisplays(){
-
+void CardGroupDisplayWidget::updateCardDisplays()
+{
 }
 
 QList<CardInfoPtr> CardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort)
@@ -47,8 +48,8 @@ QList<CardInfoPtr> CardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoP
 }
 
 QList<CardInfoPtr> CardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
-                                                                  const QStringList properties,
-                                                                  Qt::SortOrder order = Qt::AscendingOrder)
+                                                        const QStringList properties,
+                                                        Qt::SortOrder order = Qt::AscendingOrder)
 {
     CardInfoComparator comparator(properties, order);
     std::sort(cardsToSort.begin(), cardsToSort.end(), comparator);
