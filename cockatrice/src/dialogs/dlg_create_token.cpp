@@ -64,7 +64,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     destroyCheckBox->setChecked(true);
 
     faceDownCheckBox = new QCheckBox(tr("Create face-down token"));
-    faceDownCheckBox->setChecked(false);
+    connect(faceDownCheckBox, &QCheckBox::toggled, this, &DlgCreateToken::faceDownCheckBoxToggled);
 
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(nameLabel, 0, 0);
@@ -157,6 +157,21 @@ void DlgCreateToken::closeEvent(QCloseEvent *event)
 {
     event->accept();
     SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+}
+
+void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
+{
+    if (checked) {
+        ptEdit->clear();
+        ptEdit->clearFocus();
+        ptEdit->setEnabled(false);
+        annotationEdit->clear();
+        annotationEdit->clearFocus();
+        annotationEdit->setEnabled(false);
+    } else {
+        ptEdit->setEnabled(true);
+        annotationEdit->setEnabled(true);
+    }
 }
 
 void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QModelIndex & /*previous*/)
