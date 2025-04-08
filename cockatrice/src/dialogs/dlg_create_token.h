@@ -23,7 +23,7 @@ struct TokenInfo
     QString color;
     QString pt;
     QString annotation;
-    bool destroy = false;
+    bool destroy = true;
 };
 
 class DlgCreateToken : public QDialog
