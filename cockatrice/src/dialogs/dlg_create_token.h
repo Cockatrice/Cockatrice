@@ -37,6 +37,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 private slots:
+    void faceDownCheckBoxToggled(bool checked);
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
     void actChooseTokenFromAll(bool checked);
