@@ -305,7 +305,7 @@ void DeckViewContainer::forceStart()
 {
     const auto msg = tr("Are you sure you want to force start?\nThis will kick all non-ready players from the game.");
     const auto res =
-        QMessageBox::warning(this, tr("Cockatrice"), msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        QMessageBox::question(this, tr("Cockatrice"), msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     if (res == QMessageBox::No) {
         return;
     }
