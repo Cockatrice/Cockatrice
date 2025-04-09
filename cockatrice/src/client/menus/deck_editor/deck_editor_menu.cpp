@@ -3,8 +3,7 @@
 #include "../../../settings/cache_settings.h"
 #include "../../../settings/shortcuts_settings.h"
 
-DeckEditorMenu::DeckEditorMenu(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QMenu(parent), deckEditor(_deckEditor)
+DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
     aNewDeck = new QAction(QString(), this);
     connect(aNewDeck, SIGNAL(triggered()), deckEditor, SLOT(actNewDeck()));
