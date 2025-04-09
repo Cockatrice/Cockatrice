@@ -41,9 +41,8 @@ OverlapWidget::OverlapWidget(QWidget *parent,
     : QWidget(parent), overlapPercentage(overlapPercentage), maxColumns(maxColumns), maxRows(maxRows),
       direction(direction), adjustOnResize(adjustOnResize)
 {
-    this->setMinimumSize(0, 0);
-    overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction);
-    this->setLayout(overlapLayout);
+    overlapLayout = new OverlapLayout(this, overlapPercentage, maxColumns, maxRows, direction, Qt::Horizontal);
+    setLayout(overlapLayout);
 }
 
 /**
@@ -57,7 +56,12 @@ OverlapWidget::OverlapWidget(QWidget *parent,
  */
 void OverlapWidget::addWidget(QWidget *widgetToAdd) const
 {
-    this->overlapLayout->addWidget(widgetToAdd);
+    overlapLayout->addWidget(widgetToAdd);
+}
+
+void OverlapWidget::removeWidget(QWidget *widgetToRemove) const
+{
+    overlapLayout->removeWidget(widgetToRemove);
 }
 
 /**
@@ -72,8 +76,8 @@ void OverlapWidget::clearLayout()
     if (overlapLayout != nullptr) {
         QLayoutItem *item;
         while ((item = overlapLayout->takeAt(0)) != nullptr) {
-            delete item->widget(); // Delete the widget
-            delete item;           // Delete the layout item
+            item->widget()->deleteLater();
+            delete item;
         }
     }
 

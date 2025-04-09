@@ -17,6 +17,7 @@ public:
                   Qt::Orientation direction,
                   bool adjustOnResize = false);
     void addWidget(QWidget *widgetToAdd) const;
+    void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();
     void adjustMaxColumnsAndRows();
 
