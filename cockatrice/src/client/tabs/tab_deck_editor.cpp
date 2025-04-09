@@ -55,7 +55,7 @@ TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : AbstractTabDeckEdi
 
 void TabDeckEditor::createMenus()
 {
-    deckMenu = new DeckEditorMenu(this, this);
+    deckMenu = new DeckEditorMenu(this);
     addTabMenu(deckMenu);
 
     viewMenu = new QMenu(this);
