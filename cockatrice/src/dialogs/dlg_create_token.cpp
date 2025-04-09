@@ -224,27 +224,11 @@ void DlgCreateToken::actReject()
     reject();
 }
 
-QString DlgCreateToken::getName() const
+TokenInfo DlgCreateToken::getTokenInfo() const
 {
-    return nameEdit->text();
-}
-
-QString DlgCreateToken::getColor() const
-{
-    return QString(colorEdit->itemData(colorEdit->currentIndex()).toChar());
-}
-
-QString DlgCreateToken::getPT() const
-{
-    return ptEdit->text();
-}
-
-QString DlgCreateToken::getAnnotation() const
-{
-    return annotationEdit->text();
-}
-
-bool DlgCreateToken::getDestroy() const
-{
-    return destroyCheckBox->isChecked();
+    return {.name = nameEdit->text(),
+            .color = colorEdit->itemData(colorEdit->currentIndex()).toString(),
+            .pt = ptEdit->text(),
+            .annotation = annotationEdit->text(),
+            .destroy = destroyCheckBox->isChecked()};
 }
