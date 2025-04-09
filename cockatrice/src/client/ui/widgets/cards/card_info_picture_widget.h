@@ -60,7 +60,7 @@ private:
     qreal aspectRatio = magicTheGatheringCardAspectRatio;
     int baseWidth = 200;
     int baseHeight = 200;
-    double scaleFactor = 1.5;
+    double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;
