@@ -9,6 +9,7 @@
 
 #include <QMenu>
 #include <QMouseEvent>
+#include <QScreen>
 #include <QStylePainter>
 #include <QWidget>
 #include <utility>
@@ -37,7 +38,7 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverTo
         setMouseTracking(true);
     }
 
-    enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(this);
+    enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(this->window());
     enlargedPixmapWidget->hide();
 
     hoverTimer = new QTimer(this);
@@ -210,7 +211,8 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
  */
 QSize CardInfoPictureWidget::sizeHint() const
 {
-    return {static_cast<int>(baseWidth * scaleFactor), static_cast<int>(baseHeight * scaleFactor)};
+    return {static_cast<int>(baseWidth * scaleFactor / 100.0),
+            static_cast<int>(baseWidth * scaleFactor / 100.0 * aspectRatio)};
 }
 
 /**
@@ -254,10 +256,24 @@ void CardInfoPictureWidget::leaveEvent(QEvent *event)
 void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
+
     if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
-        const QPointF cursorPos = QCursor::pos();
-        enlargedPixmapWidget->move(QPoint(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
-                                          static_cast<int>(cursorPos.y()) + enlargedPixmapOffset));
+        const QPoint cursorPos = QCursor::pos();
+        const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
+        const QSize widgetSize = enlargedPixmapWidget->size();
+
+        int newX = cursorPos.x() + enlargedPixmapOffset;
+        int newY = cursorPos.y() + enlargedPixmapOffset;
+
+        // Adjust if out of bounds
+        if (newX + widgetSize.width() > screenGeometry.right()) {
+            newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+        }
+        if (newY + widgetSize.height() > screenGeometry.bottom()) {
+            newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+        }
+
+        enlargedPixmapWidget->move(newX, newY);
     }
 }
 
@@ -370,13 +386,25 @@ void CardInfoPictureWidget::showEnlargedPixmap() const
         return;
     }
 
-    const QSize enlargedSize(static_cast<int>(size().width() * scaleFactor),
-                             static_cast<int>(size().width() * aspectRatio * scaleFactor));
+    const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * aspectRatio * 2));
     enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
 
-    const QPointF cursorPos = QCursor::pos();
-    enlargedPixmapWidget->move(static_cast<int>(cursorPos.x()) + enlargedPixmapOffset,
-                               static_cast<int>(cursorPos.y()) + enlargedPixmapOffset);
+    const QPoint cursorPos = QCursor::pos();
+    const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
+    const QSize widgetSize = enlargedPixmapWidget->size();
+
+    int newX = cursorPos.x() + enlargedPixmapOffset;
+    int newY = cursorPos.y() + enlargedPixmapOffset;
+
+    // Adjust if out of bounds
+    if (newX + widgetSize.width() > screenGeometry.right()) {
+        newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+    }
+    if (newY + widgetSize.height() > screenGeometry.bottom()) {
+        newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+    }
+
+    enlargedPixmapWidget->move(newX, newY);
 
     enlargedPixmapWidget->show();
 }
