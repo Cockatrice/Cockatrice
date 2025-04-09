@@ -664,7 +664,7 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
         visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexNone);
     }
     connect(&visualDeckStoragePromptForConversionSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            [this](int index) {
+            [](int index) {
                 SettingsCache::instance().setVisualDeckStoragePromptForConversion(
                     index == visualDeckStoragePromptForConversionIndexPrompt);
                 SettingsCache::instance().setVisualDeckStorageAlwaysConvert(
