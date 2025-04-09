@@ -4,7 +4,6 @@
 #include "../../client/tabs/tab_game.h"
 #include "../../client/ui/theme_manager.h"
 #include "../../deck/deck_loader.h"
-#include "../../dialogs/dlg_create_token.h"
 #include "../../dialogs/dlg_move_top_cards_until.h"
 #include "../../dialogs/dlg_roll_dice.h"
 #include "../../main.h"
@@ -109,9 +108,9 @@ void PlayerArea::setPlayerZoneId(int _playerZoneId)
 }
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
-    : QObject(_parent), game(_parent), movingCardsUntil(false), shortcutsActive(false), lastTokenDestroy(true),
-      lastTokenTableRow(0), id(_id), active(false), local(_local), judge(_judge), mirrored(false), handVisible(false),
-      conceded(false), zoneId(0), dialogSemaphore(false), deck(nullptr)
+    : QObject(_parent), game(_parent), movingCardsUntil(false), shortcutsActive(false), lastTokenTableRow(0), id(_id),
+      active(false), local(_local), judge(_judge), mirrored(false), handVisible(false), conceded(false), zoneId(0),
+      dialogSemaphore(false), deck(nullptr)
 {
     userInfo = new ServerInfo_User;
     userInfo->CopyFrom(info);
@@ -1826,37 +1825,35 @@ void Player::actCreateToken()
         return;
     }
 
-    lastTokenName = dlg.getName();
-    lastTokenPT = dlg.getPT();
-    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard(lastTokenName);
+    lastTokenInfo = dlg.getTokenInfo();
+
+    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard(lastTokenInfo.name);
     if (correctedCard) {
-        lastTokenName = correctedCard->getName();
+        lastTokenInfo.name = correctedCard->getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
-        if (lastTokenPT.isEmpty()) {
-            lastTokenPT = correctedCard->getPowTough();
+        if (lastTokenInfo.pt.isEmpty()) {
+            lastTokenInfo.pt = correctedCard->getPowTough();
         }
     }
-    lastTokenColor = dlg.getColor();
-    lastTokenAnnotation = dlg.getAnnotation();
-    lastTokenDestroy = dlg.getDestroy();
+
     aCreateAnotherToken->setEnabled(true);
-    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenInfo.name));
     actCreateAnotherToken();
 }
 
 void Player::actCreateAnotherToken()
 {
-    if (lastTokenName.isEmpty()) {
+    if (lastTokenInfo.name.isEmpty()) {
         return;
     }
 
     Command_CreateToken cmd;
     cmd.set_zone("table");
-    cmd.set_card_name(lastTokenName.toStdString());
-    cmd.set_color(lastTokenColor.toStdString());
-    cmd.set_pt(lastTokenPT.toStdString());
-    cmd.set_annotation(lastTokenAnnotation.toStdString());
-    cmd.set_destroy_on_zone_change(lastTokenDestroy);
+    cmd.set_card_name(lastTokenInfo.name.toStdString());
+    cmd.set_color(lastTokenInfo.color.toStdString());
+    cmd.set_pt(lastTokenInfo.pt.toStdString());
+    cmd.set_annotation(lastTokenInfo.annotation.toStdString());
+    cmd.set_destroy_on_zone_change(lastTokenInfo.destroy);
     cmd.set_x(-1);
     cmd.set_y(lastTokenTableRow);
 
@@ -4180,12 +4177,13 @@ void Player::setLastToken(CardInfoPtr cardInfo)
         return;
     }
 
-    lastTokenName = cardInfo->getName();
-    lastTokenColor = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower();
-    lastTokenPT = cardInfo->getPowTough();
-    lastTokenAnnotation = SettingsCache::instance().getAnnotateTokens() ? cardInfo->getText() : "";
+    lastTokenInfo = {.name = cardInfo->getName(),
+                     .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
+                     .pt = cardInfo->getPowTough(),
+                     .annotation = SettingsCache::instance().getAnnotateTokens() ? cardInfo->getText() : "",
+                     .destroy = true};
+
     lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getTableRow());
-    lastTokenDestroy = true;
-    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenName));
+    aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenInfo.name));
     aCreateAnotherToken->setEnabled(true);
 }

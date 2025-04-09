@@ -17,19 +17,24 @@ class CardDatabaseModel;
 class TokenDisplayModel;
 class CardInfoPictureWidget;
 
+struct TokenInfo
+{
+    QString name;
+    QString color;
+    QString pt;
+    QString annotation;
+    bool destroy = true;
+};
+
 class DlgCreateToken : public QDialog
 {
     Q_OBJECT
 public:
     explicit DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
-    QString getName() const;
-    QString getColor() const;
-    QString getPT() const;
-    QString getAnnotation() const;
-    bool getDestroy() const;
+    TokenInfo getTokenInfo() const;
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event) override;
 private slots:
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
