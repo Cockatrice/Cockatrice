@@ -19,7 +19,7 @@ protected:
     void SetUp() override
     {
         cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
-        notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead After All");
+        notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead");
         truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth");
     }
 }
@@ -37,8 +37,8 @@ QUERY(Not1, cat, "NOT t:kithkin", true)
 QUERY(Not2, cat, "NOT t:creature", false)
 QUERY(NonKeyword1, cat, "not t:kithkin", false)
 QUERY(NonKeyword2, cat, "t:bat or t:creature", false)
-QUERY(NonKeyword3, notDeadAfterAll, "not dead after all", true)
-QUERY(NonKeyword4, truth, "truth or tale", false)
+QUERY(NonKeyword3, notDeadAfterAll, "not dead", true)
+QUERY(NonKeyword4, truth, "truth or trail", false)
 QUERY(Case, cat, "t:cReAtUrE", true)
 
 QUERY(And, cat, "t:creature t:creature", true)
