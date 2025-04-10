@@ -16,7 +16,7 @@ DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(Visua
     QString fullColorIdentity = "WUBRG";
     for (const QChar &color : fullColorIdentity) {
         auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
-        manaSymbol->setMaximumWidth(25);
+        manaSymbol->setFixedWidth(25);
 
         layout->addWidget(manaSymbol);
 
