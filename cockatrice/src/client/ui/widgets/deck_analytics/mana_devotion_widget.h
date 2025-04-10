@@ -1,5 +1,6 @@
 #ifndef MANA_DEVOTION_WIDGET_H
 #define MANA_DEVOTION_WIDGET_H
+
 #include "../../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 

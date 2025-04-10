@@ -1,3 +1,6 @@
+#ifndef MANA_BASE_WIDGET_H
+#define MANA_BASE_WIDGET_H
+
 #include "../../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 
@@ -5,9 +8,6 @@
 #include <QWidget>
 #include <decklist.h>
 #include <utility>
-
-#ifndef MANA_BASE_WIDGET_H
-#define MANA_BASE_WIDGET_H
 
 class ManaBaseWidget : public QWidget
 {
