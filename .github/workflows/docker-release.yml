@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Docker meta
-        id: metal
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
