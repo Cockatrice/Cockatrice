@@ -140,6 +140,7 @@ set(cockatrice_SOURCES
     src/game/board/counter_general.cpp
     src/game/cards/abstract_card_drag_item.cpp
     src/game/cards/abstract_card_item.cpp
+    src/game/cards/card_completer_proxy_model.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
     src/game/cards/card_database_model.cpp
@@ -150,6 +151,7 @@ set(cockatrice_SOURCES
     src/game/cards/card_info.cpp
     src/game/cards/card_item.cpp
     src/game/cards/card_list.cpp
+    src/game/cards/card_search_model.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
     src/game/filters/filter_builder.cpp
@@ -203,8 +205,31 @@ set(cockatrice_SOURCES
     src/settings/settings_manager.cpp
     src/settings/shortcut_treeview.cpp
     src/settings/shortcuts_settings.cpp
+    src/utility/card_info_comparator.cpp
+    src/utility/levenshtein.cpp
     src/utility/logger.cpp
     src/utility/sequence_edit.cpp
+    src/client/ui/widgets/general/display/bar_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
+    src/client/ui/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
+    src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
+    src/client/ui/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
+    src/client/ui/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
+    src/client/ui/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
+    src/client/ui/widgets/cards/deck_card_zone_display_widget.cpp
 )
 
 add_subdirectory(sounds)
