@@ -43,6 +43,7 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_room.cpp
     src/client/tabs/tab_server.cpp
     src/client/tabs/tab_supervisor.cpp
+    src/client/tabs/tab_visual_database_display.cpp
     src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/client/tapped_out_interface.cpp
     src/client/translate_counter_name.cpp
@@ -92,6 +93,14 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/client/ui/widgets/quick_settings/settings_button_widget.cpp
     src/client/ui/widgets/quick_settings/settings_popup_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp
@@ -204,6 +213,7 @@ set(cockatrice_SOURCES
     src/settings/settings_manager.cpp
     src/settings/shortcut_treeview.cpp
     src/settings/shortcuts_settings.cpp
+    src/utility/card_info_comparator.cpp
     src/utility/logger.cpp
     src/utility/sequence_edit.cpp
 )
