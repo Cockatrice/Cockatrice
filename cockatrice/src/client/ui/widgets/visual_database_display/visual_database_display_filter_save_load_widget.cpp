@@ -21,11 +21,10 @@ VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWi
 
     // Input for filter filename
     filenameInput = new QLineEdit(this);
-    filenameInput->setPlaceholderText(tr("Enter filename..."));
     layout->addWidget(filenameInput);
 
     // Save button
-    saveButton = new QPushButton(tr("Save Filter"), this);
+    saveButton = new QPushButton(this);
     layout->addWidget(saveButton);
     connect(saveButton, &QPushButton::clicked, this, &VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter);
 
@@ -34,6 +33,13 @@ VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWi
     layout->addWidget(fileListWidget);
 
     refreshFilterList(); // Populate the file list on startup
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayFilterSaveLoadWidget::retranslateUi()
+{
+    saveButton->setText(tr("Save Filter"));
+    filenameInput->setPlaceholderText(tr("Enter filename..."));
 }
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
@@ -67,7 +73,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filename)
 {
-    QString filePath = SettingsCache::instance().getFiltersPath() + "/" + filename;
+    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))

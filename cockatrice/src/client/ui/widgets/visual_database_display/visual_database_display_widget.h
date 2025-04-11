@@ -92,7 +92,7 @@ private:
     QTimer *debounceTimer;
     QTimer *loadCardsTimer;
 
-    int debounceTime = 300;
+    int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
 

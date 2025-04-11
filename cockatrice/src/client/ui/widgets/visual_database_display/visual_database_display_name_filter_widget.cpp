@@ -16,7 +16,6 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
     setLayout(layout);
 
     searchBox = new QLineEdit(this);
-    searchBox->setPlaceholderText(tr("Filter by name..."));
     layout->addWidget(searchBox);
 
     connect(searchBox, &QLineEdit::returnPressed, this, [this]() {
@@ -33,21 +32,28 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
     layout->addWidget(flowWidget);
 
     loadFromDeckButton = new QPushButton(this);
-    loadFromDeckButton->setText(tr("Load from Deck"));
     layout->addWidget(loadFromDeckButton);
 
     connect(loadFromDeckButton, &QPushButton::clicked, this, &VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck);
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel); });
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
+{
+    searchBox->setPlaceholderText(tr("Filter by name..."));
+    loadFromDeckButton->setText(tr("Load from Deck"));
 }
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
-    DeckListModel *deck_list_model = deckEditor->deckDockWidget->deckModel;
+    DeckListModel *deckListModel = deckEditor->deckDockWidget->deckModel;
 
-    if (!deck_list_model)
+    if (!deckListModel)
         return;
-    DeckList *decklist = deck_list_model->getDeckList();
+    DeckList *decklist = deckListModel->getDeckList();
     if (!decklist)
         return;
     InnerDecklistNode *listRoot = decklist->getRoot();

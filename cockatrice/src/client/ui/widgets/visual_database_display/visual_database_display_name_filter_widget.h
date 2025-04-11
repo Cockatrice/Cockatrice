@@ -25,6 +25,9 @@ public:
     void updateFilterModel();
     void syncWithFilterModel();
 
+public slots:
+    void retranslateUi();
+
 private:
     AbstractTabDeckEditor *deckEditor;
     FilterTreeModel *filterModel;

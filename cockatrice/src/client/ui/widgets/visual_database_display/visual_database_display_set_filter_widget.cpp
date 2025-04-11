@@ -80,13 +80,14 @@ void VisualDatabaseDisplaySetFilterWidget::updateSetButtonsVisibility()
 {
     QString filterText = searchBox->text().trimmed().toLower();
 
-    for (auto it = setButtons.begin(); it != setButtons.end(); ++it) {
-        QString shortName = it.key().toLower();
-        QString longName = it.value()->text().toLower();
-        bool alwaysVisible = activeSets.contains(it.key()) && activeSets[it.key()];
+    for (const QString &setName : setButtons.keys()) {
+        QPushButton *buttonForSet = setButtons[setName];
+        QString shortName = setName.toLower();
+        QString longName = buttonForSet->text().toLower();
+        bool alwaysVisible = activeSets.contains(setName) && activeSets[setName];
         bool visible =
             alwaysVisible || filterText.isEmpty() || shortName.contains(filterText) || longName.contains(filterText);
-        it.value()->setVisible(visible);
+        buttonForSet->setVisible(visible);
     }
 }
 
@@ -181,10 +182,10 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
     }
 
     // Sync button states with selected sets
-    for (auto it = setButtons.begin(); it != setButtons.end(); ++it) {
-        bool active = selectedSets.contains(it.key());
-        activeSets[it.key()] = active;
-        it.value()->setChecked(active);
+    for (const auto &key : setButtons.keys()) {
+        bool active = selectedSets.contains(key);
+        activeSets[key] = active;
+        setButtons[key]->setChecked(active);
     }
 }
 

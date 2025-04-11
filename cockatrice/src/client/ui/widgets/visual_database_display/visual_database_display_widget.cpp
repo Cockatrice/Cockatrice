@@ -230,7 +230,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
             addCard(info);
         } else {
-            qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
+            qCDebug(VisualDatabaseDisplayLog) << "Card " << name.toString() << " not found in database!";
         }
     }
 

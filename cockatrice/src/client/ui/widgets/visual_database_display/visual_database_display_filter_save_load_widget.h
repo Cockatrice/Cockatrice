@@ -26,6 +26,9 @@ public:
     void refreshFilterList();
     void deleteFilter(const QString &filename, QPushButton *deleteButton);
 
+public slots:
+    void retranslateUi();
+
 private:
     FilterTreeModel *filterModel;
 
