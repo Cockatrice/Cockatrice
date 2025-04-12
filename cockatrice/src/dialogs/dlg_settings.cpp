@@ -563,6 +563,13 @@ void AppearanceSettingsPage::retranslateUi()
     maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 }
 
+enum visualDeckStoragePromptForConversionIndex
+{
+    visualDeckStoragePromptForConversionIndexNone,
+    visualDeckStoragePromptForConversionIndexPrompt,
+    visualDeckStoragePromptForConversionIndexAlways
+};
+
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
@@ -642,24 +649,33 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setOpenDeckInNewTab);
 
-    visualDeckStoragePromptForConversionCheckBox.setChecked(
-        SettingsCache::instance().getVisualDeckStoragePromptForConversion());
-    connect(&visualDeckStoragePromptForConversionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStoragePromptForConversion);
-
-    visualDeckStorageAlwaysConvertCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageAlwaysConvert());
-    connect(&visualDeckStorageAlwaysConvertCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageAlwaysConvert);
-
     visualDeckStorageInGameCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageInGame());
     connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageInGame);
 
+    visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
+    visualDeckStoragePromptForConversionSelector.addItem("");
+    visualDeckStoragePromptForConversionSelector.addItem("");
+    if (SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexPrompt);
+    } else if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexAlways);
+    } else {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexNone);
+    }
+    connect(&visualDeckStoragePromptForConversionSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [](int index) {
+                SettingsCache::instance().setVisualDeckStoragePromptForConversion(
+                    index == visualDeckStoragePromptForConversionIndexPrompt);
+                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(
+                    index == visualDeckStoragePromptForConversionIndexAlways);
+            });
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageAlwaysConvertCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 2, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -719,9 +735,15 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
-    visualDeckStoragePromptForConversionCheckBox.setText(tr("Prompt before converting .txt decks to .cod format"));
-    visualDeckStorageAlwaysConvertCheckBox.setText(tr("Always convert if not prompted"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
+    visualDeckStoragePromptForConversionLabel.setText(
+        tr("When adding a tag in the visual deck storage to a .txt deck:"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
+                                                             tr("do nothing"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexPrompt,
+                                                             tr("ask to convert to .cod"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
+                                                             tr("always convert to .cod"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

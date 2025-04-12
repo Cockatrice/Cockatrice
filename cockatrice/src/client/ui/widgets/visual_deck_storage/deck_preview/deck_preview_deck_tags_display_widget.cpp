@@ -106,16 +106,16 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                     canAddTags = true;
 
                     if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
-                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Checked);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
+                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
                     }
                 } else {
-                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(Qt::CheckState::Unchecked);
+                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
 
                     if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Unchecked);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
                     } else {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(Qt::CheckState::Checked);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(true);
                     }
                 }
             }
