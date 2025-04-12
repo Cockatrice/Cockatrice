@@ -574,6 +574,9 @@ void MainWindow::registerError(Response::ResponseCode r, QString reasonStr, quin
         case Response::RespRegistrationFailed:
             QMessageBox::critical(this, tr("Error"), tr("Registration failed for a technical problem on the server."));
             break;
+        case Response::RespNotConnected:
+            QMessageBox::critical(this, tr("Error"), tr("The connection to the server has been lost."));
+            break;
         default:
             QMessageBox::critical(this, tr("Error"),
                                   tr("Unknown registration error: %1").arg(static_cast<int>(r)) +
