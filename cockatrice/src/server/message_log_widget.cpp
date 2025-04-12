@@ -14,19 +14,7 @@
 
 const QString MessageLogWidget::getCurrentTime()
 {
-    if (showInGameTime) {
-        int seconds = *elapsedSeconds;
-        int minutes = seconds / 60;
-        seconds -= minutes * 60;
-        int hours = minutes / 60;
-        minutes -= hours * 60;
-        return QString("[%1:%2:%3] ")
-            .arg(QString::number(hours).rightJustified(2, '0'))
-            .arg(QString::number(minutes).rightJustified(2, '0'))
-            .arg(QString::number(seconds).rightJustified(2, '0'));
-    } else {
-        return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
-    }
+    return ChatView::getCurrentTime();
 }
 
 const QString &MessageLogWidget::tableConstant() const
@@ -874,10 +862,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logAlwaysLookAtTopCard(Player *, CardZone *, bool)));
 }
 
-MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, int *seconds, QWidget *parent)
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
 {
-    showInGameTime = SettingsCache::instance().getLocalTime();
-    elapsedSeconds = seconds;
-    ChatView::setTime(seconds);
 }

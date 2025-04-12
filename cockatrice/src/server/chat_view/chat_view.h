@@ -1,6 +1,7 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
+#include "../../client/tabs/tab_game.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
 #include "room_message_type.h"
@@ -16,7 +17,6 @@ class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
 class UserListProxy;
-class TabGame;
 
 class UserMessagePosition
 {
@@ -44,7 +44,6 @@ private:
         HoveredCard,
         HoveredUser
     };
-    int *elapsedSeconds{};
     const UserListProxy *const userListProxy;
     UserContextMenu *userContextMenu;
     QString lastSender;
@@ -79,7 +78,6 @@ private:
     QColor otherUserColor = QColor(0, 65, 255); // dark blue
     QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
     QColor linkColor;
-    QString getCurrentTime();
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
@@ -105,10 +103,10 @@ protected:
     void enterEvent(QEvent *event) override;
 #endif
     void leaveEvent(QEvent *event) override;
-    void setTime(int *time);
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    QString getCurrentTime() const;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void cardNameHovered(QString cardName);

@@ -408,6 +408,11 @@ void TabGame::closeRequest(bool forced)
     close();
 }
 
+QString TabGame::getCurrentInGameTime() const
+{
+    return QTime::fromMSecsSinceStartOfDay(secondsElapsed * 1000).toString("[hh:mm:ss] ");
+}
+
 void TabGame::replayNextEvent(Player::EventProcessingOptions options)
 {
     processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), nullptr, options);
@@ -446,15 +451,8 @@ void TabGame::replayRewind()
 
 void TabGame::incrementGameTime()
 {
-    int seconds = ++secondsElapsed;
-    int minutes = seconds / 60;
-    seconds -= minutes * 60;
-    int hours = minutes / 60;
-    minutes -= hours * 60;
-
-    timeElapsedLabel->setText(QString::number(hours).rightJustified(2, '0') + ":" +
-                              QString::number(minutes).rightJustified(2, '0') + ":" +
-                              QString::number(seconds).rightJustified(2, '0'));
+    ++secondsElapsed;
+    timeElapsedLabel->setText(getCurrentInGameTime());
 }
 
 void TabGame::adminLockChanged(bool lock)
@@ -1679,7 +1677,7 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
-    messageLog = new MessageLogWidget(tabSupervisor, this, &secondsElapsed);
+    messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
