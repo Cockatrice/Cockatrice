@@ -1,16 +1,20 @@
 #ifndef PHASE_H
 #define PHASE_H
 
+#include <QApplication>
 #include <QString>
-#include <QtCore>
 
 class Phase
 {
     Q_DECLARE_TR_FUNCTIONS(Phase)
 
+    QString name;
+
 public:
-    QString name, color, soundFileName;
-    Phase(const char *_name, QString _color, QString _soundFileName);
+    QString color, soundFileName;
+    Phase(const QString &_name, const QString &_color, const QString &_soundFileName);
+
+    QString getName() const;
 };
 
 struct Phases
