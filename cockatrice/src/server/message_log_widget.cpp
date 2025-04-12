@@ -616,7 +616,7 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
     soundEngine->playSound(phase.soundFileName);
 
     appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               phase.name + "</b></font>");
+               phase.getName() + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
