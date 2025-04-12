@@ -1,6 +1,7 @@
 #include "deck_editor_database_display_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../../tabs/tab_supervisor.h"
@@ -56,7 +57,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     connect(&searchKeySignals, &KeySignals::onCtrlEnter, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
     connect(&searchKeySignals, &KeySignals::onCtrlC, this, &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
-    connect(help, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
+    connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
     databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
     databaseModel->setObjectName("databaseModel");
@@ -232,42 +233,6 @@ void DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents()
 void DeckEditorDatabaseDisplayWidget::saveDbHeaderState()
 {
     SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
-}
-
-void DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp()
-{
-
-    QFile file("theme:help/search.md");
-
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        return;
-    }
-
-    QTextStream in(&file);
-    QString text = in.readAll();
-    file.close();
-
-    // Poor Markdown Converter
-    auto opts = QRegularExpression::MultilineOption;
-    text = text.replace(QRegularExpression("^(###)(.*)", opts), "<h3>\\2</h3>")
-               .replace(QRegularExpression("^(##)(.*)", opts), "<h2>\\2</h2>")
-               .replace(QRegularExpression("^(#)(.*)", opts), "<h1>\\2</h1>")
-               .replace(QRegularExpression("^------*", opts), "<hr />")
-               .replace(QRegularExpression(R"(\[([^[]+)\]\(([^\)]+)\))", opts), R"(<a href='\2'>\1</a>)");
-
-    auto browser = new QTextBrowser;
-    browser->setParent(this, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint |
-                                 Qt::WindowCloseButtonHint | Qt::WindowFullscreenButtonHint);
-    browser->setWindowTitle("Search Help");
-    browser->setReadOnly(true);
-    browser->setMinimumSize({500, 600});
-
-    QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
-    browser->document()->setDefaultStyleSheet(sheet);
-
-    browser->setHtml(text);
-    connect(browser, &QTextBrowser::anchorClicked, [this](const QUrl &link) { searchEdit->setText(link.fragment()); });
-    browser->show();
 }
 
 void DeckEditorDatabaseDisplayWidget::setFilterTree(FilterTree *filterTree)

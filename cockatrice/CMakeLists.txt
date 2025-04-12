@@ -157,6 +157,7 @@ set(cockatrice_SOURCES
     src/game/filters/filter_string.cpp
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
+    src/game/filters/syntax_help.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
     src/game/game_view.cpp
