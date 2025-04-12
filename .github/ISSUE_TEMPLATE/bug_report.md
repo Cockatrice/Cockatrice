@@ -2,7 +2,8 @@
 name: "🐛 Bug Report"
 about: Report an issue encountered while using Cockatrice
 title: ''
-labels: 'Bug'
+type: 'Bug'
+labels: ''
 assignees: ''
 
 ---
