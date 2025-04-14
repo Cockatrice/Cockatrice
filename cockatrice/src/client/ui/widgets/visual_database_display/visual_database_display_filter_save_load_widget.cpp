@@ -108,7 +108,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
     filterModel->blockSignals(false);
     filterModel->filterTree()->blockSignals(false);
 
-    filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
 }
 

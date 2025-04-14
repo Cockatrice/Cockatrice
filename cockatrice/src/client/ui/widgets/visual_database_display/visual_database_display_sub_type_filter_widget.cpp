@@ -1,6 +1,7 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../game/filters/filter_tree.h"
 #include "../../../../game/filters/filter_tree_model.h"
 
 #include <QLineEdit>
@@ -151,6 +152,9 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
         }
     }
     filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
 }
 

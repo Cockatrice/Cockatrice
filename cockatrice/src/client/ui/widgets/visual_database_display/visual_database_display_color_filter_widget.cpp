@@ -6,6 +6,12 @@
 #include <QSet>
 #include <QTimer>
 
+/**
+ * This widget provides a graphical control element for the CardFilter::Attr::AttrColor filters applied to the filter
+ * model.
+ * @param parent The Qt Widget that this widget will parent to
+ * @param _filterModel The filter model that this widget will manipulate
+ */
 VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(QWidget *parent,
                                                                                FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel), layout(new QHBoxLayout(this))
@@ -142,10 +148,9 @@ void VisualDatabaseDisplayColorFilterWidget::updateColorFilter()
     filterModel->blockSignals(false);
     filterModel->filterTree()->blockSignals(false);
 
-    if (filterModel->filterTree()->nodeAt(0)) {
-        filterModel->filterTree()->nodeAt(0)->nodeChanged();
-    }
+    emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
+
     blockSync = false;
 }
 

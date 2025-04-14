@@ -146,9 +146,7 @@ void VisualDatabaseDisplaySetFilterWidget::updateSetFilter()
     filterModel->blockSignals(false);
     filterModel->filterTree()->blockSignals(false);
 
-    if (filterModel->filterTree()->nodeAt(0)) {
-        filterModel->filterTree()->nodeAt(0)->nodeChanged();
-    }
+    emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
 }
 

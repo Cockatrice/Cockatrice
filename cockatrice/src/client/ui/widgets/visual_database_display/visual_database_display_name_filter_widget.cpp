@@ -118,7 +118,10 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
     filterModel->blockSignals(false);
     filterModel->filterTree()->blockSignals(false);
 
-    filterModel->filterTree()->nodeAt(0)->nodeChanged();
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
 }
 
