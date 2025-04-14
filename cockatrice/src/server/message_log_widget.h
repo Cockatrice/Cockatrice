@@ -41,7 +41,7 @@ public slots:
                         Player *targetPlayer,
                         QString targetCard,
                         bool playerTarget);
-    void logCreateToken(Player *player, QString cardName, QString pt);
+    void logCreateToken(Player *player, QString cardName, QString pt, bool faceDown);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logDestroyCard(Player *player, QString cardName);
     void logDrawCards(Player *player, int number, bool deckIsEmpty);

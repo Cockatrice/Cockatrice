@@ -2246,7 +2246,7 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     card->setDestroyOnZoneChange(event.destroy_on_zone_change());
     card->setFaceDown(event.face_down());
 
-    emit logCreateToken(this, card->getName(), card->getPT());
+    emit logCreateToken(this, card->getName(), card->getPT(), card->getFaceDown());
     zone->addCard(card, true, event.x(), event.y());
 }
 
