@@ -19,7 +19,7 @@ void HandlePublicServers::downloadPublicServers()
 {
     QUrl url(QString(PUBLIC_SERVERS_JSON));
     reply = nam->get(QNetworkRequest(url));
-    connect(reply, SIGNAL(finished()), this, SLOT(actFinishParsingDownloadedData()));
+    connect(reply, &QNetworkReply::finished, this, &HandlePublicServers::actFinishParsingDownloadedData);
 }
 
 void HandlePublicServers::actFinishParsingDownloadedData()

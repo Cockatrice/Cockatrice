@@ -263,8 +263,7 @@ void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 void RemoteDeckList_TreeModel::refreshTree()
 {
     PendingCommand *pend = client->prepareSessionCommand(Command_DeckList());
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deckListFinished(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &RemoteDeckList_TreeModel::deckListFinished);
 
     client->sendCommand(pend);
 }
@@ -298,7 +297,7 @@ RemoteDeckList_TreeWidget::RemoteDeckList_TreeWidget(AbstractClient *_client, QW
     proxyModel->setDynamicSortFilter(true);
     proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     setModel(proxyModel);
-    connect(treeModel, SIGNAL(treeRefreshed()), this, SLOT(expandAll()));
+    connect(treeModel, &RemoteDeckList_TreeModel::treeRefreshed, this, &RemoteDeckList_TreeWidget::expandAll);
 
     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     setUniformRowHeights(true);

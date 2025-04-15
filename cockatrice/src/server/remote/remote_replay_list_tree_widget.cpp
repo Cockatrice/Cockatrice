@@ -253,8 +253,7 @@ void RemoteReplayList_TreeModel::clearAll()
 void RemoteReplayList_TreeModel::refreshTree()
 {
     PendingCommand *pend = client->prepareSessionCommand(Command_ReplayList());
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(replayListFinished(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &RemoteReplayList_TreeModel::replayListFinished);
 
     client->sendCommand(pend);
 }

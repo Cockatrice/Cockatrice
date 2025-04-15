@@ -63,7 +63,7 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
     permanentRadio = new QRadioButton(tr("&permanent ban"));
     temporaryRadio = new QRadioButton(tr("&temporary ban"));
     temporaryRadio->setChecked(true);
-    connect(temporaryRadio, SIGNAL(toggled(bool)), this, SLOT(enableTemporaryEdits(bool)));
+    connect(temporaryRadio, &QRadioButton::toggled, this, &BanDialog::enableTemporaryEdits);
     daysLabel = new QLabel(tr("&Days:"));
     daysEdit = new QSpinBox;
     daysEdit->setMinimum(0);
@@ -106,9 +106,9 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
 
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+    connect(okButton, &QPushButton::clicked, this, &BanDialog::okClicked);
     QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(cancelButton, &QPushButton::clicked, this, &BanDialog::reject);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
@@ -144,9 +144,9 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
 
     QPushButton *okButton = new QPushButton(tr("&OK"));
     okButton->setAutoDefault(true);
-    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+    connect(okButton, &QPushButton::clicked, this, &WarningDialog::okClicked);
     QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(cancelButton, &QPushButton::clicked, this, &WarningDialog::reject);
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
@@ -423,7 +423,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 {
     itemDelegate = new UserListItemDelegate(this);
     userContextMenu = new UserContextMenu(tabSupervisor, this);
-    connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
+    connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &UserListWidget::openMessageDialog);
 
     userTree = new QTreeWidget;
     userTree->setColumnCount(3);
@@ -434,7 +434,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setIconSize(QSize(20, 18));
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
-    connect(userTree, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(userClicked(QTreeWidgetItem *, int)));
+    connect(userTree, &QTreeWidget::itemActivated, this, &UserListWidget::userClicked);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userTree);
