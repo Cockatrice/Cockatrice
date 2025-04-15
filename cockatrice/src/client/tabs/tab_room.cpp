@@ -53,28 +53,29 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
             SIGNAL(openMessageDialog(const QString &, bool)));
 
     chatView = new ChatView(tabSupervisor, nullptr, true, this);
-    connect(chatView, SIGNAL(showMentionPopup(const QString &)), this, SLOT(actShowMentionPopup(const QString &)));
-    connect(chatView, SIGNAL(messageClickedSignal()), this, SLOT(focusTab()));
-    connect(chatView, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
+    connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
+    connect(chatView, &ChatView::messageClickedSignal, this, &TabRoom::focusTab);
+    connect(chatView, &ChatView::openMessageDialog, this, &TabRoom::openMessageDialog);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
-    connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
-    connect(&SettingsCache::instance(), SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
+    connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
+    connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
+    connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+            &TabRoom::actCompleterChanged);
     sayLabel = new QLabel;
     sayEdit = new LineEditCompleter;
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     sayLabel->setBuddy(sayEdit);
-    connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+    connect(sayEdit, &LineEditCompleter::returnPressed, this, &TabRoom::sendMessage);
 
     QMenu *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
-    connect(aClearChat, SIGNAL(triggered()), this, SLOT(actClearChat()));
+    connect(aClearChat, &QAction::triggered, this, &TabRoom::actClearChat);
 
     chatSettingsMenu->addSeparator();
 
     aOpenChatSettings = chatSettingsMenu->addAction(QString());
-    connect(aOpenChatSettings, SIGNAL(triggered()), this, SLOT(actOpenChatSettings()));
+    connect(aOpenChatSettings, &QAction::triggered, this, &TabRoom::actOpenChatSettings);
 
     QToolButton *chatSettingsButton = new QToolButton;
     chatSettingsButton->setIcon(QPixmap("theme:icons/settings"));
@@ -126,7 +127,8 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &TabRoom::refreshShortcuts);
     refreshShortcuts();
 
     retranslateUi();
@@ -165,9 +167,9 @@ void TabRoom::actShowPopup(const QString &message)
 {
     if (trayIcon && (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this) ||
                      QApplication::activeWindow() == nullptr || QApplication::focusWidget() == nullptr)) {
-        disconnect(trayIcon, SIGNAL(messageClicked()), nullptr, nullptr);
+        disconnect(trayIcon, &QSystemTrayIcon::messageClicked, nullptr, nullptr);
         trayIcon->showMessage(message, tr("Click to view"));
-        connect(trayIcon, SIGNAL(messageClicked()), chatView, SLOT(actMessageClicked()));
+        connect(trayIcon, &QSystemTrayIcon::messageClicked, chatView, &ChatView::messageClickedSignal);
     }
 }
 
@@ -201,8 +203,7 @@ void TabRoom::sendMessage()
         cmd.set_message(sayEdit->text().toStdString());
 
         PendingCommand *pend = prepareRoomCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(sayFinished(const Response &)));
+        connect(pend, &PendingCommand::finished, this, &TabRoom::sayFinished);
         sendRoomCommand(pend);
         sayEdit->clear();
     }

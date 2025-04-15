@@ -33,7 +33,7 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox
     roomList->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
     joinButton = new QPushButton;
-    connect(joinButton, SIGNAL(clicked()), this, SLOT(joinClicked()));
+    connect(joinButton, &QPushButton::clicked, this, &RoomSelector::joinClicked);
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     buttonLayout->addWidget(joinButton);
@@ -44,9 +44,8 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox
     retranslateUi();
     setLayout(vbox);
 
-    connect(client, SIGNAL(listRoomsEventReceived(const Event_ListRooms &)), this,
-            SLOT(processListRoomsEvent(const Event_ListRooms &)));
-    connect(roomList, SIGNAL(activated(const QModelIndex &)), this, SLOT(joinClicked()));
+    connect(client, &AbstractClient::listRoomsEventReceived, this, &RoomSelector::processListRoomsEvent);
+    connect(roomList, &QTreeWidget::activated, this, &RoomSelector::joinClicked);
     client->sendCommand(client->prepareSessionCommand(Command_ListRooms()));
 }
 
@@ -144,10 +143,9 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
     serverInfoBox = new QTextBrowser;
     serverInfoBox->setOpenExternalLinks(true);
 
-    connect(roomSelector, SIGNAL(joinRoomRequest(int, bool)), this, SLOT(joinRoom(int, bool)));
+    connect(roomSelector, &RoomSelector::joinRoomRequest, this, &TabServer::joinRoom);
 
-    connect(client, SIGNAL(serverMessageEventReceived(const Event_ServerMessage &)), this,
-            SLOT(processServerMessageEvent(const Event_ServerMessage &)));
+    connect(client, &AbstractClient::serverMessageEventReceived, this, &TabServer::processServerMessageEvent);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(roomSelector);
@@ -185,8 +183,7 @@ void TabServer::joinRoom(int id, bool setCurrent)
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(setCurrent);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(joinRoomFinished(Response, CommandContainer, QVariant)));
+        connect(pend, &PendingCommand::finished, this, &TabServer::joinRoomFinished);
 
         client->sendCommand(pend);
 
