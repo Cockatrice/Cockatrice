@@ -46,14 +46,19 @@ RemoteClient::RemoteClient(QObject *parent)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     connect(socket, &QTcpSocket::errorOccurred, this, &RemoteClient::slotSocketError);
 #else
-    connect(socket, &QTcpSocket::error, this, &RemoteClient::slotSocketError);
+    connect(socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &RemoteClient::slotSocketError);
 #endif
 
     websocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     connect(websocket, &QWebSocket::binaryMessageReceived, this, &RemoteClient::websocketMessageReceived);
     connect(websocket, &QWebSocket::connected, this, &RemoteClient::slotConnected);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+    connect(websocket, &QWebSocket::errorOccurred, this, &RemoteClient::slotWebSocketError);
+#else
     connect(websocket, qOverload<QAbstractSocket::SocketError>(&QWebSocket::error), this,
             &RemoteClient::slotWebSocketError);
+#endif
 
     connect(this, &RemoteClient::serverIdentificationEventReceived, this,
             &RemoteClient::processServerIdentificationEvent);
