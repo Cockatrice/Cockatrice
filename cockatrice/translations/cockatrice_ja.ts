@@ -542,17 +542,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <translation>関連カードを見る</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation>デッキにカードを追加</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation>メインボード</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation>サイドボード</translation>
     </message>
@@ -8217,38 +8217,38 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="69"/>
         <source>Chat Room</source>
-        <translation type="unfinished"/>
+        <translation>チャットルーム</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="71"/>
         <source>Game Window</source>
-        <translation type="unfinished"/>
+        <translation>ゲームウィンドウ</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Load Deck from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>クリップボードからデッキを開く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="75"/>
         <location filename="src/settings/shortcuts_settings.h" line="669"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>リプレイ</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="77"/>
         <source>Tabs</source>
-        <translation type="unfinished"/>
+        <translation>タブ</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="150"/>
         <source>Check for Card Updates...</source>
-        <translation type="unfinished"/>
+        <translation>カードデータベース更新...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="153"/>
         <source>Connect...</source>
-        <translation type="unfinished"/>
+        <translation>接続...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="156"/>
@@ -8268,43 +8268,43 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="164"/>
         <source>Register...</source>
-        <translation type="unfinished"/>
+        <translation>ユーザー登録...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="167"/>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>設定...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="170"/>
         <source>Start a Local Game...</source>
-        <translation type="unfinished"/>
+        <translation>ローカルゲームを開始...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="173"/>
         <source>Watch Replay...</source>
-        <translation type="unfinished"/>
+        <translation>リプレイを見る...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="176"/>
         <source>Analyze Deck (deckstats.net)</source>
         <oldsource>Analyze Deck</oldsource>
-        <translation type="unfinished"/>
+        <translation>デッキを分析 (deckstats.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="180"/>
         <source>Analyze Deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>デッキを分析 (tappedout.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="183"/>
         <source>Clear All Filters</source>
-        <translation type="unfinished"/>
+        <translation>全フィルタ解除</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="186"/>
         <source>Clear Selected Filter</source>
-        <translation type="unfinished"/>
+        <translation>選択したフィルタを解除</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="190"/>
@@ -8314,17 +8314,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="191"/>
         <source>Remove Card</source>
-        <translation type="unfinished"/>
+        <translation>カードを取り除く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="194"/>
         <source>Manage Sets...</source>
-        <translation type="unfinished"/>
+        <translation>セットを管理...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="197"/>
         <source>Edit Custom Tokens...</source>
-        <translation type="unfinished"/>
+        <translation>カスタムトークンを編集...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="201"/>
@@ -8339,17 +8339,17 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="208"/>
         <source>Add Card</source>
-        <translation type="unfinished"/>
+        <translation>カードを追加</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="211"/>
         <source>Load Deck...</source>
-        <translation type="unfinished"/>
+        <translation>デッキを開く...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="215"/>
         <source>Load Deck from Clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>クリップボードからデッキを開く...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="219"/>
@@ -8364,38 +8364,38 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="226"/>
         <source>New Deck</source>
-        <translation type="unfinished"/>
+        <translation>新しいデッキ</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="230"/>
         <source>Open Custom Pictures Folder</source>
-        <translation type="unfinished"/>
+        <translation>カスタム画像フォルダを開く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="233"/>
         <source>Print Deck...</source>
-        <translation type="unfinished"/>
+        <translation>デッキを印刷...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="236"/>
         <source>Delete Card</source>
-        <translation type="unfinished"/>
+        <translation>カードを削除</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="239"/>
         <location filename="src/settings/shortcuts_settings.h" line="637"/>
         <source>Reset Layout</source>
-        <translation type="unfinished"/>
+        <translation>レイアウトをリセット</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="242"/>
         <source>Save Deck</source>
-        <translation type="unfinished"/>
+        <translation>デッキを保存</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="245"/>
         <source>Save Deck as...</source>
-        <translation type="unfinished"/>
+        <translation>名前を付けて保存...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="249"/>
@@ -8410,108 +8410,108 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="257"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>クリップボードにデッキをコピー</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="261"/>
         <source>Save Deck to Clipboard (No Set Info)</source>
-        <translation type="unfinished"/>
+        <translation>クリップボードにデッキをコピー（セット情報なし）</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="264"/>
         <source>Load Local Deck...</source>
-        <translation type="unfinished"/>
+        <translation>デッキ読み込み...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="267"/>
         <source>Load Remote Deck...</source>
-        <translation type="unfinished"/>
+        <translation>サーバーのデッキを開く...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="270"/>
         <source>Set Ready to Start</source>
-        <translation type="unfinished"/>
+        <translation>準備完了する</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="274"/>
         <source>Toggle Sideboard Lock</source>
-        <translation type="unfinished"/>
+        <translation>サイドボードロックの切り替え</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="277"/>
         <location filename="src/settings/shortcuts_settings.h" line="349"/>
         <source>Add Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>緑カウンターを置く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="280"/>
         <location filename="src/settings/shortcuts_settings.h" line="352"/>
         <source>Remove Green Counter</source>
-        <translation type="unfinished"/>
+        <translation>緑カウンターを取り除く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="283"/>
         <location filename="src/settings/shortcuts_settings.h" line="355"/>
         <source>Set Green Counters...</source>
-        <translation type="unfinished"/>
+        <translation>緑カウンターの数を決める...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="286"/>
         <source>Add Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>黄カウンターを置く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="289"/>
         <source>Remove Yellow Counter</source>
-        <translation type="unfinished"/>
+        <translation>黄カウンターを取り除く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="292"/>
         <source>Set Yellow Counters...</source>
-        <translation type="unfinished"/>
+        <translation>黄カウンターの数を決める...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="295"/>
         <location filename="src/settings/shortcuts_settings.h" line="340"/>
         <source>Add Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>赤カウンターを置く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="298"/>
         <location filename="src/settings/shortcuts_settings.h" line="343"/>
         <source>Remove Red Counter</source>
-        <translation type="unfinished"/>
+        <translation>赤カウンターを取り除く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="301"/>
         <location filename="src/settings/shortcuts_settings.h" line="346"/>
         <source>Set Red Counters...</source>
-        <translation type="unfinished"/>
+        <translation>赤カウンターの数を決める...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="304"/>
         <source>Add Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>ライフを得る</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="307"/>
         <source>Remove Life Counter</source>
-        <translation type="unfinished"/>
+        <translation>ライフを失う</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="310"/>
         <source>Set Life Counters...</source>
-        <translation type="unfinished"/>
+        <translation>ライフ総量を決める...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="313"/>
         <source>Add White Counter</source>
-        <translation type="unfinished"/>
+        <translation>白カウンターを置く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="316"/>
         <source>Remove White Counter</source>
-        <translation type="unfinished"/>
+        <translation>白カウンターを取り除く</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="319"/>

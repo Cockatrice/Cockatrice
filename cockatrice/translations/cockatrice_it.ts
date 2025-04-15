@@ -4,7 +4,7 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="82"/>
         <source>&amp;Set counter...</source>
-        <translation>Imposta segnalino</translation>
+        <translation>Imposta &amp;contatore...</translation>
     </message>
 </context>
 <context>
@@ -12,12 +12,12 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="200"/>
         <source>Set counter</source>
-        <translation>Imposta segnalino</translation>
+        <translation>Imposta contatore</translation>
     </message>
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="201"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation>Nuovo valore per il segnalino &apos;%1&apos;:</translation>
+        <translation>Nuovo valore per il contatore &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -25,12 +25,12 @@
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="24"/>
         <source>&amp;Refresh</source>
-        <translation>&amp;Aggiorna</translation>
+        <translation>&amp;Ricarica</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="32"/>
         <source>Parse Set Name and Number (if available)</source>
-        <translation>Acquisisci nome set e numero (se disponibili)</translation>
+        <translation>Acquisisci set e numero (se disponibili)</translation>
     </message>
 </context>
 <context>
@@ -125,7 +125,7 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/all_zones_card_amount_widget.cpp" line="40"/>
         <source>Sideboard</source>
-        <translation>Panchina</translation>
+        <translation>Sideboard</translation>
     </message>
 </context>
 <context>
@@ -158,12 +158,12 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="536"/>
         <source>Menu settings</source>
-        <translation>Menù impostazioni.</translation>
+        <translation>Impostazioni menù</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="537"/>
         <source>Show keyboard shortcuts in right-click menus</source>
-        <translation>Mostra scorciatoie da tastiera nel menù del tasto destro del mouse.</translation>
+        <translation>Mostra scorciatoie da tastiera nel menù del tasto destro del mouse</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="539"/>
@@ -178,17 +178,17 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="541"/>
         <source>Auto-Rotate cards with sideways layout</source>
-        <translation>Ruota automaticamente carte con disposizione orizzontale.</translation>
+        <translation>Ruota automaticamente carte con disposizione orizzontale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="543"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client restart]</source>
-        <translation>Sovrascrivi tutte le arti delle carte con set di preferenza personale (Comportamento di modifica dell&apos;ID pre-provider) [Richiede il riavvio del Client]</translation>
+        <translation>Sovrascrivi tutte le immagini delle carte con set personale (Comportamento pre-modifica Provider ID) [richiede riavvio]</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="546"/>
         <source>Bump sets that the deck contains cards from to the top in the printing selector</source>
-        <translation>Imposta le carte che il mazzo contiene dall&apos;alto verso il basso nel selettore di stampa</translation>
+        <translation>Nel selettore di stampa, mostra per primi i set delle carte che il mazzo contiene</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="547"/>
@@ -198,28 +198,28 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="548"/>
         <source>Use rounded card corners</source>
-        <translation type="unfinished"/>
+        <translation>Usa i bordi delle carte arrotondati</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="550"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation>Percentuale minima di sovrapposizione delle carte in pila e in mano verticale</translation>
+        <translation>Sovrapposizione % minima delle carte in pila e nella mano verticale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="551"/>
         <source>Maximum initial height for card view window:</source>
-        <translation>Altezza iniziale massima per la finestra di visualizzazione della scheda:</translation>
+        <translation>Altezza iniziale massima per la finestra di visualizzazione delle carte:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="552"/>
         <location filename="src/dialogs/dlg_settings.cpp" line="554"/>
         <source> rows</source>
-        <translation>file</translation>
+        <translation> file</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="553"/>
         <source>Maximum expanded height for card view window:</source>
-        <translation>Altezza massima per la finestra di visualizzazione della carta:</translation>
+        <translation>Altezza massima per la finestra di visualizzazione delle carte:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="556"/>
@@ -272,7 +272,7 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="46"/>
         <source>ban client I&amp;D</source>
-        <translation>banna client I&amp;D</translation>
+        <translation>Banna client I&amp;D</translation>
     </message>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="60"/>
@@ -432,25 +432,25 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
         <location filename="src/game/filters/filter_card.cpp" line="7"/>
         <source>AND</source>
         <comment>Logical conjunction operator used in card filter</comment>
-        <translation>E</translation>
+        <translation>AND</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="9"/>
         <source>OR</source>
         <comment>Logical disjunction operator used in card filter</comment>
-        <translation>O</translation>
+        <translation>OR</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="11"/>
         <source>AND NOT</source>
         <comment>Negated logical conjunction operator used in card filter</comment>
-        <translation>E NON</translation>
+        <translation>AND NOT</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="13"/>
         <source>OR NOT</source>
         <comment>Negated logical disjunction operator used in card filter</comment>
-        <translation>O NON</translation>
+        <translation>OR NOT</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="23"/>
@@ -485,7 +485,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="35"/>
         <source>Mana Value</source>
-        <translation>Valore di Mana</translation>
+        <translation>Valore di mana</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="37"/>
@@ -533,7 +533,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="74"/>
         <source>View transformation</source>
-        <translation>Mostra trasformazione</translation>
+        <translation>Visualizza trasformazione</translation>
     </message>
 </context>
 <context>
@@ -541,20 +541,20 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="288"/>
         <source>View related cards</source>
-        <translation>Mostra carte correlate</translation>
+        <translation>Guarda carte correlate</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
-        <translation>Aggiungi carta al &amp;mazzo</translation>
+        <translation>Aggiungi la carta al &amp;mazzo</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation>Mazzo</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation>Sideboard</translation>
     </message>
@@ -749,7 +749,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="193"/>
         <source>Select Printing</source>
-        <translation>Seleziona Stampa</translation>
+        <translation>Seleziona stampa</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="195"/>
@@ -1025,12 +1025,12 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1041"/>
         <source>Redirect Cache TTL:</source>
-        <translation>Reindirizza TTL della cache:</translation>
+        <translation>TTL cache dei reindirizzamenti:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1042"/>
         <source>How long cached redirects for urls are valid for.</source>
-        <translation>Per quanto tempo sono validi i reindirizzamenti memorizzati nella cache per gli URL.</translation>
+        <translation>Per quanto tempo sono validi i reindirizzamenti per gli URL memorizzati nella cache.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1043"/>
@@ -1085,7 +1085,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1031"/>
         <source>Last Change</source>
-        <translation>Ultimo cambiamento</translation>
+        <translation>Ultima modifica</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1032"/>
@@ -1105,7 +1105,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1035"/>
         <source>Download card pictures on the fly</source>
-        <translation>Download immagini delle carte</translation>
+        <translation>Scarica immagini delle carte in tempo reale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1036"/>
@@ -1138,7 +1138,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="181"/>
         <source>Count</source>
-        <translation>Conteggio</translation>
+        <translation>Quantità</translation>
     </message>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="185"/>
@@ -1148,7 +1148,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="187"/>
         <source>Number</source>
-        <translation>Quantità</translation>
+        <translation>Numero</translation>
     </message>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="189"/>
@@ -1192,7 +1192,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp" line="57"/>
         <source>Edit tags ...</source>
-        <translation>Modifica etichette...</translation>
+        <translation>Imposta etichette...</translation>
     </message>
 </context>
 <context>
@@ -1210,7 +1210,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="158"/>
         <source>Add a new tag (e.g., Aggro️)</source>
-        <translation>Aggiungi una nuova etichetta (Esempio: Aggro️)</translation>
+        <translation>Aggiungi una nuova etichetta (Es.: Aggro️)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="159"/>
@@ -1378,7 +1378,7 @@ Questa è visibile solo ai moderatori e non alla persona bannata.</translation>
         <location filename="src/game/deckview/deck_view_container.cpp" line="126"/>
         <source>Unload deck</source>
         <oldsource>Unload deck...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Deseleziona mazzo</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="127"/>
@@ -1662,12 +1662,12 @@ Vuoi convertire il mazzo al formato .cod?</translation>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="98"/>
         <source>Starting life total:</source>
-        <translation>Totale vita iniziale:</translation>
+        <translation>Punti vita iniziali:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="108"/>
         <source>Game setup options</source>
-        <translation>Opzioni di configurazione del gioco</translation>
+        <translation>Configurazione partita</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="158"/>
@@ -2491,7 +2491,7 @@ La tua email verrà utilizzata per verificare il tuo account.</translation>
     <message>
         <location filename="src/dialogs/dlg_roll_dice.cpp" line="13"/>
         <source>Number of sides:</source>
-        <translation>Numero di lati:</translation>
+        <translation>Numero di facce:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_roll_dice.cpp" line="20"/>
@@ -2643,7 +2643,7 @@ Desideri modificare l&apos;impostazione della posizione del database?</translati
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1699"/>
         <source>Shortcuts</source>
-        <translation>Combinazioni di tasti</translation>
+        <translation>Scorciatoie</translation>
     </message>
 </context>
 <context>
@@ -2922,12 +2922,12 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/game/game_selector.cpp" line="263"/>
         <source>Join Game</source>
-        <translation type="unfinished"/>
+        <translation>Entra nella partita</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="266"/>
         <source>Spectate Game</source>
-        <translation type="unfinished"/>
+        <translation>Osserva partita</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="269"/>
@@ -2947,7 +2947,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/game/game_selector.cpp" line="318"/>
         <source>Please join the respective room first.</source>
-        <translation>Si prega di entrare nella rispettiva stanza prima.</translation>
+        <translation>Si prega di entrare prima nella rispettiva stanza.</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="361"/>
@@ -3091,12 +3091,12 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="320"/>
         <source>Reset all paths</source>
-        <translation>Reimposta tutti gli indirizzi di download</translation>
+        <translation>Reimposta tutti i percorsi</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="149"/>
         <source>All paths have been reset</source>
-        <translation>Gli indirizzi di download sono stati resettati</translation>
+        <translation>I percorsi sono stati resettati</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="221"/>
@@ -3156,7 +3156,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="313"/>
         <source>Custom database directory:</source>
-        <translation>Cartella database personalizzata.</translation>
+        <translation>Cartella database personalizzata:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="314"/>
@@ -3688,7 +3688,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="664"/>
         <source>&amp;Restore password...</source>
-        <translation>Recupera Password...</translation>
+        <translation>&amp;Recupera password...</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="665"/>
@@ -3713,7 +3713,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="675"/>
         <source>C&amp;ard Database</source>
-        <translation>Database delle c&amp;arte</translation>
+        <translation>&amp;Database delle carte</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="676"/>
@@ -3748,7 +3748,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="683"/>
         <source>Tabs</source>
-        <translation>Schede</translation>
+        <translation>&amp;Schede</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="685"/>
@@ -3773,12 +3773,12 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="689"/>
         <source>Check for Card Updates...</source>
-        <translation>Cerca Aggiornamenti Carte...</translation>
+        <translation>Controlla aggiornamenti carte...</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="690"/>
         <source>View &amp;Debug Log</source>
-        <translation>Vedi Log %Debug</translation>
+        <translation>Vedi Registro di &amp;debug</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="691"/>
@@ -3901,17 +3901,17 @@ Scopri metodi alternativi per visualizzare i set o disabilitare set ed effetti n
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1216"/>
         <source>Failed to start. The file might be missing, or permissions might be incorrect.</source>
-        <translation type="unfinished"/>
+        <translation>Avvio non riuscito. Il file potrebbe essere assente, o i permessi errati.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1219"/>
         <source>The process crashed some time after starting successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Il processo si è arrestato in modo anomalo poco dopo essersi avviato con successo.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1223"/>
         <source>Timed out. The process took too long to respond. The last waitFor...() function timed out.</source>
-        <translation type="unfinished"/>
+        <translation>Richiesta scaduta. Il processo ci ha messo troppo a rispondere. L&apos;ultima funzione waitFor...() è scaduta.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1226"/>
@@ -3921,18 +3921,19 @@ Scopri metodi alternativi per visualizzare i set o disabilitare set ed effetti n
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1230"/>
         <source>An error occurred when attempting to read from the process. For example, the process may not be running.</source>
-        <translation type="unfinished"/>
+        <translation>Si è verificato un errore nel cercare di leggere dal processo. Ad esempio, il processo potrebbe non essere in esecuzione.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1235"/>
         <source>Unknown error occurred.</source>
-        <translation type="unfinished"/>
+        <translation>Si è verificato un errore sconosciuto.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1240"/>
         <source>The card database updater exited with an error:
 %1</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;aggiornamento del database delle carte è terminato con un errore:
+%1</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1291"/>
@@ -4199,7 +4200,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="328"/>
         <source>%1 puts %2 into play%3 face down.</source>
-        <translation>%1 mette %2 in gioco %3 a faccia in giù.</translation>
+        <translation>%1 mette %2 sul campo di battaglia %3 a faccia in giù.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="330"/>
@@ -4229,7 +4230,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="342"/>
         <source>%1 puts %2%3 onto the bottom of their library.</source>
-        <translation>%1 mette %2%3 in fondo alla propria libreria.</translation>
+        <translation>%1 mette %2%3 in fondo al proprio grimorio.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="344"/>
@@ -4271,7 +4272,7 @@ Il database delle carte verrà ricaricato.</translation>
         <source>%1 is looking at the %4 %3 card(s) %2.</source>
         <oldsource>%1 is looking at the top %3 card(s) %2.</oldsource>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation><numerusform>%1 sta guardando una carta %4 %2.</numerusform><numerusform>%1 sta guardando %3 carte %4 %2.</numerusform><numerusform>%1 sta guardando %3 carte %4 %2.</numerusform></translation>
+        <translation><numerusform>%1 sta guardando %3 carta %4 %2.</numerusform><numerusform>%1 sta guardando %3 carte %4 %2.</numerusform><numerusform>%1 sta guardando %3 carte %4 %2.</numerusform></translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="393"/>
@@ -4393,12 +4394,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="543"/>
         <source>%1 peeks at face down card #%2.</source>
-        <translation>%1 ha sbirciato la carta a faccia in giù #%2.</translation>
+        <translation>%1 sbircia la carta a faccia in giù #%2.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="545"/>
         <source>%1 peeks at face down card #%2: %3.</source>
-        <translation>%1 ha sbirciato la carta a faccia in giù #%2: %3.</translation>
+        <translation>%1 sbircia la carta a faccia in giù #%2: %3.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="551"/>
@@ -4448,8 +4449,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="587"/>
         <source>%1 flips %2 coins. There are %3 heads and %4 tails.</source>
-        <translation>%1 lancia %2 monete. Sono uscite %3 teste e %4 croci.
- </translation>
+        <translation>%1 lancia %2 monete. Sono uscite %3 teste e %4 croci.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="597"/>
@@ -4564,7 +4564,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="772"/>
         <source>%1 shuffles the top %3 cards of %2.</source>
-        <translation>%1 mescola le %3 carte in cima da %2.</translation>
+        <translation>%1 mescola le prime %3 carte da %2.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="777"/>
@@ -4703,7 +4703,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/game_specific_terms.h" line="29"/>
         <source>Card Type</source>
-        <translation>Tipo di carta</translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="src/game/game_specific_terms.h" line="31"/>
@@ -4779,7 +4779,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/phase.cpp" line="19"/>
         <source>Untap</source>
-        <translation>Stappa</translation>
+        <translation>STAP</translation>
     </message>
     <message>
         <location filename="src/game/phase.cpp" line="20"/>
@@ -4789,7 +4789,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/phase.cpp" line="21"/>
         <source>Draw</source>
-        <translation>Pesca</translation>
+        <translation>Acquisizione</translation>
     </message>
     <message>
         <location filename="src/game/phase.cpp" line="22"/>
@@ -4829,7 +4829,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/phase.cpp" line="29"/>
         <source>End/Cleanup</source>
-        <translation>Fine/Cancellazione</translation>
+        <translation>Finale / Cancellazione</translation>
     </message>
 </context>
 <context>
@@ -4872,7 +4872,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/client/ui/phases_toolbar.cpp" line="168"/>
         <source>Combat damage step</source>
-        <translation>Sottofase di danno da combattimento</translation>
+        <translation>Sottofase del danno da combattimento</translation>
     </message>
     <message>
         <location filename="src/client/ui/phases_toolbar.cpp" line="170"/>
@@ -4963,14 +4963,14 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="src/game/player/player.cpp" line="773"/>
         <location filename="src/game/player/player.cpp" line="779"/>
         <source>&amp;Top of library</source>
-        <translation>Cima al grimorio</translation>
+        <translation>&amp;Cima al grimorio</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="768"/>
         <location filename="src/game/player/player.cpp" line="774"/>
         <location filename="src/game/player/player.cpp" line="780"/>
         <source>&amp;Bottom of library</source>
-        <translation>Fondo al grimorio</translation>
+        <translation>&amp;Fondo al grimorio</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="772"/>
@@ -5003,7 +5003,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="786"/>
         <source>View &amp;top cards of library...</source>
-        <translation>Guarda &amp;le prime carte del grimorio...</translation>
+        <translation>Guarda &amp;le carte in cima al grimorio...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="788"/>
@@ -5078,7 +5078,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="789"/>
         <source>Lend library to...</source>
-        <translation>Presta la libreria a...</translation>
+        <translation>Presta il grimorio a...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="802"/>
@@ -5094,12 +5094,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="812"/>
         <source>Shuffle top cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mescola le carte in cima...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="823"/>
         <source>Shuffle bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mescola le carte in fondo...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="826"/>
@@ -5272,12 +5272,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="880"/>
         <source>Increase power and decrease toughness</source>
-        <translation>Incrementa forza e decrementa costituzione</translation>
+        <translation>Aumenta forza e diminuisci costituzione</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="881"/>
         <source>Decrease power and increase toughness</source>
-        <translation>Decrementa forza e incrementa costituzione</translation>
+        <translation>Diminuisci forza e aumenta costituzione</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="882"/>
@@ -5337,12 +5337,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="903"/>
         <source>&amp;Bottom of library in random order</source>
-        <translation>In fondo al grimorio in ordine casuale</translation>
+        <translation>In &amp;fondo al grimorio in ordine casuale</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1141"/>
         <source>View top cards of library</source>
-        <translation>Guarda le prima carte del grimorio</translation>
+        <translation>Guarda le carte in cima al grimorio</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1154"/>
@@ -5367,7 +5367,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="3110"/>
         <source>(max. %1)</source>
-        <translation>(max. %1)</translation>
+        <translation>(max %1)</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1289"/>
@@ -5408,7 +5408,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="792"/>
         <source>&amp;Bottom of library...</source>
-        <translation>&amp;In fondo alla libreria...</translation>
+        <translation>&amp;In fondo al grimorio...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="794"/>
@@ -5488,7 +5488,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="1622"/>
         <source>Move bottom cards to exile</source>
-        <translation>Metti le ultime care in esilio</translation>
+        <translation>Metti le ultime carte in esilio</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1738"/>
@@ -5544,7 +5544,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="4014"/>
         <source>View related cards</source>
-        <translation>Vedi carte collegate</translation>
+        <translation>Guarda carte correlate</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="4062"/>
@@ -5562,12 +5562,12 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="106"/>
         <source>Display Navigation Buttons</source>
-        <translation type="unfinished"/>
+        <translation>Visualizza pulsanti di navigazione</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="110"/>
         <source>&lt;b&gt;Warning:&lt;/b&gt; You appear to be using custom card art, which has known bugs when also using the printing selector in this version of Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Attenzione:&lt;/b&gt; Stai utilizzando la cartella delle immagini personalizzate, che causa dei bug se usato insieme al selettore di stampa in questa versione di Cockatrice.</translation>
     </message>
 </context>
 <context>
@@ -5963,7 +5963,7 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="src/dialogs/dlg_settings.cpp" line="1463"/>
         <location filename="src/dialogs/dlg_settings.cpp" line="1486"/>
         <source>Restore all default shortcuts</source>
-        <translation>Ripristina tutte le scorciatoie predefinite</translation>
+        <translation>Ripristina scorciatoie predefinite</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1464"/>
@@ -5998,17 +5998,17 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1485"/>
         <source>How to set custom shortcuts</source>
-        <translation>Come impostare scorciatoie predefinite</translation>
+        <translation>Come impostare scorciatoie personalizzate</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1487"/>
         <source>Clear all shortcuts</source>
-        <translation>Rimuovi tutte le shortcuts</translation>
+        <translation>Elimina tutte le scorciatoie</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1488"/>
         <source>Search by shortcut name</source>
-        <translation>Cerca per nome scorciatoia</translation>
+        <translation>Cerca per nome della scorciatoia</translation>
     </message>
 </context>
 <context>
@@ -6030,14 +6030,14 @@ Il database delle carte verrà ricaricato.</translation>
         <location filename="src/settings/shortcuts_settings.cpp" line="54"/>
         <source>Your configuration file contained invalid shortcuts.
 Please check your shortcut settings!</source>
-        <translation>Il file di configurazione conteneva combinazioni di tasti non valide.
+        <translation>Il file di configurazione conteneva scorciatoie non valide.
 Controlla le impostazioni!</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.cpp" line="56"/>
         <source>The following shortcuts have been set to default:
 </source>
-        <translation>Le seguenti combinazioni di tasti sono state reimpostate al valore predefinito:
+        <translation>Le seguenti scorciatoie sono state reimpostate al valore predefinito:
 </translation>
     </message>
 </context>
@@ -6133,7 +6133,7 @@ Controlla le impostazioni!</translation>
     <message>
         <location filename="src/client/network/spoiler_background_updater.cpp" line="184"/>
         <source>Last change:</source>
-        <translation>Ultimo cambiamento:</translation>
+        <translation>Ultima modifica:</translation>
     </message>
 </context>
 <context>
@@ -6169,12 +6169,12 @@ Controlla le impostazioni!</translation>
     <message>
         <location filename="src/client/tabs/tab_account.cpp" line="57"/>
         <source>Add to Buddy List</source>
-        <translation>Aggiungi a Lista Amici</translation>
+        <translation>Aggiungi a Lista amici</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_account.cpp" line="67"/>
         <source>Add to Ignore List</source>
-        <translation>Aggiungi a Lista Ignorati</translation>
+        <translation>Aggiungi a Lista ignorati</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_account.h" line="53"/>
@@ -6503,7 +6503,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp" line="32"/>
         <source>Could not open deck at %1</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile aprire il mazzo a %1</translation>
     </message>
 </context>
 <context>
@@ -7494,7 +7494,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="348"/>
         <source>Copy hash to clipboard</source>
-        <translation>Copia hash nella clipboard</translation>
+        <translation>Copia hash negli appunti</translation>
     </message>
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="368"/>
@@ -7686,12 +7686,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="708"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
-        <translation>&amp;Doppio click sulle carte per giocarle (disabilitato un solo click)</translation>
+        <translation>&amp;Doppio click sulle carte per giocarle (anzichè un solo click)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="709"/>
         <source>&amp;Clicking plays all selected cards (instead of just the clicked card)</source>
-        <translation>Gioca tutte le carte selezionate</translation>
+        <translation>&amp;Cliccare gioca tutte le carte selezionate (anziché solo quella cliccata)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="710"/>
@@ -7701,7 +7701,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="711"/>
         <source>Close card view window when last card is removed</source>
-        <translation type="unfinished"/>
+        <translation>Chiudi la finestra di visualizzazione carte quando l&apos;ultima carta viene rimossa</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="712"/>
@@ -7711,7 +7711,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="713"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
-        <translation>Usa menù-a-strappo, permettendo ai menù del tasto destro del mouse di rimanere sullo schermo</translation>
+        <translation>Usa menù a strappo, permettendo ai menù del tasto destro del mouse di rimanere sullo schermo</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="714"/>
@@ -7726,12 +7726,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="716"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
-        <translation>Abilita notifiche anche per i giochi in cui si è solo uno spettatore</translation>
+        <translation>Notifica anche per le partite in cui si è solo uno spettatore</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="717"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
-        <translation>Notifca nella barra delle applicazioni quando degli utenti nella tua lista amici si connetto</translation>
+        <translation>Notifca quando utenti nella tua lista amici si connettono</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="718"/>
@@ -7761,12 +7761,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="723"/>
         <source>Always convert if not prompted</source>
-        <translation type="unfinished"/>
+        <translation>Converti automaticamente i mazzi senza chiedere</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="724"/>
         <source>Use visual deck storage in game lobby</source>
-        <translation type="unfinished"/>
+        <translation>Usa galleria mazzi nella lobby</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="725"/>
@@ -7871,17 +7871,17 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="189"/>
         <source>Include Folder Names in Search</source>
-        <translation type="unfinished"/>
+        <translation>Includi nomi delle cartelle nella ricerca</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="190"/>
         <source>Draw unused Color Identities</source>
-        <translation type="unfinished"/>
+        <translation>Mostra identità di colore inutilizzate</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="191"/>
         <source>Unused Color Identities Opacity</source>
-        <translation type="unfinished"/>
+        <translation>Opacità identità di colore inutilizzata</translation>
     </message>
 </context>
 <context>
@@ -8009,7 +8009,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/dialogs/dlg_manage_sets.cpp" line="139"/>
         <source>first the CUSTOM Folder (%1), then the Enabled Sets in this dialog (Top to Bottom)</source>
         <comment>%1 is a link to the wiki</comment>
-        <translation>innanzitutto la cartella CUSTOM (%1), poi le Espansioni Abilitate in questo dialogo (da Cima a Fondo)</translation>
+        <translation>innanzitutto la cartella CUSTOM (%1), poi le Espansioni abilitate in questo dialogo (da cima a fondo)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_manage_sets.cpp" line="138"/>
@@ -8067,7 +8067,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="195"/>
         <source>Ungrouped</source>
-        <translation>Non raggruppato</translation>
+        <translation>Non raggruppare</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="196"/>
@@ -8077,7 +8077,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="197"/>
         <source>Group by Mana Value</source>
-        <translation>Raggruppa per valore di mana</translation>
+        <translation>Raggruppa per costo</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="198"/>
@@ -8092,7 +8092,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="206"/>
         <source>Sort by Name</source>
-        <translation>Ordina per nome </translation>
+        <translation>Ordina per nome</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="207"/>
@@ -8102,7 +8102,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="208"/>
         <source>Sort by Mana Cost</source>
-        <translation>Ordina per costo di mana</translation>
+        <translation>Ordina per costo</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="209"/>
@@ -8122,7 +8122,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="215"/>
         <source>shuffle when closing</source>
-        <translation>Mescola quando chiudi</translation>
+        <translation>Mescola alla chiusura</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="216"/>
@@ -8167,17 +8167,17 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="45"/>
         <source>Game Lobby</source>
-        <translation>Lobby del gioco</translation>
+        <translation>Lobby della partita</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="47"/>
         <source>Card Counters</source>
-        <translation>Segnalini Carta</translation>
+        <translation>Segnalini della carta</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="49"/>
         <source>Player Counters</source>
-        <translation>Segnalini Giocatore</translation>
+        <translation>Contatori del giocatore</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="51"/>
@@ -8232,12 +8232,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="71"/>
         <source>Game Window</source>
-        <translation>Finestra di Gioco</translation>
+        <translation>Finestra di gioco</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="73"/>
         <source>Load Deck from Clipboard</source>
-        <translation>Carica mazzo dalla clipboard</translation>
+        <translation>Carica mazzo dagli appunti</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="75"/>
@@ -8253,7 +8253,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="150"/>
         <source>Check for Card Updates...</source>
-        <translation>Controlla per aggiornamenti carte...</translation>
+        <translation>Controlla Aggiornamenti Carte...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="153"/>
@@ -8273,7 +8273,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="161"/>
         <source>Full screen</source>
-        <translation>Schermo intero</translation>
+        <translation>Schermo Intero</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="164"/>
@@ -8288,7 +8288,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="170"/>
         <source>Start a Local Game...</source>
-        <translation>Inizia una partita in locale...</translation>
+        <translation>Inizia una Partita in Locale...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="173"/>
@@ -8299,12 +8299,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/settings/shortcuts_settings.h" line="176"/>
         <source>Analyze Deck (deckstats.net)</source>
         <oldsource>Analyze Deck</oldsource>
-        <translation>Analizza mazzo (deckstats.net)</translation>
+        <translation>Analizza Mazzo (deckstats.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="180"/>
         <source>Analyze Deck (tappedout.net)</source>
-        <translation>Analizza mazzo (tappedout.net)</translation>
+        <translation>Analizza Mazzo (tappedout.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="183"/>
@@ -8354,27 +8354,27 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="211"/>
         <source>Load Deck...</source>
-        <translation>Carica mazzo...</translation>
+        <translation>Carica Mazzo...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="215"/>
         <source>Load Deck from Clipboard...</source>
-        <translation>Carica Mazzo da Appunti...</translation>
+        <translation>Carica il Mazzo dagli Appunti...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="219"/>
         <source>Edit Deck in Clipboard, Annotated</source>
-        <translation>Modifica il mazzo negli appunti con annotazioni</translation>
+        <translation>Modifica Mazzo negli Appunti con Annotazioni</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="223"/>
         <source>Edit Deck in Clipboard</source>
-        <translation>Modifica mazzo negli appunti</translation>
+        <translation>Modifica Mazzo negli Appunti</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="226"/>
         <source>New Deck</source>
-        <translation>Nuovo mazzo</translation>
+        <translation>Nuovo Mazzo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="230"/>
@@ -8384,7 +8384,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="233"/>
         <source>Print Deck...</source>
-        <translation>Stampa mazzo...</translation>
+        <translation>Stampa Mazzo...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="236"/>
@@ -8400,12 +8400,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="242"/>
         <source>Save Deck</source>
-        <translation>Salva mazzo</translation>
+        <translation>Salva Mazzo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="245"/>
         <source>Save Deck as...</source>
-        <translation>Salva mazzo con nome</translation>
+        <translation>Salva Mazzo con Nome...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="249"/>
@@ -8415,7 +8415,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="253"/>
         <source>Save Deck to Clipboard, Annotated (No Set Info)</source>
-        <translation>Salva il mazzo negli appunti con annotazioni (senza info set)</translation>
+        <translation>Salva Mazzo negli Appunti con Annotazioni (Senza Info Set)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="257"/>
@@ -8425,7 +8425,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="261"/>
         <source>Save Deck to Clipboard (No Set Info)</source>
-        <translation>Salva il mazzo negli appunti (senza info set)</translation>
+        <translation>Salva Mazzo negli Appunti (Senza Info Set)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="264"/>
@@ -8451,152 +8451,152 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/settings/shortcuts_settings.h" line="277"/>
         <location filename="src/settings/shortcuts_settings.h" line="349"/>
         <source>Add Green Counter</source>
-        <translation>Aggiungi Segnalino Verde</translation>
+        <translation>Aumenta Segnalino Verde</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="280"/>
         <location filename="src/settings/shortcuts_settings.h" line="352"/>
         <source>Remove Green Counter</source>
-        <translation>Rimuovi Segnalino Verde</translation>
+        <translation>Riduci Segnalino Verde</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="283"/>
         <location filename="src/settings/shortcuts_settings.h" line="355"/>
         <source>Set Green Counters...</source>
-        <translation>Imposta Segnalini Verdi...</translation>
+        <translation>Imposta Segnalino Verde...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="286"/>
         <source>Add Yellow Counter</source>
-        <translation>Aggiungi Segnalino Giallo</translation>
+        <translation>Aumenta Segnalino Giallo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="289"/>
         <source>Remove Yellow Counter</source>
-        <translation>Rimuovi Segnalino Giallo</translation>
+        <translation>Riduci Segnalino Giallo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="292"/>
         <source>Set Yellow Counters...</source>
-        <translation>Imposta Segnalini Gialli</translation>
+        <translation>Imposta Segnalino Giallo...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="295"/>
         <location filename="src/settings/shortcuts_settings.h" line="340"/>
         <source>Add Red Counter</source>
-        <translation>Aggiungi Segnalino Rosso</translation>
+        <translation>Aumenta Segnalino Rosso</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="298"/>
         <location filename="src/settings/shortcuts_settings.h" line="343"/>
         <source>Remove Red Counter</source>
-        <translation>Rimuovi Segnalino Rosso</translation>
+        <translation>Riduci Segnalino Rosso</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="301"/>
         <location filename="src/settings/shortcuts_settings.h" line="346"/>
         <source>Set Red Counters...</source>
-        <translation>Imposta Segnalini Rossi...</translation>
+        <translation>Imposta Contatore Rosso...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="304"/>
         <source>Add Life Counter</source>
-        <translation>Aggiungi Segnalino Vita</translation>
+        <translation>Aumenta Contatore Vita</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="307"/>
         <source>Remove Life Counter</source>
-        <translation>Rimuovi Segnalino Vita</translation>
+        <translation>Riduci Contatore Vita</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="310"/>
         <source>Set Life Counters...</source>
-        <translation>Imposta Segnalini Vita...</translation>
+        <translation>Imposta Contatore Vita...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="313"/>
         <source>Add White Counter</source>
-        <translation>Aggiungi Segnalino Bianco</translation>
+        <translation>Aumenta Contatore Bianco</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="316"/>
         <source>Remove White Counter</source>
-        <translation>Rimuovi Segnalino Bianco</translation>
+        <translation>Riduci Contatore Bianco</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="319"/>
         <source>Set White Counters...</source>
-        <translation>Imposta Segnalini Bianchi</translation>
+        <translation>Imposta Contatore Bianco...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="322"/>
         <source>Add Blue Counter</source>
-        <translation>Aggiungi Contatore Blu</translation>
+        <translation>Aumenta Contatore Blu</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="325"/>
         <source>Remove Blue Counter</source>
-        <translation>Rimuovi Segnalino Blu</translation>
+        <translation>Riduci Contatore Blu</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="328"/>
         <source>Set Blue Counters...</source>
-        <translation>Imposta Segnalini Blu...</translation>
+        <translation>Imposta Contatore Blu...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="331"/>
         <source>Add Black Counter</source>
-        <translation>Aggiungi Segnalino Nero</translation>
+        <translation>Aumenta Contatore Nero</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="334"/>
         <source>Remove Black Counter</source>
-        <translation>Rimuovi Segnalino Nero</translation>
+        <translation>Riduci Contatore Nero</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="337"/>
         <source>Set Black Counters...</source>
-        <translation>Imposta Segnalino Nero...</translation>
+        <translation>Imposta Contatore Nero...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="358"/>
         <source>Add Colorless Counter</source>
-        <translation>Aggiungi Segnalino Incolore</translation>
+        <translation>Aumenta Contatore Incolore</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="361"/>
         <source>Remove Colorless Counter</source>
-        <translation>Rimuovi Segnalino Incolore</translation>
+        <translation>Riduci Contatore Incolore</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="364"/>
         <source>Set Colorless Counters...</source>
-        <translation>Imposta Segnalini Incolore...</translation>
+        <translation>Imposta Contatore Incolore...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="367"/>
         <source>Add Other Counter</source>
-        <translation>Aggiungi Altro Segnalino</translation>
+        <translation>Aumenta Contatore Altro</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="370"/>
         <source>Remove Other Counter</source>
-        <translation>Rimuovi Altro Segnalino</translation>
+        <translation>Riduci Contatore Altro</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="373"/>
         <source>Set Other Counters...</source>
-        <translation>Imposta Altri Segnalini...</translation>
+        <translation>Imposta Contatore Altro...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="376"/>
         <source>Add Power (+1/+0)</source>
-        <translation>Aggiungi Forza (+1/+0)</translation>
+        <translation>Aumenta Forza (+1/+0)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="379"/>
         <source>Remove Power (-1/-0)</source>
-        <translation>Rimuovi Forza (-1/-0)</translation>
+        <translation>Diminuisci Forza (-1/-0)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="382"/>
@@ -8606,12 +8606,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="385"/>
         <source>Add Toughness (+0/+1)</source>
-        <translation>Aggiungi Costituzione (+0/+1)</translation>
+        <translation>Aumenta Costituzione (+0/+1)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="388"/>
         <source>Remove Toughness (-0/-1)</source>
-        <translation>Rimuovi Costituzione (-0/-1)</translation>
+        <translation>Riduci Costituzione (-0/-1)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="391"/>
@@ -8621,12 +8621,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="394"/>
         <source>Add Power and Toughness (+1/+1)</source>
-        <translation>Aggiungi Forza e Costituzione (+1/+1)</translation>
+        <translation>Aumenta Forza e Costituzione (+1/+1)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="397"/>
         <source>Remove Power and Toughness (-1/-1)</source>
-        <translation>Rimuovi Forza e Costituzione (-1/-1)</translation>
+        <translation>Diminuisci Forza e Costituzione (-1/-1)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="400"/>
@@ -8701,7 +8701,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="436"/>
         <source>Next Phase Action</source>
-        <translation>Nuova Fase</translation>
+        <translation>Azione della Fase Successiva</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="439"/>
@@ -8711,7 +8711,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="442"/>
         <source>Hide Card in Reveal Window</source>
-        <translation>Nascondi la carta nella finestra di visualizzazione</translation>
+        <translation>Nascondi Carta nella Finestra di Visualizzazione</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="445"/>
@@ -8721,7 +8721,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="448"/>
         <source>Untap All</source>
-        <translation>Stappa Tutto</translation>
+        <translation>STAPpa Tutto</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="451"/>
@@ -8736,7 +8736,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="457"/>
         <source>Peek Card</source>
-        <translation>Osserva Carta</translation>
+        <translation>Sbircia Carta</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="460"/>
@@ -8746,12 +8746,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="463"/>
         <source>Attach Card...</source>
-        <translation>Attacca Carta...</translation>
+        <translation>Assegna Carta...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="466"/>
         <source>Unattach Card</source>
-        <translation>Stacca Carta</translation>
+        <translation>Togli Carta</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="469"/>
@@ -8776,28 +8776,28 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="481"/>
         <source>Set Annotation...</source>
-        <translation>Imposta annotazione...</translation>
+        <translation>Imposta Note...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="484"/>
         <source>Select All Cards in Zone</source>
-        <translation>Seleziona tutte le carte nella zona</translation>
+        <translation>Seleziona Tutte le Carte nella Zona</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="487"/>
         <source>Select All Cards in Row</source>
-        <translation>Seleziona tutte le carte nella riga</translation>
+        <translation>Seleziona Tutte le Carte nella Riga</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="490"/>
         <source>Select All Cards in Column</source>
-        <translation>Seleziona tutte le carte nella colonna</translation>
+        <translation>Seleziona Tutte le Carte nella Colonna</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="493"/>
         <location filename="src/settings/shortcuts_settings.h" line="553"/>
         <source>Bottom of Library</source>
-        <translation>Fondo del mazzo</translation>
+        <translation>Fondo al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="496"/>
@@ -8825,19 +8825,19 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/settings/shortcuts_settings.h" line="504"/>
         <location filename="src/settings/shortcuts_settings.h" line="572"/>
         <source>Top of Library</source>
-        <translation>Vedi Cima della Libreria</translation>
+        <translation>Cima al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="507"/>
         <location filename="src/settings/shortcuts_settings.h" line="536"/>
         <location filename="src/settings/shortcuts_settings.h" line="558"/>
         <source>Battlefield, Face Down</source>
-        <translation>Campo di battaglia, faccia in giù</translation>
+        <translation>Campo di Battaglia, faccia in giù</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="510"/>
         <source>Battlefield</source>
-        <translation>Campo di battaglia</translation>
+        <translation>Campo di Battaglia</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="518"/>
@@ -8852,12 +8852,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="524"/>
         <source>Top Cards of Library</source>
-        <translation>Vedi Prime Carte della Libreria</translation>
+        <translation>Carte in Cima al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="527"/>
         <source>Bottom Cards of Library</source>
-        <translation>Carte in fondo al grimorio</translation>
+        <translation>Carte in Fondo al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="530"/>
@@ -8885,27 +8885,27 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="550"/>
         <source>Stack Until Found</source>
-        <translation>Impila fino a trovare</translation>
+        <translation>Impila Fino a Trovare</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="575"/>
         <source>Draw Bottom Card</source>
-        <translation>Pesca la carta in fondo al mazzo</translation>
+        <translation>Pesca Carta in Fondo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="578"/>
         <source>Draw Multiple Cards from Bottom...</source>
-        <translation>Pesca più carte dal fondo del mazzo...</translation>
+        <translation>Pesca Multiple Carte in Fondo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="581"/>
         <source>Draw Arrow...</source>
-        <translation>Disegna freccia...</translation>
+        <translation>Disegna Freccia...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="584"/>
         <source>Remove Local Arrows</source>
-        <translation>Rimuovi frecce locali</translation>
+        <translation>Rimuovi Frecce Locali</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="587"/>
@@ -8925,17 +8925,17 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="595"/>
         <source>Shuffle Library</source>
-        <translation>Mischia il Mazzo</translation>
+        <translation>Mescola il Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="598"/>
         <source>Shuffle Top Cards of Library</source>
-        <translation>Mescola carte in cima al grimorio</translation>
+        <translation>Mescola Carte in Cima al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="601"/>
         <source>Shuffle Bottom Cards of Library</source>
-        <translation>Mescola carte in fondo al grimorio</translation>
+        <translation>Mescola Carte in Fondo al Grimorio</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="604"/>
@@ -8950,37 +8950,37 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="610"/>
         <source>Draw Multiple Cards...</source>
-        <translation>Pesca più carte...</translation>
+        <translation>Pesca più Carte...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="613"/>
         <source>Undo Draw</source>
-        <translation>Annulla Disegno</translation>
+        <translation>Annulla Pescata</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="616"/>
         <source>Always Reveal Top Card</source>
-        <translation>Rivela sempre la carta in cima</translation>
+        <translation>Rivela Sempre la Carta in Cima</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="619"/>
         <source>Always Look At Top Card</source>
-        <translation>Guarda sempre la carta in cima</translation>
+        <translation>Guarda Sempre la Carta in Cima</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="622"/>
         <source>Rotate View Clockwise</source>
-        <translation>Ruota la vista in senso orario</translation>
+        <translation>Ruota Vista in Senso Orario</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="625"/>
         <source>Rotate View Counterclockwise</source>
-        <translation>Ruota la vista in senso antiorario</translation>
+        <translation>Ruota Vista in Senso Antiorario</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="628"/>
         <source>Unfocus Text Box</source>
-        <translation>Non focalizzare il Blocco di Testo</translation>
+        <translation>Togli Focus dalla Casella di Testo</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="631"/>
@@ -9000,22 +9000,22 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="643"/>
         <source>Skip Forward</source>
-        <translation>Salta avanti</translation>
+        <translation>Salta Avanti</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="646"/>
         <source>Skip Backward</source>
-        <translation>Salta indietro</translation>
+        <translation>Salta Indietro</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="649"/>
         <source>Skip Forward by a lot</source>
-        <translation>Salta avanti di molto</translation>
+        <translation>Salta Avanti di Molto</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="652"/>
         <source>Skip Backward by a lot</source>
-        <translation>Salta indietro di molto</translation>
+        <translation>Salta Indietro di Molto</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="655"/>
@@ -9025,7 +9025,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="658"/>
         <source>Toggle Fast Forward</source>
-        <translation>Attiva/disattiva avanzamento rapido</translation>
+        <translation>Attiva/Disattiva Avanzamento Rapido</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="663"/>

@@ -12,12 +12,12 @@
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="200"/>
         <source>Set counter</source>
-        <translation type="unfinished"/>
+        <translation>Podesi brojač</translation>
     </message>
     <message>
         <location filename="src/game/board/abstract_counter.cpp" line="201"/>
         <source>New value for counter &apos;%1&apos;:</source>
-        <translation type="unfinished"/>
+        <translation>Nova vrednost za brojač &apos;%1&apos;:</translation>
     </message>
 </context>
 <context>
@@ -38,12 +38,12 @@
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="232"/>
         <source>Open in new tab</source>
-        <translation type="unfinished"/>
+        <translation>Otvori u novoj kartici</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="261"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"/>
+        <translation>Da li ste sigurni?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="262"/>
@@ -542,17 +542,17 @@ Ovo je samo sačuvano za moderatore i ne može biti viđeno od strane zabranjene
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation type="unfinished"/>
     </message>

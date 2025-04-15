@@ -542,17 +542,17 @@ Informacja ta zachowywana jest dla moderatorów i nie jest widoczna dla zbanowan
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation type="unfinished"/>
     </message>
