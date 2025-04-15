@@ -30,6 +30,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
+#include <QPrinter>
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
