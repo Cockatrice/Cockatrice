@@ -19,9 +19,11 @@ PictureLoaderWorker::PictureLoaderWorker()
       picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false),
       overrideAllCardArtWithPersonalPreference(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference())
 {
-    connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(this, &PictureLoaderWorker::startLoadQueue, this, &PictureLoaderWorker::processLoadQueue,
+            Qt::QueuedConnection);
+    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoaderWorker::picsPathChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this,
+            &PictureLoaderWorker::picDownloadChanged);
     connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
             &PictureLoaderWorker::setOverrideAllCardArtWithPersonalPreference);
 
@@ -43,7 +45,7 @@ PictureLoaderWorker::PictureLoaderWorker()
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+    connect(networkManager, &QNetworkAccessManager::finished, this, &PictureLoaderWorker::picDownloadFinished);
 
     cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();

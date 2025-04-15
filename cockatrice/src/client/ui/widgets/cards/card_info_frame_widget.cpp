@@ -21,7 +21,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
 
     text = new CardInfoTextWidget();
     text->setObjectName("text");
-    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
+    connect(text, &CardInfoTextWidget::linkActivated, this, qOverload<const QString &>(&CardInfoFrameWidget::setCard));
 
     tab1 = new QWidget(this);
     tab2 = new QWidget(this);
@@ -34,7 +34,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     insertTab(ImageOnlyView, tab1, QString());
     insertTab(TextOnlyView, tab2, QString());
     insertTab(ImageAndTextView, tab3, QString());
-    connect(this, SIGNAL(currentChanged(int)), this, SLOT(setViewMode(int)));
+    connect(this, &CardInfoFrameWidget::currentChanged, this, &CardInfoFrameWidget::setViewMode);
 
     tab1Layout = new QVBoxLayout();
     tab1Layout->setObjectName("tab1Layout");
@@ -154,7 +154,7 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
     info = std::move(card);
 
     if (info) {
-        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clearCard()));
+        connect(info.data(), &QObject::destroyed, this, &CardInfoFrameWidget::clearCard);
     }
 
     setViewTransformationButtonVisibility(hasTransformation(info));
