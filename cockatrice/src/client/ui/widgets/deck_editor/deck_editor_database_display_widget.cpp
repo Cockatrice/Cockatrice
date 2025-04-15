@@ -43,7 +43,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
     setFocusPolicy(Qt::ClickFocus);
 
     searchKeySignals.setObjectName("searchKeySignals");
-    connect(searchEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+    connect(searchEdit, &SearchLineEdit::textChanged, this, &DeckEditorDatabaseDisplayWidget::updateSearch);
     connect(&searchKeySignals, &KeySignals::onEnter, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
     connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, this,
             &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
@@ -76,7 +76,8 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
     databaseView->sortByColumn(0, Qt::AscendingOrder);
     databaseView->setModel(databaseDisplayModel);
     databaseView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(databaseView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(databaseCustomMenu(QPoint)));
+    connect(databaseView, &QTreeView::customContextMenuRequested, this,
+            &DeckEditorDatabaseDisplayWidget::databaseCustomMenu);
     connect(databaseView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDatabaseDisplayWidget::updateCard);
     connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
@@ -88,7 +89,8 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
     } else {
         databaseView->header()->restoreState(dbHeaderState);
     }
-    connect(databaseView->header(), SIGNAL(geometriesChanged()), this, SLOT(saveDbHeaderState()));
+    connect(databaseView->header(), &QHeaderView::geometriesChanged, this,
+            &DeckEditorDatabaseDisplayWidget::saveDbHeaderState);
 
     searchEdit->setTreeView(databaseView);
 

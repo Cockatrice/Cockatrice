@@ -68,7 +68,7 @@ void CardInfoPictureWidget::setCard(CardInfoPtr card)
     info = std::move(card);
 
     if (info) {
-        connect(info.data(), SIGNAL(pixmapUpdated()), this, SLOT(updatePixmap()));
+        connect(info.data(), &CardInfo::pixmapUpdated, this, &CardInfoPictureWidget::updatePixmap);
     }
 
     updatePixmap();
