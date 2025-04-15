@@ -24,6 +24,7 @@ struct TokenInfo
     QString pt;
     QString annotation;
     bool destroy = true;
+    bool faceDown = false;
 };
 
 class DlgCreateToken : public QDialog
@@ -36,6 +37,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 private slots:
+    void faceDownCheckBoxToggled(bool checked);
     void tokenSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void updateSearch(const QString &search);
     void actChooseTokenFromAll(bool checked);
@@ -51,6 +53,7 @@ private:
     QComboBox *colorEdit;
     QLineEdit *nameEdit, *ptEdit, *annotationEdit;
     QCheckBox *destroyCheckBox;
+    QCheckBox *faceDownCheckBox;
     QRadioButton *chooseTokenFromAllRadioButton, *chooseTokenFromDeckRadioButton;
     CardInfoPictureWidget *pic;
     QTreeView *chooseTokenView;

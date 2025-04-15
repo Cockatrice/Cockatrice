@@ -249,12 +249,16 @@ void MessageLogWidget::logCreateArrow(Player *player,
     }
 }
 
-void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
+void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt, bool faceDown)
 {
-    appendHtmlServerMessage(tr("%1 creates token: %2%3.")
-                                .arg(sanitizeHtml(player->getName()))
-                                .arg(cardLink(std::move(cardName)))
-                                .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    if (faceDown) {
+        appendHtmlServerMessage(tr("%1 creates face down token.").arg(sanitizeHtml(player->getName())));
+    } else {
+        appendHtmlServerMessage(tr("%1 creates token: %2%3.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(cardLink(std::move(cardName)))
+                                    .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    }
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
@@ -826,8 +830,8 @@ void MessageLogWidget::connectToPlayer(Player *player)
             SLOT(logRollDie(Player *, int, const QList<uint> &)));
     connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
             SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
-    connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this,
-            SLOT(logCreateToken(Player *, QString, QString)));
+    connect(player, SIGNAL(logCreateToken(Player *, QString, QString, bool)), this,
+            SLOT(logCreateToken(Player *, QString, QString, bool)));
     connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this,
             SLOT(logSetCounter(Player *, QString, int, int)));
     connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this,

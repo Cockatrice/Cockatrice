@@ -84,6 +84,7 @@ private:
     bool conceded;
     bool sideboardLocked;
     void revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges);
+    void sendCreateTokenEvents(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord, GameEventStorage &ges);
 
 public:
     mutable QMutex playerMutex;
