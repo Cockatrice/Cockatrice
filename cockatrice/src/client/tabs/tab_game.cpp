@@ -115,11 +115,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     createReplayMenuItems();
     createViewMenuItems();
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &TabGame::refreshShortcuts);
     refreshShortcuts();
     messageLog->logReplayStarted(gameInfo.game_id());
 
-    QTimer::singleShot(0, this, SLOT(loadLayout()));
+    QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor,
@@ -156,14 +157,15 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMenuItems();
     createViewMenuItems();
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &TabGame::refreshShortcuts);
     refreshShortcuts();
 
     // append game to rooms game list for others to see
     for (int i = gameInfo.game_types_size() - 1; i >= 0; i--)
         gameTypes.append(roomGameTypes.find(gameInfo.game_types(i)).value());
 
-    QTimer::singleShot(0, this, SLOT(loadLayout()));
+    QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
 
 void TabGame::addMentionTag(const QString &value)
@@ -628,7 +630,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     }
     scene->addPlayer(newPlayer);
 
-    connect(newPlayer, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
+    connect(newPlayer, &Player::newCardAdded, this, &TabGame::newCardAdded);
     messageLog->connectToPlayer(newPlayer);
 
     if (local && !spectator) {
@@ -636,7 +638,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
             newPlayer->setShortcutsActive();
 
         auto *deckView = new DeckViewContainer(playerId, this);
-        connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SLOT(newCardAdded(AbstractCardItem *)));
+        connect(deckView, &DeckViewContainer::newCardAdded, this, &TabGame::newCardAdded);
         deckViewContainers.insert(playerId, deckView);
         deckViewContainerLayout->addWidget(deckView);
 
@@ -784,8 +786,7 @@ void TabGame::sendGameCommand(PendingCommand *pend, int playerId)
     if (!client)
         return;
 
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(commandFinished(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &TabGame::commandFinished);
     client->sendCommand(pend);
 }
 
@@ -796,8 +797,7 @@ void TabGame::sendGameCommand(const google::protobuf::Message &command, int play
         return;
 
     PendingCommand *pend = prepareGameCommand(command);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(commandFinished(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &TabGame::commandFinished);
     client->sendCommand(pend);
 }
 
@@ -1198,10 +1198,11 @@ void TabGame::eventSetActivePhase(const Event_SetActivePhase &event,
 
 void TabGame::newCardAdded(AbstractCardItem *card)
 {
-    connect(card, SIGNAL(hovered(AbstractCardItem *)), cardInfoFrameWidget, SLOT(setCard(AbstractCardItem *)));
+    connect(card, &AbstractCardItem::hovered, cardInfoFrameWidget,
+            qOverload<AbstractCardItem *>(&CardInfoFrameWidget::setCard));
     connect(card, &AbstractCardItem::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    connect(card, SIGNAL(cardShiftClicked(QString)), this, SLOT(linkCardToChat(QString)));
+    connect(card, &AbstractCardItem::cardShiftClicked, this, &TabGame::linkCardToChat);
 }
 
 CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
@@ -1289,34 +1290,34 @@ void TabGame::updateCardMenu(AbstractCardItem *card)
 void TabGame::createMenuItems()
 {
     aNextPhase = new QAction(this);
-    connect(aNextPhase, SIGNAL(triggered()), this, SLOT(actNextPhase()));
+    connect(aNextPhase, &QAction::triggered, this, &TabGame::actNextPhase);
     aNextPhaseAction = new QAction(this);
-    connect(aNextPhaseAction, SIGNAL(triggered()), this, SLOT(actNextPhaseAction()));
+    connect(aNextPhaseAction, &QAction::triggered, this, &TabGame::actNextPhaseAction);
     aNextTurn = new QAction(this);
-    connect(aNextTurn, SIGNAL(triggered()), this, SLOT(actNextTurn()));
+    connect(aNextTurn, &QAction::triggered, this, &TabGame::actNextTurn);
     aReverseTurn = new QAction(this);
-    connect(aReverseTurn, SIGNAL(triggered()), this, SLOT(actReverseTurn()));
+    connect(aReverseTurn, &QAction::triggered, this, &TabGame::actReverseTurn);
     aRemoveLocalArrows = new QAction(this);
-    connect(aRemoveLocalArrows, SIGNAL(triggered()), this, SLOT(actRemoveLocalArrows()));
+    connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
     aRotateViewCW = new QAction(this);
-    connect(aRotateViewCW, SIGNAL(triggered()), this, SLOT(actRotateViewCW()));
+    connect(aRotateViewCW, &QAction::triggered, this, &TabGame::actRotateViewCW);
     aRotateViewCCW = new QAction(this);
-    connect(aRotateViewCCW, SIGNAL(triggered()), this, SLOT(actRotateViewCCW()));
+    connect(aRotateViewCCW, &QAction::triggered, this, &TabGame::actRotateViewCCW);
     aGameInfo = new QAction(this);
-    connect(aGameInfo, SIGNAL(triggered()), this, SLOT(actGameInfo()));
+    connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
     aConcede = new QAction(this);
-    connect(aConcede, SIGNAL(triggered()), this, SLOT(actConcede()));
+    connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
     aLeaveGame = new QAction(this);
     connect(aLeaveGame, &QAction::triggered, this, [this] { closeRequest(); });
     aFocusChat = new QAction(this);
-    connect(aFocusChat, SIGNAL(triggered()), sayEdit, SLOT(setFocus()));
+    connect(aFocusChat, &QAction::triggered, sayEdit, qOverload<>(&LineEditCompleter::setFocus));
     aCloseReplay = nullptr;
 
     phasesMenu = new TearOffMenu(this);
 
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         QAction *temp = new QAction(QString(), this);
-        connect(temp, SIGNAL(triggered()), this, SLOT(actPhaseAction()));
+        connect(temp, &QAction::triggered, this, &TabGame::actPhaseAction);
         phasesMenu->addAction(temp);
         phaseActions.append(temp);
     }
@@ -1375,40 +1376,40 @@ void TabGame::createViewMenuItems()
 
     aCardInfoDockVisible = cardInfoDockMenu->addAction(QString());
     aCardInfoDockVisible->setCheckable(true);
-    connect(aCardInfoDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aCardInfoDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
     aCardInfoDockFloating = cardInfoDockMenu->addAction(QString());
     aCardInfoDockFloating->setCheckable(true);
-    connect(aCardInfoDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aCardInfoDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
 
     aMessageLayoutDockVisible = messageLayoutDockMenu->addAction(QString());
     aMessageLayoutDockVisible->setCheckable(true);
-    connect(aMessageLayoutDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aMessageLayoutDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
     aMessageLayoutDockFloating = messageLayoutDockMenu->addAction(QString());
     aMessageLayoutDockFloating->setCheckable(true);
-    connect(aMessageLayoutDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aMessageLayoutDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
 
     aPlayerListDockVisible = playerListDockMenu->addAction(QString());
     aPlayerListDockVisible->setCheckable(true);
-    connect(aPlayerListDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aPlayerListDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
     aPlayerListDockFloating = playerListDockMenu->addAction(QString());
     aPlayerListDockFloating->setCheckable(true);
-    connect(aPlayerListDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aPlayerListDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
 
     if (replayDock) {
         replayDockMenu = viewMenu->addMenu(QString());
 
         aReplayDockVisible = replayDockMenu->addAction(QString());
         aReplayDockVisible->setCheckable(true);
-        connect(aReplayDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+        connect(aReplayDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
         aReplayDockFloating = replayDockMenu->addAction(QString());
         aReplayDockFloating->setCheckable(true);
-        connect(aReplayDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+        connect(aReplayDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
     }
 
     viewMenu->addSeparator();
 
     aResetLayout = viewMenu->addAction(QString());
-    connect(aResetLayout, SIGNAL(triggered()), this, SLOT(actResetLayout()));
+    connect(aResetLayout, &QAction::triggered, this, &TabGame::actResetLayout);
     viewMenu->addAction(aResetLayout);
 
     addTabMenu(viewMenu);
@@ -1459,7 +1460,7 @@ void TabGame::loadLayout()
         aReplayDockFloating->setChecked(replayDock->isFloating());
     }
 
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+    QTimer::singleShot(100, this, &TabGame::freeDocksSize);
 }
 
 void TabGame::freeDocksSize()
@@ -1525,15 +1526,15 @@ void TabGame::actResetLayout()
         playerListDock->setMaximumSize(250, 50);
     }
 
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+    QTimer::singleShot(100, this, &TabGame::freeDocksSize);
 }
 
 void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay)
-        connect(phasesToolbar, SIGNAL(sendGameCommand(const ::google::protobuf::Message &, int)), this,
-                SLOT(sendGameCommand(const ::google::protobuf::Message &, int)));
+        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, this,
+                qOverload<const ::google::protobuf::Message &, int>(&TabGame::sendGameCommand));
     scene = new GameScene(phasesToolbar, this);
     gameView = new GameView(scene);
 
@@ -1551,9 +1552,8 @@ void TabGame::createReplayDock()
     // timeline widget
     timelineWidget = new ReplayTimelineWidget;
     timelineWidget->setTimeline(replayTimeline);
-    connect(timelineWidget, SIGNAL(processNextEvent(Player::EventProcessingOptions)), this,
-            SLOT(replayNextEvent(Player::EventProcessingOptions)));
-    connect(timelineWidget, SIGNAL(replayFinished()), this, SLOT(replayFinished()));
+    connect(timelineWidget, &ReplayTimelineWidget::processNextEvent, this, &TabGame::replayNextEvent);
+    connect(timelineWidget, &ReplayTimelineWidget::replayFinished, this, &TabGame::replayFinished);
     connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &TabGame::replayRewind);
 
     // timeline skip shortcuts
@@ -1585,13 +1585,13 @@ void TabGame::createReplayDock()
     playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
     replayPlayButton->setIcon(playButtonIcon);
     replayPlayButton->setCheckable(true);
-    connect(replayPlayButton, SIGNAL(toggled(bool)), this, SLOT(replayPlayButtonToggled(bool)));
+    connect(replayPlayButton, &QToolButton::toggled, this, &TabGame::replayPlayButtonToggled);
 
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
     replayFastForwardButton->setCheckable(true);
-    connect(replayFastForwardButton, SIGNAL(toggled(bool)), this, SLOT(replayFastForwardButtonToggled(bool)));
+    connect(replayFastForwardButton, &QToolButton::toggled, this, &TabGame::replayFastForwardButtonToggled);
 
     // putting everything together
     replayControlLayout = new QHBoxLayout;
@@ -1611,7 +1611,7 @@ void TabGame::createReplayDock()
     replayDock->setFloating(false);
 
     replayDock->installEventFilter(this);
-    connect(replayDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+    connect(replayDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)
@@ -1652,7 +1652,7 @@ void TabGame::createCardInfoDock(bool bReplay)
     cardInfoDock->setFloating(false);
 
     cardInfoDock->installEventFilter(this);
-    connect(cardInfoDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+    connect(cardInfoDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createPlayerListDock(bool bReplay)
@@ -1674,26 +1674,28 @@ void TabGame::createPlayerListDock(bool bReplay)
     playerListDock->setFloating(false);
 
     playerListDock->installEventFilter(this);
-    connect(playerListDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+    connect(playerListDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createMessageDock(bool bReplay)
 {
     messageLog = new MessageLogWidget(tabSupervisor, this);
-    connect(messageLog, SIGNAL(cardNameHovered(QString)), cardInfoFrameWidget, SLOT(setCard(QString)));
+    connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
+            qOverload<const QString &>(&CardInfoFrameWidget::setCard));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
-    connect(messageLog, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
+    connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
 
     if (!bReplay) {
-        connect(messageLog, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
-        connect(messageLog, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
-        connect(&SettingsCache::instance(), SIGNAL(chatMentionCompleterChanged()), this, SLOT(actCompleterChanged()));
+        connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
+        connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
+        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+                &TabGame::actCompleterChanged);
 
         timeElapsedLabel = new QLabel;
         timeElapsedLabel->setAlignment(Qt::AlignCenter);
         gameTimer = new QTimer(this);
         gameTimer->setInterval(1000);
-        connect(gameTimer, SIGNAL(timeout()), this, SLOT(incrementGameTime()));
+        connect(gameTimer, &QTimer::timeout, this, &TabGame::incrementGameTime);
         gameTimer->start();
 
         sayLabel = new QLabel;
@@ -1721,8 +1723,8 @@ void TabGame::createMessageDock(bool bReplay)
             }
         }
 
-        connect(tabSupervisor, SIGNAL(adminLockChanged(bool)), this, SLOT(adminLockChanged(bool)));
-        connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(actSay()));
+        connect(tabSupervisor, &TabSupervisor::adminLockChanged, this, &TabGame::adminLockChanged);
+        connect(sayEdit, &LineEditCompleter::returnPressed, this, &TabGame::actSay);
 
         sayHLayout = new QHBoxLayout;
         sayHLayout->addWidget(sayLabel);
@@ -1748,7 +1750,7 @@ void TabGame::createMessageDock(bool bReplay)
     messageLayoutDock->setFloating(false);
 
     messageLayoutDock->installEventFilter(this);
-    connect(messageLayoutDock, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+    connect(messageLayoutDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::hideEvent(QHideEvent *event)

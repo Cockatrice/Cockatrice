@@ -6,10 +6,10 @@
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
     aNewDeck = new QAction(QString(), this);
-    connect(aNewDeck, SIGNAL(triggered()), deckEditor, SLOT(actNewDeck()));
+    connect(aNewDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actNewDeck);
 
     aLoadDeck = new QAction(QString(), this);
-    connect(aLoadDeck, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeck()));
+    connect(aLoadDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeck);
 
     loadRecentDeckMenu = new QMenu(this);
     connect(&SettingsCache::instance().recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
@@ -21,47 +21,50 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     updateRecentlyOpened();
 
     aSaveDeck = new QAction(QString(), this);
-    connect(aSaveDeck, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeck()));
+    connect(aSaveDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actSaveDeck);
 
     aSaveDeckAs = new QAction(QString(), this);
-    connect(aSaveDeckAs, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckAs()));
+    connect(aSaveDeckAs, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actSaveDeckAs);
 
     aLoadDeckFromClipboard = new QAction(QString(), this);
-    connect(aLoadDeckFromClipboard, SIGNAL(triggered()), deckEditor, SLOT(actLoadDeckFromClipboard()));
+    connect(aLoadDeckFromClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeckFromClipboard);
 
     aEditDeckInClipboard = new QAction(QString(), this);
-    connect(aEditDeckInClipboard, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboard()));
+    connect(aEditDeckInClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actEditDeckInClipboard);
 
     aEditDeckInClipboardRaw = new QAction(QString(), this);
-    connect(aEditDeckInClipboardRaw, SIGNAL(triggered()), deckEditor, SLOT(actEditDeckInClipboardRaw()));
+    connect(aEditDeckInClipboardRaw, &QAction::triggered, deckEditor,
+            &AbstractTabDeckEditor::actEditDeckInClipboardRaw);
 
     aSaveDeckToClipboard = new QAction(QString(), this);
-    connect(aSaveDeckToClipboard, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboard()));
+    connect(aSaveDeckToClipboard, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actSaveDeckToClipboard);
 
     aSaveDeckToClipboardNoSetInfo = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardNoSetInfo, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboardNoSetInfo()));
+    connect(aSaveDeckToClipboardNoSetInfo, &QAction::triggered, deckEditor,
+            &AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo);
 
     aSaveDeckToClipboardRaw = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardRaw, SIGNAL(triggered()), deckEditor, SLOT(actSaveDeckToClipboardRaw()));
+    connect(aSaveDeckToClipboardRaw, &QAction::triggered, deckEditor,
+            &AbstractTabDeckEditor::actSaveDeckToClipboardRaw);
 
     aSaveDeckToClipboardRawNoSetInfo = new QAction(QString(), this);
-    connect(aSaveDeckToClipboardRawNoSetInfo, SIGNAL(triggered()), deckEditor,
-            SLOT(actSaveDeckToClipboardRawNoSetInfo()));
+    connect(aSaveDeckToClipboardRawNoSetInfo, &QAction::triggered, deckEditor,
+            &AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo);
 
     aPrintDeck = new QAction(QString(), this);
-    connect(aPrintDeck, SIGNAL(triggered()), deckEditor, SLOT(actPrintDeck()));
+    connect(aPrintDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actPrintDeck);
 
     aExportDeckDecklist = new QAction(QString(), this);
-    connect(aExportDeckDecklist, SIGNAL(triggered()), deckEditor, SLOT(actExportDeckDecklist()));
+    connect(aExportDeckDecklist, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actExportDeckDecklist);
 
     aExportDeckDecklistXyz = new QAction(QString(), this);
-    connect(aExportDeckDecklistXyz, SIGNAL(triggered()), deckEditor, SLOT(actExportDeckDecklistXyz()));
+    connect(aExportDeckDecklistXyz, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actExportDeckDecklistXyz);
 
     aAnalyzeDeckDeckstats = new QAction(QString(), this);
-    connect(aAnalyzeDeckDeckstats, SIGNAL(triggered()), deckEditor, SLOT(actAnalyzeDeckDeckstats()));
+    connect(aAnalyzeDeckDeckstats, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actAnalyzeDeckDeckstats);
 
     aAnalyzeDeckTappedout = new QAction(QString(), this);
-    connect(aAnalyzeDeckTappedout, SIGNAL(triggered()), deckEditor, SLOT(actAnalyzeDeckTappedout()));
+    connect(aAnalyzeDeckTappedout, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actAnalyzeDeckTappedout);
 
     analyzeDeckMenu = new QMenu(this);
     analyzeDeckMenu->addAction(aExportDeckDecklist);
@@ -102,7 +105,8 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addAction(aClose);
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &DeckEditorMenu::refreshShortcuts);
     refreshShortcuts();
 }
 
