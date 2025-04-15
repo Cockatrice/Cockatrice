@@ -10,7 +10,7 @@ LocalClient::LocalClient(LocalServerInterface *_lsi,
                          QObject *parent)
     : AbstractClient(parent), lsi(_lsi)
 {
-    connect(lsi, SIGNAL(itemToClient(const ServerMessage &)), this, SLOT(itemFromServer(const ServerMessage &)));
+    connect(lsi, &LocalServerInterface::itemToClient, this, &LocalClient::itemFromServer);
 
     userName = _playerName;
 
