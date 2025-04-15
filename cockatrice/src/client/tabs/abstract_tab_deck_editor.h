@@ -44,6 +44,8 @@ class AbstractTabDeckEditor : public Tab
 {
     Q_OBJECT
 
+    friend class DeckEditorMenu;
+
 public:
     explicit AbstractTabDeckEditor(TabSupervisor *_tabSupervisor);
 
