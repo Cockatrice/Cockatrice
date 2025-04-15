@@ -25,6 +25,7 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
+#include "tab_visual_database_display.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
@@ -134,6 +135,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabVisualDeckStorage->setCheckable(true);
     connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
 
+    aTabVisualDatabaseDisplay = new QAction(this);
+    connect(aTabVisualDatabaseDisplay, &QAction::triggered, this, [this] { addVisualDatabaseDisplayTab(); });
+
     aTabServer = new QAction(this);
     aTabServer->setCheckable(true);
     connect(aTabServer, &QAction::triggered, this, &TabSupervisor::actTabServer);
@@ -177,6 +181,7 @@ void TabSupervisor::retranslateUi()
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
+    aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
     aTabDeckStorage->setText(tr("Deck Storage"));
@@ -372,6 +377,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
+    tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabDeckStorage);
     tabsMenu->addAction(aTabReplays);
 }
@@ -800,6 +806,14 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabVisualDatabaseDisplay *TabSupervisor::addVisualDatabaseDisplayTab()
+{
+    auto *tab = new TabVisualDatabaseDisplay(this);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }

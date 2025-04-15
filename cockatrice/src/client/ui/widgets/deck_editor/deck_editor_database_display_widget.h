@@ -22,6 +22,7 @@ public:
     CardDatabaseDisplayModel *databaseDisplayModel;
 
 public slots:
+    void showSearchSyntaxHelp();
     CardInfoPtr currentCardInfo() const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();

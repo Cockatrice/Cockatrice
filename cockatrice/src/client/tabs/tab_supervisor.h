@@ -5,6 +5,7 @@
 #include "../../server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
+#include "tab_visual_database_display.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -91,8 +92,8 @@ private:
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays,
-        *aTabAdmin, *aTabLog;
+    QAction *aTabDeckEditor, *aTabVisualDeckStorage, *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount,
+        *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -149,6 +150,7 @@ signals:
 
 public slots:
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
+    TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void maximizeMainWindow();
