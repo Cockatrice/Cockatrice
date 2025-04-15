@@ -69,11 +69,16 @@ protected slots:
     void updateSearch(const QString &search) const;
 
 private:
-    SettingsButtonWidget *quickFilterWidget;
+    QWidget *filterContainer;
+    QHBoxLayout *filterContainerLayout;
+    SettingsButtonWidget *quickFilterSaveLoadWidget;
     VisualDatabaseDisplayFilterSaveLoadWidget *saveLoadWidget;
+    SettingsButtonWidget *quickFilterNameWidget;
     VisualDatabaseDisplayNameFilterWidget *nameFilterWidget;
     VisualDatabaseDisplayMainTypeFilterWidget *mainTypeFilterWidget;
+    SettingsButtonWidget *quickFilterSubTypeWidget;
     VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
+    SettingsButtonWidget *quickFilterSetWidget;
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     KeySignals searchKeySignals;
     AbstractTabDeckEditor *deckEditor;
@@ -88,7 +93,6 @@ private:
     QVBoxLayout *overlapCategoriesLayout;
     OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
-    QWidget *container;
     QTimer *debounceTimer;
     QTimer *loadCardsTimer;
 
