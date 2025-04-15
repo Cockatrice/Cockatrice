@@ -26,6 +26,11 @@ void SettingsButtonWidget::addSettingsWidget(QWidget *toAdd) const
     popup->addSettingsWidget(toAdd);
 }
 
+void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
+{
+    button->setIcon(iconMap);
+}
+
 void SettingsButtonWidget::togglePopup()
 {
     if (popup->isVisible()) {

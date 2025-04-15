@@ -91,27 +91,42 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
-    quickFilterWidget = new SettingsButtonWidget(this);
+    filterContainer = new QWidget(this);
+    filterContainerLayout = new QHBoxLayout(filterContainer);
+    filterContainer->setLayout(filterContainerLayout);
 
+    quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
+    quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
+    quickFilterNameWidget = new SettingsButtonWidget(this);
+    quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/rename"));
     nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
     mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+    quickFilterSubTypeWidget = new SettingsButtonWidget(this);
+    quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/player"));
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
+    quickFilterSetWidget = new SettingsButtonWidget(this);
+    quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scales"));
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+    filterContainer->setMaximumHeight(80);
 
-    quickFilterWidget->addSettingsWidget(saveLoadWidget);
-    quickFilterWidget->addSettingsWidget(nameFilterWidget);
-    // quickFilterWidget->addSettingsWidget(mainTypeFilterWidget);
-    quickFilterWidget->addSettingsWidget(subTypeFilterWidget);
-    quickFilterWidget->addSettingsWidget(setFilterWidget);
+    quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
+    quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
+    quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
+    quickFilterSetWidget->addSettingsWidget(setFilterWidget);
+
+    filterContainerLayout->addWidget(mainTypeFilterWidget);
+    filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
+    filterContainerLayout->addWidget(quickFilterNameWidget);
+    filterContainerLayout->addWidget(quickFilterSubTypeWidget);
+    filterContainerLayout->addWidget(quickFilterSetWidget);
 
     searchLayout->addWidget(colorFilterWidget);
-    searchLayout->addWidget(quickFilterWidget);
     searchLayout->addWidget(searchEdit);
 
     mainLayout->addWidget(searchContainer);
 
-    mainLayout->addWidget(mainTypeFilterWidget);
+    mainLayout->addWidget(filterContainer);
 
     mainLayout->addWidget(flowWidget);
 
