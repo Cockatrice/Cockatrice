@@ -65,7 +65,8 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
             &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
 
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &AbstractTabDeckEditor::refreshShortcuts);
 }
 
 void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
@@ -337,8 +338,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(saveDeckRemoteFinished(Response)));
+        connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
         tabSupervisor->getClient()->sendCommand(pend);
 
         return true;
@@ -457,7 +457,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckDockWidget->deckModel, SLOT(printDeckList(QPrinter *)));
+    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
     dlg->exec();
 }
 

@@ -21,7 +21,7 @@ TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 #endif
 
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
+    connect(networkManager, &QNetworkAccessManager::finished, this, &TabEdhRec::processApiJson);
 }
 
 void TabEdhRec::retranslateUi()

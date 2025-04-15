@@ -67,36 +67,36 @@ void TabDeckEditor::createMenus()
 
     aCardInfoDockVisible = cardInfoDockMenu->addAction(QString());
     aCardInfoDockVisible->setCheckable(true);
-    connect(aCardInfoDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aCardInfoDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
     aCardInfoDockFloating = cardInfoDockMenu->addAction(QString());
     aCardInfoDockFloating->setCheckable(true);
-    connect(aCardInfoDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aCardInfoDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
     aDeckDockVisible = deckDockMenu->addAction(QString());
     aDeckDockVisible->setCheckable(true);
-    connect(aDeckDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aDeckDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
     aDeckDockFloating = deckDockMenu->addAction(QString());
     aDeckDockFloating->setCheckable(true);
-    connect(aDeckDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aDeckDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
     aFilterDockVisible = filterDockMenu->addAction(QString());
     aFilterDockVisible->setCheckable(true);
-    connect(aFilterDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aFilterDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
     aFilterDockFloating = filterDockMenu->addAction(QString());
     aFilterDockFloating->setCheckable(true);
-    connect(aFilterDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aFilterDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
     aPrintingSelectorDockVisible = printingSelectorDockMenu->addAction(QString());
     aPrintingSelectorDockVisible->setCheckable(true);
-    connect(aPrintingSelectorDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
+    connect(aPrintingSelectorDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
     aPrintingSelectorDockFloating = printingSelectorDockMenu->addAction(QString());
     aPrintingSelectorDockFloating->setCheckable(true);
-    connect(aPrintingSelectorDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
+    connect(aPrintingSelectorDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
     viewMenu->addSeparator();
 
     aResetLayout = viewMenu->addAction(QString());
-    connect(aResetLayout, SIGNAL(triggered()), this, SLOT(restartLayout()));
+    connect(aResetLayout, &QAction::triggered, this, &TabDeckEditor::restartLayout);
     viewMenu->addAction(aResetLayout);
 
     deckMenu->setSaveStatus(false);
@@ -200,7 +200,7 @@ void TabDeckEditor::loadLayout()
     databaseDisplayDockWidget->setMinimumSize(100, 100);
     databaseDisplayDockWidget->setMaximumSize(1400, 5000);
 
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+    QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
 }
 
 void TabDeckEditor::restartLayout()
@@ -236,7 +236,7 @@ void TabDeckEditor::restartLayout()
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Vertical);
 
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+    QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
 }
 
 void TabDeckEditor::freeDocksSize()

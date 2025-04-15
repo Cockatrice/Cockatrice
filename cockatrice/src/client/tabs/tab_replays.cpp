@@ -96,8 +96,8 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     // Left side actions
     aOpenLocalReplay = new QAction(this);
     aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
-    connect(aOpenLocalReplay, SIGNAL(triggered()), this, SLOT(actOpenLocalReplay()));
-    connect(localDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenLocalReplay()));
+    connect(aOpenLocalReplay, &QAction::triggered, this, &TabReplays::actOpenLocalReplay);
+    connect(localDirView, &QTreeView::doubleClicked, this, &TabReplays::actOpenLocalReplay);
     aRenameLocal = new QAction(this);
     aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
     connect(aRenameLocal, &QAction::triggered, this, &TabReplays::actRenameLocal);
@@ -106,7 +106,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
     aDeleteLocalReplay = new QAction(this);
     aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aDeleteLocalReplay, SIGNAL(triggered()), this, SLOT(actDeleteLocalReplay()));
+    connect(aDeleteLocalReplay, &QAction::triggered, this, &TabReplays::actDeleteLocalReplay);
 
     aOpenReplaysFolder = new QAction(this);
     aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
@@ -115,17 +115,17 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     // Right side actions
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
-    connect(aOpenRemoteReplay, SIGNAL(triggered()), this, SLOT(actOpenRemoteReplay()));
-    connect(serverDirView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actOpenRemoteReplay()));
+    connect(aOpenRemoteReplay, &QAction::triggered, this, &TabReplays::actOpenRemoteReplay);
+    connect(serverDirView, &QTreeView::doubleClicked, this, &TabReplays::actOpenRemoteReplay);
     aDownload = new QAction(this);
     aDownload->setIcon(QPixmap("theme:icons/arrow_left_green"));
-    connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
+    connect(aDownload, &QAction::triggered, this, &TabReplays::actDownload);
     aKeep = new QAction(this);
     aKeep->setIcon(QPixmap("theme:icons/lock"));
-    connect(aKeep, SIGNAL(triggered()), this, SLOT(actKeepRemoteReplay()));
+    connect(aKeep, &QAction::triggered, this, &TabReplays::actKeepRemoteReplay);
     aDeleteRemoteReplay = new QAction(this);
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aDeleteRemoteReplay, SIGNAL(triggered()), this, SLOT(actDeleteRemoteReplay()));
+    connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
 
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalReplay);
@@ -146,8 +146,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
 
-    connect(client, SIGNAL(replayAddedEventReceived(const Event_ReplayAdded &)), this,
-            SLOT(replayAddedEventReceived(const Event_ReplayAdded &)));
+    connect(client, &AbstractClient::replayAddedEventReceived, this, &TabReplays::replayAddedEventReceived);
 
     connect(client, &AbstractClient::userInfoChanged, this, &TabReplays::handleConnected);
     connect(client, &AbstractClient::statusChanged, this, &TabReplays::handleConnectionChanged);
@@ -323,8 +322,7 @@ void TabReplays::actOpenRemoteReplay()
         cmd.set_replay_id(curRight->replay_id());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(openRemoteReplayFinished(const Response &)));
+        connect(pend, &PendingCommand::finished, this, &TabReplays::openRemoteReplayFinished);
         client->sendCommand(pend);
     }
 }
@@ -378,8 +376,7 @@ void TabReplays::downloadNodeAtIndex(const QModelIndex &curLeft, const QModelInd
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(filePath);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        connect(pend, &PendingCommand::finished, this, &TabReplays::downloadFinished);
         client->sendCommand(pend);
     }
     // node at index was invalid
@@ -416,8 +413,7 @@ void TabReplays::actKeepRemoteReplay()
         cmd.set_do_not_hide(!curRight->do_not_hide());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(keepRemoteReplayFinished(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &TabReplays::keepRemoteReplayFinished);
         client->sendCommand(pend);
     }
 }
@@ -455,8 +451,7 @@ void TabReplays::actDeleteRemoteReplay()
         cmd.set_game_id(curRight->game_id());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(deleteRemoteReplayFinished(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &TabReplays::deleteRemoteReplayFinished);
         client->sendCommand(pend);
     }
 }

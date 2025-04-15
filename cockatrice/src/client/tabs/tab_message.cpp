@@ -28,11 +28,11 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
 {
     chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
-    connect(chatView, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
-    connect(chatView, SIGNAL(addMentionTag(QString)), this, SLOT(addMentionTag(QString)));
+    connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabMessage::deleteCardInfoPopup);
+    connect(chatView, &ChatView::addMentionTag, this, &TabMessage::addMentionTag);
     sayEdit = new LineEditUnfocusable;
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
-    connect(sayEdit, SIGNAL(returnPressed()), this, SLOT(sendMessage()));
+    connect(sayEdit, &LineEditUnfocusable::returnPressed, this, &TabMessage::sendMessage);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(chatView);
@@ -102,7 +102,7 @@ void TabMessage::sendMessage()
     cmd.set_message(sayEdit->text().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(messageSent(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &TabMessage::messageSent);
     client->sendCommand(pend);
 
     sayEdit->clear();
@@ -140,10 +140,10 @@ bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event)
 void TabMessage::showSystemPopup(const Event_UserMessage &event)
 {
     if (trayIcon) {
-        disconnect(trayIcon, SIGNAL(messageClicked()), 0, 0);
+        disconnect(trayIcon, &QSystemTrayIcon::messageClicked, 0, 0);
         trayIcon->showMessage(tr("Private message from") + " " + otherUserInfo->name().c_str(),
                               event.message().c_str());
-        connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
+        connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &TabMessage::messageClicked);
     } else {
         qCWarning(TabMessageLog) << "Error: trayIcon is NULL. TabMessage::showSystemPopup failed";
     }

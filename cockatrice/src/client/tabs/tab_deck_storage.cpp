@@ -105,19 +105,19 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     // Left side actions
     aOpenLocalDeck = new QAction(this);
     aOpenLocalDeck->setIcon(QPixmap("theme:icons/pencil"));
-    connect(aOpenLocalDeck, SIGNAL(triggered()), this, SLOT(actOpenLocalDeck()));
+    connect(aOpenLocalDeck, &QAction::triggered, this, &TabDeckStorage::actOpenLocalDeck);
     aRenameLocal = new QAction(this);
     aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
     connect(aRenameLocal, &QAction::triggered, this, &TabDeckStorage::actRenameLocal);
     aUpload = new QAction(this);
     aUpload->setIcon(QPixmap("theme:icons/arrow_right_green"));
-    connect(aUpload, SIGNAL(triggered()), this, SLOT(actUpload()));
+    connect(aUpload, &QAction::triggered, this, &TabDeckStorage::actUpload);
     aNewLocalFolder = new QAction(this);
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabDeckStorage::actNewLocalFolder);
     aDeleteLocalDeck = new QAction(this);
     aDeleteLocalDeck->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aDeleteLocalDeck, SIGNAL(triggered()), this, SLOT(actDeleteLocalDeck()));
+    connect(aDeleteLocalDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteLocalDeck);
 
     aOpenDecksFolder = new QAction(this);
     aOpenDecksFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
@@ -126,16 +126,16 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     // Right side actions
     aOpenRemoteDeck = new QAction(this);
     aOpenRemoteDeck->setIcon(QPixmap("theme:icons/pencil"));
-    connect(aOpenRemoteDeck, SIGNAL(triggered()), this, SLOT(actOpenRemoteDeck()));
+    connect(aOpenRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actOpenRemoteDeck);
     aDownload = new QAction(this);
     aDownload->setIcon(QPixmap("theme:icons/arrow_left_green"));
-    connect(aDownload, SIGNAL(triggered()), this, SLOT(actDownload()));
+    connect(aDownload, &QAction::triggered, this, &TabDeckStorage::actDownload);
     aNewFolder = new QAction(this);
     aNewFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
-    connect(aNewFolder, SIGNAL(triggered()), this, SLOT(actNewFolder()));
+    connect(aNewFolder, &QAction::triggered, this, &TabDeckStorage::actNewFolder);
     aDeleteRemoteDeck = new QAction(this);
     aDeleteRemoteDeck->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aDeleteRemoteDeck, SIGNAL(triggered()), this, SLOT(actDeleteRemoteDeck()));
+    connect(aDeleteRemoteDeck, &QAction::triggered, this, &TabDeckStorage::actDeleteRemoteDeck);
 
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
@@ -339,8 +339,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     cmd.set_deck_list(deckString.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(uploadFinished(Response, CommandContainer)));
+    connect(pend, &PendingCommand::finished, this, &TabDeckStorage::uploadFinished);
     client->sendCommand(pend);
 }
 
@@ -421,8 +420,7 @@ void TabDeckStorage::actOpenRemoteDeck()
         cmd.set_deck_id(node->getId());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(openRemoteDeckFinished(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::openRemoteDeckFinished);
         client->sendCommand(pend);
     }
 }
@@ -479,8 +477,7 @@ void TabDeckStorage::downloadNodeAtIndex(const QModelIndex &curLeft, const QMode
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(filePath);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(downloadFinished(Response, CommandContainer, QVariant)));
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::downloadFinished);
         client->sendCommand(pend);
     }
     // node at index is invalid
@@ -522,8 +519,7 @@ void TabDeckStorage::actNewFolder()
     cmd.set_dir_name(folder);
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(newFolderFinished(Response, CommandContainer)));
+    connect(pend, &PendingCommand::finished, this, &TabDeckStorage::newFolderFinished);
     client->sendCommand(pend);
 }
 
@@ -573,15 +569,13 @@ void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curR
         Command_DeckDelDir cmd;
         cmd.set_path(targetPath.toStdString());
         pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(deleteFolderFinished(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteFolderFinished);
     } else {
         const auto *deckNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(curRight);
         Command_DeckDel cmd;
         cmd.set_deck_id(deckNode->getId());
         pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(deleteDeckFinished(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &TabDeckStorage::deleteDeckFinished);
     }
 
     client->sendCommand(pend);
