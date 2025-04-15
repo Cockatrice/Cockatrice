@@ -32,22 +32,22 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     filterView->setHeaderHidden(true);
     filterView->setContextMenuPolicy(Qt::CustomContextMenu);
     filterView->installEventFilter(&filterViewKeySignals);
-    connect(filterModel, SIGNAL(layoutChanged()), filterView, SLOT(expandAll()));
-    connect(filterView, SIGNAL(customContextMenuRequested(const QPoint &)), this,
-            SLOT(filterViewCustomContextMenu(const QPoint &)));
-    connect(&filterViewKeySignals, SIGNAL(onDelete()), this, SLOT(actClearFilterOne()));
+    connect(filterModel, &FilterTreeModel::layoutChanged, filterView, &QTreeView::expandAll);
+    connect(filterView, &QTreeView::customContextMenuRequested, this,
+            &DeckEditorFilterDockWidget::filterViewCustomContextMenu);
+    connect(&filterViewKeySignals, &KeySignals::onDelete, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     auto *filterBuilder = new FilterBuilder;
     filterBuilder->setObjectName("filterBuilder");
-    connect(filterBuilder, SIGNAL(add(const CardFilter *)), filterModel, SLOT(addFilter(const CardFilter *)));
+    connect(filterBuilder, &FilterBuilder::add, filterModel, &FilterTreeModel::addFilter);
 
     aClearFilterOne = new QAction(QString(), this);
     aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aClearFilterOne, SIGNAL(triggered()), this, SLOT(actClearFilterOne()));
+    connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);
     aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
-    connect(aClearFilterAll, SIGNAL(triggered()), this, SLOT(actClearFilterAll()));
+    connect(aClearFilterAll, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterAll);
 
     auto *filterDelOne = new QToolButton();
     filterDelOne->setObjectName("filterDelOne");

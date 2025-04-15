@@ -117,7 +117,7 @@ void LineEditCompleter::setCompleter(QCompleter *completer)
 {
     c = completer;
     c->setWidget(this);
-    connect(c, SIGNAL(activated(QString)), this, SLOT(insertCompletion(QString)));
+    connect(c, qOverload<const QString &>(&QCompleter::activated), this, &LineEditCompleter::insertCompletion);
 }
 
 void LineEditCompleter::setCompletionList(QStringList completionList)

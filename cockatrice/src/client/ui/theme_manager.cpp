@@ -24,7 +24,7 @@ static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
-    connect(&SettingsCache::instance(), SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ThemeManager::themeChangedSlot);
     themeChangedSlot();
 }
 

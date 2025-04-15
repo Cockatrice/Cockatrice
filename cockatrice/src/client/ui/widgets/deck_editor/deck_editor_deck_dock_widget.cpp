@@ -20,7 +20,7 @@ DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent
     setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
     installEventFilter(deckEditor);
-    connect(this, SIGNAL(topLevelChanged(bool)), deckEditor, SLOT(dockTopLevelChanged(bool)));
+    connect(this, &DeckEditorDeckDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
     createDeckDock();
 }
 
@@ -28,7 +28,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 {
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
-    connect(deckModel, SIGNAL(deckHashChanged()), this, SLOT(updateHash()));
+    connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
     deckView = new QTreeView();
     deckView->setObjectName("deckView");
     deckView->setModel(deckModel);
@@ -41,15 +41,15 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
-    connect(deckView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(actSwapCard()));
-    connect(deckView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(decklistCustomMenu(QPoint)));
-    connect(&deckViewKeySignals, SIGNAL(onShiftS()), this, SLOT(actSwapCard()));
-    connect(&deckViewKeySignals, SIGNAL(onEnter()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementSelection()));
-    connect(&deckViewKeySignals, SIGNAL(onShiftRight()), this, SLOT(actIncrement()));
-    connect(&deckViewKeySignals, SIGNAL(onShiftLeft()), this, SLOT(actDecrementSelection()));
-    connect(&deckViewKeySignals, SIGNAL(onDelete()), this, SLOT(actRemoveCard()));
+    connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapCard);
+    connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
+    connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapCard);
+    connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onCtrlAltMinus, this, &DeckEditorDeckDockWidget::actDecrementSelection);
+    connect(&deckViewKeySignals, &KeySignals::onShiftRight, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onShiftLeft, this, &DeckEditorDeckDockWidget::actDecrementSelection);
+    connect(&deckViewKeySignals, &KeySignals::onDelete, this, &DeckEditorDeckDockWidget::actRemoveCard);
 
     nameLabel = new QLabel();
     nameLabel->setObjectName("nameLabel");
@@ -57,7 +57,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->setObjectName("nameEdit");
     nameLabel->setBuddy(nameEdit);
-    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateName(const QString &)));
+    connect(nameEdit, &LineEditUnfocusable::textChanged, this, &DeckEditorDeckDockWidget::updateName);
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
@@ -65,7 +65,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     commentsEdit->setMinimumHeight(nameEdit->minimumSizeHint().height());
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
-    connect(commentsEdit, SIGNAL(textChanged()), this, SLOT(updateComments()));
+    connect(commentsEdit, &QTextEdit::textChanged, this, &DeckEditorDeckDockWidget::updateComments);
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
@@ -81,25 +81,25 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
-    connect(aIncrement, SIGNAL(triggered()), this, SLOT(actIncrement()));
+    connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
     aDecrement = new QAction(QString(), this);
     aDecrement->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aDecrement, SIGNAL(triggered()), this, SLOT(actDecrementSelection()));
+    connect(aDecrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     auto *tbDecrement = new QToolButton(this);
     tbDecrement->setDefaultAction(aDecrement);
 
     aRemoveCard = new QAction(QString(), this);
     aRemoveCard->setIcon(QPixmap("theme:icons/remove_row"));
-    connect(aRemoveCard, SIGNAL(triggered()), this, SLOT(actRemoveCard()));
+    connect(aRemoveCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actRemoveCard);
     auto *tbRemoveCard = new QToolButton(this);
     tbRemoveCard->setDefaultAction(aRemoveCard);
 
     aSwapCard = new QAction(QString(), this);
     aSwapCard->setIcon(QPixmap("theme:icons/swap"));
-    connect(aSwapCard, SIGNAL(triggered()), this, SLOT(actSwapCard()));
+    connect(aSwapCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actSwapCard);
     auto *tbSwapCard = new QToolButton(this);
     tbSwapCard->setDefaultAction(aSwapCard);
 
