@@ -40,19 +40,19 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     colorEdit->addItem(tr("multicolor"), QChar('m'));
     colorEdit->addItem(tr("colorless"), QChar());
     colorLabel->setBuddy(colorEdit);
-    connect(colorEdit, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
+    connect(colorEdit, &QComboBox::currentIndexChanged, this, &DlgEditTokens::colorChanged);
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;
     ptEdit->setMaxLength(MAX_NAME_LENGTH);
     ptLabel->setBuddy(ptEdit);
-    connect(ptEdit, SIGNAL(textChanged(QString)), this, SLOT(ptChanged(QString)));
+    connect(ptEdit, &QLineEdit::textChanged, this, &DlgEditTokens::ptChanged);
 
     annotationLabel = new QLabel(tr("&Annotation:"));
     annotationEdit = new QLineEdit;
     annotationEdit->setMaxLength(MAX_NAME_LENGTH);
     annotationLabel->setBuddy(annotationEdit);
-    connect(annotationEdit, SIGNAL(textChanged(QString)), this, SLOT(annotationChanged(QString)));
+    connect(annotationEdit, &QLineEdit::textChanged, this, &DlgEditTokens::annotationChanged);
 
     auto *grid = new QGridLayout;
     grid->addWidget(nameLabel, 0, 0);
@@ -87,15 +87,15 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     chooseTokenView->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     chooseTokenView->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
 
-    connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this,
-            SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
+    connect(chooseTokenView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &DlgEditTokens::tokenSelectionChanged);
 
     QAction *aAddToken = new QAction(tr("Add token"), this);
     aAddToken->setIcon(QPixmap("theme:icons/increment"));
-    connect(aAddToken, SIGNAL(triggered()), this, SLOT(actAddToken()));
+    connect(aAddToken, &QAction::triggered, this, &DlgEditTokens::actAddToken);
     QAction *aRemoveToken = new QAction(tr("Remove token"), this);
     aRemoveToken->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aRemoveToken, SIGNAL(triggered()), this, SLOT(actRemoveToken()));
+    connect(aRemoveToken, &QAction::triggered, this, &DlgEditTokens::actRemoveToken);
 
     auto *databaseToolBar = new QToolBar;
     databaseToolBar->addAction(aAddToken);
@@ -110,8 +110,8 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     hbox->addWidget(tokenDataGroupBox);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditTokens::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditTokens::reject);
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);

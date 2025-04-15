@@ -34,11 +34,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
     btnRefreshServers->setFixedWidth(30);
 
-    connect(hps, SIGNAL(sigPublicServersDownloadedSuccessfully()), this, SLOT(rebuildComboBoxList()));
-    connect(hps, SIGNAL(sigPublicServersDownloadedUnsuccessfully(int)), this, SLOT(rebuildComboBoxList(int)));
-    connect(btnRefreshServers, SIGNAL(released()), this, SLOT(downloadThePublicServers()));
+    connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, this, [this] { rebuildComboBoxList(); });
+    connect(hps, &HandlePublicServers::sigPublicServersDownloadedUnsuccessfully, this,
+            &DlgConnect::rebuildComboBoxList);
+    connect(btnRefreshServers, &QPushButton::released, this, &DlgConnect::downloadThePublicServers);
 
-    connect(this, SIGNAL(sigPublicServersDownloaded()), this, SLOT(rebuildComboBoxList()));
+    connect(this, &DlgConnect::sigPublicServersDownloaded, this, [this] { rebuildComboBoxList(); });
     preRebuildComboBoxList();
 
     newHostButton = new QRadioButton(tr("New Host"), this);
@@ -102,17 +103,17 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     btnForgotPassword->setIcon(QPixmap("theme:icons/forgot_password"));
     btnForgotPassword->setToolTip(tr("Reset Password"));
     btnForgotPassword->setFixedWidth(30);
-    connect(btnForgotPassword, SIGNAL(released()), this, SLOT(actForgotPassword()));
+    connect(btnForgotPassword, &QPushButton::released, this, &DlgConnect::actForgotPassword);
 
     forgotPasswordLabel = new QLabel(tr("Forgot password?"));
     forgotPasswordLabel->setBuddy(btnForgotPassword);
 
     btnConnect = new QPushButton(tr("&Connect"));
-    connect(btnConnect, SIGNAL(released()), this, SLOT(actOk()));
+    connect(btnConnect, &QPushButton::released, this, &DlgConnect::actOk);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel);
     buttonBox->addButton(btnConnect, QDialogButtonBox::AcceptRole);
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgConnect::reject);
 
     newHolderLayout = new QHBoxLayout;
     newHolderLayout->addWidget(previousHosts);
@@ -171,12 +172,12 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     setFixedHeight(sizeHint().height());
     setMinimumWidth(300);
 
-    connect(previousHostButton, SIGNAL(toggled(bool)), this, SLOT(previousHostSelected(bool)));
-    connect(newHostButton, SIGNAL(toggled(bool)), this, SLOT(newHostSelected(bool)));
+    connect(previousHostButton, &QRadioButton::toggled, this, &DlgConnect::previousHostSelected);
+    connect(newHostButton, &QRadioButton::toggled, this, &DlgConnect::newHostSelected);
 
     previousHostButton->setChecked(true);
 
-    connect(previousHosts, SIGNAL(currentTextChanged(const QString &)), this, SLOT(updateDisplayInfo(const QString &)));
+    connect(previousHosts, &QComboBox::currentTextChanged, this, &DlgConnect::updateDisplayInfo);
 
     playernameEdit->setFocus();
 }

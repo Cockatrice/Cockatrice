@@ -22,7 +22,7 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
     textLabel = new QLabel(tr("To change your avatar, choose a new image.\nTo remove your current avatar, confirm "
                               "without choosing a new image."));
     browseButton = new QPushButton(tr("Browse..."));
-    connect(browseButton, SIGNAL(clicked()), this, SLOT(actBrowse()));
+    connect(browseButton, &QPushButton::clicked, this, &DlgEditAvatar::actBrowse);
 
     QGridLayout *grid = new QGridLayout;
     grid->addWidget(imageLabel, 0, 0, 1, 2);
@@ -30,8 +30,8 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
     grid->addWidget(browseButton, 1, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditAvatar::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditAvatar::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

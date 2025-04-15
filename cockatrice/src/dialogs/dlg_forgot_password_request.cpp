@@ -55,8 +55,8 @@ DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(pa
     grid->addWidget(playernameEdit, 3, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgForgotPasswordRequest::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgForgotPasswordRequest::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

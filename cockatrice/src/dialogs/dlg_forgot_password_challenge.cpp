@@ -78,8 +78,8 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     grid->addWidget(emailEdit, 4, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgForgotPasswordChallenge::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgForgotPasswordChallenge::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

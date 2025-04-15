@@ -39,28 +39,28 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     aTop->setIcon(QPixmap("theme:icons/arrow_top_green"));
     aTop->setToolTip(tr("Move selected set to the top"));
     aTop->setEnabled(false);
-    connect(aTop, SIGNAL(triggered()), this, SLOT(actTop()));
+    connect(aTop, &QAction::triggered, this, &WndSets::actTop);
     setsEditToolBar->addAction(aTop);
 
     aUp = new QAction(QString(), this);
     aUp->setIcon(QPixmap("theme:icons/arrow_up_green"));
     aUp->setToolTip(tr("Move selected set up"));
     aUp->setEnabled(false);
-    connect(aUp, SIGNAL(triggered()), this, SLOT(actUp()));
+    connect(aUp, &QAction::triggered, this, &WndSets::actUp);
     setsEditToolBar->addAction(aUp);
 
     aDown = new QAction(QString(), this);
     aDown->setIcon(QPixmap("theme:icons/arrow_down_green"));
     aDown->setToolTip(tr("Move selected set down"));
     aDown->setEnabled(false);
-    connect(aDown, SIGNAL(triggered()), this, SLOT(actDown()));
+    connect(aDown, &QAction::triggered, this, &WndSets::actDown);
     setsEditToolBar->addAction(aDown);
 
     aBottom = new QAction(QString(), this);
     aBottom->setIcon(QPixmap("theme:icons/arrow_bottom_green"));
     aBottom->setToolTip(tr("Move selected set to the bottom"));
     aBottom->setEnabled(false);
-    connect(aBottom, SIGNAL(triggered()), this, SLOT(actBottom()));
+    connect(aBottom, &QAction::triggered, this, &WndSets::actBottom);
     setsEditToolBar->addAction(aBottom);
 
     // search field
@@ -74,7 +74,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     defaultSortButton = new QPushButton(tr("Default order"));
     defaultSortButton->setToolTip(tr("Restore original art priority order"));
 
-    connect(defaultSortButton, SIGNAL(clicked()), this, SLOT(actRestoreOriginalOrder()));
+    connect(defaultSortButton, &QPushButton::clicked, this, &WndSets::actRestoreOriginalOrder);
 
     filterBox = new QHBoxLayout;
     filterBox->addWidget(searchField);
@@ -106,7 +106,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setColumnHidden(SetsModel::PriorityCol, true);
     view->setRootIsDecorated(false);
 
-    connect(view->header(), SIGNAL(sectionClicked(int)), this, SLOT(actSort(int)));
+    connect(view->header(), &QHeaderView::sectionClicked, this, &WndSets::actSort);
 
     // bottom buttons
     enableAllButton = new QPushButton(tr("Enable all sets"));
@@ -114,20 +114,15 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     enableSomeButton = new QPushButton(tr("Enable selected set(s)"));
     disableSomeButton = new QPushButton(tr("Disable selected set(s)"));
 
-    connect(enableAllButton, SIGNAL(clicked()), this, SLOT(actEnableAll()));
-    connect(disableAllButton, SIGNAL(clicked()), this, SLOT(actDisableAll()));
-    connect(enableSomeButton, SIGNAL(clicked()), this, SLOT(actEnableSome()));
-    connect(disableSomeButton, SIGNAL(clicked()), this, SLOT(actDisableSome()));
-    connect(view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this,
-            SLOT(actToggleButtons(const QItemSelection &, const QItemSelection &)));
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    connect(searchField, SIGNAL(textChanged(const QString &)), displayModel,
-            SLOT(setFilterRegularExpression(const QString &)));
-#else
-    connect(searchField, SIGNAL(textChanged(const QString &)), displayModel, SLOT(setFilterRegExp(const QString &)));
-#endif
-    connect(view->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(actDisableSortButtons(int)));
-    connect(searchField, SIGNAL(textChanged(const QString &)), this, SLOT(actDisableResetButton(const QString &)));
+    connect(enableAllButton, &QPushButton::clicked, this, &WndSets::actEnableAll);
+    connect(disableAllButton, &QPushButton::clicked, this, &WndSets::actDisableAll);
+    connect(enableSomeButton, &QPushButton::clicked, this, &WndSets::actEnableSome);
+    connect(disableSomeButton, &QPushButton::clicked, this, &WndSets::actDisableSome);
+    connect(view->selectionModel(), &QItemSelectionModel::selectionChanged, this, &WndSets::actToggleButtons);
+    connect(searchField, &LineEditUnfocusable::textChanged, displayModel,
+            qOverload<const QString &>(&SetsDisplayModel::setFilterRegularExpression));
+    connect(view->header(), &QHeaderView::sortIndicatorChanged, this, &WndSets::actDisableSortButtons);
+    connect(searchField, &LineEditUnfocusable::textChanged, this, &WndSets::actDisableResetButton);
 
     labNotes = new QLabel;
     labNotes->setWordWrap(true);
@@ -158,7 +153,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarningButton->setText(tr("Use the current sorting as the set priority instead"));
     sortWarningButton->setToolTip(tr("Sorts the set priority using the same column"));
     sortWarningButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(sortWarningButton, SIGNAL(released()), this, SLOT(actIgnoreWarning()));
+    connect(sortWarningButton, &QPushButton::released, this, &WndSets::actIgnoreWarning);
     sortWarningLayout->addWidget(sortWarningButton, 1, 0);
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
@@ -170,8 +165,8 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     connect(includeRebalancedCardsCheckBox, &QAbstractButton::toggled, this, &WndSets::includeRebalancedCardsChanged);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actSave()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actRestore()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &WndSets::actSave);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &WndSets::actRestore);
 
     mainLayout = new QGridLayout;
     mainLayout->addLayout(filterBox, 0, 1, 1, 2);
