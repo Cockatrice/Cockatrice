@@ -4,6 +4,7 @@
 #include "../../../../game/cards/card_database.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../game/filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../../utility/card_info_comparator.h"
 #include "../../pixel_map_generator.h"
@@ -53,6 +54,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
     searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
@@ -74,8 +76,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
     connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));*/
-    connect(help, &QAction::triggered, deckEditor->databaseDisplayDockWidget,
-            &DeckEditorDatabaseDisplayWidget::showSearchSyntaxHelp);
 
     databaseView = new QTreeView(this);
     databaseView->setObjectName("databaseView");
