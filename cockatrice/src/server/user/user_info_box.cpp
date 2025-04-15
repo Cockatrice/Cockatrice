@@ -63,9 +63,9 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
         buttonsLayout->addWidget(&avatarButton);
         mainLayout->addLayout(buttonsLayout, 7, 0, 1, 3);
 
-        connect(&editButton, SIGNAL(clicked()), this, SLOT(actEdit()));
-        connect(&passwordButton, SIGNAL(clicked()), this, SLOT(actPassword()));
-        connect(&avatarButton, SIGNAL(clicked()), this, SLOT(actAvatar()));
+        connect(&editButton, &QPushButton::clicked, this, &UserInfoBox::actEdit);
+        connect(&passwordButton, &QPushButton::clicked, this, &UserInfoBox::actPassword);
+        connect(&avatarButton, &QPushButton::clicked, this, &UserInfoBox::actAvatar);
     }
 
     setWindowTitle(tr("User Information"));
@@ -185,8 +185,7 @@ void UserInfoBox::updateInfo(const QString &userName)
     cmd.set_user_name(userName.toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(processResponse(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &UserInfoBox::processResponse);
 
     client->sendCommand(pend);
 }
@@ -204,8 +203,7 @@ void UserInfoBox::actEdit()
     Command_GetUserInfo cmd;
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(actEditInternal(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &UserInfoBox::actEditInternal);
 
     client->sendCommand(pend);
 }
@@ -244,8 +242,7 @@ void UserInfoBox::actEditInternal(const Response &r)
     cmd.set_country(dlg.getCountry().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(processEditResponse(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &UserInfoBox::processEditResponse);
 
     client->sendCommand(pend);
 }
@@ -291,8 +288,7 @@ void UserInfoBox::changePassword(const QString &oldPassword, const QString &newP
     }
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(processPasswordResponse(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &UserInfoBox::processPasswordResponse);
 
     client->sendCommand(pend);
 }
@@ -307,8 +303,7 @@ void UserInfoBox::actAvatar()
     cmd.set_image(dlg.getImage().data(), dlg.getImage().size());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(processAvatarResponse(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &UserInfoBox::processAvatarResponse);
 
     client->sendCommand(pend);
 }

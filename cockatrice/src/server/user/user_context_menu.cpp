@@ -116,7 +116,7 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
 
     // The dialog needs to be non-modal in order to not block the event queue of the client.
     BanDialog *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
-    connect(dlg, SIGNAL(accepted()), this, SLOT(banUser_dialogFinished()));
+    connect(dlg, &QDialog::accepted, this, &UserContextMenu::banUser_dialogFinished);
     dlg->show();
 }
 
@@ -129,7 +129,7 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
 
     // The dialog needs to be non-modal in order to not block the event queue of the client.
     WarningDialog *dlg = new WarningDialog(user, clientid, static_cast<QWidget *>(parent()));
-    connect(dlg, SIGNAL(accepted()), this, SLOT(warnUser_dialogFinished()));
+    connect(dlg, &QDialog::accepted, this, &UserContextMenu::warnUser_dialogFinished);
 
     if (response.warning_size() > 0) {
         for (int i = 0; i < response.warning_size(); ++i) {
@@ -148,8 +148,7 @@ void UserContextMenu::warnUser_processUserInfoResponse(const Response &resp)
     cmd.set_user_name(userInfo.name());
     cmd.set_user_clientid(userInfo.clientid());
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(warnUser_processGetWarningsListResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUser_processGetWarningsListResponse);
     client->sendCommand(pend);
 }
 
@@ -433,8 +432,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         cmd.set_user_name(userName.toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(gamesOfUserReceived(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::gamesOfUserReceived);
 
         client->sendCommand(pend);
     } else if (actionClicked == aAddToBuddyList) {
@@ -471,8 +469,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         cmd.set_user_name(userName.toStdString());
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(banUser_processUserInfoResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUser_processUserInfoResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
         Command_AdjustMod cmd;
@@ -480,8 +477,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         cmd.set_should_be_mod(actionClicked == aPromoteToMod);
 
         PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aPromoteToJudge || actionClicked == aDemoteFromJudge) {
         Command_AdjustMod cmd;
@@ -489,36 +485,31 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         cmd.set_should_be_judge(actionClicked == aPromoteToJudge);
 
         PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(adjustMod_processUserResponse(Response, CommandContainer)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aBanHistory) {
         Command_GetBanHistory cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(banUserHistory_processResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUserHistory_processResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aWarnUser) {
         Command_GetUserInfo cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(warnUser_processUserInfoResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUser_processUserInfoResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aWarnHistory) {
         Command_GetWarnHistory cmd;
         cmd.set_user_name(userName.toStdString());
         PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(warnUserHistory_processResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUserHistory_processResponse);
         client->sendCommand(pend);
     } else if (actionClicked == aGetAdminNotes) {
         Command_GetAdminNotes cmd;
         cmd.set_user_name(userName.toStdString());
         auto *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(getAdminNotes_processResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &UserContextMenu::getAdminNotes_processResponse);
         client->sendCommand(pend);
 
     } else if (actionClicked == aCopyToClipBoard) {
