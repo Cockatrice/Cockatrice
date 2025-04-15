@@ -2,12 +2,12 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck/deck_loader.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "../../server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
 #include "tab_visual_database_display.h"
+#include "visual_deck_editor/tab_deck_editor_visual.h"
+#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
