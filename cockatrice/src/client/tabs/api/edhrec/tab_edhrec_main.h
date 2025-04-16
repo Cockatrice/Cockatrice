@@ -32,6 +32,7 @@ public slots:
     void processTopCardsResponse(QJsonObject reply);
     void processTopTagsResponse(QJsonObject reply);
     void processTopCommandersResponse(QJsonObject reply);
+    void processAverageDeckResponse(QJsonObject reply);
     void prettyPrintJson(const QJsonValue &value, int indentLevel);
     void setCard(CardInfoPtr _cardToQuery, bool isCommander = false);
     void actNavigatePage(QString url);

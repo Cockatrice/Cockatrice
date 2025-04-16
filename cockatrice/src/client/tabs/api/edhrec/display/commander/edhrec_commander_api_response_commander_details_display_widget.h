@@ -20,6 +20,7 @@ public:
 
 public slots:
     void actRequestComboNavigation();
+    void actRequestAverageDeckNavigation();
 signals:
     void requestUrl(QString url);
 
@@ -27,6 +28,7 @@ private:
     QLabel *label;
     QLabel *salt;
     QPushButton *comboPushButton;
+    QPushButton *averageDeckPushButton;
     QVBoxLayout *layout;
     CardInfoPictureWidget *commanderPicture;
     EdhrecCommanderApiResponseCommanderDetails commanderDetails;

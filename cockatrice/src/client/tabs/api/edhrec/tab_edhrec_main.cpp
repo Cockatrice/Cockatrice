@@ -3,6 +3,8 @@
 #include "../../../../game/cards/card_completer_proxy_model.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_search_model.h"
+#include "../../tab_supervisor.h"
+#include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
 #include "api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "api_response/top_commanders/edhrec_top_commanders_api_response.h"
@@ -226,6 +228,8 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
         processTopCardsResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/combos/")) {
         processCommanderResponse(jsonObj);
+    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/average-decks/")) {
+        processAverageDeckResponse(jsonObj);
     } else {
         prettyPrintJson(jsonObj, 4);
     }
@@ -339,6 +343,13 @@ void TabEdhRecMain::processCommanderResponse(QJsonObject reply)
     // **Ensure layout stays correct**
     mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
     mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
+}
+
+void TabEdhRecMain::processAverageDeckResponse(QJsonObject reply)
+{
+    EdhrecAverageDeckApiResponse deckData;
+    deckData.fromJson(reply);
+    tabSupervisor->addVisualDeckEditorTab(deckData.deck.deckLoader);
 }
 
 void TabEdhRecMain::prettyPrintJson(const QJsonValue &value, int indentLevel)

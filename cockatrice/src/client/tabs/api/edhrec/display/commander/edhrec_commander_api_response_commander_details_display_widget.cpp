@@ -26,11 +26,13 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     salt->setAlignment(Qt::AlignCenter);
 
     comboPushButton = new QPushButton(this);
+    averageDeckPushButton = new QPushButton(this);
 
     layout->addWidget(commanderPicture);
     layout->addWidget(label);
     layout->addWidget(salt);
     layout->addWidget(comboPushButton);
+    layout->addWidget(averageDeckPushButton);
 
     QWidget *currentParent = parentWidget();
     TabEdhRecMain *parentTab = nullptr;
@@ -45,6 +47,8 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     if (parentTab) {
         connect(comboPushButton, &QPushButton::clicked, this,
                 &EdhrecCommanderResponseCommanderDetailsDisplayWidget::actRequestComboNavigation);
+        connect(averageDeckPushButton, &QPushButton::clicked, this,
+                &EdhrecCommanderResponseCommanderDetailsDisplayWidget::actRequestAverageDeckNavigation);
         connect(this, &EdhrecCommanderResponseCommanderDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
     }
@@ -57,9 +61,15 @@ void EdhrecCommanderResponseCommanderDetailsDisplayWidget::retranslateUi()
     label->setText(commanderDetails.getLabel());
     salt->setText(tr("Salt: ") + QString::number(commanderDetails.getSalt()));
     comboPushButton->setText(tr("Combos"));
+    averageDeckPushButton->setText(tr("Average Deck"));
 }
 
 void EdhrecCommanderResponseCommanderDetailsDisplayWidget::actRequestComboNavigation()
 {
     emit requestUrl("/combos/" + commanderDetails.getSanitized());
+}
+
+void EdhrecCommanderResponseCommanderDetailsDisplayWidget::actRequestAverageDeckNavigation()
+{
+    emit requestUrl("/average-decks/" + commanderDetails.getSanitized());
 }
