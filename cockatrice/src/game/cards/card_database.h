@@ -28,9 +28,6 @@ enum LoadStatus
     NoCards
 };
 
-typedef QHash<QString, CardInfoPtr> CardNameMap;
-typedef QHash<QString, CardSetPtr> SetNameMap;
-
 class CardDatabase : public QObject
 {
     Q_OBJECT
