@@ -34,6 +34,7 @@ signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
     void cardScaleFactorChanged(int _scale);
     void cardChanged(CardInfoPtr card);
+    void cardClicked();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
