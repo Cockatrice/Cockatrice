@@ -123,11 +123,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     groupAndSortContainer->setLayout(groupAndSortLayout);
 
     groupByComboBox = new QComboBox();
-    QStringList groupProperties;
-    groupProperties << "maintype"
-                    << "colors"
-                    << "cmc"
-                    << "name";
+    QStringList groupProperties = {"maintype", "colors", "cmc", "name"};
     groupByComboBox->addItems(groupProperties);
     groupByComboBox->setMinimumWidth(300);
     connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
@@ -137,6 +133,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     sortCriteriaButton = new SettingsButtonWidget(this);
 
     sortLabel = new QLabel(sortCriteriaButton);
+    sortLabel->setWordWrap(true);
 
     QStringList sortProperties = {"colors", "cmc", "name", "maintype"};
     sortByListWidget = new QListWidget();
@@ -151,7 +148,6 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
     connect(sortByListWidget->model(), &QAbstractItemModel::rowsMoved, this,
             &VisualDeckEditorWidget::actChangeActiveSortCriteria);
-    // connect(sortByListWidget, &QListWidget::itemChanged, this, &VisualDeckEditorWidget::actChangeActiveSortCriteria);
     actChangeActiveSortCriteria();
 
     sortByListWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -193,7 +189,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
 
 void VisualDeckEditorWidget::retranslateUi()
 {
-    sortLabel->setText(tr("Click and drag to change\nthe sort order within the groups"));
+    sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     searchPushButton->setText(tr("Quick search and add card"));
     displayTypeButton->setText(tr("Flat Layout"));
 }
@@ -206,12 +202,19 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 
 void VisualDeckEditorWidget::updateDisplayType()
 {
-    if (displayTypeButton->text() == tr("Overlap Layout")) {
-        emit displayTypeChanged("flat");
-        displayTypeButton->setText("Flat Layout");
-    } else {
-        emit displayTypeChanged("overlap");
-        displayTypeButton->setText(tr("Overlap Layout"));
+    // Toggle the display type
+    currentDisplayType = (currentDisplayType == DisplayType::Overlap) ? DisplayType::Flat : DisplayType::Overlap;
+
+    // Update UI and emit signal
+    switch (currentDisplayType) {
+        case DisplayType::Flat:
+            emit displayTypeChanged("flat");
+            displayTypeButton->setText(tr("Flat Layout"));
+            break;
+        case DisplayType::Overlap:
+            emit displayTypeChanged("overlap");
+            displayTypeButton->setText(tr("Overlap Layout"));
+            break;
     }
 }
 
@@ -224,23 +227,24 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
         for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
             if (displayWidget->zoneName == zone) {
                 found = true;
+                break;
             }
         }
 
-        if (!found) {
-            DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-                zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10, cardSizeWidget);
-            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this,
-                    &VisualDeckEditorWidget::onCardClick);
-            connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
-            connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
-            connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::refreshDisplayType);
-            zoneContainerLayout->addWidget(zoneDisplayWidget);
+        if (found) {
+            continue;
         }
+        DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
+            zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10, cardSizeWidget);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+        connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::refreshDisplayType);
+        zoneContainerLayout->addWidget(zoneDisplayWidget);
     }
 }
 
@@ -251,9 +255,9 @@ void VisualDeckEditorWidget::deleteZoneIfDoesNotExist()
     for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
         bool found = false;
         for (const QString &zone : *deckListModel->getZones()) {
-
             if (displayWidget->zoneName == zone) {
                 found = true;
+                break;
             }
         }
 
@@ -291,48 +295,12 @@ void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight)
 {
     // Might use these at some point.
-    (void)topLeft;
-    (void)bottomRight;
+    Q_UNUSED(topLeft);
+    Q_UNUSED(bottomRight);
     // Necessary to delay this in this manner else the updateDisplay will nuke widgets while their onClick event
     // hasn't returned yet. Interval of 0 means QT will schedule this after the current event loop has finished.
     updateZoneWidgets();
 }
-
-/*void VisualDeckEditorWidget::sortCards()
-{
-    QStringList sortCriteria;
-    sortCriteria.append(activeSortCriteria);
-    this->sortCardList(sortCriteria, Qt::SortOrder::AscendingOrder);
-    QString lastSortCriteriaValue = "";
-    overlapCategories = new QWidget(scrollArea);
-    overlapCategoriesLayout = new QVBoxLayout(overlapCategories);
-    OverlapWidget *printings_group_widget = new OverlapWidget(80, 1, 1, Qt::Vertical, overlapCategories);
-    overlap_control_widget->connectOverlapWidget(printings_group_widget);
-    for (int i = 0; i < cards->size(); i++) {
-        CardInfoPtr info = cards->at(i);
-        if (info) {
-            if (info->getProperty(activeSortCriteria) != lastSortCriteriaValue) {
-                printings_group_widget->adjustMaxColumnsAndRows();
-                lastSortCriteriaValue = info->getProperty(activeSortCriteria);
-                printings_group_widget = new OverlapWidget(80, 1, 1, Qt::Vertical, overlapCategories);
-                overlapCategoriesLayout->addWidget(printings_group_widget);
-                overlap_control_widget->connectOverlapWidget(printings_group_widget);
-            }
-            CardInfoPictureWithTextOverlayWidget* display = new
-CardInfoPictureWithTextOverlayWidget(printings_group_widget, true);
-
-            display->setCard(info);
-            printings_group_widget->addWidget(display);
-            update();
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-    printings_group_widget->adjustMaxColumnsAndRows();
-
-    scrollArea->setWidget(overlapCategories);
-    update();
-}*/
 
 void VisualDeckEditorWidget::onHover(CardInfoPtr hoveredCard)
 {

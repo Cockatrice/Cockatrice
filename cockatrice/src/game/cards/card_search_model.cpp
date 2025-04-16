@@ -66,8 +66,6 @@ void CardSearchModel::updateSearchResults(const QString &query)
 
     emit dataChanged(index(0, 0), index(rowCount() - 1, 0));
     emit layoutChanged();
-    for (SearchResult &result : searchResults) {
-        qDebug() << result.card->getName();
-    }
+
     endResetModel();
 }

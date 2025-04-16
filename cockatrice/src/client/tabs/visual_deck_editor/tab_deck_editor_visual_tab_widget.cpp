@@ -5,11 +5,11 @@
 
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
                                                            AbstractTabDeckEditor *_deckEditor,
-                                                           DeckListModel *model,
-                                                           CardDatabaseModel *card_database_model,
-                                                           CardDatabaseDisplayModel *card_database_display_model)
-    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(model), cardDatabaseModel(card_database_model),
-      cardDatabaseDisplayModel(card_database_display_model)
+                                                           DeckListModel *_deckModel,
+                                                           CardDatabaseModel *_cardDatabaseModel,
+                                                           CardDatabaseDisplayModel *_cardDatabaseDisplayModel)
+    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), cardDatabaseModel(_cardDatabaseModel),
+      cardDatabaseDisplayModel(_cardDatabaseDisplayModel)
 {
     this->setTabsClosable(true); // Enable tab closing
     connect(this, &QTabWidget::tabCloseRequested, this, &TabDeckEditorVisualTabWidget::handleTabClose);
@@ -28,7 +28,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             &AbstractTabDeckEditor::actAddCard);
 
     visualDatabaseDisplay =
-        new VisualDatabaseDisplayWidget(this, deckEditor, cardDatabaseModel, cardDatabaseDisplayModel);
+        new VisualDatabaseDisplayWidget(this, deckEditor, _cardDatabaseModel, _cardDatabaseDisplayModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay);

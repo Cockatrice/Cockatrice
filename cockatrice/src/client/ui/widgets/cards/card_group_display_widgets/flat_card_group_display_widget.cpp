@@ -88,7 +88,7 @@ void FlatCardGroupDisplayWidget::updateCardDisplays()
     for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
         if (!usedWidgets.contains(widget)) {
             flowWidget->layout()->removeWidget(widget);
-            delete widget;
+            widget->deleteLater();
         }
     }
 

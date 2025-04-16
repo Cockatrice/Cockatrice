@@ -96,28 +96,30 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
             }
         }
 
-        if (!found) {
-            if (displayType == "overlap") {
-                auto *display_widget = new OverlappedCardGroupDisplayWidget(
-                    cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
-                    subBannerOpacity, cardSizeWidget);
-                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
-                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
-                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
-                cardGroupLayout->addWidget(display_widget);
-            } else if (displayType == "flat") {
-                auto *display_widget = new FlatCardGroupDisplayWidget(
-                    cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
-                    subBannerOpacity, cardSizeWidget);
-                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
-                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
-                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
-                cardGroupLayout->addWidget(display_widget);
-            }
+        if (found) {
+            continue;
+        }
+
+        if (displayType == "overlap") {
+            auto *display_widget = new OverlappedCardGroupDisplayWidget(
+                cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
+                subBannerOpacity, cardSizeWidget);
+            connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+            connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+            connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                    &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+            cardGroupLayout->addWidget(display_widget);
+        } else if (displayType == "flat") {
+            auto *display_widget = new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName,
+                                                                  cardGroup, activeGroupCriteria, activeSortCriteria,
+                                                                  subBannerOpacity, cardSizeWidget);
+            connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+            connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+            connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                    &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+            cardGroupLayout->addWidget(display_widget);
         }
     }
 }
@@ -133,7 +135,6 @@ void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
         if (!validGroups.contains(cardGroupDisplayWidget->cardGroupCategory)) {
             cardGroupLayout->removeWidget(cardGroupDisplayWidget);
             cardGroupDisplayWidget->deleteLater(); // Properly delete the widget after the event loop cycles
-        } else {
         }
     }
 }

@@ -15,11 +15,11 @@ class TabDeckEditorVisualTabWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    explicit TabDeckEditorVisualTabWidget(QWidget *parent = nullptr,
-                                          AbstractTabDeckEditor *deckEditor = nullptr,
-                                          DeckListModel *deckModel = nullptr,
-                                          CardDatabaseModel *card_database_model = nullptr,
-                                          CardDatabaseDisplayModel *card_database_display_model = nullptr);
+    explicit TabDeckEditorVisualTabWidget(QWidget *parent,
+                                          AbstractTabDeckEditor *_deckEditor,
+                                          DeckListModel *_deckModel,
+                                          CardDatabaseModel *_cardDatabaseModel,
+                                          CardDatabaseDisplayModel *_cardDatabaseDisplayModel);
 
     // Utility functions
     void addNewTab(QWidget *widget, const QString &title);

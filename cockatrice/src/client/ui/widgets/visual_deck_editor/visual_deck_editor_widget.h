@@ -17,6 +17,12 @@
 #include <QWidget>
 #include <qscrollarea.h>
 
+enum class DisplayType
+{
+    Flat,
+    Overlap
+};
+
 class VisualDeckEditorWidget : public QWidget
 {
     Q_OBJECT
@@ -62,6 +68,7 @@ private:
     CardCompleterProxyModel *proxyModel;
     QCompleter *completer;
     QPushButton *searchPushButton;
+    DisplayType currentDisplayType = DisplayType::Overlap;
     QPushButton *displayTypeButton;
     QWidget *groupAndSortContainer;
     QHBoxLayout *groupAndSortLayout;

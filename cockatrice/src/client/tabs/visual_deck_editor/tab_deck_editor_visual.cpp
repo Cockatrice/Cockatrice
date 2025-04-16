@@ -305,7 +305,7 @@ void TabDeckEditorVisual::loadLayout()
     databaseDisplayDockWidget->setMinimumSize(100, 100);
     databaseDisplayDockWidget->setMaximumSize(1400, 5000);
 
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
+    QTimer::singleShot(100, this, &TabDeckEditorVisual::freeDocksSize);
 }
 
 void TabDeckEditorVisual::retranslateUi()
@@ -457,6 +457,7 @@ void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
 
     if (o == deckAnalyticsDock) {
         aDeckAnalyticsDockFloating->setChecked(topLevel);
+        return;
     }
 
     if (o == printingSelectorDockWidget) {
