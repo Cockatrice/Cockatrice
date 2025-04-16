@@ -536,4 +536,5 @@ void FilterTree::clear()
     while (childCount() > 0) {
         deleteAt(0);
     }
+    emit changed();
 }

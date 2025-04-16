@@ -69,6 +69,7 @@ protected slots:
     void updateSearch(const QString &search) const;
 
 private:
+    QToolButton *clearFilterWidget;
     QWidget *filterContainer;
     QHBoxLayout *filterContainerLayout;
     SettingsButtonWidget *quickFilterSaveLoadWidget;

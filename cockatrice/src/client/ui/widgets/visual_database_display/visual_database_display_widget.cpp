@@ -95,8 +95,14 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterContainerLayout = new QHBoxLayout(filterContainer);
     filterContainer->setLayout(filterContainerLayout);
 
+    clearFilterWidget = new QToolButton();
+    clearFilterWidget->setFixedSize(32, 32);
+    clearFilterWidget->setIcon(QPixmap("theme:icons/delete"));
+    connect(clearFilterWidget, &QToolButton::clicked, this, [this] { filterModel->clear(); });
+
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
     quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));
+
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     quickFilterNameWidget = new SettingsButtonWidget(this);
     quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/rename"));
@@ -122,6 +128,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterContainerLayout->addWidget(quickFilterSetWidget);
 
     searchLayout->addWidget(colorFilterWidget);
+    searchLayout->addWidget(clearFilterWidget);
     searchLayout->addWidget(searchEdit);
 
     mainLayout->addWidget(searchContainer);

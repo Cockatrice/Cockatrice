@@ -316,5 +316,7 @@ bool FilterTreeModel::removeRows(int row, int count, const QModelIndex &parent)
 
 void FilterTreeModel::clear()
 {
+    emit layoutAboutToBeChanged();
     fTree->clear();
+    emit layoutChanged();
 }
