@@ -1,7 +1,7 @@
 #include "edhrec_commander_api_response_card_details_display_widget.h"
 
-#include "../../../../../game/cards/card_database_manager.h"
-#include "../tab_edhrec_main.h"
+#include "../../../../../../game/cards/card_database_manager.h"
+#include "../../tab_edhrec_main.h"
 
 EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCardDetailsDisplayWidget(
     QWidget *parent,

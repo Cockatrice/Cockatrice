@@ -5,10 +5,10 @@
 #include "../../server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
+#include "api/edhrec/tab_edhrec_main.h"
 #include "tab_visual_database_display.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
 #include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
-#include "api/edhrec/tab_edhrec_main.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
@@ -95,8 +95,8 @@ private:
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabVisualDeckStorage, *aTabVisualDatabaseDisplay, *aTabServer,
-        *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
+    QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabVisualDeckStorage, *aTabVisualDatabaseDisplay,
+        *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);

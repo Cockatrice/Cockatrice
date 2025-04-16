@@ -1,8 +1,9 @@
 #ifndef EDHREC_TOP_CARDS_API_RESPONSE_DISPLAY_WIDGET_H
 #define EDHREC_TOP_CARDS_API_RESPONSE_DISPLAY_WIDGET_H
 
-#include "../api_response/top_cards/edhrec_top_cards_api_response.h"
+#include "../../api_response/top_cards/edhrec_top_cards_api_response.h"
 
+#include <QResizeEvent>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>

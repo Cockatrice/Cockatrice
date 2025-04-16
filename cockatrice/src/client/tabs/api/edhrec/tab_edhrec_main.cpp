@@ -7,10 +7,10 @@
 #include "api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "api_response/top_commanders/edhrec_top_commanders_api_response.h"
 #include "api_response/top_tags/edhrec_top_tags_api_response.h"
-#include "commander/edhrec_commander_api_response_display_widget.h"
-#include "top_cards/edhrec_top_cards_api_response_display_widget.h"
-#include "top_commander/edhrec_top_commanders_api_response_display_widget.h"
-#include "top_tags/edhrec_top_tags_api_response_display_widget.h"
+#include "display/commander/edhrec_commander_api_response_display_widget.h"
+#include "display/top_cards/edhrec_top_cards_api_response_display_widget.h"
+#include "display/top_commander/edhrec_top_commanders_api_response_display_widget.h"
+#include "display/top_tags/edhrec_top_tags_api_response_display_widget.h"
 
 #include <QCompleter>
 #include <QDebug>

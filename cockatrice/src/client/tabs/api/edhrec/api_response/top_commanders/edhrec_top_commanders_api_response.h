@@ -19,4 +19,4 @@ public:
     void debugPrint() const;
 };
 
-#endif //EDHREC_TOP_COMMANDERS_API_RESPONSE_H
+#endif // EDHREC_TOP_COMMANDERS_API_RESPONSE_H

@@ -20,13 +20,13 @@ set(cockatrice_SOURCES
     src/client/tabs/abstract_tab_deck_editor.cpp
     src/client/tabs/api/edhrec/tab_edhrec.cpp
     src/client/tabs/api/edhrec/tab_edhrec_main.cpp
-    src/client/tabs/api/edhrec/commander/edhrec_commander_api_response_display_widget.cpp
-    src/client/tabs/api/edhrec/commander/edhrec_commander_api_response_card_details_display_widget.cpp
-    src/client/tabs/api/edhrec/commander/edhrec_commander_api_response_card_list_display_widget.cpp
-    src/client/tabs/api/edhrec/commander/edhrec_commander_api_response_commander_details_display_widget.cpp
-    src/client/tabs/api/edhrec/top_cards/edhrec_top_cards_api_response_display_widget.cpp
-    src/client/tabs/api/edhrec/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
-    src/client/tabs/api/edhrec/top_tags/edhrec_top_tags_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_card_details_display_widget.cpp
+    src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_commander_details_display_widget.cpp
+    src/client/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
+    src/client/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
     src/client/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_archidekt_links.cpp
     src/client/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_average_deck_statistics.cpp
     src/client/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_card_details.cpp
