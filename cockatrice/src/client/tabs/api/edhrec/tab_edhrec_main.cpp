@@ -161,7 +161,9 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
 
 void TabEdhRecMain::actNavigatePage(QString url)
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
+    auto finalUrl = QUrl("https://json.edhrec.com/pages" + url + ".json");
+    qInfo() << "Requested:" << finalUrl;
+    QNetworkRequest request{finalUrl};
 
     networkManager->get(request);
 }
@@ -222,6 +224,8 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
         processTopTagsResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/top/year.json")) {
         processTopCardsResponse(jsonObj);
+    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/combos/")) {
+        processCommanderResponse(jsonObj);
     } else {
         prettyPrintJson(jsonObj, 4);
     }

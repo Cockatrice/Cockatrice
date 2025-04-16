@@ -5,6 +5,7 @@
 #include "../../api_response/commander/edhrec_commander_api_response_commander_details.h"
 
 #include <QLabel>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -17,9 +18,15 @@ public:
         const EdhrecCommanderApiResponseCommanderDetails &_commanderDetails);
     void retranslateUi();
 
+public slots:
+    void actRequestComboNavigation();
+signals:
+    void requestUrl(QString url);
+
 private:
     QLabel *label;
     QLabel *salt;
+    QPushButton *comboPushButton;
     QVBoxLayout *layout;
     CardInfoPictureWidget *commanderPicture;
     EdhrecCommanderApiResponseCommanderDetails commanderDetails;
