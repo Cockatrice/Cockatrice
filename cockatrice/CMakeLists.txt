@@ -74,13 +74,17 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_size_widget.cpp
     src/client/ui/widgets/cards/deck_card_zone_display_widget.cpp
     src/client/ui/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/client/ui/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_base_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp
+    src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp
-    src/client/ui/widgets/general/display/banner_widget.cpp
+    src/client/ui/widgets/general/display/bar_widget.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
@@ -108,6 +112,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
     src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp
     src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
+    src/client/ui/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp

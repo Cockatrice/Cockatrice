@@ -8,6 +8,7 @@
 #include "../../../settings/cache_settings.h"
 #include "../../ui/pixel_map_generator.h"
 #include "../../ui/widgets/cards/card_info_frame_widget.h"
+#include "../../ui/widgets/deck_analytics/deck_analytics_widget.h"
 #include "../../ui/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../tab_deck_editor.h"
 #include "../tab_supervisor.h"
@@ -81,6 +82,8 @@ void TabDeckEditorVisual::onDeckChanged()
 {
     AbstractTabDeckEditor::onDeckChanged();
     tabContainer->visualDeckView->decklistDataChanged(QModelIndex(), QModelIndex());
+    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
 void TabDeckEditorVisual::createMenus()
