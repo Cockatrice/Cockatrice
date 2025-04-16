@@ -15,9 +15,6 @@ public:
     explicit EdhrecTopCommandersApiResponseDisplayWidget(QWidget *parent, EdhrecTopCommandersApiResponse response);
     void resizeEvent(QResizeEvent *event) override;
 
-public slots:
-    void onSplitterChange();
-
 private:
     QHBoxLayout *layout;
     QVBoxLayout *cardDisplayLayout;

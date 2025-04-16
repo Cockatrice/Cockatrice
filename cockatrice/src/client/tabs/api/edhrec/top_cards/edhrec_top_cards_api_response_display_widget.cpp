@@ -1,9 +1,8 @@
-#include "edhrec_top_tags_api_response_display_widget.h"
+#include "edhrec_top_cards_api_response_display_widget.h"
 
 #include "../../../../ui/widgets/cards/card_info_picture_widget.h"
-#include "../api_response/top_commanders/edhrec_top_commanders_api_response.h"
+#include "../api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "../commander/edhrec_commander_api_response_card_list_display_widget.h"
-#include "../commander/edhrec_commander_api_response_commander_details_display_widget.h"
 
 #include <QListView>
 #include <QResizeEvent>
@@ -11,8 +10,8 @@
 #include <QSplitter>
 #include <QStringListModel>
 
-EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWidget *parent,
-                                                                             EdhrecTopTagsApiResponse response)
+EdhrecTopCardsApiResponseDisplayWidget::EdhrecTopCardsApiResponseDisplayWidget(QWidget *parent,
+                                                                               EdhrecTopCardsApiResponse response)
     : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
@@ -41,7 +40,7 @@ EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWi
     layout->addWidget(scrollArea);
 }
 
-void EdhrecTopTagsApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
+void EdhrecTopCardsApiResponseDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     layout->invalidate();

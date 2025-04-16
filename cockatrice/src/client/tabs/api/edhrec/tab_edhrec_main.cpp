@@ -4,9 +4,11 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/cards/card_search_model.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
+#include "api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "api_response/top_commanders/edhrec_top_commanders_api_response.h"
 #include "api_response/top_tags/edhrec_top_tags_api_response.h"
 #include "commander/edhrec_commander_api_response_display_widget.h"
+#include "top_cards/edhrec_top_cards_api_response_display_widget.h"
 #include "top_commander/edhrec_top_commanders_api_response_display_widget.h"
 #include "top_tags/edhrec_top_tags_api_response_display_widget.h"
 
@@ -50,6 +52,7 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     navigationContainer->setLayout(navigationLayout);
 
     cardsPushButton = new QPushButton(navigationContainer);
+    connect(cardsPushButton, &QPushButton::clicked, this, &TabEdhRecMain::getTopCards);
     topCommandersPushButton = new QPushButton(navigationContainer);
     connect(topCommandersPushButton, &QPushButton::clicked, this, &TabEdhRecMain::getTopCommanders);
     tagsPushButton = new QPushButton(navigationContainer);
@@ -109,6 +112,8 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     setCentralWidget(container);
 
     TabEdhRecMain::retranslateUi();
+
+    getTopCards();
 }
 
 void TabEdhRecMain::retranslateUi()
@@ -161,6 +166,13 @@ void TabEdhRecMain::actNavigatePage(QString url)
     networkManager->get(request);
 }
 
+void TabEdhRecMain::getTopCards()
+{
+    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/top/year.json")};
+
+    networkManager->get(request);
+}
+
 void TabEdhRecMain::getTopCommanders()
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
@@ -208,11 +220,40 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
         processCommanderResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags.json")) {
         processTopTagsResponse(jsonObj);
+    } else if (responseUrl.startsWith("https://json.edhrec.com/pages/top/year.json")) {
+        processTopCardsResponse(jsonObj);
     } else {
         prettyPrintJson(jsonObj, 4);
     }
 
     reply->deleteLater();
+}
+
+void TabEdhRecMain::processTopCardsResponse(QJsonObject reply)
+{
+    EdhrecTopCardsApiResponse deckData;
+    deckData.fromJson(reply);
+
+    // **Remove previous page display to prevent stacking**
+    if (currentPageDisplay) {
+        mainLayout->removeWidget(currentPageDisplay);
+        delete currentPageDisplay;
+        currentPageDisplay = nullptr;
+    }
+
+    // **Create new currentPageDisplay**
+    currentPageDisplay = new QWidget(container);
+    currentPageLayout = new QVBoxLayout(currentPageDisplay);
+    currentPageDisplay->setLayout(currentPageLayout);
+
+    auto display = new EdhrecTopCardsApiResponseDisplayWidget(currentPageDisplay, deckData);
+    currentPageLayout->addWidget(display);
+
+    mainLayout->addWidget(currentPageDisplay);
+
+    // **Ensure layout stays correct**
+    mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
+    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabEdhRecMain::processTopTagsResponse(QJsonObject reply)
