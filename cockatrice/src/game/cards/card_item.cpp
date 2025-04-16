@@ -8,8 +8,8 @@
 #include "../zones/card_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
-#include "card_database.h"
 #include "card_drag_item.h"
+#include "card_info.h"
 #include "pb/serverinfo_card.pb.h"
 
 #include <QApplication>

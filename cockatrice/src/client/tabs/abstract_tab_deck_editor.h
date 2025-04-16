@@ -1,7 +1,7 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
-#include "../../game/cards/card_database.h"
+#include "../../game/cards/card_info.h"
 #include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_database_display_widget.h"

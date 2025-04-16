@@ -1,7 +1,7 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
-#include "../../../game/cards/card_database.h"
+#include "../../../game/cards/card_info.h"
 #include "picture_to_load.h"
 
 #include <QLoggingCategory>

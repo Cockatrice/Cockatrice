@@ -2,7 +2,7 @@
 #define CARD_GROUP_DISPLAY_WIDGET_H
 
 #include "../../../../../deck/deck_list_model.h"
-#include "../../../../../game/cards/card_database.h"
+#include "../../../../../game/cards/card_info.h"
 #include "../../general/display/banner_widget.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 #include "../card_size_widget.h"
