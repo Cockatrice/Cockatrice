@@ -97,7 +97,11 @@ void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QStri
         cleanedUrl.chop(5);
 
     // Expecting something like: "commanders/the-ur-dragon/core/expensive"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList parts = cleanedUrl.split('/', Qt::SkipEmptyParts);
+#else
+    QStringList parts = cleanedUrl.split('/', QString::SkipEmptyParts);
+#endif
 
     if (parts.size() < 2)
         return;
