@@ -2,7 +2,7 @@
 #define ABSTRACTCARDITEM_H
 
 #include "../board/arrow_target.h"
-#include "card_database.h"
+#include "card_info.h"
 
 class Player;
 

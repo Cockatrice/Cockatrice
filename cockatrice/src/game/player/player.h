@@ -4,7 +4,7 @@
 #include "../../client/tearoff_menu.h"
 #include "../../dialogs/dlg_create_token.h"
 #include "../board/abstract_graphics_item.h"
-#include "../cards/card_database.h"
+#include "../cards/card_info.h"
 #include "../filters/filter_string.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"

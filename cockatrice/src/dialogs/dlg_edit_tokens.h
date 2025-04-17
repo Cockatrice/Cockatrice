@@ -1,7 +1,7 @@
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H
 
-#include "../game/cards/card_database.h"
+#include "../game/cards/card_info.h"
 
 #include <QDialog>
 

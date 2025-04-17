@@ -1,7 +1,7 @@
 #ifndef COLOR_IDENTITY_WIDGET_H
 #define COLOR_IDENTITY_WIDGET_H
 
-#include "../../../../../game/cards/card_database.h"
+#include "../../../../../game/cards/card_info.h"
 
 #include <QHBoxLayout>
 #include <QWidget>

@@ -1,7 +1,7 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QTimer>

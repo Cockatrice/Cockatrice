@@ -25,6 +25,9 @@ typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
 typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
 
+typedef QHash<QString, CardInfoPtr> CardNameMap;
+typedef QHash<QString, CardSetPtr> SetNameMap;
+
 Q_DECLARE_METATYPE(CardInfoPtr)
 
 class CardSet : public QList<CardInfoPtr>
