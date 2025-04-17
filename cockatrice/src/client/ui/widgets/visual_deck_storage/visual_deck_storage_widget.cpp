@@ -212,7 +212,9 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
 
-    // Deck sort intermittently segfaults due to invalid DeckPreviewWidget, unless we use QTimer trick
+    /* We have to schedule a QTimer here so that the sorting logic doesn't try to access widgets that haven't been
+     * processed by the event loop yet. Otherwise, deck sorting will intermittently segfault on some systems.
+     */
     QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
 }
 
