@@ -1,7 +1,7 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_H
 #define EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_H
 
-#include "edhrec_commander_api_response_card_prices.h"
+#include "../card_prices/edhrec_api_response_card_prices.h"
 
 #include <QJsonArray>
 #include <QJsonObject>

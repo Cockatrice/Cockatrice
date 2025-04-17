@@ -333,7 +333,7 @@ void TabEdhRecMain::processCommanderResponse(QJsonObject reply)
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData);
+    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, QUrl(""));
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);

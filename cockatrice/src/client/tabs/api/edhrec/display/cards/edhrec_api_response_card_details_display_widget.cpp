@@ -1,11 +1,11 @@
-#include "edhrec_commander_api_response_card_details_display_widget.h"
+#include "edhrec_api_response_card_details_display_widget.h"
 
 #include "../../../../../../game/cards/card_database_manager.h"
 #include "../../tab_edhrec_main.h"
 
-EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCardDetailsDisplayWidget(
+EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
     QWidget *parent,
-    const EdhrecCommanderApiResponseCardDetails &_toDisplay)
+    const EdhrecApiResponseCardDetails &_toDisplay)
     : QWidget(parent), toDisplay(_toDisplay)
 {
     layout = new QVBoxLayout(this);
@@ -55,13 +55,13 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
 
     if (parentTab) {
         connect(cardPictureWidget, &CardInfoPictureWidget::cardClicked, this,
-                &EdhrecCommanderApiResponseCardDetailsDisplayWidget::actRequestPageNavigation);
-        connect(this, &EdhrecCommanderApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
+                &EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation);
+        connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
     }
 }
 
-void EdhrecCommanderApiResponseCardDetailsDisplayWidget::actRequestPageNavigation()
+void EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation()
 {
     emit requestUrl(toDisplay.url);
 }

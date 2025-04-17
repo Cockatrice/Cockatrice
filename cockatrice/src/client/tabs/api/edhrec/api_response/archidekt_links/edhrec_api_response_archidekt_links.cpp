@@ -1,11 +1,11 @@
-#include "edhrec_commander_api_response_archidekt_links.h"
+#include "edhrec_api_response_archidekt_links.h"
 
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-void EdhrecCommanderApiResponseArchidektLink::fromJson(const QJsonObject &json)
+void EdhrecApiResponseArchidektLink::fromJson(const QJsonObject &json)
 {
     c = json.value("c").toString();
     f = json.value("f").toInt(0);
@@ -13,7 +13,7 @@ void EdhrecCommanderApiResponseArchidektLink::fromJson(const QJsonObject &json)
     u = json.value("u").toString();
 }
 
-void EdhrecCommanderApiResponseArchidektLink::debugPrint() const
+void EdhrecApiResponseArchidektLink::debugPrint() const
 {
     qDebug() << "  C:" << c;
     qDebug() << "  F:" << f;
@@ -27,7 +27,7 @@ void EdhrecCommanderApiResponseArchidektLinks::fromJson(const QJsonArray &json)
     for (const QJsonValue &value : json) {
         if (value.isObject()) {
             QJsonObject entryJson = value.toObject();
-            EdhrecCommanderApiResponseArchidektLink entry;
+            EdhrecApiResponseArchidektLink entry;
             entry.fromJson(entryJson);
             entries.append(entry);
         }

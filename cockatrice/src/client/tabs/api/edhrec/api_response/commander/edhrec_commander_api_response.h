@@ -1,9 +1,9 @@
 #ifndef DECKDATA_H
 #define DECKDATA_H
 
-#include "edhrec_commander_api_response_archidekt_links.h"
+#include "../archidekt_links//edhrec_api_response_archidekt_links.h"
+#include "../cards/edhrec_api_response_card_container.h"
 #include "edhrec_commander_api_response_average_deck_statistics.h"
-#include "edhrec_commander_api_response_card_container.h"
 
 #include <QDebug>
 #include <QJsonObject>
@@ -19,7 +19,7 @@ public:
     QString header;
     QJsonObject panels;
     QString description;
-    EdhrecCommanderApiResponseCardContainer container;
+    EdhrecApiResponseCardContainer container;
 
     void fromJson(const QJsonObject &json);
     void debugPrint() const;

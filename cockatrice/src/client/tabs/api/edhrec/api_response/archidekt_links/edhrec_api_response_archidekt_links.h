@@ -7,7 +7,7 @@
 #include <QVector>
 
 // Represents a single Archidekt entry
-class EdhrecCommanderApiResponseArchidektLink
+class EdhrecApiResponseArchidektLink
 {
 public:
     QString c;
@@ -23,7 +23,7 @@ public:
 class EdhrecCommanderApiResponseArchidektLinks
 {
 public:
-    QVector<EdhrecCommanderApiResponseArchidektLink> entries;
+    QVector<EdhrecApiResponseArchidektLink> entries;
 
     void fromJson(const QJsonArray &json);
     void debugPrint() const;

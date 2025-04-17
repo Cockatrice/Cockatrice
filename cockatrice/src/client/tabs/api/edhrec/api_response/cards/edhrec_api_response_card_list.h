@@ -1,21 +1,21 @@
 #ifndef CARD_LIST_H
 #define CARD_LIST_H
 
-#include "edhrec_commander_api_response_card_details.h"
+#include "edhrec_api_response_card_details.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QList>
 #include <QString>
 
-class EdhrecCommanderApiResponseCardList
+class EdhrecApiResponseCardList
 {
 public:
     QString header;
-    QList<EdhrecCommanderApiResponseCardDetails> cardViews;
+    QList<EdhrecApiResponseCardDetails> cardViews;
 
     // Default constructor
-    EdhrecCommanderApiResponseCardList();
+    EdhrecApiResponseCardList();
 
     // Method to populate the object from a JSON object
     void fromJson(const QJsonObject &json);

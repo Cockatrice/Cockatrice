@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QString>
 
-class EdhrecCommanderApiResponseCardDetails
+class EdhrecApiResponseCardDetails
 {
 public:
     QString name;
@@ -17,7 +17,7 @@ public:
     int numDecks;
     int potentialDecks;
 
-    EdhrecCommanderApiResponseCardDetails();
+    EdhrecApiResponseCardDetails();
 
     // Method to populate the object from a JSON object
     void fromJson(const QJsonObject &json);

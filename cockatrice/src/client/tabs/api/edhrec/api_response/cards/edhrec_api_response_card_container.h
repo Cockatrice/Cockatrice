@@ -1,7 +1,7 @@
 #ifndef CONTAINER_ENTRY_H
 #define CONTAINER_ENTRY_H
 
-#include "edhrec_commander_api_response_card_list.h"
+#include "edhrec_api_response_card_list.h"
 #include "edhrec_commander_api_response_commander_details.h"
 
 #include <QDebug>
@@ -10,11 +10,11 @@
 #include <QString>
 #include <QVector>
 
-class EdhrecCommanderApiResponseCardContainer
+class EdhrecApiResponseCardContainer
 {
 public:
     // Constructor
-    EdhrecCommanderApiResponseCardContainer() = default;
+    EdhrecApiResponseCardContainer() = default;
 
     // Parse deck-related data from JSON
     void fromJson(const QJsonObject &json);
@@ -35,7 +35,7 @@ public:
     {
         return card;
     }
-    const QVector<EdhrecCommanderApiResponseCardList> &getCardlists() const
+    const QVector<EdhrecApiResponseCardList> &getCardlists() const
     {
         return cardlists;
     }
@@ -52,7 +52,7 @@ private:
     QString description;
     QVector<QJsonObject> breadcrumb;
     EdhrecCommanderApiResponseCommanderDetails card;
-    QVector<EdhrecCommanderApiResponseCardList> cardlists;
+    QVector<EdhrecApiResponseCardList> cardlists;
     QString keywords;
     QString title;
 };

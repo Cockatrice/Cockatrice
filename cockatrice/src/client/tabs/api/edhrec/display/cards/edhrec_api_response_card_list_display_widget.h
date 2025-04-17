@@ -3,18 +3,17 @@
 
 #include "../../../../../ui/widgets/general/display/banner_widget.h"
 #include "../../../../../ui/widgets/general/layout_containers/flow_widget.h"
-#include "../../api_response/commander/edhrec_commander_api_response_card_list.h"
+#include "../../api_response/cards/edhrec_api_response_card_list.h"
 
 #include <QResizeEvent>
 #include <QVBoxLayout>
 #include <QWidget>
 
-class EdhrecCommanderApiResponseCardListDisplayWidget : public QWidget
+class EdhrecApiResponseCardListDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EdhrecCommanderApiResponseCardListDisplayWidget(QWidget *parent,
-                                                             EdhrecCommanderApiResponseCardList toDisplay);
+    explicit EdhrecApiResponseCardListDisplayWidget(QWidget *parent, EdhrecApiResponseCardList toDisplay);
     void resizeEvent(QResizeEvent *event) override;
     [[nodiscard]] QString getBannerText() const
     {

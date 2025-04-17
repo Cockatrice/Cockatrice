@@ -1,4 +1,4 @@
-#include "edhrec_commander_api_response_card_prices.h"
+#include "edhrec_api_response_card_prices.h"
 
 #include <QDebug>
 
