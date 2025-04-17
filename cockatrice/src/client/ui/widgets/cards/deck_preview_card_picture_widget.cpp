@@ -1,5 +1,7 @@
 #include "deck_preview_card_picture_widget.h"
 
+#include "../../../../settings/cache_settings.h"
+
 #include <QApplication>
 #include <QFileInfo>
 #include <QFontMetrics>
@@ -22,15 +24,24 @@
  */
 DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
                                                            const bool hoverToZoomEnabled,
+                                                           const bool raiseOnEnter,
                                                            const QColor &textColor,
                                                            const QColor &outlineColor,
                                                            const int fontSize,
                                                            const Qt::Alignment alignment)
-    : CardInfoPictureWithTextOverlayWidget(parent, hoverToZoomEnabled, textColor, outlineColor, fontSize, alignment)
+    : CardInfoPictureWithTextOverlayWidget(parent,
+                                           hoverToZoomEnabled,
+                                           raiseOnEnter,
+                                           textColor,
+                                           outlineColor,
+                                           fontSize,
+                                           alignment)
 {
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
     connect(singleClickTimer, &QTimer::timeout, this, [this]() { emit imageClicked(lastMouseEvent, this); });
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+            &CardInfoPictureWidget::setRaiseOnEnterEnabled);
 }
 
 void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)

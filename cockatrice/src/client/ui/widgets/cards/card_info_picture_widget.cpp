@@ -30,8 +30,9 @@
  *
  * Initializes the widget with a minimum height and sets the pixmap to a dirty state for initial loading.
  */
-CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverToZoomEnabled)
-    : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(hoverToZoomEnabled)
+CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverToZoomEnabled, const bool _raiseOnEnter)
+    : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(_hoverToZoomEnabled),
+      raiseOnEnter(_raiseOnEnter)
 {
     setMinimumHeight(baseHeight);
     if (hoverToZoomEnabled) {
@@ -44,6 +45,17 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool hoverTo
     hoverTimer = new QTimer(this);
     hoverTimer->setSingleShot(true);
     connect(hoverTimer, &QTimer::timeout, this, &CardInfoPictureWidget::showEnlargedPixmap);
+
+    // Store the widget's original position
+    originalPos = this->pos();
+
+    // Create the animation
+    animation = new QPropertyAnimation(this, "pos");
+    animation->setDuration(200); // 200ms animation duration
+    animation->setEasingCurve(QEasingCurve::OutQuad);
+
+    animation->setStartValue(originalPos);
+    animation->setEndValue(originalPos - QPoint(0, animationOffset));
 
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
@@ -84,6 +96,11 @@ void CardInfoPictureWidget::setHoverToZoomEnabled(const bool enabled)
     setMouseTracking(enabled);
 }
 
+void CardInfoPictureWidget::setRaiseOnEnterEnabled(const bool enabled)
+{
+    raiseOnEnter = enabled;
+}
+
 /**
  * @brief Handles widget resizing by updating the pixmap size.
  * @param event The resize event (unused).
@@ -93,6 +110,7 @@ void CardInfoPictureWidget::setHoverToZoomEnabled(const bool enabled)
 void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
+    originalPos = pos(); // Update the baseline position
     updatePixmap();
 }
 
@@ -234,6 +252,18 @@ void CardInfoPictureWidget::enterEvent(QEvent *event)
 
     // Emit signal indicating a card is being hovered on
     emit hoveredOnCard(info);
+
+    if (raiseOnEnter) {
+        if (animation->state() == QAbstractAnimation::Running) {
+            animation->pause(); // Pause current animation
+        } else {
+            originalPos = this->pos(); // Update the baseline position
+            animation->setStartValue(originalPos);
+            animation->setEndValue(originalPos - QPoint(0, animationOffset));
+        }
+        animation->setDirection(QAbstractAnimation::Forward);
+        animation->start();
+    }
 }
 
 /**
@@ -243,10 +273,36 @@ void CardInfoPictureWidget::enterEvent(QEvent *event)
 void CardInfoPictureWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
+
     if (hoverToZoomEnabled) {
         hoverTimer->stop();
         enlargedPixmapWidget->hide();
     }
+
+    if (raiseOnEnter) {
+        if (animation->state() == QAbstractAnimation::Running) {
+            animation->pause(); // Pause current animation
+        }
+        animation->setDirection(QAbstractAnimation::Backward);
+        animation->start();
+    }
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void CardInfoPictureWidget::moveEvent(QMoveEvent *event)
+#else
+void CardInfoPictureWidget::moveEvent(QEvent *event)
+#endif
+{
+    QWidget::moveEvent(event);
+
+    hoverTimer->stop();
+    enlargedPixmapWidget->hide();
+
+    if (animation->state() == QAbstractAnimation::Running) {
+        return;
+    }
+    originalPos = this->pos(); // Update the baseline position
 }
 
 /**

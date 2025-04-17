@@ -6,6 +6,7 @@
 
 #include <QTimer>
 #include <QWidget>
+#include <QPropertyAnimation>
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
@@ -17,17 +18,18 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
+    explicit CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false, bool raiseOnEnter = false);
     CardInfoPtr getInfo()
     {
         return info;
     }
     [[nodiscard]] QSize sizeHint() const override;
-    void setHoverToZoomEnabled(bool enabled);
 
 public slots:
     void setCard(CardInfoPtr card);
     void setScaleFactor(int scale); // New slot for scaling
+    void setHoverToZoomEnabled(bool enabled);
+    void setRaiseOnEnterEnabled(bool enabled);
     void updatePixmap();
 
 signals:
@@ -40,8 +42,10 @@ protected:
     void paintEvent(QPaintEvent *) override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void enterEvent(QEnterEvent *event) override; // Qt6 signature
+    void moveEvent(QMoveEvent *event) override;
 #else
     void enterEvent(QEvent *event) override; // Qt5 signature
+    void moveEvent(QEvent *event) override;
 #endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -64,10 +68,14 @@ private:
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;
+    bool raiseOnEnter;
     int hoverActivateThresholdInMs = 500;
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
+    QPropertyAnimation *animation;
+    QPoint originalPos;         // Store the original position
+    const int animationOffset = 10; // Adjust this for how much the widget moves up
 
     QMenu *createRightClickMenu();
     QMenu *createViewRelatedCardsMenu();

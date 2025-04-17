@@ -280,6 +280,8 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
     visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
+    visualDeckStorageSelectionAnimation =
+        settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -759,6 +761,13 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T value)
     visualDeckStorageInGame = value;
     settings->setValue("interface/visualdeckstorageingame", visualDeckStorageInGame);
     emit visualDeckStorageInGameChanged(visualDeckStorageInGame);
+}
+
+void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageSelectionAnimation = value;
+    settings->setValue("interface/visualdeckstorageselectionanimation", visualDeckStorageSelectionAnimation);
+    emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

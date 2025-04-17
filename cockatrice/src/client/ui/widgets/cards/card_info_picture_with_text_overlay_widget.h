@@ -14,6 +14,7 @@ class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
 public:
     explicit CardInfoPictureWithTextOverlayWidget(QWidget *parent = nullptr,
                                                   bool hoverToZoomEnabled = false,
+                                                  bool raiseOnEnter = false,
                                                   const QColor &textColor = Qt::white,
                                                   const QColor &outlineColor = Qt::black,
                                                   int fontSize = 12,

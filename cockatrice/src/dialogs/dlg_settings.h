@@ -154,6 +154,7 @@ private:
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
     QCheckBox visualDeckStorageInGameCheckBox;
+    QCheckBox visualDeckStorageSelectionAnimationCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;
