@@ -17,10 +17,10 @@ RUN apt-get update && apt-get install -y\
   qt6-tools-dev-tools
 
 COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
-COPY ./common /home/servatrice/code/common
-COPY ./servatrice /home/servatrice/code/servatrice
 COPY ./cmake /home/servatrice/code/cmake
+COPY ./common /home/servatrice/code/common
 COPY ./dbconverter /home/servatrice/code/dbconverter
+COPY ./servatrice /home/servatrice/code/servatrice
 
 WORKDIR /home/servatrice/code
 
