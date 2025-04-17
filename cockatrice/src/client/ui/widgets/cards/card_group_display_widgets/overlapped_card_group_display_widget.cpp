@@ -91,7 +91,7 @@ void OverlappedCardGroupDisplayWidget::updateCardDisplays()
     for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
         if (!usedWidgets.contains(widget)) {
             overlapWidget->layout()->removeWidget(widget);
-            delete widget;
+            widget->deleteLater();
         }
     }
 

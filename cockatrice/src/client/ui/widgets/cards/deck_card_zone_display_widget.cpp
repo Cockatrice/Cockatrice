@@ -68,7 +68,7 @@ void DeckCardZoneDisplayWidget::refreshDisplayType(const QString &_displayType)
         if (item->widget()) {
             item->widget()->deleteLater();
         } else if (item->layout()) {
-            delete item->layout();
+            item->layout()->deleteLater();
         }
         delete item;
     }
