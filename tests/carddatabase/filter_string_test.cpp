@@ -22,7 +22,7 @@ protected:
         notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead");
         truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth");
     }
-// void TearDown() override {}
+    // void TearDown() override {}
 
     CardData cat;
     CardData notDeadAfterAll;
