@@ -163,9 +163,7 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
 
 void TabEdhRecMain::actNavigatePage(QString url)
 {
-    auto finalUrl = QUrl("https://json.edhrec.com/pages" + url + ".json");
-    qInfo() << "Requested:" << finalUrl;
-    QNetworkRequest request{finalUrl};
+    QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json");};
 
     networkManager->get(request);
 }

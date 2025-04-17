@@ -33,7 +33,5 @@ void TabDeckStorageVisual::actOpenLocalDeck(const QString &filePath)
         return;
     }
 
-    DeckLoader lol;
-
     emit openDeckEditor(&deckLoader);
 }
