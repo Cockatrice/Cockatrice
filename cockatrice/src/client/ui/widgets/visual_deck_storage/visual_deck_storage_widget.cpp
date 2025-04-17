@@ -211,14 +211,16 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
-    reapplySortAndFilters();
+
+    // Deck sort intermittently segfaults due to invalid DeckPreviewWidget, unless we use QTimer trick
+    QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
 }
 
 void VisualDeckStorageWidget::updateShowFolders(bool enabled)
 {
     if (folderWidget) {
         folderWidget->updateShowFolders(enabled);
-        reapplySortAndFilters();
+        QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
     }
 }
 
