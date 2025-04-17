@@ -47,6 +47,7 @@ private:
     EdhrecCommanderApiResponseCommanderDetails commanderDetails;
 
     void updateOptionButtonSelection(QMap<QString, QPushButton *> &buttons, const QString &selectedKey);
+    QString addNavigationOptionsToUrl(QString baseUrl);
     QString buildComboUrl() const;
 };
 

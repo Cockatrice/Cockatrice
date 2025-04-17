@@ -14,8 +14,6 @@ EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigation
     gameChangerLabel = new QLabel(this);
     budgetLabel = new QLabel(this);
 
-    commanderDetails.debugPrint();
-
     comboPushButton = new QPushButton(this);
     averageDeckPushButton = new QPushButton(this);
 
@@ -27,10 +25,10 @@ EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigation
     for (int i = 0; i < gameChangerOptions.length(); i++) {
         QString option = gameChangerOptions.at(i);
         QString label = option.isEmpty() ? "All" : option.at(0).toUpper() + option.mid(1);
-        QPushButton *btn = new QPushButton(label, this);
-        gameChangerButtons[option] = btn;
-        layout->addWidget(btn, 2, i);
-        connect(btn, &QPushButton::clicked, this, [=, this]() {
+        QPushButton *optionButton = new QPushButton(label, this);
+        gameChangerButtons[option] = optionButton;
+        layout->addWidget(optionButton, 2, i);
+        connect(optionButton, &QPushButton::clicked, this, [=, this]() {
             selectedGameChanger = option;
             updateOptionButtonSelection(gameChangerButtons, option);
             actRequestCommanderNavigation();
@@ -91,10 +89,12 @@ void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QStri
     QString cleanedUrl = url;
 
     // Remove base and file extension
-    if (cleanedUrl.startsWith("https://json.edhrec.com/pages/"))
+    if (cleanedUrl.startsWith("https://json.edhrec.com/pages/")) {
         cleanedUrl = cleanedUrl.mid(QString("https://json.edhrec.com/pages/").length());
-    if (cleanedUrl.endsWith(".json"))
+    }
+    if (cleanedUrl.endsWith(".json")) {
         cleanedUrl.chop(5);
+    }
 
     // Expecting something like: "commanders/the-ur-dragon/core/expensive"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -103,8 +103,9 @@ void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QStri
     QStringList parts = cleanedUrl.split('/', QString::SkipEmptyParts);
 #endif
 
-    if (parts.size() < 2)
+    if (parts.size() < 2) {
         return;
+    }
 
     QString commanderName = parts[1];
     QString gameChangerOpt, budgetOpt;
@@ -124,10 +125,12 @@ void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QStri
     }
 
     // Validate and apply
-    if (!gameChangerButtons.contains(gameChangerOpt))
+    if (!gameChangerButtons.contains(gameChangerOpt)) {
         gameChangerOpt.clear();
-    if (!budgetButtons.contains(budgetOpt))
+    }
+    if (!budgetButtons.contains(budgetOpt)) {
         budgetOpt.clear();
+    }
 
     selectedGameChanger = gameChangerOpt;
     selectedBudget = budgetOpt;
@@ -144,14 +147,20 @@ void EdhrecCommanderApiResponseNavigationWidget::updateOptionButtonSelection(QMa
     }
 }
 
+QString EdhrecCommanderApiResponseNavigationWidget::addNavigationOptionsToUrl(QString baseUrl)
+{
+    if (!selectedGameChanger.isEmpty()) {
+        baseUrl += "/" + selectedGameChanger;
+    }
+    if (!selectedBudget.isEmpty()) {
+        baseUrl += "/" + selectedBudget;
+    }
+    return baseUrl;
+}
+
 void EdhrecCommanderApiResponseNavigationWidget::actRequestCommanderNavigation()
 {
-    QString url = "/commanders/" + commanderDetails.getSanitized();
-    if (!selectedGameChanger.isEmpty())
-        url += "/" + selectedGameChanger;
-    if (!selectedBudget.isEmpty())
-        url += "/" + selectedBudget;
-    emit requestUrl(url);
+    emit requestUrl(addNavigationOptionsToUrl("/commanders/" + commanderDetails.getSanitized()));
 }
 
 void EdhrecCommanderApiResponseNavigationWidget::actRequestComboNavigation()
@@ -161,10 +170,5 @@ void EdhrecCommanderApiResponseNavigationWidget::actRequestComboNavigation()
 
 void EdhrecCommanderApiResponseNavigationWidget::actRequestAverageDeckNavigation()
 {
-    QString url = "/average-decks/" + commanderDetails.getSanitized();
-    if (!selectedGameChanger.isEmpty())
-        url += "/" + selectedGameChanger;
-    if (!selectedBudget.isEmpty())
-        url += "/" + selectedBudget;
-    emit requestUrl(url);
+    emit requestUrl(addNavigationOptionsToUrl("/average-decks/" + commanderDetails.getSanitized()));
 }
