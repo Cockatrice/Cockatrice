@@ -24,7 +24,9 @@ protected:
     }
 // void TearDown() override {}
 
-CardData cat;
+    CardData cat;
+    CardData notDeadAfterAll;
+    CardData truth;
 };
 
 QUERY(Empty, cat, "", true)
