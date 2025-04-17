@@ -6,6 +6,7 @@
 #include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/pixel_map_generator.h"
+#include "api/edhrec/tab_edhrec_main.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_notify_user.pb.h"
 #include "pb/event_user_message.pb.h"
@@ -136,6 +137,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabVisualDeckEditor = new QAction(this);
     connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(nullptr); });
 
+    aTabEdhRec = new QAction(this);
+    connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
+
     aTabVisualDeckStorage = new QAction(this);
     aTabVisualDeckStorage->setCheckable(true);
     connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
@@ -186,6 +190,7 @@ void TabSupervisor::retranslateUi()
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
+    aTabEdhRec->setText(tr("EDHRec"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
     aTabServer->setText(tr("Server"));
@@ -383,6 +388,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addAction(aTabVisualDeckEditor);
+    tabsMenu->addAction(aTabEdhRec);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
     tabsMenu->addAction(aTabVisualDatabaseDisplay);
@@ -827,6 +833,15 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *dec
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabEdhRecMain *TabSupervisor::addEdhrecMainTab()
+{
+    auto *tab = new TabEdhRecMain(this);
+
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }

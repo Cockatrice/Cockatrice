@@ -1,7 +1,7 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_DISPLAY_WIDGET_H
 
-#include "api_response/edhrec_commander_api_response.h"
+#include "../../api_response/commander/edhrec_commander_api_response.h"
 
 #include <QScrollArea>
 #include <QVBoxLayout>

@@ -4,9 +4,8 @@
 #include "../../../../game/cards/card_info.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../../tab.h"
-#include "edhrec_commander_api_response_display_widget.h"
+#include "display/commander/edhrec_commander_api_response_display_widget.h"
 
-#include <QHBoxLayout>
 #include <QNetworkAccessManager>
 
 class TabEdhRec : public Tab

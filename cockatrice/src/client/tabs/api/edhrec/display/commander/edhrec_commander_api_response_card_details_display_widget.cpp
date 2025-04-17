@@ -1,6 +1,7 @@
 #include "edhrec_commander_api_response_card_details_display_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
+#include "../../../../../../game/cards/card_database_manager.h"
+#include "../../tab_edhrec_main.h"
 
 EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCardDetailsDisplayWidget(
     QWidget *parent,
@@ -11,14 +12,17 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
     setLayout(layout);
 
     cardPictureWidget = new CardInfoPictureWidget(this);
-    cardPictureWidget->setCard(CardDatabaseManager::getInstance()->getCard(toDisplay.name));
+    cardPictureWidget->setCard(CardDatabaseManager::getInstance()->guessCard(toDisplay.sanitized));
 
     label = new QLabel(this);
     label->setText(toDisplay.name + "\n" + toDisplay.label);
     label->setAlignment(Qt::AlignHCenter);
 
+    int inclusionRate = 0;
     // Set label color based on inclusion rate
-    int inclusionRate = (toDisplay.numDecks * 100) / toDisplay.potentialDecks;
+    if (toDisplay.potentialDecks != 0) {
+        inclusionRate = (toDisplay.numDecks * 100) / toDisplay.potentialDecks;
+    }
 
     QColor labelColor;
     if (inclusionRate <= 30) {
@@ -38,4 +42,26 @@ EdhrecCommanderApiResponseCardDetailsDisplayWidget::EdhrecCommanderApiResponseCa
 
     layout->addWidget(cardPictureWidget);
     layout->addWidget(label);
+
+    QWidget *currentParent = parentWidget();
+    TabEdhRecMain *parentTab = nullptr;
+
+    while (currentParent) {
+        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
+            break;
+        }
+        currentParent = currentParent->parentWidget();
+    }
+
+    if (parentTab) {
+        connect(cardPictureWidget, &CardInfoPictureWidget::cardClicked, this,
+                &EdhrecCommanderApiResponseCardDetailsDisplayWidget::actRequestPageNavigation);
+        connect(this, &EdhrecCommanderApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
+                &TabEdhRecMain::actNavigatePage);
+    }
+}
+
+void EdhrecCommanderApiResponseCardDetailsDisplayWidget::actRequestPageNavigation()
+{
+    emit requestUrl(toDisplay.url);
 }
