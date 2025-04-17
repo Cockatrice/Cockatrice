@@ -4,9 +4,9 @@
 #include "../../../../game/cards/card_database.h"
 #include "card_info_picture_enlarged_widget.h"
 
+#include <QPropertyAnimation>
 #include <QTimer>
 #include <QWidget>
-#include <QPropertyAnimation>
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
@@ -18,7 +18,9 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false, bool raiseOnEnter = false);
+    explicit CardInfoPictureWidget(QWidget *parent = nullptr,
+                                   bool hoverToZoomEnabled = false,
+                                   bool raiseOnEnter = false);
     CardInfoPtr getInfo()
     {
         return info;
@@ -74,7 +76,7 @@ private:
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
     QPropertyAnimation *animation;
-    QPoint originalPos;         // Store the original position
+    QPoint originalPos;             // Store the original position
     const int animationOffset = 10; // Adjust this for how much the widget moves up
 
     QMenu *createRightClickMenu();
