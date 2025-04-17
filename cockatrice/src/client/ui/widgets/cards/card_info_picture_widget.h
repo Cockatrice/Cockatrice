@@ -44,12 +44,11 @@ protected:
     void paintEvent(QPaintEvent *) override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void enterEvent(QEnterEvent *event) override; // Qt6 signature
-    void moveEvent(QMoveEvent *event) override;
 #else
     void enterEvent(QEvent *event) override; // Qt5 signature
-    void moveEvent(QEvent *event) override;
 #endif
     void leaveEvent(QEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void loadPixmap();
