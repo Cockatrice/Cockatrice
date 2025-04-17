@@ -17,7 +17,7 @@ public:
     explicit EdhrecCommanderResponseCommanderDetailsDisplayWidget(
         QWidget *parent,
         const EdhrecCommanderApiResponseCommanderDetails &_commanderDetails,
-        QUrl baseUrl);
+        QString baseUrl);
     void retranslateUi();
 
 private:

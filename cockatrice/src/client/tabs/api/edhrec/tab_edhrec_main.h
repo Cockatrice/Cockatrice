@@ -29,6 +29,7 @@ public:
 
 public slots:
     void processApiJson(QNetworkReply *reply);
+    void processCommanderResponse(QJsonObject reply, QString responseUrl = "");
     void processTopCardsResponse(QJsonObject reply);
     void processTopTagsResponse(QJsonObject reply);
     void processTopCommandersResponse(QJsonObject reply);
@@ -55,7 +56,6 @@ private:
     CardInfoPtr cardToQuery;
     EdhrecCommanderApiResponseDisplayWidget *displayWidget;
 
-    void processCommanderResponse(QJsonObject reply);
 };
 
 #endif // TAB_EDHREC_MAIN_H

@@ -13,7 +13,7 @@
 
 EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
                                                                                  EdhrecCommanderApiResponse response,
-                                                                                 QUrl baseUrl)
+                                                                                 QString baseUrl)
     : QWidget(parent)
 {
     layout = new QHBoxLayout(this);

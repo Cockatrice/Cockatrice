@@ -15,7 +15,7 @@ public:
     explicit EdhrecCommanderApiResponseNavigationWidget(
         QWidget *parent,
         const EdhrecCommanderApiResponseCommanderDetails &_commanderDetails,
-        QUrl baseUrl);
+        QString baseUrl);
     void retranslateUi();
     void applyOptionsFromUrl(const QString &url);
 

@@ -5,10 +5,9 @@
 EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigationWidget(
     QWidget *parent,
     const EdhrecCommanderApiResponseCommanderDetails &_commanderDetails,
-    QUrl baseUrl)
+    QString baseUrl)
     : QWidget(parent), commanderDetails(_commanderDetails)
 {
-    qInfo() << commanderDetails.getUrl();
     layout = new QGridLayout(this);
     setLayout(layout);
 
@@ -27,7 +26,7 @@ EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigation
 
     for (int i = 0; i < gameChangerOptions.length(); i++) {
         QString option = gameChangerOptions.at(i);
-        QString label = option.isEmpty() ? "Any" : option.at(0).toUpper() + option.mid(1);
+        QString label = option.isEmpty() ? "All" : option.at(0).toUpper() + option.mid(1);
         QPushButton *btn = new QPushButton(label, this);
         gameChangerButtons[option] = btn;
         layout->addWidget(btn, 2, i);
@@ -76,7 +75,7 @@ EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigation
     }
 
     retranslateUi();
-    applyOptionsFromUrl(baseUrl.toString());
+    applyOptionsFromUrl(baseUrl);
 }
 
 void EdhrecCommanderApiResponseNavigationWidget::retranslateUi()
@@ -89,32 +88,46 @@ void EdhrecCommanderApiResponseNavigationWidget::retranslateUi()
 
 void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QString &url)
 {
-    // Example input: /commanders/kaalia-of-the-vast/core/budget
-    QStringList parts = url.split('/', Qt::SkipEmptyParts);
+    QString cleanedUrl = url;
 
-    // Make sure there's at least a base + commander name
+    // Remove base and file extension
+    if (cleanedUrl.startsWith("https://json.edhrec.com/pages/"))
+        cleanedUrl = cleanedUrl.mid(QString("https://json.edhrec.com/pages/").length());
+    if (cleanedUrl.endsWith(".json"))
+        cleanedUrl.chop(5);
+
+    // Expecting something like: "commanders/the-ur-dragon/core/expensive"
+    QStringList parts = cleanedUrl.split('/', Qt::SkipEmptyParts);
+
     if (parts.size() < 2)
         return;
 
-    // Extract extra segments, if any
+    QString commanderName = parts[1];
     QString gameChangerOpt, budgetOpt;
 
-    if (parts.size() >= 3)
-        gameChangerOpt = parts[2]; // this would be "core", "upgraded", etc.
-    if (parts.size() >= 4)
-        budgetOpt = parts[3]; // "budget" or "expensive"
+    // Define valid sets
+    QSet<QString> validGameChangers = {"core", "upgraded", "optimized"};
+    QSet<QString> validBudgets = {"budget", "expensive"};
 
-    // Defensive: only accept known values
+    // Check remaining parts after commander
+    for (int i = 2; i < parts.size(); ++i) {
+        QString part = parts[i].toLower();
+        if (validGameChangers.contains(part)) {
+            gameChangerOpt = part;
+        } else if (validBudgets.contains(part)) {
+            budgetOpt = part;
+        }
+    }
+
+    // Validate and apply
     if (!gameChangerButtons.contains(gameChangerOpt))
-        gameChangerOpt = "";
+        gameChangerOpt.clear();
     if (!budgetButtons.contains(budgetOpt))
-        budgetOpt = "";
+        budgetOpt.clear();
 
-    // Apply internal state
     selectedGameChanger = gameChangerOpt;
     selectedBudget = budgetOpt;
 
-    // Apply visual state
     updateOptionButtonSelection(gameChangerButtons, selectedGameChanger);
     updateOptionButtonSelection(budgetButtons, selectedBudget);
 }
@@ -139,12 +152,7 @@ void EdhrecCommanderApiResponseNavigationWidget::actRequestCommanderNavigation()
 
 void EdhrecCommanderApiResponseNavigationWidget::actRequestComboNavigation()
 {
-    QString url = "/combos/" + commanderDetails.getSanitized();
-    if (!selectedGameChanger.isEmpty())
-        url += "/" + selectedGameChanger;
-    if (!selectedBudget.isEmpty())
-        url += "/" + selectedBudget;
-    emit requestUrl(url);
+    emit requestUrl("/combos/" + commanderDetails.getSanitized());
 }
 
 void EdhrecCommanderApiResponseNavigationWidget::actRequestAverageDeckNavigation()

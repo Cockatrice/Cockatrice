@@ -6,7 +6,7 @@
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
     QWidget *parent,
     const EdhrecCommanderApiResponseCommanderDetails &_commanderDetails,
-    QUrl baseUrl)
+    QString baseUrl)
     : QWidget(parent), commanderDetails(_commanderDetails)
 {
     layout = new QVBoxLayout(this);
