@@ -22,6 +22,7 @@ set(cockatrice_SOURCES
     src/client/tabs/api/edhrec/tab_edhrec_main.cpp
     src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
     src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
+    src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
     src/client/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp

@@ -2,6 +2,7 @@
 
 #include "../../../../../../game/cards/card_database_manager.h"
 #include "../../../../../ui/widgets/cards/card_info_picture_widget.h"
+#include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
 
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
     QWidget *parent,
@@ -22,11 +23,14 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     salt = new QLabel(this);
     salt->setAlignment(Qt::AlignCenter);
 
+    cardPricesDisplayWidget = new EdhrecApiResponseCardPricesDisplayWidget(this, commanderDetails.getPrices());
+
     navigationWidget = new EdhrecCommanderApiResponseNavigationWidget(this, commanderDetails, baseUrl);
 
     layout->addWidget(commanderPicture);
     layout->addWidget(label);
     layout->addWidget(salt);
+    layout->addWidget(cardPricesDisplayWidget);
     layout->addWidget(navigationWidget);
 
     retranslateUi();
