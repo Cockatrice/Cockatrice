@@ -55,7 +55,6 @@ private:
     QPushButton *searchPushButton;
     CardInfoPtr cardToQuery;
     EdhrecCommanderApiResponseDisplayWidget *displayWidget;
-
 };
 
 #endif // TAB_EDHREC_MAIN_H
