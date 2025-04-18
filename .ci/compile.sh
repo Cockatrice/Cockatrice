@@ -185,8 +185,8 @@ echo "::group::Build project"
 if [[ $RUNNER_OS == Windows ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
+  # cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
+  cmake --build . "${buildflags[@]}"
 else
   cmake --build . "${buildflags[@]}"
 fi
@@ -223,7 +223,7 @@ if [[ $MAKE_PACKAGE ]]; then
 
   if [[ $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    cd .. 
+    cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
