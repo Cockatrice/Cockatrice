@@ -27,7 +27,7 @@ public:
         return tr("EDHREC: ") + cardName;
     }
 
-    CardSizeWidget* getCardSizeSlider()
+    CardSizeWidget *getCardSizeSlider()
     {
         return cardSizeSlider;
     }
