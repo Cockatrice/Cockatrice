@@ -1,8 +1,9 @@
 ---
 name: "💡 Feature Request"
-about: Request a new feature
+about: Request a new feature for Cockatrice
 title: ''
-labels: 'Feature Request'
+type: 'Feature'
+labels: ''
 assignees: ''
 
 ---
