@@ -343,8 +343,8 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     grid->addWidget(realnameEdit, 10, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgRegister::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgRegister::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

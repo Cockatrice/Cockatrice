@@ -74,13 +74,14 @@ GeneralSettingsPage::GeneralSettingsPage()
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     advertiseTranslationPageLabel.setOpenExternalLinks(true);
 
-    connect(&languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+    connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::languageBoxChanged);
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
     connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setNotifyAboutNewVersion);
-    connect(&showTipsOnStartup, SIGNAL(clicked(bool)), &settings, SLOT(setShowTipsOnStartup(bool)));
+    connect(&showTipsOnStartup, &QCheckBox::clicked, &settings, &SettingsCache::setShowTipsOnStartup);
 
     auto *personalGrid = new QGridLayout;
     personalGrid->addWidget(&languageLabel, 0, 0);
@@ -99,37 +100,38 @@ GeneralSettingsPage::GeneralSettingsPage()
     deckPathEdit = new QLineEdit(settings.getDeckPath());
     deckPathEdit->setReadOnly(true);
     QPushButton *deckPathButton = new QPushButton("...");
-    connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
+    connect(deckPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::deckPathButtonClicked);
 
     filtersPathEdit = new QLineEdit(settings.getFiltersPath());
     filtersPathEdit->setReadOnly(true);
     QPushButton *filtersPathButton = new QPushButton("...");
-    connect(filtersPathButton, SIGNAL(clicked()), this, SLOT(filtersPathButtonClicked()));
+    connect(filtersPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::filtersPathButtonClicked);
 
     replaysPathEdit = new QLineEdit(settings.getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
-    connect(replaysPathButton, SIGNAL(clicked()), this, SLOT(replaysPathButtonClicked()));
+    connect(replaysPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::replaysPathButtonClicked);
 
     picsPathEdit = new QLineEdit(settings.getPicsPath());
     picsPathEdit->setReadOnly(true);
     QPushButton *picsPathButton = new QPushButton("...");
-    connect(picsPathButton, SIGNAL(clicked()), this, SLOT(picsPathButtonClicked()));
+    connect(picsPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::picsPathButtonClicked);
 
     cardDatabasePathEdit = new QLineEdit(settings.getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
     QPushButton *cardDatabasePathButton = new QPushButton("...");
-    connect(cardDatabasePathButton, SIGNAL(clicked()), this, SLOT(cardDatabasePathButtonClicked()));
+    connect(cardDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::cardDatabasePathButtonClicked);
 
     customCardDatabasePathEdit = new QLineEdit(settings.getCustomCardDatabasePath());
     customCardDatabasePathEdit->setReadOnly(true);
     QPushButton *customCardDatabasePathButton = new QPushButton("...");
-    connect(customCardDatabasePathButton, SIGNAL(clicked()), this, SLOT(customCardDatabaseButtonClicked()));
+    connect(customCardDatabasePathButton, &QPushButton::clicked, this,
+            &GeneralSettingsPage::customCardDatabaseButtonClicked);
 
     tokenDatabasePathEdit = new QLineEdit(settings.getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     QPushButton *tokenDatabasePathButton = new QPushButton("...");
-    connect(tokenDatabasePathButton, SIGNAL(clicked()), this, SLOT(tokenDatabasePathButtonClicked()));
+    connect(tokenDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::tokenDatabasePathButtonClicked);
 
     // Required init here to avoid crashing on Portable builds
     resetAllPathsButton = new QPushButton;
@@ -151,7 +153,7 @@ GeneralSettingsPage::GeneralSettingsPage()
         customCardDatabasePathButton->setVisible(false);
         tokenDatabasePathButton->setVisible(false);
     } else {
-        connect(resetAllPathsButton, SIGNAL(clicked()), this, SLOT(resetAllPathsClicked()));
+        connect(resetAllPathsButton, &QPushButton::clicked, this, &GeneralSettingsPage::resetAllPathsClicked);
         allPathsResetLabel = new QLabel(tr("All paths have been reset"));
         allPathsResetLabel->setVisible(false);
     }
@@ -193,8 +195,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     GeneralSettingsPage::retranslateUi();
 
     // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
-    connect(&updateReleaseChannelBox, SIGNAL(currentIndexChanged(int)), &settings,
-            SLOT(setUpdateReleaseChannelIndex(int)));
+    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings,
+            &SettingsCache::setUpdateReleaseChannelIndex);
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
@@ -364,8 +366,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             themeBox.setCurrentIndex(i);
     }
 
-    connect(&themeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(themeBoxChanged(int)));
-    connect(&openThemeButton, SIGNAL(clicked()), this, SLOT(openThemeLocation()));
+    connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
+    connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
@@ -409,8 +411,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
     verticalCardOverlapPercentBox.setRange(0, 80);
-    connect(&verticalCardOverlapPercentBox, SIGNAL(valueChanged(int)), &settings,
-            SLOT(setStackCardOverlapPercent(int)));
+    connect(&verticalCardOverlapPercentBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setStackCardOverlapPercent);
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
     cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().getCardViewInitialRowsMax());
@@ -460,11 +462,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
     minPlayersForMultiColumnLayoutEdit.setValue(settings.getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, SIGNAL(valueChanged(int)), &settings,
-            SLOT(setMinPlayersForMultiColumnLayout(int)));
+    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, SIGNAL(valueChanged(int)), &settings, SLOT(setMaxFontSize(int)));
+    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setMaxFontSize);
     maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
@@ -778,8 +781,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
 
-    connect(&clearDownloadedPicsButton, SIGNAL(clicked()), this, SLOT(clearDownloadedPicsButtonClicked()));
-    connect(&resetDownloadURLs, SIGNAL(clicked()), this, SLOT(resetDownloadedURLsButtonClicked()));
+    connect(&clearDownloadedPicsButton, &QPushButton::clicked, this,
+            &DeckEditorSettingsPage::clearDownloadedPicsButtonClicked);
+    connect(&resetDownloadURLs, &QPushButton::clicked, this, &DeckEditorSettingsPage::resetDownloadedURLsButtonClicked);
 
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
@@ -789,11 +793,11 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
     mpSpoilerPathButton = new QPushButton("...");
-    connect(mpSpoilerPathButton, SIGNAL(clicked()), this, SLOT(spoilerPathButtonClicked()));
+    connect(mpSpoilerPathButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::spoilerPathButtonClicked);
 
     updateNowButton = new QPushButton;
     updateNowButton->setFixedWidth(150);
-    connect(updateNowButton, SIGNAL(clicked()), this, SLOT(updateSpoilers()));
+    connect(updateNowButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::updateSpoilers);
 
     // Update the GUI depending on if the box is ticked or not
     setSpoilersEnabled(mcDownloadSpoilersCheckBox.isChecked());
@@ -803,22 +807,21 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlList->setAlternatingRowColors(true);
     urlList->setDragEnabled(true);
     urlList->setDragDropMode(QAbstractItemView::InternalMove);
-    connect(urlList->model(), SIGNAL(rowsMoved(const QModelIndex, int, int, const QModelIndex, int)), this,
-            SLOT(urlListChanged(const QModelIndex, int, int, const QModelIndex, int)));
+    connect(urlList->model(), &QAbstractItemModel::rowsMoved, this, &DeckEditorSettingsPage::urlListChanged);
 
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    connect(aAdd, SIGNAL(triggered()), this, SLOT(actAddURL()));
+    connect(aAdd, &QAction::triggered, this, &DeckEditorSettingsPage::actAddURL);
 
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    connect(aEdit, SIGNAL(triggered()), this, SLOT(actEditURL()));
+    connect(aEdit, &QAction::triggered, this, &DeckEditorSettingsPage::actEditURL);
 
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemoveURL()));
+    connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
     auto *urlToolBar = new QToolBar;
     urlToolBar->setOrientation(Qt::Vertical);
@@ -885,14 +888,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the checkbox, hide/un-hide the other fields
-    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), &SettingsCache::instance(),
-            SLOT(setDownloadSpoilerStatus(bool)));
-    connect(&mcDownloadSpoilersCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSpoilersEnabled(bool)));
-    connect(&pixmapCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setPixmapCacheSize(int)));
-    connect(&networkCacheEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
-            SLOT(setNetworkCacheSizeInMB(int)));
-    connect(&networkRedirectCacheTtlEdit, SIGNAL(valueChanged(int)), &SettingsCache::instance(),
-            SLOT(setNetworkRedirectCacheTtl(int)));
+    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
+            &SettingsCache::setDownloadSpoilerStatus);
+    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
+    connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setPixmapCacheSize);
+    connect(&networkCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setNetworkCacheSizeInMB);
+    connect(&networkRedirectCacheTtlEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setNetworkRedirectCacheTtl);
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -1014,8 +1018,8 @@ void DeckEditorSettingsPage::updateSpoilers()
 
     // Create a new SBU that will act as if the client was just reloaded
     auto *sbu = new SpoilerBackgroundUpdater();
-    connect(sbu, SIGNAL(spoilerCheckerDone()), this, SLOT(unlockSettings()));
-    connect(sbu, SIGNAL(spoilersUpdatedSuccessfully()), this, SLOT(unlockSettings()));
+    connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, this, &DeckEditorSettingsPage::unlockSettings);
+    connect(sbu, &SpoilerBackgroundUpdater::spoilersUpdatedSuccessfully, this, &DeckEditorSettingsPage::unlockSettings);
 }
 
 void DeckEditorSettingsPage::unlockSettings()
@@ -1121,7 +1125,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     mentionColor = new QLineEdit();
     mentionColor->setText(SettingsCache::instance().getChatMentionColor());
     updateMentionPreview();
-    connect(mentionColor, SIGNAL(textChanged(QString)), this, SLOT(updateColor(QString)));
+    connect(mentionColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateColor);
 
     messagePopups.setChecked(SettingsCache::instance().getShowMessagePopup());
     connect(&messagePopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
@@ -1136,8 +1140,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     customAlertString = new QLineEdit();
     customAlertString->setText(SettingsCache::instance().getHighlightWords());
-    connect(customAlertString, SIGNAL(textChanged(QString)), &SettingsCache::instance(),
-            SLOT(setHighlightWords(QString)));
+    connect(customAlertString, &QLineEdit::textChanged, &SettingsCache::instance(), &SettingsCache::setHighlightWords);
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
@@ -1156,7 +1159,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightColor = new QLineEdit();
     highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
     updateHighlightPreview();
-    connect(highlightColor, SIGNAL(textChanged(QString)), this, SLOT(updateHighlightColor(QString)));
+    connect(highlightColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateHighlightColor);
 
     auto *highlightNotice = new QGridLayout;
     highlightNotice->addWidget(highlightColor, 0, 2);
@@ -1175,15 +1178,15 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
-    connect(aAdd, SIGNAL(triggered()), this, SLOT(actAdd()));
+    connect(aAdd, &QAction::triggered, this, &MessagesSettingsPage::actAdd);
 
     aEdit = new QAction(this);
     aEdit->setIcon(QPixmap("theme:icons/pencil"));
-    connect(aEdit, SIGNAL(triggered()), this, SLOT(actEdit()));
+    connect(aEdit, &QAction::triggered, this, &MessagesSettingsPage::actEdit);
 
     aRemove = new QAction(this);
     aRemove->setIcon(QPixmap("theme:icons/decrement"));
-    connect(aRemove, SIGNAL(triggered()), this, SLOT(actRemove()));
+    connect(aRemove, &QAction::triggered, this, &MessagesSettingsPage::actRemove);
 
     auto *messageToolBar = new QToolBar;
     messageToolBar->setOrientation(Qt::Vertical);
@@ -1349,24 +1352,25 @@ SoundSettingsPage::SoundSettingsPage()
             themeBox.setCurrentIndex(i);
     }
 
-    connect(&themeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(themeBoxChanged(int)));
-    connect(&soundTestButton, SIGNAL(clicked()), soundEngine, SLOT(testSound()));
+    connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &SoundSettingsPage::themeBoxChanged);
+    connect(&soundTestButton, &QPushButton::clicked, soundEngine, &SoundEngine::testSound);
 
     masterVolumeSlider = new QSlider(Qt::Horizontal);
     masterVolumeSlider->setMinimum(0);
     masterVolumeSlider->setMaximum(100);
     masterVolumeSlider->setValue(SettingsCache::instance().getMasterVolume());
     masterVolumeSlider->setToolTip(QString::number(SettingsCache::instance().getMasterVolume()));
-    connect(&SettingsCache::instance(), SIGNAL(masterVolumeChanged(int)), this, SLOT(masterVolumeChanged(int)));
-    connect(masterVolumeSlider, SIGNAL(sliderReleased()), soundEngine, SLOT(testSound()));
-    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), &SettingsCache::instance(), SLOT(setMasterVolume(int)));
+    connect(&SettingsCache::instance(), &SettingsCache::masterVolumeChanged, this,
+            &SoundSettingsPage::masterVolumeChanged);
+    connect(masterVolumeSlider, &QSlider::sliderReleased, soundEngine, &SoundEngine::testSound);
+    connect(masterVolumeSlider, &QSlider::valueChanged, &SettingsCache::instance(), &SettingsCache::setMasterVolume);
 
     masterVolumeSpinBox = new QSpinBox();
     masterVolumeSpinBox->setMinimum(0);
     masterVolumeSpinBox->setMaximum(100);
     masterVolumeSpinBox->setValue(SettingsCache::instance().getMasterVolume());
-    connect(masterVolumeSlider, SIGNAL(valueChanged(int)), masterVolumeSpinBox, SLOT(setValue(int)));
-    connect(masterVolumeSpinBox, SIGNAL(valueChanged(int)), masterVolumeSlider, SLOT(setValue(int)));
+    connect(masterVolumeSlider, &QSlider::valueChanged, masterVolumeSpinBox, &QSpinBox::setValue);
+    connect(masterVolumeSpinBox, qOverload<int>(&QSpinBox::valueChanged), masterVolumeSlider, &QSlider::setValue);
 
     auto *soundGrid = new QGridLayout;
     soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 3);
@@ -1476,8 +1480,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
     setLayout(_mainLayout);
 
-    connect(btnResetAll, SIGNAL(clicked()), this, SLOT(resetShortcuts()));
-    connect(btnClearAll, SIGNAL(clicked()), this, SLOT(clearShortcuts()));
+    connect(btnResetAll, &QPushButton::clicked, this, &ShortcutSettingsPage::resetShortcuts);
+    connect(btnClearAll, &QPushButton::clicked, this, &ShortcutSettingsPage::clearShortcuts);
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
 
@@ -1548,7 +1552,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     auto rec = QGuiApplication::primaryScreen()->availableGeometry();
     this->setMinimumSize(qMin(700, rec.width()), qMin(700, rec.height()));
 
-    connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::updateLanguage);
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
@@ -1575,7 +1579,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     vboxLayout->addWidget(pagesWidget);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(close()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgSettings::close);
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(vboxLayout);
@@ -1626,8 +1630,7 @@ void DlgSettings::createIcons()
     shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     shortcutsButton->setIcon(QPixmap("theme:config/shorcuts"));
 
-    connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this,
-            SLOT(changePage(QListWidgetItem *, QListWidgetItem *)));
+    connect(contentsWidget, &QListWidget::currentItemChanged, this, &DlgSettings::changePage);
 }
 
 void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous)

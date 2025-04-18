@@ -48,8 +48,8 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     grid->addWidget(realnameEdit, 3, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditUser::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditUser::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

@@ -53,7 +53,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
         }
     }
 
-    connect(this, SIGNAL(newTipRequested(int)), this, SLOT(updateTip(int)));
+    connect(this, &DlgTipOfTheDay::newTipRequested, this, &DlgTipOfTheDay::updateTip);
     newTipRequested(currentTip);
 
     content = new QVBoxLayout;
@@ -69,14 +69,14 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     buttonBox->addButton(nextButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(QDialogButtonBox::Ok);
     buttonBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(nextButton, SIGNAL(clicked()), this, SLOT(nextClicked()));
-    connect(previousButton, SIGNAL(clicked()), this, SLOT(previousClicked()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgTipOfTheDay::accept);
+    connect(nextButton, &QPushButton::clicked, this, &DlgTipOfTheDay::nextClicked);
+    connect(previousButton, &QPushButton::clicked, this, &DlgTipOfTheDay::previousClicked);
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
     showTipsOnStartupCheck->setChecked(SettingsCache::instance().getShowTipsOnStartup());
-    connect(showTipsOnStartupCheck, SIGNAL(clicked(bool)), &SettingsCache::instance(),
-            SLOT(setShowTipsOnStartup(bool)));
+    connect(showTipsOnStartupCheck, &QCheckBox::clicked, &SettingsCache::instance(),
+            &SettingsCache::setShowTipsOnStartup);
     buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(tipNumber);
