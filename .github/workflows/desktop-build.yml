@@ -218,14 +218,14 @@ jobs:
 
           - target: 15
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Release
             core_count: 3
             make_package: 1
 
           - target: 15
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Debug
             core_count: 3
 
@@ -347,7 +347,7 @@ jobs:
       matrix:
         include:
           - target: 10
-            qt_version: 6.6.*
+            qt_version: 6.8.*
             qt_arch: msvc2022_64
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
