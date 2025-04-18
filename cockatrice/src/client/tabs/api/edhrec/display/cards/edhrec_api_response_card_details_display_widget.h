@@ -3,6 +3,8 @@
 
 #include "../../../../../ui/widgets/cards/card_info_picture_widget.h"
 #include "../../api_response/cards/edhrec_api_response_card_details.h"
+#include "edhrec_api_response_card_inclusion_display_widget.h"
+#include "edhrec_api_response_card_synergy_display_widget.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -22,7 +24,9 @@ private:
     EdhrecApiResponseCardDetails toDisplay;
     QVBoxLayout *layout;
     CardInfoPictureWidget *cardPictureWidget;
-    QLabel *label;
+    QLabel *nameLabel;
+    EdhrecApiResponseCardInclusionDisplayWidget *inclusionDisplayWidget;
+    EdhrecApiResponseCardSynergyDisplayWidget *synergyDisplayWidget;
 };
 
 #endif // EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H

@@ -24,7 +24,9 @@ set(cockatrice_SOURCES
     src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
     src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
+    src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
     src/client/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
     src/client/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
     src/client/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
@@ -99,6 +101,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
+    src/client/ui/widgets/general/display/percent_bar_widget.cpp
     src/client/ui/widgets/general/display/shadow_background_label.cpp
     src/client/ui/widgets/general/layout_containers/flow_widget.cpp
     src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp

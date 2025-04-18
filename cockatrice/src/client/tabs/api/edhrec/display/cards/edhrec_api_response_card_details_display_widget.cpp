@@ -14,34 +14,18 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     cardPictureWidget = new CardInfoPictureWidget(this);
     cardPictureWidget->setCard(CardDatabaseManager::getInstance()->guessCard(toDisplay.sanitized));
 
-    label = new QLabel(this);
-    label->setText(toDisplay.name + "\n" + toDisplay.label);
-    label->setAlignment(Qt::AlignHCenter);
+    nameLabel = new QLabel(this);
+    nameLabel->setText(toDisplay.name);
+    nameLabel->setAlignment(Qt::AlignHCenter);
 
-    int inclusionRate = 0;
-    // Set label color based on inclusion rate
-    if (toDisplay.potentialDecks != 0) {
-        inclusionRate = (toDisplay.numDecks * 100) / toDisplay.potentialDecks;
-    }
+    inclusionDisplayWidget = new EdhrecApiResponseCardInclusionDisplayWidget(this, toDisplay);
 
-    QColor labelColor;
-    if (inclusionRate <= 30) {
-        labelColor = QColor(255, 0, 0); // Red
-    } else if (inclusionRate <= 60) {
-        int red = 255 - ((inclusionRate - 30) * 2);
-        int green = (inclusionRate - 30) * 4; // Adjust green to make the transition smoother
-        labelColor = QColor(red, green, 0);   // purple-ish
-    } else if (inclusionRate <= 90) {
-        int green = (inclusionRate - 60) * 5; // Increase green
-        labelColor = QColor(100, green, 100); // Green shades
-    } else {
-        labelColor = QColor(100, 200, 100); // Dark Green
-    }
+    synergyDisplayWidget = new EdhrecApiResponseCardSynergyDisplayWidget(this, toDisplay);
 
-    label->setStyleSheet(QString("color: %1").arg(labelColor.name()));
-
+    layout->addWidget(nameLabel);
     layout->addWidget(cardPictureWidget);
-    layout->addWidget(label);
+    layout->addWidget(inclusionDisplayWidget);
+    layout->addWidget(synergyDisplayWidget);
 
     QWidget *currentParent = parentWidget();
     TabEdhRecMain *parentTab = nullptr;
