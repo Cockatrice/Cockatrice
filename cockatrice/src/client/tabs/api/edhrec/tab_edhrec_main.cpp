@@ -215,7 +215,8 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
     if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/year.json")) {
         processTopCommandersResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/")) {
-        processCommanderResponse(jsonObj);
+        qInfo() << "Received top kek";
+        processCommanderResponse(jsonObj, responseUrl);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/cards/")) {
         processCommanderResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/tags/")) {
@@ -225,6 +226,7 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/top/year.json")) {
         processTopCardsResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/combos/")) {
+        qInfo() << "Received combos";
         processCommanderResponse(jsonObj);
     } else if (responseUrl.startsWith("https://json.edhrec.com/pages/average-decks/")) {
         processAverageDeckResponse(jsonObj);
@@ -316,7 +318,7 @@ void TabEdhRecMain::processTopCommandersResponse(QJsonObject reply)
     mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
 }
 
-void TabEdhRecMain::processCommanderResponse(QJsonObject reply)
+void TabEdhRecMain::processCommanderResponse(QJsonObject reply, QString responseUrl)
 {
     EdhrecCommanderApiResponse deckData;
     deckData.fromJson(reply);
@@ -333,7 +335,7 @@ void TabEdhRecMain::processCommanderResponse(QJsonObject reply)
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData);
+    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, responseUrl);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);

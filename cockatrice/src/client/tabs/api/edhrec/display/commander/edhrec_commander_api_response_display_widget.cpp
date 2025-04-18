@@ -2,8 +2,8 @@
 
 #include "../../../../../ui/widgets/cards/card_info_picture_widget.h"
 #include "../../api_response/commander/edhrec_commander_api_response.h"
-#include "edhrec_commander_api_response_card_list_display_widget.h"
-#include "edhrec_commander_api_response_commander_details_display_widget.h"
+#include "../cards/edhrec_api_response_card_list_display_widget.h"
+#include "edhrec_api_response_commander_details_display_widget.h"
 
 #include <QListView>
 #include <QResizeEvent>
@@ -12,7 +12,8 @@
 #include <QStringListModel>
 
 EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
-                                                                                 EdhrecCommanderApiResponse response)
+                                                                                 EdhrecCommanderApiResponse response,
+                                                                                 QString baseUrl)
     : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
@@ -31,15 +32,15 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
     QStringList widgetNames;
 
     // Add commander details
-    auto commanderPicture =
-        new EdhrecCommanderResponseCommanderDetailsDisplayWidget(this, response.container.getCommanderDetails());
+    auto commanderPicture = new EdhrecCommanderResponseCommanderDetailsDisplayWidget(
+        this, response.container.getCommanderDetails(), baseUrl);
     cardDisplayLayout->addWidget(commanderPicture);
     widgetNames.append("Commander Details");
 
     // Add card list widgets
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
-    for (const EdhrecCommanderApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
-        auto cardListDisplayWidget = new EdhrecCommanderApiResponseCardListDisplayWidget(this, card_list);
+    for (const EdhrecApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
+        auto cardListDisplayWidget = new EdhrecApiResponseCardListDisplayWidget(this, card_list);
         cardDisplayLayout->addWidget(cardListDisplayWidget);
         widgetNames.append(cardListDisplayWidget->getBannerText());
     }

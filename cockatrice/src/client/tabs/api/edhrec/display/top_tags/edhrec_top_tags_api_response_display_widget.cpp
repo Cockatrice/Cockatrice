@@ -1,7 +1,7 @@
 #include "edhrec_top_tags_api_response_display_widget.h"
 
 #include "../../api_response/top_tags/edhrec_top_tags_api_response.h"
-#include "../commander/edhrec_commander_api_response_card_list_display_widget.h"
+#include "../cards/edhrec_api_response_card_list_display_widget.h"
 
 EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWidget *parent,
                                                                              EdhrecTopTagsApiResponse response)
@@ -14,8 +14,8 @@ EdhrecTopTagsApiResponseDisplayWidget::EdhrecTopTagsApiResponseDisplayWidget(QWi
 
     // Add card list widgets
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
-    for (const EdhrecCommanderApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
-        auto cardListDisplayWidget = new EdhrecCommanderApiResponseCardListDisplayWidget(this, card_list);
+    for (const EdhrecApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
+        auto cardListDisplayWidget = new EdhrecApiResponseCardListDisplayWidget(this, card_list);
         cardDisplayLayout->addWidget(cardListDisplayWidget);
     }
 

@@ -76,7 +76,7 @@ void TabEdhRec::processApiJson(QNetworkReply *reply)
     EdhrecCommanderApiResponse deckData;
     deckData.fromJson(jsonObj);
 
-    displayWidget = new EdhrecCommanderApiResponseDisplayWidget(this, deckData);
+    displayWidget = new EdhrecCommanderApiResponseDisplayWidget(this, deckData, reply->url().toString());
     // flowWidget->addWidget(displayWidget);
     setCentralWidget(displayWidget);
 

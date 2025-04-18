@@ -12,7 +12,9 @@ class EdhrecCommanderApiResponseDisplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EdhrecCommanderApiResponseDisplayWidget(QWidget *parent, EdhrecCommanderApiResponse response);
+    explicit EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
+                                                     EdhrecCommanderApiResponse response,
+                                                     QString baseUrl);
     void resizeEvent(QResizeEvent *event) override;
 
 public slots:

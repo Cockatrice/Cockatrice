@@ -1,4 +1,4 @@
-#include "edhrec_commander_api_response_card_prices.h"
+#include "edhrec_api_response_card_prices.h"
 
 #include <QDebug>
 
@@ -18,14 +18,14 @@ void CardPrices::fromJson(const QJsonObject &json)
 
 void CardPrices::debugPrint() const
 {
-    qDebug() << "Card Prices:";
-    qDebug() << "Cardhoarder:" << cardhoarder;
-    qDebug() << "Cardkingdom:" << cardkingdom;
-    qDebug() << "Cardmarket:" << cardmarket;
-    qDebug() << "Face2Face:" << face2face;
-    qDebug() << "Manapool:" << manapool;
-    qDebug() << "Mtgstocks:" << mtgstocks;
-    qDebug() << "SCG:" << scg;
-    qDebug() << "TCGL:" << tcgl;
-    qDebug() << "Tcgplayer:" << tcgplayer;
+    qInfo() << "Card Prices:";
+    qInfo() << "Cardhoarder:" << cardhoarder;
+    qInfo() << "Cardkingdom:" << cardkingdom;
+    qInfo() << "Cardmarket:" << cardmarket;
+    qInfo() << "Face2Face:" << face2face;
+    qInfo() << "Manapool:" << manapool;
+    qInfo() << "Mtgstocks:" << mtgstocks;
+    qInfo() << "SCG:" << scg;
+    qInfo() << "TCGL:" << tcgl;
+    qInfo() << "Tcgplayer:" << tcgplayer;
 }

@@ -1,10 +1,10 @@
-#include "edhrec_commander_api_response_card_container.h"
+#include "edhrec_api_response_card_container.h"
 
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 
-void EdhrecCommanderApiResponseCardContainer::fromJson(const QJsonObject &json)
+void EdhrecApiResponseCardContainer::fromJson(const QJsonObject &json)
 {
     // Parse breadcrumb
     QJsonArray breadcrumbArray = json.value("breadcrumb").toArray();
@@ -20,7 +20,7 @@ void EdhrecCommanderApiResponseCardContainer::fromJson(const QJsonObject &json)
     for (const QJsonValue &cardlistValue : cardlistsArray) {
         QJsonObject cardlistObj = cardlistValue.toObject();
         QJsonArray cardviewsArray = cardlistObj.value("cardviews").toArray();
-        EdhrecCommanderApiResponseCardList cardView;
+        EdhrecApiResponseCardList cardView;
         cardView.fromJson(cardlistValue.toObject());
         cardlists.push_back(cardView);
     }
@@ -29,7 +29,7 @@ void EdhrecCommanderApiResponseCardContainer::fromJson(const QJsonObject &json)
     title = json.value("title").toString();
 }
 
-void EdhrecCommanderApiResponseCardContainer::debugPrint() const
+void EdhrecApiResponseCardContainer::debugPrint() const
 {
     qDebug() << "Breadcrumb:";
     for (const auto &breadcrumbEntry : breadcrumb) {
