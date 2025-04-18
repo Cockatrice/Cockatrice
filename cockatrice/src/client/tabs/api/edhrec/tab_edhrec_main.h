@@ -2,7 +2,9 @@
 #define TAB_EDHREC_MAIN_H
 
 #include "../../../../game/cards/card_database.h"
+#include "../../../ui/widgets/cards/card_size_widget.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
+#include "../../../ui/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab.h"
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
 
@@ -23,6 +25,11 @@ public:
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
         return tr("EDHREC: ") + cardName;
+    }
+
+    CardSizeWidget *getCardSizeSlider()
+    {
+        return cardSizeSlider;
     }
 
     QNetworkAccessManager *networkManager;
@@ -53,6 +60,8 @@ private:
     QPushButton *tagsPushButton;
     QLineEdit *searchBar;
     QPushButton *searchPushButton;
+    SettingsButtonWidget *settingsButton;
+    CardSizeWidget *cardSizeSlider;
     CardInfoPtr cardToQuery;
     EdhrecCommanderApiResponseDisplayWidget *displayWidget;
 };
