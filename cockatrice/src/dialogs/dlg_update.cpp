@@ -41,10 +41,11 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     enableUpdateButton(false);             // Unless we know there's an update available, you can't install
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
 
-    connect(gotoDownload, SIGNAL(clicked()), this, SLOT(gotoDownloadPage()));
-    connect(manualDownload, SIGNAL(clicked()), this, SLOT(downloadUpdate()));
-    connect(stopDownload, SIGNAL(clicked()), this, SLOT(cancelDownload()));
-    connect(ok, SIGNAL(clicked()), this, SLOT(closeDialog()));
+    connect(gotoDownload, &QPushButton::clicked, this, &DlgUpdate::gotoDownloadPage);
+    // TODO: make reinstall button actually do something when clicked
+    // connect(manualDownload, &QPushButton::clicked, this, &DlgUpdate::downloadUpdate);
+    connect(stopDownload, &QPushButton::clicked, this, &DlgUpdate::cancelDownload);
+    connect(ok, &QPushButton::clicked, this, &DlgUpdate::closeDialog);
 
     auto *parentLayout = new QVBoxLayout(this);
     parentLayout->addWidget(descriptionLabel);
@@ -68,9 +69,9 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 
     // Initialize the checker and downloader class
     uDownloader = new UpdateDownloader(this);
-    connect(uDownloader, SIGNAL(downloadSuccessful(QUrl)), this, SLOT(downloadSuccessful(QUrl)));
-    connect(uDownloader, SIGNAL(progressMade(qint64, qint64)), this, SLOT(downloadProgressMade(qint64, qint64)));
-    connect(uDownloader, SIGNAL(error(QString)), this, SLOT(downloadError(QString)));
+    connect(uDownloader, &UpdateDownloader::downloadSuccessful, this, &DlgUpdate::downloadSuccessful);
+    connect(uDownloader, &UpdateDownloader::progressMade, this, &DlgUpdate::downloadProgressMade);
+    connect(uDownloader, &UpdateDownloader::error, this, &DlgUpdate::downloadError);
 
     // Check for updates
     beginUpdateCheck();
@@ -108,9 +109,8 @@ void DlgUpdate::beginUpdateCheck()
     setLabel(tr("Checking for updates..."));
 
     auto checker = new ClientUpdateChecker(this);
-    connect(checker, SIGNAL(finishedCheck(bool, bool, Release *)), this,
-            SLOT(finishedUpdateCheck(bool, bool, Release *)));
-    connect(checker, SIGNAL(error(QString)), this, SLOT(updateCheckError(QString)));
+    connect(checker, &ClientUpdateChecker::finishedCheck, this, &DlgUpdate::finishedUpdateCheck);
+    connect(checker, &ClientUpdateChecker::error, this, &DlgUpdate::updateCheckError);
     checker->check();
 }
 

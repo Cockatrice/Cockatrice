@@ -22,7 +22,7 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const QString &cardName,
     pic->setObjectName("pic");
     text = new CardInfoTextWidget();
     text->setObjectName("text");
-    connect(text, SIGNAL(linkActivated(const QString &)), this, SLOT(setCard(const QString &)));
+    connect(text, &CardInfoTextWidget::linkActivated, this, [this](const QString &card) { setCard(card); });
 
     auto *layout = new QVBoxLayout();
     layout->setObjectName("layout");
@@ -52,7 +52,7 @@ void CardInfoDisplayWidget::setCard(CardInfoPtr card)
         disconnect(info.data(), nullptr, this, nullptr);
     info = std::move(card);
     if (info)
-        connect(info.data(), SIGNAL(destroyed()), this, SLOT(clear()));
+        connect(info.data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
 
     text->setCard(info);
     pic->setCard(info);

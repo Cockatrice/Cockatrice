@@ -117,7 +117,7 @@ void DlgCreateGame::sharedCtor()
     grid->addWidget(rememberGameSettings, 3, 0);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateGame::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
@@ -158,8 +158,8 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     clearButton = new QPushButton(tr("&Clear"));
     buttonBox->addButton(QDialogButtonBox::Cancel);
     buttonBox->addButton(clearButton, QDialogButtonBox::ActionRole);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOK()));
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(actReset()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgCreateGame::actOK);
+    connect(clearButton, &QPushButton::clicked, this, &DlgCreateGame::actReset);
 
     setWindowTitle(tr("Create game"));
 }
@@ -204,7 +204,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
         gameTypeCheckBox->setChecked(types.contains(gameTypeIterator.key()));
     }
 
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgCreateGame::accept);
 
     setWindowTitle(tr("Game information"));
 }
@@ -279,7 +279,7 @@ void DlgCreateGame::actOK()
         SettingsCache::instance().setGameTypes(_gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(checkResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &DlgCreateGame::checkResponse);
     room->sendRoomCommand(pend);
 
     buttonBox->setEnabled(false);

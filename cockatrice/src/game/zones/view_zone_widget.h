@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
+#include <QLineEdit>
 
 class QLabel;
 class QPushButton;
@@ -47,6 +48,8 @@ private:
     QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
+
+    QLineEdit searchEdit;
     QComboBox groupBySelector;
     QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;

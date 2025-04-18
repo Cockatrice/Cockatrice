@@ -68,6 +68,7 @@ signals:
     void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
     void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);
+    void visualDeckStorageSelectionAnimationChanged(bool enabled);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -103,7 +104,7 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+    QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
@@ -145,6 +146,7 @@ private:
     bool visualDeckStoragePromptForConversion;
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
+    bool visualDeckStorageSelectionAnimation;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -232,6 +234,10 @@ public:
     QString getDeckPath() const
     {
         return deckPath;
+    }
+    QString getFiltersPath() const
+    {
+        return filtersPath;
     }
     QString getReplaysPath() const
     {
@@ -461,6 +467,10 @@ public:
     bool getVisualDeckStorageInGame() const
     {
         return visualDeckStorageInGame;
+    }
+    bool getVisualDeckStorageSelectionAnimation() const
+    {
+        return visualDeckStorageSelectionAnimation;
     }
     bool getHorizontalHand() const
     {
@@ -754,6 +764,7 @@ public slots:
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
+    void setFiltersPath(const QString &_filtersPath);
     void setReplaysPath(const QString &_replaysPath);
     void setThemesPath(const QString &_themesPath);
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
@@ -798,9 +809,10 @@ public slots:
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
-    void setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion);
-    void setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert);
+    void setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion);
+    void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

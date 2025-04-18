@@ -1,7 +1,7 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 
 #include <QComboBox>
 #include <QFrame>

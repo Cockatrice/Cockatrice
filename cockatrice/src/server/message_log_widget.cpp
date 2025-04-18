@@ -616,7 +616,7 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
     soundEngine->playSound(phase.soundFileName);
 
     appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               phase.name + "</b></font>");
+               phase.getName() + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
@@ -820,42 +820,28 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
 void MessageLogWidget::connectToPlayer(Player *player)
 {
 
-    connect(player, SIGNAL(logSay(Player *, QString)), this, SLOT(logSay(Player *, QString)));
+    connect(player, &Player::logSay, this, &MessageLogWidget::logSay);
     connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
-    connect(player, SIGNAL(logRollDie(Player *, int, const QList<uint> &)), this,
-            SLOT(logRollDie(Player *, int, const QList<uint> &)));
-    connect(player, SIGNAL(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)), this,
-            SLOT(logCreateArrow(Player *, Player *, QString, Player *, QString, bool)));
-    connect(player, SIGNAL(logCreateToken(Player *, QString, QString)), this,
-            SLOT(logCreateToken(Player *, QString, QString)));
-    connect(player, SIGNAL(logSetCounter(Player *, QString, int, int)), this,
-            SLOT(logSetCounter(Player *, QString, int, int)));
-    connect(player, SIGNAL(logSetCardCounter(Player *, QString, int, int, int)), this,
-            SLOT(logSetCardCounter(Player *, QString, int, int, int)));
-    connect(player, SIGNAL(logSetTapped(Player *, CardItem *, bool)), this,
-            SLOT(logSetTapped(Player *, CardItem *, bool)));
-    connect(player, SIGNAL(logSetDoesntUntap(Player *, CardItem *, bool)), this,
-            SLOT(logSetDoesntUntap(Player *, CardItem *, bool)));
-    connect(player, SIGNAL(logSetPT(Player *, CardItem *, QString)), this,
-            SLOT(logSetPT(Player *, CardItem *, QString)));
-    connect(player, SIGNAL(logSetAnnotation(Player *, CardItem *, QString)), this,
-            SLOT(logSetAnnotation(Player *, CardItem *, QString)));
-    connect(player, SIGNAL(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)), this,
-            SLOT(logMoveCard(Player *, CardItem *, CardZone *, int, CardZone *, int)));
-    connect(player, SIGNAL(logFlipCard(Player *, QString, bool)), this, SLOT(logFlipCard(Player *, QString, bool)));
-    connect(player, SIGNAL(logDestroyCard(Player *, QString)), this, SLOT(logDestroyCard(Player *, QString)));
-    connect(player, SIGNAL(logAttachCard(Player *, QString, Player *, QString)), this,
-            SLOT(logAttachCard(Player *, QString, Player *, QString)));
-    connect(player, SIGNAL(logUnattachCard(Player *, QString)), this, SLOT(logUnattachCard(Player *, QString)));
+    connect(player, &Player::logRollDie, this, &MessageLogWidget::logRollDie);
+    connect(player, &Player::logCreateArrow, this, &MessageLogWidget::logCreateArrow);
+    connect(player, &Player::logCreateToken, this, &MessageLogWidget::logCreateToken);
+    connect(player, &Player::logSetCounter, this, &MessageLogWidget::logSetCounter);
+    connect(player, &Player::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
+    connect(player, &Player::logSetTapped, this, &MessageLogWidget::logSetTapped);
+    connect(player, &Player::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
+    connect(player, &Player::logSetPT, this, &MessageLogWidget::logSetPT);
+    connect(player, &Player::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
+    connect(player, &Player::logMoveCard, this, &MessageLogWidget::logMoveCard);
+    connect(player, &Player::logFlipCard, this, &MessageLogWidget::logFlipCard);
+    connect(player, &Player::logDestroyCard, this, &MessageLogWidget::logDestroyCard);
+    connect(player, &Player::logAttachCard, this, &MessageLogWidget::logAttachCard);
+    connect(player, &Player::logUnattachCard, this, &MessageLogWidget::logUnattachCard);
     connect(player, &Player::logDumpZone, this, &MessageLogWidget::logDumpZone);
-    connect(player, SIGNAL(logDrawCards(Player *, int, bool)), this, SLOT(logDrawCards(Player *, int, bool)));
-    connect(player, SIGNAL(logUndoDraw(Player *, QString)), this, SLOT(logUndoDraw(Player *, QString)));
-    connect(player, SIGNAL(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)), this,
-            SLOT(logRevealCards(Player *, CardZone *, int, QString, Player *, bool, int, bool)));
-    connect(player, SIGNAL(logAlwaysRevealTopCard(Player *, CardZone *, bool)), this,
-            SLOT(logAlwaysRevealTopCard(Player *, CardZone *, bool)));
-    connect(player, SIGNAL(logAlwaysLookAtTopCard(Player *, CardZone *, bool)), this,
-            SLOT(logAlwaysLookAtTopCard(Player *, CardZone *, bool)));
+    connect(player, &Player::logDrawCards, this, &MessageLogWidget::logDrawCards);
+    connect(player, &Player::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
+    connect(player, &Player::logRevealCards, this, &MessageLogWidget::logRevealCards);
+    connect(player, &Player::logAlwaysRevealTopCard, this, &MessageLogWidget::logAlwaysRevealTopCard);
+    connect(player, &Player::logAlwaysLookAtTopCard, this, &MessageLogWidget::logAlwaysLookAtTopCard);
 }
 
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)

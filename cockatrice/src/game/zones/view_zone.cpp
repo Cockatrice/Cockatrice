@@ -1,8 +1,8 @@
 #include "view_zone.h"
 
 #include "../../server/pending_command.h"
-#include "../cards/card_database.h"
 #include "../cards/card_drag_item.h"
+#include "../cards/card_info.h"
 #include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_dump_zone.pb.h"
@@ -148,7 +148,16 @@ void ZoneViewZone::updateCardIds(CardAction action)
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {
-    CardList cardsToDisplay(cards);
+    // filter cards
+    CardList cardsToDisplay = CardList(cards.getContentsKnown());
+    for (auto card : cards) {
+        if (filterString.check(card->getInfo())) {
+            card->show();
+            cardsToDisplay.append(card);
+        } else {
+            card->hide();
+        }
+    }
 
     // sort cards
     QList<CardList::SortOption> sortOptions;
@@ -261,6 +270,12 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 
         return GridSize{rows, qMax(cols, 1)};
     }
+}
+
+void ZoneViewZone::setFilterString(const QString &_filterString)
+{
+    filterString = FilterString(_filterString);
+    reorganizeCards();
 }
 
 void ZoneViewZone::setGroupBy(CardList::SortOption _groupBy)

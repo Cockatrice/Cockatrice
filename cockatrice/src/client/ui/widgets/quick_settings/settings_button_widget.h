@@ -13,6 +13,7 @@ class SettingsButtonWidget : public QWidget
 public:
     explicit SettingsButtonWidget(QWidget *parent = nullptr);
     void addSettingsWidget(QWidget *toAdd) const;
+    void setButtonIcon(QPixmap iconMap);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

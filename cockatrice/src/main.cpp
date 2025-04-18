@@ -28,7 +28,6 @@
 #include "client/ui/window_main.h"
 #include "dialogs/dlg_settings.h"
 #include "featureset.h"
-#include "game/cards/card_database.h"
 #include "rng_sfmt.h"
 #include "settings/cache_settings.h"
 #include "utility/logger.h"

@@ -117,7 +117,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
 
     showOnlyIfSpectatorsCanWatch = new QCheckBox(tr("Show games only if &spectators can watch"));
     showOnlyIfSpectatorsCanWatch->setChecked(gamesProxyModel->getShowOnlyIfSpectatorsCanWatch());
-    connect(showOnlyIfSpectatorsCanWatch, SIGNAL(toggled(bool)), this, SLOT(toggleSpectatorCheckboxEnabledness(bool)));
+    connect(showOnlyIfSpectatorsCanWatch, &QCheckBox::toggled, this,
+            &DlgFilterGames::toggleSpectatorCheckboxEnabledness);
 
     showSpectatorPasswordProtected = new QCheckBox(tr("Show spectator password p&rotected games"));
     showSpectatorPasswordProtected->setChecked(gamesProxyModel->getShowSpectatorPasswordProtected());
@@ -158,8 +159,8 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hbox->addLayout(rightColumn);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgFilterGames::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgFilterGames::reject);
 
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);

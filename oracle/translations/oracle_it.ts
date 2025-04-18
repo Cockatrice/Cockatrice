@@ -369,7 +369,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid.</source>
-        <translation>L&apos;indirizzo URL non è valido.</translation>
+        <translation>L&apos;indirizzo fornito non è valido.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>

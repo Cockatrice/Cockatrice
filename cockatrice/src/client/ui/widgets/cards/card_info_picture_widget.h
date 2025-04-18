@@ -1,9 +1,10 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 #include "card_info_picture_enlarged_widget.h"
 
+#include <QPropertyAnimation>
 #include <QTimer>
 #include <QWidget>
 
@@ -17,23 +18,27 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit CardInfoPictureWidget(QWidget *parent = nullptr, bool hoverToZoomEnabled = false);
+    explicit CardInfoPictureWidget(QWidget *parent = nullptr,
+                                   bool hoverToZoomEnabled = false,
+                                   bool raiseOnEnter = false);
     CardInfoPtr getInfo()
     {
         return info;
     }
     [[nodiscard]] QSize sizeHint() const override;
-    void setHoverToZoomEnabled(bool enabled);
 
 public slots:
     void setCard(CardInfoPtr card);
     void setScaleFactor(int scale); // New slot for scaling
+    void setHoverToZoomEnabled(bool enabled);
+    void setRaiseOnEnterEnabled(bool enabled);
     void updatePixmap();
 
 signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
     void cardScaleFactorChanged(int _scale);
     void cardChanged(CardInfoPtr card);
+    void cardClicked();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -44,6 +49,7 @@ protected:
     void enterEvent(QEvent *event) override; // Qt5 signature
 #endif
     void leaveEvent(QEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void loadPixmap();
@@ -60,14 +66,18 @@ private:
     qreal aspectRatio = magicTheGatheringCardAspectRatio;
     int baseWidth = 200;
     int baseHeight = 200;
-    double scaleFactor = 1.5;
+    double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;
+    bool raiseOnEnter;
     int hoverActivateThresholdInMs = 500;
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
+    QPropertyAnimation *animation;
+    QPoint originalPos;             // Store the original position
+    const int animationOffset = 10; // Adjust this for how much the widget moves up
 
     QMenu *createRightClickMenu();
     QMenu *createViewRelatedCardsMenu();

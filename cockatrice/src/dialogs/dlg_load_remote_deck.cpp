@@ -15,8 +15,8 @@ DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) :
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgLoadRemoteDeck::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgLoadRemoteDeck::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(dirView);
@@ -28,8 +28,8 @@ DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) :
     setMinimumWidth(sizeHint().width());
     resize(400, 600);
 
-    connect(dirView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this,
-            SLOT(currentItemChanged(const QModelIndex &, const QModelIndex &)));
+    connect(dirView->selectionModel(), &QItemSelectionModel::currentChanged, this,
+            &DlgLoadRemoteDeck::currentItemChanged);
 }
 
 void DlgLoadRemoteDeck::currentItemChanged(const QModelIndex &current, const QModelIndex & /*previous*/)

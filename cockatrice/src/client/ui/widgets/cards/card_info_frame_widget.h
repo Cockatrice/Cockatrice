@@ -1,7 +1,7 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 
 #include <QPushButton>
 #include <QTabWidget>

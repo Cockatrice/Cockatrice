@@ -31,6 +31,7 @@ public:
 
     CardSizeWidget *cardSizeWidget;
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
+    bool deckPreviewSelectionAnimationEnabled;
 
 public slots:
     void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option
@@ -39,6 +40,7 @@ public slots:
     void updateColorFilter();
     void updateSearchFilter();
     void updateTagsVisibility(bool visible);
+    void updateSelectionAnimationEnabled(bool enabled);
     void updateSortOrder();
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;

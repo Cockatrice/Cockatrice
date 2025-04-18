@@ -6,6 +6,7 @@
 #include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/pixel_map_generator.h"
+#include "api/edhrec/tab_edhrec_main.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_notify_user.pb.h"
 #include "pb/event_user_message.pb.h"
@@ -25,6 +26,9 @@
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
+#include "tab_visual_database_display.h"
+#include "visual_deck_editor/tab_deck_editor_visual.h"
+#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
@@ -130,9 +134,18 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabDeckEditor = new QAction(this);
     connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
 
+    aTabVisualDeckEditor = new QAction(this);
+    connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(nullptr); });
+
+    aTabEdhRec = new QAction(this);
+    connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
+
     aTabVisualDeckStorage = new QAction(this);
     aTabVisualDeckStorage->setCheckable(true);
     connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
+
+    aTabVisualDatabaseDisplay = new QAction(this);
+    connect(aTabVisualDatabaseDisplay, &QAction::triggered, this, [this] { addVisualDatabaseDisplayTab(); });
 
     aTabServer = new QAction(this);
     aTabServer->setCheckable(true);
@@ -176,7 +189,10 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
+    aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
+    aTabEdhRec->setText(tr("EDHRec"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
+    aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
     aTabDeckStorage->setText(tr("Deck Storage"));
@@ -223,6 +239,7 @@ void TabSupervisor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
+    aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
     aTabVisualDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckStorage"));
     aTabServer->setShortcuts(shortcuts.getShortcut("Tabs/aTabServer"));
     aTabAccount->setShortcuts(shortcuts.getShortcut("Tabs/aTabAccount"));
@@ -370,8 +387,11 @@ void TabSupervisor::resetTabsMenu()
 {
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
+    tabsMenu->addAction(aTabVisualDeckEditor);
+    tabsMenu->addAction(aTabEdhRec);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabVisualDeckStorage);
+    tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabDeckStorage);
     tabsMenu->addAction(aTabReplays);
 }
@@ -800,6 +820,36 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *deckToOpen)
+{
+    auto *tab = new TabDeckEditorVisual(this);
+    if (deckToOpen)
+        tab->openDeck(new DeckLoader(*deckToOpen));
+    connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
+    connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
+    myAddTab(tab);
+    deckEditorTabs.append(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabEdhRecMain *TabSupervisor::addEdhrecMainTab()
+{
+    auto *tab = new TabEdhRecMain(this);
+
+    myAddTab(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabVisualDatabaseDisplay *TabSupervisor::addVisualDatabaseDisplayTab()
+{
+    auto *tab = new TabVisualDatabaseDisplay(this);
+    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }

@@ -542,17 +542,17 @@ Detta sparas endast för moderatorer och kan inte ses av den bannlysta personen.
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation type="unfinished"/>
     </message>
@@ -8864,7 +8864,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="587"/>
         <source>Leave Game</source>
-        <translation type="unfinished"/>
+        <translation>Lämna spelet</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="591"/>
@@ -8874,7 +8874,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="592"/>
         <source>Roll Dice...</source>
-        <translation type="unfinished"/>
+        <translation>Kasta tärning</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="595"/>
@@ -8984,32 +8984,32 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="663"/>
         <source>Visual Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Visuell Leklagring</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="667"/>
         <source>Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Leklagring</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="671"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Server</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="673"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Konto</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="674"/>
         <source>Administration</source>
-        <translation type="unfinished"/>
+        <translation>Administratör</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="678"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>Loggar</translation>
     </message>
 </context>
 </TS>

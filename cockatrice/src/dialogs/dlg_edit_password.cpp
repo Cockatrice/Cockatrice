@@ -44,8 +44,8 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
     grid->addWidget(newPasswordEdit2, 2, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditPassword::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditPassword::reject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);

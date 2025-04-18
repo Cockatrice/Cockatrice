@@ -472,6 +472,45 @@ QStringList CardDatabase::getAllMainCardTypes() const
     return types.values();
 }
 
+QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getMainCardType();
+        typeCounts[type]++;
+    }
+
+    return typeCounts;
+}
+
+QMap<QString, int> CardDatabase::getAllSubCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getCardType();
+
+        QStringList parts = type.split(" — ");
+
+        if (parts.size() > 1) { // Ensure there are subtypes
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+            QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
+#else
+            QStringList subtypes = parts[1].split(" ", QString::SkipEmptyParts);
+#endif
+
+            for (const QString &subtype : subtypes) {
+                typeCounts[subtype]++;
+            }
+        }
+    }
+
+    return typeCounts;
+}
+
 void CardDatabase::checkUnknownSets()
 {
     auto _sets = getSetList();

@@ -25,7 +25,7 @@
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="24"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"/>
+        <translation>&amp;aktualisieren</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="32"/>
@@ -38,18 +38,19 @@
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="232"/>
         <source>Open in new tab</source>
-        <translation type="unfinished"/>
+        <translation>In neuem Reiter öffnen</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="261"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="262"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation type="unfinished"/>
+        <translation>Die Deckliste wurde bearbeitet.
+Änderungen speichern?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="315"/>
@@ -60,44 +61,45 @@ Do you want to save the changes?</source>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="467"/>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="479"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="315"/>
         <source>Could not open deck at %1</source>
-        <translation type="unfinished"/>
+        <translation>Deck an Stelle %1 konnte nicht geöffnet werden</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="326"/>
         <source>Could not save remote deck</source>
-        <translation type="unfinished"/>
+        <translation>Remote-Deck konnte nicht gespeichert werden</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="348"/>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="369"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation type="unfinished"/>
+        <translation>Das Deck konnte nicht abgespeichert werden.
+Bitte überprüfen Sie ob das Verzeichnis bearbeitet werden kann und versuchen Sie es erneut.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="354"/>
         <source>Save deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck speichern</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="382"/>
         <source>The deck could not be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Das Deck konnte nicht abgespeichert werden.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="467"/>
         <source>There are no cards in your deck to be exported</source>
-        <translation type="unfinished"/>
+        <translation>Es gibt keine Karten in Ihrem Deck zum Exportieren</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="479"/>
         <source>No deck was selected to be exported.</source>
-        <translation type="unfinished"/>
+        <translation>Es wurde kein Deck zum Exportieren ausgewählt.</translation>
     </message>
 </context>
 <context>
@@ -196,7 +198,7 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="548"/>
         <source>Use rounded card corners</source>
-        <translation type="unfinished"/>
+        <translation>Abgerundete Karten Ecken verwenden</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="550"/>
@@ -542,17 +544,17 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
         <translation>Zugehörige Karten ansehen</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="317"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation>Karte zum Deck hinzufügen</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation>Mainboard</translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="336"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation>Sideboard</translation>
     </message>
@@ -724,7 +726,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp" line="44"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Karteninformation</translation>
     </message>
 </context>
 <context>
@@ -737,12 +739,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="191"/>
         <source>Add to Deck</source>
-        <translation type="unfinished"/>
+        <translation>Zum Deck hinzufügen</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="192"/>
         <source>Add to Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Zum Sideboard hinzufügen</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="193"/>
@@ -752,27 +754,27 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="195"/>
         <source>Show on EDHREC (Commander)</source>
-        <translation type="unfinished"/>
+        <translation>Auf EDHREC anzeigen (Commander)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="199"/>
         <source>Show on EDHREC (Card)</source>
-        <translation type="unfinished"/>
+        <translation>Auf EDHREC anzeigen (Karte)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="208"/>
         <source>Show Related cards</source>
-        <translation type="unfinished"/>
+        <translation>Zeige ähnliche Karten</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="280"/>
         <source>Add card to &amp;maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Karte zum &amp;Hauptdeck hinzufügen</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="281"/>
         <source>Add card to &amp;sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Karte zum &amp;Sideboard hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -780,7 +782,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="71"/>
         <source>Banner Card</source>
-        <translation type="unfinished"/>
+        <translation>Bannerkarte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="506"/>
@@ -790,7 +792,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="523"/>
         <source>Deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="525"/>
@@ -800,12 +802,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="526"/>
         <source>&amp;Comments:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Kommentare:</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="527"/>
         <source>Hash:</source>
-        <translation type="unfinished"/>
+        <translation>Hash:</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="529"/>
@@ -820,7 +822,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="531"/>
         <source>&amp;Remove row</source>
-        <translation type="unfinished"/>
+        <translation>Reihe &amp;entfernen</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="532"/>
@@ -833,7 +835,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="139"/>
         <source>Filters</source>
-        <translation type="unfinished"/>
+        <translation>Filter</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="141"/>
@@ -843,7 +845,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="142"/>
         <source>Delete selected</source>
-        <translation type="unfinished"/>
+        <translation>Auswahl löschen</translation>
     </message>
 </context>
 <context>
@@ -1169,7 +1171,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/deck/deck_loader.cpp" line="22"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"/>
+        <translation>Alle Dateien (*.*)</translation>
     </message>
 </context>
 <context>

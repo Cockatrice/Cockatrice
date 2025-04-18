@@ -30,6 +30,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
+#include <QPrinter>
 #include <QProcessEnvironment>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -65,7 +66,8 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
             &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
 
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &AbstractTabDeckEditor::refreshShortcuts);
 }
 
 void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
@@ -124,8 +126,13 @@ void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
 {
     QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
     QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
-    deckDockWidget->swapCard(
-        deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber));
+
+    QModelIndex foundCard = deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
+    if (!foundCard.isValid()) {
+        foundCard = deckDockWidget->deckModel->findCard(info->getName(), zoneName);
+    }
+
+    deckDockWidget->swapCard(foundCard);
 }
 
 /**
@@ -332,8 +339,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(saveDeckRemoteFinished(Response)));
+        connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
         tabSupervisor->getClient()->sendCommand(pend);
 
         return true;
@@ -357,6 +363,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
     dialog.selectFile(getDeckList()->getName().trimmed());
+
     if (!dialog.exec())
         return false;
 
@@ -451,7 +458,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, SIGNAL(paintRequested(QPrinter *)), deckDockWidget->deckModel, SLOT(printDeckList(QPrinter *)));
+    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
     dlg->exec();
 }
 

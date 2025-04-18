@@ -1,7 +1,7 @@
 #ifndef SET_PRIORITY_COMPARATOR_H
 #define SET_PRIORITY_COMPARATOR_H
 
-#include "../game/cards/card_database.h"
+#include "../game/cards/card_info.h"
 
 class SetPriorityComparator
 {

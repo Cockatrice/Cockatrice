@@ -125,6 +125,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
     updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
 
+    deckPreviewSelectionAnimationEnabled = SettingsCache::instance().getVisualDeckStorageSelectionAnimation();
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+            &VisualDeckStorageWidget::updateSelectionAnimationEnabled);
+
     // deck area
     scrollArea = new QScrollArea(this);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -211,14 +215,18 @@ void VisualDeckStorageWidget::createRootFolderWidget()
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
-    reapplySortAndFilters();
+
+    /* We have to schedule a QTimer here so that the sorting logic doesn't try to access widgets that haven't been
+     * processed by the event loop yet. Otherwise, deck sorting will intermittently segfault on some systems.
+     */
+    QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
 }
 
 void VisualDeckStorageWidget::updateShowFolders(bool enabled)
 {
     if (folderWidget) {
         folderWidget->updateShowFolders(enabled);
-        reapplySortAndFilters();
+        QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
     }
 }
 
@@ -266,4 +274,9 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
     } else {
         tagFilterWidget->setHidden(true);
     }
+}
+
+void VisualDeckStorageWidget::updateSelectionAnimationEnabled(const bool enabled)
+{
+    deckPreviewSelectionAnimationEnabled = enabled;
 }

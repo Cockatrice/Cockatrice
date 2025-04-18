@@ -23,11 +23,10 @@
 PictureLoader::PictureLoader() : QObject(nullptr)
 {
     worker = new PictureLoaderWorker;
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoader::picsPathChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this, &PictureLoader::picDownloadChanged);
 
-    connect(worker, SIGNAL(imageLoaded(CardInfoPtr, const QImage &)), this,
-            SLOT(imageLoaded(CardInfoPtr, const QImage &)));
+    connect(worker, &PictureLoaderWorker::imageLoaded, this, &PictureLoader::imageLoaded);
 }
 
 PictureLoader::~PictureLoader()

@@ -31,7 +31,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
             &VisualDeckStorageTagFilterWidget::refreshTags);
     deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
 
-    bannerCardDisplayWidget = new DeckPreviewCardPictureWidget(this);
+    bannerCardDisplayWidget =
+        new DeckPreviewCardPictureWidget(this, false, visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
 
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageClicked, this,
             &DeckPreviewWidget::imageClickedEvent);

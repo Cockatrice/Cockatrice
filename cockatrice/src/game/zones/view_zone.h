@@ -1,6 +1,7 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
+#include "../filters/filter_string.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
@@ -35,6 +36,7 @@ private:
     int minRows, numberCards;
     CardZone *origZone;
     bool revealZone, writeableRevealZone;
+    FilterString filterString = FilterString("");
     CardList::SortOption groupBy, sortBy;
     bool pileView;
     bool isReversed;
@@ -96,6 +98,7 @@ public:
     }
 public slots:
     void close();
+    void setFilterString(const QString &_filterString);
     void setGroupBy(CardList::SortOption _groupBy);
     void setSortBy(CardList::SortOption _sortBy);
     void setPileView(int _pileView);

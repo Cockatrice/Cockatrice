@@ -263,6 +263,8 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
 
     emitRecursiveUpdates(index);
     deckList->refreshDeckHash();
+
+    emit dataChanged(index, index);
     return true;
 }
 
@@ -292,7 +294,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     } else {
         emitRecursiveUpdates(parent);
     }
-
+    emit dataChanged(parent, parent);
     return true;
 }
 
@@ -481,6 +483,94 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
     connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
     connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     rebuildTree();
+}
+
+QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
+{
+    QList<CardInfoPtr> cards;
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return cards;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return cards;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        for (int j = 0; j < currentZone->size(); j++) {
+            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            if (!currentCard)
+                continue;
+            for (int k = 0; k < currentCard->getNumber(); ++k) {
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                    currentCard->getName(), currentCard->getCardProviderId());
+                if (info) {
+                    cards.append(info);
+                } else {
+                    qDebug() << "Card not found in database!";
+                }
+            }
+        }
+    }
+    return cards;
+}
+
+QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName) const
+{
+    QList<CardInfoPtr> cards;
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return cards;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return cards;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        if (currentZone->getName() == zoneName) {
+            for (int j = 0; j < currentZone->size(); j++) {
+                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+                if (!currentCard)
+                    continue;
+                for (int k = 0; k < currentCard->getNumber(); ++k) {
+                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                        currentCard->getName(), currentCard->getCardProviderId());
+                    if (info) {
+                        cards.append(info);
+                    } else {
+                        qDebug() << "Card not found in database!";
+                    }
+                }
+            }
+        }
+    }
+    return cards;
+}
+
+QList<QString> *DeckListModel::getZones() const
+{
+    QList<QString> *zones = new QList<QString>();
+    DeckList *decklist = getDeckList();
+    if (!decklist) {
+        return zones;
+    }
+    InnerDecklistNode *listRoot = decklist->getRoot();
+    if (!listRoot)
+        return zones;
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        if (!currentZone)
+            continue;
+        zones->append(currentZone->getName());
+    }
+    return zones;
 }
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)

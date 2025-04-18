@@ -280,6 +280,8 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
     visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
+    visualDeckStorageSelectionAnimation =
+        settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -449,6 +451,12 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
 {
     deckPath = _deckPath;
     settings->setValue("paths/decks", deckPath);
+}
+
+void SettingsCache::setFiltersPath(const QString &_filtersPath)
+{
+    filtersPath = _filtersPath;
+    settings->setValue("paths/filters", filtersPath);
 }
 
 void SettingsCache::setReplaysPath(const QString &_replaysPath)
@@ -736,13 +744,13 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
-void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
+void SettingsCache::setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion)
 {
     visualDeckStoragePromptForConversion = _visualDeckStoragePromptForConversion;
     settings->setValue("interface/visualdeckstoragepromptforconversion", visualDeckStoragePromptForConversion);
 }
 
-void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert)
+void SettingsCache::setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert)
 {
     visualDeckStorageAlwaysConvert = _visualDeckStorageAlwaysConvert;
     settings->setValue("interface/visualdeckstoragealwaysconvert", visualDeckStorageAlwaysConvert);
@@ -753,6 +761,13 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T value)
     visualDeckStorageInGame = value;
     settings->setValue("interface/visualdeckstorageingame", visualDeckStorageInGame);
     emit visualDeckStorageInGameChanged(visualDeckStorageInGame);
+}
+
+void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageSelectionAnimation = value;
+    settings->setValue("interface/visualdeckstorageselectionanimation", visualDeckStorageSelectionAnimation);
+    emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)
@@ -1312,6 +1327,7 @@ void SettingsCache::loadPaths()
 {
     QString dataPath = getDataPath();
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
+    filtersPath = getSafeConfigPath("paths/filters", dataPath + "/filters/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");

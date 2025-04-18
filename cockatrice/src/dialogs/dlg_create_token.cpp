@@ -36,7 +36,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
         nameEdit->setFocus();
     });
 
-    connect(nameEdit, SIGNAL(textChanged(const QString &)), this, SLOT(updateSearch(const QString &)));
+    connect(nameEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updateSearch);
     nameLabel->setBuddy(nameEdit);
 
     colorLabel = new QLabel(tr("C&olor:"));
@@ -82,9 +82,9 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 
     chooseTokenFromAllRadioButton = new QRadioButton(tr("Show &all tokens"));
-    connect(chooseTokenFromAllRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromAll(bool)));
+    connect(chooseTokenFromAllRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromAll);
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
-    connect(chooseTokenFromDeckRadioButton, SIGNAL(toggled(bool)), this, SLOT(actChooseTokenFromDeck(bool)));
+    connect(chooseTokenFromDeckRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromDeck);
 
     QByteArray deckHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     chooseTokenView = new QTreeView;
@@ -104,9 +104,9 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->header()->hideSection(1);                                         // Sets
     chooseTokenView->header()->hideSection(2);                                         // Mana Cost
     chooseTokenView->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents); // Color(s)
-    connect(chooseTokenView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex, QModelIndex)), this,
-            SLOT(tokenSelectionChanged(QModelIndex, QModelIndex)));
-    connect(chooseTokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(actOk()));
+    connect(chooseTokenView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            &DlgCreateToken::tokenSelectionChanged);
+    connect(chooseTokenView, &QTreeView::doubleClicked, this, &DlgCreateToken::actOk);
 
     if (predefinedTokens.isEmpty()) {
         chooseTokenFromAllRadioButton->setChecked(true);
@@ -135,8 +135,8 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     hbox->setColumnStretch(1, 1);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(actOk()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(actReject()));
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgCreateToken::actOk);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateToken::actReject);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(hbox);
@@ -224,27 +224,11 @@ void DlgCreateToken::actReject()
     reject();
 }
 
-QString DlgCreateToken::getName() const
+TokenInfo DlgCreateToken::getTokenInfo() const
 {
-    return nameEdit->text();
-}
-
-QString DlgCreateToken::getColor() const
-{
-    return QString(colorEdit->itemData(colorEdit->currentIndex()).toChar());
-}
-
-QString DlgCreateToken::getPT() const
-{
-    return ptEdit->text();
-}
-
-QString DlgCreateToken::getAnnotation() const
-{
-    return annotationEdit->text();
-}
-
-bool DlgCreateToken::getDestroy() const
-{
-    return destroyCheckBox->isChecked();
+    return {.name = nameEdit->text(),
+            .color = colorEdit->itemData(colorEdit->currentIndex()).toString(),
+            .pt = ptEdit->text(),
+            .annotation = annotationEdit->text(),
+            .destroy = destroyCheckBox->isChecked()};
 }

@@ -2,8 +2,9 @@
 #define PLAYER_H
 
 #include "../../client/tearoff_menu.h"
+#include "../../dialogs/dlg_create_token.h"
 #include "../board/abstract_graphics_item.h"
-#include "../cards/card_database.h"
+#include "../cards/card_info.h"
 #include "../filters/filter_string.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
@@ -291,9 +292,10 @@ private:
     int defaultNumberTopCardsToPlaceBelow = 1;
     int defaultNumberBottomCards = 1;
     int defaultNumberDieRoll = 20;
-    QString lastTokenName, lastTokenColor, lastTokenPT, lastTokenAnnotation;
-    bool lastTokenDestroy;
+
+    TokenInfo lastTokenInfo;
     int lastTokenTableRow;
+
     ServerInfo_User *userInfo;
     int id;
     bool active;

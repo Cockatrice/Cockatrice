@@ -18,7 +18,7 @@ PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_
 {
     if (highlightable) {
         activeAnimationTimer = new QTimer(this);
-        connect(activeAnimationTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+        connect(activeAnimationTimer, &QTimer::timeout, this, &PhaseButton::updateAnimation);
         activeAnimationTimer->setSingleShot(false);
     } else
         activeAnimationCounter = 9;
@@ -106,9 +106,9 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     : QGraphicsItem(parent), width(100), height(100), ySpacing(1), symbolSize(8)
 {
     auto *aUntapAll = new QAction(this);
-    connect(aUntapAll, SIGNAL(triggered()), this, SLOT(actUntapAll()));
+    connect(aUntapAll, &QAction::triggered, this, &PhasesToolbar::actUntapAll);
     auto *aDrawCard = new QAction(this);
-    connect(aDrawCard, SIGNAL(triggered()), this, SLOT(actDrawCard()));
+    connect(aDrawCard, &QAction::triggered, this, &PhasesToolbar::actDrawCard);
 
     PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
     PhaseButton *upkeepButton = new PhaseButton("upkeep", this);
@@ -126,10 +126,10 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
                << combatBlockersButton << combatDamageButton << combatEndButton << main2Button << cleanupButton;
 
     for (auto &i : buttonList)
-        connect(i, SIGNAL(clicked()), this, SLOT(phaseButtonClicked()));
+        connect(i, &PhaseButton::clicked, this, &PhasesToolbar::phaseButtonClicked);
 
     nextTurnButton = new PhaseButton("nextturn", this, nullptr, false);
-    connect(nextTurnButton, SIGNAL(clicked()), this, SLOT(actNextTurn()));
+    connect(nextTurnButton, &PhaseButton::clicked, this, &PhasesToolbar::actNextTurn);
 
     rearrangeButtons();
 
