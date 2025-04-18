@@ -74,7 +74,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     advertiseTranslationPageLabel.setOpenExternalLinks(true);
 
-    connect(&languageBox, &QComboBox::currentIndexChanged, this, &GeneralSettingsPage::languageBoxChanged);
+    connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::languageBoxChanged);
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
@@ -194,7 +195,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     GeneralSettingsPage::retranslateUi();
 
     // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
-    connect(&updateReleaseChannelBox, &QComboBox::currentIndexChanged, &settings,
+    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings,
             &SettingsCache::setUpdateReleaseChannelIndex);
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
@@ -365,7 +366,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             themeBox.setCurrentIndex(i);
     }
 
-    connect(&themeBox, &QComboBox::currentIndexChanged, this, &AppearanceSettingsPage::themeBoxChanged);
+    connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
     auto *themeGrid = new QGridLayout;
@@ -1351,7 +1352,7 @@ SoundSettingsPage::SoundSettingsPage()
             themeBox.setCurrentIndex(i);
     }
 
-    connect(&themeBox, &QComboBox::currentIndexChanged, this, &SoundSettingsPage::themeBoxChanged);
+    connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &SoundSettingsPage::themeBoxChanged);
     connect(&soundTestButton, &QPushButton::clicked, soundEngine, &SoundEngine::testSound);
 
     masterVolumeSlider = new QSlider(Qt::Horizontal);
