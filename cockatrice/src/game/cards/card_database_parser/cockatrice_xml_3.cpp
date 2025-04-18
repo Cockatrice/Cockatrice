@@ -13,10 +13,10 @@
 
 bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
-    qCDebug(CockatriceXml3Log) << "Trying to parse: " << fileName;
+    qCInfo(CockatriceXml3Log) << "Trying to parse: " << fileName;
 
     if (!fileName.endsWith(".xml", Qt::CaseInsensitive)) {
-        qCDebug(CockatriceXml3Log) << "Parsing failed: wrong extension";
+        qCInfo(CockatriceXml3Log) << "Parsing failed: wrong extension";
         return false;
     }
 
@@ -28,12 +28,12 @@ bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &d
                 if (version == COCKATRICE_XML3_TAGVER) {
                     return true;
                 } else {
-                    qCDebug(CockatriceXml3Log) << "Parsing failed: wrong version" << version;
+                    qCInfo(CockatriceXml3Log) << "Parsing failed: wrong version" << version;
                     return false;
                 }
 
             } else {
-                qCDebug(CockatriceXml3Log) << "Parsing failed: wrong element tag" << xml.name();
+                qCInfo(CockatriceXml3Log) << "Parsing failed: wrong element tag" << xml.name();
                 return false;
             }
         }
@@ -58,7 +58,7 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
                 } else if (name == "cards") {
                     loadCardsFromXml(xml);
                 } else if (!name.isEmpty()) {
-                    qCDebug(CockatriceXml3Log) << "Unknown item" << name << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown item" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -93,7 +93,7 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
                     releaseDate =
                         QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
                 } else if (!name.isEmpty()) {
-                    qCDebug(CockatriceXml3Log) << "Unknown set property" << name << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown set property" << name << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -263,7 +263,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         relatedCards << relation;
                     }
                 } else if (!xmlName.isEmpty()) {
-                    qCDebug(CockatriceXml3Log) << "Unknown card property" << xmlName << ", trying to continue anyway";
+                    qCInfo(CockatriceXml3Log) << "Unknown card property" << xmlName << ", trying to continue anyway";
                     xml.skipCurrentElement();
                 }
             }
@@ -280,7 +280,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
     if (set.isNull()) {
-        qCDebug(CockatriceXml3Log) << "&operator<< set is nullptr";
+        qCWarning(CockatriceXml3Log) << "&operator<< set is nullptr";
         return xml;
     }
 
@@ -297,7 +297,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &info)
 {
     if (info.isNull()) {
-        qCDebug(CockatriceXml3Log) << "operator<< info is nullptr";
+        qCWarning(CockatriceXml3Log) << "operator<< info is nullptr";
         return xml;
     }
 

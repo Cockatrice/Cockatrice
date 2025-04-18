@@ -23,11 +23,10 @@
 PictureLoader::PictureLoader() : QObject(nullptr)
 {
     worker = new PictureLoaderWorker;
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoader::picsPathChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this, &PictureLoader::picDownloadChanged);
 
-    connect(worker, SIGNAL(imageLoaded(CardInfoPtr, const QImage &)), this,
-            SLOT(imageLoaded(CardInfoPtr, const QImage &)));
+    connect(worker, &PictureLoaderWorker::imageLoaded, this, &PictureLoader::imageLoaded);
 }
 
 PictureLoader::~PictureLoader()
@@ -115,7 +114,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         if (bigPixmap.isNull()) {
-            qCWarning(PictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
+            qCDebug(PictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
             return;
         }
 
@@ -140,7 +139,11 @@ void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());
     } else {
         if (card->getUpsideDownArt()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+            QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
+#else
             QImage mirrorImage = image.mirrored(true, true);
+#endif
             QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
         } else {
             QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(image));
@@ -194,4 +197,32 @@ void PictureLoader::picDownloadChanged()
 void PictureLoader::picsPathChanged()
 {
     QPixmapCache::clear();
+}
+
+bool PictureLoader::hasCustomArt()
+{
+    auto picsPath = SettingsCache::instance().getPicsPath();
+    QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    // Check if there is at least one non-directory file in the pics path, other
+    // than in the "downloadedPics" subdirectory.
+    while (it.hasNext()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
+        QFileInfo dir(it.nextFileInfo());
+#else
+        // nextFileInfo() is only available in Qt 6.3+, for previous versions, we build
+        // the QFileInfo from a QString which requires more system calls.
+        QFileInfo dir(it.next());
+#endif
+
+        if (it.fileName() == "downloadedPics")
+            continue;
+
+        QDirIterator subIt(it.filePath(), QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+        if (subIt.hasNext()) {
+            return true;
+        }
+    }
+
+    return false;
 }

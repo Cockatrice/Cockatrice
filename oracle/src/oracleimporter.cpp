@@ -213,13 +213,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
     // mtgjson name => xml name
     static const QMap<QString, QString> setInfoProperties{
-        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}};
+        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}, {"isRebalanced", "isRebalanced"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
 
     int numCards = 0;
-    QMap<QString, QList<SplitCardPart>> splitCards;
+    QMap<QString, QPair<QList<SplitCardPart>, QString>> splitCards;
     QString ptSeparator("/");
     QVariantMap card;
     QString layout, name, text, colors, colorIdentity, faceName;
@@ -293,6 +293,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         const QChar lastChar = numProperty.isEmpty() ? QChar() : numProperty.back();
 
         // Un-Sets do some wonky stuff. Split up these cards as individual entries.
+        // these cards will have a num with a letter (abc) behind it, put that letter into the name
         if (setsWithCardsWithSameNameButDifferentText.contains(currentSet->getShortName()) &&
             allNameProps.contains(faceName) && layout == "normal" && lastChar.isLetter()) {
             numComponent = " (" + QString(lastChar).toLower() + ")";
@@ -337,13 +338,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
             auto _faceName = getStringPropertyFromMap(card, "faceName");
             SplitCardPart split(_faceName, text, properties, setInfo);
-            auto found_iter = splitCards.find(name);
+            auto found_iter = splitCards.find(name + numProperty);
             if (found_iter == splitCards.end()) {
-                splitCards.insert(name, {split});
+                splitCards.insert(name + numProperty, {{split}, name});
             } else if (layout == "adventure") {
-                found_iter->insert(0, split);
+                found_iter->first.insert(0, split);
             } else {
-                found_iter->append(split);
+                found_iter->first.append(split);
             }
         } else {
             // relations
@@ -397,22 +398,15 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     static const QString splitCardTextSeparator = QString("\n\n---\n\n");
     for (const QString &nameSplit : splitCards.keys()) {
         // get all parts for this specific card
-        QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit);
-        QSet<QString> done{};
+        QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit).first;
+        name = splitCards.value(nameSplit).second;
 
         text.clear();
         properties.clear();
         relatedCards.clear();
 
         for (const SplitCardPart &tmp : splitCardParts) {
-            // some sets have 2 different variations of the same split card,
-            // eg. Fire // Ice in WC02. Avoid adding duplicates.
             QString splitName = tmp.getName();
-            if (done.contains(splitName)) {
-                continue;
-            }
-            done.insert(splitName);
-
             if (!text.isEmpty()) {
                 text.append(splitCardTextSeparator);
             }
@@ -441,7 +435,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 }
             }
         }
-        CardInfoPtr newCard = addCard(nameSplit, text, isToken, properties, relatedCards, setInfo);
+        CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, setInfo);
         numCards++;
     }
 

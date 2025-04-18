@@ -3,7 +3,7 @@
 
 #include "../../../../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../../../../deck/deck_list_model.h"
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
 #include "card_amount_widget.h"

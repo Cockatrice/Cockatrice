@@ -1,6 +1,6 @@
 #include "card_list.h"
 
-#include "card_database.h"
+#include "card_info.h"
 #include "card_item.h"
 
 #include <QDebug>
@@ -151,6 +151,6 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
     }
 
     // this line should never be reached
-    qCDebug(CardListLog) << "cardlist.cpp: Could not find extractor for SortOption" << option;
+    qCWarning(CardListLog) << "cardlist.cpp: Could not find extractor for SortOption" << option;
     return [](CardItem *) { return ""; };
 }

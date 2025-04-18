@@ -1,5 +1,6 @@
 #include "local_client.h"
 
+#include "debug_pb_message.h"
 #include "local_server_interface.h"
 #include "pb/session_commands.pb.h"
 
@@ -9,7 +10,9 @@ LocalClient::LocalClient(LocalServerInterface *_lsi,
                          QObject *parent)
     : AbstractClient(parent), lsi(_lsi)
 {
-    connect(lsi, SIGNAL(itemToClient(const ServerMessage &)), this, SLOT(itemFromServer(const ServerMessage &)));
+    connect(lsi, &LocalServerInterface::itemToClient, this, &LocalClient::itemFromServer);
+
+    userName = _playerName;
 
     Command_Login loginCmd;
     loginCmd.set_user_name(_playerName.toStdString());
@@ -27,10 +30,14 @@ LocalClient::~LocalClient()
 
 void LocalClient::sendCommandContainer(const CommandContainer &cont)
 {
+    qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+
     lsi->itemFromClient(cont);
 }
 
 void LocalClient::itemFromServer(const ServerMessage &item)
 {
+    qCDebug(LocalClientLog).noquote() << userName << "IN" << getSafeDebugString(item);
+
     processProtocolItem(item);
 }

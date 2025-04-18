@@ -36,42 +36,43 @@ RemoteClient::RemoteClient(QObject *parent)
     int keepalive = SettingsCache::instance().getKeepAlive();
     timer = new QTimer(this);
     timer->setInterval(keepalive * 1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(ping()));
+    connect(timer, &QTimer::timeout, this, &RemoteClient::ping);
 
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(socket, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(socket, &QTcpSocket::connected, this, &RemoteClient::slotConnected);
+    connect(socket, &QTcpSocket::readyRead, this, &RemoteClient::readData);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     connect(socket, &QTcpSocket::errorOccurred, this, &RemoteClient::slotSocketError);
 #else
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(slotSocketError(QAbstractSocket::SocketError)));
+    connect(socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &RemoteClient::slotSocketError);
 #endif
 
     websocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     connect(websocket, &QWebSocket::binaryMessageReceived, this, &RemoteClient::websocketMessageReceived);
     connect(websocket, &QWebSocket::connected, this, &RemoteClient::slotConnected);
-    connect(websocket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(slotWebSocketError(QAbstractSocket::SocketError)));
 
-    connect(this, SIGNAL(serverIdentificationEventReceived(const Event_ServerIdentification &)), this,
-            SLOT(processServerIdentificationEvent(const Event_ServerIdentification &)));
-    connect(this, SIGNAL(connectionClosedEventReceived(Event_ConnectionClosed)), this,
-            SLOT(processConnectionClosedEvent(Event_ConnectionClosed)));
-    connect(this, SIGNAL(sigConnectToServer(QString, unsigned int, QString, QString)), this,
-            SLOT(doConnectToServer(QString, unsigned int, QString, QString)));
-    connect(this, SIGNAL(sigDisconnectFromServer()), this, SLOT(doDisconnectFromServer()));
-    connect(this, SIGNAL(sigRegisterToServer(QString, unsigned int, QString, QString, QString, QString, QString)), this,
-            SLOT(doRegisterToServer(QString, unsigned int, QString, QString, QString, QString, QString)));
-    connect(this, SIGNAL(sigActivateToServer(QString)), this, SLOT(doActivateToServer(QString)));
-    connect(this, SIGNAL(sigRequestForgotPasswordToServer(QString, unsigned int, QString)), this,
-            SLOT(doRequestForgotPasswordToServer(QString, unsigned int, QString)));
-    connect(this, SIGNAL(sigSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)), this,
-            SLOT(doSubmitForgotPasswordResetToServer(QString, unsigned int, QString, QString, QString)));
-    connect(this, SIGNAL(sigSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)), this,
-            SLOT(doSubmitForgotPasswordChallengeToServer(QString, unsigned int, QString, QString)));
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+    connect(websocket, &QWebSocket::errorOccurred, this, &RemoteClient::slotWebSocketError);
+#else
+    connect(websocket, qOverload<QAbstractSocket::SocketError>(&QWebSocket::error), this,
+            &RemoteClient::slotWebSocketError);
+#endif
+
+    connect(this, &RemoteClient::serverIdentificationEventReceived, this,
+            &RemoteClient::processServerIdentificationEvent);
+    connect(this, &RemoteClient::connectionClosedEventReceived, this, &RemoteClient::processConnectionClosedEvent);
+    connect(this, &RemoteClient::sigConnectToServer, this, &RemoteClient::doConnectToServer);
+    connect(this, &RemoteClient::sigDisconnectFromServer, this, &RemoteClient::doDisconnectFromServer);
+    connect(this, &RemoteClient::sigRegisterToServer, this, &RemoteClient::doRegisterToServer);
+    connect(this, &RemoteClient::sigActivateToServer, this, &RemoteClient::doActivateToServer);
+    connect(this, &RemoteClient::sigRequestForgotPasswordToServer, this,
+            &RemoteClient::doRequestForgotPasswordToServer);
+    connect(this, &RemoteClient::sigSubmitForgotPasswordResetToServer, this,
+            &RemoteClient::doSubmitForgotPasswordResetToServer);
+    connect(this, &RemoteClient::sigSubmitForgotPasswordChallengeToServer, this,
+            &RemoteClient::doSubmitForgotPasswordChallengeToServer);
 }
 
 RemoteClient::~RemoteClient()
@@ -124,8 +125,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordRequest.set_user_name(userName.toStdString());
         cmdForgotPasswordRequest.set_clientid(getSrvClientID(lastHostname).toStdString());
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordRequest);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(requestForgotPasswordResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::requestForgotPasswordResponse);
         sendCommand(pend);
         return;
     }
@@ -144,8 +144,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
             cmdForgotPasswordReset.set_new_password(password.toStdString());
         }
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordReset);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(submitForgotPasswordResetResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::submitForgotPasswordResetResponse);
         sendCommand(pend);
         return;
     }
@@ -156,8 +155,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordChallenge.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordChallenge.set_email(email.toStdString());
         PendingCommand *pend = prepareSessionCommand(cmdForgotPasswordChallenge);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(submitForgotPasswordChallengeResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::submitForgotPasswordChallengeResponse);
         sendCommand(pend);
         return;
     }
@@ -178,7 +176,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdRegister.set_real_name(realName.toStdString());
         cmdRegister.set_clientid(getSrvClientID(lastHostname).toStdString());
         PendingCommand *pend = prepareSessionCommand(cmdRegister);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(registerResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::registerResponse);
         sendCommand(pend);
 
         return;
@@ -191,7 +189,7 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdActivate.set_clientid(getSrvClientID(lastHostname).toStdString());
 
         PendingCommand *pend = prepareSessionCommand(cmdActivate);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(activateResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::activateResponse);
         sendCommand(pend);
 
         return;
@@ -207,7 +205,7 @@ void RemoteClient::doRequestPasswordSalt()
     cmdRqSalt.set_user_name(userName.toStdString());
 
     PendingCommand *pend = prepareSessionCommand(cmdRqSalt);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(passwordSaltResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::passwordSaltResponse);
     sendCommand(pend);
 }
 
@@ -246,7 +244,7 @@ void RemoteClient::doLogin()
         }
 
         PendingCommand *pend = prepareSessionCommand(cmdLogin);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
+        connect(pend, &PendingCommand::finished, this, &RemoteClient::loginResponse);
         sendCommand(pend);
     }
 }
@@ -259,7 +257,7 @@ void RemoteClient::doHashedLogin()
     cmdLogin.set_hashed_password(hashedPassword.toStdString());
 
     PendingCommand *pend = prepareSessionCommand(cmdLogin);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this, SLOT(loginResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::loginResponse);
     sendCommand(pend);
 }
 
@@ -338,6 +336,11 @@ void RemoteClient::registerResponse(const Response &response)
         case Response::RespRegistrationAcceptedNeedsActivation:
             emit registerAcceptedNeedsActivate();
             doLogin();
+            break;
+        case Response::RespNotConnected:
+            // this response is created by the client from doDisconnectFromServer, do not call it again!
+            emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
+                               static_cast<quint32>(resp.denied_end_time()));
             break;
         default:
             emit registerError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),

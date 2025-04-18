@@ -131,123 +131,128 @@ Please check that the directory is writable and try again.</source>
 <context>
     <name>AppearanceSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="489"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="494"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="489"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="494"/>
         <source>Could not create themes directory at &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="527"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="532"/>
         <source>Theme settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="528"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="533"/>
         <source>Current theme:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="529"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="534"/>
         <source>Open themes folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="531"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="536"/>
         <source>Menu settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="532"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="537"/>
         <source>Show keyboard shortcuts in right-click menus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="534"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="539"/>
         <source>Card rendering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="535"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="540"/>
         <source>Display card names on cards having a picture</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="536"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="541"/>
         <source>Auto-Rotate cards with sideways layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="538"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="543"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client restart]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="541"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="546"/>
         <source>Bump sets that the deck contains cards from to the top in the printing selector</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="542"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="547"/>
         <source>Scale cards on mouse over</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="544"/>
-        <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="545"/>
-        <source>Maximum initial height for card view window:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="546"/>
         <location filename="src/dialogs/dlg_settings.cpp" line="548"/>
-        <source> rows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="547"/>
-        <source>Maximum expanded height for card view window:</source>
+        <source>Use rounded card corners</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="550"/>
-        <source>Hand layout</source>
+        <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="551"/>
-        <source>Display hand horizontally (wastes space)</source>
+        <source>Maximum initial height for card view window:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="552"/>
-        <source>Enable left justification</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="554"/>
-        <source>Table grid layout</source>
+        <source> rows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="555"/>
-        <source>Invert vertical coordinate</source>
+        <location filename="src/dialogs/dlg_settings.cpp" line="553"/>
+        <source>Maximum expanded height for card view window:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="556"/>
-        <source>Minimum player count for multi-column layout:</source>
+        <source>Hand layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="557"/>
+        <source>Display hand horizontally (wastes space)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="558"/>
+        <source>Enable left justification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="560"/>
+        <source>Table grid layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="561"/>
+        <source>Invert vertical coordinate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="562"/>
+        <source>Minimum player count for multi-column layout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/dialogs/dlg_settings.cpp" line="563"/>
         <source>Maximum font size for information displayed on cards:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -533,22 +538,22 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>CardInfoPictureWidget</name>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="282"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="288"/>
         <source>View related cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="311"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="332"/>
         <source>Add card to deck</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="324"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="345"/>
         <source>Mainboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="330"/>
+        <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="351"/>
         <source>Sideboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -963,166 +968,166 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
 <context>
     <name>DeckEditorSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="976"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1039"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="982"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1045"/>
         <source>Update Spoilers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="870"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="906"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="876"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="912"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="870"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="876"/>
         <source>Download URLs have been reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="906"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="912"/>
         <source>Downloaded card pictures have been reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="909"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="915"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="909"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="915"/>
         <source>One or more downloaded card pictures could not be cleared.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="916"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="922"/>
         <source>Add URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="916"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="936"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="922"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="942"/>
         <source>URL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="936"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1041"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="942"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1047"/>
         <source>Edit URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1033"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1039"/>
         <source>Network Cache Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1035"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1041"/>
         <source>Redirect Cache TTL:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1036"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1042"/>
         <source>How long cached redirects for urls are valid for.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1037"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1043"/>
         <source>Picture Cache Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1040"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1046"/>
         <source>Add New URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1042"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1048"/>
         <source>Remove URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1043"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1049"/>
         <source>Day(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="965"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="971"/>
         <source>Updating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="995"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1001"/>
         <source>Choose path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1021"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1027"/>
         <source>URL Download Priority</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1022"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1028"/>
         <source>Spoilers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1023"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1029"/>
         <source>Download Spoilers Automatically</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1024"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1030"/>
         <source>Spoiler Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1025"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1031"/>
         <source>Last Change</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1026"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1032"/>
         <source>Spoilers download automatically on launch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1027"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1033"/>
         <source>Press the button to manually update without relaunching</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1028"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1034"/>
         <source>Do not close settings until manual update is complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1029"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1035"/>
         <source>Download card pictures on the fly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1030"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1036"/>
         <source>How to add a custom URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1031"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1037"/>
         <source>Delete Downloaded Images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1032"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1038"/>
         <source>Reset Download URLs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1034"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1040"/>
         <source>On-disk cache for downloaded pictures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1038"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1044"/>
         <source>In-memory cache for pictures not currently on screen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2496,12 +2501,12 @@ Your email will be used to verify your account.</source>
 <context>
     <name>DlgSettings</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1610"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1616"/>
         <source>Unknown Error loading card database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1618"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1624"/>
         <source>Your card database is invalid.
 
 Cockatrice may not function correctly with an invalid database
@@ -2512,7 +2517,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1624"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1630"/>
         <source>Your card database version is too old.
 
 This can cause problems loading card information or images
@@ -2523,7 +2528,7 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1630"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1636"/>
         <source>Your card database did not finish loading
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues with your cards.xml attached
@@ -2532,21 +2537,21 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1636"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1642"/>
         <source>File Error loading your card database.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1640"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1646"/>
         <source>Your card database was loaded but contains no cards.
 
 Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1644"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1650"/>
         <source>Unknown card database load status
 
 Please file a ticket at https://github.com/Cockatrice/Cockatrice/issues
@@ -2555,59 +2560,59 @@ Would you like to change your database location setting?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1652"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1662"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1672"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1658"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1668"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1678"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1663"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1669"/>
         <source>The path to your deck directory is invalid. Would you like to go back and set the correct path?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1673"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1679"/>
         <source>The path to your card pictures directory is invalid. Would you like to go back and set the correct path?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1685"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1691"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1687"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1693"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1688"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1694"/>
         <source>Appearance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1689"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1695"/>
         <source>User Interface</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1690"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1696"/>
         <source>Card Sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1691"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1697"/>
         <source>Chat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1692"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1698"/>
         <source>Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1693"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1699"/>
         <source>Shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3059,102 +3064,102 @@ You may have to build from source yourself.</oldsource>
 <context>
     <name>GeneralSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="319"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="320"/>
         <source>Reset all paths</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="148"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="149"/>
         <source>All paths have been reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="220"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="230"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="240"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="250"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="260"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="270"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="221"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="231"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="241"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="251"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="261"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="271"/>
         <source>Choose path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="298"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="299"/>
         <source>Personal settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="299"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="300"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="302"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="303"/>
         <source>Paths (editing disabled in portable mode)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="304"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="305"/>
         <source>Paths</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="307"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="308"/>
         <source>How to help with translations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="308"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="309"/>
         <source>Decks directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="309"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="310"/>
         <source>Replays directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="310"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="311"/>
         <source>Pictures directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="311"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="312"/>
         <source>Card database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="312"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="313"/>
         <source>Custom database directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="313"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="314"/>
         <source>Token database:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="314"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="315"/>
         <source>Update channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="315"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="316"/>
         <source>Check for client updates on startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="316"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="317"/>
         <source>Notify if a feature supported by the server is missing in my client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="317"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="318"/>
         <source>Automatically run Oracle when running a new version of Cockatrice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="318"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="319"/>
         <source>Show tips on startup</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4554,110 +4559,110 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>MessagesSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1283"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1289"/>
         <source>Word1 Word2 Word3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1284"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1290"/>
         <source>Add New Message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1285"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1291"/>
         <source>Edit Message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1286"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1292"/>
         <source>Remove Message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1235"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1241"/>
         <source>Add message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1235"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1248"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1241"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1254"/>
         <source>Message:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1248"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1254"/>
         <source>Edit message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1266"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1272"/>
         <source>Chat settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1267"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1273"/>
         <source>Custom alert words</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1268"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1274"/>
         <source>Enable chat mentions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1269"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1275"/>
         <source>Enable mention completer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1270"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1276"/>
         <source>In-game message macros</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1272"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1278"/>
         <source>How to use in-game message macros</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1273"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1279"/>
         <source>Ignore chat room messages sent by unregistered users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1274"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1280"/>
         <source>Ignore private messages sent by unregistered users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1275"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1276"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1281"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1282"/>
         <source>Invert text color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1277"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1283"/>
         <source>Enable desktop notifications for private messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1278"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1284"/>
         <source>Enable desktop notification for mentions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1279"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1285"/>
         <source>Enable room message history on join</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1280"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1281"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1286"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1287"/>
         <source>(Color is hexadecimal)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1282"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1288"/>
         <source>Separate words with a space, alphanumeric characters only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5524,8 +5529,13 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>PrintingSelector</name>
     <message>
-        <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="85"/>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="106"/>
         <source>Display Navigation Buttons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="110"/>
+        <source>&lt;b&gt;Warning:&lt;/b&gt; You appear to be using custom card art, which has known bugs when also using the printing selector in this version of Cockatrice.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5919,53 +5929,53 @@ Cockatrice will now reload the card database.</source>
 <context>
     <name>ShortcutSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1457"/>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1480"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1463"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1486"/>
         <source>Restore all default shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1458"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1464"/>
         <source>Do you really want to restore all default shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1465"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1471"/>
         <source>Clear all default shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1466"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1472"/>
         <source>Do you really want to clear all shortcuts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1475"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1481"/>
         <source>Section:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1476"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1482"/>
         <source>Action:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1477"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1483"/>
         <source>Shortcut:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1479"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1485"/>
         <source>How to set custom shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1481"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1487"/>
         <source>Clear all shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1482"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1488"/>
         <source>Search by shortcut name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6019,27 +6029,27 @@ Please check your shortcut settings!</source>
 <context>
     <name>SoundSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1359"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1365"/>
         <source>Enable &amp;sounds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1360"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1366"/>
         <source>Current sounds theme:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1361"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1367"/>
         <source>Test system sound engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1362"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1368"/>
         <source>Sound settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="1363"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="1369"/>
         <source>Master volume</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7634,102 +7644,102 @@ Please refrain from engaging in this activity or further actions may be taken ag
 <context>
     <name>UserInterfaceSettingsPage</name>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="701"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="707"/>
         <source>General interface settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="702"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="708"/>
         <source>&amp;Double-click cards to play them (instead of single-click)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="703"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="709"/>
         <source>&amp;Clicking plays all selected cards (instead of just the clicked card)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="704"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="710"/>
         <source>&amp;Play all nonlands onto the stack (not the battlefield) by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="705"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="711"/>
         <source>Close card view window when last card is removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="706"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="712"/>
         <source>Annotate card text on tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="707"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="713"/>
         <source>Use tear-off menus, allowing right click menus to persist on screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="708"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="714"/>
         <source>Notifications settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="709"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="715"/>
         <source>Enable notifications in taskbar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="710"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="716"/>
         <source>Notify in the taskbar for game events while you are spectating</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="711"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="717"/>
         <source>Notify in the taskbar when users in your buddy list connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="712"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="718"/>
         <source>Animation settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="713"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="719"/>
         <source>&amp;Tap/untap animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="714"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="720"/>
         <source>Deck editor/storage settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="715"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="721"/>
         <source>Open deck in new tab by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="716"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="722"/>
         <source>Prompt before converting .txt decks to .cod format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="717"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="723"/>
         <source>Always convert if not prompted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="718"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="724"/>
         <source>Use visual deck storage in game lobby</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="719"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="725"/>
         <source>Replay settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="src/dialogs/dlg_settings.cpp" line="720"/>
+        <location filename="src/dialogs/dlg_settings.cpp" line="726"/>
         <source>Buffer time for backwards skip via shortcut:</source>
         <translation type="unfinished"></translation>
     </message>

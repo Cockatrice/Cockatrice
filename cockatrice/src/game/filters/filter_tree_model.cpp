@@ -78,6 +78,62 @@ void FilterTreeModel::addFilter(const CardFilter *f)
     emit layoutChanged();
 }
 
+void FilterTreeModel::clearFiltersOfType(CardFilter::Attr filterType)
+{
+    emit layoutAboutToBeChanged();
+
+    // Recursively remove all nodes with the given filter type
+    fTree->removeFiltersByAttr(filterType);
+
+    emit layoutChanged();
+}
+
+QList<const CardFilter *> FilterTreeModel::getFiltersOfType(CardFilter::Attr filterType) const
+{
+    QList<const CardFilter *> filters;
+    if (!fTree) {
+        return filters;
+    }
+
+    std::function<void(const FilterTreeNode *)> traverse;
+    traverse = [&](const FilterTreeNode *node) {
+        if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
+            if (filterItem->attr() == filterType) {
+                QString text = filterItem->text();
+                filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
+            }
+        }
+        for (int i = 0; i < node->childCount(); ++i) {
+            traverse(node->nodeAt(i));
+        }
+    };
+
+    traverse(fTree);
+    return filters;
+}
+
+QList<const CardFilter *> FilterTreeModel::allFilters() const
+{
+    QList<const CardFilter *> filters;
+    if (!fTree) {
+        return filters;
+    }
+
+    std::function<void(const FilterTreeNode *)> traverse;
+    traverse = [&](const FilterTreeNode *node) {
+        if (const auto *filterItem = dynamic_cast<const FilterItem *>(node)) {
+            QString text = filterItem->text();
+            filters.append(new CardFilter(text, filterItem->type(), filterItem->attr()));
+        }
+        for (int i = 0; i < node->childCount(); ++i) {
+            traverse(node->nodeAt(i));
+        }
+    };
+
+    traverse(fTree);
+    return filters;
+}
+
 int FilterTreeModel::rowCount(const QModelIndex &parent) const
 {
     const FilterTreeNode *node;
@@ -256,4 +312,11 @@ bool FilterTreeModel::removeRows(int row, int count, const QModelIndex &parent)
         return removeRow(parent.row(), parent.parent());
 
     return true;
+}
+
+void FilterTreeModel::clear()
+{
+    emit layoutAboutToBeChanged();
+    fTree->clear();
+    emit layoutChanged();
 }

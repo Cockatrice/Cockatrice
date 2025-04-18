@@ -24,7 +24,7 @@ static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
-    connect(&SettingsCache::instance(), SIGNAL(themeChanged()), this, SLOT(themeChangedSlot()));
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ThemeManager::themeChangedSlot);
     themeChangedSlot();
 }
 
@@ -32,7 +32,7 @@ void ThemeManager::ensureThemeDirectoryExists()
 {
     if (SettingsCache::instance().getThemeName().isEmpty() ||
         !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
-        qCDebug(ThemeManagerLog) << "Theme name not set, setting default value";
+        qCInfo(ThemeManagerLog) << "Theme name not set, setting default value";
         SettingsCache::instance().setThemeName(NONE_THEME_NAME);
     }
 }
@@ -105,7 +105,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
-    qCDebug(ThemeManagerLog) << "Theme changed:" << themeName;
+    qCInfo(ThemeManagerLog) << "Theme changed:" << themeName;
 
     QString dirPath = getAvailableThemes().value(themeName);
     QDir dir = dirPath;

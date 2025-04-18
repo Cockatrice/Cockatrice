@@ -74,7 +74,7 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
     }
 
     if (_server.empty())
-        qCDebug(UserInfoConnectionLog) << "There was a problem!";
+        qCWarning(UserInfoConnectionLog) << "There was a problem!";
 
     return _server;
 }

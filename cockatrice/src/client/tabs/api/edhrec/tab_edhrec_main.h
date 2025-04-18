@@ -1,0 +1,61 @@
+#ifndef TAB_EDHREC_MAIN_H
+#define TAB_EDHREC_MAIN_H
+
+#include "../../../../game/cards/card_database.h"
+#include "../../../ui/widgets/general/layout_containers/flow_widget.h"
+#include "../../tab.h"
+#include "display/commander/edhrec_commander_api_response_display_widget.h"
+
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QNetworkAccessManager>
+#include <QPushButton>
+
+class TabEdhRecMain : public Tab
+{
+    Q_OBJECT
+public:
+    explicit TabEdhRecMain(TabSupervisor *_tabSupervisor);
+
+    void retranslateUi() override;
+    void doSearch();
+    QString getTabText() const override
+    {
+        auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
+        return tr("EDHREC: ") + cardName;
+    }
+
+    QNetworkAccessManager *networkManager;
+
+public slots:
+    void processApiJson(QNetworkReply *reply);
+    void processTopCardsResponse(QJsonObject reply);
+    void processTopTagsResponse(QJsonObject reply);
+    void processTopCommandersResponse(QJsonObject reply);
+    void processAverageDeckResponse(QJsonObject reply);
+    void prettyPrintJson(const QJsonValue &value, int indentLevel);
+    void setCard(CardInfoPtr _cardToQuery, bool isCommander = false);
+    void actNavigatePage(QString url);
+    void getTopCards();
+    void getTopCommanders();
+    void getTopTags();
+
+private:
+    QWidget *container;
+    QWidget *navigationContainer;
+    QWidget *currentPageDisplay;
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *navigationLayout;
+    QVBoxLayout *currentPageLayout;
+    QPushButton *cardsPushButton;
+    QPushButton *topCommandersPushButton;
+    QPushButton *tagsPushButton;
+    QLineEdit *searchBar;
+    QPushButton *searchPushButton;
+    CardInfoPtr cardToQuery;
+    EdhrecCommanderApiResponseDisplayWidget *displayWidget;
+
+    void processCommanderResponse(QJsonObject reply);
+};
+
+#endif // TAB_EDHREC_MAIN_H

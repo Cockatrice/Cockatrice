@@ -1,7 +1,7 @@
 #ifndef PICTURE_TO_LOAD_H
 #define PICTURE_TO_LOAD_H
 
-#include "../../../game/cards/card_database.h"
+#include "../../../game/cards/card_info.h"
 
 #include <QLoggingCategory>
 

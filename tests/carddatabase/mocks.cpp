@@ -110,6 +110,9 @@ void SettingsCache::setSeenTips(const QList<int> & /* _seenTips */)
 void SettingsCache::setDeckPath(const QString & /* _deckPath */)
 {
 }
+void SettingsCache::setFiltersPath(const QString & /*_filtersPath */)
+{
+}
 void SettingsCache::setReplaysPath(const QString & /* _replaysPath */)
 {
 }
@@ -203,7 +206,7 @@ void SettingsCache::setPrintingSelectorSortOrder(int /* _printingSelectorSortOrd
 void SettingsCache::setPrintingSelectorCardSize(int /* _printingSelectorCardSize */)
 {
 }
-void SettingsCache::setIncludeOnlineOnlyCards(bool /* _includeOnlineOnlyCards */)
+void SettingsCache::setIncludeRebalancedCards(bool /* _includeRebalancedCards */)
 {
 }
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
@@ -238,11 +241,10 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
     int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
 {
 }
-void SettingsCache::setVisualDeckStoragePromptForConversion(
-    QT_STATE_CHANGED_T /* _visualDeckStoragePromptForConversion */)
+void SettingsCache::setVisualDeckStoragePromptForConversion(bool /* _visualDeckStoragePromptForConversion */)
 {
 }
-void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T /* _visualDeckStorageAlwaysConvert */)
+void SettingsCache::setVisualDeckStorageAlwaysConvert(bool /* _visualDeckStorageAlwaysConvert */)
 {
 }
 void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)

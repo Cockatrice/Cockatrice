@@ -55,9 +55,9 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
             break;
         case CockatriceFormat: {
             result = loadFromFile_Native(&file);
-            qCDebug(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
+            qCInfo(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
-                qCDebug(DeckLoaderLog) << "Retrying as plain format";
+                qCInfo(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
                 result = loadFromFile_Plain(&file);
                 fmt = PlainTextFormat;
@@ -79,7 +79,7 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
         emit deckLoaded();
     }
 
-    qCDebug(DeckLoaderLog) << "Deck was loaded -" << result;
+    qCInfo(DeckLoaderLog) << "Deck was loaded -" << result;
     return result;
 }
 

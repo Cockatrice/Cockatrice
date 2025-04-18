@@ -1,11 +1,13 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QTimer>
 #include <QWidget>
+
+inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
 class AbstractCardItem;
 class QMenu;
@@ -32,6 +34,7 @@ signals:
     void hoveredOnCard(CardInfoPtr hoveredCard);
     void cardScaleFactorChanged(int _scale);
     void cardChanged(CardInfoPtr card);
+    void cardClicked();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -58,7 +61,7 @@ private:
     qreal aspectRatio = magicTheGatheringCardAspectRatio;
     int baseWidth = 200;
     int baseHeight = 200;
-    double scaleFactor = 1.5;
+    double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;

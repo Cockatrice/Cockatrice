@@ -101,6 +101,11 @@ GeneralSettingsPage::GeneralSettingsPage()
     QPushButton *deckPathButton = new QPushButton("...");
     connect(deckPathButton, SIGNAL(clicked()), this, SLOT(deckPathButtonClicked()));
 
+    filtersPathEdit = new QLineEdit(settings.getFiltersPath());
+    filtersPathEdit->setReadOnly(true);
+    QPushButton *filtersPathButton = new QPushButton("...");
+    connect(filtersPathButton, SIGNAL(clicked()), this, SLOT(filtersPathButtonClicked()));
+
     replaysPathEdit = new QLineEdit(settings.getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     QPushButton *replaysPathButton = new QPushButton("...");
@@ -132,6 +137,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
+        filtersPathEdit->setEnabled(false);
         replaysPathEdit->setEnabled(false);
         picsPathEdit->setEnabled(false);
         cardDatabasePathEdit->setEnabled(false);
@@ -154,24 +160,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGrid->addWidget(&deckPathLabel, 0, 0);
     pathsGrid->addWidget(deckPathEdit, 0, 1);
     pathsGrid->addWidget(deckPathButton, 0, 2);
-    pathsGrid->addWidget(&replaysPathLabel, 1, 0);
-    pathsGrid->addWidget(replaysPathEdit, 1, 1);
-    pathsGrid->addWidget(replaysPathButton, 1, 2);
-    pathsGrid->addWidget(&picsPathLabel, 2, 0);
-    pathsGrid->addWidget(picsPathEdit, 2, 1);
-    pathsGrid->addWidget(picsPathButton, 2, 2);
-    pathsGrid->addWidget(&cardDatabasePathLabel, 3, 0);
-    pathsGrid->addWidget(cardDatabasePathEdit, 3, 1);
-    pathsGrid->addWidget(cardDatabasePathButton, 3, 2);
-    pathsGrid->addWidget(&customCardDatabasePathLabel, 4, 0);
-    pathsGrid->addWidget(customCardDatabasePathEdit, 4, 1);
-    pathsGrid->addWidget(customCardDatabasePathButton, 4, 2);
-    pathsGrid->addWidget(&tokenDatabasePathLabel, 5, 0);
-    pathsGrid->addWidget(tokenDatabasePathEdit, 5, 1);
-    pathsGrid->addWidget(tokenDatabasePathButton, 5, 2);
+    pathsGrid->addWidget(&filtersPathLabel, 1, 0);
+    pathsGrid->addWidget(filtersPathEdit, 1, 1);
+    pathsGrid->addWidget(filtersPathButton, 1, 2);
+    pathsGrid->addWidget(&replaysPathLabel, 2, 0);
+    pathsGrid->addWidget(replaysPathEdit, 2, 1);
+    pathsGrid->addWidget(replaysPathButton, 2, 2);
+    pathsGrid->addWidget(&picsPathLabel, 3, 0);
+    pathsGrid->addWidget(picsPathEdit, 3, 1);
+    pathsGrid->addWidget(picsPathButton, 3, 2);
+    pathsGrid->addWidget(&cardDatabasePathLabel, 4, 0);
+    pathsGrid->addWidget(cardDatabasePathEdit, 4, 1);
+    pathsGrid->addWidget(cardDatabasePathButton, 4, 2);
+    pathsGrid->addWidget(&customCardDatabasePathLabel, 5, 0);
+    pathsGrid->addWidget(customCardDatabasePathEdit, 5, 1);
+    pathsGrid->addWidget(customCardDatabasePathButton, 5, 2);
+    pathsGrid->addWidget(&tokenDatabasePathLabel, 6, 0);
+    pathsGrid->addWidget(tokenDatabasePathEdit, 6, 1);
+    pathsGrid->addWidget(tokenDatabasePathButton, 6, 2);
     if (!isPortable) {
-        pathsGrid->addWidget(resetAllPathsButton, 6, 0);
-        pathsGrid->addWidget(allPathsResetLabel, 6, 1);
+        pathsGrid->addWidget(resetAllPathsButton, 7, 0);
+        pathsGrid->addWidget(allPathsResetLabel, 7, 1);
     }
     pathsGroupBox = new QGroupBox;
     pathsGroupBox->setLayout(pathsGrid);
@@ -209,8 +218,8 @@ QString GeneralSettingsPage::languageName(const QString &lang)
     QString appNameHint = translationPrefix + "_" + lang;
     bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
-        qCDebug(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
-                                << translationPath;
+        qCWarning(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
+                                  << translationPath;
     }
 
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
@@ -224,6 +233,16 @@ void GeneralSettingsPage::deckPathButtonClicked()
 
     deckPathEdit->setText(path);
     SettingsCache::instance().setDeckPath(path);
+}
+
+void GeneralSettingsPage::filtersPathButtonClicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
+    if (path.isEmpty())
+        return;
+
+    filtersPathEdit->setText(path);
+    SettingsCache::instance().setFiltersPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -307,6 +326,7 @@ void GeneralSettingsPage::retranslateUi()
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
     deckPathLabel.setText(tr("Decks directory:"));
+    filtersPathLabel.setText(tr("Filters directory:"));
     replaysPathLabel.setText(tr("Replays directory:"));
     picsPathLabel.setText(tr("Pictures directory:"));
     cardDatabasePathLabel.setText(tr("Card database:"));
@@ -563,6 +583,13 @@ void AppearanceSettingsPage::retranslateUi()
     maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 }
 
+enum visualDeckStoragePromptForConversionIndex
+{
+    visualDeckStoragePromptForConversionIndexNone,
+    visualDeckStoragePromptForConversionIndexPrompt,
+    visualDeckStoragePromptForConversionIndexAlways
+};
+
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
@@ -642,24 +669,33 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setOpenDeckInNewTab);
 
-    visualDeckStoragePromptForConversionCheckBox.setChecked(
-        SettingsCache::instance().getVisualDeckStoragePromptForConversion());
-    connect(&visualDeckStoragePromptForConversionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStoragePromptForConversion);
-
-    visualDeckStorageAlwaysConvertCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageAlwaysConvert());
-    connect(&visualDeckStorageAlwaysConvertCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageAlwaysConvert);
-
     visualDeckStorageInGameCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageInGame());
     connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageInGame);
 
+    visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
+    visualDeckStoragePromptForConversionSelector.addItem("");
+    visualDeckStoragePromptForConversionSelector.addItem("");
+    if (SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexPrompt);
+    } else if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexAlways);
+    } else {
+        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexNone);
+    }
+    connect(&visualDeckStoragePromptForConversionSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [](int index) {
+                SettingsCache::instance().setVisualDeckStoragePromptForConversion(
+                    index == visualDeckStoragePromptForConversionIndexPrompt);
+                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(
+                    index == visualDeckStoragePromptForConversionIndexAlways);
+            });
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageAlwaysConvertCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 2, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -719,9 +755,15 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
-    visualDeckStoragePromptForConversionCheckBox.setText(tr("Prompt before converting .txt decks to .cod format"));
-    visualDeckStorageAlwaysConvertCheckBox.setText(tr("Always convert if not prompted"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
+    visualDeckStoragePromptForConversionLabel.setText(
+        tr("When adding a tag in the visual deck storage to a .txt deck:"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
+                                                             tr("do nothing"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexPrompt,
+                                                             tr("ask to convert to .cod"));
+    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
+                                                             tr("always convert to .cod"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");
@@ -1620,7 +1662,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     bool showLoadError = true;
     QString loadErrorMessage = tr("Unknown Error loading card database");
     LoadStatus loadStatus = CardDatabaseManager::getInstance()->getLoadStatus();
-    qCDebug(DlgSettingsLog) << "Card Database load status: " << loadStatus;
+    qCInfo(DlgSettingsLog) << "Card Database load status: " << loadStatus;
     switch (loadStatus) {
         case Ok:
             showLoadError = false;

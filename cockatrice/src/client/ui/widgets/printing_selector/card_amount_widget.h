@@ -3,7 +3,7 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../deck/deck_loader.h"
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 

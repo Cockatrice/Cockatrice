@@ -1,8 +1,16 @@
 #include "phase.h"
 
-Phase::Phase(const char *_name, QString _color, QString _soundFileName) : color(_color), soundFileName(_soundFileName)
+Phase::Phase(const QString &_name, const QString &_color, const QString &_soundFileName)
+    : name(_name), color(_color), soundFileName(_soundFileName)
 {
-    name = tr(_name);
+}
+
+/**
+ * @return The translated name for the phase
+ */
+QString Phase::getName() const
+{
+    return tr(name.toUtf8().data());
 }
 
 Phase Phases::getPhase(int phase)

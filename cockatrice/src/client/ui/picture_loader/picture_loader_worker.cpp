@@ -16,11 +16,16 @@ QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a90
 PictureLoaderWorker::PictureLoaderWorker()
     : QObject(nullptr), picsPath(SettingsCache::instance().getPicsPath()),
       customPicsPath(SettingsCache::instance().getCustomPicsPath()),
-      picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false)
+      picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false),
+      overrideAllCardArtWithPersonalPreference(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference())
 {
-    connect(this, SIGNAL(startLoadQueue()), this, SLOT(processLoadQueue()), Qt::QueuedConnection);
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(this, &PictureLoaderWorker::startLoadQueue, this, &PictureLoaderWorker::processLoadQueue,
+            Qt::QueuedConnection);
+    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoaderWorker::picsPathChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this,
+            &PictureLoaderWorker::picDownloadChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+            &PictureLoaderWorker::setOverrideAllCardArtWithPersonalPreference);
 
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -40,7 +45,7 @@ PictureLoaderWorker::PictureLoaderWorker()
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(picDownloadFinished(QNetworkReply *)));
+    connect(networkManager, &QNetworkAccessManager::finished, this, &PictureLoaderWorker::picDownloadFinished);
 
     cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
@@ -83,11 +88,24 @@ void PictureLoaderWorker::processLoadQueue()
         qCDebug(PictureLoaderWorkerLog).nospace()
             << "[card: " << cardName << " set: " << setName << "]: Trying to load picture";
 
-        if (CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
-                cardName, cardBeingLoaded.getCard()->getPixmapCacheKey())) {
-            if (cardImageExistsOnDisk(setName, correctedCardName)) {
-                continue;
-            }
+        // FIXME: This is a hack so that to keep old Cockatrice behavior
+        // (ignoring provider ID) when the "override all card art with personal
+        // preference" is set.
+        //
+        // Figure out a proper way to integrate the two systems at some point.
+        //
+        // Note: need to go through a member for
+        // overrideAllCardArtWithPersonalPreference as reading from the
+        // SettingsCache instance from the PictureLoaderWorker thread could
+        // cause race conditions.
+        //
+        // XXX: Reading from the CardDatabaseManager instance from the
+        // PictureLoaderWorker thread might not be safe either
+        bool searchCustomPics = overrideAllCardArtWithPersonalPreference ||
+                                CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
+                                    cardName, cardBeingLoaded.getCard()->getPixmapCacheKey());
+        if (searchCustomPics && cardImageExistsOnDisk(setName, correctedCardName, searchCustomPics)) {
+            continue;
         }
 
         qCDebug(PictureLoaderWorkerLog).nospace()
@@ -100,23 +118,26 @@ void PictureLoaderWorker::processLoadQueue()
     }
 }
 
-bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &correctedCardname)
+bool PictureLoaderWorker::cardImageExistsOnDisk(QString &setName, QString &correctedCardname, bool searchCustomPics)
 {
     QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
     QList<QString> picsPaths = QList<QString>();
-    QDirIterator it(customPicsPath, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
-    // Recursively check all subdirectories of the CUSTOM folder
-    while (it.hasNext()) {
-        QString thisPath(it.next());
-        QFileInfo thisFileInfo(thisPath);
+    if (searchCustomPics) {
+        QDirIterator it(customPicsPath, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
-        if (thisFileInfo.isFile() &&
-            (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
-             thisFileInfo.baseName() == correctedCardname)) {
-            picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+        // Recursively check all subdirectories of the CUSTOM folder
+        while (it.hasNext()) {
+            QString thisPath(it.next());
+            QFileInfo thisFileInfo(thisPath);
+
+            if (thisFileInfo.isFile() &&
+                (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
+                 thisFileInfo.baseName() == correctedCardname)) {
+                picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
+            }
         }
     }
 
@@ -194,7 +215,7 @@ void PictureLoaderWorker::picDownloadFailed()
         loadQueue.prepend(cardBeingDownloaded);
         mutex.unlock();
     } else {
-        qCDebug(PictureLoaderWorkerLog).nospace()
+        qCWarning(PictureLoaderWorkerLog).nospace()
             << "[card: " << cardBeingDownloaded.getCard()->getCorrectedName()
             << " set: " << cardBeingDownloaded.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
@@ -224,6 +245,23 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     }
 
     QNetworkRequest req(url);
+
+    // QNetworkDiskCache leaks file descriptors when downloading compressed
+    // files, see https://bugreports.qt.io/browse/QTBUG-135641
+    //
+    // We can set the Accept-Encoding header manually to disable Qt's automatic
+    // response decompression, but then we would have to deal with decompression
+    // ourselves.
+    //
+    // Since we are dowloading images that are usually stored in a
+    // compressed format (e.g. jpeg or webp), it's not clear compression at the
+    // HTTP level helps; in fact, images are typically returned without
+    // compression. Redirects, on the other hand, are compressed and cause file
+    // descriptor leaks -- but since redirects have no payload, we don't really
+    // care either.
+    //
+    // In the end, just do the simple thing and disable HTTP compression.
+    req.setRawHeader("accept-encoding", "identity");
 
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
@@ -405,7 +443,7 @@ void PictureLoaderWorker::picDownloadFinished(QNetworkReply *reply)
     }
 
     if (logSuccessMessage) {
-        qCDebug(PictureLoaderWorkerLog).nospace()
+        qCInfo(PictureLoaderWorkerLog).nospace()
             << "[card: " << cardBeingDownloaded.getCard()->getName() << " set: " << cardBeingDownloaded.getSetName()
             << "]: Image successfully " << (isFromCache ? "loaded from cached" : "downloaded from") << " url "
             << reply->url().toDisplayString();
@@ -449,6 +487,11 @@ void PictureLoaderWorker::picsPathChanged()
     QMutexLocker locker(&mutex);
     picsPath = SettingsCache::instance().getPicsPath();
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
+}
+
+void PictureLoaderWorker::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference)
+{
+    overrideAllCardArtWithPersonalPreference = _overrideAllCardArtWithPersonalPreference;
 }
 
 void PictureLoaderWorker::clearNetworkCache()

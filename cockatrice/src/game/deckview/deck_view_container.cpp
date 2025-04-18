@@ -57,19 +57,13 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     forceStartGameButton = new QPushButton;
     sideboardLockButton = new ToggleButton;
 
-    connect(loadLocalButton, SIGNAL(clicked()), this, SLOT(loadLocalDeck()));
-    connect(readyStartButton, SIGNAL(clicked()), this, SLOT(readyStart()));
+    connect(loadLocalButton, &QPushButton::clicked, this, &DeckViewContainer::loadLocalDeck);
+    connect(loadRemoteButton, &QPushButton::clicked, this, &DeckViewContainer::loadRemoteDeck);
+    connect(readyStartButton, &QPushButton::clicked, this, &DeckViewContainer::readyStart);
     connect(unloadDeckButton, &QPushButton::clicked, this, &DeckViewContainer::unloadDeck);
     connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
-    connect(sideboardLockButton, SIGNAL(clicked()), this, SLOT(sideboardLockButtonClicked()));
-    connect(sideboardLockButton, SIGNAL(stateChanged()), this, SLOT(updateSideboardLockButtonText()));
-
-    if (parentGame->getIsLocalGame()) {
-        loadRemoteButton->setVisible(false);
-        loadRemoteButton->setEnabled(false);
-    } else {
-        connect(loadRemoteButton, SIGNAL(clicked()), this, SLOT(loadRemoteDeck()));
-    }
+    connect(sideboardLockButton, &QPushButton::clicked, this, &DeckViewContainer::sideboardLockButtonClicked);
+    connect(sideboardLockButton, &ToggleButton::stateChanged, this, &DeckViewContainer::updateSideboardLockButtonText);
 
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
@@ -83,8 +77,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addStretch();
 
     deckView = new DeckView;
-    connect(deckView, SIGNAL(newCardAdded(AbstractCardItem *)), this, SIGNAL(newCardAdded(AbstractCardItem *)));
-    connect(deckView, SIGNAL(sideboardPlanChanged()), this, SLOT(sideboardPlanChanged()));
+    connect(deckView, &DeckView::newCardAdded, this, &DeckViewContainer::newCardAdded);
+    connect(deckView, &DeckView::sideboardPlanChanged, this, &DeckViewContainer::sideboardPlanChanged);
 
     deckViewLayout = new QVBoxLayout;
     deckViewLayout->addLayout(buttonHBox);
@@ -93,7 +87,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     setLayout(deckViewLayout);
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &DeckViewContainer::refreshShortcuts);
     refreshShortcuts();
 
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
@@ -268,8 +263,7 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
     Command_DeckSelect cmd;
     cmd.set_deck(deckString.toStdString());
     PendingCommand *pend = parentGame->prepareGameCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(deckSelectFinished(const Response &)));
+    connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
     parentGame->sendGameCommand(pend, playerId);
 }
 
@@ -280,8 +274,7 @@ void DeckViewContainer::loadRemoteDeck()
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
         PendingCommand *pend = parentGame->prepareGameCommand(cmd);
-        connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-                SLOT(deckSelectFinished(const Response &)));
+        connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
         parentGame->sendGameCommand(pend, playerId);
     }
 }
@@ -303,6 +296,13 @@ void DeckViewContainer::readyStart()
 
 void DeckViewContainer::forceStart()
 {
+    const auto msg = tr("Are you sure you want to force start?\nThis will kick all non-ready players from the game.");
+    const auto res =
+        QMessageBox::question(this, tr("Cockatrice"), msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (res == QMessageBox::No) {
+        return;
+    }
+
     Command_ReadyStart cmd;
     cmd.set_force_start(true);
     cmd.set_ready(true);

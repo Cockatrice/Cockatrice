@@ -1,7 +1,7 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "../game/cards/card_database.h"
+#include "../game/cards/card_info.h"
 #include "decklist.h"
 
 #include <QAbstractItemModel>
@@ -110,6 +110,9 @@ public:
         return deckList;
     }
     void setDeckList(DeckLoader *_deck);
+    QList<CardInfoPtr> getCardsAsCardInfoPtrs() const;
+    QList<CardInfoPtr> getCardsAsCardInfoPtrsForZone(QString zoneName) const;
+    QList<QString> *getZones() const;
 
 private:
     DeckLoader *deckList;

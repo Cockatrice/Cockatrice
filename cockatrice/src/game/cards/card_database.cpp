@@ -68,7 +68,7 @@ void CardDatabase::clear()
 void CardDatabase::addCard(CardInfoPtr card)
 {
     if (card == nullptr) {
-        qCDebug(CardDatabaseLog) << "CardDatabase::addCard(nullptr)";
+        qCWarning(CardDatabaseLog) << "CardDatabase::addCard(nullptr)";
         return;
     }
 
@@ -93,7 +93,7 @@ void CardDatabase::addCard(CardInfoPtr card)
 void CardDatabase::removeCard(CardInfoPtr card)
 {
     if (card.isNull()) {
-        qCDebug(CardDatabaseLog) << "CardDatabase::removeCard(nullptr)";
+        qCWarning(CardDatabaseLog) << "CardDatabase::removeCard(nullptr)";
         return;
     }
 
@@ -247,8 +247,8 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
-    qCDebug(CardDatabaseLoadingLog) << "Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size()
-                                    << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
+    qCInfo(CardDatabaseLoadingLog) << "Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size()
+                                   << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
 
     return tempLoadStatus;
 }
@@ -257,7 +257,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 {
     reloadDatabaseMutex->lock();
 
-    qCDebug(CardDatabaseLoadingLog) << "Started";
+    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
 
     clear(); // remove old db
 
@@ -278,7 +278,7 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     for (auto i = 0; i < databasePaths.size(); ++i) {
         const auto &databasePath = databasePaths.at(i);
-        qCDebug(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << databasePath << ")";
+        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << databasePath << ")";
         loadCardDatabase(databasePath);
     }
 
@@ -291,10 +291,10 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     if (loadStatus == Ok) {
         checkUnknownSets(); // update deck editors, etc
-        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "Success";
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
         emit cardDatabaseLoadingFinished();
     } else {
-        qCDebug(CardDatabaseLoadingSuccessOrFailureLog) << "Failed";
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
@@ -470,6 +470,45 @@ QStringList CardDatabase::getAllMainCardTypes() const
         types.insert(cardIterator.next().value()->getMainCardType());
     }
     return types.values();
+}
+
+QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getMainCardType();
+        typeCounts[type]++;
+    }
+
+    return typeCounts;
+}
+
+QMap<QString, int> CardDatabase::getAllSubCardTypesWithCount() const
+{
+    QMap<QString, int> typeCounts;
+    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
+
+    while (cardIterator.hasNext()) {
+        QString type = cardIterator.next().value()->getCardType();
+
+        QStringList parts = type.split(" — ");
+
+        if (parts.size() > 1) { // Ensure there are subtypes
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+            QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
+#else
+            QStringList subtypes = parts[1].split(" ", QString::SkipEmptyParts);
+#endif
+
+            for (const QString &subtype : subtypes) {
+                typeCounts[subtype]++;
+            }
+        }
+    }
+
+    return typeCounts;
 }
 
 void CardDatabase::checkUnknownSets()

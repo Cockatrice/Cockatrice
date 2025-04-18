@@ -4,24 +4,30 @@
 git push -d origin --REPLACE-WITH-BETA-LIST--
  -->
 
-<!-- This list of binaries should be updated every time the CI is changed to
-include different targets -->
+<!-- This list of binaries should be updated every time the CI is changed to include all targets -->
 <pre>
-<b>Pre-compiled binaries we serve:</b>
- - <kbd>Windows 10+</kbd>
- - <kbd>Windows 7+</kbd>
- - <kbd>macOS 14+</kbd> ("Sonoma") / Apple M
- - <kbd>macOS 13+</kbd> ("Ventura") / Intel
- - <kbd>Ubuntu 24.04 LTS</kbd> ("Noble Numbat")
- - <kbd>Ubuntu 22.04 LTS</kbd> ("Jammy Jellyfish")
- - <kbd>Ubuntu 20.04 LTS</kbd> ("Focal Fossa")
- - <kbd>Debian 12</kbd> ("Bookworm")
- - <kbd>Debian 11</kbd> ("Bullseye")
- - <kbd>Fedora 41</kbd>
- - <kbd>Fedora 40</kbd>
- 
-<i>We are also packaged in <kbd>Arch Linux</kbd>'s official "extra" repository, courtesy of @FFY00</i>
-<i>General Linux support is available via a <kbd>flatpak</kbd> package (Flathub)</i>
+Available pre-compiled binaries for installation:
+
+  <b>Windows</b>
+   • <kbd>Windows 10+</kbd>
+   • <kbd>Windows 7+</kbd>
+
+  <b>macOS</b>
+   • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Apple M</sub>
+   • <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub> <sub>Apple M</sub>
+   • <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub> <sub>Intel</sub>
+
+  <b>Linux</b>
+   • <kbd>Ubuntu 24.04 LTS</kbd> <sub><i>Noble Numbat</i></sub>
+   • <kbd>Ubuntu 22.04 LTS</kbd> <sub><i>Jammy Jellyfish</i></sub>
+   • <kbd>Ubuntu 20.04 LTS</kbd> <sub><i>Focal Fossa</i></sub>
+   • <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
+   • <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
+   • <kbd>Fedora 41</kbd>
+   • <kbd>Fedora 40</kbd>
+
+<sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
+<sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
 </pre>
 
 

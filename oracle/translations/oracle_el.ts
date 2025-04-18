@@ -61,7 +61,8 @@
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="287"/>
-        <source>Sets JSON file (%1)</source>
+        <source>Sets file (%1)</source>
+        <oldsource>Sets JSON file (%1)</oldsource>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -245,7 +246,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="465"/>
+        <location filename="src/oracleimporter.cpp" line="472"/>
         <source>Dummy set containing tokens</source>
         <translation>Εικονικό σετ που περιέχει tokens</translation>
     </message>

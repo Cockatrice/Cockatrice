@@ -1,7 +1,7 @@
 #ifndef CARD_PICTURE_ENLARGED_WIDGET_H
 #define CARD_PICTURE_ENLARGED_WIDGET_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../game/cards/card_info.h"
 
 #include <QPixmap>
 #include <QWidget>

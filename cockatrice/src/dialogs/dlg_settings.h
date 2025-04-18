@@ -46,6 +46,7 @@ public:
 
 private slots:
     void deckPathButtonClicked();
+    void filtersPathButtonClicked();
     void replaysPathButtonClicked();
     void picsPathButtonClicked();
     void cardDatabasePathButtonClicked();
@@ -58,6 +59,7 @@ private:
     QStringList findQmFiles();
     QString languageName(const QString &lang);
     QLineEdit *deckPathEdit;
+    QLineEdit *filtersPathEdit;
     QLineEdit *replaysPathEdit;
     QLineEdit *picsPathEdit;
     QLineEdit *cardDatabasePathEdit;
@@ -74,6 +76,7 @@ private:
     QComboBox updateReleaseChannelBox;
     QLabel languageLabel;
     QLabel deckPathLabel;
+    QLabel filtersPathLabel;
     QLabel replaysPathLabel;
     QLabel picsPathLabel;
     QLabel cardDatabasePathLabel;
@@ -148,8 +151,8 @@ private:
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
-    QCheckBox visualDeckStoragePromptForConversionCheckBox;
-    QCheckBox visualDeckStorageAlwaysConvertCheckBox;
+    QLabel visualDeckStoragePromptForConversionLabel;
+    QComboBox visualDeckStoragePromptForConversionSelector;
     QCheckBox visualDeckStorageInGameCheckBox;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;

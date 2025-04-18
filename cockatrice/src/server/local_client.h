@@ -3,6 +3,10 @@
 
 #include "../client/game_logic/abstract_client.h"
 
+#include <QLoggingCategory>
+
+inline Q_LOGGING_CATEGORY(LocalClientLog, "local_client");
+
 class LocalServerInterface;
 
 class LocalClient : public AbstractClient

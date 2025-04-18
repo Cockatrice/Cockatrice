@@ -116,8 +116,7 @@ void TabLog::getClicked()
     cmd.set_date_range(dateRange);
     cmd.set_maximum_results(maximumResults->value());
     PendingCommand *pend = client->prepareModeratorCommand(cmd);
-    connect(pend, SIGNAL(finished(Response, CommandContainer, QVariant)), this,
-            SLOT(viewLogHistory_processResponse(Response)));
+    connect(pend, &PendingCommand::finished, this, &TabLog::viewLogHistory_processResponse);
     client->sendCommand(pend);
 }
 
@@ -186,11 +185,11 @@ void TabLog::createDock()
 
     getButton = new QPushButton(tr("Get User Logs"));
     getButton->setAutoDefault(true);
-    connect(getButton, SIGNAL(clicked()), this, SLOT(getClicked()));
+    connect(getButton, &QPushButton::clicked, this, &TabLog::getClicked);
 
     clearButton = new QPushButton(tr("Clear Filters"));
     clearButton->setAutoDefault(true);
-    connect(clearButton, SIGNAL(clicked()), this, SLOT(clearClicked()));
+    connect(clearButton, &QPushButton::clicked, this, &TabLog::clearClicked);
 
     criteriaGrid = new QGridLayout;
     criteriaGrid->addWidget(labelFindUserName, 0, 0);

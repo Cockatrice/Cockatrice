@@ -55,11 +55,11 @@ signals:
     void themeChanged();
     void picDownloadChanged();
     void displayCardNamesChanged();
-    void overrideAllCardArtWithPersonalPreferenceChanged();
+    void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);
     void bumpSetsWithCardsInDeckToTopChanged();
     void printingSelectorSortOrderChanged();
     void printingSelectorCardSizeChanged();
-    void includeOnlineOnlyCardsChanged(bool _includeOnlineOnlyCards);
+    void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
@@ -103,7 +103,7 @@ private:
     QByteArray tokenDialogGeometry;
     QByteArray setsDialogGeometry;
     QString lang;
-    QString deckPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
+    QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
@@ -131,7 +131,7 @@ private:
     bool bumpSetsWithCardsInDeckToTop;
     int printingSelectorSortOrder;
     int printingSelectorCardSize;
-    bool includeOnlineOnlyCards;
+    bool includeRebalancedCards;
     bool printingSelectorNavigationButtonsVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
@@ -233,6 +233,10 @@ public:
     QString getDeckPath() const
     {
         return deckPath;
+    }
+    QString getFiltersPath() const
+    {
+        return filtersPath;
     }
     QString getReplaysPath() const
     {
@@ -407,9 +411,9 @@ public:
     {
         return printingSelectorCardSize;
     }
-    bool getIncludeOnlineOnlyCards() const
+    bool getIncludeRebalancedCards() const
     {
-        return includeOnlineOnlyCards;
+        return includeRebalancedCards;
     }
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
@@ -759,6 +763,7 @@ public slots:
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
     void setDeckPath(const QString &_deckPath);
+    void setFiltersPath(const QString &_filtersPath);
     void setReplaysPath(const QString &_replaysPath);
     void setThemesPath(const QString &_themesPath);
     void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
@@ -792,7 +797,7 @@ public slots:
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
     void setPrintingSelectorSortOrder(int _printingSelectorSortOrder);
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
-    void setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards);
+    void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
@@ -803,8 +808,8 @@ public slots:
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
-    void setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion);
-    void setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert);
+    void setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion);
+    void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);

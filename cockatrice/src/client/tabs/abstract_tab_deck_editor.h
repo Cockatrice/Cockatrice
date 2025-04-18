@@ -1,7 +1,7 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
-#include "../../game/cards/card_database.h"
+#include "../../game/cards/card_info.h"
 #include "../menus/deck_editor/deck_editor_menu.h"
 #include "../ui/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../ui/widgets/deck_editor/deck_editor_database_display_widget.h"
@@ -44,6 +44,8 @@ class AbstractTabDeckEditor : public Tab
 {
     Q_OBJECT
 
+    friend class DeckEditorMenu;
+
 public:
     explicit AbstractTabDeckEditor(TabSupervisor *_tabSupervisor);
 
@@ -67,7 +69,7 @@ public:
     DeckEditorPrintingSelectorDockWidget *printingSelectorDockWidget;
 
 public slots:
-    void onDeckChanged();
+    virtual void onDeckChanged();
     void updateCard(CardInfoPtr _card);
     void actAddCard(CardInfoPtr info);
     void actAddCardToSideboard(CardInfoPtr info);
@@ -90,7 +92,7 @@ protected slots:
     void cleanDeckAndResetModified();
     virtual void actLoadDeck();
     bool actSaveDeck();
-    bool actSaveDeckAs();
+    virtual bool actSaveDeckAs();
     virtual void actLoadDeckFromClipboard();
     void actEditDeckInClipboard();
     void actEditDeckInClipboardRaw();

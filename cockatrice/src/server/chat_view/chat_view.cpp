@@ -60,7 +60,7 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTime
     setReadOnly(true);
     setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
     setOpenLinks(false);
-    connect(this, SIGNAL(anchorClicked(const QUrl &)), this, SLOT(openLink(const QUrl &)));
+    connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
     showInGameTime = SettingsCache::instance().getLocalTime();
 }
 

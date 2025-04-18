@@ -140,7 +140,7 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // ensure that the defaut path exists and return it
     if (tmp.isEmpty() || !QDir(tmp).exists()) {
         if (!QDir().mkpath(defaultPath))
-            qCDebug(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
+            qCInfo(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
         tmp = defaultPath;
     }
     return tmp;
@@ -161,7 +161,7 @@ SettingsCache::SettingsCache()
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
     if (isPortableBuild)
-        qCDebug(SettingsCacheLog) << "Portable mode enabled";
+        qCInfo(SettingsCacheLog) << "Portable mode enabled";
 
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
@@ -260,7 +260,7 @@ SettingsCache::SettingsCache()
     bumpSetsWithCardsInDeckToTop = settings->value("cards/bumpsetswithcardsindecktotop", true).toBool();
     printingSelectorSortOrder = settings->value("cards/printingselectorsortorder", 1).toInt();
     printingSelectorCardSize = settings->value("cards/printingselectorcardsize", 100).toInt();
-    includeOnlineOnlyCards = settings->value("cards/includeonlineonlycards", false).toBool();
+    includeRebalancedCards = settings->value("cards/includerebalancedcards", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
@@ -458,6 +458,12 @@ void SettingsCache::setDeckPath(const QString &_deckPath)
     settings->setValue("paths/decks", deckPath);
 }
 
+void SettingsCache::setFiltersPath(const QString &_filtersPath)
+{
+    filtersPath = _filtersPath;
+    settings->setValue("paths/filters", filtersPath);
+}
+
 void SettingsCache::setReplaysPath(const QString &_replaysPath)
 {
     replaysPath = _replaysPath;
@@ -639,7 +645,7 @@ void SettingsCache::setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED
 {
     overrideAllCardArtWithPersonalPreference = static_cast<bool>(_overrideAllCardArt);
     settings->setValue("cards/overrideallcardartwithpersonalpreference", overrideAllCardArtWithPersonalPreference);
-    emit overrideAllCardArtWithPersonalPreferenceChanged();
+    emit overrideAllCardArtWithPersonalPreferenceChanged(overrideAllCardArtWithPersonalPreference);
 }
 
 void SettingsCache::setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop)
@@ -663,11 +669,14 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
     emit printingSelectorCardSizeChanged();
 }
 
-void SettingsCache::setIncludeOnlineOnlyCards(bool _includeOnlineOnlyCards)
+void SettingsCache::setIncludeRebalancedCards(bool _includeRebalancedCards)
 {
-    includeOnlineOnlyCards = _includeOnlineOnlyCards;
-    settings->setValue("cards/includeonlineonlycards", includeOnlineOnlyCards);
-    emit includeOnlineOnlyCardsChanged(includeOnlineOnlyCards);
+    if (includeRebalancedCards == _includeRebalancedCards)
+        return;
+
+    includeRebalancedCards = _includeRebalancedCards;
+    settings->setValue("cards/includerebalancedcards", includeRebalancedCards);
+    emit includeRebalancedCardsChanged(includeRebalancedCards);
 }
 
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible)
@@ -740,13 +749,13 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
 }
 
-void SettingsCache::setVisualDeckStoragePromptForConversion(QT_STATE_CHANGED_T _visualDeckStoragePromptForConversion)
+void SettingsCache::setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion)
 {
     visualDeckStoragePromptForConversion = _visualDeckStoragePromptForConversion;
     settings->setValue("interface/visualdeckstoragepromptforconversion", visualDeckStoragePromptForConversion);
 }
 
-void SettingsCache::setVisualDeckStorageAlwaysConvert(QT_STATE_CHANGED_T _visualDeckStorageAlwaysConvert)
+void SettingsCache::setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert)
 {
     visualDeckStorageAlwaysConvert = _visualDeckStorageAlwaysConvert;
     settings->setValue("interface/visualdeckstoragealwaysconvert", visualDeckStorageAlwaysConvert);
@@ -1316,6 +1325,7 @@ void SettingsCache::loadPaths()
 {
     QString dataPath = getDataPath();
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
+    filtersPath = getSafeConfigPath("paths/filters", dataPath + "/filters/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
     themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
     picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");

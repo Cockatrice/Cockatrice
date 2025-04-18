@@ -28,9 +28,6 @@ enum LoadStatus
     NoCards
 };
 
-typedef QHash<QString, CardInfoPtr> CardNameMap;
-typedef QHash<QString, CardSetPtr> SetNameMap;
-
 class CardDatabase : public QObject
 {
     Q_OBJECT
@@ -98,6 +95,8 @@ public:
     LoadStatus loadFromFile(const QString &fileName);
     bool saveCustomTokensToFile();
     QStringList getAllMainCardTypes() const;
+    QMap<QString, int> getAllMainCardTypesWithCount() const;
+    QMap<QString, int> getAllSubCardTypesWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;

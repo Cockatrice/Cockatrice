@@ -1,7 +1,7 @@
 #include "tab_edhrec.h"
 
-#include "api_response/edhrec_commander_api_response.h"
-#include "edhrec_commander_api_response_display_widget.h"
+#include "api_response/commander/edhrec_commander_api_response.h"
+#include "display/commander/edhrec_commander_api_response_display_widget.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -21,7 +21,7 @@ TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 #endif
 
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
-    connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
+    connect(networkManager, &QNetworkAccessManager::finished, this, &TabEdhRec::processApiJson);
 }
 
 void TabEdhRec::retranslateUi()

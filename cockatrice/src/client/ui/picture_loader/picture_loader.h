@@ -1,7 +1,7 @@
 #ifndef PICTURELOADER_H
 #define PICTURELOADER_H
 
-#include "../../../game/cards/card_database.h"
+#include "../../../game/cards/card_info.h"
 #include "picture_loader_worker.h"
 
 #include <QLoggingCategory>
@@ -36,6 +36,7 @@ public:
     static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
     static void cacheCardPixmaps(QList<CardInfoPtr> cards);
+    static bool hasCustomArt();
 
 public slots:
     static void clearNetworkCache();
