@@ -18,6 +18,7 @@ public:
 private:
     QVBoxLayout *layout;
     EdhrecApiResponseCardDetails toDisplay;
+    QLabel *commanderLabel;
     QLabel *amountLabel;
     QLabel *inclusionLabel;
     PercentBarWidget *percentBarWidget;

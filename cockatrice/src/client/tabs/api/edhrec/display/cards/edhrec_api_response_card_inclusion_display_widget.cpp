@@ -8,6 +8,8 @@ EdhrecApiResponseCardInclusionDisplayWidget::EdhrecApiResponseCardInclusionDispl
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
+    commanderLabel = new QLabel(this);
+    commanderLabel->setAlignment(Qt::AlignCenter);
     amountLabel = new QLabel(this);
     amountLabel->setAlignment(Qt::AlignCenter);
     inclusionLabel = new QLabel(this);
@@ -18,8 +20,12 @@ EdhrecApiResponseCardInclusionDisplayWidget::EdhrecApiResponseCardInclusionDispl
         layout->addWidget(amountLabel);
         layout->addWidget(inclusionLabel);
         layout->addWidget(percentBarWidget);
+        commanderLabel->hide();
     } else {
-        hide();
+        amountLabel->hide();
+        inclusionLabel->hide();
+        percentBarWidget->hide();
+        layout->addWidget(commanderLabel);
     }
 
     retranslateUi();
@@ -27,6 +33,7 @@ EdhrecApiResponseCardInclusionDisplayWidget::EdhrecApiResponseCardInclusionDispl
 
 void EdhrecApiResponseCardInclusionDisplayWidget::retranslateUi()
 {
+    commanderLabel->setText(toDisplay.label);
     amountLabel->setText(tr("In %1 decks").arg(QString::number(toDisplay.inclusion)));
     inclusionLabel->setText(tr("%1% of %2 decks")
                                 .arg(QString::number(toDisplay.inclusion / (toDisplay.potentialDecks / 100.0), 'f', 2),
