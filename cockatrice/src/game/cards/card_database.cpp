@@ -386,9 +386,10 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName,
 
     for (const auto &cardInfoPerSetList : setMap) {
         for (auto &cardInfoForSet : cardInfoPerSetList) {
-            if (cardInfoForSet.getPtr()->getShortName() == setShortName &&
-                cardInfoForSet.getProperty("num") == collectorNumber) {
-                return cardInfoForSet;
+            if (cardInfoForSet.getPtr()->getShortName() == setShortName) {
+                if (cardInfoForSet.getProperty("num") == collectorNumber || collectorNumber.isEmpty()) {
+                    return cardInfoForSet;
+                }
             }
         }
     }
