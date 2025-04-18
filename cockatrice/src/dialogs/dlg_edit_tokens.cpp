@@ -40,7 +40,7 @@ DlgEditTokens::DlgEditTokens(QWidget *parent) : QDialog(parent), currentCard(nul
     colorEdit->addItem(tr("multicolor"), QChar('m'));
     colorEdit->addItem(tr("colorless"), QChar());
     colorLabel->setBuddy(colorEdit);
-    connect(colorEdit, &QComboBox::currentIndexChanged, this, &DlgEditTokens::colorChanged);
+    connect(colorEdit, qOverload<int>(&QComboBox::currentIndexChanged), this, &DlgEditTokens::colorChanged);
 
     ptLabel = new QLabel(tr("&P/T:"));
     ptEdit = new QLineEdit;

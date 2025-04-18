@@ -410,7 +410,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
     verticalCardOverlapPercentBox.setRange(0, 80);
-    connect(&verticalCardOverlapPercentBox, &QSpinBox::valueChanged, &settings,
+    connect(&verticalCardOverlapPercentBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
             &SettingsCache::setStackCardOverlapPercent);
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
@@ -461,11 +461,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
     minPlayersForMultiColumnLayoutEdit.setValue(settings.getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, &QSpinBox::valueChanged, &settings,
+    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
             &SettingsCache::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, &QSpinBox::valueChanged, &settings, &SettingsCache::setMaxFontSize);
+    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setMaxFontSize);
     maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
@@ -889,10 +890,11 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
             &SettingsCache::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
-    connect(&pixmapCacheEdit, &QSpinBox::valueChanged, &SettingsCache::instance(), &SettingsCache::setPixmapCacheSize);
-    connect(&networkCacheEdit, &QSpinBox::valueChanged, &SettingsCache::instance(),
+    connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setPixmapCacheSize);
+    connect(&networkCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setNetworkCacheSizeInMB);
-    connect(&networkRedirectCacheTtlEdit, &QSpinBox::valueChanged, &SettingsCache::instance(),
+    connect(&networkRedirectCacheTtlEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setNetworkRedirectCacheTtl);
 
     mpGeneralGroupBox = new QGroupBox;
@@ -1367,7 +1369,7 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSpinBox->setMaximum(100);
     masterVolumeSpinBox->setValue(SettingsCache::instance().getMasterVolume());
     connect(masterVolumeSlider, &QSlider::valueChanged, masterVolumeSpinBox, &QSpinBox::setValue);
-    connect(masterVolumeSpinBox, &QSpinBox::valueChanged, masterVolumeSlider, &QSlider::setValue);
+    connect(masterVolumeSpinBox, qOverload<int>(&QSpinBox::valueChanged), masterVolumeSlider, &QSlider::setValue);
 
     auto *soundGrid = new QGridLayout;
     soundGrid->addWidget(&soundEnabledCheckBox, 0, 0, 1, 3);
