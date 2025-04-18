@@ -347,7 +347,7 @@ jobs:
       matrix:
         include:
           - target: 10
-            qt_version: 6.8.*
+            qt_version: 6.6.*
             qt_arch: msvc2022_64
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
