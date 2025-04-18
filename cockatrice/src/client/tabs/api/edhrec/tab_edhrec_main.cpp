@@ -94,11 +94,18 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     searchPushButton = new QPushButton(navigationContainer);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() { doSearch(); });
 
+    settingsButton = new SettingsButtonWidget(this);
+
+    cardSizeSlider = new CardSizeWidget(this);
+
+    settingsButton->addSettingsWidget(cardSizeSlider);
+
     navigationLayout->addWidget(cardsPushButton);
     navigationLayout->addWidget(topCommandersPushButton);
     navigationLayout->addWidget(tagsPushButton);
     navigationLayout->addWidget(searchBar);
     navigationLayout->addWidget(searchPushButton);
+    navigationLayout->addWidget(settingsButton);
 
     currentPageDisplay = new QWidget(container);
     currentPageLayout = new QVBoxLayout(currentPageDisplay);

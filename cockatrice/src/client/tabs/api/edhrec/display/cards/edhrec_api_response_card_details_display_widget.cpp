@@ -38,8 +38,11 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     }
 
     if (parentTab) {
+        cardPictureWidget->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
         connect(cardPictureWidget, &CardInfoPictureWidget::cardClicked, this,
                 &EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation);
+        connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, cardPictureWidget,
+                &CardInfoPictureWidget::setScaleFactor);
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
     }
