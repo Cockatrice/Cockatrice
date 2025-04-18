@@ -41,7 +41,7 @@ If you ever encounter a bug, have a suggestion or idea, or feel a need for a dev
 
 For basic information related to the app and getting started, please take a look at our official site: **https://cockatrice.github.io**
 
-If you'd like to help and contribute to Cockatrice in any way, check out our [README](https://github.com/Cockatrice/Cockatrice#get-involved-).  
+If you'd like to help and contribute to Cockatrice in any way, check out our [README](https://github.com/Cockatrice/Cockatrice#contribute).  
 We're always available to answer questions you may have on how the program works and how you can provide a meaningful contribution.
 
 
