@@ -125,6 +125,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
     updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
 
+    deckPreviewSelectionAnimationEnabled = SettingsCache::instance().getVisualDeckStorageSelectionAnimation();
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+            &VisualDeckStorageWidget::updateSelectionAnimationEnabled);
+
     // deck area
     scrollArea = new QScrollArea(this);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -270,4 +274,9 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
     } else {
         tagFilterWidget->setHidden(true);
     }
+}
+
+void VisualDeckStorageWidget::updateSelectionAnimationEnabled(const bool enabled)
+{
+    deckPreviewSelectionAnimationEnabled = enabled;
 }

@@ -9,6 +9,7 @@
  * @brief Constructs a CardPictureWithTextOverlay widget.
  * @param parent The parent widget.
  * @param hoverToZoomEnabled If this widget will spawn a larger widget when hovered over.
+ * @param raiseOnEnter If this widget will raise slightly when entered.
  * @param textColor The color of the overlay text.
  * @param outlineColor The color of the outline around the text.
  * @param fontSize The font size of the overlay text.
@@ -18,11 +19,12 @@
  */
 CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidget *parent,
                                                                            const bool hoverToZoomEnabled,
+                                                                           const bool raiseOnEnter,
                                                                            const QColor &textColor,
                                                                            const QColor &outlineColor,
                                                                            const int fontSize,
                                                                            const Qt::Alignment alignment)
-    : CardInfoPictureWidget(parent, hoverToZoomEnabled), textColor(textColor), outlineColor(outlineColor),
+    : CardInfoPictureWidget(parent, hoverToZoomEnabled, raiseOnEnter), textColor(textColor), outlineColor(outlineColor),
       fontSize(fontSize), textAlignment(alignment)
 {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

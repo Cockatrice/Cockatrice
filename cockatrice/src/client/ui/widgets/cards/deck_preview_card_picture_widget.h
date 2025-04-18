@@ -14,6 +14,7 @@ class DeckPreviewCardPictureWidget final : public CardInfoPictureWithTextOverlay
 public:
     explicit DeckPreviewCardPictureWidget(QWidget *parent,
                                           bool hoverToZoomEnabled = false,
+                                          bool raiseOnEnter = false,
                                           const QColor &textColor = Qt::white,
                                           const QColor &outlineColor = Qt::black,
                                           int fontSize = 12,
