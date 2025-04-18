@@ -620,8 +620,7 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 
     soundEngine->playSound(phase.soundFileName);
 
-    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() +
-               phase.getName() + "</b></font>");
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() + phase.getName() + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
