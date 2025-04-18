@@ -459,7 +459,7 @@ bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> u
 
 QString ChatView::getCurrentTime() const
 {
-    if (showInGameTime) {
+    if (game && showInGameTime) {
         return game->getCurrentInGameTime();
     } else {
         return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
