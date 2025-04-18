@@ -1,20 +1,24 @@
 #!/bin/bash
 
-# This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
+# This script is to be used by the CI environment from the project root directory, do not use it from somewhere else.
 
-# Compiles cockatrice inside of a ci environment
+# Compiles cockatrice inside of a CI environment
 # --install runs make install
 # --package [<package type>] runs make package, optionally force the type
 # --suffix <suffix> renames package with this suffix, requires arg
 # --server compiles servatrice
 # --test runs tests
-# --debug or --release sets the build type ie CMAKE_BUILD_TYPE
+# --debug or --release sets the build type (CMAKE_BUILD_TYPE)
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
 # --parallel <core count> sets how many cores cmake should build with in parallel
+# --ninja use Ninja for building (default if Ninja is available)
+# --make use Make for building (fallback if Ninja is unavailable)
 # uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
 # exitcode: 1 for failure, 3 for invalid arguments
+
+USE_NINJA=
 
 # Read arguments
 while [[ $# != 0 ]]; do
@@ -85,6 +89,14 @@ while [[ $# != 0 ]]; do
       PARALLEL_COUNT="$1"
       shift
       ;;
+    '--ninja')
+      USE_NINJA=1
+      shift
+      ;;
+    '--make')
+      USE_NINJA=
+      shift
+      ;;
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -124,17 +136,23 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
+# Auto-detect Ninja if not explicitly set
+if [[ -z "$USE_NINJA" ]]; then
+  if command -v ninja &>/dev/null; then
+    USE_NINJA=1
+    echo "::notice::Using Ninja generator by default"
+  else
+    echo "::notice::Ninja not found, falling back to Make"
+  fi
+fi
+
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
-if [[ $PARALLEL_COUNT ]]; then
-  if [[ $(cmake --build /not_a_dir --parallel 2>&1 | head -1) =~ parallel ]]; then
-    # workaround for bionic having an old cmake
-    echo "this version of cmake does not support --parallel, using native build tool -j instead"
-    buildflags+=(-- -j "$PARALLEL_COUNT")
-    # note, no normal build flags should be added after this
-  else
-    buildflags+=(--parallel "$PARALLEL_COUNT")
-  fi
+
+# Remove parallelism flag for Ninja (it handles this automatically)
+if [[ ! $USE_NINJA && $PARALLEL_COUNT ]]; then
+  # Only use parallelism flag if using Make (not Ninja)
+  buildflags+=(--parallel "$PARALLEL_COUNT")
 fi
 
 function ccachestatsverbose() {
@@ -156,12 +174,17 @@ fi
 
 echo "::group::Configure cmake"
 cmake --version
-cmake .. "${flags[@]}"
+if [[ $USE_NINJA ]]; then
+  cmake -G Ninja .. "${flags[@]}"
+else
+  cmake .. "${flags[@]}"
+fi
 echo "::endgroup::"
 
 echo "::group::Build project"
 if [[ $RUNNER_OS == Windows ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
 else
@@ -200,7 +223,7 @@ if [[ $MAKE_PACKAGE ]]; then
 
   if [[ $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    cd ..
+    cd .. 
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
