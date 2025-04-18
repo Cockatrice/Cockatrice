@@ -9,6 +9,8 @@ on:
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
       - '.github/workflows/translations-*.yml'
+      - '.github/workflows/docker-release.yml'
+      
     tags:
       - '*'
   pull_request:
