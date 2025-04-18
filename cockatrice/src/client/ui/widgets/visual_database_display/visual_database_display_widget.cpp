@@ -195,13 +195,30 @@ void VisualDatabaseDisplayWidget::populateCards()
         databaseDisplayModel->fetchMore(QModelIndex());
     }
 
+    QList<const CardFilter *> setFilters = filterModel->getFiltersOfType(CardFilter::AttrSet);
+    const CardFilter *setFilter = nullptr;
+    if (setFilters.length() == 1) {
+        setFilter = setFilters.at(0);
+    }
+
     for (int row = start; row < end; ++row) {
         qCDebug(VisualDatabaseDisplayLog) << "Adding " << row;
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         qCDebug(VisualDatabaseDisplayLog) << name.toString();
+
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
-            addCard(info);
+            if (setFilter) {
+                CardInfoPerSetMap setMap = info->getSets();
+                if (setMap.contains(setFilter->term())) {
+                    for (CardInfoPerSet cardSetInstance : setMap[setFilter->term()]) {
+                        addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                            name.toString(), cardSetInstance.getProperty("uuid")));
+                    }
+                }
+            } else {
+                addCard(info);
+            }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
         }
