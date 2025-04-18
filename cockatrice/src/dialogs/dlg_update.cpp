@@ -42,6 +42,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
 
     connect(gotoDownload, &QPushButton::clicked, this, &DlgUpdate::gotoDownloadPage);
+    // TODO: make reinstall button actually do something when clicked
     // connect(manualDownload, &QPushButton::clicked, this, &DlgUpdate::downloadUpdate);
     connect(stopDownload, &QPushButton::clicked, this, &DlgUpdate::cancelDownload);
     connect(ok, &QPushButton::clicked, this, &DlgUpdate::closeDialog);
