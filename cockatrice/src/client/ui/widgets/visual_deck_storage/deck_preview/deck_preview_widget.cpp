@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QSet>
+#include <QStandardItemModel>
 #include <QVBoxLayout>
 
 DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
@@ -27,6 +28,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     deckLoader = new DeckLoader();
     deckLoader->setParent(this);
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
+    /* TODO: We shouldn't update the tags on *every* deck load, since it's kinda expensive. We should instead count how
+     many deck loads have finished already and if we've loaded all decks and THEN load all the tags at once. */
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
     deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
@@ -194,6 +197,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
     // Block signals temporarily
     bool wasBlocked = bannerCardComboBox->blockSignals(true);
+    bannerCardComboBox->setUpdatesEnabled(false);
 
     // Clear the existing items in the combo box
     bannerCardComboBox->clear();
@@ -209,12 +213,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
-                if (info) {
-                    bannerCardSet.insert(
-                        QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
-                }
+                bannerCardSet.insert(QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
             }
         }
     }
@@ -226,13 +225,22 @@ void DeckPreviewWidget::updateBannerCardComboBox()
         return a.first.toLower() < b.first.toLower();
     });
 
+    // This is *slightly* more performant than using addItem in a loop.
+
+    QStandardItemModel *model = new QStandardItemModel(pairList.size(), 1, bannerCardComboBox);
+
+    int row = 0;
     for (const auto &pair : pairList) {
         QVariantMap dataMap;
         dataMap["name"] = pair.first;
         dataMap["uuid"] = pair.second;
 
-        bannerCardComboBox->addItem(pair.first, dataMap);
+        QStandardItem *item = new QStandardItem(pair.first);
+        item->setData(dataMap, Qt::UserRole);
+        model->setItem(row++, 0, item);
     }
+
+    bannerCardComboBox->setModel(model);
 
     // Try to restore the previous selection by finding the currentText
     int restoredIndex = bannerCardComboBox->findText(currentText);
@@ -251,6 +259,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
     // Restore the previous signal blocking state
     bannerCardComboBox->blockSignals(wasBlocked);
+    bannerCardComboBox->setUpdatesEnabled(true);
 }
 
 void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
