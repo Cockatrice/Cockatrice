@@ -12,9 +12,9 @@ class VisualDeckStorageTagFilterWidget : public QWidget
 
     VisualDeckStorageWidget *parent;
 
-    QStringList gatherAllTags() const;
-    void removeTagsNotInList(const QStringList &tags);
-    void addTagsIfNotPresent(const QStringList &tags);
+    QSet<QString> gatherAllTags() const;
+    void removeTagsNotInList(const QSet<QString> &tags);
+    void addTagsIfNotPresent(const QSet<QString> &tags);
     void addTagIfNotPresent(const QString &tag);
     void sortTags();
 
