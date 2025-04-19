@@ -138,7 +138,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
 
     connect(addTagButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::addTag);
     connect(newTagInput, &QLineEdit::textChanged, this,
-            [=, this](const QString &text) { addTagButton->setEnabled(!text.trimmed().isEmpty()); });
+            [this](const QString &text) { addTagButton->setEnabled(!text.trimmed().isEmpty()); });
 
     // OK and Cancel buttons
     buttonLayout = new QHBoxLayout(this);
