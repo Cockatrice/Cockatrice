@@ -348,7 +348,7 @@ jobs:
         include:
           - target: 10
             qt_version: 6.6.*
-            qt_arch: msvc2019_64  # msvc2022_64 is only available starting Qt 6.8, which introduces a bug in game window
+            qt_arch: win64_msvc2022_64
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: Windows ${{matrix.target}}
