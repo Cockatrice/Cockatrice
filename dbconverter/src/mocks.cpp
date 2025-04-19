@@ -208,6 +208,13 @@ void SettingsCache::setIncludeRebalancedCards(bool /* _includeRebalancedCards */
 void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T /* _navigationButtonsVisible */)
 {
 }
+void SettingsCache::setDeckEditorBannerCardComboBoxVisible(
+    QT_STATE_CHANGED_T /* _deckEditorBannerCardComboBoxVisible */)
+{
+}
+void SettingsCache::setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T /* _deckEditorTagsWidgetVisible */)
+{
+}
 void SettingsCache::setVisualDeckStorageSortingOrder(int /* _visualDeckStorageSortingOrder */)
 {
 }
