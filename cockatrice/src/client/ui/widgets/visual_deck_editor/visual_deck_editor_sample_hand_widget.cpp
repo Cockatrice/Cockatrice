@@ -16,7 +16,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     connect(resetButton, SIGNAL(clicked()), this, SLOT(updateDisplay()));
     layout->addWidget(resetButton);
 
-    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
     for (CardInfoPtr card : getRandomCards(7)) {
