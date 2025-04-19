@@ -10,15 +10,15 @@
 peg::parser search(R"(
 Start <- QueryPartList
 ~ws <- [ ]+
-QueryPartList <- ComplexQueryPart ( ws ("and" ws)? ComplexQueryPart)* ws*
+QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 
-ComplexQueryPart <- SomewhatComplexQueryPart ws $or<[oO][rR]> ws ComplexQueryPart / SomewhatComplexQueryPart
+ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
-NotQuery <- ('not' ws/'-') SomewhatComplexQueryPart
+NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 SetQuery <- ('e'/'set') [:] FlexStringValue
 OracleQuery <- 'o' [:] RegexString
 
