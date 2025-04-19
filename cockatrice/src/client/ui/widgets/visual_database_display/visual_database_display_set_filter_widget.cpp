@@ -64,13 +64,13 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
         setButtons[shortName] = button;
 
         // Connect toggle signal
-        connect(button, &QPushButton::toggled, this,
-                [this, shortName](bool checked) { handleSetToggled(shortName, checked); });
         if (setsActivated < setsToPreactivate) {
             setsActivated++;
             activeSets[shortName] = true;
             button->setChecked(true);
         }
+        connect(button, &QPushButton::toggled, this,
+                [this, shortName](bool checked) { handleSetToggled(shortName, checked); });
     }
     updateSetFilter();
     updateSetButtonsVisibility(); // Ensure visibility is updated initially
