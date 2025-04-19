@@ -12,6 +12,11 @@
 
 #include <utility>
 
+const QString MessageLogWidget::getCurrentTime()
+{
+    return ChatView::getCurrentTime();
+}
+
 const QString &MessageLogWidget::tableConstant() const
 {
     static const QString constant("table");
@@ -615,14 +620,13 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 
     soundEngine->playSound(phase.soundFileName);
 
-    appendHtml("<font color=\"" + phase.color + "\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               phase.getName() + "</b></font>");
+    appendHtml("<font color=\"" + phase.color + "\"><b>" + getCurrentTime() + phase.getName() + "</b></font>");
 }
 
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
-    appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               QString(tr("%1's turn.")).arg(player->getName()) + "</b></font><br>");
+    appendHtml("<br><font color=\"green\"><b>" + getCurrentTime() + QString(tr("%1's turn.")).arg(player->getName()) +
+               "</b></font><br>");
 }
 
 void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)

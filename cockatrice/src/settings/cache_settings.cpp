@@ -335,6 +335,7 @@ SettingsCache::SettingsCache()
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
+    localTime = settings->value("chat/localtime", false).toBool();
 }
 
 void SettingsCache::setUseTearOffMenus(bool _useTearOffMenus)
@@ -422,6 +423,12 @@ void SettingsCache::setRoomHistory(const QT_STATE_CHANGED_T _roomHistory)
 {
     roomHistory = (bool)_roomHistory;
     settings->setValue("chat/roomhistory", roomHistory);
+}
+
+void SettingsCache::setLocalTime(const QT_STATE_CHANGED_T _localTime)
+{
+    localTime = (bool)_localTime;
+    settings->setValue("chat/localtime", localTime);
 }
 
 void SettingsCache::setLang(const QString &_lang)

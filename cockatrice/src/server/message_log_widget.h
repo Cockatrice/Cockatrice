@@ -26,6 +26,7 @@ private:
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
 
+    const QString getCurrentTime();
     const QString &tableConstant() const;
     const QString &graveyardConstant() const;
     const QString &exileConstant() const;

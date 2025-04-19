@@ -61,6 +61,7 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTime
     setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
+    showInGameTime = SettingsCache::instance().getLocalTime();
 }
 
 void ChatView::retranslateUi()
@@ -102,10 +103,9 @@ void ChatView::appendHtml(const QString &html)
 void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
-
     QString htmlText =
         "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
-        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+        getCurrentTime() + html + "</font>";
 
     if (optionalIsBold)
         htmlText = "<b>" + htmlText + "</b>";
@@ -168,7 +168,7 @@ void ChatView::appendMessage(QString message,
         timeFormat.setForeground(serverMessageColor);
         timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
-        cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
+        cursor.insertText(getCurrentTime());
     }
 
     // nickname
@@ -455,6 +455,15 @@ bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> u
 
     return (getAttentionList.contains(message) &&
             (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin));
+}
+
+QString ChatView::getCurrentTime() const
+{
+    if (game && showInGameTime) {
+        return game->getCurrentInGameTime();
+    } else {
+        return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+    }
 }
 
 void ChatView::actMessageClicked()
