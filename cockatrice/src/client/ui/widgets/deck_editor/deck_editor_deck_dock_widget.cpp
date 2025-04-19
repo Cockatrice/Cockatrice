@@ -58,6 +58,28 @@ void DeckEditorDeckDockWidget::createDeckDock()
     nameEdit->setObjectName("nameEdit");
     nameLabel->setBuddy(nameEdit);
     connect(nameEdit, &LineEditUnfocusable::textChanged, this, &DeckEditorDeckDockWidget::updateName);
+
+    quickSettingsWidget = new SettingsButtonWidget(this);
+
+    showBannerCardCheckBox = new QCheckBox();
+    showBannerCardCheckBox->setObjectName("showBannerCardCheckBox");
+    showBannerCardCheckBox->setChecked(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setDeckEditorBannerCardComboBoxVisible);
+    connect(&SettingsCache::instance(), &SettingsCache::deckEditorBannerCardComboBoxVisibleChanged, this,
+            &DeckEditorDeckDockWidget::updateShowBannerCardComboBox);
+
+    showTagsWidgetCheckBox = new QCheckBox();
+    showTagsWidgetCheckBox->setObjectName("showTagsWidgetCheckBox");
+    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().getDeckEditorTagsWidgetVisible());
+    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setDeckEditorTagsWidgetVisible);
+    connect(&SettingsCache::instance(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
+            &DeckEditorDeckDockWidget::updateShowTagsWidget);
+
+    quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
+    quickSettingsWidget->addSettingsWidget(showTagsWidgetCheckBox);
+
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
@@ -69,6 +91,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
+    bannerCardLabel->setHidden(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -76,8 +99,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
     });
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::setBannerCard);
+    bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
+    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
@@ -109,6 +134,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     upperLayout->addWidget(nameLabel, 0, 0);
     upperLayout->addWidget(nameEdit, 0, 1);
+    upperLayout->addWidget(quickSettingsWidget, 0, 2);
 
     upperLayout->addWidget(commentsLabel, 1, 0);
     upperLayout->addWidget(commentsEdit, 1, 1);
@@ -289,6 +315,17 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
     emit deckChanged();
+}
+
+void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
+{
+    bannerCardLabel->setHidden(!visible);
+    bannerCardComboBox->setHidden(!visible);
+}
+
+void DeckEditorDeckDockWidget::updateShowTagsWidget(const bool visible)
+{
+    deckTagsDisplayWidget->setHidden(!visible);
 }
 
 /**
@@ -526,6 +563,8 @@ void DeckEditorDeckDockWidget::retranslateUi()
     setWindowTitle(tr("Deck"));
 
     nameLabel->setText(tr("Deck &name:"));
+    showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
+    showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
     hashLabel1->setText(tr("Hash:"));
 
