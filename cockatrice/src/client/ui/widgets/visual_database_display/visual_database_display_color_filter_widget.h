@@ -43,21 +43,21 @@ public:
 
 signals:
     void filterModeChanged(FilterMode filterMode);
-    void activeColorsChanged();
 
 private slots:
     void handleColorToggled(QChar color, bool active);
-    void updateColorFilter();
+    void addFilter(QChar color);
+    void removeFilter(QChar color);
     void updateFilterMode();
+    void setManaSymbolActive(QChar color, bool active);
+    QList<QChar> getActiveColors();
     void syncWithFilterModel();
 
 private:
     FilterTreeModel *filterModel;
     QHBoxLayout *layout;
     QPushButton *toggleButton;
-    QMap<QChar, bool> activeColors;
     FilterMode currentMode = FilterMode::Includes; // Default mode
-    bool blockSync = false;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H

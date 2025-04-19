@@ -20,12 +20,17 @@ ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isAct
             &ManaSymbolWidget::updateOpacity);
 }
 
+void ManaSymbolWidget::toggleSymbol()
+{
+    setColorActive(!isActive);
+    emit colorToggled(getSymbolChar(), isActive);
+}
+
 void ManaSymbolWidget::setColorActive(bool active)
 {
     if (isActive != active) {
         isActive = active;
         updateOpacity();
-        emit colorToggled(getSymbolChar(), isActive);
     }
 }
 
@@ -46,9 +51,7 @@ void ManaSymbolWidget::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
     if (mayBeToggled) {
-        isActive = !isActive;
-        updateOpacity();
-        emit colorToggled(getSymbolChar(), isActive);
+        toggleSymbol();
     }
 }
 

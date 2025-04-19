@@ -78,6 +78,13 @@ void FilterTreeModel::addFilter(const CardFilter *f)
     emit layoutChanged();
 }
 
+void FilterTreeModel::removeFilter(const CardFilter *f)
+{
+    emit layoutAboutToBeChanged();
+    fTree->removeFilter(f);
+    emit layoutChanged();
+}
+
 void FilterTreeModel::clearFiltersOfType(CardFilter::Attr filterType)
 {
     emit layoutAboutToBeChanged();

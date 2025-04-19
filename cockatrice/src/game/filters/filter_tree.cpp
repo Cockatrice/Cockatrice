@@ -531,6 +531,31 @@ void FilterTree::removeFiltersByAttr(CardFilter::Attr filterType)
     }
 }
 
+void FilterTree::removeFilter(const CardFilter *toRemove)
+{
+    for (int i = childNodes.size() - 1; i >= 0; --i) {
+        auto *logicMap = dynamic_cast<LogicMap *>(childNodes.at(i));
+        if (!logicMap || logicMap->attr != toRemove->attr())
+            continue;
+
+        FilterItemList *typeList = logicMap->typeList(toRemove->type());
+        if (!typeList)
+            continue;
+
+        int termIdx = typeList->termIndex(toRemove->term());
+        if (termIdx != -1) {
+            typeList->deleteAt(termIdx);
+            emit typeList->nodeChanged();
+            if (typeList->childCount() == 0) {
+                int logicIndex = logicMap->childIndex(typeList);
+                if (logicIndex != -1) {
+                    logicMap->deleteAt(logicIndex);
+                }
+            }
+        }
+    }
+}
+
 void FilterTree::clear()
 {
     while (childCount() > 0) {
