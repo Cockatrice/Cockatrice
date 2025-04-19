@@ -12,13 +12,13 @@ class VisualDeckStorageTagFilterWidget : public QWidget
 
 public:
     explicit VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent);
-    QStringList gatherAllTags();
+    QStringList gatherAllTags() const;
     void filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const;
     void removeTagsNotInList(const QStringList &tags);
     void addTagsIfNotPresent(const QStringList &tags);
     void addTagIfNotPresent(const QString &tag);
     void sortTags();
-    QStringList getAllKnownTags();
+    QStringList getAllKnownTags() const;
     VisualDeckStorageWidget *parent;
 
 public slots:

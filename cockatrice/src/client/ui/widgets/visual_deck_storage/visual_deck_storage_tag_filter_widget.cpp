@@ -136,7 +136,7 @@ void VisualDeckStorageTagFilterWidget::sortTags()
     }
 }
 
-QStringList VisualDeckStorageTagFilterWidget::gatherAllTags()
+QStringList VisualDeckStorageTagFilterWidget::gatherAllTags() const
 {
     QStringList allTags;
     QList<DeckPreviewWidget *> deckWidgets = parent->findChildren<DeckPreviewWidget *>();
@@ -149,7 +149,7 @@ QStringList VisualDeckStorageTagFilterWidget::gatherAllTags()
     return allTags;
 }
 
-QStringList VisualDeckStorageTagFilterWidget::getAllKnownTags()
+QStringList VisualDeckStorageTagFilterWidget::getAllKnownTags() const
 {
     QStringList allTags;
 
