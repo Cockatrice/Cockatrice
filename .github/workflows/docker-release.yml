@@ -4,16 +4,18 @@ on:
   push:
     tags:
       - '*Release*'
-    branches:
-      - master
   pull_request:
     branches:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
+      - 'CMakeLists.txt'
+      - 'LICENSE'
+      - 'README.md'
       - 'Dockerfile'
       - 'servatrice/**'
       - 'common/**'
+      - 'cmake/**'
       - '!**.md'
 
 jobs:
