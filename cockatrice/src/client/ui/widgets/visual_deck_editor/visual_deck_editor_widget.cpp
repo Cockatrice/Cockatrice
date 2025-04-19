@@ -227,6 +227,7 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
         for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
             if (displayWidget->zoneName == zone) {
                 found = true;
+                displayWidget->displayCards();
                 break;
             }
         }

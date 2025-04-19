@@ -26,7 +26,7 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     banner = new BannerWidget(this, cardGroupCategory, Qt::Orientation::Vertical, bannerOpacity);
 
     layout->addWidget(banner);
-    updateCardDisplays();
+    CardGroupDisplayWidget::updateCardDisplays();
 }
 
 void CardGroupDisplayWidget::updateCardDisplays()
