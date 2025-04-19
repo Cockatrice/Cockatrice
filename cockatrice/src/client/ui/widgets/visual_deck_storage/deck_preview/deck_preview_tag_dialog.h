@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QStringList>
+#include <QVBoxLayout>
 
 class DeckPreviewTagDialog : public QDialog
 {
@@ -26,14 +27,17 @@ private slots:
     void retranslateUi();
 
 private:
+    QVBoxLayout *mainLayout;
     QLabel *instructionLabel;
-    QListWidget *tagListView_;
-    QLineEdit *filterInput_;
-    QLineEdit *newTagInput_;
-    QPushButton *addTagButton_;
+    QListWidget *tagListView;
+    QLineEdit *filterInput;
+    QHBoxLayout *addTagLayout;
+    QLineEdit *newTagInput;
+    QPushButton *addTagButton;
+    QHBoxLayout *buttonLayout;
     QPushButton *okButton;
     QPushButton *cancelButton;
-    QStringList activeTags_;
+    QStringList activeTags;
 };
 
 #endif // DECK_PREVIEW_TAG_DIALOG_H

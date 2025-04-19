@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const QStringList &activeTags, QWidget *parent)
-    : QDialog(parent), activeTags_(activeTags)
+    : QDialog(parent), activeTags(activeTags)
 {
     resize(400, 500);
 
@@ -100,13 +100,13 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     combinedTags.removeDuplicates();
 
     // Main layout
-    auto *mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
 
     // Filter bar
-    filterInput_ = new QLineEdit(this);
-    mainLayout->addWidget(filterInput_);
+    filterInput = new QLineEdit(this);
+    mainLayout->addWidget(filterInput);
 
-    connect(filterInput_, &QLineEdit::textChanged, this, &DeckPreviewTagDialog::filterTags);
+    connect(filterInput, &QLineEdit::textChanged, this, &DeckPreviewTagDialog::filterTags);
 
     // Instruction label
     instructionLabel = new QLabel(this);
@@ -114,31 +114,34 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     mainLayout->addWidget(instructionLabel);
 
     // Tag list view
-    tagListView_ = new QListWidget(this);
-    mainLayout->addWidget(tagListView_);
+    tagListView = new QListWidget(this);
+    mainLayout->addWidget(tagListView);
 
     // Populate combined tags
     for (const auto &tag : combinedTags) {
-        auto *item = new QListWidgetItem(tagListView_);
+        auto *item = new QListWidgetItem(tagListView);
         auto *tagWidget = new DeckPreviewTagItemWidget(tag, activeTags.contains(tag), this);
-        tagListView_->addItem(item);
-        tagListView_->setItemWidget(item, tagWidget);
+        tagListView->addItem(item);
+        tagListView->setItemWidget(item, tagWidget);
 
         connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
     }
 
     // Add tag input layout
-    auto *addTagLayout = new QHBoxLayout();
-    newTagInput_ = new QLineEdit(this);
-    addTagButton_ = new QPushButton(this);
-    addTagLayout->addWidget(newTagInput_);
-    addTagLayout->addWidget(addTagButton_);
+    addTagLayout = new QHBoxLayout(this);
+    newTagInput = new QLineEdit(this);
+    addTagButton = new QPushButton(this);
+    addTagButton->setEnabled(false);
+    addTagLayout->addWidget(newTagInput);
+    addTagLayout->addWidget(addTagButton);
     mainLayout->addLayout(addTagLayout);
 
-    connect(addTagButton_, &QPushButton::clicked, this, &DeckPreviewTagDialog::addTag);
+    connect(addTagButton, &QPushButton::clicked, this, &DeckPreviewTagDialog::addTag);
+    connect(newTagInput, &QLineEdit::textChanged, this,
+            [=, this](const QString &text) { addTagButton->setEnabled(!text.trimmed().isEmpty()); });
 
     // OK and Cancel buttons
-    auto *buttonLayout = new QHBoxLayout();
+    buttonLayout = new QHBoxLayout(this);
     okButton = new QPushButton(this);
     cancelButton = new QPushButton(this);
     buttonLayout->addStretch();
@@ -155,30 +158,30 @@ void DeckPreviewTagDialog::retranslateUi()
 {
     setWindowTitle(tr("Deck Tags Manager"));
     instructionLabel->setText(tr("Manage your deck tags. Check or uncheck tags as needed, or add new ones:"));
-    newTagInput_->setPlaceholderText(tr("Add a new tag (e.g., Aggro️)"));
-    addTagButton_->setText(tr("Add Tag"));
-    filterInput_->setPlaceholderText(tr("Filter tags..."));
+    newTagInput->setPlaceholderText(tr("Add a new tag (e.g., Aggro️)"));
+    addTagButton->setText(tr("Add Tag"));
+    filterInput->setPlaceholderText(tr("Filter tags..."));
     okButton->setText(tr("OK"));
     cancelButton->setText(tr("Cancel"));
 }
 
 QStringList DeckPreviewTagDialog::getActiveTags() const
 {
-    return activeTags_;
+    return activeTags;
 }
 
 void DeckPreviewTagDialog::addTag()
 {
-    QString newTag = newTagInput_->text().trimmed();
+    QString newTag = newTagInput->text().trimmed();
     if (newTag.isEmpty()) {
         QMessageBox::warning(this, tr("Invalid Input"), tr("Tag name cannot be empty!"));
         return;
     }
 
     // Prevent duplicate tags
-    for (int i = 0; i < tagListView_->count(); ++i) {
-        auto *item = tagListView_->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView_->itemWidget(item));
+    for (int i = 0; i < tagListView->count(); ++i) {
+        auto *item = tagListView->item(i);
+        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget && tagWidget->checkBox()->text() == newTag) {
             QMessageBox::warning(this, tr("Duplicate Tag"), tr("This tag already exists."));
             return;
@@ -186,23 +189,23 @@ void DeckPreviewTagDialog::addTag()
     }
 
     // Add the new tag
-    auto *item = new QListWidgetItem(tagListView_);
+    auto *item = new QListWidgetItem(tagListView);
     auto *tagWidget = new DeckPreviewTagItemWidget(newTag, true, this);
-    tagListView_->addItem(item);
-    tagListView_->setItemWidget(item, tagWidget);
-    activeTags_.append(newTag);
+    tagListView->addItem(item);
+    tagListView->setItemWidget(item, tagWidget);
+    activeTags.append(newTag);
 
     connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
 
     // Clear the input field
-    newTagInput_->clear();
+    newTagInput->clear();
 }
 
 void DeckPreviewTagDialog::filterTags(const QString &text)
 {
-    for (int i = 0; i < tagListView_->count(); ++i) {
-        auto *item = tagListView_->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView_->itemWidget(item));
+    for (int i = 0; i < tagListView->count(); ++i) {
+        auto *item = tagListView->item(i);
+        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget) {
             bool matches = tagWidget->checkBox()->text().contains(text, Qt::CaseInsensitive);
             item->setHidden(!matches);
@@ -212,12 +215,12 @@ void DeckPreviewTagDialog::filterTags(const QString &text)
 
 void DeckPreviewTagDialog::onCheckboxStateChanged()
 {
-    activeTags_.clear();
-    for (int i = 0; i < tagListView_->count(); ++i) {
-        auto *item = tagListView_->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView_->itemWidget(item));
+    activeTags.clear();
+    for (int i = 0; i < tagListView->count(); ++i) {
+        auto *item = tagListView->item(i);
+        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget && tagWidget->checkBox()->isChecked()) {
-            activeTags_.append(tagWidget->checkBox()->text());
+            activeTags.append(tagWidget->checkBox()->text());
         }
     }
 }
