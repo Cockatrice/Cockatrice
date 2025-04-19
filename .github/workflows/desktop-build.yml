@@ -210,7 +210,6 @@ jobs:
             make_package: 1
 
           - target: 14
-            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Release
@@ -218,17 +217,15 @@ jobs:
             make_package: 1
 
           - target: 15
-            soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Release
             core_count: 3
             make_package: 1
 
           - target: 15
-            soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Debug
             core_count: 3
 
@@ -349,13 +346,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 7
-            qt_version: 5.15.*
-            qt_arch: msvc2019_64
-
           - target: 10
             qt_version: 6.6.*
-            qt_arch: msvc2019_64
+            qt_arch: msvc2019_64  # win64_msvc2022_64 is only available starting Qt 6.8, which introduces a bug in game window
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: Windows ${{matrix.target}}
@@ -383,7 +376,6 @@ jobs:
           setup-python: false
           version: ${{matrix.qt_version}}
           arch: win64_${{matrix.qt_arch}}
-          tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
