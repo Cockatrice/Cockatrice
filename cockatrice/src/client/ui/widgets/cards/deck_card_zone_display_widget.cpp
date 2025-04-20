@@ -93,6 +93,8 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
         for (CardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
             if (cardGroupDisplayWidget->cardGroupCategory == cardGroup) {
                 found = true;
+                cardGroupDisplayWidget->updateCardDisplays();
+                break;
             }
         }
 
