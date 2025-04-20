@@ -2,7 +2,7 @@
 
 #include "../client/sound_engine.h"
 #include "../client/translate_counter_name.h"
-#include "../game/cards/card_item.h"
+#include "../game/board/card_item.h"
 #include "../game/phase.h"
 #include "../game/player/player.h"
 #include "../game/zones/card_zone.h"

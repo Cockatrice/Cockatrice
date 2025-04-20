@@ -2,8 +2,8 @@
 
 #include "../../client/ui/theme_manager.h"
 #include "../../settings/cache_settings.h"
-#include "../cards/card_drag_item.h"
-#include "../cards/card_item.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
 

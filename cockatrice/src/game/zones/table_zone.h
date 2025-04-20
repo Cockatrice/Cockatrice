@@ -1,7 +1,7 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../cards/abstract_card_item.h"
+#include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
 /*

@@ -3,7 +3,7 @@
 
 #include "../../client/translation.h"
 #include "../board/abstract_graphics_item.h"
-#include "../cards/card_list.h"
+#include "../board/card_list.h"
 
 #include <QLoggingCategory>
 #include <QString>
