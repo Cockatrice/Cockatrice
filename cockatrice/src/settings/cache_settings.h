@@ -61,6 +61,8 @@ signals:
     void printingSelectorCardSizeChanged();
     void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
+    void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
+    void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
@@ -134,6 +136,8 @@ private:
     int printingSelectorCardSize;
     bool includeRebalancedCards;
     bool printingSelectorNavigationButtonsVisible;
+    bool deckEditorBannerCardComboBoxVisible;
+    bool deckEditorTagsWidgetVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
     bool visualDeckStorageShowBannerCardComboBox;
@@ -419,6 +423,14 @@ public:
     bool getPrintingSelectorNavigationButtonsVisible() const
     {
         return printingSelectorNavigationButtonsVisible;
+    }
+    bool getDeckEditorBannerCardComboBoxVisible() const
+    {
+        return deckEditorBannerCardComboBoxVisible;
+    }
+    bool getDeckEditorTagsWidgetVisible() const
+    {
+        return deckEditorTagsWidgetVisible;
     }
     int getVisualDeckStorageSortingOrder() const
     {
@@ -800,6 +812,8 @@ public slots:
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
     void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
+    void setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible);
+    void setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);

@@ -263,6 +263,9 @@ SettingsCache::SettingsCache()
     includeRebalancedCards = settings->value("cards/includerebalancedcards", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
+    deckEditorBannerCardComboBoxVisible =
+        settings->value("interface/deckeditorbannercardcomboboxvisible", true).toBool();
+    deckEditorTagsWidgetVisible = settings->value("interface/deckeditortagswidgetvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
@@ -679,6 +682,20 @@ void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED
     printingSelectorNavigationButtonsVisible = _navigationButtonsVisible;
     settings->setValue("cards/printingselectornavigationbuttonsvisible", printingSelectorNavigationButtonsVisible);
     emit printingSelectorNavigationButtonsVisibleChanged();
+}
+
+void SettingsCache::setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible)
+{
+    deckEditorBannerCardComboBoxVisible = _deckEditorBannerCardComboBoxVisible;
+    settings->setValue("interface/deckeditorbannercardcomboboxvisible", deckEditorBannerCardComboBoxVisible);
+    emit deckEditorBannerCardComboBoxVisibleChanged(deckEditorBannerCardComboBoxVisible);
+}
+
+void SettingsCache::setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible)
+{
+    deckEditorTagsWidgetVisible = _deckEditorTagsWidgetVisible;
+    settings->setValue("interface/deckeditortagswidgetvisible", deckEditorTagsWidgetVisible);
+    emit deckEditorTagsWidgetVisibleChanged(deckEditorTagsWidgetVisible);
 }
 
 void SettingsCache::setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder)
