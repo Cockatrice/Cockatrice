@@ -168,13 +168,16 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
+    src/game/board/abstract_card_drag_item.cpp
+    src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
     src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
+    src/game/board/card_drag_item.cpp
+    src/game/board/card_item.cpp
+    src/game/board/card_list.cpp
     src/game/board/counter_general.cpp
-    src/game/cards/abstract_card_drag_item.cpp
-    src/game/cards/abstract_card_item.cpp
     src/game/cards/card_completer_proxy_model.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
@@ -182,10 +185,7 @@ set(cockatrice_SOURCES
     src/game/cards/card_database_parser/card_database_parser.cpp
     src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    src/game/cards/card_drag_item.cpp
     src/game/cards/card_info.cpp
-    src/game/cards/card_item.cpp
-    src/game/cards/card_list.cpp
     src/game/cards/card_search_model.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp

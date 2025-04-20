@@ -3,10 +3,10 @@
 
 #include "../../settings/cache_settings.h"
 #include "../cards/card_info.h"
-#include "../cards/card_item.h"
 #include "../player/player.h"
 #include "../player/player_target.h"
 #include "../zones/card_zone.h"
+#include "card_item.h"
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"

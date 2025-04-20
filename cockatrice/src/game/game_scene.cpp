@@ -2,7 +2,7 @@
 
 #include "../client/ui/phases_toolbar.h"
 #include "../settings/cache_settings.h"
-#include "cards/card_item.h"
+#include "board/card_item.h"
 #include "player/player.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"

@@ -2,14 +2,14 @@
 
 #include "../../client/tabs/tab_game.h"
 #include "../../settings/cache_settings.h"
-#include "../board/arrow_item.h"
+#include "../cards/card_info.h"
 #include "../game_scene.h"
 #include "../player/player.h"
 #include "../zones/card_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
+#include "arrow_item.h"
 #include "card_drag_item.h"
-#include "card_info.h"
 #include "pb/serverinfo_card.pb.h"
 
 #include <QApplication>
