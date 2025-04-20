@@ -239,54 +239,33 @@ static QString getDomainForWebsite(DeckLoader::DecklistWebsite website)
     }
 }
 
-// This struct is here to support the forEachCard function call, defined in decklist. It
-// requires a function to be called for each card, and passes an inner node and a card for
-// each card in the decklist.
-struct FormatDeckListForExport
+/**
+ * Converts the card to the String that represents it in the decklist export
+ */
+static QString toDecklistExportString(const DecklistCardNode *card)
 {
-    // Create refrences for the strings that will be passed in.
-    QString &mainBoardCards;
-    QString &sideBoardCards;
-    // create main operator for struct, allowing the foreachcard to work.
-    FormatDeckListForExport(QString &_mainBoardCards, QString &_sideBoardCards)
-        : mainBoardCards(_mainBoardCards), sideBoardCards(_sideBoardCards){};
+    QString cardString;
+    // Get the number of cards and add the card name
+    cardString += QString::number(card->getNumber());
+    // Add a space between card num and name
+    cardString += "%20";
+    // Add card name
+    cardString += card->getName();
 
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card) const
-    {
-        // Get the card name
-        CardInfoPtr dbCard = CardDatabaseManager::getInstance()->getCard(card->getName());
-        if (!dbCard || dbCard->getIsToken()) {
-            // If it's a token, we don't care about the card.
-            return;
-        }
-
-        // Check if it's a sideboard card.
-        if (node->getName() == DECK_ZONE_SIDE) {
-            // Get the number of cards and add the card name
-            sideBoardCards += QString::number(card->getNumber());
-            // Add a space between card num and name
-            sideBoardCards += "%20";
-            // Add card name
-            sideBoardCards += card->getName();
-            // Add a return at the end of the card
-            sideBoardCards += "%0A";
-        } else // If it's a mainboard card, do the same thing, but for the mainboard card string
-        {
-            mainBoardCards += QString::number(card->getNumber());
-            mainBoardCards += "%20";
-            mainBoardCards += card->getName();
-            if (!card->getCardSetShortName().isNull()) {
-                mainBoardCards += "%20";
-                mainBoardCards += "(" + card->getCardSetShortName() + ")";
-            }
-            if (!card->getCardCollectorNumber().isNull()) {
-                mainBoardCards += "%20";
-                mainBoardCards += card->getCardCollectorNumber();
-            }
-            mainBoardCards += "%0A";
-        }
+    if (!card->getCardSetShortName().isNull()) {
+        cardString += "%20";
+        cardString += "(" + card->getCardSetShortName() + ")";
     }
-};
+    if (!card->getCardCollectorNumber().isNull()) {
+        cardString += "%20";
+        cardString += card->getCardCollectorNumber();
+    }
+
+    // Add a return at the end of the card
+    cardString += "%0A";
+
+    return cardString;
+}
 
 /**
  * Export deck to decklist function, called to format the deck in a way to be sent to a server
@@ -298,8 +277,25 @@ QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
     QString deckString = "https://" + getDomainForWebsite(website) + "/?";
     // Create two strings to pass to function
     QString mainBoardCards, sideBoardCards;
-    // Set up the struct to call.
-    FormatDeckListForExport formatDeckListForExport(mainBoardCards, sideBoardCards);
+
+    // Set up the function to call
+    auto formatDeckListForExport = [&mainBoardCards, &sideBoardCards](const auto *node, const auto *card) {
+        // Get the card name
+        CardInfoPtr dbCard = CardDatabaseManager::getInstance()->getCard(card->getName());
+        if (!dbCard || dbCard->getIsToken()) {
+            // If it's a token, we don't care about the card.
+            return;
+        }
+
+        // Check if it's a sideboard card.
+        if (node->getName() == DECK_ZONE_SIDE) {
+            sideBoardCards += toDecklistExportString(card);
+        } else {
+            // If it's a mainboard card, do the same thing, but for the mainboard card string
+            mainBoardCards += toDecklistExportString(card);
+        }
+    };
+
     // call our struct function for each card in the deck
     forEachCard(formatDeckListForExport);
     // Remove the extra return at the end of the last cards
@@ -316,17 +312,12 @@ QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
     return deckString;
 }
 
-// This struct is here to support the forEachCard function call, defined in decklist.
-// It requires a function to be called for each card, and it will set the providerId.
-struct SetProviderId
+/**
+ * Sets the providerId on each card in the decklist based on its set name and collector number.
+ */
+void DeckLoader::resolveSetNameAndNumberToProviderID()
 {
-    // Main operator for struct, allowing the foreachcard to work.
-    SetProviderId()
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
-    {
+    auto setProviderId = [](const auto node, const auto card) {
         Q_UNUSED(node);
         // Retrieve the providerId based on setName and collectorNumber
         QString providerId =
@@ -336,50 +327,23 @@ struct SetProviderId
 
         // Set the providerId on the card
         card->setCardProviderId(providerId);
-    }
-};
+    };
 
-/**
- * This function iterates through each card in the decklist and sets the providerId
- * on each card based on its set name and collector number.
- */
-void DeckLoader::resolveSetNameAndNumberToProviderID()
-{
-    // Set up the struct to call.
-    SetProviderId setProviderId;
-
-    // Call the forEachCard method for each card in the deck
     forEachCard(setProviderId);
 }
 
-// This struct is here to support the forEachCard function call, defined in decklist.
-// It requires a function to be called for each card, and it will set the providerId.
-struct ClearSetNameAndNumber
-{
-    // Main operator for struct, allowing the foreachcard to work.
-    ClearSetNameAndNumber()
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
-    {
-        Q_UNUSED(node);
-        // Set the providerId on the card
-        card->setCardSetShortName(nullptr);
-        card->setCardCollectorNumber(nullptr);
-    }
-};
-
 /**
- * This function iterates through each card in the decklist and sets the providerId
- * on each card based on its set name and collector number.
+ * Clears the set name and numbers on each card in the decklist.
  */
 void DeckLoader::clearSetNamesAndNumbers()
 {
-    // Set up the struct to call.
-    ClearSetNameAndNumber clearSetNameAndNumber;
+    auto clearSetNameAndNumber = [](const auto node, auto card) {
+        Q_UNUSED(node)
+        // Set the providerId on the card
+        card->setCardSetShortName(nullptr);
+        card->setCardCollectorNumber(nullptr);
+    };
 
-    // Call the forEachCard method for each card in the deck
     forEachCard(clearSetNameAndNumber);
 }
 
