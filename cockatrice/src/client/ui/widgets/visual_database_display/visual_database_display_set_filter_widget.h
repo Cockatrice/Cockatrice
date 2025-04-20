@@ -16,6 +16,7 @@ class VisualDatabaseDisplaySetFilterWidget : public QWidget
     Q_OBJECT
 public:
     explicit VisualDatabaseDisplaySetFilterWidget(QWidget *parent, FilterTreeModel *filterModel);
+    void retranslateUi();
     void createSetButtons();
     void updateSetButtonsVisibility();
     void handleSetToggled(const QString &setShortName, bool active);

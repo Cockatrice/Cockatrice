@@ -62,9 +62,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
-    databaseDisplayModel->setFilterTree(filterModel->filterTree());
-
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, &QLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
@@ -143,6 +140,10 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
     connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
+
+    databaseDisplayModel->setFilterTree(filterModel->filterTree());
+
+    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
     loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout

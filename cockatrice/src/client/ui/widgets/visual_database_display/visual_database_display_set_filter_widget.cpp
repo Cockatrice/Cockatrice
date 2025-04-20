@@ -36,8 +36,13 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
-    createSetButtons();      // Populate buttons initially
-    updateFilterMode(false); // Initialize toggle button text
+    createSetButtons(); // Populate buttons initially
+    retranslateUi();
+}
+
+void VisualDatabaseDisplaySetFilterWidget::retranslateUi()
+{
+    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
 }
 
 void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
@@ -190,6 +195,6 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
 void VisualDatabaseDisplaySetFilterWidget::updateFilterMode(bool checked)
 {
     exactMatchMode = checked;
-    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateSetFilter();
+    retranslateUi();
 }
