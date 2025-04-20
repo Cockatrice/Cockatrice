@@ -4,12 +4,27 @@
 #include "../../../../game/filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QMap>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
+
+class VisualDatabaseDisplayRecentSetFilterSettingsWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    VisualDatabaseDisplayRecentSetFilterSettingsWidget(QWidget *parent);
+    void retranslateUi();
+
+private:
+    QHBoxLayout *layout;
+    QCheckBox *filterToMostRecentSetsCheckBox;
+    QSpinBox *filterToMostRecentSetsAmount;
+};
 
 class VisualDatabaseDisplaySetFilterWidget : public QWidget
 {
@@ -18,6 +33,7 @@ public:
     explicit VisualDatabaseDisplaySetFilterWidget(QWidget *parent, FilterTreeModel *filterModel);
     void retranslateUi();
     void createSetButtons();
+    void filterToRecentSets();
     void updateSetButtonsVisibility();
     void handleSetToggled(const QString &setShortName, bool active);
 
@@ -29,6 +45,7 @@ private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allMainCardTypesWithCount;
     QVBoxLayout *layout;
+    VisualDatabaseDisplayRecentSetFilterSettingsWidget *recentSetsSettingsWidget;
     QLineEdit *searchBox;
     FlowWidget *flowWidget;
     QPushButton *toggleButton; // Mode switch button

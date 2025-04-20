@@ -71,6 +71,8 @@ signals:
     void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);
     void visualDeckStorageSelectionAnimationChanged(bool enabled);
+    void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
+    void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -151,6 +153,8 @@ private:
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
     bool visualDeckStorageSelectionAnimation;
+    bool visualDatabaseDisplayFilterToMostRecentSetsEnabled;
+    int visualDatabaseDisplayFilterToMostRecentSetsAmount;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -483,6 +487,14 @@ public:
     bool getVisualDeckStorageSelectionAnimation() const
     {
         return visualDeckStorageSelectionAnimation;
+    }
+    bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const
+    {
+        return visualDatabaseDisplayFilterToMostRecentSetsEnabled;
+    }
+    int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const
+    {
+        return visualDatabaseDisplayFilterToMostRecentSetsAmount;
     }
     bool getHorizontalHand() const
     {
@@ -827,6 +839,8 @@ public slots:
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
+    void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
+    void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

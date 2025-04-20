@@ -285,6 +285,10 @@ SettingsCache::SettingsCache()
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
     visualDeckStorageSelectionAnimation =
         settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
+    visualDatabaseDisplayFilterToMostRecentSetsEnabled =
+        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
+    visualDatabaseDisplayFilterToMostRecentSetsAmount =
+        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsamount", 10).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -785,6 +789,22 @@ void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T va
     visualDeckStorageSelectionAnimation = value;
     settings->setValue("interface/visualdeckstorageselectionanimation", visualDeckStorageSelectionAnimation);
     emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
+}
+
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled)
+{
+    visualDatabaseDisplayFilterToMostRecentSetsEnabled = _enabled;
+    settings->setValue("interface/visualdatabasedisplayfiltertomostrecentsetsenabled",
+                       visualDatabaseDisplayFilterToMostRecentSetsEnabled);
+    emit visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(visualDatabaseDisplayFilterToMostRecentSetsEnabled);
+}
+
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount)
+{
+    visualDatabaseDisplayFilterToMostRecentSetsAmount = _amount;
+    settings->setValue("interface/visualdatabasedisplayfiltertomostrecentsetsamount",
+                       visualDatabaseDisplayFilterToMostRecentSetsAmount);
+    emit visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(visualDatabaseDisplayFilterToMostRecentSetsAmount);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)
