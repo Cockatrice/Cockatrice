@@ -36,7 +36,7 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
-    createSetButtons();      // Populate buttons initially
+    createSetButtons(); // Populate buttons initially
     retranslateUi();
 }
 
