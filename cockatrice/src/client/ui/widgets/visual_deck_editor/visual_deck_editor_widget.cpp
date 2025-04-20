@@ -29,7 +29,6 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
 
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
-    setMinimumSize(0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
@@ -162,7 +161,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     groupAndSortLayout->addWidget(sortCriteriaButton);
     groupAndSortLayout->addWidget(displayTypeButton);
 
-    scrollArea = new QScrollArea();
+    scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setMinimumSize(0, 0);
 
