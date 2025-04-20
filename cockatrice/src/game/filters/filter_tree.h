@@ -270,6 +270,7 @@ public:
 
     bool acceptsCard(CardInfoPtr info) const;
     void removeFiltersByAttr(CardFilter::Attr filterType);
+    void removeFilter(const CardFilter *toRemove);
     void clear();
 };
 
