@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QVariant>
-#include <game/cards/card_database.h>
+#include <game/cards/card_info.h>
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
@@ -117,13 +117,24 @@ private:
     CardInfoPerSet setInfo;
 };
 
-class OracleImporter : public CardDatabase
+class OracleImporter : public QObject
 {
     Q_OBJECT
 private:
     const QStringList mainCardTypes = {"Planeswalker", "Creature", "Land",       "Sorcery",
                                        "Instant",      "Artifact", "Enchantment"};
     static const QRegularExpression formatRegex;
+
+    /**
+     * The cards, indexed by name.
+     */
+    CardNameMap cards;
+
+    /**
+     * The sets, indexed by short name.
+     */
+    SetNameMap sets;
+
     QList<SetToDownload> allSets;
     QVariantMap setsMap;
     QString dataDir;
@@ -146,6 +157,10 @@ public:
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cards);
+    const CardNameMap &getCardList() const
+    {
+        return cards;
+    }
     QList<SetToDownload> &getSets()
     {
         return allSets;

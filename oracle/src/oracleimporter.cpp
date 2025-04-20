@@ -19,7 +19,7 @@ SplitCardPart::SplitCardPart(const QString &_name,
 
 const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^format-");
 
-OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : CardDatabase(parent), dataDir(_dataDir)
+OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : QObject(parent), dataDir(_dataDir)
 {
 }
 
@@ -494,6 +494,7 @@ bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUr
 
 void OracleImporter::clear()
 {
-    CardDatabase::clear();
+    sets.clear();
+    cards.clear();
     allSets.clear();
 }
