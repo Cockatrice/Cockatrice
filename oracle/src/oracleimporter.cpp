@@ -463,8 +463,8 @@ int OracleImporter::startImport()
 {
     int setCards = 0, setIndex = 0;
     // add an empty set for tokens
-    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
-    sets.insert(TOKENS_SETNAME, tokenSet);
+    CardSetPtr tokenSet = CardSet::newInstance(CardSet::TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
+    sets.insert(CardSet::TOKENS_SETNAME, tokenSet);
 
     for (const SetToDownload &curSetToParse : allSets) {
         CardSetPtr newSet =

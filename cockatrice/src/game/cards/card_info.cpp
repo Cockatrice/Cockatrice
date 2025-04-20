@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <utility>
 
+const char *CardSet::TOKENS_SETNAME = "TK";
+
 CardSet::CardSet(const QString &_shortName,
                  const QString &_longName,
                  const QString &_setType,

@@ -61,8 +61,6 @@ private:
                 *removeCardMutex = new QBasicMutex();
 
 public:
-    static const char *TOKENS_SETNAME;
-
     explicit CardDatabase(QObject *parent = nullptr);
     ~CardDatabase() override;
     void clear();
