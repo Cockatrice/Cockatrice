@@ -142,7 +142,6 @@ void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar color)
     }
 }
 
-
 void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
 {
     switch (currentMode) {
