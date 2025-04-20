@@ -256,6 +256,12 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
 void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T /* _enabled */)
+{
+}
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int /* _amount */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }
