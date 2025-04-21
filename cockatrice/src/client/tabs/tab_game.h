@@ -92,6 +92,7 @@ private:
     QCompleter *completer;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
+    bool showInGameTime;
 
     // Replay related members
     GameReplay *replay;
@@ -224,6 +225,7 @@ public:
     void retranslateUi() override;
     void updatePlayerListDockTitle();
     void closeRequest(bool forced = false) override;
+    QString getCurrentInGameTime() const;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;
