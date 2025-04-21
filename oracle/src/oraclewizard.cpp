@@ -158,7 +158,7 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
         languageBox->setCurrentIndex(index);
     }
 
-    connect(languageBox, &QComboBox::currentIndexChanged, this, &IntroPage::languageBoxChanged);
+    connect(languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &IntroPage::languageBoxChanged);
 
     auto *layout = new QGridLayout(this);
     layout->addWidget(label, 0, 0, 1, 2);
