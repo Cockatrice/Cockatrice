@@ -92,7 +92,8 @@ public:
 class SplitCardPart
 {
 public:
-    SplitCardPart(const QString &_name, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
+    SplitCardPart(const QString &_name, const QString &_text, const QVariantHash &_properties,
+                  const CardInfoPerSet &setInfo);
     inline const QString &getName() const
     {
         return name;
@@ -136,11 +137,11 @@ private:
     QList<SetToDownload> allSets;
 
     CardInfoPtr addCard(QString name,
-                        QString text,
+                        const QString &text,
                         bool isToken,
                         QVariantHash properties,
-                        QList<CardRelation *> &relatedCards,
-                        CardInfoPerSet setInfo);
+                        const QList<CardRelation *> &relatedCards,
+                        const CardInfoPerSet &setInfo);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);

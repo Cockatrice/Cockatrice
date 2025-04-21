@@ -12,7 +12,7 @@
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
-                             const CardInfoPerSet _setInfo)
+                             const CardInfoPerSet &_setInfo)
     : name(_name), text(_text), properties(_properties), setInfo(_setInfo)
 {
 }
@@ -125,11 +125,11 @@ static void sortAndReduceColors(QString &colors)
 }
 
 CardInfoPtr OracleImporter::addCard(QString name,
-                                    QString text,
+                                    const QString &text,
                                     bool isToken,
                                     QVariantHash properties,
-                                    QList<CardRelation *> &relatedCards,
-                                    CardInfoPerSet setInfo)
+                                    const QList<CardRelation *> &relatedCards,
+                                    const CardInfoPerSet &setInfo)
 {
     // Workaround for card name weirdness
     name = name.replace("Æ", "AE");
