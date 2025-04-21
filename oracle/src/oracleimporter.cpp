@@ -47,23 +47,15 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     }
 
     QListIterator it(setsMap.values());
-    QVariantMap map;
-
-    QString shortName;
-    QString longName;
-    QList<QVariant> setCards;
-    QString setType;
-    QDate releaseDate;
-    CardSet::Priority priority;
 
     while (it.hasNext()) {
-        map = it.next().toMap();
-        shortName = map.value("code").toString().toUpper();
-        longName = map.value("name").toString();
-        setCards = map.value("cards").toList();
-        setType = map.value("type").toString();
-        releaseDate = map.value("releaseDate").toDate();
-        priority = getSetPriority(setType, shortName);
+        QVariantMap map = it.next().toMap();
+        QString shortName = map.value("code").toString().toUpper();
+        QString longName = map.value("name").toString();
+        QList<QVariant> setCards = map.value("cards").toList();
+        QString setType = map.value("type").toString();
+        QDate releaseDate = map.value("releaseDate").toDate();
+        CardSet::Priority priority = getSetPriority(setType, shortName);
         // capitalize set type
         if (setType.length() > 0) {
             // basic grammar for words that aren't capitalized, like in "From the Vault"
