@@ -23,7 +23,7 @@ OracleImporter::OracleImporter(QObject *parent) : QObject(parent)
 {
 }
 
-CardSet::Priority OracleImporter::getSetPriority(QString &setType, QString &shortName)
+static CardSet::Priority getSetPriority(const QString &setType, const QString &shortName)
 {
     if (!setTypePriorities.contains(setType.toLower())) {
         qDebug() << "warning: Set type" << setType << "unrecognized for prioritization";

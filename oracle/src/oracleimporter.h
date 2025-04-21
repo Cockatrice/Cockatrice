@@ -150,7 +150,6 @@ signals:
 
 public:
     explicit OracleImporter(QObject *parent = nullptr);
-    CardSet::Priority getSetPriority(QString &setType, QString &shortName);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
