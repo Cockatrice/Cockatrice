@@ -137,7 +137,6 @@ private:
 
     QList<SetToDownload> allSets;
     QVariantMap setsMap;
-    QString dataDir;
 
     QString getMainCardType(const QStringList &typeList);
     CardInfoPtr addCard(QString name,
@@ -151,7 +150,7 @@ signals:
     void dataReadProgress(int bytesRead, int totalBytes);
 
 public:
-    explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
+    explicit OracleImporter(QObject *parent = nullptr);
     CardSet::Priority getSetPriority(QString &setType, QString &shortName);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
@@ -164,10 +163,6 @@ public:
     QList<SetToDownload> &getSets()
     {
         return allSets;
-    }
-    const QString &getDataDir() const
-    {
-        return dataDir;
     }
     void clear();
 

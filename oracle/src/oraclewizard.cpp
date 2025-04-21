@@ -60,7 +60,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
     connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
 
-    importer = new OracleImporter(SettingsCache::instance().getDataPath(), this);
+    importer = new OracleImporter(this);
 
     nam = new QNetworkAccessManager(this);
 
