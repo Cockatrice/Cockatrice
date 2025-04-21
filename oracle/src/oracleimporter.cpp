@@ -12,18 +12,18 @@
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
-                             const CardInfoPerSet _setInfo)
+                             const CardInfoPerSet &_setInfo)
     : name(_name), text(_text), properties(_properties), setInfo(_setInfo)
 {
 }
 
 const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^format-");
 
-OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : QObject(parent), dataDir(_dataDir)
+OracleImporter::OracleImporter(QObject *parent) : QObject(parent)
 {
 }
 
-CardSet::Priority OracleImporter::getSetPriority(QString &setType, QString &shortName)
+static CardSet::Priority getSetPriority(const QString &setType, const QString &shortName)
 {
     if (!setTypePriorities.contains(setType.toLower())) {
         qDebug() << "warning: Set type" << setType << "unrecognized for prioritization";
@@ -40,30 +40,22 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     QList<SetToDownload> newSetList;
 
     bool ok;
-    setsMap = QtJson::Json::parse(QString(data), ok).toMap().value("data").toMap();
+    auto setsMap = QtJson::Json::parse(QString(data), ok).toMap().value("data").toMap();
     if (!ok) {
         qDebug() << "error: QtJson::Json::parse()";
         return false;
     }
 
     QListIterator it(setsMap.values());
-    QVariantMap map;
-
-    QString shortName;
-    QString longName;
-    QList<QVariant> setCards;
-    QString setType;
-    QDate releaseDate;
-    CardSet::Priority priority;
 
     while (it.hasNext()) {
-        map = it.next().toMap();
-        shortName = map.value("code").toString().toUpper();
-        longName = map.value("name").toString();
-        setCards = map.value("cards").toList();
-        setType = map.value("type").toString();
-        releaseDate = map.value("releaseDate").toDate();
-        priority = getSetPriority(setType, shortName);
+        QVariantMap map = it.next().toMap();
+        QString shortName = map.value("code").toString().toUpper();
+        QString longName = map.value("name").toString();
+        QList<QVariant> setCards = map.value("cards").toList();
+        QString setType = map.value("type").toString();
+        QDate releaseDate = map.value("releaseDate").toDate();
+        CardSet::Priority priority = getSetPriority(setType, shortName);
         // capitalize set type
         if (setType.length() > 0) {
             // basic grammar for words that aren't capitalized, like in "From the Vault"
@@ -93,13 +85,16 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     return true;
 }
 
-QString OracleImporter::getMainCardType(const QStringList &typeList)
+static QString getMainCardType(const QStringList &typeList)
 {
     if (typeList.isEmpty()) {
         return {};
     }
 
-    for (const auto &type : mainCardTypes) {
+    static const QStringList typePriority = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                             "Instant",      "Artifact", "Enchantment"};
+
+    for (const auto &type : typePriority) {
         if (typeList.contains(type)) {
             return type;
         }
@@ -108,12 +103,33 @@ QString OracleImporter::getMainCardType(const QStringList &typeList)
     return typeList.first();
 }
 
+/**
+ * Sorts and deduplicates the color chars in the string by WUBRG order.
+ *
+ * @param colors The string containing the color chars. Will be modified in-place
+ */
+static void sortAndReduceColors(QString &colors)
+{
+    // sort
+    static const QHash<QChar, unsigned int> colorOrder{{'W', 0}, {'U', 1}, {'B', 2}, {'R', 3}, {'G', 4}};
+    std::sort(colors.begin(), colors.end(),
+              [](const QChar a, const QChar b) { return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX); });
+    // reduce
+    QChar lastChar = '\0';
+    for (int i = 0; i < colors.size(); ++i) {
+        if (colors.at(i) == lastChar)
+            colors.remove(i, 1);
+        else
+            lastChar = colors.at(i);
+    }
+}
+
 CardInfoPtr OracleImporter::addCard(QString name,
-                                    QString text,
+                                    const QString &text,
                                     bool isToken,
                                     QVariantHash properties,
-                                    QList<CardRelation *> &relatedCards,
-                                    CardInfoPerSet setInfo)
+                                    const QList<CardRelation *> &relatedCards,
+                                    const CardInfoPerSet &setInfo)
 {
     // Workaround for card name weirdness
     name = name.replace("Æ", "AE");
@@ -197,7 +213,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     return newCard;
 }
 
-QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName)
+static QString getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName)
 {
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
@@ -440,23 +456,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     }
 
     return numCards;
-}
-
-void OracleImporter::sortAndReduceColors(QString &colors)
-{
-    // sort
-    const QHash<QChar, unsigned int> colorOrder{{'W', 0}, {'U', 1}, {'B', 2}, {'R', 3}, {'G', 4}};
-    std::sort(colors.begin(), colors.end(), [&colorOrder](const QChar a, const QChar b) {
-        return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX);
-    });
-    // reduce
-    QChar lastChar = '\0';
-    for (int i = 0; i < colors.size(); ++i) {
-        if (colors.at(i) == lastChar)
-            colors.remove(i, 1);
-        else
-            lastChar = colors.at(i);
-    }
 }
 
 int OracleImporter::startImport()
