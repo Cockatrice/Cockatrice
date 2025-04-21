@@ -85,13 +85,16 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
     return true;
 }
 
-QString OracleImporter::getMainCardType(const QStringList &typeList)
+static QString getMainCardType(const QStringList &typeList)
 {
     if (typeList.isEmpty()) {
         return {};
     }
 
-    for (const auto &type : mainCardTypes) {
+    static const QStringList typePriority = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                             "Instant",      "Artifact", "Enchantment"};
+
+    for (const auto &type : typePriority) {
         if (typeList.contains(type)) {
             return type;
         }

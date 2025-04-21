@@ -121,8 +121,6 @@ class OracleImporter : public QObject
 {
     Q_OBJECT
 private:
-    const QStringList mainCardTypes = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                       "Instant",      "Artifact", "Enchantment"};
     static const QRegularExpression formatRegex;
 
     /**
@@ -137,7 +135,6 @@ private:
 
     QList<SetToDownload> allSets;
 
-    QString getMainCardType(const QStringList &typeList);
     CardInfoPtr addCard(QString name,
                         QString text,
                         bool isToken,
