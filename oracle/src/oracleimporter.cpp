@@ -19,7 +19,7 @@ SplitCardPart::SplitCardPart(const QString &_name,
 
 const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^format-");
 
-OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : CardDatabase(parent), dataDir(_dataDir)
+OracleImporter::OracleImporter(const QString &_dataDir, QObject *parent) : QObject(parent), dataDir(_dataDir)
 {
 }
 
@@ -463,8 +463,8 @@ int OracleImporter::startImport()
 {
     int setCards = 0, setIndex = 0;
     // add an empty set for tokens
-    CardSetPtr tokenSet = CardSet::newInstance(TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
-    sets.insert(TOKENS_SETNAME, tokenSet);
+    CardSetPtr tokenSet = CardSet::newInstance(CardSet::TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
+    sets.insert(CardSet::TOKENS_SETNAME, tokenSet);
 
     for (const SetToDownload &curSetToParse : allSets) {
         CardSetPtr newSet =
@@ -494,6 +494,7 @@ bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUr
 
 void OracleImporter::clear()
 {
-    CardDatabase::clear();
+    sets.clear();
+    cards.clear();
     allSets.clear();
 }
