@@ -21,8 +21,6 @@ private:
         MessageContext_Mulligan
     };
 
-    int mulliganNumber;
-    Player *mulliganPlayer;
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
 
