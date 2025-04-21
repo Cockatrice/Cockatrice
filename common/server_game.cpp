@@ -87,7 +87,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
 
     if (room->getServer()->getGameShouldPing()) {
         pingClock = new QTimer(this);
-        connect(pingClock, SIGNAL(timeout()), this, SLOT(pingClockTimeout()));
+        connect(pingClock, &QTimer::timeout, this, &Server_Game::pingClockTimeout);
         pingClock->start(1000);
     }
 }
