@@ -136,7 +136,6 @@ private:
     SetNameMap sets;
 
     QList<SetToDownload> allSets;
-    QVariantMap setsMap;
 
     QString getMainCardType(const QStringList &typeList);
     CardInfoPtr addCard(QString name,
