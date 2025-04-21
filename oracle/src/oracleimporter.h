@@ -164,10 +164,6 @@ public:
         return allSets;
     }
     void clear();
-
-protected:
-    inline QString getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName);
-    void sortAndReduceColors(QString &colors);
 };
 
 #endif

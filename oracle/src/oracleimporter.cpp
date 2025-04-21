@@ -100,6 +100,27 @@ QString OracleImporter::getMainCardType(const QStringList &typeList)
     return typeList.first();
 }
 
+/**
+ * Sorts and deduplicates the color chars in the string by WUBRG order.
+ *
+ * @param colors The string containing the color chars. Will be modified in-place
+ */
+static void sortAndReduceColors(QString &colors)
+{
+    // sort
+    static const QHash<QChar, unsigned int> colorOrder{{'W', 0}, {'U', 1}, {'B', 2}, {'R', 3}, {'G', 4}};
+    std::sort(colors.begin(), colors.end(),
+              [](const QChar a, const QChar b) { return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX); });
+    // reduce
+    QChar lastChar = '\0';
+    for (int i = 0; i < colors.size(); ++i) {
+        if (colors.at(i) == lastChar)
+            colors.remove(i, 1);
+        else
+            lastChar = colors.at(i);
+    }
+}
+
 CardInfoPtr OracleImporter::addCard(QString name,
                                     QString text,
                                     bool isToken,
@@ -189,7 +210,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     return newCard;
 }
 
-QString OracleImporter::getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName)
+static QString getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName)
 {
     return card.contains(propertyName) ? card.value(propertyName).toString() : QString("");
 }
@@ -432,23 +453,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     }
 
     return numCards;
-}
-
-void OracleImporter::sortAndReduceColors(QString &colors)
-{
-    // sort
-    const QHash<QChar, unsigned int> colorOrder{{'W', 0}, {'U', 1}, {'B', 2}, {'R', 3}, {'G', 4}};
-    std::sort(colors.begin(), colors.end(), [&colorOrder](const QChar a, const QChar b) {
-        return colorOrder.value(a, INT_MAX) < colorOrder.value(b, INT_MAX);
-    });
-    // reduce
-    QChar lastChar = '\0';
-    for (int i = 0; i < colors.size(); ++i) {
-        if (colors.at(i) == lastChar)
-            colors.remove(i, 1);
-        else
-            lastChar = colors.at(i);
-    }
 }
 
 int OracleImporter::startImport()
