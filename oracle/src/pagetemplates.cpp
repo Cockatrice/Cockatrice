@@ -23,7 +23,7 @@ SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPa
     progressBar = new QProgressBar(this);
 
     urlButton = new QPushButton(this);
-    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
+    connect(urlButton, &QPushButton::clicked, this, &SimpleDownloadFilePage::actRestoreDefaultUrl);
 
     defaultPathCheckBox = new QCheckBox(this);
 
@@ -91,8 +91,8 @@ void SimpleDownloadFilePage::downloadFile(QUrl url)
 {
     QNetworkReply *reply = wizard()->nam->get(QNetworkRequest(url));
 
-    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinished()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgress(qint64, qint64)));
+    connect(reply, &QNetworkReply::finished, this, &SimpleDownloadFilePage::actDownloadFinished);
+    connect(reply, &QNetworkReply::downloadProgress, this, &SimpleDownloadFilePage::actDownloadProgress);
 }
 
 void SimpleDownloadFilePage::actDownloadProgress(qint64 received, qint64 total)
