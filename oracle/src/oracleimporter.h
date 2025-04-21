@@ -92,7 +92,9 @@ public:
 class SplitCardPart
 {
 public:
-    SplitCardPart(const QString &_name, const QString &_text, const QVariantHash &_properties,
+    SplitCardPart(const QString &_name,
+                  const QString &_text,
+                  const QVariantHash &_properties,
                   const CardInfoPerSet &setInfo);
     inline const QString &getName() const
     {
@@ -151,7 +153,7 @@ public:
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
-    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cards);
+    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList);
     const CardNameMap &getCardList() const
     {
         return cards;
