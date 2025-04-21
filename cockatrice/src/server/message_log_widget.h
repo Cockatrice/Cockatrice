@@ -26,9 +26,7 @@ private:
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
 
-    QString sanitizeHtml(QString dirty) const;
-    QString cardLink(QString cardName) const;
-    QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
+    static QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange);
 
 public slots:
     void containerProcessingDone();

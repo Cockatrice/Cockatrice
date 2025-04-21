@@ -20,18 +20,17 @@ static const QString DECK_ZONE_NAME = "deck";
 static const QString SIDEBOARD_ZONE_NAME = "sb";
 static const QString STACK_ZONE_NAME = "stack";
 
-QString MessageLogWidget::sanitizeHtml(QString dirty) const
+static QString sanitizeHtml(QString dirty)
 {
     return dirty.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 }
 
-QString MessageLogWidget::cardLink(const QString cardName) const
+static QString cardLink(const QString &cardName)
 {
     return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
 }
 
-QPair<QString, QString>
-MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const
+QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange)
 {
     bool cardNameContainsStartZone = false;
     QString fromStr;
@@ -92,7 +91,7 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
     if (!cardNameContainsStartZone) {
         cardName.clear();
     }
-    return QPair<QString, QString>(cardName, fromStr);
+    return {cardName, fromStr};
 }
 
 void MessageLogWidget::containerProcessingDone()
