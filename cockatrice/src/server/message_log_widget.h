@@ -26,14 +26,6 @@ private:
     MessageContext currentContext;
     QString messagePrefix, messageSuffix;
 
-    const QString &tableConstant() const;
-    const QString &graveyardConstant() const;
-    const QString &exileConstant() const;
-    const QString &handConstant() const;
-    const QString &deckConstant() const;
-    const QString &sideboardConstant() const;
-    const QString &stackConstant() const;
-
     QString sanitizeHtml(QString dirty) const;
     QString cardLink(QString cardName) const;
     QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const;
