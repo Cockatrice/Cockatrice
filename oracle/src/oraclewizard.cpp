@@ -58,7 +58,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
     settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
-    connect(&SettingsCache::instance(), SIGNAL(langChanged()), this, SLOT(updateLanguage()));
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
 
     importer = new OracleImporter(SettingsCache::instance().getDataPath(), this);
 
@@ -158,7 +158,7 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
         languageBox->setCurrentIndex(index);
     }
 
-    connect(languageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(languageBoxChanged(int)));
+    connect(languageBox, &QComboBox::currentIndexChanged, this, &IntroPage::languageBoxChanged);
 
     auto *layout = new QGridLayout(this);
     layout->addWidget(label, 0, 0, 1, 2);
@@ -226,10 +226,10 @@ LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
     urlRadioButton->setChecked(true);
 
     urlButton = new QPushButton(this);
-    connect(urlButton, SIGNAL(clicked()), this, SLOT(actRestoreDefaultUrl()));
+    connect(urlButton, &QPushButton::clicked, this, &LoadSetsPage::actRestoreDefaultUrl);
 
     fileButton = new QPushButton(this);
-    connect(fileButton, SIGNAL(clicked()), this, SLOT(actLoadSetsFile()));
+    connect(fileButton, &QPushButton::clicked, this, &LoadSetsPage::actLoadSetsFile);
 
     auto *layout = new QGridLayout(this);
     layout->addWidget(urlRadioButton, 0, 0);
@@ -241,7 +241,7 @@ LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(progressLabel, 4, 0);
     layout->addWidget(progressBar, 4, 1);
 
-    connect(&watcher, SIGNAL(finished()), this, SLOT(importFinished()));
+    connect(&watcher, &QFutureWatcher<bool>::finished, this, &LoadSetsPage::importFinished);
 
     setLayout(layout);
 }
@@ -387,8 +387,8 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
     auto *reply = wizard()->nam->get(QNetworkRequest(url));
 
-    connect(reply, SIGNAL(finished()), this, SLOT(actDownloadFinishedSetsFile()));
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(actDownloadProgressSetsFile(qint64, qint64)));
+    connect(reply, &QNetworkReply::finished, this, &LoadSetsPage::actDownloadFinishedSetsFile);
+    connect(reply, &QNetworkReply::downloadProgress, this, &LoadSetsPage::actDownloadProgressSetsFile);
 }
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
@@ -598,7 +598,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 void SaveSetsPage::cleanupPage()
 {
     wizard()->importer->clear();
-    disconnect(wizard()->importer, SIGNAL(setIndexChanged(int, int, const QString &)), nullptr, nullptr);
+    disconnect(wizard()->importer, &OracleImporter::setIndexChanged, nullptr, nullptr);
 }
 
 void SaveSetsPage::initializePage()
@@ -611,8 +611,7 @@ void SaveSetsPage::initializePage()
         return;
     }
     messageLog->show();
-    connect(wizard()->importer, SIGNAL(setIndexChanged(int, int, const QString &)), this,
-            SLOT(updateTotalProgress(int, int, const QString &)));
+    connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
 
     if (!wizard()->importer->startImport()) {
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
