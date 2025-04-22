@@ -373,7 +373,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           cache: true
-          setup-python: false
+          setup-python: true  # temp workaround to fix action until new aqtversion is released
           version: ${{matrix.qt_version}}
           arch: win64_${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
