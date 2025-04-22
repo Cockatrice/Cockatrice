@@ -255,10 +255,10 @@ jobs:
         shell: bash
         id: build
         env:
-          BUILDTYPE: '${{matrix.type}}'
+          BUILDTYPE: ${{ matrix.type }}
           MAKE_TEST: 1
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: -macOS${{ matrix.target }}${{ matrix.soc == 'Intel' && '_Intel' || '' }}
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
