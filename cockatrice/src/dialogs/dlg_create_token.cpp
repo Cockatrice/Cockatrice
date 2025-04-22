@@ -162,6 +162,8 @@ void DlgCreateToken::closeEvent(QCloseEvent *event)
 void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
 {
     if (checked) {
+        colorEdit->setCurrentIndex(6);
+        colorEdit->setEnabled(false);
         ptEdit->clear();
         ptEdit->clearFocus();
         ptEdit->setEnabled(false);
@@ -169,6 +171,7 @@ void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
         annotationEdit->clearFocus();
         annotationEdit->setEnabled(false);
     } else {
+        colorEdit->setEnabled(true);
         ptEdit->setEnabled(true);
         annotationEdit->setEnabled(true);
     }

@@ -401,9 +401,9 @@ makeCreateTokenEvent(Server_CardZone *zone, Server_Card *card, int xCoord, int y
     if (!card->getFaceDown() || revealFacedownInfo) {
         event.set_card_name(card->getName().toStdString());
         event.set_card_provider_id(card->getProviderId().toStdString());
-        event.set_color(card->getColor().toStdString());
     }
 
+    event.set_color(card->getColor().toStdString());
     event.set_pt(card->getPT().toStdString());
     event.set_annotation(card->getAnnotation().toStdString());
     event.set_destroy_on_zone_change(card->getDestroyOnZoneChange());
@@ -1515,9 +1515,9 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
 
     auto *card = new Server_Card(cardName, cardProviderId, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
-    card->setColor(nameFromStdString(cmd.color()));
     // Client should already prevent face-down tokens from having attributes; this just an extra server-side check
     if (!cmd.face_down()) {
+        card->setColor(nameFromStdString(cmd.color()));
         card->setPT(nameFromStdString(cmd.pt()));
         card->setAnnotation(nameFromStdString(cmd.annotation()));
     }
