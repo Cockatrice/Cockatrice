@@ -30,8 +30,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Docker meta data
-        id: meta
+      - name: Docker metadata
+        id: metadata
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -65,7 +65,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
