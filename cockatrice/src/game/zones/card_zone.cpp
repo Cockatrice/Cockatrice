@@ -92,6 +92,10 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
             default:
                 break;
         }
+    else {
+        return (theirOwn ? tr("their custom zone '%1'", "nominative").arg(name)
+                         : tr("%1's custom zone '%2'", "nominative").arg(ownerName).arg(name));
+    }
     return QString();
 }
 
