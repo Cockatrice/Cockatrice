@@ -3669,7 +3669,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="660"/>
         <source>Start &amp;local game...</source>
-        <translation>Inizia &amp;partita in locale...</translation>
+        <translation>Inizia partita in &amp;locale...</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="661"/>
