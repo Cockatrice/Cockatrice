@@ -39,11 +39,11 @@ jobs:
           labels: |
             org.opencontainers.image.title=Servatrice
             org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for cockatrice, a cross-platform virtual tabletop for multiplayer card games
+            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
           annotations: |
             org.opencontainers.image.title=Servatrice
             org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for cockatrice, a cross-platform virtual tabletop for multiplayer card games  
+            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games  
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
