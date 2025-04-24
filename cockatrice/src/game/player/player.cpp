@@ -8,6 +8,7 @@
 #include "../../dialogs/dlg_roll_dice.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
+#include "../../settings/card_counter_settings.h"
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
@@ -534,7 +535,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     aPlayFacedown = new QAction(this);
     connect(aPlayFacedown, &QAction::triggered, this, &Player::actPlayFacedown);
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 6; ++i) {
         auto *tempAddCounter = new QAction(this);
         tempAddCounter->setData(9 + i * 1000);
         auto *tempRemoveCounter = new QAction(this);
@@ -883,19 +884,16 @@ void Player::retranslateUi()
     aResetPT->setText(tr("Reset p&ower and toughness"));
     aSetAnnotation->setText(tr("&Set annotation..."));
 
-    QStringList counterColors;
-    counterColors.append(tr("Red"));
-    counterColors.append(tr("Yellow"));
-    counterColors.append(tr("Green"));
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
     for (int i = 0; i < aAddCounter.size(); ++i) {
-        aAddCounter[i]->setText(tr("&Add counter (%1)").arg(counterColors[i]));
+        aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
     }
     for (int i = 0; i < aRemoveCounter.size(); ++i) {
-        aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(counterColors[i]));
+        aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(cardCounterSettings.displayName(i)));
     }
     for (int i = 0; i < aSetCounter.size(); ++i) {
-        aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(counterColors[i]));
+        aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
@@ -951,24 +949,33 @@ void Player::setShortcutsActive()
     addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
     addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCYellow"));
     addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCGreen"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCCyan"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCPurple"));
+    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCMagenta"));
 
     QList<QKeySequence> removeCCShortCuts;
     removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCRed"));
     removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCYellow"));
     removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCGreen"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCCyan"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCPurple"));
+    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCMagenta"));
 
     QList<QKeySequence> setCCShortCuts;
     setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCRed"));
     setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCYellow"));
     setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCGreen"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCCyan"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCPurple"));
+    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCMagenta"));
 
-    for (int i = 0; i < aAddCounter.size(); ++i) {
+    for (int i = 0; i < addCCShortCuts.size(); ++i) {
         aAddCounter[i]->setShortcut(addCCShortCuts.at(i));
     }
-    for (int i = 0; i < aRemoveCounter.size(); ++i) {
+    for (int i = 0; i < removeCCShortCuts.size(); ++i) {
         aRemoveCounter[i]->setShortcut(removeCCShortCuts.at(i));
     }
-    for (int i = 0; i < aSetCounter.size(); ++i) {
+    for (int i = 0; i < setCCShortCuts.size(); ++i) {
         aSetCounter[i]->setShortcut(setCCShortCuts.at(i));
     }
 
@@ -3875,15 +3882,19 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aSelectAll);
                 cardMenu->addAction(aSelectRow);
 
+                cardMenu->addSeparator();
+                auto *cardCountersMenu = new QMenu(tr("Other counters"));
                 for (int i = 0; i < aAddCounter.size(); ++i) {
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aAddCounter[i]);
+                    auto *targetMenu = i < 3 ? cardMenu : cardCountersMenu;
+                    targetMenu->addSeparator();
+                    targetMenu->addAction(aAddCounter[i]);
                     if (card->getCounters().contains(i)) {
-                        cardMenu->addAction(aRemoveCounter[i]);
+                        targetMenu->addAction(aRemoveCounter[i]);
                     }
-                    cardMenu->addAction(aSetCounter[i]);
+                    targetMenu->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
+                cardMenu->addMenu(cardCountersMenu);
             } else if (card->getZone()->getName() == "stack") {
                 // Card is on the stack
                 if (canModifyCard) {

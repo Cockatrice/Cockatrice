@@ -125,6 +125,9 @@ private:
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
+    QGroupBox *cardCountersGroupBox;
+    QLabel *cardCountersNameWarning;
+    QList<QLabel *> cardCounterNames;
     QSpinBox minPlayersForMultiColumnLayoutEdit;
     QSpinBox maxFontSizeForCardsEdit;
 
