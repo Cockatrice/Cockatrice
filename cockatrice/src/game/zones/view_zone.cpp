@@ -30,7 +30,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            bool _writeableRevealZone,
                            QGraphicsItem *parent,
                            bool _isReversed)
-    : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
+    : SelectZone(_p, _origZone->getName(), false, false, true, parent), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
       isReversed(_isReversed)

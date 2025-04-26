@@ -37,9 +37,8 @@ SelectZone::SelectZone(Player *_player,
                        bool _hasCardAttr,
                        bool _isShufflable,
                        bool _contentsKnown,
-                       QGraphicsItem *parent,
-                       bool isView)
-    : CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent, isView)
+                       QGraphicsItem *parent)
+    : CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent)
 {
 }
 

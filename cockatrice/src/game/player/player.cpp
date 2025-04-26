@@ -124,7 +124,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
-    auto *_deck = new PileZone(this, "deck", true, false, playerArea);
+    auto *_deck = addZone(new PileZone(this, "deck", true, false, playerArea));
     QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
                            10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
     _deck->setPos(base);
@@ -135,22 +135,23 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     handCounter->setPos(base + QPointF(0, h + 10));
     qreal h2 = handCounter->boundingRect().height();
 
-    PileZone *grave = new PileZone(this, "grave", false, true, playerArea);
+    PileZone *grave = addZone(new PileZone(this, "grave", false, true, playerArea));
     grave->setPos(base + QPointF(0, h + h2 + 10));
 
-    PileZone *rfg = new PileZone(this, "rfg", false, true, playerArea);
+    PileZone *rfg = addZone(new PileZone(this, "rfg", false, true, playerArea));
     rfg->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
-    PileZone *sb = new PileZone(this, "sb", false, false, playerArea);
+    PileZone *sb = addZone(new PileZone(this, "sb", false, false, playerArea));
     sb->setVisible(false);
 
-    table = new TableZone(this, this);
+    table = addZone(new TableZone(this, this));
     connect(table, &TableZone::sizeChanged, this, &Player::updateBoundingRect);
 
-    stack = new StackZone(this, (int)table->boundingRect().height(), this);
+    stack = addZone(new StackZone(this, (int)table->boundingRect().height(), this));
 
-    hand = new HandZone(this, _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
-                        (int)table->boundingRect().height(), this);
+    hand = addZone(new HandZone(this,
+                                _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
+                                (int)table->boundingRect().height(), this));
     connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
 
@@ -2889,11 +2890,6 @@ void Player::deleteCard(CardItem *card)
     }
 }
 
-void Player::addZone(CardZone *zone)
-{
-    zones.insert(zone->getName(), zone);
-}
-
 AbstractCounter *Player::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),
@@ -3692,9 +3688,8 @@ void Player::actCardCounterTrigger()
  */
 static bool isUnwritableRevealZone(CardZone *zone)
 {
-    if (zone && zone->getIsView()) {
-        auto *view = static_cast<ZoneViewZone *>(zone);
-        return view && view->getRevealZone() && !view->getWriteableRevealZone();
+    if (auto *view = qobject_cast<ZoneViewZone *>(zone)) {
+        return view->getRevealZone() && !view->getWriteableRevealZone();
     }
     return false;
 }
@@ -3784,8 +3779,7 @@ void Player::updateCardMenu(const CardItem *card)
 
     bool revealedCard = false;
     bool writeableCard = getLocalOrJudge();
-    if (card->getZone() && card->getZone()->getIsView()) {
-        auto *view = dynamic_cast<ZoneViewZone *>(card->getZone());
+    if (auto *view = qobject_cast<ZoneViewZone *>(card->getZone())) {
         if (view->getRevealZone()) {
             if (view->getWriteableRevealZone()) {
                 writeableCard = true;
@@ -3955,7 +3949,7 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
-                if (card->getZone()->getIsView()) {
+                if (qobject_cast<ZoneViewZone *>(card->getZone())) {
                     cardMenu->addAction(aSelectColumn);
                 }
 

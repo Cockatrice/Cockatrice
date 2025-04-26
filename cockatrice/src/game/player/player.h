@@ -409,7 +409,12 @@ public:
     void playCardToTable(const CardItem *c, bool faceDown);
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
-    void addZone(CardZone *z);
+
+    template <typename T> T *addZone(T *zone)
+    {
+        zones.insert(zone->getName(), zone);
+        return zone;
+    }
 
     AbstractCounter *addCounter(const ServerInfo_Counter &counter);
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
