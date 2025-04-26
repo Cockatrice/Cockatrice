@@ -417,6 +417,29 @@ static Event_AttachCard makeAttachCardEvent(Server_Card *attachedCard, Server_Ca
     return event;
 }
 
+/**
+ * Determines whether moving the card from startZone to targetZone should cause the card to be destroyed.
+ */
+static bool
+shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, const Server_CardZone *targetZone)
+{
+    if (!card->getDestroyOnZoneChange()) {
+        return false;
+    }
+
+    if (startZone->getName() == targetZone->getName()) {
+        return false;
+    }
+
+    // Allow tokens on the stack
+    if ((startZone->getName() == "table" || startZone->getName() == "stack") &&
+        (targetZone->getName() == "table" || targetZone->getName() == "stack")) {
+        return false;
+    }
+
+    return true;
+}
+
 Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
                                                Server_CardZone *startzone,
                                                const QList<const CardToMove *> &_cards,
@@ -523,7 +546,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
         }
 
-        if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
+        if (shouldDestroyOnMove(card, startzone, targetzone)) {
             Event_DestroyCard event;
             event.set_zone_name(startzone->getName().toStdString());
             event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
