@@ -379,7 +379,7 @@ jobs:
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@dev/cache-v4
+        uses: lukka/run-vcpkg@11
         with:
           runVcpkgInstall: true
           doNotCache: false
