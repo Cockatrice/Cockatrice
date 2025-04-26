@@ -373,13 +373,13 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           cache: true
-          setup-python: true  # temp workaround to fix action until new aqtversion is released
+          setup-python: true
           version: ${{matrix.qt_version}}
           arch: win64_${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
 
       - name: Run vcpkg
-        uses: lukka/run-vcpkg@11
+        uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
           doNotCache: false
