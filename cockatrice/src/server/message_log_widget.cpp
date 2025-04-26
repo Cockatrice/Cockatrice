@@ -217,7 +217,7 @@ void MessageLogWidget::logCreateArrow(Player *player,
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt, bool faceDown)
 {
     if (faceDown) {
-        appendHtmlServerMessage(tr("%1 creates face down token.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(tr("%1 creates a face down token.").arg(sanitizeHtml(player->getName())));
     } else {
         appendHtmlServerMessage(tr("%1 creates token: %2%3.")
                                     .arg(sanitizeHtml(player->getName()))
