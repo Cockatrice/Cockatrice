@@ -381,7 +381,7 @@ jobs:
       - name: Run vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          runVcpkgInstall: true
+          runVcpkgInstall: false
           doNotCache: false
         env:
           VCPKG_DEFAULT_TRIPLET: 'x64-windows'
