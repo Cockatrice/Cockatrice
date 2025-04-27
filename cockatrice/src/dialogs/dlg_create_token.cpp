@@ -63,7 +63,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     destroyCheckBox = new QCheckBox(tr("&Destroy token when it leaves the table"));
     destroyCheckBox->setChecked(true);
 
-    faceDownCheckBox = new QCheckBox(tr("Create face-down token"));
+    faceDownCheckBox = new QCheckBox(tr("Create face-down (Only hides name)"));
     connect(faceDownCheckBox, &QCheckBox::toggled, this, &DlgCreateToken::faceDownCheckBoxToggled);
 
     QGridLayout *grid = new QGridLayout;
@@ -167,9 +167,6 @@ void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
         ptEdit->clear();
         ptEdit->clearFocus();
         ptEdit->setEnabled(false);
-        annotationEdit->clear();
-        annotationEdit->clearFocus();
-        annotationEdit->setEnabled(false);
     } else {
         colorEdit->setEnabled(true);
         ptEdit->setEnabled(true);

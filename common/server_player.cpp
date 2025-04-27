@@ -1519,8 +1519,8 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     if (!cmd.face_down()) {
         card->setColor(nameFromStdString(cmd.color()));
         card->setPT(nameFromStdString(cmd.pt()));
-        card->setAnnotation(nameFromStdString(cmd.annotation()));
     }
+    card->setAnnotation(nameFromStdString(cmd.annotation()));
     card->setDestroyOnZoneChange(cmd.destroy_on_zone_change());
     card->setFaceDown(cmd.face_down());
 
