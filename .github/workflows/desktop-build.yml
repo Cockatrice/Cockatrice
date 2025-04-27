@@ -382,7 +382,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: false
-          doNotCache: false
+          doNotCache: true
         env:
           VCPKG_DEFAULT_TRIPLET: 'x64-windows'
           VCPKG_DISABLE_METRICS: 1
