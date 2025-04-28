@@ -15,4 +15,5 @@ message Event_CreateToken {
     optional sint32 x = 8;
     optional sint32 y = 9;
     optional string card_provider_id = 10;
+    optional bool face_down = 11;
 }

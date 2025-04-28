@@ -214,12 +214,16 @@ void MessageLogWidget::logCreateArrow(Player *player,
     }
 }
 
-void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
+void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt, bool faceDown)
 {
-    appendHtmlServerMessage(tr("%1 creates token: %2%3.")
-                                .arg(sanitizeHtml(player->getName()))
-                                .arg(cardLink(std::move(cardName)))
-                                .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    if (faceDown) {
+        appendHtmlServerMessage(tr("%1 creates a face down token.").arg(sanitizeHtml(player->getName())));
+    } else {
+        appendHtmlServerMessage(tr("%1 creates token: %2%3.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(cardLink(std::move(cardName)))
+                                    .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    }
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
