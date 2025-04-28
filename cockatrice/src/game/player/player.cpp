@@ -2066,6 +2066,8 @@ void Player::createCard(const CardItem *sourceCard,
             break;
 
         case CardRelation::TransformInto:
+            // allow cards to directly transform on stack
+            cmd.set_zone(sourceCard->getZone()->getName() == "stack" ? "stack" : "table");
             // Transform card zone changes are handled server-side
             cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
