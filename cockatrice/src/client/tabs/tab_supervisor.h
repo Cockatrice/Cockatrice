@@ -152,6 +152,7 @@ signals:
     void showWindowIfHidden();
 
 public slots:
+    void openDeckInNewTab(const DeckLoader *deckToOpen);
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();

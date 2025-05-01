@@ -590,7 +590,7 @@ void TabSupervisor::actTabDeckStorage(bool checked)
 void TabSupervisor::openTabDeckStorage()
 {
     tabDeckStorage = new TabDeckStorage(this, client, userInfo);
-    connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::openDeckInNewTab);
     myAddTab(tabDeckStorage, aTabDeckStorage);
     connect(tabDeckStorage, &Tab::closed, this, [this] {
         tabDeckStorage = nullptr;
@@ -691,7 +691,7 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
     auto *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
     connect(tab, &TabGame::openMessageDialog, this, &TabSupervisor::addMessageTab);
-    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::openDeckInNewTab);
     myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
@@ -701,7 +701,7 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 {
     auto *tab = new TabGame(this, localClients, event, QMap<int, QString>());
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
-    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
+    connect(tab, &TabGame::openDeckEditor, this, &TabSupervisor::openDeckInNewTab);
     myAddTab(tab);
     gameTabs.insert(event.game_info().game_id(), tab);
     setCurrentWidget(tab);
@@ -805,6 +805,20 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
+}
+
+/**
+ * Creates a new deck editor tab and loads the deck into it.
+ * Creates either a classic or visual deck editor tab depending on settings
+ * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
+ */
+void TabSupervisor::openDeckInNewTab(const DeckLoader *deckToOpen)
+{
+    if (SettingsCache::instance().getOpenInVisualDeckEditor()) {
+        addVisualDeckEditorTab(deckToOpen);
+    } else {
+        addDeckEditorTab(deckToOpen);
+    }
 }
 
 /**
