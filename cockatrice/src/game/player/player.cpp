@@ -417,6 +417,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
 
+        mCardCounters = new QMenu;
+
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
         playerMenu->addSeparator();
@@ -458,6 +460,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         sbMenu = nullptr;
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
+        mCardCounters = nullptr;
     }
 
     aTap = new QAction(this);
@@ -886,6 +889,7 @@ void Player::retranslateUi()
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
+    mCardCounters->setTitle(tr("Ca&rd counters"));
     for (int i = 0; i < aAddCounter.size(); ++i) {
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
     }
@@ -3883,18 +3887,17 @@ void Player::updateCardMenu(const CardItem *card)
                 cardMenu->addAction(aSelectRow);
 
                 cardMenu->addSeparator();
-                auto *cardCountersMenu = new QMenu(tr("Other counters"));
+                mCardCounters->clear();
                 for (int i = 0; i < aAddCounter.size(); ++i) {
-                    auto *targetMenu = i < 3 ? cardMenu : cardCountersMenu;
-                    targetMenu->addSeparator();
-                    targetMenu->addAction(aAddCounter[i]);
+                    mCardCounters->addSeparator();
+                    mCardCounters->addAction(aAddCounter[i]);
                     if (card->getCounters().contains(i)) {
-                        targetMenu->addAction(aRemoveCounter[i]);
+                        mCardCounters->addAction(aRemoveCounter[i]);
                     }
-                    targetMenu->addAction(aSetCounter[i]);
+                    mCardCounters->addAction(aSetCounter[i]);
                 }
                 cardMenu->addSeparator();
-                cardMenu->addMenu(cardCountersMenu);
+                cardMenu->addMenu(mCardCounters);
             } else if (card->getZone()->getName() == "stack") {
                 // Card is on the stack
                 if (canModifyCard) {
