@@ -153,6 +153,7 @@ private:
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
     bool visualDeckStorageSelectionAnimation;
+    bool openInVisualDeckEditor;
     bool visualDatabaseDisplayFilterToMostRecentSetsEnabled;
     int visualDatabaseDisplayFilterToMostRecentSetsAmount;
     bool horizontalHand;
@@ -487,6 +488,10 @@ public:
     bool getVisualDeckStorageSelectionAnimation() const
     {
         return visualDeckStorageSelectionAnimation;
+    }
+    bool getOpenInVisualDeckEditor() const
+    {
+        return openInVisualDeckEditor;
     }
     bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const
     {
@@ -839,6 +844,7 @@ public slots:
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
+    void setOpenInVisualDeckEditor(QT_STATE_CHANGED_T value);
     void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
     void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
