@@ -681,6 +681,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageSelectionAnimation);
 
+    openInVisualDeckEditorCheckBox.setChecked(SettingsCache::instance().getOpenInVisualDeckEditor());
+    connect(&openInVisualDeckEditorCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setOpenInVisualDeckEditor);
+
     visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
     visualDeckStoragePromptForConversionSelector.addItem("");
     visualDeckStoragePromptForConversionSelector.addItem("");
@@ -703,8 +707,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
     deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
+    deckEditorGrid->addWidget(&openInVisualDeckEditorCheckBox, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 4, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 4, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -766,6 +771,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
     visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
+    openInVisualDeckEditorCheckBox.setText(tr("Open decks in visual deck editor"));
     visualDeckStoragePromptForConversionLabel.setText(
         tr("When adding a tag in the visual deck storage to a .txt deck:"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
