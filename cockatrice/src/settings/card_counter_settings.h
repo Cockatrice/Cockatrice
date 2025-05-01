@@ -1,12 +1,14 @@
 #ifndef CARD_COUNTER_SETTINGS_H
 #define CARD_COUNTER_SETTINGS_H
 
+#include "settings_manager.h"
+
 #include <QObject>
 
 class QSettings;
 class QColor;
 
-class CardCounterSettings : public QObject
+class CardCounterSettings : public SettingsManager
 {
     Q_OBJECT
 
@@ -22,9 +24,6 @@ public slots:
 
 signals:
     void colorChanged(int counterId, const QColor &color);
-
-private:
-    QSettings *m_settings;
 };
 
 #endif // CARD_COUNTER_SETTINGS_H

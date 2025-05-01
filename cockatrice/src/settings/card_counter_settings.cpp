@@ -4,7 +4,7 @@
 #include <QSettings>
 
 CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *parent)
-    : QObject(parent), m_settings(new QSettings(settingsPath + "global.ini", QSettings::IniFormat))
+    : SettingsManager(settingsPath + "global.ini", parent)
 {
 }
 
@@ -12,10 +12,10 @@ void CardCounterSettings::setColor(int counterId, const QColor &color)
 {
     QString key = QString("cards/counters/%1/color").arg(counterId);
 
-    if (m_settings->value(key).value<QColor>() == color)
+    if (settings.value(key).value<QColor>() == color)
         return;
 
-    m_settings->setValue(key, color);
+    settings.setValue(key, color);
     emit colorChanged(counterId, color);
 }
 
@@ -35,7 +35,7 @@ QColor CardCounterSettings::color(int counterId) const
         defaultColor = QColor::fromHsv(h, s, v);
     }
 
-    return m_settings->value(QString("cards/counters/%1/color").arg(counterId), defaultColor).value<QColor>();
+    return settings.value(QString("cards/counters/%1/color").arg(counterId), defaultColor).value<QColor>();
 }
 
 QString CardCounterSettings::displayName(int counterId) const
