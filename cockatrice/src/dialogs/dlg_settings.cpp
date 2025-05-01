@@ -487,10 +487,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     auto *cardCountersLayout = new QVBoxLayout;
     cardCountersLayout->addLayout(cardCounterColorsLayout, 1);
 
-    cardCountersNameWarning = new QLabel;
-    cardCountersNameWarning->setWordWrap(true);
-    cardCountersLayout->addWidget(cardCountersNameWarning);
-
     cardCountersGroupBox = new QGroupBox;
     cardCountersGroupBox->setLayout(cardCountersLayout);
 
@@ -631,12 +627,10 @@ void AppearanceSettingsPage::retranslateUi()
     cardViewExpandedRowsMaxBox.setSuffix(tr(" rows"));
 
     cardCountersGroupBox->setTitle(tr("Card counters"));
-    cardCountersNameWarning->setText(
-        tr("<b>Note:</b> The names can't be changed and might not match the actual colors."));
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
     for (int index = 0; index < cardCounterNames.size(); ++index) {
-        cardCounterNames[index]->setText(cardCounterSettings.displayName(index));
+        cardCounterNames[index]->setText(tr("Counter %1").arg(cardCounterSettings.displayName(index)));
     }
 
     handGroupBox->setTitle(tr("Hand layout"));

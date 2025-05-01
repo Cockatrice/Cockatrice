@@ -40,22 +40,16 @@ QColor CardCounterSettings::color(int counterId) const
 
 QString CardCounterSettings::displayName(int counterId) const
 {
-    // These are hardcoded for now. They should become configurable at some
-    // point.
-    switch (counterId) {
-        case 0:
-            return tr("Red");
-        case 1:
-            return tr("Yellow");
-        case 2:
-            return tr("Green");
-        case 3:
-            return tr("Cyan");
-        case 4:
-            return tr("Purple");
-        case 5:
-            return tr("Magenta");
-        default:
-            return QString(tr("Custom %1")).arg(counterId - 5);
+    // Currently, card counters name are fixed to A, B, ..., Z, AA, AB, ...
+
+    auto nChars = 1 + counterId / 26;
+    QString str;
+    str.resize(nChars);
+
+    for (auto it = str.rbegin(); it != str.rend(); ++it) {
+        *it = QChar('A' + (counterId) % 26);
+        counterId /= 26;
     }
+
+    return str;
 }

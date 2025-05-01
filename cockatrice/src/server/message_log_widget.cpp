@@ -1,4 +1,5 @@
 #include "message_log_widget.h"
+mCardCounters->clear();
 
 #include "../client/sound_engine.h"
 #include "../client/translate_counter_name.h"
@@ -609,16 +610,15 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     QString finalStr;
     int delta = abs(oldValue - value);
     if (value > oldValue) {
-        finalStr = tr("%1 places %2 %3 counter(s) on %4 (now %5).", "", delta);
+        finalStr = tr("%1 places %2 \"%3\" counter(s) on %4 (now %5).", "", delta);
     } else {
-        finalStr = tr("%1 removes %2 %3 counter(s) from %4 (now %5).", "", delta);
+        finalStr = tr("%1 removes %2 \"%3\" counter(s) from %4 (now %5).", "", delta);
     }
 
-    QLocale locale;
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
     appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName()))
                                 .arg("<font class=\"blue\">" + QString::number(delta) + "</font>")
-                                .arg(locale.toLower(cardCounterSettings.displayName(counterId)))
+                                .arg(cardCounterSettings.displayName(counterId))
                                 .arg(cardLink(std::move(cardName)))
                                 .arg(value));
 }
