@@ -2,6 +2,7 @@
 
 #include <QColor>
 #include <QSettings>
+#include <QtMath>
 
 CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *parent)
     : SettingsManager(settingsPath + "global.ini", parent)
