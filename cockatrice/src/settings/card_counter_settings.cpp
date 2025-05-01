@@ -29,8 +29,8 @@ QColor CardCounterSettings::color(int counterId) const
     } else {
         // Future-proof support for more counters with pseudo-random colors
         int h = (counterId * 37) % 360;
-        int s = 128 + 64 * sin((counterId * 97) * 0.1);   // 64-192
-        int v = 196 + 32 * sin((counterId * 101) * 0.07); // 164-228
+        int s = 128 + 64 * qSin((counterId * 97) * 0.1);   // 64-192
+        int v = 196 + 32 * qSin((counterId * 101) * 0.07); // 164-228
 
         defaultColor = QColor::fromHsv(h, s, v);
     }
