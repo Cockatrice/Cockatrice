@@ -1,5 +1,4 @@
 #include "message_log_widget.h"
-mCardCounters->clear();
 
 #include "../client/sound_engine.h"
 #include "../client/translate_counter_name.h"
