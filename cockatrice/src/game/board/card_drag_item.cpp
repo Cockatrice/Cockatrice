@@ -47,8 +47,19 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         cursorZone = zoneViewZone;
     else if (cardZone)
         cursorZone = cardZone;
-    if (!cursorZone)
+    if (!cursorZone) {
+        // Temporary fix: avoid the cards getting stuck visually when not over
+        // any zone.
+        QPointF newPos = cursorScenePos - hotSpot;
+
+        if (newPos != pos()) {
+            for (int i = 0; i < childDrags.size(); i++)
+                childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
+            setPos(newPos);
+        }
+
         return;
+    }
     currentZone = cursorZone;
 
     QPointF zonePos = currentZone->scenePos();
