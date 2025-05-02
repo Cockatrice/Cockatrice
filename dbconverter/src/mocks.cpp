@@ -256,6 +256,9 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
 void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setDefaultDeckEditorType(int /* value */)
+{
+}
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T /* _enabled */)
 {
 }
