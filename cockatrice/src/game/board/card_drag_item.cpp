@@ -47,8 +47,13 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         cursorZone = zoneViewZone;
     else if (cardZone)
         cursorZone = cardZone;
+
+    // Always update the current zone, even if its null, to cancel the drag
+    // instead of dropping cards into an non-intuitive location.
+    currentZone = cursorZone;
+
     if (!cursorZone) {
-        // Temporary fix: avoid the cards getting stuck visually when not over
+        // Avoid the cards getting stuck visually when not over
         // any zone.
         QPointF newPos = cursorScenePos - hotSpot;
 
@@ -60,7 +65,6 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 
         return;
     }
-    currentZone = cursorZone;
 
     QPointF zonePos = currentZone->scenePos();
     QPointF cursorPosInZone = cursorScenePos - zonePos;
