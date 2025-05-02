@@ -4,6 +4,7 @@
 #include "../client/network/release_channel.h"
 #include "../client/network/spoiler_background_updater.h"
 #include "../client/sound_engine.h"
+#include "../client/tabs/tab_supervisor.h"
 #include "../client/ui/picture_loader/picture_loader.h"
 #include "../client/ui/theme_manager.h"
 #include "../deck/custom_line_edit.h"
@@ -681,10 +682,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageSelectionAnimation);
 
-    openInVisualDeckEditorCheckBox.setChecked(SettingsCache::instance().getOpenInVisualDeckEditor());
-    connect(&openInVisualDeckEditorCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setOpenInVisualDeckEditor);
-
     visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
     visualDeckStoragePromptForConversionSelector.addItem("");
     visualDeckStoragePromptForConversionSelector.addItem("");
@@ -703,13 +700,20 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
                     index == visualDeckStoragePromptForConversionIndexAlways);
             });
 
+    defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
+    defaultDeckEditorTypeSelector.addItem("");
+    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().getDefaultDeckEditorType());
+    connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            &SettingsCache::instance(), &SettingsCache::setDefaultDeckEditorType);
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
     deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&openInVisualDeckEditorCheckBox, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 4, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 4, 1);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -771,7 +775,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
     visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
-    openInVisualDeckEditorCheckBox.setText(tr("Open decks in visual deck editor"));
     visualDeckStoragePromptForConversionLabel.setText(
         tr("When adding a tag in the visual deck storage to a .txt deck:"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
@@ -780,6 +783,9 @@ void UserInterfaceSettingsPage::retranslateUi()
                                                              tr("ask to convert to .cod"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
                                                              tr("always convert to .cod"));
+    defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
+    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
+    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

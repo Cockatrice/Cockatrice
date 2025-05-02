@@ -75,6 +75,14 @@ protected:
 class TabSupervisor : public QTabWidget
 {
     Q_OBJECT
+
+public:
+    enum DeckEditorType
+    {
+        ClassicDeckEditor,
+        VisualDeckEditor
+    };
+
 private:
     ServerInfo_User *userInfo;
     AbstractClient *client;

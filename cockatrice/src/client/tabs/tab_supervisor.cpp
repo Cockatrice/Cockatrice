@@ -814,10 +814,19 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const DeckLoader *deckToOpen)
 {
-    if (SettingsCache::instance().getOpenInVisualDeckEditor()) {
-        addVisualDeckEditorTab(deckToOpen);
-    } else {
-        addDeckEditorTab(deckToOpen);
+    int type = SettingsCache::instance().getDefaultDeckEditorType();
+    switch (type) {
+        case ClassicDeckEditor:
+            addDeckEditorTab(deckToOpen);
+            break;
+        case VisualDeckEditor:
+            addVisualDeckEditorTab(deckToOpen);
+            break;
+        default:
+            qCWarning(TabSupervisorLog) << "Unknown DeckEditorType [" << type
+                                        << "]; opening ClassicDeckEditor as fallback";
+            addDeckEditorTab(deckToOpen);
+            break;
     }
 }
 

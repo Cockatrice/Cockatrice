@@ -285,7 +285,7 @@ SettingsCache::SettingsCache()
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
     visualDeckStorageSelectionAnimation =
         settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
-    openInVisualDeckEditor = settings->value("interface/openInVisualDeckEditor", true).toBool();
+    defaultDeckEditorType = settings->value("interface/defaultDeckEditorType", 1).toInt();
     visualDatabaseDisplayFilterToMostRecentSetsEnabled =
         settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
     visualDatabaseDisplayFilterToMostRecentSetsAmount =
@@ -792,10 +792,10 @@ void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T va
     emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
 }
 
-void SettingsCache::setOpenInVisualDeckEditor(QT_STATE_CHANGED_T value)
+void SettingsCache::setDefaultDeckEditorType(int value)
 {
-    openInVisualDeckEditor = value;
-    settings->setValue("interface/openInVisualDeckEditor", openInVisualDeckEditor);
+    defaultDeckEditorType = value;
+    settings->setValue("interface/defaultDeckEditorType", defaultDeckEditorType);
 }
 
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled)
