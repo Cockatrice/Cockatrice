@@ -66,7 +66,7 @@ void ManaSymbolWidget::loadManaIcon()
     QString filename = "theme:icons/mana/";
 
     if (symbol == "W" || symbol == "U" || symbol == "B" || symbol == "R" || symbol == "G") {
-        filename += symbol + ".svg";
+        filename += symbol;
     }
 
     manaIcon = QPixmap(filename);
