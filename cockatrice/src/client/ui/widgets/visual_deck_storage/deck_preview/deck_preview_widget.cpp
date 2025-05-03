@@ -188,6 +188,7 @@ void DeckPreviewWidget::refreshBannerCardText()
 {
     bannerCardDisplayWidget->setOverlayText(
         deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
+    bannerCardDisplayWidget->setToolTip(deckLoader->getLastFileName());
 }
 
 void DeckPreviewWidget::updateBannerCardComboBox()
