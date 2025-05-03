@@ -387,14 +387,14 @@ jobs:
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
-      - name: Run vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          runVcpkgInstall: true
-          doNotCache: false
-        env:
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
-          VCPKG_DISABLE_METRICS: 1
+      # - name: Run vcpkg
+      #   uses: lukka/run-vcpkg@v11
+      #   with:
+      #     runVcpkgInstall: true
+      #     doNotCache: false
+      #   env:
+      #     VCPKG_DEFAULT_TRIPLET: 'x64-windows'
+      #     VCPKG_DISABLE_METRICS: 1
 
       - name: Build Cockatrice
         id: build
