@@ -47,20 +47,6 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     // If the number is < 0, then it means that we can give the option to make the area sorted
     if (numberCards < 0) {
-        // search edit
-        searchEdit.setFocusPolicy(Qt::ClickFocus);
-        searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
-        searchEdit.setClearButtonEnabled(true);
-        searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-        auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
-
-        connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
-
-        QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
-        searchEditProxy->setWidget(&searchEdit);
-        searchEditProxy->setZValue(2000000007);
-        vbox->addItem(searchEditProxy);
-
         // top row
         QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
@@ -103,6 +89,20 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         }
 
         vbox->addItem(hBottomRow);
+
+        // search edit
+        searchEdit.setFocusPolicy(Qt::ClickFocus);
+        searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
+        searchEdit.setClearButtonEnabled(true);
+        searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+        auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+
+        connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
+
+        QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
+        searchEditProxy->setWidget(&searchEdit);
+        searchEditProxy->setZValue(2000000006);
+        vbox->addItem(searchEditProxy);
     }
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
