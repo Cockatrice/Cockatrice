@@ -64,6 +64,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
     });
 }
 
+CardInfoPictureWidget::~CardInfoPictureWidget()
+{
+    enlargedPixmapWidget->hide();
+    enlargedPixmapWidget->deleteLater();
+}
+
 /**
  * @brief Sets the card to be displayed and updates the pixmap.
  * @param card A shared pointer to the card information (CardInfoPtr).
@@ -339,6 +345,12 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
     }
 
     emit cardClicked();
+}
+
+void CardInfoPictureWidget::hideEvent(QHideEvent *event)
+{
+    enlargedPixmapWidget->hide();
+    QWidget::hideEvent(event);
 }
 
 QMenu *CardInfoPictureWidget::createRightClickMenu()
