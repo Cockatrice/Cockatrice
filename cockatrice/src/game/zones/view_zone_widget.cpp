@@ -56,6 +56,11 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
+        if (SettingsCache::instance().getFocusCardViewSearchBar()) {
+            this->setActive(true);
+            searchEdit.setFocus();
+        }
+
         QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
         searchEditProxy->setWidget(&searchEdit);
         searchEditProxy->setZValue(2000000007);
