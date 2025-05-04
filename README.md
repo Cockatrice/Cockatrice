@@ -8,7 +8,7 @@
    <a href="#related-repositories">Related</a> <b>|</b>
    <a href="#community-resources-">Community</a> <b>|</b>
    <a href="#contribute">Contribute</a> <b>|</b>
-   <a href="#build--">Build</a> <b>|</b>
+   <a href="#build---">Build</a> <b>|</b>
    <a href="#run">Run</a>
 </p>
 
