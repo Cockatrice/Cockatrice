@@ -387,7 +387,9 @@ jobs:
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
-      - name: Run vcpkg
+      # TODO: re-enable when https://github.com/lukka/run-vcpkg/issues/243 is fixed
+      - if: false
+        name: Run vcpkg (disabled)
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
