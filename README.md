@@ -38,8 +38,8 @@ Latest <kbd>stable</kbd> release:
 </pre><pre>
 Latest <kbd>beta</kbd> version:
 [![Download Beta Release](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg?label=version&colorB=f37f40 "Download Latest Beta Release")](https://github.com/cockatrice/cockatrice/releases) ![](https://img.shields.io/github/release-date-pre/Cockatrice/Cockatrice.svg?label=released&colorB=f37f40 "Release Date") [![](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads&colorB=f37f40 "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0) [![](https://img.shields.io/github/commits-since/Cockatrice/Cockatrice/latest.svg?label=changes&colorB=f37f40 "Changes over Stable Release")](https://github.com/Cockatrice/Cockatrice/pulls?q=is%3Apr+is%3Aclosed)
-<sub><i>While incorporating the latest fixes and features, beta builds may not be stable and/or contain new bugs!</i></sub>
-<sub><b><i>Please report any findings when testing them!</i></b></sub>
+<sub><i>While incorporating the latest fixes and features, beta builds may not be stable or contain new bugs!</i></sub>
+<sub><b><i>Please report any findings and open new issues when testing them!</i></b></sub>
 </pre>
 
 # Related Repositories
