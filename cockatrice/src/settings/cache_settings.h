@@ -184,6 +184,7 @@ private:
     int cardViewInitialRowsMax;
     int cardViewExpandedRowsMax;
     bool closeEmptyCardView;
+    bool focusCardViewSearchBar;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -699,6 +700,7 @@ public:
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
+    void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
     QString getClientID()
     {
         return clientID;
@@ -726,6 +728,10 @@ public:
     bool getCloseEmptyCardView() const
     {
         return closeEmptyCardView;
+    }
+    bool getFocusCardViewSearchBar() const
+    {
+        return focusCardViewSearchBar;
     }
     ShortcutsSettings &shortcuts() const
     {

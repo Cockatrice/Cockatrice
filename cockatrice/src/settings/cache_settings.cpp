@@ -251,6 +251,7 @@ SettingsCache::SettingsCache()
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
+    focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -368,6 +369,12 @@ void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)
 {
     closeEmptyCardView = value;
     settings->setValue("interface/closeEmptyCardView", closeEmptyCardView);
+}
+
+void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
+{
+    focusCardViewSearchBar = value;
+    settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
