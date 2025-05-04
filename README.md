@@ -79,10 +79,11 @@ Cockatrice tries to use the [Google Developer Documentation Style Guide](https:/
 
 <details>
 <summary><b>Kudos to our amazing contributors ❤️</b></summary>
+<br>
    <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
       <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
    </a><br>
-   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a>.</i></sub>
+   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a></i></sub>
 </details>
 
 ### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
@@ -92,7 +93,7 @@ Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Coc
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting invovled, and join a group of hundreds of others!<br>
 
 
-# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
+# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Docker](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
 
 Dependencies: *(for minimum versions search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
