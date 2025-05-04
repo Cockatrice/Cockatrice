@@ -150,10 +150,10 @@ The following flags (with their non-default values) can be passed to `cmake`:
 
 #### Docker
 
-You can run an instance of <kbd>Servatrice</kbd> (the Cockatrice server) using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile.<br>
+You can build an image & deploy a <kbd>Servatrice</kbd> (Cockatrice server) container using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile yourself.<br>
 
-For more information, have a look in our wiki section on [Setting up Servatrice](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).<br>
-There, you'll also find more hints on our **docker-compose** file which will configure and run both a MySQL server and Servatrice.
+For more details, look into our wiki section on [Setting up Servatrice](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).<br>
+You'll also find more hints on our **pre-build image** there, or the **docker-compose** file which will configure and run both a MySQL server and Servatrice.
 
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
