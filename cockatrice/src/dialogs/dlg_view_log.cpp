@@ -4,6 +4,7 @@
 #include "../utility/logger.h"
 
 #include <QPlainTextEdit>
+#include <QRegularExpression>
 #include <QVBoxLayout>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
@@ -44,7 +45,12 @@ void DlgViewLog::loadInitialLogBuffer()
 
 void DlgViewLog::logEntryAdded(QString message)
 {
-    logArea->appendPlainText(message);
+    static auto colorEscapeCodePattern = QRegularExpression("\033\\[\\d+m");
+
+    QString sanitizedMessage = message;
+    sanitizedMessage.replace(colorEscapeCodePattern, "");
+
+    logArea->appendPlainText(sanitizedMessage);
 }
 
 void DlgViewLog::closeEvent(QCloseEvent * /* event */)
