@@ -563,6 +563,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     setWindowTitle(tr("Deck"));
 
     nameLabel->setText(tr("Deck &name:"));
+    quickSettingsWidget->setToolTip(tr("Banner Card/Tags Visibility Settings"));
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
