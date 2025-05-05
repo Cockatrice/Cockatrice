@@ -3,24 +3,40 @@
 #include "../settings/cache_settings.h"
 #include "../utility/logger.h"
 
+#include <QClipboard>
 #include <QPlainTextEdit>
+#include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {
-
     logArea = new QPlainTextEdit;
     logArea->setReadOnly(true);
 
     auto *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(3);
+    mainLayout->setContentsMargins(20, 20, 20, 6);
+
     mainLayout->addWidget(logArea);
+
+    auto *bottomLayout = new QHBoxLayout;
 
     coClearLog = new QCheckBox;
     coClearLog->setText(tr("Clear log when closing"));
     coClearLog->setChecked(SettingsCache::instance().servers().getClearDebugLogStatus(false));
     connect(coClearLog, &QCheckBox::toggled, this, &DlgViewLog::actCheckBoxChanged);
-    mainLayout->addWidget(coClearLog);
+
+    copyToClipboardButton = new QPushButton;
+    copyToClipboardButton->setText(tr("Copy to clipboard"));
+    copyToClipboardButton->setAutoDefault(false);
+    connect(copyToClipboardButton, &QPushButton::clicked, this, &DlgViewLog::actCopyToClipboard);
+
+    bottomLayout->addWidget(coClearLog);
+    bottomLayout->addStretch();
+    bottomLayout->addWidget(copyToClipboardButton);
+
+    mainLayout->addLayout(bottomLayout);
 
     setLayout(mainLayout);
 
@@ -34,6 +50,11 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 void DlgViewLog::actCheckBoxChanged(bool abNewValue)
 {
     SettingsCache::instance().servers().setClearDebugLogStatus(abNewValue);
+}
+
+void DlgViewLog::actCopyToClipboard()
+{
+    QApplication::clipboard()->setText(logArea->toPlainText());
 }
 
 void DlgViewLog::loadInitialLogBuffer()
