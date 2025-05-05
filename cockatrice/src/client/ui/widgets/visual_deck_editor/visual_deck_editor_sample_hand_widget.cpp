@@ -1,6 +1,5 @@
 #include "visual_deck_editor_sample_hand_widget.h"
 
-#include "../../../../../../../../../../../mnt/games-hdd/coding/CLionProjects/Cockatrice/cockatrice/src/client/ui/widgets/cards/card_size_widget.h"
 #include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
