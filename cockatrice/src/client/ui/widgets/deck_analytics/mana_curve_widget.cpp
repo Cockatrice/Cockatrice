@@ -91,7 +91,7 @@ void ManaCurveWidget::updateDisplay()
     // Add new widgets to the layout in sorted order
     for (const auto &entry : sortedManaCurve) {
         BarWidget *barWidget =
-            new BarWidget(QString::number(entry.first), entry.second, highestEntry, QColor(11, 11, 11), this);
+            new BarWidget(QString::number(entry.first), entry.second, highestEntry, QColor(122, 122, 122), this);
         barLayout->addWidget(barWidget);
     }
 
