@@ -229,6 +229,7 @@ set(cockatrice_SOURCES
     src/server/user/user_list_manager.cpp
     src/server/user/user_list_widget.cpp
     src/settings/cache_settings.cpp
+    src/settings/card_counter_settings.cpp
     src/settings/card_database_settings.cpp
     src/settings/card_override_settings.cpp
     src/settings/debug_settings.cpp
