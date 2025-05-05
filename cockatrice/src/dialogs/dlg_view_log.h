@@ -19,11 +19,13 @@ protected:
 private:
     QPlainTextEdit *logArea;
     QCheckBox *coClearLog;
+    QPushButton *copyToClipboardButton;
 
     void loadInitialLogBuffer();
 private slots:
     void appendLogEntry(const QString &message);
     void actCheckBoxChanged(bool abNewValue);
+    void actCopyToClipboard();
 };
 
 #endif
