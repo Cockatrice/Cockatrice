@@ -272,6 +272,9 @@ void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STA
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int /* _amount */)
 {
 }
+void SettingsCache::setVisualDeckEditorSampleHandSize(int /* _amount */)
+{
+}
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)
 {
 }
