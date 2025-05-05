@@ -1,7 +1,7 @@
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 #define VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 
-#include "../../../../../../../../../../../mnt/games-hdd/coding/CLionProjects/Cockatrice/cockatrice/src/client/ui/widgets/cards/card_size_widget.h"
+#include "../../../../client/ui/widgets/cards/card_size_widget.h"
 #include "../../../../deck/deck_list_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
