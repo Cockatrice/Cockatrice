@@ -42,7 +42,7 @@ void DlgViewLog::loadInitialLogBuffer()
         logEntryAdded(message);
 }
 
-void DlgViewLog::logEntryAdded(QString message)
+void DlgViewLog::logEntryAdded(const QString &message)
 {
     logArea->appendPlainText(message);
 }
