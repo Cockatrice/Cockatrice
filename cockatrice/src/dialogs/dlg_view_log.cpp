@@ -27,7 +27,7 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
     resize(800, 500);
 
     loadInitialLogBuffer();
-    connect(&Logger::getInstance(), &Logger::logEntryAdded, this, &DlgViewLog::logEntryAdded);
+    connect(&Logger::getInstance(), &Logger::logEntryAdded, this, &DlgViewLog::appendLogEntry);
 }
 
 void DlgViewLog::actCheckBoxChanged(bool abNewValue)
@@ -39,10 +39,10 @@ void DlgViewLog::loadInitialLogBuffer()
 {
     QList<QString> logBuffer = Logger::getInstance().getLogBuffer();
     for (const QString &message : logBuffer)
-        logEntryAdded(message);
+        appendLogEntry(message);
 }
 
-void DlgViewLog::logEntryAdded(const QString &message)
+void DlgViewLog::appendLogEntry(const QString &message)
 {
     logArea->appendPlainText(message);
 }

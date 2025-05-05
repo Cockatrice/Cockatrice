@@ -22,7 +22,7 @@ private:
 
     void loadInitialLogBuffer();
 private slots:
-    void logEntryAdded(const QString &message);
+    void appendLogEntry(const QString &message);
     void actCheckBoxChanged(bool abNewValue);
 };
 
