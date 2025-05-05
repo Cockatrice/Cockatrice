@@ -158,8 +158,6 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     clearFilterWidget->setToolTip(tr("Clear all filters"));
 
-
-
     quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
     quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));

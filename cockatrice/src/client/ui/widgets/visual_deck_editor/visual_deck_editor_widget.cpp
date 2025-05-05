@@ -194,7 +194,8 @@ void VisualDeckEditorWidget::retranslateUi()
                                     "preferred printing to the deck on pressing enter"));
     sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
     displayTypeButton->setText(tr("Flat Layout"));
-    displayTypeButton->setToolTip(tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
+    displayTypeButton->setToolTip(
+        tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
