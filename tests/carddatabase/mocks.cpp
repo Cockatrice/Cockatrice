@@ -68,6 +68,9 @@ void SettingsCache::setCardViewExpandedRowsMax(int /* value */)
 void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
 {
 }
