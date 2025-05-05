@@ -58,6 +58,8 @@ void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
             toggleButton->setText(tr("Mode: Include/Exclude"));
             break;
     }
+
+    toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
 
 void VisualDatabaseDisplayColorFilterWidget::handleColorToggled(QChar color, bool active)

@@ -45,6 +45,7 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 {
     searchBox->setPlaceholderText(tr("Filter by name..."));
     loadFromDeckButton->setText(tr("Load from Deck"));
+    loadFromDeckButton->setToolTip(tr("Apply all card names in currently loaded deck as exact match name filters"));
 }
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()

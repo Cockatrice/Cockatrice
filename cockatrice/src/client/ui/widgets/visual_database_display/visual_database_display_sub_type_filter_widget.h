@@ -16,6 +16,7 @@ class VisualDatabaseDisplaySubTypeFilterWidget : public QWidget
     Q_OBJECT
 public:
     explicit VisualDatabaseDisplaySubTypeFilterWidget(QWidget *parent, FilterTreeModel *filterModel);
+    void retranslateUi();
     void createSubTypeButtons();
     void updateSubTypeButtonsVisibility();
     int getMaxSubTypeCount() const;

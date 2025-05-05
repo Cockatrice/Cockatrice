@@ -51,6 +51,14 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
 
     createSubTypeButtons();  // Populate buttons initially
     updateFilterMode(false); // Initialize the toggle button text
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplaySubTypeFilterWidget::retranslateUi()
+{
+    spinBox->setToolTip(tr("Do not display card sub-types with less than this amount of cards in the database"));
+    toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
 
 void VisualDatabaseDisplaySubTypeFilterWidget::createSubTypeButtons()
