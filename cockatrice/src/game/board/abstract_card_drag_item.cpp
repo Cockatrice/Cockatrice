@@ -39,6 +39,8 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
         prepareGeometryChange();
         update();
     });
+
+    connect(item, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
 }
 
 AbstractCardDragItem::~AbstractCardDragItem()
