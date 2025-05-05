@@ -194,6 +194,9 @@ void VisualDeckStorageWidget::retranslateUi()
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
     unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
     unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
+
+    refreshButton->setToolTip(tr("Refresh loaded files"));
+    quickSettingsWidget->setToolTip(tr("Visual Deck Storage Settings"));
 }
 
 /**
