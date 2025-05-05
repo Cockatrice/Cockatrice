@@ -62,7 +62,7 @@ signals:
     void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
     void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
-    void deckEditorTagsWidgetVisibleChanged(bool _visible);\
+    void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);

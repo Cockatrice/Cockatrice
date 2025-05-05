@@ -25,7 +25,8 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     handSizeSpinBox = new QSpinBox(this);
     handSizeSpinBox->setValue(SettingsCache::instance().getVisualDeckEditorSampleHandSize());
     handSizeSpinBox->setMinimum(1);
-    connect(handSizeSpinBox, &QSpinBox::valueChanged, &SettingsCache::instance(), &SettingsCache::setVisualDeckEditorSampleHandSize);
+    connect(handSizeSpinBox, &QSpinBox::valueChanged, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckEditorSampleHandSize);
     connect(handSizeSpinBox, &QSpinBox::valueChanged, this, &VisualDeckEditorSampleHandWidget::updateDisplay);
     resetAndHandSizeLayout->addWidget(handSizeSpinBox);
 
@@ -67,7 +68,8 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
-        connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, displayWidget, &CardInfoPictureWidget::setScaleFactor);
+        connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, displayWidget,
+                &CardInfoPictureWidget::setScaleFactor);
         flowWidget->addWidget(displayWidget);
     }
 }
