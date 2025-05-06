@@ -29,7 +29,8 @@ public:
     {
         return tagName;
     }
-    TagState getState() const {
+    TagState getState() const
+    {
         return state;
     }
 

@@ -72,7 +72,6 @@ void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<Dec
     }
 }
 
-
 void VisualDeckStorageTagFilterWidget::refreshTags()
 {
     QSet<QString> allTags = gatherAllTags();
