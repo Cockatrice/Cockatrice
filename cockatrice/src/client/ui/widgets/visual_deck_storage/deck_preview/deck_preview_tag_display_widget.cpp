@@ -6,7 +6,7 @@
 #include <QPainter>
 
 DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const QString &_tagName)
-    : QWidget(parent), tagName(_tagName), isSelected(false)
+    : QWidget(parent), tagName(_tagName), state(TagState::NotSelected)
 {
     // Create layout
     auto *layout = new QHBoxLayout(this);
@@ -48,36 +48,58 @@ QSize DeckPreviewTagDisplayWidget::sizeHint() const
 
 void DeckPreviewTagDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        setSelected(!isSelected);
-        emit tagClicked();
+    switch (event->button()) {
+        case Qt::LeftButton:
+            setState(TagState::Selected);
+            break;
+        case Qt::RightButton:
+            setState(TagState::Excluded);
+            break;
+        case Qt::MiddleButton:
+            setState(TagState::NotSelected);
+            break;
+        default:
+            break;
     }
-    QWidget::mousePressEvent(event);
-}
 
-void DeckPreviewTagDisplayWidget::setSelected(bool selected)
-{
-    isSelected = selected;
-    update(); // Trigger a repaint
+    emit tagClicked();
+    QWidget::mousePressEvent(event);
 }
 
 void DeckPreviewTagDisplayWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    // Set background color
-    QColor backgroundColor = isSelected ? QColor(173, 216, 230) : Qt::white;
+    QColor backgroundColor;
+    QColor borderColor;
+    int borderWidth;
+
+    switch (state) {
+        case TagState::Selected:
+            backgroundColor = QColor(173, 216, 230); // Light blue
+            borderColor = Qt::blue;
+            borderWidth = 2;
+            break;
+        case TagState::Excluded:
+            backgroundColor = QColor(255, 182, 193); // Light red/pink
+            borderColor = Qt::red;
+            borderWidth = 2;
+            break;
+        case TagState::NotSelected:
+        default:
+            backgroundColor = Qt::white;
+            borderColor = Qt::gray;
+            borderWidth = 1;
+            break;
+    }
+
     painter.setBrush(backgroundColor);
     painter.setPen(Qt::NoPen);
-
-    // Draw background
     painter.drawRect(rect());
 
-    // Draw border
-    QColor borderColor = isSelected ? Qt::blue : Qt::gray;
-    QPen borderPen(borderColor, isSelected ? 2 : 1);
+    QPen borderPen(borderColor, borderWidth);
     painter.setPen(borderPen);
-    painter.drawRect(rect().adjusted(0, 0, -1, -1)); // Adjust for pen width
+    painter.drawRect(rect().adjusted(0, 0, -1, -1));
 
     // Calculate font size based on widget height
     QFont font = painter.font();
