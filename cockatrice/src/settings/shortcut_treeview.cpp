@@ -150,7 +150,7 @@ void ShortcutTreeView::currentChanged(const QModelIndex &current, const QModelIn
  */
 void ShortcutTreeView::updateSearchString(const QString &searchString)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
     const auto skipEmptyParts = Qt::SkipEmptyParts;
 #else
     const auto skipEmptyParts = QString::SkipEmptyParts;
