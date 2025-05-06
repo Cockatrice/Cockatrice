@@ -143,7 +143,6 @@ The following flags (with their non-default values) can be passed to `cmake`:
 
 # Run
 
-
 <kbd>Cockatrice</kbd> is the game client<br>
 <kbd>Oracle</kbd> fetches card data<br>
 <kbd>Servatrice</kbd> is the server<br>

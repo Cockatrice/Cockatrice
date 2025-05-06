@@ -203,7 +203,7 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="550"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation>Sovrapposizione % minima delle carte in pila e nella mano verticale</translation>
+        <translation>Sovrapposizione % minima delle carte in pila e nella mano verticale:</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="551"/>
@@ -2770,13 +2770,13 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
         <location filename="src/dialogs/dlg_update.cpp" line="154"/>
         <location filename="src/dialogs/dlg_update.cpp" line="165"/>
         <source>Released</source>
-        <translation>Rilasciato</translation>
+        <translation>Data di rilascio</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="155"/>
         <location filename="src/dialogs/dlg_update.cpp" line="166"/>
         <source>Changelog</source>
-        <translation>Cambiamenti della versione</translation>
+        <translation>Changelog</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="156"/>
@@ -2789,13 +2789,14 @@ Per favore, visitate la pagina di download per aggiornare manualmente.</translat
 You may have to manually download the new version.</source>
         <oldsource>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</oldsource>
-        <translation type="unfinished"/>
+        <translation>Purtroppo l&apos;aggiornamento automatico non è riuscito a trovare una versione compatibile. 
+Dovrai scaricare la nuova versione manualmente.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="171"/>
         <source>Please check the &lt;a href=&quot;%1&quot;&gt;releases page&lt;/a&gt; on our Github and download the build for your system.</source>
         <oldsource>Please check the download page manually and visit the wiki for instructions on compiling.</oldsource>
-        <translation type="unfinished"/>
+        <translation>Per favore, controlla la &lt;a href=&quot;%1&quot;&gt;pagina delle release&lt;/a&gt; sul nostro Github e scarica la versione giusta per il tuo sistema.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="208"/>
@@ -3668,7 +3669,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="660"/>
         <source>Start &amp;local game...</source>
-        <translation>Inizia &amp;partita in locale...</translation>
+        <translation>Inizia partita in &amp;locale...</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="661"/>
@@ -3688,7 +3689,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="664"/>
         <source>&amp;Restore password...</source>
-        <translation>&amp;Recupera password...</translation>
+        <translation>Recupera &amp;password...</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="665"/>
@@ -3713,7 +3714,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="675"/>
         <source>C&amp;ard Database</source>
-        <translation>&amp;Database delle carte</translation>
+        <translation>&amp;Database carte</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="676"/>
@@ -3916,7 +3917,7 @@ Scopri metodi alternativi per visualizzare i set o disabilitare set ed effetti n
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1226"/>
         <source>An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel.</source>
-        <translation type="unfinished"/>
+        <translation>Si è verificato un errore nel cercare di scrivere al processo. Ad esempio, il processo potrebbe non essere in esecuzione, o potrebbe aver chiuso il suo canale di input.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1230"/>
@@ -5850,7 +5851,7 @@ Il database delle carte verrà ricaricato.</translation>
     <message>
         <location filename="src/server/remote/remote_replay_list_tree_widget.cpp" line="157"/>
         <source>Time started</source>
-        <translation>Inizio tempo</translation>
+        <translation>Inizio</translation>
     </message>
     <message>
         <location filename="src/server/remote/remote_replay_list_tree_widget.cpp" line="159"/>
@@ -7122,7 +7123,7 @@ Più informazioni inserisci, più specifici saranno i risultati.</translation>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="178"/>
         <source>Deck Editor</source>
-        <translation>Editor dei mazzi</translation>
+        <translation>&amp;Editor dei mazzi</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="179"/>
@@ -7142,12 +7143,12 @@ Più informazioni inserisci, più specifici saranno i risultati.</translation>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="182"/>
         <source>Deck Storage</source>
-        <translation>Archivio mazzi</translation>
+        <translation>&amp;Archivio mazzi</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="183"/>
         <source>Game Replays</source>
-        <translation>Replay partite</translation>
+        <translation>&amp;Replay partite</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="184"/>
@@ -8299,12 +8300,12 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/settings/shortcuts_settings.h" line="176"/>
         <source>Analyze Deck (deckstats.net)</source>
         <oldsource>Analyze Deck</oldsource>
-        <translation>Analizza Mazzo (deckstats.net)</translation>
+        <translation>Analizza mazzo (deckstats.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="180"/>
         <source>Analyze Deck (tappedout.net)</source>
-        <translation>Analizza Mazzo (tappedout.net)</translation>
+        <translation>Analizza mazzo (tappedout.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="183"/>
@@ -8496,7 +8497,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
         <location filename="src/settings/shortcuts_settings.h" line="301"/>
         <location filename="src/settings/shortcuts_settings.h" line="346"/>
         <source>Set Red Counters...</source>
-        <translation>Imposta Contatore Rosso...</translation>
+        <translation>Imposta Segnalino Rosso...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="304"/>

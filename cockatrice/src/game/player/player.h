@@ -128,7 +128,7 @@ signals:
                         Player *targetPlayer,
                         QString targetCard,
                         bool _playerTarget);
-    void logCreateToken(Player *player, QString cardName, QString pt);
+    void logCreateToken(Player *player, QString cardName, QString pt, bool faceDown);
     void logDrawCards(Player *player, int number, bool deckIsEmpty);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);

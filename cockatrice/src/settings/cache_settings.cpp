@@ -251,6 +251,7 @@ SettingsCache::SettingsCache()
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
+    focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -285,6 +286,7 @@ SettingsCache::SettingsCache()
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
     visualDeckStorageSelectionAnimation =
         settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
+    defaultDeckEditorType = settings->value("interface/defaultDeckEditorType", 1).toInt();
     visualDatabaseDisplayFilterToMostRecentSetsEnabled =
         settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
     visualDatabaseDisplayFilterToMostRecentSetsAmount =
@@ -367,6 +369,12 @@ void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)
 {
     closeEmptyCardView = value;
     settings->setValue("interface/closeEmptyCardView", closeEmptyCardView);
+}
+
+void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
+{
+    focusCardViewSearchBar = value;
+    settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -789,6 +797,12 @@ void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T va
     visualDeckStorageSelectionAnimation = value;
     settings->setValue("interface/visualdeckstorageselectionanimation", visualDeckStorageSelectionAnimation);
     emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
+}
+
+void SettingsCache::setDefaultDeckEditorType(int value)
+{
+    defaultDeckEditorType = value;
+    settings->setValue("interface/defaultDeckEditorType", defaultDeckEditorType);
 }
 
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled)

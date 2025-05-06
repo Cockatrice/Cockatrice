@@ -4,6 +4,7 @@
 #include "../client/network/release_channel.h"
 #include "../client/network/spoiler_background_updater.h"
 #include "../client/sound_engine.h"
+#include "../client/tabs/tab_supervisor.h"
 #include "../client/ui/picture_loader/picture_loader.h"
 #include "../client/ui/theme_manager.h"
 #include "../deck/custom_line_edit.h"
@@ -629,6 +630,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setCloseEmptyCardView);
 
+    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().getFocusCardViewSearchBar());
+    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setFocusCardViewSearchBar);
+
     annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
     connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setAnnotateTokens);
@@ -642,8 +647,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
     generalGrid->addWidget(&playToStackCheckBox, 2, 0);
     generalGrid->addWidget(&closeEmptyCardViewCheckBox, 3, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 4, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 5, 0);
+    generalGrid->addWidget(&focusCardViewSearchBarCheckBox, 4, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 5, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 6, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -699,12 +705,20 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
                     index == visualDeckStoragePromptForConversionIndexAlways);
             });
 
+    defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
+    defaultDeckEditorTypeSelector.addItem("");
+    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().getDefaultDeckEditorType());
+    connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            &SettingsCache::instance(), &SettingsCache::setDefaultDeckEditorType);
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
     deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -754,6 +768,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     clickPlaysAllSelectedCheckBox.setText(tr("&Clicking plays all selected cards (instead of just the clicked card)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
     closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
+    focusCardViewSearchBarCheckBox.setText(tr("Auto focus search bar when card view window is opened"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
@@ -774,6 +789,9 @@ void UserInterfaceSettingsPage::retranslateUi()
                                                              tr("ask to convert to .cod"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
                                                              tr("always convert to .cod"));
+    defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
+    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
+    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

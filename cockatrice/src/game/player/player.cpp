@@ -1864,6 +1864,7 @@ void Player::actCreateAnotherToken()
     cmd.set_pt(lastTokenInfo.pt.toStdString());
     cmd.set_annotation(lastTokenInfo.annotation.toStdString());
     cmd.set_destroy_on_zone_change(lastTokenInfo.destroy);
+    cmd.set_face_down(lastTokenInfo.faceDown);
     cmd.set_x(-1);
     cmd.set_y(lastTokenTableRow);
 
@@ -2075,6 +2076,8 @@ void Player::createCard(const CardItem *sourceCard,
             break;
 
         case CardRelation::TransformInto:
+            // allow cards to directly transform on stack
+            cmd.set_zone(sourceCard->getZone()->getName() == "stack" ? "stack" : "table");
             // Transform card zone changes are handled server-side
             cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
@@ -2240,10 +2243,10 @@ void Player::eventCreateToken(const Event_CreateToken &event)
 
     CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()),
                                   QString::fromStdString(event.card_provider_id()), event.card_id());
-    // use db PT if not provided in event
+    // use db PT if not provided in event and not face-down
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
-    } else {
+    } else if (!event.face_down()) {
         CardInfoPtr dbCard = card->getInfo();
         if (dbCard) {
             card->setPT(dbCard->getPowTough());
@@ -2252,8 +2255,9 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     card->setColor(QString::fromStdString(event.color()));
     card->setAnnotation(QString::fromStdString(event.annotation()));
     card->setDestroyOnZoneChange(event.destroy_on_zone_change());
+    card->setFaceDown(event.face_down());
 
-    emit logCreateToken(this, card->getName(), card->getPT());
+    emit logCreateToken(this, card->getName(), card->getPT(), card->getFaceDown());
     zone->addCard(card, true, event.x(), event.y());
 }
 

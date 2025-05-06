@@ -21,6 +21,7 @@ public:
     explicit CardInfoPictureWidget(QWidget *parent = nullptr,
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
+    ~CardInfoPictureWidget();
     CardInfoPtr getInfo()
     {
         return info;
@@ -52,6 +53,7 @@ protected:
     void moveEvent(QMoveEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
     void loadPixmap();
     [[nodiscard]] const QPixmap &getResizedPixmap() const
     {

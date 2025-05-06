@@ -16,7 +16,11 @@ RUN apt-get update && apt-get install -y\
   qt6-tools-dev \
   qt6-tools-dev-tools
 
-COPY . /home/servatrice/code/
+COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
+COPY ./cmake /home/servatrice/code/cmake
+COPY ./common /home/servatrice/code/common
+COPY ./servatrice /home/servatrice/code/servatrice
+
 WORKDIR /home/servatrice/code
 
 WORKDIR build
