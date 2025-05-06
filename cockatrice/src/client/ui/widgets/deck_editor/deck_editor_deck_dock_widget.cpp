@@ -294,6 +294,9 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     int restoredIndex = bannerCardComboBox->findText(currentText);
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
+        if (deckModel->getDeckList()->getBannerCard().second != bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap()["uuid"].toString()){
+            setBannerCard(restoredIndex);
+        }
     } else {
         // Add a placeholder "-" and set it as the current selection
         int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().first);
