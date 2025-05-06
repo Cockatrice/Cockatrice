@@ -95,7 +95,6 @@ void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QSet<QString> &
     }
 }
 
-
 void VisualDeckStorageTagFilterWidget::addTagsIfNotPresent(const QSet<QString> &tags)
 {
     for (const QString &tag : tags) {
