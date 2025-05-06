@@ -6,7 +6,8 @@
 #include <QString>
 #include <QWidget>
 
-enum class TagState {
+enum class TagState
+{
     NotSelected,
     Selected,
     Excluded
@@ -28,7 +29,9 @@ public:
     {
         return tagName;
     }
-    TagState getState() const { return state; }
+    TagState getState() const {
+        return state;
+    }
 
     void setState(const TagState newState)
     {
@@ -64,7 +67,7 @@ private:
     QLabel *tagLabel;         ///< Label for displaying the tag name.
     QPushButton *closeButton; ///< Button to close/remove the tag.
     QString tagName;          ///< The name of the tag.
-    TagState state;          ///< Indicates whether the tag is unselected, selected, or excluded.
+    TagState state;           ///< Indicates whether the tag is unselected, selected, or excluded.
 };
 
 #endif // DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
