@@ -7,6 +7,8 @@
 #include "../visual_deck_storage_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
+#include <QAbstractItemView>
+#include <QApplication>
 #include <QComboBox>
 #include <QEvent>
 #include <QVBoxLayout>
@@ -74,7 +76,22 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override
     {
         if (event->type() == QEvent::Wheel) {
-            return true; // Blocks the event
+            if (auto *combo = qobject_cast<QComboBox *>(obj)) {
+                // If popup is not open, forward event to parent scroll area
+                if (!combo->view()->isVisible()) {
+                    // Try to find a scrollable parent and manually send the event
+                    QWidget *parent = combo->parentWidget();
+                    while (parent) {
+                        if (auto *scroll = qobject_cast<QAbstractScrollArea *>(parent)) {
+                            QApplication::sendEvent(scroll->viewport(), event);
+                            return true; // Mark event as handled
+                        }
+                        parent = parent->parentWidget();
+                    }
+                    // If no scrollable parent found, just block
+                    return true;
+                }
+            }
         }
         return QObject::eventFilter(obj, event);
     }
