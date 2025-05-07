@@ -135,6 +135,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
