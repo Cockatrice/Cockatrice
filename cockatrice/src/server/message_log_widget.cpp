@@ -86,6 +86,8 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
         fromStr = tr(" from sideboard");
     } else if (zoneName == STACK_ZONE_NAME) {
         fromStr = tr(" from the stack");
+    } else {
+        fromStr = tr(" from custom zone '%1'").arg(zoneName);
     }
 
     if (!cardNameContainsStartZone) {
@@ -321,13 +323,16 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else if (targetZoneName == STACK_ZONE_NAME) {
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
+    } else {
+        finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
     }
 
     if (usesNewX) {
         appendHtmlServerMessage(
             finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(newX));
     } else {
-        appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second));
+        appendHtmlServerMessage(
+            finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(targetZoneName));
     }
 }
 

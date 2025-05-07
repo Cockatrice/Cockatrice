@@ -144,7 +144,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     PileZone *sb = addZone(new PileZone(this, "sb", false, false, playerArea));
     sb->setVisible(false);
 
-    table = addZone(new TableZone(this, this));
+    table = addZone(new TableZone(this, "table", this));
     connect(table, &TableZone::sizeChanged, this, &Player::updateBoundingRect);
 
     stack = addZone(new StackZone(this, (int)table->boundingRect().height(), this));
@@ -400,6 +400,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         sbMenu->addAction(aViewSideboard);
         sb->setMenu(sbMenu, aViewSideboard);
 
+        mCustomZones = playerMenu->addMenu(QString());
+        mCustomZones->menuAction()->setVisible(false);
+
         aUntapAll = new QAction(this);
         connect(aUntapAll, &QAction::triggered, this, &Player::actUntapAll);
 
@@ -455,6 +458,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     if (!local && !judge) {
         countersMenu = nullptr;
         sbMenu = nullptr;
+        mCustomZones = nullptr;
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
     }
@@ -829,6 +833,11 @@ void Player::retranslateUi()
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->setTitle(tr("&Library"));
         countersMenu->setTitle(tr("&Counters"));
+        mCustomZones->setTitle(tr("C&ustom Zones"));
+
+        for (auto aViewZone : mCustomZones->actions()) {
+            aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));
+        }
 
         aUntapAll->setText(tr("&Untap all permanents"));
         aRollDie->setText(tr("R&oll die..."));
@@ -2715,19 +2724,79 @@ void Player::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*op
 
 void Player::processPlayerInfo(const ServerInfo_Player &info)
 {
+    static QSet<QString> builtinZones{/* PileZones */
+                                      "deck", "grave", "rfg", "sb",
+                                      /* TableZone */
+                                      "table",
+                                      /* StackZone */
+                                      "stack",
+                                      /* HandZone */
+                                      "hand"};
     clearCounters();
     clearArrows();
 
-    QMapIterator<QString, CardZone *> zoneIt(zones);
+    QMutableMapIterator<QString, CardZone *> zoneIt(zones);
     while (zoneIt.hasNext()) {
         zoneIt.next().value()->clearContents();
+
+        if (!builtinZones.contains(zoneIt.key())) {
+            zoneIt.remove();
+        }
+    }
+
+    // Can be null if we are not the local player!
+    if (mCustomZones) {
+        mCustomZones->clear();
+        mCustomZones->menuAction()->setVisible(false);
     }
 
     const int zoneListSize = info.zone_list_size();
     for (int i = 0; i < zoneListSize; ++i) {
         const ServerInfo_Zone &zoneInfo = info.zone_list(i);
-        CardZone *zone = zones.value(QString::fromStdString(zoneInfo.name()), 0);
+
+        QString zoneName = QString::fromStdString(zoneInfo.name());
+        CardZone *zone = zones.value(zoneName, 0);
         if (!zone) {
+            // Create a new CardZone if it doesn't exist
+
+            if (zoneInfo.with_coords()) {
+                // Visibility not currently supported for TableZone
+                zone = addZone(new TableZone(this, zoneName, this));
+            } else {
+                // Zones without coordinats are always treated as non-shufflable
+                // PileZones, although supporting alternate hand or stack zones
+                // might make sense in some scenarios.
+                bool contentsKnown;
+
+                switch (zoneInfo.type()) {
+                    case ServerInfo_Zone::PrivateZone:
+                        contentsKnown = local || judge || (game->getSpectator() && game->getSpectatorsSeeEverything());
+                        break;
+
+                    case ServerInfo_Zone::PublicZone:
+                        contentsKnown = true;
+                        break;
+
+                    case ServerInfo_Zone::HiddenZone:
+                        contentsKnown = false;
+                        break;
+                }
+
+                zone = addZone(new PileZone(this, zoneName, /* isShufflable */ false, contentsKnown, this));
+            }
+
+            // Non-builtin zones are hidden by default and can't be interacted
+            // with, except through menus.
+            zone->setVisible(false);
+
+            if (mCustomZones) {
+                mCustomZones->menuAction()->setVisible(true);
+                QAction *aViewZone = mCustomZones->addAction(tr("View custom zone '%1'").arg(zoneName));
+                aViewZone->setData(zoneName);
+                connect(aViewZone, &QAction::triggered, this,
+                        [zoneName, this]() { static_cast<GameScene *>(scene())->toggleZoneView(this, zoneName, -1); });
+            }
+
             continue;
         }
 
