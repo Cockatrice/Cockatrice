@@ -2,6 +2,7 @@
 
 #include "../../../../deck/deck_loader.h"
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../settings/cache_settings.h"
 #include "../cards/card_info_picture_widget.h"
 
 #include <random>
@@ -12,23 +13,45 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
+    resetAndHandSizeContainerWidget = new QWidget(this);
+    resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);
+    resetAndHandSizeContainerWidget->setLayout(resetAndHandSizeLayout);
+
     resetButton = new QPushButton(this);
     connect(resetButton, SIGNAL(clicked()), this, SLOT(updateDisplay()));
-    layout->addWidget(resetButton);
+    resetAndHandSizeLayout->addWidget(resetButton);
+
+    handSizeSpinBox = new QSpinBox(this);
+    handSizeSpinBox->setValue(SettingsCache::instance().getVisualDeckEditorSampleHandSize());
+    handSizeSpinBox->setMinimum(1);
+    connect(handSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckEditorSampleHandSize);
+    connect(handSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+            &VisualDeckEditorSampleHandWidget::updateDisplay);
+    resetAndHandSizeLayout->addWidget(handSizeSpinBox);
+
+    layout->addWidget(resetAndHandSizeContainerWidget);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
-    for (CardInfoPtr card : getRandomCards(7)) {
+    cardSizeWidget = new CardSizeWidget(this, flowWidget);
+    layout->addWidget(cardSizeWidget);
+
+    for (CardInfoPtr card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
+        displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
         flowWidget->addWidget(displayWidget);
     }
+
+    retranslateUi();
 }
 
 void VisualDeckEditorSampleHandWidget::retranslateUi()
 {
-    resetButton->setText(tr("Reset"));
+    resetButton->setText(tr("Draw a new sample hand"));
+    handSizeSpinBox->setToolTip(tr("Sample hand size"));
 }
 
 void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)
@@ -41,9 +64,12 @@ void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)
 void VisualDeckEditorSampleHandWidget::updateDisplay()
 {
     flowWidget->clearLayout();
-    for (CardInfoPtr card : getRandomCards(7)) {
+    for (CardInfoPtr card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
+        displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
+        connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, displayWidget,
+                &CardInfoPictureWidget::setScaleFactor);
         flowWidget->addWidget(displayWidget);
     }
 }

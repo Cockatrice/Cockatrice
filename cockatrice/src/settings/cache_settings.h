@@ -73,6 +73,7 @@ signals:
     void visualDeckStorageSelectionAnimationChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
+    void visualDeckEditorSampleHandSizeAmountChanged(int amount);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -156,6 +157,7 @@ private:
     int defaultDeckEditorType;
     bool visualDatabaseDisplayFilterToMostRecentSetsEnabled;
     int visualDatabaseDisplayFilterToMostRecentSetsAmount;
+    int visualDeckEditorSampleHandSize;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -501,6 +503,10 @@ public:
     int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const
     {
         return visualDatabaseDisplayFilterToMostRecentSetsAmount;
+    }
+    int getVisualDeckEditorSampleHandSize() const
+    {
+        return visualDeckEditorSampleHandSize;
     }
     bool getHorizontalHand() const
     {
@@ -853,6 +859,7 @@ public slots:
     void setDefaultDeckEditorType(int value);
     void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
     void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);
+    void setVisualDeckEditorSampleHandSize(int _amount);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

@@ -291,6 +291,7 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
     visualDatabaseDisplayFilterToMostRecentSetsAmount =
         settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsamount", 10).toInt();
+    visualDeckEditorSampleHandSize = settings->value("interface/visualdeckeditorsamplehandsize", 7).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -819,6 +820,13 @@ void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _am
     settings->setValue("interface/visualdatabasedisplayfiltertomostrecentsetsamount",
                        visualDatabaseDisplayFilterToMostRecentSetsAmount);
     emit visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(visualDatabaseDisplayFilterToMostRecentSetsAmount);
+}
+
+void SettingsCache::setVisualDeckEditorSampleHandSize(int _amount)
+{
+    visualDeckEditorSampleHandSize = _amount;
+    settings->setValue("interface/visualdeckeditorsamplehandsize", visualDeckEditorSampleHandSize);
+    emit visualDeckEditorSampleHandSizeAmountChanged(visualDeckEditorSampleHandSize);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)
