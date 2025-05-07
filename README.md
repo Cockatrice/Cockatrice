@@ -8,7 +8,7 @@
    <a href="#related-repositories">Related</a> <b>|</b>
    <a href="#community-resources-">Community</a> <b>|</b>
    <a href="#contribute">Contribute</a> <b>|</b>
-   <a href="#build--">Build</a> <b>|</b>
+   <a href="#build---">Build</a> <b>|</b>
    <a href="#run">Run</a>
 </p>
 
@@ -38,8 +38,8 @@ Latest <kbd>stable</kbd> release:
 </pre><pre>
 Latest <kbd>beta</kbd> version:
 [![Download Beta Release](https://img.shields.io/github/release/cockatrice/cockatrice/all.svg?label=version&colorB=f37f40 "Download Latest Beta Release")](https://github.com/cockatrice/cockatrice/releases) ![](https://img.shields.io/github/release-date-pre/Cockatrice/Cockatrice.svg?label=released&colorB=f37f40 "Release Date") [![](https://img.shields.io/github/downloads-pre/cockatrice/cockatrice/latest/total.svg?label=downloads&colorB=f37f40 "Number of Downloads")](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0) [![](https://img.shields.io/github/commits-since/Cockatrice/Cockatrice/latest.svg?label=changes&colorB=f37f40 "Changes over Stable Release")](https://github.com/Cockatrice/Cockatrice/pulls?q=is%3Apr+is%3Aclosed)
-<sub><i>While incorporating the latest fixes and features, beta builds may not be stable and/or contain new bugs!</i></sub>
-<sub><b><i>Please report any findings when testing them!</i></b></sub>
+<sub><i>While incorporating the latest fixes and features, beta builds may not be stable or contain new bugs!</i></sub>
+<sub><b><i>Please report any findings and open new issues when testing them!</i></b></sub>
 </pre>
 
 # Related Repositories
@@ -79,10 +79,11 @@ Cockatrice tries to use the [Google Developer Documentation Style Guide](https:/
 
 <details>
 <summary><b>Kudos to our amazing contributors ❤️</b></summary>
+<br>
    <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
       <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
    </a><br>
-   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a>.</i></sub>
+   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a></i></sub>
 </details>
 
 ### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
@@ -92,7 +93,7 @@ Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Coc
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting invovled, and join a group of hundreds of others!<br>
 
 
-# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
+# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Docker](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
 
 Dependencies: *(for minimum versions search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)
@@ -149,10 +150,10 @@ The following flags (with their non-default values) can be passed to `cmake`:
 
 #### Docker
 
-You can run an instance of <kbd>Servatrice</kbd> (the Cockatrice server) using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile.<br>
+You can build an image & deploy a <kbd>Servatrice</kbd> (Cockatrice server) container using [Docker](https://www.docker.com/resources/what-container/) and our Dockerfile yourself.<br>
 
-For more information, have a look in our wiki section on [Setting up Servatrice](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).<br>
-There, you'll also find more hints on our **docker-compose** file which will configure and run both a MySQL server and Servatrice.
+For more details, look into our wiki section on [Setting up Servatrice](https://github.com/Cockatrice/Cockatrice/wiki/Setting-up-Servatrice#using-docker).<br>
+You'll also find more hints on our **pre-build image** there, or the **docker-compose** file which will configure and run both a MySQL server and Servatrice.
 
 
 # License [![GPLv2 License](https://img.shields.io/github/license/Cockatrice/Cockatrice.svg)](https://github.com/Cockatrice/Cockatrice/blob/master/LICENSE)
