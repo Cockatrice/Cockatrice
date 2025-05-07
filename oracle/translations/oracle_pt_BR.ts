@@ -63,7 +63,7 @@
         <location filename="src/oraclewizard.cpp" line="287"/>
         <source>Sets file (%1)</source>
         <oldsource>Sets JSON file (%1)</oldsource>
-        <translation type="unfinished"/>
+        <translation>Arquivo de expansões (%1)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="317"/>
