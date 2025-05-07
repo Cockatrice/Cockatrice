@@ -43,7 +43,7 @@ RemoteClient::RemoteClient(QObject *parent)
     connect(socket, &QTcpSocket::connected, this, &RemoteClient::slotConnected);
     connect(socket, &QTcpSocket::readyRead, this, &RemoteClient::readData);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     connect(socket, &QTcpSocket::errorOccurred, this, &RemoteClient::slotSocketError);
 #else
     connect(socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &RemoteClient::slotSocketError);
