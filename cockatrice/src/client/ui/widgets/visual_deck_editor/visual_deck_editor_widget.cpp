@@ -190,7 +190,12 @@ void VisualDeckEditorWidget::retranslateUi()
 {
     sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     searchPushButton->setText(tr("Quick search and add card"));
+    searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
+                                    "preferred printing to the deck on pressing enter"));
+    sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
     displayTypeButton->setText(tr("Flat Layout"));
+    displayTypeButton->setToolTip(
+        tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()

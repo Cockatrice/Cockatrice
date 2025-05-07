@@ -91,7 +91,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -567,6 +567,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     setWindowTitle(tr("Deck"));
 
     nameLabel->setText(tr("Deck &name:"));
+    quickSettingsWidget->setToolTip(tr("Banner Card/Tags Visibility Settings"));
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
