@@ -104,6 +104,8 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageCardSize);
 
     quickSettingsWidget = new SettingsButtonWidget(this);
     quickSettingsWidget->addSettingsWidget(showFoldersCheckBox);

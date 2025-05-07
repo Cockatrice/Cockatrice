@@ -34,14 +34,7 @@ CardSizeWidget::CardSizeWidget(QWidget *parent, FlowWidget *_flowWidget, int def
 
     // Debounce setup
     debounceTimer.setSingleShot(true);
-    connect(&debounceTimer, &QTimer::timeout, this, [this]() {
-        // Check the type of the parent widget
-        if (qobject_cast<PrintingSelector *>(parentWidget())) {
-            SettingsCache::instance().setPrintingSelectorCardSize(pendingValue);
-        } else if (qobject_cast<VisualDeckStorageWidget *>(parentWidget())) {
-            SettingsCache::instance().setVisualDeckStorageCardSize(pendingValue);
-        }
-    });
+    connect(&debounceTimer, &QTimer::timeout, this, [this] { emit cardSizeSettingUpdated(pendingValue); });
 
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardSizeWidget::updateCardSizeSetting);
 }

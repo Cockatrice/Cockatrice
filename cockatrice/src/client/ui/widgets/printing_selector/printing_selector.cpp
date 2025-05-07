@@ -70,6 +70,8 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     cardSizeWidget =
         new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setPrintingSelectorCardSize);
 
     displayOptionsWidget->addSettingsWidget(sortToolBar);
     displayOptionsWidget->addSettingsWidget(navigationCheckBox);

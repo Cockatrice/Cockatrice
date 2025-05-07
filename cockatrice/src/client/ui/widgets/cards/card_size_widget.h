@@ -17,8 +17,16 @@ public:
     explicit CardSizeWidget(QWidget *parent, FlowWidget *flowWidget = nullptr, int defaultValue = 100);
     [[nodiscard]] QSlider *getSlider() const;
 
-public slots:
+private slots:
     void updateCardSizeSetting(int newValue);
+
+signals:
+    /**
+     * Emitted when the slider value changes, but on a debounce timer.
+     * Any parents that care about saving the value to settings should use this signal to indicate when to save the new
+     * value to settings.
+     */
+    void cardSizeSettingUpdated(int newValue);
 
 private:
     QWidget *parent;
