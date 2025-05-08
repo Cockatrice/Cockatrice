@@ -84,12 +84,10 @@ bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
     if (QFile::exists(newFileName)) {
-        QMessageBox::StandardButton reply = QMessageBox::question(
-            parent,
-            QObject::tr("Overwrite Existing File?"),
-            QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
-            QMessageBox::Yes | QMessageBox::No
-        );
+        QMessageBox::StandardButton reply =
+            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
+                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
+                                  QMessageBox::Yes | QMessageBox::No);
         return reply == QMessageBox::Yes;
     }
     return true; // Safe to proceed
