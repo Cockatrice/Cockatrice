@@ -39,6 +39,7 @@ public:
         None,
         Filepath
     };
+    Q_ENUM(TooltipType)
 
     explicit VisualDeckStorageQuickSettingsWidget(QWidget *parent = nullptr);
 
