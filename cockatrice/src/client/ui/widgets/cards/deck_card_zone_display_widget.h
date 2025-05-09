@@ -19,6 +19,7 @@ class DeckCardZoneDisplayWidget : public QWidget
 public:
     DeckCardZoneDisplayWidget(QWidget *parent,
                               DeckListModel *deckListModel,
+                              QPersistentModelIndex trackedIndex,
                               QString zoneName,
                               QString activeGroupCriteria,
                               QStringList activeSortCriteria,
@@ -27,6 +28,7 @@ public:
                               int subBannerOpacity,
                               CardSizeWidget *_cardSizeWidget);
     DeckListModel *deckListModel;
+    QPersistentModelIndex trackedIndex;
     QString zoneName;
     void addCardsToOverlapWidget();
     void resizeEvent(QResizeEvent *event) override;
@@ -37,10 +39,11 @@ public slots:
     void displayCards();
     void refreshDisplayType(const DisplayType &displayType);
     void addCardGroupIfItDoesNotExist();
-    void deleteCardGroupIfItDoesNotExist();
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
     QList<QString> getGroupCriteriaValueList();
+    void onCategoryAddition(const QModelIndex &parent, int first, int last);
+    void onCategoryRemoval(const QModelIndex &parent, int first, int last);
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
@@ -59,6 +62,7 @@ private:
     QWidget *cardGroupContainer;
     QVBoxLayout *cardGroupLayout;
     OverlapWidget *overlapWidget;
+    QHash<QPersistentModelIndex, QWidget*> indexToWidgetMap;
 };
 
 #endif // DECK_CARD_ZONE_DISPLAY_WIDGET_H

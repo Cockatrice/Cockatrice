@@ -312,7 +312,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     } else {
         emitRecursiveUpdates(parent);
     }
-    emit dataChanged(parent, parent);
+
     return true;
 }
 

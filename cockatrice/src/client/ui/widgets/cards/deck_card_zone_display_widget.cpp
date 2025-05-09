@@ -9,6 +9,7 @@
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,
+                                                     QPersistentModelIndex _trackedIndex,
                                                      QString _zoneName,
                                                      QString _activeGroupCriteria,
                                                      QStringList _activeSortCriteria,
@@ -16,7 +17,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      int bannerOpacity,
                                                      int subBannerOpacity,
                                                      CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
+    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
       activeSortCriteria(_activeSortCriteria), displayType(_displayType), bannerOpacity(bannerOpacity),
       subBannerOpacity(subBannerOpacity), cardSizeWidget(_cardSizeWidget)
 {
@@ -34,8 +35,65 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     banner->setBuddy(cardGroupContainer);
 
     displayCards();
-    connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::displayCards);
+    //connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::displayCards);
+    //connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::decklistDataChanged);
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
 }
+
+void DeckCardZoneDisplayWidget::onCategoryAddition(const QModelIndex &parent, int first, int last)
+{
+    if (parent == trackedIndex) {
+        for (int i = first; i <= last; i++) {
+            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 1, trackedIndex));
+
+            if (indexToWidgetMap.contains(index)) {
+                continue;
+            }
+
+            qInfo() << deckListModel->data(index, Qt::EditRole).toString();
+
+            if (displayType == "overlap") {
+                auto *display_widget = new OverlappedCardGroupDisplayWidget(
+                    cardGroupContainer, deckListModel, zoneName, deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria, activeSortCriteria,
+                    subBannerOpacity, cardSizeWidget);
+                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                        SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+                cardGroupLayout->addWidget(display_widget);
+                indexToWidgetMap.insert(index, display_widget);
+            } else if (displayType == "flat") {
+                auto *display_widget = new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName,
+                                                                      deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria, activeSortCriteria,
+                                                                      subBannerOpacity, cardSizeWidget);
+                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                        SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+                connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
+                        &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
+                cardGroupLayout->addWidget(display_widget);
+                indexToWidgetMap.insert(index, display_widget);
+            }
+        }
+    }
+}
+
+void DeckCardZoneDisplayWidget::onCategoryRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            cardGroupLayout->removeWidget(indexToWidgetMap.value(idx));
+            indexToWidgetMap.value(idx)->deleteLater();
+            indexToWidgetMap.remove(idx);
+        }
+    }
+}
+
 void DeckCardZoneDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
@@ -57,8 +115,6 @@ void DeckCardZoneDisplayWidget::onHover(CardInfoPtr card)
 
 void DeckCardZoneDisplayWidget::displayCards()
 {
-    addCardGroupIfItDoesNotExist();
-    deleteCardGroupIfItDoesNotExist();
 }
 
 void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
@@ -123,21 +179,6 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
             connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
                     &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
             cardGroupLayout->addWidget(display_widget);
-        }
-    }
-}
-
-void DeckCardZoneDisplayWidget::deleteCardGroupIfItDoesNotExist()
-{
-    QList<CardGroupDisplayWidget *> cardGroupsDisplayWidgets =
-        cardGroupContainer->findChildren<CardGroupDisplayWidget *>();
-
-    QList<QString> validGroups = getGroupCriteriaValueList();
-
-    for (CardGroupDisplayWidget *cardGroupDisplayWidget : cardGroupsDisplayWidgets) {
-        if (!validGroups.contains(cardGroupDisplayWidget->cardGroupCategory)) {
-            cardGroupLayout->removeWidget(cardGroupDisplayWidget);
-            cardGroupDisplayWidget->deleteLater(); // Properly delete the widget after the event loop cycles
         }
     }
 }

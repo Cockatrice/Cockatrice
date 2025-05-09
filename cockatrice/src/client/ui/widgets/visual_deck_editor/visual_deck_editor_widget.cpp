@@ -26,8 +26,6 @@
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)
 {
-    connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
-
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout = new QVBoxLayout(this);
@@ -175,13 +173,16 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 
-    updateZoneWidgets();
-
     cardSizeWidget = new CardSizeWidget(this);
 
     mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(cardSizeWidget);
+
+    connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &VisualDeckEditorWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &VisualDeckEditorWidget::onCardRemoval);
+    constructZoneWidgetsFromDeckListModel();
 
     retranslateUi();
 }
@@ -198,10 +199,81 @@ void VisualDeckEditorWidget::retranslateUi()
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
 
+void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
+{
+    if (parent == deckListModel->getRoot()) {
+        for (int i = first; i <= last; i++) {
+            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 1, deckListModel->getRoot()));
+
+            if (indexToWidgetMap.contains(index)) {
+                continue;
+            }
+
+            qInfo() << deckListModel->data(index, Qt::EditRole).toString();
+
+            DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
+                zoneContainer, deckListModel, index, deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria,
+                activeSortCriteria, 20, 10, cardSizeWidget);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+            connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+            connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
+            connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
+                    &DeckCardZoneDisplayWidget::refreshDisplayType);
+            zoneContainerLayout->addWidget(zoneDisplayWidget);
+
+            indexToWidgetMap.insert(index, zoneDisplayWidget);
+        }
+    }
+}
+
+void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            zoneContainerLayout->removeWidget(indexToWidgetMap.value(idx));
+            indexToWidgetMap.value(idx)->deleteLater();
+            indexToWidgetMap.remove(idx);
+        }
+    }
+}
+
+void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
+{
+    qInfo() << "Constructing zone widgets";
+    for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); ++i) {
+        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 1, deckListModel->getRoot()));
+
+        if (indexToWidgetMap.contains(index)) {
+            continue;
+        }
+
+        qInfo() << deckListModel->data(index, Qt::EditRole).toString();
+
+        DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
+            zoneContainer, deckListModel, index, deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria,
+            activeSortCriteria, 20, 10, cardSizeWidget);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+        connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::refreshDisplayType);
+        zoneContainerLayout->addWidget(zoneDisplayWidget);
+
+        indexToWidgetMap.insert(index, zoneDisplayWidget);
+    }
+}
+
 void VisualDeckEditorWidget::updateZoneWidgets()
 {
-    addZoneIfDoesNotExist();
-    deleteZoneIfDoesNotExist();
 }
 
 void VisualDeckEditorWidget::updateDisplayType()
@@ -219,57 +291,6 @@ void VisualDeckEditorWidget::updateDisplayType()
             break;
     }
     emit displayTypeChanged(currentDisplayType);
-}
-
-void VisualDeckEditorWidget::addZoneIfDoesNotExist()
-{
-    QList<DeckCardZoneDisplayWidget *> cardZoneDisplayWidgets =
-        zoneContainer->findChildren<DeckCardZoneDisplayWidget *>();
-    for (const QString &zone : *deckListModel->getZones()) {
-        bool found = false;
-        for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
-            if (displayWidget->zoneName == zone) {
-                found = true;
-                displayWidget->displayCards();
-                break;
-            }
-        }
-
-        if (found) {
-            continue;
-        }
-        DeckCardZoneDisplayWidget *zoneDisplayWidget =
-            new DeckCardZoneDisplayWidget(zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria,
-                                          currentDisplayType, 20, 10, cardSizeWidget);
-        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
-        connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
-                &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
-        connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
-                &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
-        connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
-                &DeckCardZoneDisplayWidget::refreshDisplayType);
-        zoneContainerLayout->addWidget(zoneDisplayWidget);
-    }
-}
-
-void VisualDeckEditorWidget::deleteZoneIfDoesNotExist()
-{
-    QList<DeckCardZoneDisplayWidget *> cardZoneDisplayWidgets =
-        zoneContainer->findChildren<DeckCardZoneDisplayWidget *>();
-    for (DeckCardZoneDisplayWidget *displayWidget : cardZoneDisplayWidgets) {
-        bool found = false;
-        for (const QString &zone : *deckListModel->getZones()) {
-            if (displayWidget->zoneName == zone) {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            zoneContainerLayout->removeWidget(displayWidget);
-        }
-    }
 }
 
 void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
