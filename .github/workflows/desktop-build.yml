@@ -111,11 +111,6 @@ jobs:
             package: RPM
 
           - distro: Ubuntu
-            version: 20.04
-            package: DEB
-            test: skip    # Ubuntu 20.04 has a broken Qt for debug builds
-
-          - distro: Ubuntu
             version: 22.04
             package: DEB
             test: skip    # Running tests on all distros is superfluous
