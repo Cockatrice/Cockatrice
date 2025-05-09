@@ -79,7 +79,6 @@ void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 
 void AbstractTabDeckEditor::onDeckChanged()
 {
-
 }
 
 void AbstractTabDeckEditor::onDeckModified()
