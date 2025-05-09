@@ -92,6 +92,10 @@ signals:
 public:
     explicit DeckListModel(QObject *parent = nullptr);
     ~DeckListModel() override;
+    QModelIndex getRoot() const
+    {
+        return nodeToIndex(root);
+    };
     QString getSortCriteriaForCard(CardInfoPtr info);
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;

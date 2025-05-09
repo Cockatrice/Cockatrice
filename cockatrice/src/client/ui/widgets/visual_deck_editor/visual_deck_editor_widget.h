@@ -41,8 +41,9 @@ public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void updateZoneWidgets();
     void updateDisplayType();
-    void addZoneIfDoesNotExist();
-    void deleteZoneIfDoesNotExist();
+    void onCardAddition(const QModelIndex &parent, int first, int last);
+    void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void constructZoneWidgetsFromDeckListModel();
 
 signals:
     void activeCardChanged(CardInfoPtr activeCard);
@@ -83,6 +84,7 @@ private:
     QVBoxLayout *zoneContainerLayout;
     // OverlapControlWidget *overlapControlWidget;
     QWidget *container;
+    QHash<QPersistentModelIndex, QWidget*> indexToWidgetMap;
 };
 
 #endif // VISUAL_DECK_EDITOR_H
