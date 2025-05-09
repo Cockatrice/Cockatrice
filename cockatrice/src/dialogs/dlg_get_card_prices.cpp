@@ -162,7 +162,7 @@ void DlgGetCardPrices::startCardPriceRequests()
 
             if (excludeLandsCheckBox->isChecked()) {
                 CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(cardName);
-                if (!card  || card->getMainCardType() == "Land")
+                if (!card || card->getMainCardType() == "Land")
                     continue;
             }
 

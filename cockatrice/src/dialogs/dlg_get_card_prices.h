@@ -10,8 +10,8 @@
 #include <QMap>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QPushButton>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QStringList>
 #include <QTableWidget>
 
@@ -19,27 +19,29 @@ class DeckListModel;
 class QLabel;
 class QScrollArea;
 
-class CardPriceTableWidgetItem : public QTableWidgetItem {
+class CardPriceTableWidgetItem : public QTableWidgetItem
+{
 public:
     // Constructor
-    CardPriceTableWidgetItem(const QString &text) : QTableWidgetItem(text) {}
+    CardPriceTableWidgetItem(const QString &text) : QTableWidgetItem(text)
+    {
+    }
 
     bool operator<(const QTableWidgetItem &other) const override
     {
         bool ok1, ok2;
-        double val1 = text().remove('%').toDouble(&ok1);  // Remove '%' and convert to double
-        double val2 = other.text().remove('%').toDouble(&ok2);  // Remove '%' and convert to double
+        double val1 = text().remove('%').toDouble(&ok1);       // Remove '%' and convert to double
+        double val2 = other.text().remove('%').toDouble(&ok2); // Remove '%' and convert to double
 
         // Handle non-numeric cases gracefully
         if (ok1 && ok2) {
-            return val1 < val2;  // Compare as double values
+            return val1 < val2; // Compare as double values
         }
 
         // If conversion to double failed, fallback to string comparison
         return text() < other.text();
     }
 };
-
 
 class DlgGetCardPrices : public QDialog
 {
@@ -48,11 +50,11 @@ class DlgGetCardPrices : public QDialog
 public:
     explicit DlgGetCardPrices(QWidget *parent, DeckListModel *_model);
 
-    signals:
-        void allRequestsFinished();
+signals:
+    void allRequestsFinished();
 
-    private slots:
-        void onCardPriceReply();
+private slots:
+    void onCardPriceReply();
     void onAllRequestsFinished();
     void actOK();
     void onSelectionChanged();
@@ -95,7 +97,6 @@ private:
 
     int totalCardsToProcess = 0;
     int finishedCardCount = 0;
-
 };
 
 #endif // DLG_GET_CARD_PRICES_H
