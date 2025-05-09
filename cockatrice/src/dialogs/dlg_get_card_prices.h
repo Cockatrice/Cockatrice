@@ -5,10 +5,12 @@
 #include "../deck/deck_list_model.h"
 
 #include <QCheckBox> // Include for the checkbox
+#include <QComboBox>
 #include <QDialog>
 #include <QMap>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPushButton>
 #include <QProgressBar>
 #include <QStringList>
 #include <QTableWidget>
@@ -54,7 +56,9 @@ public:
     void onAllRequestsFinished();
     void actOK();
     void onSelectionChanged();
-    void onExcludeLandsChanged(bool checked);  // Slot for handling checkbox state change
+    void onExcludeLandsChanged(bool checked);
+    void onAllPrintingsChanged(bool checked);
+    void onCurrencyChanged(int index);
 
 private:
     void retranslateUi();
@@ -71,16 +75,19 @@ private:
     int pendingRequests = 0;
     int totalRequests = 0;
     int finishedRequests = 0;
-    QMap<QString, QStringList> setCards; // Result storage
-    double totalPrice = 0.0;  // Tracks total price of all cards
+    QMap<QString, QStringList> setCards;
+    double totalPrice = 0.0;
     double totalMinPrice = 0.0;
     double totalMaxPrice = 0.0;
-    QCheckBox *excludeLandsCheckBox;  // CheckBox to exclude lands
+    QCheckBox *allPrintingsCheckBox;
+    QCheckBox *excludeLandsCheckBox;
+    QComboBox *currencyComboBox;
     QMap<QString, QList<QString>> printingsByCardName;
     QMap<QString, double> uuidPrices;
     QMap<QString, QString> uuidToCardName;
     QMap<QString, int> pendingPerCard;
     QMap<QString, QString> actualUuidsByCardName;
+    QPushButton *fetchButton;
     QProgressBar *progressBar;
     QProgressBar *uuidProgressBar;
     QLabel *progressLabel;

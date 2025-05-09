@@ -6,6 +6,7 @@
 #include "../game/cards/card_database_manager.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QItemSelectionModel>
@@ -14,6 +15,7 @@
 #include <QLabel>
 #include <QNetworkRequest>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QSplitter>
 #include <QTableWidget>
@@ -21,6 +23,7 @@
 #include <QUrlQuery>
 #include <QVBoxLayout>
 #include <limits>
+#include <qdialogbuttonbox.h>
 
 DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDialog(parent), model(_model)
 {
@@ -31,18 +34,34 @@ DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDi
     instructionLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     minTotalLabel = new QLabel(this);
+    minTotalLabel->setHidden(true);
     maxTotalLabel = new QLabel(this);
+    maxTotalLabel->setHidden(true);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
+
+    allPrintingsCheckBox = new QCheckBox("Check prices for all printings of every card", this);
+    allPrintingsCheckBox->setChecked(false);
+    connect(allPrintingsCheckBox, &QCheckBox::toggled, this, &DlgGetCardPrices::onAllPrintingsChanged);
 
     excludeLandsCheckBox = new QCheckBox("Exclude Lands", this);
     excludeLandsCheckBox->setChecked(true);
     connect(excludeLandsCheckBox, &QCheckBox::toggled, this, &DlgGetCardPrices::onExcludeLandsChanged);
 
+    currencyComboBox = new QComboBox(this);
+    currencyComboBox->addItem("Euro (€)", QVariant(QString("eur")));
+    currencyComboBox->addItem("US Dollar ($)", QVariant(QString("usd")));
+    currencyComboBox->setCurrentIndex(0);
+    connect(currencyComboBox, &QComboBox::currentIndexChanged, this, &DlgGetCardPrices::onCurrencyChanged);
+
     tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(4);
-    tableWidget->setHorizontalHeaderLabels({"Card Name", "Actual", "Min", "Max"});
+    tableWidget->setColumnCount(7);
+    tableWidget->setHorizontalHeaderLabels({"Card Name", "Actual", "Actual Set", "Min", "Min Set", "Max", "Max Set"});
+    tableWidget->setColumnHidden(3, true);
+    tableWidget->setColumnHidden(4, true);
+    tableWidget->setColumnHidden(5, true);
+    tableWidget->setColumnHidden(6, true);
 
     tableWidget->setSelectionMode(QAbstractItemView::MultiSelection);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -57,16 +76,18 @@ DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDi
     scrollArea->setWidgetResizable(true);
     scrollArea->setWidget(tableWidget);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgGetCardPrices::actOK);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+    fetchButton = new QPushButton(this);
+    buttonBox->addButton(fetchButton, QDialogButtonBox::ButtonRole::ActionRole);
+    connect(fetchButton, &QPushButton::clicked, this, &DlgGetCardPrices::actOK);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgGetCardPrices::reject);
 
     QHBoxLayout *progressLayout = new QHBoxLayout();
     progressBar = new QProgressBar(this);
-    progressLabel = new QLabel("0/0 cards loaded", this);
+    progressLabel = new QLabel(this);
 
     uuidProgressBar = new QProgressBar(this);
-    uuidProgressLabel = new QLabel("0/0 prices fetched", this);
+    uuidProgressLabel = new QLabel(this);
 
     progressBar->setMinimum(0);
     progressBar->setMaximum(0); // Set to 0 until we know how many cards
@@ -84,7 +105,9 @@ DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDi
     mainLayout->addWidget(instructionLabel);
     mainLayout->addWidget(minTotalLabel);
     mainLayout->addWidget(maxTotalLabel);
+    mainLayout->addWidget(allPrintingsCheckBox);
     mainLayout->addWidget(excludeLandsCheckBox);
+    mainLayout->addWidget(currencyComboBox);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(buttonBox);
     mainLayout->addLayout(progressLayout);
@@ -92,8 +115,6 @@ DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDi
     retranslateUi();
 
     connect(this, &DlgGetCardPrices::allRequestsFinished, this, &DlgGetCardPrices::onAllRequestsFinished);
-
-    startCardPriceRequests();
 }
 
 void DlgGetCardPrices::startCardPriceRequests()
@@ -141,7 +162,7 @@ void DlgGetCardPrices::startCardPriceRequests()
 
             if (excludeLandsCheckBox->isChecked()) {
                 CardInfoPtr card = CardDatabaseManager::getInstance()->getCard(cardName);
-                if (card->getMainCardType() == "Land")
+                if (!card  || card->getMainCardType() == "Land")
                     continue;
             }
 
@@ -152,16 +173,20 @@ void DlgGetCardPrices::startCardPriceRequests()
             QString actualUuid = currentCard->getCardProviderId();
             QList<QString> &uuidList = printingsByCardName[cardName];
 
-            CardInfoPerSetMap allSets = info->getSets();
-            for (QList cardsInSet : allSets) {
-                for (CardInfoPerSet cardInSet : cardsInSet) {
-                    QString uuid = cardInSet.getProperty("uuid");
-                    uuidList.append(uuid);
-                    uuidToCardName[uuid] = cardName;
+            if (allPrintingsCheckBox->isChecked()) {
+                CardInfoPerSetMap allSets = info->getSets();
+                for (QList cardsInSet : allSets) {
+                    for (CardInfoPerSet cardInSet : cardsInSet) {
+                        QString uuid = cardInSet.getProperty("uuid");
+                        uuidList.append(uuid);
+                        uuidToCardName[uuid] = cardName;
+                    }
                 }
+            } else {
+                uuidList.append(actualUuid);
+                uuidToCardName[actualUuid] = cardName;
             }
 
-            // Make sure no duplicates
             uuidList.removeDuplicates();
 
             pendingPerCard[cardName] = uuidList.size();
@@ -169,7 +194,7 @@ void DlgGetCardPrices::startCardPriceRequests()
             totalCardsToProcess++;
             progressBar->setMaximum(totalCardsToProcess);
             progressBar->setValue(0);
-            progressLabel->setText(QString("0/%1 cards loaded").arg(totalCardsToProcess));
+            progressLabel->setText(QString(tr("0/%1 cards loaded")).arg(totalCardsToProcess));
             finishedCardCount = 0;
 
             for (const QString &uuid : uuidList) {
@@ -213,7 +238,7 @@ void DlgGetCardPrices::onCardPriceReply()
             QJsonObject obj = jsonDoc.object();
             if (obj.contains("prices") && obj["prices"].isObject()) {
                 QJsonObject prices = obj["prices"].toObject();
-                double eurValue = prices["eur"].toString().toDouble();
+                double eurValue = prices[currencyComboBox->currentData(Qt::UserRole).toString()].toString().toDouble();
                 uuidPrices[uuid] = eurValue;
             }
         }
@@ -225,15 +250,17 @@ void DlgGetCardPrices::onCardPriceReply()
 
     finishedRequests++;
     uuidProgressBar->setValue(finishedRequests);
-    uuidProgressLabel->setText(QString("%1/%2 prices fetched").arg(finishedRequests).arg(totalRequests));
+    uuidProgressLabel->setText(QString(tr("%1/%2 prices fetched")).arg(finishedRequests).arg(totalRequests));
 
     if (--pendingPerCard[cardName] == 0) {
         finishedCardCount++;
         progressBar->setValue(finishedCardCount);
-        progressLabel->setText(QString("%1/%2 cards loaded").arg(finishedCardCount).arg(totalCardsToProcess));
+        progressLabel->setText(QString(tr("%1/%2 cards loaded")).arg(finishedCardCount).arg(totalCardsToProcess));
 
         const QList<QString> &uuids = printingsByCardName.value(cardName);
         QString actualUuid = actualUuidsByCardName.value(cardName);
+        QString minUuid = "";
+        QString maxUuid = "";
 
         double minPrice = std::numeric_limits<double>::max();
         double maxPrice = std::numeric_limits<double>::lowest();
@@ -243,18 +270,24 @@ void DlgGetCardPrices::onCardPriceReply()
 
         for (const QString &u : uuids) {
             double price = uuidPrices.value(u, -1.0);
-            if (price <= 0.0)
+            if (price <= 0.0) {
                 continue;
+            }
 
             hasValidPrice = true;
 
-            if (u == actualUuid)
+            if (u == actualUuid) {
                 actualPrice = price;
+            }
 
-            if (price <= minPrice)
+            if (price <= minPrice) {
                 minPrice = price;
-            if (price >= maxPrice)
+                minUuid = u;
+            }
+            if (price >= maxPrice) {
                 maxPrice = price;
+                maxUuid = u;
+            }
         }
 
         if (!hasValidPrice) {
@@ -265,9 +298,13 @@ void DlgGetCardPrices::onCardPriceReply()
             tableWidget->setItem(row, 1, new CardPriceTableWidgetItem("N/A"));
             tableWidget->setItem(row, 2, new CardPriceTableWidgetItem("N/A"));
             tableWidget->setItem(row, 3, new CardPriceTableWidgetItem("N/A"));
+            tableWidget->setItem(row, 4, new CardPriceTableWidgetItem("N/A"));
+            tableWidget->setItem(row, 5, new CardPriceTableWidgetItem("N/A"));
+            tableWidget->setItem(row, 6, new CardPriceTableWidgetItem("N/A"));
         } else {
-            if (actualPrice < 0.0)
-                actualPrice = minPrice;  // fallback
+            if (actualPrice < 0.0) {
+                actualPrice = minPrice; // fallback
+            }
 
             totalPrice += actualPrice;
             totalMinPrice += minPrice;
@@ -277,8 +314,23 @@ void DlgGetCardPrices::onCardPriceReply()
             tableWidget->insertRow(row);
             tableWidget->setItem(row, 0, new CardPriceTableWidgetItem(cardName));
             tableWidget->setItem(row, 1, new CardPriceTableWidgetItem(QString::number(actualPrice, 'f', 2)));
-            tableWidget->setItem(row, 2, new CardPriceTableWidgetItem(QString::number(minPrice, 'f', 2)));
-            tableWidget->setItem(row, 3, new CardPriceTableWidgetItem(QString::number(maxPrice, 'f', 2)));
+            tableWidget->setItem(row, 2,
+                                 new CardPriceTableWidgetItem(CardDatabaseManager::getInstance()
+                                                                  ->getSpecificSetForCard(cardName, actualUuid)
+                                                                  .getPtr()
+                                                                  ->getShortName()));
+            tableWidget->setItem(row, 3, new CardPriceTableWidgetItem(QString::number(minPrice, 'f', 2)));
+            tableWidget->setItem(row, 4,
+                                 new CardPriceTableWidgetItem(CardDatabaseManager::getInstance()
+                                                                  ->getSpecificSetForCard(cardName, minUuid)
+                                                                  .getPtr()
+                                                                  ->getShortName()));
+            tableWidget->setItem(row, 5, new CardPriceTableWidgetItem(QString::number(maxPrice, 'f', 2)));
+            tableWidget->setItem(row, 6,
+                                 new CardPriceTableWidgetItem(CardDatabaseManager::getInstance()
+                                                                  ->getSpecificSetForCard(cardName, maxUuid)
+                                                                  .getPtr()
+                                                                  ->getShortName()));
         }
     }
 
@@ -290,12 +342,18 @@ void DlgGetCardPrices::onCardPriceReply()
 
 void DlgGetCardPrices::onAllRequestsFinished()
 {
-    instructionLabel->setText(tr("Total Price: %1 EUR (%2%)")
-                              .arg(totalPrice, 0, 'f', 2)
-                              .arg(100.0, 0, 'f', 2));
+    instructionLabel->setText(tr("Total Price: %1 %2 (%3%)")
+                                  .arg(totalPrice, 0, 'f', 2)
+                                  .arg(currencyComboBox->currentData(Qt::DisplayRole).toString())
+                                  .arg(100.0, 0, 'f', 2));
 
-    minTotalLabel->setText(tr("Minimum Possible Total: %1 EUR").arg(totalMinPrice, 0, 'f', 2));
-    maxTotalLabel->setText(tr("Maximum Possible Total: %1 EUR").arg(totalMaxPrice, 0, 'f', 2));
+    minTotalLabel->setText(tr("Minimum Possible Total: %1 %2")
+                               .arg(totalMinPrice, 0, 'f', 2)
+                               .arg(currencyComboBox->currentData(Qt::DisplayRole).toString()));
+    maxTotalLabel->setText(tr("Maximum Possible Total: %1 %2")
+                               .arg(totalMaxPrice, 0, 'f', 2)
+                               .arg(currencyComboBox->currentData(Qt::DisplayRole).toString()));
+    fetchButton->setDisabled(false);
 }
 
 void DlgGetCardPrices::onSelectionChanged()
@@ -314,15 +372,33 @@ void DlgGetCardPrices::onSelectionChanged()
 void DlgGetCardPrices::onExcludeLandsChanged(bool checked)
 {
     Q_UNUSED(checked)
-    startCardPriceRequests();
+}
+
+void DlgGetCardPrices::onCurrencyChanged(int index)
+{
+    Q_UNUSED(index);
+}
+
+void DlgGetCardPrices::onAllPrintingsChanged(bool checked)
+{
+    minTotalLabel->setHidden(!checked);
+    maxTotalLabel->setHidden(!checked);
+    tableWidget->setColumnHidden(3, !checked);
+    tableWidget->setColumnHidden(4, !checked);
+    tableWidget->setColumnHidden(5, !checked);
+    tableWidget->setColumnHidden(6, !checked);
 }
 
 void DlgGetCardPrices::retranslateUi()
 {
-    instructionLabel->setText(tr("Fetching card prices... Please wait."));
+    instructionLabel->setText(tr("Press fetch to start."));
+    fetchButton->setText(tr("Fetch!"));
+    progressLabel->setText(tr("0/0 cards loaded"));
+    uuidProgressLabel->setText(tr("0/0 prices fetched"));
 }
 
 void DlgGetCardPrices::actOK()
 {
-    accept();
+    fetchButton->setDisabled(true);
+    startCardPriceRequests();
 }
