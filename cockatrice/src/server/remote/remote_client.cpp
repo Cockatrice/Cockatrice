@@ -415,7 +415,7 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
     ServerMessage newServerMessage;
     newServerMessage.ParseFromArray(message.data(), message.length());
 
-    qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+    //qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
 
     processProtocolItem(newServerMessage);
 }
