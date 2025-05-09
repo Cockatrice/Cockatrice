@@ -4,6 +4,7 @@
 #include "visual_deck_storage_widget.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QSpinBox>
 
 VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
@@ -80,6 +81,26 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacityLabel);
     unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacitySpinBox);
 
+    // tooltip selector
+    auto deckPreviewTooltipWidget = new QWidget(this);
+
+    deckPreviewTooltipLabel = new QLabel(deckPreviewTooltipWidget);
+    deckPreviewTooltipComboBox = new QComboBox(deckPreviewTooltipWidget);
+    deckPreviewTooltipComboBox->setFocusPolicy(Qt::StrongFocus);
+    deckPreviewTooltipComboBox->addItem("", TooltipType::None);
+    deckPreviewTooltipComboBox->addItem("", TooltipType::Filepath);
+
+    deckPreviewTooltipComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageTooltipType());
+    connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this] { emit deckPreviewTooltipChanged(getDeckPreviewTooltip()); });
+    connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageTooltipType);
+
+    auto deckPreviewTooltipLayout = new QHBoxLayout(deckPreviewTooltipWidget);
+    deckPreviewTooltipLayout->setContentsMargins(11, 0, 11, 0);
+    deckPreviewTooltipLayout->addWidget(deckPreviewTooltipLabel);
+    deckPreviewTooltipLayout->addWidget(deckPreviewTooltipComboBox);
+
     // card size slider
     cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
@@ -95,6 +116,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     this->addSettingsWidget(searchFolderNamesCheckBox);
     this->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
     this->addSettingsWidget(unusedColorIdentityOpacityWidget);
+    this->addSettingsWidget(deckPreviewTooltipWidget);
     this->addSettingsWidget(cardSizeWidget);
 
     connect(&SettingsCache::instance(), &SettingsCache::langChanged, this,
@@ -112,6 +134,10 @@ void VisualDeckStorageQuickSettingsWidget::retranslateUi()
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
     unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
     unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
+
+    deckPreviewTooltipLabel->setText(tr("Deck tooltip:"));
+    deckPreviewTooltipComboBox->setItemText(0, tr("None"));
+    deckPreviewTooltipComboBox->setItemText(1, tr("Filepath"));
 }
 
 bool VisualDeckStorageQuickSettingsWidget::getShowFolders() const
@@ -147,6 +173,11 @@ bool VisualDeckStorageQuickSettingsWidget::getSearchFolderNames() const
 int VisualDeckStorageQuickSettingsWidget::getUnusedColorIdentitiesOpacity() const
 {
     return unusedColorIdentitiesOpacitySpinBox->value();
+}
+
+VisualDeckStorageQuickSettingsWidget::TooltipType VisualDeckStorageQuickSettingsWidget::getDeckPreviewTooltip() const
+{
+    return deckPreviewTooltipComboBox->currentData().value<TooltipType>();
 }
 
 int VisualDeckStorageQuickSettingsWidget::getCardSize() const
