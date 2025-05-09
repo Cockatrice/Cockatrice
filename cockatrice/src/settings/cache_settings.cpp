@@ -280,6 +280,7 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
         settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
+    visualDeckStorageTooltipType = settings->value("interface/visualdeckstoragetooltiptype", 0).toInt();
     visualDeckStoragePromptForConversion =
         settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
     visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
@@ -772,6 +773,12 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
     emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
+}
+
+void SettingsCache::setVisualDeckStorageTooltipType(int value)
+{
+    visualDeckStorageTooltipType = value;
+    settings->setValue("interface/visualdeckstoragetooltiptype", visualDeckStorageTooltipType);
 }
 
 void SettingsCache::setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion)

@@ -251,6 +251,9 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(
     int /* _visualDeckStorageUnusedColorIdentitiesOpacity */)
 {
 }
+void SettingsCache::setVisualDeckStorageTooltipType(int /* value */)
+{
+}
 void SettingsCache::setVisualDeckStoragePromptForConversion(bool /* _visualDeckStoragePromptForConversion */)
 {
 }
