@@ -104,6 +104,19 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
     deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
 
+    activeGroupCriteriaLabel = new QLabel(this);
+
+    activeGroupCriteriaComboBox = new QComboBox(this);
+    activeGroupCriteriaComboBox->addItem(tr("Main Type"), DeckListModelGroupCriteria::MAIN_TYPE);
+    activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
+    activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
+    connect(activeGroupCriteriaComboBox, &QComboBox::currentIndexChanged, [this]() {
+        deckModel->setActiveGroupCriteria(
+            static_cast<DeckListModelGroupCriteria>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
+        deckView->expandAll();
+        deckView->expandAll();
+    });
+
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -144,6 +157,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
 
+    upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
+
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
     auto *hashSizePolicy = new QSizePolicy();
@@ -153,6 +169,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     hashLabel->setObjectName("hashLabel");
     hashLabel->setReadOnly(true);
     hashLabel->setFrame(false);
+
+
 
     auto *lowerLayout = new QGridLayout;
     lowerLayout->setObjectName("lowerLayout");
@@ -578,6 +596,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
+    activeGroupCriteriaLabel->setText(tr("Group by:"));
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));
