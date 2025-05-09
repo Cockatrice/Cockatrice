@@ -1,6 +1,6 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../../../../../../../../../mnt/games-hdd/coding/CLionProjects/Cockatrice/cockatrice/src/dialogs/dlg_get_card_prices.h"
+#include "../../../../dialogs/dlg_get_card_prices.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 
