@@ -110,7 +110,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     activeGroupCriteriaComboBox->addItem(tr("Main Type"), DeckListModelGroupCriteria::MAIN_TYPE);
     activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
     activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
-    connect(activeGroupCriteriaComboBox, &QComboBox::currentIndexChanged, [this]() {
+    connect(activeGroupCriteriaComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
         deckModel->setActiveGroupCriteria(
             static_cast<DeckListModelGroupCriteria>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
         deckView->expandAll();
@@ -169,8 +169,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
     hashLabel->setObjectName("hashLabel");
     hashLabel->setReadOnly(true);
     hashLabel->setFrame(false);
-
-
 
     auto *lowerLayout = new QGridLayout;
     lowerLayout->setObjectName("lowerLayout");

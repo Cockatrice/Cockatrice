@@ -29,7 +29,8 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
-QString DeckListModel::getSortCriteriaForCard(CardInfoPtr info){
+QString DeckListModel::getSortCriteriaForCard(CardInfoPtr info)
+{
     if (!info) {
         return "unknown";
     }
@@ -484,7 +485,8 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     emit layoutChanged();
 }
 
-void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria){
+void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria)
+{
     activeGroupCriteria = newCriteria;
     rebuildTree();
 }
