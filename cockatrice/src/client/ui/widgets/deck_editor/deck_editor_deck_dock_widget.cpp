@@ -228,19 +228,22 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
-    emit deckChanged();
+    emit nameChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
-    emit deckChanged();
+    emit commentsChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateHash()
 {
     hashLabel->setText(deckModel->getDeckList()->getDeckHash());
-    emit deckChanged();
+    emit hashChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
@@ -318,7 +321,7 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
-    emit deckChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
@@ -366,8 +369,12 @@ void DeckEditorDeckDockWidget::cleanDeck()
 {
     deckModel->cleanList();
     nameEdit->setText(QString());
+    emit nameChanged();
     commentsEdit->setText(QString());
+    emit commentsChanged();
     hashLabel->setText(QString());
+    emit hashChanged();
+    emit deckModified();
     emit deckChanged();
     updateBannerCardComboBox();
     deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
@@ -426,7 +433,7 @@ void DeckEditorDeckDockWidget::actSwapCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        emit deckChanged();
+        emit deckModified();
     }
 
     update();
@@ -521,7 +528,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        emit deckChanged();
+        emit deckModified();
     }
 }
 
@@ -539,7 +546,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
     else
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
 
-    emit deckChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)

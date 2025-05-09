@@ -49,7 +49,11 @@ public slots:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 signals:
+    void nameChanged();
+    void commentsChanged();
+    void hashChanged();
     void deckChanged();
+    void deckModified();
     void cardChanged(CardInfoPtr _card);
 
 private:
