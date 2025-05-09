@@ -12,7 +12,8 @@ class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
-enum DeckListModelGroupCriteria{
+enum DeckListModelGroupCriteria
+{
     MAIN_TYPE,
     MANA_COST,
     COLOR

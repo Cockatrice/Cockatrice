@@ -70,8 +70,8 @@ private:
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *hashLabel1;
     LineEditUnfocusable *hashLabel;
-    QLabel* activeGroupCriteriaLabel;
-    QComboBox* activeGroupCriteriaComboBox;
+    QLabel *activeGroupCriteriaLabel;
+    QComboBox *activeGroupCriteriaComboBox;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
