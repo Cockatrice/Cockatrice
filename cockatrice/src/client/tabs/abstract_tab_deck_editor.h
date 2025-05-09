@@ -70,6 +70,7 @@ public:
 
 public slots:
     virtual void onDeckChanged();
+    virtual void onDeckModified();
     void updateCard(CardInfoPtr _card);
     void actAddCard(CardInfoPtr info);
     void actAddCardToSideboard(CardInfoPtr info);

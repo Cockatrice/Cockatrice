@@ -80,7 +80,7 @@ void TabDeckEditorVisual::createCentralFrame()
 
 void TabDeckEditorVisual::onDeckChanged()
 {
-    AbstractTabDeckEditor::onDeckChanged();
+    AbstractTabDeckEditor::onDeckModified();
     tabContainer->visualDeckView->decklistDataChanged(QModelIndex(), QModelIndex());
     tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
     tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
