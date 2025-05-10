@@ -113,6 +113,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(activeGroupCriteriaComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
         deckModel->setActiveGroupCriteria(
             static_cast<DeckListModelGroupCriteria>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
+        deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
         deckView->expandAll();
         deckView->expandAll();
     });
