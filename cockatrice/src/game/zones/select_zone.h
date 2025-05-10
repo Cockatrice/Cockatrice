@@ -26,8 +26,7 @@ public:
                bool _hasCardAttr,
                bool _isShufflable,
                bool _contentsKnown,
-               QGraphicsItem *parent = nullptr,
-               bool isView = false);
+               QGraphicsItem *parent = nullptr);
 };
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse = false);

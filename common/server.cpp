@@ -51,8 +51,7 @@ Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCo
     qRegisterMetaType<IslMessage>("IslMessage");
     qRegisterMetaType<Command_JoinGame>("Command_JoinGame");
 
-    connect(this, SIGNAL(sigSendIslMessage(IslMessage, int)), this, SLOT(doSendIslMessage(IslMessage, int)),
-            Qt::QueuedConnection);
+    connect(this, &Server::sigSendIslMessage, this, &Server::doSendIslMessage, Qt::QueuedConnection);
 }
 
 void Server::prepareDestroy()
@@ -67,7 +66,7 @@ void Server::prepareDestroy()
 
 void Server::setDatabaseInterface(Server_DatabaseInterface *_databaseInterface)
 {
-    connect(this, SIGNAL(endSession(qint64)), _databaseInterface, SLOT(endSession(qint64)));
+    connect(this, &Server::endSession, _databaseInterface, &Server_DatabaseInterface::endSession);
     databaseInterfaces.insert(QThread::currentThread(), _databaseInterface);
 }
 
@@ -568,8 +567,9 @@ void Server::addRoom(Server_Room *newRoom)
     QWriteLocker locker(&roomsLock);
     qDebug() << "Adding room: ID=" << newRoom->getId() << "name=" << newRoom->getName();
     rooms.insert(newRoom->getId(), newRoom);
-    connect(newRoom, SIGNAL(roomInfoChanged(ServerInfo_Room)), this, SLOT(broadcastRoomUpdate(const ServerInfo_Room &)),
-            Qt::QueuedConnection);
+    connect(
+        newRoom, &Server_Room::roomInfoChanged, this, [this](auto roomInfo) { broadcastRoomUpdate(roomInfo); },
+        Qt::QueuedConnection);
 }
 
 int Server::getUsersCount() const

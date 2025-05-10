@@ -43,6 +43,8 @@ public:
         PriorityLowest = 100,
     };
 
+    static const char *TOKENS_SETNAME;
+
 private:
     QString shortName, longName;
     unsigned int sortKey;

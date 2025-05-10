@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <utility>
 
+const char *CardSet::TOKENS_SETNAME = "TK";
+
 CardSet::CardSet(const QString &_shortName,
                  const QString &_longName,
                  const QString &_setType,
@@ -289,8 +291,12 @@ QString CardInfo::getCorrectedName() const
 
 void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
 {
-    _set->append(smartThis);
-    sets[_set->getShortName()].append(_info);
+    if (!_set->contains(smartThis)) {
+        _set->append(smartThis);
+    }
+    if (!sets[_set->getShortName()].contains(_info)) {
+        sets[_set->getShortName()].append(_info);
+    }
 
     refreshCachedSetNames();
 }

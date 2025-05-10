@@ -1,7 +1,7 @@
 #include "card_zone.h"
 
+#include "../board/card_item.h"
 #include "../cards/card_database_manager.h"
-#include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
@@ -19,21 +19,16 @@
  * @param _isShufflable whether it makes sense to shuffle this zone by default after viewing it
  * @param _contentsKnown whether the cards in the zone are known to the client
  * @param parent the parent graphics object.
- * @param _isView whether this zone is a view of another zone. Modifications to a view should modify the original
  */
 CardZone::CardZone(Player *_p,
                    const QString &_name,
                    bool _hasCardAttr,
                    bool _isShufflable,
                    bool _contentsKnown,
-                   QGraphicsItem *parent,
-                   bool _isView)
+                   QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), player(_p), name(_name), cards(_contentsKnown), views{}, menu(nullptr),
-      doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable), isView(_isView)
+      doubleClickAction(0), hasCardAttr(_hasCardAttr), isShufflable(_isShufflable)
 {
-    if (!isView)
-        player->addZone(this);
-
     // If we join a game before the card db finishes loading, the cards might have the wrong printings.
     // Force refresh all cards in the zone when db finishes loading to fix that.
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
@@ -97,6 +92,10 @@ QString CardZone::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
             default:
                 break;
         }
+    else {
+        return (theirOwn ? tr("their custom zone '%1'", "nominative").arg(name)
+                         : tr("%1's custom zone '%2'", "nominative").arg(ownerName).arg(name));
+    }
     return QString();
 }
 

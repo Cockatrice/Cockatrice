@@ -5,25 +5,20 @@
 
 #include "gtest/gtest.h"
 
+// using std types because qt types aren't understood by gtest (without this you'll get less nice errors)
+using CardRows = QVector<std::pair<std::string, int>>;
+
 struct Result
 {
-    // using std types because qt types aren't understood by gtest (without this you'll get less nice errors)
-    using CardRows = QVector<std::pair<std::string, int>>;
     std::string name;
     std::string comments;
     CardRows mainboard;
     CardRows sideboard;
 
-    Result()
-    {
-    }
-
     Result(std::string _name, std::string _comments, CardRows _mainboard, CardRows _sideboard)
         : name(_name), comments(_comments), mainboard(_mainboard), sideboard(_sideboard)
     {
     }
-
-    void operator()(const InnerDecklistNode *innerDecklistNode, const DecklistCardNode *card);
 };
 
 void testEmpty(const QString &clipboard);

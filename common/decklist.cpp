@@ -262,21 +262,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-class InnerDecklistNode::compareFunctor
-{
-private:
-    Qt::SortOrder order;
-
-public:
-    explicit compareFunctor(Qt::SortOrder _order) : order(_order)
-    {
-    }
-    inline bool operator()(QPair<int, AbstractDecklistNode *> a, QPair<int, AbstractDecklistNode *> b) const
-    {
-        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
-    }
-};
-
 bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
 {
     while (!xml->atEnd()) {
@@ -347,7 +332,10 @@ QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
     }
 
     // Sort temporary list
-    compareFunctor cmp(order);
+    auto cmp = [order](const auto &a, const auto &b) {
+        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
+    };
+
     std::sort(tempList.begin(), tempList.end(), cmp);
 
     // Map old indexes to new indexes and
@@ -762,20 +750,9 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
     return loadFromStream_Plain(in, false);
 }
 
-struct WriteToStream
+bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
 {
-    QTextStream &stream;
-    bool prefixSideboardCards;
-    bool slashTappedOutSplitCards;
-
-    WriteToStream(QTextStream &_stream, bool _prefixSideboardCards, bool _slashTappedOutSplitCards)
-        : stream(_stream), prefixSideboardCards(_prefixSideboardCards),
-          slashTappedOutSplitCards(_slashTappedOutSplitCards)
-    {
-    }
-
-    void operator()(const InnerDecklistNode *node, const DecklistCardNode *card)
-    {
+    auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
             stream << "SB: ";
         }
@@ -784,12 +761,8 @@ struct WriteToStream
         } else {
             stream << QString("%1 %2\n").arg(card->getNumber()).arg(card->getName().replace("//", "/"));
         }
-    }
-};
+    };
 
-bool DeckList::saveToStream_Plain(QTextStream &out, bool prefixSideboardCards, bool slashTappedOutSplitCards)
-{
-    WriteToStream writeToStream(out, prefixSideboardCards, slashTappedOutSplitCards);
     forEachCard(writeToStream);
     return true;
 }
@@ -993,4 +966,20 @@ void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
     emit deckHashChanged();
+}
+
+/**
+ * Calls a given function on each card in the deck.
+ */
+void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+{
+    // Support for this is only possible if the internal structure
+    // doesn't get more complicated.
+    for (int i = 0; i < root->size(); i++) {
+        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        for (int j = 0; j < node->size(); j++) {
+            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            func(node, card);
+        }
+    }
 }

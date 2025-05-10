@@ -251,6 +251,7 @@ SettingsCache::SettingsCache()
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
+    focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -263,6 +264,9 @@ SettingsCache::SettingsCache()
     includeRebalancedCards = settings->value("cards/includerebalancedcards", true).toBool();
     printingSelectorNavigationButtonsVisible =
         settings->value("cards/printingselectornavigationbuttonsvisible", true).toBool();
+    deckEditorBannerCardComboBoxVisible =
+        settings->value("interface/deckeditorbannercardcomboboxvisible", true).toBool();
+    deckEditorTagsWidgetVisible = settings->value("interface/deckeditortagswidgetvisible", true).toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
@@ -282,6 +286,12 @@ SettingsCache::SettingsCache()
     visualDeckStorageInGame = settings->value("interface/visualdeckstorageingame", true).toBool();
     visualDeckStorageSelectionAnimation =
         settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
+    defaultDeckEditorType = settings->value("interface/defaultDeckEditorType", 1).toInt();
+    visualDatabaseDisplayFilterToMostRecentSetsEnabled =
+        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
+    visualDatabaseDisplayFilterToMostRecentSetsAmount =
+        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsamount", 10).toInt();
+    visualDeckEditorSampleHandSize = settings->value("interface/visualdeckeditorsamplehandsize", 7).toInt();
     horizontalHand = settings->value("hand/horizontal", true).toBool();
     invertVerticalCoordinate = settings->value("table/invert_vertical", false).toBool();
     minPlayersForMultiColumnLayout = settings->value("interface/min_players_multicolumn", 4).toInt();
@@ -360,6 +370,12 @@ void SettingsCache::setCloseEmptyCardView(QT_STATE_CHANGED_T value)
 {
     closeEmptyCardView = value;
     settings->setValue("interface/closeEmptyCardView", closeEmptyCardView);
+}
+
+void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
+{
+    focusCardViewSearchBar = value;
+    settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -681,6 +697,20 @@ void SettingsCache::setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED
     emit printingSelectorNavigationButtonsVisibleChanged();
 }
 
+void SettingsCache::setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible)
+{
+    deckEditorBannerCardComboBoxVisible = _deckEditorBannerCardComboBoxVisible;
+    settings->setValue("interface/deckeditorbannercardcomboboxvisible", deckEditorBannerCardComboBoxVisible);
+    emit deckEditorBannerCardComboBoxVisibleChanged(deckEditorBannerCardComboBoxVisible);
+}
+
+void SettingsCache::setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible)
+{
+    deckEditorTagsWidgetVisible = _deckEditorTagsWidgetVisible;
+    settings->setValue("interface/deckeditortagswidgetvisible", deckEditorTagsWidgetVisible);
+    emit deckEditorTagsWidgetVisibleChanged(deckEditorTagsWidgetVisible);
+}
+
 void SettingsCache::setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder)
 {
     visualDeckStorageSortingOrder = _visualDeckStorageSortingOrder;
@@ -768,6 +798,35 @@ void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T va
     visualDeckStorageSelectionAnimation = value;
     settings->setValue("interface/visualdeckstorageselectionanimation", visualDeckStorageSelectionAnimation);
     emit visualDeckStorageSelectionAnimationChanged(visualDeckStorageSelectionAnimation);
+}
+
+void SettingsCache::setDefaultDeckEditorType(int value)
+{
+    defaultDeckEditorType = value;
+    settings->setValue("interface/defaultDeckEditorType", defaultDeckEditorType);
+}
+
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled)
+{
+    visualDatabaseDisplayFilterToMostRecentSetsEnabled = _enabled;
+    settings->setValue("interface/visualdatabasedisplayfiltertomostrecentsetsenabled",
+                       visualDatabaseDisplayFilterToMostRecentSetsEnabled);
+    emit visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(visualDatabaseDisplayFilterToMostRecentSetsEnabled);
+}
+
+void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount)
+{
+    visualDatabaseDisplayFilterToMostRecentSetsAmount = _amount;
+    settings->setValue("interface/visualdatabasedisplayfiltertomostrecentsetsamount",
+                       visualDatabaseDisplayFilterToMostRecentSetsAmount);
+    emit visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(visualDatabaseDisplayFilterToMostRecentSetsAmount);
+}
+
+void SettingsCache::setVisualDeckEditorSampleHandSize(int _amount)
+{
+    visualDeckEditorSampleHandSize = _amount;
+    settings->setValue("interface/visualdeckeditorsamplehandsize", visualDeckEditorSampleHandSize);
+    emit visualDeckEditorSampleHandSizeAmountChanged(visualDeckEditorSampleHandSize);
 }
 
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand)

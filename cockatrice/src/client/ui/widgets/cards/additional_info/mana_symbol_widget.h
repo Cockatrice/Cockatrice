@@ -11,9 +11,13 @@ class ManaSymbolWidget : public QLabel
 
 public:
     ManaSymbolWidget(QWidget *parent, QString symbol, bool isActive = true, bool mayBeToggled = false);
+    void toggleSymbol();
     void setColorActive(bool active);
     void updateOpacity();
-    bool isColorActive() const;
+    bool isColorActive() const
+    {
+        return isActive;
+    };
     QString getSymbol() const
     {
         return symbol;

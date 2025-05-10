@@ -49,7 +49,11 @@ public slots:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 signals:
+    void nameChanged();
+    void commentsChanged();
+    void hashChanged();
     void deckChanged();
+    void deckModified();
     void cardChanged(CardInfoPtr _card);
 
 private:
@@ -57,6 +61,9 @@ private:
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
     LineEditUnfocusable *nameEdit;
+    SettingsButtonWidget *quickSettingsWidget;
+    QCheckBox *showBannerCardCheckBox;
+    QCheckBox *showTagsWidgetCheckBox;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
     QLabel *bannerCardLabel;
@@ -77,6 +84,8 @@ private slots:
     void setBannerCard(int);
     void updateHash();
     void refreshShortcuts();
+    void updateShowBannerCardComboBox(bool visible);
+    void updateShowTagsWidget(bool visible);
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H

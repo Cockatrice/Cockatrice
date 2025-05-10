@@ -24,7 +24,9 @@ set(cockatrice_SOURCES
     src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
     src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
+    src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
     src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
+    src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
     src/client/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
     src/client/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
     src/client/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
@@ -99,6 +101,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_push_button.cpp
     src/client/ui/widgets/general/display/labeled_input.cpp
+    src/client/ui/widgets/general/display/percent_bar_widget.cpp
     src/client/ui/widgets/general/display/shadow_background_label.cpp
     src/client/ui/widgets/general/layout_containers/flow_widget.cpp
     src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp
@@ -132,6 +135,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
+    src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
@@ -165,13 +169,16 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
+    src/game/board/abstract_card_drag_item.cpp
+    src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
     src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
+    src/game/board/card_drag_item.cpp
+    src/game/board/card_item.cpp
+    src/game/board/card_list.cpp
     src/game/board/counter_general.cpp
-    src/game/cards/abstract_card_drag_item.cpp
-    src/game/cards/abstract_card_item.cpp
     src/game/cards/card_completer_proxy_model.cpp
     src/game/cards/card_database.cpp
     src/game/cards/card_database_manager.cpp
@@ -179,10 +186,7 @@ set(cockatrice_SOURCES
     src/game/cards/card_database_parser/card_database_parser.cpp
     src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    src/game/cards/card_drag_item.cpp
     src/game/cards/card_info.cpp
-    src/game/cards/card_item.cpp
-    src/game/cards/card_list.cpp
     src/game/cards/card_search_model.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp

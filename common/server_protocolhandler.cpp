@@ -36,7 +36,7 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
       idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
 
 {
-    connect(server, SIGNAL(pingClockTimeout()), this, SLOT(pingClockTimeout()));
+    connect(server, &Server::pingClockTimeout, this, &Server_ProtocolHandler::pingClockTimeout);
 }
 
 Server_ProtocolHandler::~Server_ProtocolHandler()

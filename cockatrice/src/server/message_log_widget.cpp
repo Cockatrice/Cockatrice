@@ -2,7 +2,7 @@
 
 #include "../client/sound_engine.h"
 #include "../client/translate_counter_name.h"
-#include "../game/cards/card_item.h"
+#include "../game/board/card_item.h"
 #include "../game/phase.h"
 #include "../game/player/player.h"
 #include "../game/zones/card_zone.h"
@@ -12,74 +12,39 @@
 
 #include <utility>
 
-const QString &MessageLogWidget::tableConstant() const
-{
-    static const QString constant("table");
-    return constant;
-}
+static const QString TABLE_ZONE_NAME = "table";
+static const QString GRAVE_ZONE_NAME = "grave";
+static const QString EXILE_ZONE_NAME = "rfg";
+static const QString HAND_ZONE_NAME = "hand";
+static const QString DECK_ZONE_NAME = "deck";
+static const QString SIDEBOARD_ZONE_NAME = "sb";
+static const QString STACK_ZONE_NAME = "stack";
 
-const QString &MessageLogWidget::graveyardConstant() const
-{
-    static const QString constant("grave");
-    return constant;
-}
-
-const QString &MessageLogWidget::exileConstant() const
-{
-    static const QString constant("rfg");
-    return constant;
-}
-
-const QString &MessageLogWidget::handConstant() const
-{
-    static const QString constant("hand");
-    return constant;
-}
-
-const QString &MessageLogWidget::deckConstant() const
-{
-    static const QString constant("deck");
-    return constant;
-}
-
-const QString &MessageLogWidget::sideboardConstant() const
-{
-    static const QString constant("sb");
-    return constant;
-}
-
-const QString &MessageLogWidget::stackConstant() const
-{
-    static const QString constant("stack");
-    return constant;
-}
-
-QString MessageLogWidget::sanitizeHtml(QString dirty) const
+static QString sanitizeHtml(QString dirty)
 {
     return dirty.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 }
 
-QString MessageLogWidget::cardLink(const QString cardName) const
+static QString cardLink(const QString &cardName)
 {
     return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
 }
 
-QPair<QString, QString>
-MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange) const
+QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange)
 {
     bool cardNameContainsStartZone = false;
     QString fromStr;
     QString zoneName = zone->getName();
 
-    if (zoneName == tableConstant()) {
+    if (zoneName == TABLE_ZONE_NAME) {
         fromStr = tr(" from play");
-    } else if (zoneName == graveyardConstant()) {
+    } else if (zoneName == GRAVE_ZONE_NAME) {
         fromStr = tr(" from their graveyard");
-    } else if (zoneName == exileConstant()) {
+    } else if (zoneName == EXILE_ZONE_NAME) {
         fromStr = tr(" from exile");
-    } else if (zoneName == handConstant()) {
+    } else if (zoneName == HAND_ZONE_NAME) {
         fromStr = tr(" from their hand");
-    } else if (zoneName == deckConstant()) {
+    } else if (zoneName == DECK_ZONE_NAME) {
         if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
@@ -117,16 +82,18 @@ MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, boo
                 fromStr = tr(" from their library");
             }
         }
-    } else if (zoneName == sideboardConstant()) {
+    } else if (zoneName == SIDEBOARD_ZONE_NAME) {
         fromStr = tr(" from sideboard");
-    } else if (zoneName == stackConstant()) {
+    } else if (zoneName == STACK_ZONE_NAME) {
         fromStr = tr(" from the stack");
+    } else {
+        fromStr = tr(" from custom zone '%1'").arg(zoneName);
     }
 
     if (!cardNameContainsStartZone) {
         cardName.clear();
     }
-    return QPair<QString, QString>(cardName, fromStr);
+    return {cardName, fromStr};
 }
 
 void MessageLogWidget::containerProcessingDone()
@@ -249,12 +216,16 @@ void MessageLogWidget::logCreateArrow(Player *player,
     }
 }
 
-void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt)
+void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt, bool faceDown)
 {
-    appendHtmlServerMessage(tr("%1 creates token: %2%3.")
-                                .arg(sanitizeHtml(player->getName()))
-                                .arg(cardLink(std::move(cardName)))
-                                .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    if (faceDown) {
+        appendHtmlServerMessage(tr("%1 creates a face down token.").arg(sanitizeHtml(player->getName())));
+    } else {
+        appendHtmlServerMessage(tr("%1 creates token: %2%3.")
+                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(cardLink(std::move(cardName)))
+                                    .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
+    }
 }
 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
@@ -291,9 +262,9 @@ void MessageLogWidget::logMoveCard(Player *player,
     bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
 
     // do not log if moved within the same zone
-    if ((startZoneName == tableConstant() && targetZoneName == tableConstant() && !ownerChanged) ||
-        (startZoneName == handConstant() && targetZoneName == handConstant()) ||
-        (startZoneName == exileConstant() && targetZoneName == exileConstant())) {
+    if ((startZoneName == TABLE_ZONE_NAME && targetZoneName == TABLE_ZONE_NAME && !ownerChanged) ||
+        (startZoneName == HAND_ZONE_NAME && targetZoneName == HAND_ZONE_NAME) ||
+        (startZoneName == EXILE_ZONE_NAME && targetZoneName == EXILE_ZONE_NAME)) {
         return;
     }
 
@@ -322,20 +293,20 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     QString finalStr;
     bool usesNewX = false;
-    if (targetZoneName == tableConstant()) {
+    if (targetZoneName == TABLE_ZONE_NAME) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
             finalStr = tr("%1 puts %2 into play%3 face down.");
         } else {
             finalStr = tr("%1 puts %2 into play%3.");
         }
-    } else if (targetZoneName == graveyardConstant()) {
+    } else if (targetZoneName == GRAVE_ZONE_NAME) {
         finalStr = tr("%1 puts %2%3 into their graveyard.");
-    } else if (targetZoneName == exileConstant()) {
+    } else if (targetZoneName == EXILE_ZONE_NAME) {
         finalStr = tr("%1 exiles %2%3.");
-    } else if (targetZoneName == handConstant()) {
+    } else if (targetZoneName == HAND_ZONE_NAME) {
         finalStr = tr("%1 moves %2%3 to their hand.");
-    } else if (targetZoneName == deckConstant()) {
+    } else if (targetZoneName == DECK_ZONE_NAME) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
         } else if (newX >= targetZone->getCards().size()) {
@@ -347,18 +318,21 @@ void MessageLogWidget::logMoveCard(Player *player,
             usesNewX = true;
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
-    } else if (targetZoneName == sideboardConstant()) {
+    } else if (targetZoneName == SIDEBOARD_ZONE_NAME) {
         finalStr = tr("%1 moves %2%3 to sideboard.");
-    } else if (targetZoneName == stackConstant()) {
+    } else if (targetZoneName == STACK_ZONE_NAME) {
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
+    } else {
+        finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
     }
 
     if (usesNewX) {
         appendHtmlServerMessage(
             finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(newX));
     } else {
-        appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second));
+        appendHtmlServerMessage(
+            finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(targetZoneName));
     }
 }
 
@@ -845,6 +819,6 @@ void MessageLogWidget::connectToPlayer(Player *player)
 }
 
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
-    : ChatView(_tabSupervisor, _game, true, parent), mulliganNumber(0), currentContext(MessageContext_None)
+    : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
 }

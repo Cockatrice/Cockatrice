@@ -2,7 +2,7 @@
 
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
-#include "../cards/card_item.h"
+#include "../board/card_item.h"
 #include "../filters/syntax_help.h"
 #include "../game_scene.h"
 #include "../player/player.h"
@@ -55,6 +55,11 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
+
+        if (SettingsCache::instance().getFocusCardViewSearchBar()) {
+            this->setActive(true);
+            searchEdit.setFocus();
+        }
 
         QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
         searchEditProxy->setWidget(&searchEdit);

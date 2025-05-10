@@ -8,9 +8,10 @@
 #include "mana_devotion_widget.h"
 
 #include <QHBoxLayout>
+#include <QScrollArea>
+#include <QVBoxLayout>
 #include <QWidget>
 #include <decklist.h>
-#include <qscrollarea.h>
 
 class DeckAnalyticsWidget : public QWidget
 {
@@ -25,6 +26,11 @@ public:
 private:
     DeckListModel *deckListModel;
     QVBoxLayout *mainLayout;
+
+    QWidget *container;
+    QVBoxLayout *containerLayout;
+
+    QScrollArea *scrollArea;
 
     ManaCurveWidget *manaCurveWidget;
     ManaDevotionWidget *manaDevotionWidget;

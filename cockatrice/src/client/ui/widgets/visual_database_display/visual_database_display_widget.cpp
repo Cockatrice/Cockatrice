@@ -62,9 +62,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
-    databaseDisplayModel->setFilterTree(filterModel->filterTree());
-
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, &QLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
@@ -144,11 +141,27 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
 
+    databaseDisplayModel->setFilterTree(filterModel->filterTree());
+
+    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
+
     loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
     connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
     loadCardsTimer->start(5000);
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayWidget::retranslateUi()
+{
+    clearFilterWidget->setToolTip(tr("Clear all filters"));
+
+    quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
+    quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
+    quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
+    quickFilterSetWidget->setToolTip(tr("Filter by set"));
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -195,13 +208,30 @@ void VisualDatabaseDisplayWidget::populateCards()
         databaseDisplayModel->fetchMore(QModelIndex());
     }
 
+    QList<const CardFilter *> setFilters = filterModel->getFiltersOfType(CardFilter::AttrSet);
+    const CardFilter *setFilter = nullptr;
+    if (setFilters.length() == 1) {
+        setFilter = setFilters.at(0);
+    }
+
     for (int row = start; row < end; ++row) {
         qCDebug(VisualDatabaseDisplayLog) << "Adding " << row;
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         qCDebug(VisualDatabaseDisplayLog) << name.toString();
+
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
-            addCard(info);
+            if (setFilter) {
+                CardInfoPerSetMap setMap = info->getSets();
+                if (setMap.contains(setFilter->term())) {
+                    for (CardInfoPerSet cardSetInstance : setMap[setFilter->term()]) {
+                        addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                            name.toString(), cardSetInstance.getProperty("uuid")));
+                    }
+                }
+            } else {
+                addCard(info);
+            }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
         }

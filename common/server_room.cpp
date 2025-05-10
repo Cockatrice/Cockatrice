@@ -31,8 +31,9 @@ Server_Room::Server_Room(int _id,
       permissionLevel(_permissionLevel), privilegeLevel(_privilegeLevel), autoJoin(_autoJoin),
       joinMessage(_joinMessage), gameTypes(_gameTypes), gamesLock(QReadWriteLock::Recursive)
 {
-    connect(this, SIGNAL(gameListChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)),
-            Qt::QueuedConnection);
+    connect(
+        this, &Server_Room::gameListChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); },
+        Qt::QueuedConnection);
 }
 
 Server_Room::~Server_Room()
@@ -352,7 +353,7 @@ void Server_Room::addGame(Server_Game *game)
     roomInfo.set_room_id(id);
 
     gamesLock.lockForWrite();
-    connect(game, SIGNAL(gameInfoChanged(ServerInfo_Game)), this, SLOT(broadcastGameListUpdate(ServerInfo_Game)));
+    connect(game, &Server_Game::gameInfoChanged, this, [this](auto gameInfo) { broadcastGameListUpdate(gameInfo); });
 
     game->gameMutex.lock();
     games.insert(game->getGameId(), game);

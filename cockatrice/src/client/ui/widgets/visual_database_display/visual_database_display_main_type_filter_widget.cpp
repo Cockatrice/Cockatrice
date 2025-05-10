@@ -47,6 +47,14 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
 
     createMainTypeButtons(); // Populate buttons initially
     updateFilterMode(false); // Initialize toggle button text
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayMainTypeFilterWidget::retranslateUi()
+{
+    spinBox->setToolTip(tr("Do not display card main-types with less than this amount of cards in the database"));
+    toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
 
 void VisualDatabaseDisplayMainTypeFilterWidget::createMainTypeButtons()

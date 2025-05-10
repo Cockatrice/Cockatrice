@@ -61,6 +61,8 @@ signals:
     void printingSelectorCardSizeChanged();
     void includeRebalancedCardsChanged(bool _includeRebalancedCards);
     void printingSelectorNavigationButtonsVisibleChanged();
+    void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
+    void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
@@ -69,6 +71,9 @@ signals:
     void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);
     void visualDeckStorageSelectionAnimationChanged(bool enabled);
+    void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
+    void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
+    void visualDeckEditorSampleHandSizeAmountChanged(int amount);
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -134,6 +139,8 @@ private:
     int printingSelectorCardSize;
     bool includeRebalancedCards;
     bool printingSelectorNavigationButtonsVisible;
+    bool deckEditorBannerCardComboBoxVisible;
+    bool deckEditorTagsWidgetVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
     bool visualDeckStorageShowBannerCardComboBox;
@@ -147,6 +154,10 @@ private:
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
     bool visualDeckStorageSelectionAnimation;
+    int defaultDeckEditorType;
+    bool visualDatabaseDisplayFilterToMostRecentSetsEnabled;
+    int visualDatabaseDisplayFilterToMostRecentSetsAmount;
+    int visualDeckEditorSampleHandSize;
     bool horizontalHand;
     bool invertVerticalCoordinate;
     int minPlayersForMultiColumnLayout;
@@ -175,6 +186,7 @@ private:
     int cardViewInitialRowsMax;
     int cardViewExpandedRowsMax;
     bool closeEmptyCardView;
+    bool focusCardViewSearchBar;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -420,6 +432,14 @@ public:
     {
         return printingSelectorNavigationButtonsVisible;
     }
+    bool getDeckEditorBannerCardComboBoxVisible() const
+    {
+        return deckEditorBannerCardComboBoxVisible;
+    }
+    bool getDeckEditorTagsWidgetVisible() const
+    {
+        return deckEditorTagsWidgetVisible;
+    }
     int getVisualDeckStorageSortingOrder() const
     {
         return visualDeckStorageSortingOrder;
@@ -471,6 +491,22 @@ public:
     bool getVisualDeckStorageSelectionAnimation() const
     {
         return visualDeckStorageSelectionAnimation;
+    }
+    int getDefaultDeckEditorType() const
+    {
+        return defaultDeckEditorType;
+    }
+    bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const
+    {
+        return visualDatabaseDisplayFilterToMostRecentSetsEnabled;
+    }
+    int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const
+    {
+        return visualDatabaseDisplayFilterToMostRecentSetsAmount;
+    }
+    int getVisualDeckEditorSampleHandSize() const
+    {
+        return visualDeckEditorSampleHandSize;
     }
     bool getHorizontalHand() const
     {
@@ -670,6 +706,7 @@ public:
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
+    void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
     QString getClientID()
     {
         return clientID;
@@ -697,6 +734,10 @@ public:
     bool getCloseEmptyCardView() const
     {
         return closeEmptyCardView;
+    }
+    bool getFocusCardViewSearchBar() const
+    {
+        return focusCardViewSearchBar;
     }
     ShortcutsSettings &shortcuts() const
     {
@@ -800,6 +841,8 @@ public slots:
     void setPrintingSelectorCardSize(int _printingSelectorCardSize);
     void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
+    void setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible);
+    void setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
@@ -813,6 +856,10 @@ public slots:
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
+    void setDefaultDeckEditorType(int value);
+    void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
+    void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);
+    void setVisualDeckEditorSampleHandSize(int _amount);
     void setHorizontalHand(QT_STATE_CHANGED_T _horizontalHand);
     void setInvertVerticalCoordinate(QT_STATE_CHANGED_T _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);

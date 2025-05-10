@@ -31,5 +31,31 @@
                 <pt>4/4</pt>
             </prop>
         </card>
+        <card>
+            <name>Not Dead</name>
+            <set> Not a Card</set>
+            <tablerow>0</tablerow>
+            <text>Dead!</text>
+            <prop>
+                <muid>333</muid>
+                <colors>B</colors>
+                <manacost>B</manacost>
+                <cmc>1</cmc>
+                <maintype>Instant</maintype>
+            </prop>
+        </card>
+        <card>
+            <name>Truth</name>
+            <set> Not a Card</set>
+            <tablerow>0</tablerow>
+            <text>Truth!</text>
+            <prop>
+                <muid>444</muid>
+                <colors>U</colors>
+                <manacost>2U</manacost>
+                <cmc>2</cmc>
+                <maintype>Instant</maintype>
+            </prop>
+        </card>
     </cards>
 </cockatrice_carddatabase>

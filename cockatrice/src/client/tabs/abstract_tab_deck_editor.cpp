@@ -50,6 +50,7 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
 
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);
     connect(this, &AbstractTabDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
@@ -77,6 +78,10 @@ void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
 }
 
 void AbstractTabDeckEditor::onDeckChanged()
+{
+}
+
+void AbstractTabDeckEditor::onDeckModified()
 {
     setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());

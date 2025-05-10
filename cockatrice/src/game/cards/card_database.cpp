@@ -16,8 +16,6 @@
 #include <algorithm>
 #include <utility>
 
-const char *CardDatabase::TOKENS_SETNAME = "TK";
-
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
@@ -386,9 +384,10 @@ CardInfoPerSet CardDatabase::getSpecificSetForCard(const QString &cardName,
 
     for (const auto &cardInfoPerSetList : setMap) {
         for (auto &cardInfoForSet : cardInfoPerSetList) {
-            if (cardInfoForSet.getPtr()->getShortName() == setShortName &&
-                cardInfoForSet.getProperty("num") == collectorNumber) {
-                return cardInfoForSet;
+            if (cardInfoForSet.getPtr()->getShortName() == setShortName) {
+                if (cardInfoForSet.getProperty("num") == collectorNumber || collectorNumber.isEmpty()) {
+                    return cardInfoForSet;
+                }
             }
         }
     }
@@ -559,16 +558,15 @@ void CardDatabase::notifyEnabledSetsChanged()
 
 bool CardDatabase::saveCustomTokensToFile()
 {
-    QString fileName =
-        SettingsCache::instance().getCustomCardDatabasePath() + "/" + CardDatabase::TOKENS_SETNAME + ".xml";
+    QString fileName = SettingsCache::instance().getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
 
     SetNameMap tmpSets;
-    CardSetPtr customTokensSet = getSet(CardDatabase::TOKENS_SETNAME);
-    tmpSets.insert(CardDatabase::TOKENS_SETNAME, customTokensSet);
+    CardSetPtr customTokensSet = getSet(CardSet::TOKENS_SETNAME);
+    tmpSets.insert(CardSet::TOKENS_SETNAME, customTokensSet);
 
     CardNameMap tmpCards;
     for (const CardInfoPtr &card : cards) {
-        if (card->getSets().contains(CardDatabase::TOKENS_SETNAME)) {
+        if (card->getSets().contains(CardSet::TOKENS_SETNAME)) {
             tmpCards.insert(card->getName(), card);
         }
     }

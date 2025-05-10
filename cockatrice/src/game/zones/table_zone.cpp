@@ -3,9 +3,9 @@
 #include "../../client/ui/theme_manager.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
-#include "../cards/card_drag_item.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
 #include "../cards/card_info.h"
-#include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
@@ -19,8 +19,8 @@ const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
 const QColor TableZone::GRADIENT_COLOR = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 
-TableZone::TableZone(Player *_p, QGraphicsItem *parent)
-    : SelectZone(_p, "table", true, false, true, parent), active(false)
+TableZone::TableZone(Player *_p, const QString &name, QGraphicsItem *parent)
+    : SelectZone(_p, name, true, false, true, parent), active(false)
 {
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
     connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,

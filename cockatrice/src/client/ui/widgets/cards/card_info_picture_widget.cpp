@@ -1,7 +1,7 @@
 #include "card_info_picture_widget.h"
 
+#include "../../../../game/board/card_item.h"
 #include "../../../../game/cards/card_database_manager.h"
-#include "../../../../game/cards/card_item.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../picture_loader/picture_loader.h"
@@ -62,6 +62,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
 
         update();
     });
+}
+
+CardInfoPictureWidget::~CardInfoPictureWidget()
+{
+    enlargedPixmapWidget->hide();
+    enlargedPixmapWidget->deleteLater();
 }
 
 /**
@@ -339,6 +345,12 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
     }
 
     emit cardClicked();
+}
+
+void CardInfoPictureWidget::hideEvent(QHideEvent *event)
+{
+    enlargedPixmapWidget->hide();
+    QWidget::hideEvent(event);
 }
 
 QMenu *CardInfoPictureWidget::createRightClickMenu()

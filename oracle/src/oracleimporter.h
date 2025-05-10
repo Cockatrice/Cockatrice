@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QVariant>
-#include <game/cards/card_database.h>
+#include <game/cards/card_info.h>
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
@@ -92,7 +92,10 @@ public:
 class SplitCardPart
 {
 public:
-    SplitCardPart(const QString &_name, const QString &_text, const QVariantHash &_properties, CardInfoPerSet setInfo);
+    SplitCardPart(const QString &_name,
+                  const QString &_text,
+                  const QVariantHash &_properties,
+                  const CardInfoPerSet &setInfo);
     inline const QString &getName() const
     {
         return name;
@@ -117,48 +120,49 @@ private:
     CardInfoPerSet setInfo;
 };
 
-class OracleImporter : public CardDatabase
+class OracleImporter : public QObject
 {
     Q_OBJECT
 private:
-    const QStringList mainCardTypes = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                       "Instant",      "Artifact", "Enchantment"};
     static const QRegularExpression formatRegex;
-    QList<SetToDownload> allSets;
-    QVariantMap setsMap;
-    QString dataDir;
 
-    QString getMainCardType(const QStringList &typeList);
+    /**
+     * The cards, indexed by name.
+     */
+    CardNameMap cards;
+
+    /**
+     * The sets, indexed by short name.
+     */
+    SetNameMap sets;
+
+    QList<SetToDownload> allSets;
+
     CardInfoPtr addCard(QString name,
-                        QString text,
+                        const QString &text,
                         bool isToken,
                         QVariantHash properties,
-                        QList<CardRelation *> &relatedCards,
-                        CardInfoPerSet setInfo);
+                        const QList<CardRelation *> &relatedCards,
+                        const CardInfoPerSet &setInfo);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
 
 public:
-    explicit OracleImporter(const QString &_dataDir, QObject *parent = nullptr);
-    CardSet::Priority getSetPriority(QString &setType, QString &shortName);
+    explicit OracleImporter(QObject *parent = nullptr);
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
-    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cards);
+    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList);
+    const CardNameMap &getCardList() const
+    {
+        return cards;
+    }
     QList<SetToDownload> &getSets()
     {
         return allSets;
     }
-    const QString &getDataDir() const
-    {
-        return dataDir;
-    }
     void clear();
-
-protected:
-    inline QString getStringPropertyFromMap(const QVariantMap &card, const QString &propertyName);
-    void sortAndReduceColors(QString &colors);
 };
 
 #endif

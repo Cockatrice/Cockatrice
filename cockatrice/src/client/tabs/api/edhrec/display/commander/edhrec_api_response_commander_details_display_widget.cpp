@@ -2,6 +2,7 @@
 
 #include "../../../../../../game/cards/card_database_manager.h"
 #include "../../../../../ui/widgets/cards/card_info_picture_widget.h"
+#include "../../tab_edhrec_main.h"
 #include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
 
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
@@ -15,6 +16,22 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
 
     commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::getInstance()->getCard(commanderDetails.getName()));
+
+    QWidget *currentParent = parentWidget();
+    TabEdhRecMain *parentTab = nullptr;
+
+    while (currentParent) {
+        if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {
+            break;
+        }
+        currentParent = currentParent->parentWidget();
+    }
+
+    if (parentTab) {
+        connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, commanderPicture,
+                &CardInfoPictureWidget::setScaleFactor);
+        commanderPicture->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
+    }
 
     commanderDetails.debugPrint();
 

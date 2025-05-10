@@ -2,9 +2,9 @@
 
 #include "../../client/ui/picture_loader/picture_loader.h"
 #include "../../settings/cache_settings.h"
+#include "../cards/card_database.h"
+#include "../cards/card_database_manager.h"
 #include "../game_scene.h"
-#include "card_database.h"
-#include "card_database_manager.h"
 
 #include <QCursor>
 #include <QGraphicsScene>

@@ -39,6 +39,7 @@ VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWi
 void VisualDatabaseDisplayFilterSaveLoadWidget::retranslateUi()
 {
     saveButton->setText(tr("Save Filter"));
+    saveButton->setToolTip(tr("Save all currently applied filters to a file"));
     filenameInput->setPlaceholderText(tr("Enter filename..."));
 }
 

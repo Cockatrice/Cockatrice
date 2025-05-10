@@ -1,9 +1,9 @@
 #include "view_zone.h"
 
 #include "../../server/pending_command.h"
-#include "../cards/card_drag_item.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
 #include "../cards/card_info.h"
-#include "../cards/card_item.h"
 #include "../player/player.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
@@ -30,7 +30,7 @@ ZoneViewZone::ZoneViewZone(Player *_p,
                            bool _writeableRevealZone,
                            QGraphicsItem *parent,
                            bool _isReversed)
-    : SelectZone(_p, _origZone->getName(), false, false, true, parent, true), bRect(QRectF()), minRows(0),
+    : SelectZone(_p, _origZone->getName(), false, false, true, parent), bRect(QRectF()), minRows(0),
       numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
       writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
       isReversed(_isReversed)

@@ -3,11 +3,43 @@
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../game/filters/filter_tree.h"
 #include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../settings/cache_settings.h"
 
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
 #include <algorithm>
+
+VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentSetFilterSettingsWidget(QWidget *parent)
+    : QWidget(parent)
+{
+    layout = new QHBoxLayout(this);
+    setLayout(layout);
+
+    filterToMostRecentSetsCheckBox = new QCheckBox(this);
+    filterToMostRecentSetsCheckBox->setChecked(
+        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled());
+    connect(filterToMostRecentSetsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled);
+
+    filterToMostRecentSetsAmount = new QSpinBox(this);
+    filterToMostRecentSetsAmount->setMinimum(1);
+    filterToMostRecentSetsAmount->setMaximum(100);
+    filterToMostRecentSetsAmount->setValue(
+        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
+    connect(filterToMostRecentSetsAmount, QOverload<int>::of(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount);
+
+    layout->addWidget(filterToMostRecentSetsCheckBox);
+    layout->addWidget(filterToMostRecentSetsAmount);
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayRecentSetFilterSettingsWidget::retranslateUi()
+{
+    filterToMostRecentSetsCheckBox->setText(tr("Filter to most recent sets"));
+}
 
 VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidget *parent,
                                                                            FilterTreeModel *_filterModel)
@@ -18,6 +50,14 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
 
     layout = new QVBoxLayout(this);
     setLayout(layout);
+
+    recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
+    layout->addWidget(recentSetsSettingsWidget);
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
 
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search sets..."));
@@ -36,24 +76,26 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
-    createSetButtons();      // Populate buttons initially
-    updateFilterMode(false); // Initialize toggle button text
+    createSetButtons(); // Populate buttons initially
+    retranslateUi();
+}
+
+void VisualDatabaseDisplaySetFilterWidget::retranslateUi()
+{
+    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
 }
 
 void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 {
-    SetList shared_pointerses = CardDatabaseManager::getInstance()->getSetList();
+    SetList allSets = CardDatabaseManager::getInstance()->getSetList();
 
     // Sort by release date
-    std::sort(shared_pointerses.begin(), shared_pointerses.end(),
+    std::sort(allSets.begin(), allSets.end(),
               [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
 
-    int setsToPreactivate = 10;
-    int setsActivated = 0;
-
-    for (const auto &shared_pointer : shared_pointerses) {
-        QString shortName = shared_pointer->getShortName();
-        QString longName = shared_pointer->getLongName();
+    for (const auto &set : allSets) {
+        QString shortName = set->getShortName();
+        QString longName = set->getLongName();
 
         auto *button = new QPushButton(longName + " (" + shortName + ")", flowWidget);
         button->setCheckable(true);
@@ -66,14 +108,47 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
         // Connect toggle signal
         connect(button, &QPushButton::toggled, this,
                 [this, shortName](bool checked) { handleSetToggled(shortName, checked); });
-        if (setsActivated < setsToPreactivate) {
-            setsActivated++;
-            activeSets[shortName] = true;
-            button->setChecked(true);
-        }
     }
-    updateSetFilter();
-    updateSetButtonsVisibility(); // Ensure visibility is updated initially
+
+    filterToRecentSets();
+}
+
+void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
+{
+    if (SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled()) {
+        for (auto set : activeSets.keys()) {
+            activeSets[set] = false;
+        }
+
+        SetList allSets = CardDatabaseManager::getInstance()->getSetList();
+
+        // Sort by release date
+        std::sort(allSets.begin(), allSets.end(),
+                  [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
+
+        int setsToPreactivate = SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
+        int setsActivated = 0;
+
+        for (const auto &set : allSets) {
+            QString shortName = set->getShortName();
+            QString longName = set->getLongName();
+
+            auto button = setButtons[shortName];
+
+            if (setsActivated < setsToPreactivate) {
+                setsActivated++;
+                activeSets[shortName] = true;
+                button->blockSignals(true);
+                button->setChecked(true);
+                button->blockSignals(false);
+            } else {
+                break;
+            }
+        }
+
+        updateSetFilter();
+        updateSetButtonsVisibility();
+    }
 }
 
 void VisualDatabaseDisplaySetFilterWidget::updateSetButtonsVisibility()
@@ -183,13 +258,15 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
     for (const auto &key : setButtons.keys()) {
         bool active = selectedSets.contains(key);
         activeSets[key] = active;
+        setButtons[key]->blockSignals(true);
         setButtons[key]->setChecked(active);
+        setButtons[key]->blockSignals(false);
     }
 }
 
 void VisualDatabaseDisplaySetFilterWidget::updateFilterMode(bool checked)
 {
     exactMatchMode = checked;
-    toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateSetFilter();
+    retranslateUi();
 }

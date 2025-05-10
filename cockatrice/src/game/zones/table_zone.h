@@ -1,7 +1,7 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../cards/abstract_card_item.h"
+#include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
 /*
@@ -98,7 +98,7 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    explicit TableZone(Player *_p, QGraphicsItem *parent = nullptr);
+    explicit TableZone(Player *_p, const QString &name, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.

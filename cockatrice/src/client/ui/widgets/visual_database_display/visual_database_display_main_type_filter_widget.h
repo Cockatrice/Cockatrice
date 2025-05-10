@@ -16,6 +16,7 @@ class VisualDatabaseDisplayMainTypeFilterWidget : public QWidget
     Q_OBJECT
 public:
     explicit VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent, FilterTreeModel *filterModel);
+    void retranslateUi();
     void createMainTypeButtons();
     void updateMainTypeButtonsVisibility();
     int getMaxMainTypeCount() const;

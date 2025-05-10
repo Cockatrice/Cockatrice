@@ -47,6 +47,7 @@ void DeckPreviewColorIdentityFilterWidget::retranslateUi()
 {
     // Set the toggle button text based on the current mode
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
+    toggleButton->setToolTip(tr("Color identity filter mode (AND/OR/NOT conjunctions of filters)"));
 }
 
 void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool active)

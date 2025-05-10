@@ -1,6 +1,6 @@
 #include "card_info_text_widget.h"
 
-#include "../../../../game/cards/card_item.h"
+#include "../../../../game/board/card_item.h"
 #include "../../../../game/game_specific_terms.h"
 
 #include <QGridLayout>

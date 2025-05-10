@@ -386,13 +386,23 @@ void Server_Player::revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorag
     }
 }
 
-static Event_CreateToken makeCreateTokenEvent(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord)
+/**
+ * Creates the create token event.
+ * By default, will set event's name and color fields to empty if the token is face-down
+ */
+static Event_CreateToken
+makeCreateTokenEvent(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord, bool revealFacedownInfo = false)
 {
     Event_CreateToken event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    event.set_card_name(card->getName().toStdString());
-    event.set_card_provider_id(card->getProviderId().toStdString());
+    event.set_face_down(card->getFaceDown());
+
+    if (!card->getFaceDown() || revealFacedownInfo) {
+        event.set_card_name(card->getName().toStdString());
+        event.set_card_provider_id(card->getProviderId().toStdString());
+    }
+
     event.set_color(card->getColor().toStdString());
     event.set_pt(card->getPT().toStdString());
     event.set_annotation(card->getAnnotation().toStdString());
@@ -401,7 +411,6 @@ static Event_CreateToken makeCreateTokenEvent(Server_CardZone *zone, Server_Card
     event.set_y(yCoord);
     return event;
 }
-
 static Event_AttachCard makeAttachCardEvent(Server_Card *attachedCard, Server_Card *parentCard = nullptr)
 {
     Event_AttachCard event;
@@ -415,6 +424,29 @@ static Event_AttachCard makeAttachCardEvent(Server_Card *attachedCard, Server_Ca
     }
 
     return event;
+}
+
+/**
+ * Determines whether moving the card from startZone to targetZone should cause the card to be destroyed.
+ */
+static bool
+shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, const Server_CardZone *targetZone)
+{
+    if (!card->getDestroyOnZoneChange()) {
+        return false;
+    }
+
+    if (startZone->getName() == targetZone->getName()) {
+        return false;
+    }
+
+    // Allow tokens on the stack
+    if ((startZone->getName() == "table" || startZone->getName() == "stack") &&
+        (targetZone->getName() == "table" || targetZone->getName() == "stack")) {
+        return false;
+    }
+
+    return true;
 }
 
 Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
@@ -523,7 +555,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
             }
         }
 
-        if (card->getDestroyOnZoneChange() && (startzone->getName() != targetzone->getName())) {
+        if (shouldDestroyOnMove(card, startzone, targetzone)) {
             Event_DestroyCard event;
             event.set_zone_name(startzone->getName().toStdString());
             event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
@@ -1471,7 +1503,8 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     const QString cardName = nameFromStdString(cmd.card_name());
     const QString cardProviderId = nameFromStdString(cmd.card_provider_id());
     if (zone->hasCoords()) {
-        xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, false);
+        bool dontStackSameName = cmd.face_down();
+        xCoord = zone->getFreeGridColumn(xCoord, yCoord, cardName, dontStackSameName);
     }
     if (xCoord < 0) {
         xCoord = 0;
@@ -1482,13 +1515,17 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
 
     auto *card = new Server_Card(cardName, cardProviderId, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
-    card->setPT(nameFromStdString(cmd.pt()));
-    card->setColor(nameFromStdString(cmd.color()));
+    // Client should already prevent face-down tokens from having attributes; this just an extra server-side check
+    if (!cmd.face_down()) {
+        card->setColor(nameFromStdString(cmd.color()));
+        card->setPT(nameFromStdString(cmd.pt()));
+    }
     card->setAnnotation(nameFromStdString(cmd.annotation()));
     card->setDestroyOnZoneChange(cmd.destroy_on_zone_change());
+    card->setFaceDown(cmd.face_down());
 
     zone->insertCard(card, xCoord, yCoord);
-    ges.enqueueGameEvent(makeCreateTokenEvent(zone, card, xCoord, yCoord), playerId);
+    sendCreateTokenEvents(zone, card, xCoord, yCoord, ges);
 
     // check if the token is a replacement for an existing card
     if (!targetCard) {
@@ -1617,6 +1654,38 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
     }
 
     return Response::RespOk;
+}
+
+/**
+ * Creates and sends the events required to properly communicate the given token creation.
+ * Primarily written to handle creating face-down tokens.
+ */
+void Server_Player::sendCreateTokenEvents(Server_CardZone *zone,
+                                          Server_Card *card,
+                                          int xCoord,
+                                          int yCoord,
+                                          GameEventStorage &ges)
+{
+    // Token is not face-down; things are easy
+    if (!card->getFaceDown()) {
+        ges.enqueueGameEvent(makeCreateTokenEvent(zone, card, xCoord, yCoord), playerId);
+        return;
+    }
+
+    // Token is face-down. We have to send different info to each player
+    auto eventOthers = makeCreateTokenEvent(zone, card, xCoord, yCoord, false);
+    ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+
+    auto eventPrivate = makeCreateTokenEvent(zone, card, xCoord, yCoord, true);
+    ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
+
+    // Event_CreateToken didn't use to have face_down field; send attribute event afterward for backwards compatibility
+    Event_SetCardAttr event;
+    event.set_zone_name(zone->getName().toStdString());
+    event.set_card_id(card->getId());
+    event.set_attribute(AttrFaceDown);
+    event.set_attr_value("1");
+    ges.enqueueGameEvent(event, playerId);
 }
 
 Response::ResponseCode

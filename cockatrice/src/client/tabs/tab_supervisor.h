@@ -75,6 +75,14 @@ protected:
 class TabSupervisor : public QTabWidget
 {
     Q_OBJECT
+
+public:
+    enum DeckEditorType
+    {
+        ClassicDeckEditor,
+        VisualDeckEditor
+    };
+
 private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
@@ -152,6 +160,7 @@ signals:
     void showWindowIfHidden();
 
 public slots:
+    void openDeckInNewTab(const DeckLoader *deckToOpen);
     TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
     TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();

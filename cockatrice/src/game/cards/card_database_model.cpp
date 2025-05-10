@@ -387,7 +387,7 @@ TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(paren
 bool TokenEditModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
     CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
-    return info->getIsToken() && info->getSets().contains(CardDatabase::TOKENS_SETNAME) && rowMatchesCardName(info);
+    return info->getIsToken() && info->getSets().contains(CardSet::TOKENS_SETNAME) && rowMatchesCardName(info);
 }
 
 int TokenEditModel::rowCount(const QModelIndex &parent) const

@@ -28,7 +28,7 @@ public:
     }
 
     void logToFile(bool enabled);
-    void log(QtMsgType type, const QMessageLogContext &ctx, QString message);
+    void log(QtMsgType type, const QMessageLogContext &ctx, const QString &message);
     QString getClientVersion();
     QString getClientOperatingSystem();
     QString getSystemArchitecture();
@@ -57,10 +57,10 @@ protected:
     void closeLogfileSession();
 
 protected slots:
-    void internalLog(QString message);
+    void internalLog(const QString &message);
 
 signals:
-    void logEntryAdded(QString message);
+    void logEntryAdded(const QString &message);
 };
 
 #endif

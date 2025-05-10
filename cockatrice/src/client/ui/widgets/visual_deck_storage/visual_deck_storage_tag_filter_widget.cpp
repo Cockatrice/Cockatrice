@@ -33,57 +33,69 @@ void VisualDeckStorageTagFilterWidget::showEvent(QShowEvent *event)
 
 void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const
 {
-    // Collect selected tags from DeckPreviewTagDisplayWidget
     QStringList selectedTags;
+    QStringList excludedTags;
+
+    // Collect selected and excluded tags
     for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
-        if (tagWidget->getSelected()) {
-            selectedTags.append(tagWidget->getTagName());
+        switch (tagWidget->getState()) {
+            case TagState::Selected:
+                selectedTags.append(tagWidget->getTagName());
+                break;
+            case TagState::Excluded:
+                excludedTags.append(tagWidget->getTagName());
+                break;
+            default:
+                break;
         }
     }
 
-    // If no tags are selected, set all decks as visible
-    if (selectedTags.isEmpty()) {
+    // If no tags are selected or excluded, show all
+    if (selectedTags.isEmpty() && excludedTags.isEmpty()) {
         for (DeckPreviewWidget *deckPreview : deckPreviews) {
             deckPreview->filteredByTags = false;
         }
         return;
     }
 
-    // Filter DeckPreviewWidgets that contain all of the selected tags
-    QList<DeckPreviewWidget *> filteredDecks;
     for (DeckPreviewWidget *deckPreview : deckPreviews) {
         QStringList deckTags = deckPreview->deckLoader->getTags();
 
-        // Check if all selectedTags are in deckTags
-        bool allTagsPresent = std::all_of(selectedTags.begin(), selectedTags.end(),
+        bool hasAllSelected = std::all_of(selectedTags.begin(), selectedTags.end(),
                                           [&deckTags](const QString &tag) { return deckTags.contains(tag); });
 
-        deckPreview->filteredByTags = !allTagsPresent;
+        bool hasAnyExcluded = std::any_of(excludedTags.begin(), excludedTags.end(),
+                                          [&deckTags](const QString &tag) { return deckTags.contains(tag); });
+
+        // Filter out if any excluded tag is present or if any selected tag is missing
+        deckPreview->filteredByTags = !(hasAllSelected && !hasAnyExcluded);
     }
 }
 
 void VisualDeckStorageTagFilterWidget::refreshTags()
 {
-    QStringList allTags = gatherAllTags();
-    removeTagsNotInList(gatherAllTags());
-    addTagsIfNotPresent(gatherAllTags());
+    QSet<QString> allTags = gatherAllTags();
+    removeTagsNotInList(allTags);
+    addTagsIfNotPresent(allTags);
     sortTags();
 }
 
-void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QStringList &tags)
+void VisualDeckStorageTagFilterWidget::removeTagsNotInList(const QSet<QString> &tags)
 {
-    // Iterate through all DeckPreviewTagDisplayWidgets
+    auto *flowWidget = findChild<FlowWidget *>();
+
     for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
-        // If the tag is not in the provided tags list, remove the widget
-        if (!tags.contains(tagWidget->getTagName())) {
-            auto *flowWidget = findChild<FlowWidget *>();
+        const QString &tagName = tagWidget->getTagName();
+
+        // Keep the tag widget if it is either selected or excluded
+        if (!tags.contains(tagName) && tagWidget->getState() == TagState::NotSelected) {
             flowWidget->removeWidget(tagWidget);
-            tagWidget->deleteLater(); // Safely delete the widget
+            tagWidget->deleteLater();
         }
     }
 }
 
-void VisualDeckStorageTagFilterWidget::addTagsIfNotPresent(const QStringList &tags)
+void VisualDeckStorageTagFilterWidget::addTagsIfNotPresent(const QSet<QString> &tags)
 {
     for (const QString &tag : tags) {
         addTagIfNotPresent(tag);
@@ -136,20 +148,22 @@ void VisualDeckStorageTagFilterWidget::sortTags()
     }
 }
 
-QStringList VisualDeckStorageTagFilterWidget::gatherAllTags()
+QSet<QString> VisualDeckStorageTagFilterWidget::gatherAllTags() const
 {
-    QStringList allTags;
+    QSet<QString> allTags;
     QList<DeckPreviewWidget *> deckWidgets = parent->findChildren<DeckPreviewWidget *>();
 
     for (DeckPreviewWidget *widget : deckWidgets) {
         if (widget->checkVisibility()) {
-            allTags << widget->deckLoader->getTags();
+            for (const QString &tag : widget->deckLoader->getTags()) {
+                allTags.insert(tag);
+            }
         }
     }
     return allTags;
 }
 
-QStringList VisualDeckStorageTagFilterWidget::getAllKnownTags()
+QStringList VisualDeckStorageTagFilterWidget::getAllKnownTags() const
 {
     QStringList allTags;
 

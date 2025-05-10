@@ -128,7 +128,7 @@ signals:
                         Player *targetPlayer,
                         QString targetCard,
                         bool _playerTarget);
-    void logCreateToken(Player *player, QString cardName, QString pt);
+    void logCreateToken(Player *player, QString cardName, QString pt, bool faceDown);
     void logDrawCards(Player *player, int number, bool deckIsEmpty);
     void logUndoDraw(Player *player, QString cardName);
     void logMoveCard(Player *player, CardItem *card, CardZone *startZone, int oldX, CardZone *targetZone, int newX);
@@ -253,7 +253,7 @@ public:
 private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
-        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard;
+        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard, *mCustomZones;
     TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;
@@ -409,7 +409,12 @@ public:
     void playCardToTable(const CardItem *c, bool faceDown);
     void addCard(CardItem *c);
     void deleteCard(CardItem *c);
-    void addZone(CardZone *z);
+
+    template <typename T> T *addZone(T *zone)
+    {
+        zones.insert(zone->getName(), zone);
+        return zone;
+    }
 
     AbstractCounter *addCounter(const ServerInfo_Counter &counter);
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);

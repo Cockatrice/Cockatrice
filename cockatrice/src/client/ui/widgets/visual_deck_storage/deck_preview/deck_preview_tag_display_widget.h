@@ -6,6 +6,13 @@
 #include <QString>
 #include <QWidget>
 
+enum class TagState
+{
+    NotSelected,
+    Selected,
+    Excluded
+};
+
 class DeckPreviewTagDisplayWidget : public QWidget
 {
     Q_OBJECT
@@ -22,16 +29,16 @@ public:
     {
         return tagName;
     }
-    bool getSelected() const
+    TagState getState() const
     {
-        return isSelected;
+        return state;
     }
 
-    /**
-     * @brief Sets the selected state of the tag.
-     * @param selected True if the tag is selected, false otherwise.
-     */
-    void setSelected(bool selected);
+    void setState(const TagState newState)
+    {
+        state = newState;
+        update();
+    };
 
 signals:
     /**
@@ -61,7 +68,7 @@ private:
     QLabel *tagLabel;         ///< Label for displaying the tag name.
     QPushButton *closeButton; ///< Button to close/remove the tag.
     QString tagName;          ///< The name of the tag.
-    bool isSelected;          ///< Indicates whether the tag is selected.
+    TagState state;           ///< Indicates whether the tag is unselected, selected, or excluded.
 };
 
 #endif // DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
