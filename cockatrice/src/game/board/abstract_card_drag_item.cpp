@@ -19,6 +19,7 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
     if (parentDrag) {
         parentDrag->addChildDrag(this);
         setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
+        connect(parentDrag, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
     } else {
         hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
                           qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
@@ -41,12 +42,6 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
     });
 
     connect(item, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
-}
-
-AbstractCardDragItem::~AbstractCardDragItem()
-{
-    for (int i = 0; i < childDrags.size(); i++)
-        delete childDrags[i];
 }
 
 QPainterPath AbstractCardDragItem::shape() const
