@@ -378,20 +378,22 @@ jobs:
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
 
-      - name: Run vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          runVcpkgInstall: false
-          doNotCache: true
-        env:
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
-          VCPKG_DISABLE_METRICS: 1
-
       - name: Setup vcpkg cache
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          runVcpkgInstall: true
+          doNotCache: true
+        env:
+          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_FEATURE_FLAGS: 'binarycaching' # Possibly redundant, but explicitly sets the binary caching feature flag
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
 
       - name: Build Cockatrice
         id: build
