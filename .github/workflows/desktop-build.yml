@@ -211,7 +211,6 @@ jobs:
             make_package: 1
 
           - target: 14
-            soc: Apple
             os: macos-14
             xcode: "15.4"
             type: Release
@@ -219,17 +218,15 @@ jobs:
             make_package: 1
 
           - target: 15
-            soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Release
             core_count: 3
             make_package: 1
 
           - target: 15
-            soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.3"
             type: Debug
             core_count: 3
 
@@ -259,10 +256,10 @@ jobs:
         shell: bash
         id: build
         env:
-          BUILDTYPE: '${{matrix.type}}'
+          BUILDTYPE: ${{ matrix.type }}
           MAKE_TEST: 1
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: -macOS${{ matrix.target }}${{ matrix.soc == 'Intel' && '_Intel' || '' }}
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -350,13 +347,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 7
-            qt_version: 5.15.*
-            qt_arch: msvc2019_64
-
           - target: 10
             qt_version: 6.6.*
-            qt_arch: msvc2019_64
+            qt_arch: win64_msvc2019_64  # win64_msvc2022_64 is only available with Qt 6.8, which introduces a bug in game window
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: Windows ${{matrix.target}}
@@ -383,20 +376,14 @@ jobs:
           cache: true
           setup-python: true
           version: ${{matrix.qt_version}}
-          arch: win64_${{matrix.qt_arch}}
-          tools: ${{matrix.qt_tools}}
+          arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
 
-      # TODO: re-enable when https://github.com/lukka/run-vcpkg/issues/243 is fixed
-      - if: false
-        name: Run vcpkg (disabled)
-        uses: lukka/run-vcpkg@v11
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
         with:
-          runVcpkgInstall: true
-          doNotCache: false
-        env:
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
-          VCPKG_DISABLE_METRICS: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Cockatrice
         id: build
@@ -405,7 +392,8 @@ jobs:
           PACKAGE_SUFFIX: '-Win${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: 'x64'
-          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
+          QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\${{matrix.qt_arch}}'
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         # No need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count,
         # project and process parallelism: https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
         run: .ci/compile.sh --server --release --test --package
