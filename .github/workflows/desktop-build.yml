@@ -382,16 +382,11 @@ jobs:
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
-      # TODO: re-enable when https://github.com/lukka/run-vcpkg/issues/243 is fixed
-      - if: false
-        name: Run vcpkg (disabled)
-        uses: lukka/run-vcpkg@v11
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
         with:
-          runVcpkgInstall: true
-          doNotCache: false
-        env:
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
-          VCPKG_DISABLE_METRICS: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Cockatrice
         id: build
@@ -401,6 +396,8 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         # No need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count,
         # project and process parallelism: https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
         run: .ci/compile.sh --server --release --test --package
