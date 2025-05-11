@@ -197,6 +197,13 @@ jobs:
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
+      - name: Attest build provenance
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.build.outputs.name }}
+          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
+
   build-macos:
     strategy:
       fail-fast: false
@@ -345,6 +352,13 @@ jobs:
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
+      - name: Attest build provenance
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.build.outputs.name }}
+          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
+
   build-windows:
     strategy:
       fail-fast: false
@@ -435,3 +449,10 @@ jobs:
           asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      - name: Attest build provenance
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ steps.build.outputs.name }}
+          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
