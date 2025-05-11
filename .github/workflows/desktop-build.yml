@@ -180,6 +180,7 @@ jobs:
           .ci/name_build.sh
 
       - name: Upload artifact
+        id: upload_artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v4
         with:
@@ -188,6 +189,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
+        id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
@@ -196,6 +198,20 @@ jobs:
           asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      - name: Attest binary provenance
+        id: attestation
+        if: steps.upload_release.outcome == 'success'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
+
+      - name: Verify binary attestation
+        if: steps.attestation.outcome == 'success'
+        shell: bash
+        run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
 
   build-macos:
     strategy:
@@ -328,6 +344,7 @@ jobs:
           fi
 
       - name: Upload artifact
+        id: upload_artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
@@ -336,6 +353,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
+        id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
@@ -344,6 +362,20 @@ jobs:
           asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      - name: Attest binary provenance
+        id: attestation
+        if: steps.upload_release.outcome == 'success'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
+
+      - name: Verify binary attestation
+        if: steps.attestation.outcome == 'success'
+        shell: bash
+        run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
 
   build-windows:
     strategy:
@@ -411,6 +443,7 @@ jobs:
         run: .ci/compile.sh --server --release --test --package
 
       - name: Upload artifact
+        id: upload_artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows${{matrix.target}}-installer
@@ -427,6 +460,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
+        id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
@@ -435,3 +469,17 @@ jobs:
           asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
+
+      - name: Attest binary provenance
+        id: attestation
+        if: steps.upload_release.outcome == 'success'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
+
+      - name: Verify binary attestation
+        if: steps.attestation.outcome == 'success'
+        shell: bash
+        run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
