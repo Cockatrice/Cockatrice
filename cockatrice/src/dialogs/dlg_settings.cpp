@@ -468,7 +468,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         connect(pushButton, &QPushButton::clicked, this, [index, pushButton]() {
             auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
-            auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), pushButton);
+            auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
             if (!newColor.isValid())
                 return;
 
