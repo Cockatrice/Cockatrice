@@ -465,7 +465,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
                     }
                 });
 
-        connect(pushButton, &QPushButton::clicked, this, [index, pushButton]() {
+        connect(pushButton, &QPushButton::clicked, this, [index, this]() {
             auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
             auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
