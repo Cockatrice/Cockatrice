@@ -180,6 +180,7 @@ jobs:
           .ci/name_build.sh
 
       - name: Upload artifact
+        id: upload_artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v4
         with:
@@ -204,6 +205,8 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
@@ -341,6 +344,7 @@ jobs:
           fi
 
       - name: Upload artifact
+        id: upload_artifact
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
@@ -365,6 +369,8 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
@@ -437,6 +443,7 @@ jobs:
         run: .ci/compile.sh --server --release --test --package
 
       - name: Upload artifact
+        id: upload_artifact
         uses: actions/upload-artifact@v4
         with:
           name: Windows${{matrix.target}}-installer
@@ -469,6 +476,8 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
+          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
