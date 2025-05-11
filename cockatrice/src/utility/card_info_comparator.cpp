@@ -37,17 +37,17 @@ bool CardInfoComparator::compareVariants(const QVariant &a, const QVariant &b) c
 
     // Perform type-specific comparison
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    switch (a.typeId()) {
+    switch (static_cast<int>(a.typeId())) {
 #else
-    switch (a.type()) {
+    switch (static_cast<int>(a.type())) {
 #endif
-        case QMetaType::Int:
+        case static_cast<int>(QMetaType::Int):
             return a.toInt() < b.toInt();
-        case QMetaType::Double:
+        case static_cast<int>(QMetaType::Double):
             return a.toDouble() < b.toDouble();
-        case QMetaType::QString:
+        case static_cast<int>(QMetaType::QString):
             return a.toString() < b.toString();
-        case QMetaType::Bool:
+        case static_cast<int>(QMetaType::Bool):
             return a.toBool() < b.toBool();
         default:
             // Default to comparing as strings

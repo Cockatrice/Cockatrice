@@ -38,6 +38,7 @@ public:
                                          AbstractTabDeckEditor *deckEditor,
                                          CardDatabaseModel *database_model,
                                          CardDatabaseDisplayModel *database_display_model);
+    void retranslateUi();
 
     void adjustCardsPerPage();
     void populateCards();

@@ -150,6 +150,18 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
     loadCardsTimer->start(5000);
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayWidget::retranslateUi()
+{
+    clearFilterWidget->setToolTip(tr("Clear all filters"));
+
+    quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
+    quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
+    quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
+    quickFilterSetWidget->setToolTip(tr("Filter by set"));
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)

@@ -81,12 +81,12 @@ void Logger::closeLogfileSession()
     fileHandle.close();
 }
 
-void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString message)
+void Logger::log(QtMsgType /* type */, const QMessageLogContext & /* ctx */, const QString &message)
 {
     QMetaObject::invokeMethod(this, "internalLog", Qt::QueuedConnection, Q_ARG(const QString &, message));
 }
 
-void Logger::internalLog(QString message)
+void Logger::internalLog(const QString &message)
 {
     QMutexLocker locker(&mutex);
 

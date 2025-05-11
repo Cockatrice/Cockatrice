@@ -8,6 +8,7 @@
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_quick_settings_widget.h"
 #include "visual_deck_storage_search_widget.h"
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
@@ -29,9 +30,10 @@ public:
     void refreshIfPossible();
     void retranslateUi();
 
-    CardSizeWidget *cardSizeWidget;
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
+
+    const VisualDeckStorageQuickSettingsWidget *settings() const;
 
 public slots:
     void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option
@@ -60,15 +62,7 @@ private:
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     QToolButton *refreshButton;
-    SettingsButtonWidget *quickSettingsWidget;
-    QCheckBox *showFoldersCheckBox;
-    QCheckBox *drawUnusedColorIdentitiesCheckBox;
-    QCheckBox *bannerCardComboBoxVisibilityCheckBox;
-    QCheckBox *tagFilterVisibilityCheckBox;
-    QCheckBox *tagsOnWidgetsVisibilityCheckBox;
-    QCheckBox *searchFolderNamesCheckBox;
-    QLabel *unusedColorIdentitiesOpacityLabel;
-    QSpinBox *unusedColorIdentitiesOpacitySpinBox;
+    VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget;
 

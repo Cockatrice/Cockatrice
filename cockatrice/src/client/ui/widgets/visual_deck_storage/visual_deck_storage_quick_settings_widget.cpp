@@ -1,0 +1,155 @@
+#include "visual_deck_storage_quick_settings_widget.h"
+
+#include "../../../../settings/cache_settings.h"
+#include "visual_deck_storage_widget.h"
+
+#include <QCheckBox>
+#include <QSpinBox>
+
+VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
+    : SettingsButtonWidget(parent)
+{
+    // show folders checkbox
+    showFoldersCheckBox = new QCheckBox(this);
+    showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showFoldersChanged);
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowFolders);
+
+    // show tag filter widget checkbox
+    showTagFilterCheckBox = new QCheckBox(this);
+    showTagFilterCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
+    connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showTagFilterChanged);
+    connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagFilter);
+
+    // show tags on DeckPreviewWidget checkbox
+    showTagsOnDeckPreviewsCheckBox = new QCheckBox(this);
+    showTagsOnDeckPreviewsCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+    connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showTagsOnDeckPreviewsChanged);
+    connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews);
+
+    // show banner card selector checkbox
+    showBannerCardComboBoxCheckBox = new QCheckBox(this);
+    showBannerCardComboBoxCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
+    connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showBannerCardComboBoxChanged);
+    connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
+
+    // search folder names checkbox
+    searchFolderNamesCheckBox = new QCheckBox(this);
+    searchFolderNamesCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageSearchFolderNames());
+    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::searchFolderNamesChanged);
+    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageSearchFolderNames);
+
+    // draw unused color identities checkbox
+    drawUnusedColorIdentitiesCheckBox = new QCheckBox(this);
+    drawUnusedColorIdentitiesCheckBox->setChecked(
+        SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities());
+    connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::drawUnusedColorIdentitiesChanged);
+    connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
+
+    // color identity opacity selector
+    auto unusedColorIdentityOpacityWidget = new QWidget(this);
+
+    unusedColorIdentitiesOpacityLabel = new QLabel(unusedColorIdentityOpacityWidget);
+    unusedColorIdentitiesOpacitySpinBox = new QSpinBox(unusedColorIdentityOpacityWidget);
+
+    unusedColorIdentitiesOpacitySpinBox->setMinimum(0);
+    unusedColorIdentitiesOpacitySpinBox->setMaximum(100);
+    unusedColorIdentitiesOpacitySpinBox->setValue(
+        SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
+    connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+            &VisualDeckStorageQuickSettingsWidget::unusedColorIdentitiesOpacityChanged);
+    connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            &SettingsCache::instance(), &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
+
+    unusedColorIdentitiesOpacityLabel->setBuddy(unusedColorIdentitiesOpacitySpinBox);
+
+    auto unusedColorIdentityOpacityLayout = new QHBoxLayout(unusedColorIdentityOpacityWidget);
+    unusedColorIdentityOpacityLayout->setContentsMargins(11, 0, 11, 0);
+    unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacityLabel);
+    unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacitySpinBox);
+
+    // card size slider
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
+            &VisualDeckStorageQuickSettingsWidget::cardSizeChanged);
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageCardSize);
+
+    // putting everything together
+    this->addSettingsWidget(showFoldersCheckBox);
+    this->addSettingsWidget(showTagFilterCheckBox);
+    this->addSettingsWidget(showTagsOnDeckPreviewsCheckBox);
+    this->addSettingsWidget(showBannerCardComboBoxCheckBox);
+    this->addSettingsWidget(searchFolderNamesCheckBox);
+    this->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
+    this->addSettingsWidget(unusedColorIdentityOpacityWidget);
+    this->addSettingsWidget(cardSizeWidget);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this,
+            &VisualDeckStorageQuickSettingsWidget::retranslateUi);
+    retranslateUi();
+}
+
+void VisualDeckStorageQuickSettingsWidget::retranslateUi()
+{
+    showFoldersCheckBox->setText(tr("Show Folders"));
+    showTagFilterCheckBox->setText(tr("Show Tag Filter"));
+    showTagsOnDeckPreviewsCheckBox->setText(tr("Show Tags On Deck Previews"));
+    showBannerCardComboBoxCheckBox->setText(tr("Show Banner Card Selection Option"));
+    searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
+    drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
+    unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
+    unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowFolders() const
+{
+    return showFoldersCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getDrawUnusedColorIdentities() const
+{
+    return drawUnusedColorIdentitiesCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowBannerCardComboBox() const
+{
+    return showBannerCardComboBoxCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowTagFilter() const
+{
+    return showTagFilterCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowTagsOnDeckPreviews() const
+{
+    return showTagsOnDeckPreviewsCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getSearchFolderNames() const
+{
+    return searchFolderNamesCheckBox->isChecked();
+}
+
+int VisualDeckStorageQuickSettingsWidget::getUnusedColorIdentitiesOpacity() const
+{
+    return unusedColorIdentitiesOpacitySpinBox->value();
+}
+
+int VisualDeckStorageQuickSettingsWidget::getCardSize() const
+{
+    return cardSizeWidget->getSlider()->value();
+}

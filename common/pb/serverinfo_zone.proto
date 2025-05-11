@@ -11,6 +11,10 @@ message ServerInfo_Zone {
         // setting beingLookedAt to true.
         // Cards in a zone with the type HiddenZone are referenced by their
         // list index, whereas cards in any other zone are referenced by their ids.
+        //
+        // WARNING: Adding new zone types will break compatibility with older
+        // clients. Older clients will read new zone types as PrivateZone, which
+        // is likely *NOT* what you want.
 
         PrivateZone = 0;
         PublicZone = 1;

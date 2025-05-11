@@ -91,7 +91,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -228,19 +228,22 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
-    emit deckChanged();
+    emit nameChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
-    emit deckChanged();
+    emit commentsChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateHash()
 {
     hashLabel->setText(deckModel->getDeckList()->getDeckHash());
-    emit deckChanged();
+    emit hashChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
@@ -294,6 +297,10 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     int restoredIndex = bannerCardComboBox->findText(currentText);
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
+        if (deckModel->getDeckList()->getBannerCard().second !=
+            bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap()["uuid"].toString()) {
+            setBannerCard(restoredIndex);
+        }
     } else {
         // Add a placeholder "-" and set it as the current selection
         int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().first);
@@ -314,7 +321,7 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
     QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
     deckModel->getDeckList()->setBannerCard(
         QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
-    emit deckChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
@@ -362,8 +369,12 @@ void DeckEditorDeckDockWidget::cleanDeck()
 {
     deckModel->cleanList();
     nameEdit->setText(QString());
+    emit nameChanged();
     commentsEdit->setText(QString());
+    emit commentsChanged();
     hashLabel->setText(QString());
+    emit hashChanged();
+    emit deckModified();
     emit deckChanged();
     updateBannerCardComboBox();
     deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
@@ -422,7 +433,7 @@ void DeckEditorDeckDockWidget::actSwapCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        emit deckChanged();
+        emit deckModified();
     }
 
     update();
@@ -517,7 +528,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     if (isModified) {
-        emit deckChanged();
+        emit deckModified();
     }
 }
 
@@ -535,7 +546,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
     else
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
 
-    emit deckChanged();
+    emit deckModified();
 }
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
@@ -563,6 +574,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     setWindowTitle(tr("Deck"));
 
     nameLabel->setText(tr("Deck &name:"));
+    quickSettingsWidget->setToolTip(tr("Banner Card/Tags Visibility Settings"));
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));

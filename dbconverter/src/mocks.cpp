@@ -64,6 +64,9 @@ void SettingsCache::setCardViewExpandedRowsMax(int /* value */)
 void SettingsCache::setCloseEmptyCardView(const QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T /* value */)
+{
+}
 void SettingsCache::setKnownMissingFeatures(const QString & /* _knownMissingFeatures */)
 {
 }
@@ -256,10 +259,16 @@ void SettingsCache::setVisualDeckStorageInGame(QT_STATE_CHANGED_T /* value */)
 void SettingsCache::setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setDefaultDeckEditorType(int /* value */)
+{
+}
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T /* _enabled */)
 {
 }
 void SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int /* _amount */)
+{
+}
+void SettingsCache::setVisualDeckEditorSampleHandSize(int /* _amount */)
 {
 }
 void SettingsCache::setHorizontalHand(QT_STATE_CHANGED_T /* _horizontalHand */)

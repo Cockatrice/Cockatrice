@@ -9,6 +9,7 @@ on:
       - 'webclient/**'
       - '.github/workflows/web-*.yml'
       - '.github/workflows/translations-*.yml'
+      - '.github/workflows/docker-release.yml'
     tags:
       - '*'
   pull_request:
@@ -132,7 +133,7 @@ jobs:
       CACHE: /tmp/${{matrix.distro}}${{matrix.version}}-cache    # ${{runner.temp}} does not work?
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 200M
+      CCACHE_SIZE: 500M
 
     steps:
       - name: Checkout
@@ -386,7 +387,9 @@ jobs:
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
-      - name: Run vcpkg
+      # TODO: re-enable when https://github.com/lukka/run-vcpkg/issues/243 is fixed
+      - if: false
+        name: Run vcpkg (disabled)
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
