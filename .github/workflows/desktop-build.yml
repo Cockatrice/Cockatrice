@@ -248,7 +248,7 @@ jobs:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
-          brew install protobuf qt --force-bottle
+          brew install protobuf qt ccache --force-bottle
 
       - name: Build & Sign on Xcode ${{matrix.xcode}}
         shell: bash
@@ -262,6 +262,7 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+          CCACHE_SIZE: 500M
         # macOS runner have 3 cores usually - only the macos-13 image has 4:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
         # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
@@ -276,7 +277,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --parallel ${{matrix.core_count}}
+          .ci/compile.sh --server --parallel ${{matrix.core_count}} --ccache "$CCACHE_SIZE"
 
       - name: Sign app bundle
         if: matrix.make_package
