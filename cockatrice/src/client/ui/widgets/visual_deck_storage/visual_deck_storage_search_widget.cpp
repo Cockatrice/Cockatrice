@@ -1,5 +1,6 @@
 #include "visual_deck_storage_search_widget.h"
 
+#include "../../../../game/filters/deck_filter_string.h"
 #include "../../../../settings/cache_settings.h"
 
 /**
@@ -52,11 +53,11 @@ static QString getFileSearchName(const QString &filePath, bool includeFolderName
 {
     QString deckPath = SettingsCache::instance().getDeckPath();
     if (includeFolderName && filePath.startsWith(deckPath)) {
-        return filePath.mid(deckPath.length()).toLower();
+        return filePath.mid(deckPath.length());
     }
 
     QFileInfo fileInfo(filePath);
-    QString fileName = fileInfo.fileName().toLower();
+    QString fileName = fileInfo.fileName();
     return fileName;
 }
 
@@ -64,14 +65,10 @@ void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> wid
                                                   const QString &searchText,
                                                   bool includeFolderName)
 {
-    if (searchText.isEmpty() || searchText.isNull()) {
-        for (auto widget : widgets) {
-            widget->filteredBySearch = false;
-        }
-    }
+    auto filterString = DeckFilterString(searchText);
 
-    for (auto file : widgets) {
-        QString fileSearchName = getFileSearchName(file->filePath, includeFolderName);
-        file->filteredBySearch = !fileSearchName.contains(searchText.toLower());
+    for (auto widget : widgets) {
+        QString fileSearchName = getFileSearchName(widget->filePath, includeFolderName);
+        widget->filteredBySearch = !filterString.check(widget, {fileSearchName});
     }
 }
