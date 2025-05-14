@@ -1599,7 +1599,7 @@ void TabGame::createReplayDock()
     replayControlLayout->addWidget(replayPlayButton);
     replayControlLayout->addWidget(replayFastForwardButton);
 
-    replayControlWidget = new QWidget();
+    auto replayControlWidget = new QWidget();
     replayControlWidget->setObjectName("replayControlWidget");
     replayControlWidget->setLayout(replayControlLayout);
 
@@ -1641,7 +1641,7 @@ void TabGame::createCardInfoDock(bool bReplay)
     cardVInfoLayout->addWidget(cardInfoFrameWidget);
     cardVInfoLayout->addLayout(cardHInfoLayout);
 
-    cardBoxLayoutWidget = new QWidget;
+    auto cardBoxLayoutWidget = new QWidget;
     cardBoxLayoutWidget->setLayout(cardVInfoLayout);
 
     cardInfoDock = new QDockWidget(this);
@@ -1740,7 +1740,7 @@ void TabGame::createMessageDock(bool bReplay)
         messageLogLayout->addLayout(sayHLayout);
     }
 
-    messageLogLayoutWidget = new QWidget;
+    auto messageLogLayoutWidget = new QWidget;
     messageLogLayoutWidget->setLayout(messageLogLayout);
 
     messageLayoutDock = new QDockWidget(this);
