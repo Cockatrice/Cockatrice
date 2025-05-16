@@ -1,7 +1,9 @@
 #include "visual_deck_storage_search_widget.h"
 
 #include "../../../../game/filters/deck_filter_string.h"
+#include "../../../../game/filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
@@ -18,7 +20,13 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
     setLayout(layout);
 
     searchBar = new QLineEdit(this);
-    searchBar->setPlaceholderText(tr("Search by filename"));
+    searchBar->setPlaceholderText(tr("Search by filename (or search expression)"));
+    searchBar->setClearButtonEnabled(true);
+    searchBar->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+
+    auto help = searchBar->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    connect(help, &QAction::triggered, this, [this] { createDeckSearchSyntaxHelpWindow(searchBar); });
+
     layout->addWidget(searchBar);
 
     // Add a debounce timer for the search bar to limit frequent updates
