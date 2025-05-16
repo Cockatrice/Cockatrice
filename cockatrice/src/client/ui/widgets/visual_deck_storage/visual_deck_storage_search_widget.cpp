@@ -5,6 +5,8 @@
 #include "../../../../settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 
+#include <QAction>
+
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
  *
