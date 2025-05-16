@@ -129,6 +129,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
+      CMAKE_GENERATOR: 'Ninja'
 
     steps:
       - name: Checkout
@@ -156,9 +157,11 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
+          RUN --server --debug --test --ccache "$CCACHE_SIZE"
 
       - name: Build release package
         id: build
@@ -168,10 +171,11 @@ jobs:
           BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           type: '${{matrix.package}}'
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" --parallel 4
+                  --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
 
       - name: Upload artifact
@@ -202,7 +206,6 @@ jobs:
             os: macos-13
             xcode: "14.3.1"
             type: Release
-            core_count: 4
             make_package: 1
 
           - target: 14
@@ -210,7 +213,6 @@ jobs:
             os: macos-14
             xcode: "15.4"
             type: Release
-            core_count: 3
             make_package: 1
 
           - target: 15
@@ -218,7 +220,6 @@ jobs:
             os: macos-15
             xcode: "16.2"
             type: Release
-            core_count: 3
             make_package: 1
 
           - target: 15
@@ -226,7 +227,6 @@ jobs:
             os: macos-15
             xcode: "16.2"
             type: Debug
-            core_count: 3
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -235,6 +235,7 @@ jobs:
     env:
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+      CMAKE_GENERATOR: 'Ninja'
 
     steps:
       - name: Checkout
@@ -262,9 +263,7 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-        # macOS runner have 3 cores usually - only the macos-13 image has 4:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-        # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
@@ -276,7 +275,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --parallel ${{matrix.core_count}}
+          .ci/compile.sh --server
 
       - name: Sign app bundle
         if: matrix.make_package
@@ -394,7 +393,6 @@ jobs:
         env:
           PACKAGE_SUFFIX: '-Win${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'

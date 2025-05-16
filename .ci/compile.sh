@@ -11,9 +11,8 @@
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
-# --parallel <core count> sets how many cores cmake should build with in parallel
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR PARALLEL_COUNT
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir> --parallel <core_count>)
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -76,15 +75,6 @@ while [[ $# != 0 ]]; do
       BUILD_DIR="$1"
       shift
       ;;
-    '--parallel')
-      shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--parallel expects an argument"
-        exit 3
-      fi
-      PARALLEL_COUNT="$1"
-      shift
-      ;;
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -126,16 +116,6 @@ fi
 
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
-if [[ $PARALLEL_COUNT ]]; then
-  if [[ $(cmake --build /not_a_dir --parallel 2>&1 | head -1) =~ parallel ]]; then
-    # workaround for bionic having an old cmake
-    echo "this version of cmake does not support --parallel, using native build tool -j instead"
-    buildflags+=(-- -j "$PARALLEL_COUNT")
-    # note, no normal build flags should be added after this
-  else
-    buildflags+=(--parallel "$PARALLEL_COUNT")
-  fi
-fi
 
 function ccachestatsverbose() {
   # note, verbose only works on newer ccache, discard the error

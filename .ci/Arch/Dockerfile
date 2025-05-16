@@ -7,6 +7,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         git \
         gtest \
         mariadb-libs \
+        ninja \
         protobuf \
         qt6-base \
         qt6-imageformats \

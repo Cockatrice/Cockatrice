@@ -16,6 +16,7 @@ RUN apt-get update && \
         libqt5sql5-mysql \
         libqt5svg5-dev \
         libqt5websockets5-dev \
+        ninja-build \
         protobuf-compiler \
         qt5-image-formats-plugins \
         qtmultimedia5-dev \

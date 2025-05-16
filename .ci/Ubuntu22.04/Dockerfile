@@ -17,6 +17,7 @@ RUN apt-get update && \
         libqt6sql6-mysql \
         libqt6svg6-dev \
         libqt6websockets6-dev \
+        ninja-build \
         protobuf-compiler \
         qt6-image-formats-plugins \
         qt6-l10n-tools \
