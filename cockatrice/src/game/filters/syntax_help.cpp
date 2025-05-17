@@ -9,11 +9,12 @@
  *
  * @return the QTextBrowser
  */
-static QTextBrowser *createBrowser()
+static QTextBrowser *createBrowser(const QString &helpFile)
 {
-    QFile file("theme:help/search.md");
+    QFile file(helpFile);
 
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qCWarning(SyntaxHelpLog) << "Could not open syntax help file: " << helpFile;
         return nullptr;
     }
 
@@ -54,9 +55,29 @@ static QTextBrowser *createBrowser()
  */
 QTextBrowser *createSearchSyntaxHelpWindow(QLineEdit *lineEdit)
 {
-    auto browser = createBrowser();
+    auto browser = createBrowser("theme:help/search.md");
     QObject::connect(browser, &QTextBrowser::anchorClicked,
                      [lineEdit](const QUrl &link) { lineEdit->setText(link.fragment()); });
+    QObject::connect(lineEdit, &QObject::destroyed, browser, &QTextBrowser::close);
+    return browser;
+}
+
+/**
+ * Creates the deck search syntax help window and connects its anchorClicked signal to the given QLineEdit.
+ * The window will automatically close when the QLineEdit is destroyed.
+ *
+ * @return the QTextBrowser
+ */
+QTextBrowser *createDeckSearchSyntaxHelpWindow(QLineEdit *lineEdit)
+{
+    auto browser = createBrowser("theme:help/deck_search.md");
+    QObject::connect(browser, &QTextBrowser::anchorClicked, [lineEdit](const QUrl &link) {
+        if (link.fragment() == "cardSearchSyntaxHelp") {
+            createSearchSyntaxHelpWindow(lineEdit);
+        } else {
+            lineEdit->setText(link.fragment());
+        }
+    });
     QObject::connect(lineEdit, &QObject::destroyed, browser, &QTextBrowser::close);
     return browser;
 }

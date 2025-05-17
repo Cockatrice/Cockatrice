@@ -1,6 +1,11 @@
 #include "visual_deck_storage_search_widget.h"
 
+#include "../../../../game/filters/deck_filter_string.h"
+#include "../../../../game/filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
+
+#include <QAction>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
@@ -17,7 +22,13 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
     setLayout(layout);
 
     searchBar = new QLineEdit(this);
-    searchBar->setPlaceholderText(tr("Search by filename"));
+    searchBar->setPlaceholderText(tr("Search by filename (or search expression)"));
+    searchBar->setClearButtonEnabled(true);
+    searchBar->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+
+    auto help = searchBar->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    connect(help, &QAction::triggered, this, [this] { createDeckSearchSyntaxHelpWindow(searchBar); });
+
     layout->addWidget(searchBar);
 
     // Add a debounce timer for the search bar to limit frequent updates
@@ -52,11 +63,11 @@ static QString getFileSearchName(const QString &filePath, bool includeFolderName
 {
     QString deckPath = SettingsCache::instance().getDeckPath();
     if (includeFolderName && filePath.startsWith(deckPath)) {
-        return filePath.mid(deckPath.length()).toLower();
+        return filePath.mid(deckPath.length());
     }
 
     QFileInfo fileInfo(filePath);
-    QString fileName = fileInfo.fileName().toLower();
+    QString fileName = fileInfo.fileName();
     return fileName;
 }
 
@@ -64,14 +75,10 @@ void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> wid
                                                   const QString &searchText,
                                                   bool includeFolderName)
 {
-    if (searchText.isEmpty() || searchText.isNull()) {
-        for (auto widget : widgets) {
-            widget->filteredBySearch = false;
-        }
-    }
+    auto filterString = DeckFilterString(searchText);
 
-    for (auto file : widgets) {
-        QString fileSearchName = getFileSearchName(file->filePath, includeFolderName);
-        file->filteredBySearch = !fileSearchName.contains(searchText.toLower());
+    for (auto widget : widgets) {
+        QString fileSearchName = getFileSearchName(widget->filePath, includeFolderName);
+        widget->filteredBySearch = !filterString.check(widget, {fileSearchName});
     }
 }

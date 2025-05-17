@@ -7,7 +7,7 @@
 #include <QString>
 #include <functional>
 
-peg::parser search(R"(
+static peg::parser search(R"(
 Start <- QueryPartList
 ~ws <- [ ]+
 QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
@@ -63,7 +63,7 @@ NumericOperator <- [=:] / <[><!][=]?>
 NumericValue <- [0-9]+
 )");
 
-std::once_flag init;
+static std::once_flag init;
 
 static void setupParserRules()
 {
