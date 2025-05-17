@@ -139,11 +139,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate cache timestamp
-        id: cache_timestamp
-        shell: bash
-        run: echo "timestamp=$(date -u '+%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
-
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
         run: source .ci/docker.sh --build
@@ -152,10 +147,10 @@ jobs:
         id: ccache_restore
         uses: actions/cache/restore@v4
         env:
-          timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.timestamp}}
+          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
           restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
 
       - name: Build debug and test
@@ -182,8 +177,6 @@ jobs:
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v4
-        env:
-          timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
         with:
           path: ${{env.CACHE}}
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
