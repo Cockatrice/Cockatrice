@@ -2,6 +2,7 @@
 
 #include "../../client/tabs/tab_game.h"
 #include "../../settings/cache_settings.h"
+#include "../../settings/card_counter_settings.h"
 #include "../cards/card_info.h"
 #include "../game_scene.h"
 #include "../player/player.h"
@@ -31,6 +32,11 @@ CardItem::CardItem(Player *_owner,
     cardMenu = new QMenu;
     ptMenu = new QMenu;
     moveMenu = new QMenu;
+
+    connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
+        if (counters.contains(counterId))
+            update();
+    });
 
     retranslateUi();
 }
@@ -84,6 +90,8 @@ void CardItem::retranslateUi()
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+
     painter->save();
     AbstractCardItem::paint(painter, option, widget);
 
@@ -91,8 +99,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QMapIterator<int, int> counterIterator(counters);
     while (counterIterator.hasNext()) {
         counterIterator.next();
-        QColor _color;
-        _color.setHsv(counterIterator.key() * 60, 150, 255);
+        QColor _color = cardCounterSettings.color(counterIterator.key());
 
         paintNumberEllipse(counterIterator.value(), 14, _color, i, counters.size(), painter);
         ++i;
