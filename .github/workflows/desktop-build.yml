@@ -135,24 +135,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate cache timestamp
-        id: cache_timestamp
-        shell: bash
-        run: echo "timestamp=$(date -u '+%Y%m%d%H%M%S')" >>"$GITHUB_OUTPUT"
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        env:
-          timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
-        with:
-          path: ${{env.CACHE}}
-          key: docker-${{matrix.distro}}${{matrix.version}}-cache-${{env.timestamp}}
-          restore-keys: |
-            docker-${{matrix.distro}}${{matrix.version}}-cache-
-
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
         run: source .ci/docker.sh --build
+
+      - name: Restore compiler cache (ccache)
+        id: ccache_restore
+        uses: actions/cache/restore@v4
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CACHE}}
+          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
 
       - name: Build debug and test
         if: matrix.test != 'skip'
@@ -177,6 +172,13 @@ jobs:
           RUN --server --release --package "$type" --dir "$BUILD_DIR" \
                   --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{env.CACHE}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Upload artifact
         if: matrix.package != 'skip'
