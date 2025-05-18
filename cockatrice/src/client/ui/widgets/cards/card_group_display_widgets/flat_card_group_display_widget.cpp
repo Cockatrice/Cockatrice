@@ -6,9 +6,11 @@
 #include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>
+#include <utility>
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
                                                        DeckListModel *_deckListModel,
+                                                       QPersistentModelIndex _trackedIndex,
                                                        QString _zoneName,
                                                        QString _cardGroupCategory,
                                                        QString _activeGroupCriteria,
@@ -17,6 +19,7 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
                                                        CardSizeWidget *_cardSizeWidget)
     : CardGroupDisplayWidget(parent,
                              _deckListModel,
+                             std::move(_trackedIndex),
                              _zoneName,
                              _cardGroupCategory,
                              _activeGroupCriteria,
@@ -29,77 +32,33 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
 
     layout->addWidget(flowWidget);
     FlatCardGroupDisplayWidget::updateCardDisplays();
-    connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
+    // connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
 }
 
-void FlatCardGroupDisplayWidget::updateCardDisplays()
+QWidget* FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
 {
-    // Retrieve and sort cards
-    QList<CardInfoPtr> cardsInZone = getCardsMatchingGroup(deckListModel->getCardsAsCardInfoPtrsForZone(zoneName));
+    QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(row, 0, trackedIndex));
 
-    // Show or hide widget
-    bool shouldBeVisible = !cardsInZone.isEmpty();
-    if (shouldBeVisible != isVisible()) {
-        setVisible(shouldBeVisible);
+    if (indexToWidgetMap.contains(index)) {
+        return indexToWidgetMap[index];
     }
+    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
+    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
+    qInfo() << cardName;
 
-    // Retrieve existing widgets
-    QList<CardInfoPictureWithTextOverlayWidget *> existingWidgets =
-        flowWidget->findChildren<CardInfoPictureWithTextOverlayWidget *>();
+    auto widget = new CardInfoPictureWithTextOverlayWidget(flowWidget, true);
+    widget->setScaleFactor(cardSizeWidget->getSlider()->value());
+    widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderId));
 
-    QHash<QString, QList<CardInfoPictureWithTextOverlayWidget *>> widgetMap;
-    for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
-        widgetMap[widget->getInfo()->getName()].append(widget);
-    }
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &FlatCardGroupDisplayWidget::onClick);
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &FlatCardGroupDisplayWidget::onHover);
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
 
-    QList<CardInfoPictureWithTextOverlayWidget *> sortedWidgets;
-    QSet<CardInfoPictureWithTextOverlayWidget *> usedWidgets;
-
-    // Ensure widgets are ordered to match the sorted cards
-    for (const CardInfoPtr &card : cardsInZone) {
-        QString name = card->getName();
-        CardInfoPictureWithTextOverlayWidget *widget = nullptr;
-
-        if (!widgetMap[name].isEmpty()) {
-            // Reuse an existing widget
-            widget = widgetMap[name].takeFirst();
-        } else {
-            // Create a new widget if needed
-            widget = new CardInfoPictureWithTextOverlayWidget(flowWidget, true);
-            widget->setScaleFactor(cardSizeWidget->getSlider()->value());
-            widget->setCard(card);
-
-            connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
-                    &FlatCardGroupDisplayWidget::onClick);
-            connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
-                    &FlatCardGroupDisplayWidget::onHover);
-            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget,
-                    &CardInfoPictureWidget::setScaleFactor);
-
-            flowWidget->addWidget(widget);
-        }
-
-        // Store in sorted order
-        sortedWidgets.append(widget);
-        usedWidgets.insert(widget);
-    }
-
-    // Remove extra widgets
-    for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
-        if (!usedWidgets.contains(widget)) {
-            flowWidget->layout()->removeWidget(widget);
-            widget->deleteLater();
-        }
-    }
-
-    // **Reorder widgets in place**
-    for (int i = 0; i < sortedWidgets.size(); ++i) {
-        sortedWidgets[i]->setParent(nullptr); // Temporarily detach
-    }
-    for (int i = 0; i < sortedWidgets.size(); ++i) {
-        flowWidget->addWidget(sortedWidgets[i]); // Reattach in correct order
-    }
+    indexToWidgetMap.insert(index, widget);
+    return widget;
 }
+
+
 
 void FlatCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
 {

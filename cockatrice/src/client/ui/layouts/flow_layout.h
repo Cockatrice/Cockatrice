@@ -15,6 +15,7 @@ public:
     explicit FlowLayout(QWidget *parent = nullptr);
     FlowLayout(QWidget *parent, Qt::Orientation _flowDirection, int margin = 0, int hSpacing = 0, int vSpacing = 0);
     ~FlowLayout() override;
+    void insertWidgetAtIndex(QWidget *toInsert, int index);
 
     QSize calculateMinimumSizeHorizontal() const;
     QSize calculateSizeHintVertical() const;

@@ -11,6 +11,7 @@ class FlatCardGroupDisplayWidget : public CardGroupDisplayWidget
 public:
     FlatCardGroupDisplayWidget(QWidget *parent,
                                DeckListModel *deckListModel,
+                               QPersistentModelIndex trackedIndex,
                                QString zoneName,
                                QString cardGroupCategory,
                                QString activeGroupCriteria,
@@ -18,13 +19,33 @@ public:
                                int bannerOpacity,
                                CardSizeWidget *cardSizeWidget);
 
-    void resizeEvent(QResizeEvent *event) override;
-
 public slots:
-    void updateCardDisplays() override;
+    QWidget* constructWidgetForIndex(int row) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     FlowWidget *flowWidget;
+
+    QWidget* getLayoutParent() override
+    {
+        return flowWidget;
+    }
+
+    void addToLayout(QWidget* toAdd) override
+    {
+        flowWidget->addWidget(toAdd);
+    }
+
+    void insertIntoLayout(QWidget *toInsert, int insertAt) override
+    {
+        qInfo() << "Flat card group insertion at " << insertAt;
+        flowWidget->insertWidgetAtIndex(toInsert, insertAt);
+    }
+
+    void removeFromLayout(QWidget* toRemove) override
+    {
+        flowWidget->removeWidget(toRemove);
+    }
 };
 
 #endif // FLAT_CARD_GROUP_DISPLAY_WIDGET_H

@@ -548,6 +548,14 @@ void FlowLayout::addItem(QLayoutItem *item)
     }
 }
 
+void FlowLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
+{
+    addChildWidget(toInsert);
+    items.insert(qBound(0, index, std::max(0, static_cast<int>(items.size()))), new QWidgetItem(toInsert));
+
+    invalidate();
+}
+
 /**
  * @brief Retrieves the count of items in the layout.
  * @return The number of layout items.
