@@ -147,6 +147,7 @@ function RUN ()
     if [[ $CCACHE_DIR ]]; then
       args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache")
       args+=(--env "CCACHE_DIR=/.ccache")
+      args+=(--env "CMAKE_GENERATOR="Ninja"")
     fi
     docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
