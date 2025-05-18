@@ -1688,8 +1688,6 @@ void TabGame::createMessageDock(bool bReplay)
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
 
-    messageLogLayout->addWidget(messageLog);
-
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
@@ -1704,7 +1702,11 @@ void TabGame::createMessageDock(bool bReplay)
         gameTimer->start();
 
         messageLogLayout->addWidget(timeElapsedLabel);
+    }
 
+    messageLogLayout->addWidget(messageLog);
+
+    if (!bReplay) {
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
