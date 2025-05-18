@@ -1682,6 +1682,19 @@ void TabGame::createMessageDock(bool bReplay)
     auto messageLogLayout = new QVBoxLayout;
     messageLogLayout->setContentsMargins(0, 0, 0, 0);
 
+    // clock
+    if (!bReplay) {
+        timeElapsedLabel = new QLabel;
+        timeElapsedLabel->setAlignment(Qt::AlignCenter);
+        gameTimer = new QTimer(this);
+        gameTimer->setInterval(1000);
+        connect(gameTimer, &QTimer::timeout, this, &TabGame::incrementGameTime);
+        gameTimer->start();
+
+        messageLogLayout->addWidget(timeElapsedLabel);
+    }
+
+    // message log
     messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
             qOverload<const QString &>(&CardInfoFrameWidget::setCard));
@@ -1693,19 +1706,11 @@ void TabGame::createMessageDock(bool bReplay)
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
         connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
-
-        timeElapsedLabel = new QLabel;
-        timeElapsedLabel->setAlignment(Qt::AlignCenter);
-        gameTimer = new QTimer(this);
-        gameTimer->setInterval(1000);
-        connect(gameTimer, &QTimer::timeout, this, &TabGame::incrementGameTime);
-        gameTimer->start();
-
-        messageLogLayout->addWidget(timeElapsedLabel);
     }
 
     messageLogLayout->addWidget(messageLog);
 
+    // chat entry
     if (!bReplay) {
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
@@ -1742,6 +1747,7 @@ void TabGame::createMessageDock(bool bReplay)
         messageLogLayout->addLayout(sayHLayout);
     }
 
+    // dock
     auto messageLogLayoutWidget = new QWidget;
     messageLogLayoutWidget->setLayout(messageLogLayout);
 
