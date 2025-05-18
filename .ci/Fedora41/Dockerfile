@@ -6,6 +6,7 @@ RUN dnf install -y \
         gcc-c++ \
         git \
         mariadb-devel \
+        ninja-build \
         protobuf-devel \
         qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
         qt6-qtimageformats \
