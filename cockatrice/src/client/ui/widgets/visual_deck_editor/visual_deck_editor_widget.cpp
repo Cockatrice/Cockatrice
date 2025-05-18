@@ -203,16 +203,16 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
 {
     if (parent == deckListModel->getRoot()) {
         for (int i = first; i <= last; i++) {
-            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 1, deckListModel->getRoot()));
+            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
 
             if (indexToWidgetMap.contains(index)) {
                 continue;
             }
 
-            qInfo() << deckListModel->data(index, Qt::EditRole).toString();
+            qInfo() << "Created zone for " << deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
 
             DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-                zoneContainer, deckListModel, index, deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria,
+                zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
                 activeSortCriteria, 20, 10, cardSizeWidget);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
@@ -222,6 +222,7 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
                     &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
             connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
                     &DeckCardZoneDisplayWidget::refreshDisplayType);
+            zoneDisplayWidget->refreshDisplayType(currentDisplayType == DisplayType::Flat ? "flat" : "overlap");
             zoneContainerLayout->addWidget(zoneDisplayWidget);
 
             indexToWidgetMap.insert(index, zoneDisplayWidget);
@@ -247,16 +248,16 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 {
     qInfo() << "Constructing zone widgets";
     for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); ++i) {
-        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 1, deckListModel->getRoot()));
+        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
 
         if (indexToWidgetMap.contains(index)) {
             continue;
         }
 
-        qInfo() << deckListModel->data(index, Qt::EditRole).toString();
+        qInfo() << deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
 
         DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-            zoneContainer, deckListModel, index, deckListModel->data(index, Qt::EditRole).toString(), activeGroupCriteria,
+            zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
             activeSortCriteria, 20, 10, cardSizeWidget);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);

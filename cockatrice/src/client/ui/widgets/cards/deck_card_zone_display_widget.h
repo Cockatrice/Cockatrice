@@ -38,7 +38,6 @@ public slots:
     void onHover(CardInfoPtr card);
     void displayCards();
     void refreshDisplayType(const DisplayType &displayType);
-    void addCardGroupIfItDoesNotExist();
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
     QList<QString> getGroupCriteriaValueList();

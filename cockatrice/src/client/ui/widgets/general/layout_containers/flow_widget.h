@@ -20,6 +20,7 @@ public:
                Qt::ScrollBarPolicy horizontalPolicy,
                Qt::ScrollBarPolicy verticalPolicy);
     void addWidget(QWidget *widget_to_add) const;
+    void insertWidgetAtIndex(QWidget *toInsert, int index);
     void removeWidget(QWidget *widgetToRemove) const;
     void clearLayout();
     [[nodiscard]] int count() const;
