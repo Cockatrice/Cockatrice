@@ -235,6 +235,7 @@ jobs:
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
+      CCACHE_DIR: /tmp/${{matrix.os}}-${{matrix.type}}-cache
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
@@ -251,7 +252,17 @@ jobs:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
-          brew install protobuf qt --force-bottle
+          brew install ccache protobuf qt --force-bottle
+
+      - name: Restore compiler cache (ccache)
+        id: ccache_restore
+        uses: actions/cache/restore@v4
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.os}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.os}}-${{matrix.type}}-
 
       - name: Build & Sign on Xcode ${{matrix.xcode}}
         shell: bash
@@ -277,7 +288,14 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server
+          .ci/compile.sh --server --ccache "$CCACHE_SIZE"
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
         if: matrix.make_package
