@@ -253,7 +253,7 @@ public:
 private:
     TabGame *game;
     QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
-        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard, *mCustomZones;
+        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard, *mCustomZones, *mCardCounters;
     TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
         *bottomLibraryMenu, *rfgMenu, *playerMenu;
     QList<QMenu *> playerLists;

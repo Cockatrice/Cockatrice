@@ -12,13 +12,17 @@
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
+#include "../settings/card_counter_settings.h"
 #include "../settings/shortcut_treeview.h"
 #include "../utility/sequence_edit.h"
 
+#include <QAbstractButton>
+#include <QAbstractListModel>
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QColorDialog>
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
@@ -42,7 +46,7 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QTranslator>
-#include <qabstractbutton.h>
+#include <QVariant>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
@@ -442,6 +446,51 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
 
+    // Card counter colors
+
+    auto *cardCounterColorsLayout = new QGridLayout;
+    cardCounterColorsLayout->setColumnStretch(1, 1);
+    cardCounterColorsLayout->setColumnStretch(3, 1);
+    cardCounterColorsLayout->setColumnStretch(5, 1);
+
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    for (int index = 0; index < 6; ++index) {
+        auto *pushButton = new QPushButton;
+        pushButton->setStyleSheet(QString("background-color: %1").arg(cardCounterSettings.color(index).name()));
+
+        connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, pushButton,
+                [index, pushButton](int changedIndex, const QColor &color) {
+                    if (index == changedIndex) {
+                        pushButton->setStyleSheet(QString("background-color: %1").arg(color.name()));
+                    }
+                });
+
+        connect(pushButton, &QPushButton::clicked, this, [index, this]() {
+            auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+
+            auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
+            if (!newColor.isValid())
+                return;
+
+            cardCounterSettings.setColor(index, newColor);
+        });
+
+        auto *colorName = new QLabel;
+        cardCounterNames.append(colorName);
+
+        int row = index / 3;
+        int column = 2 * (index % 3);
+
+        cardCounterColorsLayout->addWidget(pushButton, row, column);
+        cardCounterColorsLayout->addWidget(colorName, row, column + 1);
+    }
+
+    auto *cardCountersLayout = new QVBoxLayout;
+    cardCountersLayout->addLayout(cardCounterColorsLayout, 1);
+
+    cardCountersGroupBox = new QGroupBox;
+    cardCountersGroupBox->setLayout(cardCountersLayout);
+
     // Hand layout
     horizontalHandCheckBox.setChecked(settings.getHorizontalHand());
     connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setHorizontalHand);
@@ -489,6 +538,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(cardsGroupBox);
+    mainLayout->addWidget(cardCountersGroupBox);
     mainLayout->addWidget(handGroupBox);
     mainLayout->addWidget(tableGroupBox);
     mainLayout->addStretch();
@@ -576,6 +626,13 @@ void AppearanceSettingsPage::retranslateUi()
     cardViewInitialRowsMaxBox.setSuffix(tr(" rows"));
     cardViewExpandedRowsMaxLabel.setText(tr("Maximum expanded height for card view window:"));
     cardViewExpandedRowsMaxBox.setSuffix(tr(" rows"));
+
+    cardCountersGroupBox->setTitle(tr("Card counters"));
+
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    for (int index = 0; index < cardCounterNames.size(); ++index) {
+        cardCounterNames[index]->setText(tr("Counter %1").arg(cardCounterSettings.displayName(index)));
+    }
 
     handGroupBox->setTitle(tr("Hand layout"));
     horizontalHandCheckBox.setText(tr("Display hand horizontally (wastes space)"));
