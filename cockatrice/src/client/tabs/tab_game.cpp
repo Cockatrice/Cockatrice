@@ -1682,20 +1682,8 @@ void TabGame::createMessageDock(bool bReplay)
     auto messageLogLayout = new QVBoxLayout;
     messageLogLayout->setContentsMargins(0, 0, 0, 0);
 
-    messageLog = new MessageLogWidget(tabSupervisor, this);
-    connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
-            qOverload<const QString &>(&CardInfoFrameWidget::setCard));
-    connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
-    connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
-
-    messageLogLayout->addWidget(messageLog);
-
+    // clock
     if (!bReplay) {
-        connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
-        connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
-                &TabGame::actCompleterChanged);
-
         timeElapsedLabel = new QLabel;
         timeElapsedLabel->setAlignment(Qt::AlignCenter);
         gameTimer = new QTimer(this);
@@ -1704,7 +1692,26 @@ void TabGame::createMessageDock(bool bReplay)
         gameTimer->start();
 
         messageLogLayout->addWidget(timeElapsedLabel);
+    }
 
+    // message log
+    messageLog = new MessageLogWidget(tabSupervisor, this);
+    connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
+            qOverload<const QString &>(&CardInfoFrameWidget::setCard));
+    connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
+    connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
+
+    if (!bReplay) {
+        connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
+        connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
+        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+                &TabGame::actCompleterChanged);
+    }
+
+    messageLogLayout->addWidget(messageLog);
+
+    // chat entry
+    if (!bReplay) {
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
@@ -1740,6 +1747,7 @@ void TabGame::createMessageDock(bool bReplay)
         messageLogLayout->addLayout(sayHLayout);
     }
 
+    // dock
     auto messageLogLayoutWidget = new QWidget;
     messageLogLayoutWidget->setLayout(messageLogLayout);
 
