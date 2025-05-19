@@ -282,11 +282,11 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
 void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
-    QVariant itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex());
-    deckLoader->setBannerCard(QPair<QString, QString>(bannerCardComboBox->currentText(), itemData.toString()));
+    auto nameAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckLoader->setBannerCard(nameAndId);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
-    bannerCardDisplayWidget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-        bannerCardComboBox->currentText(), itemData.toString()));
+    bannerCardDisplayWidget->setCard(
+        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(nameAndId.first, nameAndId.second));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

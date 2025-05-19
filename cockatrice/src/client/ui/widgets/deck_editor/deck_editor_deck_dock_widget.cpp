@@ -303,11 +303,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     });
 
     for (const auto &pair : pairList) {
-        QVariantMap dataMap;
-        dataMap["name"] = pair.first;
-        dataMap["uuid"] = pair.second;
-
-        bannerCardComboBox->addItem(pair.first, dataMap);
+        bannerCardComboBox->addItem(pair.first, QVariant::fromValue(pair));
     }
 
     // Try to restore the previous selection by finding the currentText
@@ -315,7 +311,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
         if (deckModel->getDeckList()->getBannerCard().second !=
-            bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap()["uuid"].toString()) {
+            bannerCardComboBox->currentData().value<QPair<QString, QString>>().second) {
             setBannerCard(restoredIndex);
         }
     } else {
@@ -335,9 +331,8 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
-    QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
-    deckModel->getDeckList()->setBannerCard(
-        QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    auto cardAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckModel->getDeckList()->setBannerCard(cardAndId);
     emit deckModified();
 }
 
