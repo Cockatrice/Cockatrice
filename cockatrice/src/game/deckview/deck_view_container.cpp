@@ -198,8 +198,10 @@ void DeckViewContainer::refreshShortcuts()
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+    unloadDeckButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/unloadDeckButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
+    forceStartGameButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/forceStartGameButton"));
 }
 
 /**
