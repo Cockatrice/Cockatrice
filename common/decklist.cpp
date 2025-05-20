@@ -441,7 +441,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     return true;
 }
 
-void DeckList::write(QXmlStreamWriter *xml)
+void DeckList::write(QXmlStreamWriter *xml) const
 {
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
@@ -508,7 +508,7 @@ bool DeckList::loadFromString_Native(const QString &nativeString)
     return loadFromXml(&xml);
 }
 
-QString DeckList::writeToString_Native()
+QString DeckList::writeToString_Native() const
 {
     QString result;
     QXmlStreamWriter xml(&result);
