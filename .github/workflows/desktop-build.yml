@@ -165,11 +165,11 @@ jobs:
         env:
           BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
-          type: '${{matrix.package}}'
+          package: '${{matrix.package}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --dir "$BUILD_DIR" \
+          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
                   --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
 
