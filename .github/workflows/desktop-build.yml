@@ -298,7 +298,7 @@ jobs:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
-        if: matrix.make_package
+        if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
@@ -310,7 +310,7 @@ jobs:
           fi
 
       - name: Notarize app bundle
-        if: matrix.make_package
+        if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
