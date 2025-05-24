@@ -236,6 +236,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       CCACHE_DIR: /tmp/${{matrix.os}}-${{matrix.type}}-cache
+      CCACHE_SIZE: 500M
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
