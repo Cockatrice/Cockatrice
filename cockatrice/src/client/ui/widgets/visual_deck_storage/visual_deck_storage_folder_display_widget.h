@@ -20,6 +20,7 @@ public:
     void refreshUi();
     void createWidgetsForFiles();
     void createWidgetsForFolders();
+    void sortBy(const std::function<bool(DeckPreviewWidget *, DeckPreviewWidget *)> &comparator, bool recursive = true);
     void flattenFolderStructure();
     QStringList gatherAllTagsFromFlowWidget() const;
     FlowWidget *getFlowWidget() const
