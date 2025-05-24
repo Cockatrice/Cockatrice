@@ -270,7 +270,6 @@ jobs:
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
-          MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -289,7 +288,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --ccache "$CCACHE_SIZE"
+          .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
