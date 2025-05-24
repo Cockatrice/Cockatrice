@@ -156,7 +156,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_MAXSIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE"
 
       - name: Build release package
         id: build
