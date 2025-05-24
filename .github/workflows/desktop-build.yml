@@ -128,7 +128,7 @@ jobs:
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.distro}}${{matrix.version}}
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 500M
+      CCACHE_MAXSIZE: 500M
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -156,7 +156,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_MAXSIZE"
 
       - name: Build release package
         id: build
@@ -236,7 +236,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
-      CCACHE_SIZE: 500M
+      CCACHE_MAXSIZE: 500M
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
@@ -289,7 +289,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --ccache "$CCACHE_SIZE"
+          .ci/compile.sh --server --ccache "$CCACHE_MAXSIZE"
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
