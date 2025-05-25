@@ -125,11 +125,11 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: ${{github.workspace}}/.ccache/${{matrix.distro}}${{matrix.version}}
-      CCACHE_COMPILERCHECK: content
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
+      CCACHE_COMPILERCHECK: content
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -237,8 +237,8 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
-      CCACHE_COMPILERCHECK: content
       CCACHE_SIZE: 500M
+      CCACHE_COMPILERCHECK: content
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
