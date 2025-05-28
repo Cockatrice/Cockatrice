@@ -161,6 +161,19 @@ if [[ $MAKE_INSTALL ]]; then
   echo "::endgroup::"
 fi
 
+if [[ $RUNNER_OS == Windows ]]; then
+  echo "Searching for liblzma.dll after build..."
+  FOUND_DLL=$(find . -name "liblzma.dll" 2>/dev/null)
+  
+  if [ -n "$FOUND_DLL" ]; then
+    echo "liblzma.dll found at:"
+    echo "$FOUND_DLL"
+  else
+    echo "ERROR: liblzma.dll not found after build!"
+    exit 1
+  fi
+fi
+
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   
