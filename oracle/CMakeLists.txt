@@ -246,16 +246,16 @@ Translations = Resources/translations\")
     COMPONENT Runtime
   )
 
-  install(
-    CODE "
-        file(GLOB_RECURSE QTPLUGINS
-            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
-        set(BU_CHMOD_BUNDLE_ITEMS ON)
-        include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
-        "
-    COMPONENT Runtime
-  )
+ # install(
+ #   CODE "
+ #       file(GLOB_RECURSE QTPLUGINS
+ #           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
+ #       set(BU_CHMOD_BUNDLE_ITEMS ON)
+ #       include(BundleUtilities)
+ #       fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
+ #       "
+ #   COMPONENT Runtime
+ # )
 endif()
 
 if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
