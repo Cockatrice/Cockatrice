@@ -139,7 +139,7 @@ if [[ $USE_CCACHE ]]; then
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+echo "::group::Configure CMake"
 cmake --version
 cmake .. "${flags[@]}"
 echo "::endgroup::"

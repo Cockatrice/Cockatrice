@@ -51,11 +51,11 @@ if(UPDATE_TRANSLATIONS)
   set(oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/oracle_en@source.ts")
 else()
   file(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
-endif(UPDATE_TRANSLATIONS)
+endif()
 
 if(WIN32)
   set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
-endif(WIN32)
+endif()
 
 if(APPLE)
   set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
@@ -63,7 +63,7 @@ if(APPLE)
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
   set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
-endif(APPLE)
+endif()
 
 if(Qt6_FOUND)
   qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
@@ -73,12 +73,11 @@ endif()
 
 include_directories(../cockatrice/src)
 
-# Libz is required to support zipped files
+# Libz is required to support zip files
 find_package(ZLIB)
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
   add_definitions("-DHAS_ZLIB")
-
   set(oracle_SOURCES ${oracle_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
 else()
   message(STATUS "Oracle: zlib not found; ZIP support disabled")
@@ -89,7 +88,6 @@ find_package(LibLZMA)
 if(LIBLZMA_FOUND)
   include_directories(${LIBLZMA_INCLUDE_DIRS})
   add_definitions("-DHAS_LZMA")
-
   set(oracle_SOURCES ${oracle_SOURCES} src/lzma/decompress.cpp)
 else()
   message(STATUS "Oracle: LibLZMA not found; xz support disabled")
@@ -164,7 +162,7 @@ endif()
 
 if(NOT WIN32 AND NOT APPLE)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
-endif(NOT WIN32 AND NOT APPLE)
+endif()
 
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
