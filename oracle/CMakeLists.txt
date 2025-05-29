@@ -151,7 +151,7 @@ if(UNIX)
 
     install(TARGETS oracle BUNDLE DESTINATION ./)
   else()
-    # Assume linux
+    # Assume Linux
     install(TARGETS oracle RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
@@ -205,17 +205,17 @@ Translations = Resources/translations\")
 endif()
 
 if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
-    DESTINATION ./
-    FILES_MATCHING
-    PATTERN "*.dll"
-  )
+  # install(
+  #   DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+  #   DESTINATION ./
+  #   FILES_MATCHING
+  #   PATTERN "*.dll"
+  # )
 
   # Qt plugins: iconengines, platforms, styles, tls (Qt6)
   install(
@@ -287,4 +287,16 @@ endif()
 
 if(Qt6_FOUND)
   qt6_finalize_target(oracle)
+endif()
+
+if(WIN32)
+  install(CODE "
+      include(BundleUtilities)
+      set(BU_CHMOD_BUNDLE_ITEMS ON)
+      fixup_bundle(
+          \"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\"
+          \"\"
+          \"\${CMAKE_INSTALL_PREFIX}\"
+      )
+  ")
 endif()
