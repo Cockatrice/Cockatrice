@@ -173,10 +173,18 @@ if [[ $RUNNER_OS == Windows ]]; then
   if [ -n "$FOUND_DLL" ]; then
     echo "liblzma.dll found at:"
     echo "$FOUND_DLL"
+
+    echo "Cleaning up duplicate debug DLLs"
+    rm -f ./oracle/liblzma.dll
+    rm -f ./vcpkg_installed/x64-windows/debug/bin/liblzma.dll
+
+    echo "$FOUND_DLL"
+    
   else
     echo "ERROR: liblzma.dll not found after build!"
     exit 1
   fi
+  
 fi
 
 if [[ $MAKE_PACKAGE ]]; then
