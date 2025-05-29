@@ -114,6 +114,11 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
+#if [[ $RUNNER_OS == Windows ]]; then
+#  VCPKG_TOOLCHAIN_FILE="D:/a/Cockatrice/vcpkg/scripts/buildsystems/vcpkg.cmake"
+#  flags+=("-DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE" "-DVCPKG_TARGET_TRIPLET=x64-windows")
+#fi
+
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 
