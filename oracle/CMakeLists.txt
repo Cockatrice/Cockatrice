@@ -251,6 +251,12 @@ Translations = Resources/translations\")
         file(GLOB_RECURSE QTPLUGINS
             \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
+
+        # Ignore directories that contain unwanted DLLs (liblzma.dll)
+        set(FIXUP_BUNDLE_IGNORE_PATHS
+            \"${CMAKE_SOURCE_DIR}/oracle\"
+            \"${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/debug/bin\")
+
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
         "
