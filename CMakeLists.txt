@@ -321,13 +321,13 @@ elseif(WIN32)
   # install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION ./)
   # install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION "bin")
 
-  set(LIBLZMA_DLL "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll")
-
-  if(EXISTS "${LIBLZMA_DLL}")
-      install(FILES "${LIBLZMA_DLL}" DESTINATION ./)
-  else()
-      message(WARNING "liblzma.dll not found at ${LIBLZMA_DLL}, skipping DLL install.")
-  endif()
+  # set(LIBLZMA_DLL "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll")
+  #
+  # if(EXISTS "${LIBLZMA_DLL}")
+  #   install(FILES "${LIBLZMA_DLL}" DESTINATION ./)
+  # else()
+  #   message(WARNING "liblzma.dll not found at ${LIBLZMA_DLL}, skipping DLL install.")
+  # endif()
 
   # Make sure vcpkg's toolchain is in use and lzma is available as a target
   # find_package(lzma CONFIG REQUIRED)
