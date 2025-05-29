@@ -319,8 +319,7 @@ elseif(WIN32)
 
   # Include liblzma.dll into the package
   # install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION ./)
-  install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+  install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION "bin")
 
   # Make sure vcpkg's toolchain is in use and lzma is available as a target
   # find_package(lzma CONFIG REQUIRED)
