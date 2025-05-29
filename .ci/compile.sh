@@ -178,7 +178,7 @@ if [[ $RUNNER_OS == Windows ]]; then
     rm -f ./oracle/liblzma.dll
     rm -f ./vcpkg_installed/x64-windows/debug/bin/liblzma.dll
 
-    echo "$FOUND_DLL"
+    find . -iname "liblzma.dll"
     
   else
     echo "ERROR: liblzma.dll not found after build!"
