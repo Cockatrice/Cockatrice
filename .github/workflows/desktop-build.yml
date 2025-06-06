@@ -125,7 +125,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: /tmp/${{matrix.distro}}${{matrix.version}}-cache    # ${{runner.temp}} does not work?
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
@@ -134,10 +134,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
-        shell: bash
-        run: source .ci/docker.sh --build
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
@@ -148,6 +144,10 @@ jobs:
           path: ${{env.CACHE}}
           key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
           restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+
+      - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
+        shell: bash
+        run: source .ci/docker.sh --build
 
       - name: Build debug and test
         if: matrix.test != 'skip'
@@ -165,11 +165,11 @@ jobs:
         env:
           BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
-          type: '${{matrix.package}}'
+          package: '${{matrix.package}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --dir "$BUILD_DIR" \
+          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
                   --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
 
@@ -235,7 +235,8 @@ jobs:
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
-      CCACHE_DIR: /tmp/${{matrix.os}}-${{matrix.type}}-cache
+      CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
+      CCACHE_SIZE: 500M
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
@@ -269,7 +270,6 @@ jobs:
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
-          MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -288,7 +288,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --ccache "$CCACHE_SIZE"
+          .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -350,7 +350,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: matrix.make_package && needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
@@ -438,7 +438,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
