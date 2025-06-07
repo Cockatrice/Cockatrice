@@ -379,5 +379,6 @@
         <file>resources/tips/tips_of_the_day.xml</file>
 
         <file>resources/help/search.md</file>
+        <file>resources/help/deck_search.md</file>
     </qresource>
 </RCC>

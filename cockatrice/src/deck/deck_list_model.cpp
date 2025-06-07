@@ -29,6 +29,24 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
+QString DeckListModel::getSortCriteriaForCard(CardInfoPtr info)
+{
+    if (!info) {
+        return "unknown";
+    }
+
+    switch (activeGroupCriteria) {
+        case DeckListModelGroupCriteria::MAIN_TYPE:
+            return info->getMainCardType();
+        case DeckListModelGroupCriteria::MANA_COST:
+            return info->getCmc();
+        case DeckListModelGroupCriteria::COLOR:
+            return info->getColors() == "" ? "Colorless" : info->getColors();
+        default:
+            return "unknown";
+    }
+}
+
 void DeckListModel::rebuildTree()
 {
     beginResetModel();
@@ -49,7 +67,7 @@ void DeckListModel::rebuildTree()
             }
 
             CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
-            QString cardType = info ? info->getMainCardType() : "unknown";
+            QString cardType = getSortCriteriaForCard(info);
 
             auto *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
 
@@ -465,6 +483,12 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     root->setSortMethod(sortMethod);
     sortHelper(root, order);
     emit layoutChanged();
+}
+
+void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria)
+{
+    activeGroupCriteria = newCriteria;
+    rebuildTree();
 }
 
 void DeckListModel::cleanList()

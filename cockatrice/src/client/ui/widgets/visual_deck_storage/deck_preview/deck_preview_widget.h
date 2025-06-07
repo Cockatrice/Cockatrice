@@ -49,6 +49,7 @@ signals:
 public slots:
     void setFilePath(const QString &filePath);
     void refreshBannerCardText();
+    void refreshBannerCardToolTip();
     void updateBannerCardComboBox();
     void setBannerCard(int);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);

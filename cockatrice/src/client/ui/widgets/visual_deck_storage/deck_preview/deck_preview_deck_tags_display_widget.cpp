@@ -12,6 +12,7 @@
 #include <QDirIterator>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
     : QWidget(_parent), deckList(nullptr)
@@ -77,6 +78,21 @@ static QStringList getAllFiles(const QString &filePath)
     return allFiles;
 }
 
+bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
+
+    if (QFile::exists(newFileName)) {
+        QMessageBox::StandardButton reply =
+            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
+                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
+                                  QMessageBox::Yes | QMessageBox::No);
+        return reply == QMessageBox::Yes;
+    }
+    return true; // Safe to proceed
+}
+
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
     if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
@@ -91,6 +107,10 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             // Retrieve saved preference if the prompt is disabled
             if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
                 if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+
+                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
+                        return;
+
                     deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
                     deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
                     deckPreviewWidget->refreshBannerCardText();
@@ -100,6 +120,10 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                 // Show the dialog to the user
                 DialogConvertDeckToCodFormat conversionDialog(parentWidget());
                 if (conversionDialog.exec() == QDialog::Accepted) {
+
+                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
+                        return;
+
                     deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
                     deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
                     deckPreviewWidget->refreshBannerCardText();

@@ -150,6 +150,7 @@ private:
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
+    int visualDeckStorageTooltipType;
     bool visualDeckStoragePromptForConversion;
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
@@ -475,6 +476,10 @@ public:
     int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
     {
         return visualDeckStorageUnusedColorIdentitiesOpacity;
+    }
+    int getVisualDeckStorageTooltipType() const
+    {
+        return visualDeckStorageTooltipType;
     }
     bool getVisualDeckStoragePromptForConversion() const
     {
@@ -852,6 +857,7 @@ public slots:
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
+    void setVisualDeckStorageTooltipType(int value);
     void setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion);
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);

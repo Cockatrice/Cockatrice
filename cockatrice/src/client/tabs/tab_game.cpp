@@ -1538,7 +1538,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     scene = new GameScene(phasesToolbar, this);
     gameView = new GameView(scene);
 
-    gamePlayAreaVBox = new QVBoxLayout;
+    auto gamePlayAreaVBox = new QVBoxLayout;
     gamePlayAreaVBox->setContentsMargins(0, 0, 0, 0);
     gamePlayAreaVBox->addWidget(gameView);
 
@@ -1594,12 +1594,12 @@ void TabGame::createReplayDock()
     connect(replayFastForwardButton, &QToolButton::toggled, this, &TabGame::replayFastForwardButtonToggled);
 
     // putting everything together
-    replayControlLayout = new QHBoxLayout;
+    auto replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
     replayControlLayout->addWidget(replayPlayButton);
     replayControlLayout->addWidget(replayFastForwardButton);
 
-    replayControlWidget = new QWidget();
+    auto replayControlWidget = new QWidget();
     replayControlWidget->setObjectName("replayControlWidget");
     replayControlWidget->setLayout(replayControlLayout);
 
@@ -1635,13 +1635,13 @@ void TabGame::createCardInfoDock(bool bReplay)
     Q_UNUSED(bReplay);
 
     cardInfoFrameWidget = new CardInfoFrameWidget();
-    cardHInfoLayout = new QHBoxLayout;
-    cardVInfoLayout = new QVBoxLayout;
+    auto cardHInfoLayout = new QHBoxLayout;
+    auto cardVInfoLayout = new QVBoxLayout;
     cardVInfoLayout->setContentsMargins(0, 0, 0, 0);
     cardVInfoLayout->addWidget(cardInfoFrameWidget);
     cardVInfoLayout->addLayout(cardHInfoLayout);
 
-    cardBoxLayoutWidget = new QWidget;
+    auto cardBoxLayoutWidget = new QWidget;
     cardBoxLayoutWidget->setLayout(cardVInfoLayout);
 
     cardInfoDock = new QDockWidget(this);
@@ -1679,6 +1679,22 @@ void TabGame::createPlayerListDock(bool bReplay)
 
 void TabGame::createMessageDock(bool bReplay)
 {
+    auto messageLogLayout = new QVBoxLayout;
+    messageLogLayout->setContentsMargins(0, 0, 0, 0);
+
+    // clock
+    if (!bReplay) {
+        timeElapsedLabel = new QLabel;
+        timeElapsedLabel->setAlignment(Qt::AlignCenter);
+        gameTimer = new QTimer(this);
+        gameTimer->setInterval(1000);
+        connect(gameTimer, &QTimer::timeout, this, &TabGame::incrementGameTime);
+        gameTimer->start();
+
+        messageLogLayout->addWidget(timeElapsedLabel);
+    }
+
+    // message log
     messageLog = new MessageLogWidget(tabSupervisor, this);
     connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
             qOverload<const QString &>(&CardInfoFrameWidget::setCard));
@@ -1690,14 +1706,12 @@ void TabGame::createMessageDock(bool bReplay)
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
         connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
+    }
 
-        timeElapsedLabel = new QLabel;
-        timeElapsedLabel->setAlignment(Qt::AlignCenter);
-        gameTimer = new QTimer(this);
-        gameTimer->setInterval(1000);
-        connect(gameTimer, &QTimer::timeout, this, &TabGame::incrementGameTime);
-        gameTimer->start();
+    messageLogLayout->addWidget(messageLog);
 
+    // chat entry
+    if (!bReplay) {
         sayLabel = new QLabel;
         sayEdit = new LineEditCompleter;
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
@@ -1726,20 +1740,15 @@ void TabGame::createMessageDock(bool bReplay)
         connect(tabSupervisor, &TabSupervisor::adminLockChanged, this, &TabGame::adminLockChanged);
         connect(sayEdit, &LineEditCompleter::returnPressed, this, &TabGame::actSay);
 
-        sayHLayout = new QHBoxLayout;
+        auto sayHLayout = new QHBoxLayout;
         sayHLayout->addWidget(sayLabel);
         sayHLayout->addWidget(sayEdit);
+
+        messageLogLayout->addLayout(sayHLayout);
     }
 
-    messageLogLayout = new QVBoxLayout;
-    messageLogLayout->setContentsMargins(0, 0, 0, 0);
-    if (!bReplay)
-        messageLogLayout->addWidget(timeElapsedLabel);
-    messageLogLayout->addWidget(messageLog);
-    if (!bReplay)
-        messageLogLayout->addLayout(sayHLayout);
-
-    messageLogLayoutWidget = new QWidget;
+    // dock
+    auto messageLogLayoutWidget = new QWidget;
     messageLogLayoutWidget->setLayout(messageLogLayout);
 
     messageLayoutDock = new QDockWidget(this);

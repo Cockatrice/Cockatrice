@@ -111,11 +111,6 @@ jobs:
             package: RPM
 
           - distro: Ubuntu
-            version: 20.04
-            package: DEB
-            test: skip    # Ubuntu 20.04 has a broken Qt for debug builds
-
-          - distro: Ubuntu
             version: 22.04
             package: DEB
             test: skip    # Running tests on all distros is superfluous
@@ -130,29 +125,25 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: /tmp/${{matrix.distro}}${{matrix.version}}-cache    # ${{runner.temp}} does not work?
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
+      CMAKE_GENERATOR: 'Ninja'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate cache timestamp
-        id: cache_timestamp
-        shell: bash
-        run: echo "timestamp=$(date -u '+%Y%m%d%H%M%S')" >>"$GITHUB_OUTPUT"
-
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Restore compiler cache (ccache)
+        id: ccache_restore
+        uses: actions/cache/restore@v4
         env:
-          timestamp: ${{steps.cache_timestamp.outputs.timestamp}}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: docker-${{matrix.distro}}${{matrix.version}}-cache-${{env.timestamp}}
-          restore-keys: |
-            docker-${{matrix.distro}}${{matrix.version}}-cache-
+          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
@@ -161,9 +152,11 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" --parallel 4
+          RUN --server --debug --test --ccache "$CCACHE_SIZE"
 
       - name: Build release package
         id: build
@@ -172,12 +165,20 @@ jobs:
         env:
           BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
-          type: '${{matrix.package}}'
+          package: '${{matrix.package}}'
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$type" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" --parallel 4
+          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
+                  --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{env.CACHE}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Upload artifact
         id: upload_artifact
@@ -223,7 +224,6 @@ jobs:
             os: macos-13
             xcode: "14.3.1"
             type: Release
-            core_count: 4
             make_package: 1
 
           - target: 14
@@ -231,7 +231,6 @@ jobs:
             os: macos-14
             xcode: "15.4"
             type: Release
-            core_count: 3
             make_package: 1
 
           - target: 15
@@ -239,7 +238,6 @@ jobs:
             os: macos-15
             xcode: "16.2"
             type: Release
-            core_count: 3
             make_package: 1
 
           - target: 15
@@ -247,15 +245,17 @@ jobs:
             os: macos-15
             xcode: "16.2"
             type: Debug
-            core_count: 3
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
+      CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
+      CCACHE_SIZE: 500M
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+      CMAKE_GENERATOR: 'Ninja'
 
     steps:
       - name: Checkout
@@ -269,23 +269,30 @@ jobs:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
           brew update
-          brew install protobuf qt --force-bottle
+          brew install ccache protobuf qt --force-bottle
+
+      - name: Restore compiler cache (ccache)
+        id: ccache_restore
+        uses: actions/cache/restore@v4
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.os}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.os}}-${{matrix.type}}-
 
       - name: Build & Sign on Xcode ${{matrix.xcode}}
         shell: bash
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
-          MAKE_TEST: 1
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-        # macOS runner have 3 cores usually - only the macos-13 image has 4:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-        # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
@@ -297,10 +304,17 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
-          .ci/compile.sh --server --parallel ${{matrix.core_count}}
+          .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
-        if: matrix.make_package
+        if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
@@ -312,7 +326,7 @@ jobs:
           fi
 
       - name: Notarize app bundle
-        if: matrix.make_package
+        if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -354,7 +368,7 @@ jobs:
 
       - name: Upload to release
         id: upload_release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: matrix.make_package && needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
@@ -419,16 +433,11 @@ jobs:
           tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
-      # TODO: re-enable when https://github.com/lukka/run-vcpkg/issues/243 is fixed
-      - if: false
-        name: Run vcpkg (disabled)
-        uses: lukka/run-vcpkg@v11
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
         with:
-          runVcpkgInstall: true
-          doNotCache: false
-        env:
-          VCPKG_DEFAULT_TRIPLET: 'x64-windows'
-          VCPKG_DISABLE_METRICS: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Cockatrice
         id: build
@@ -438,6 +447,8 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         # No need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count,
         # project and process parallelism: https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
         run: .ci/compile.sh --server --release --test --package
@@ -461,7 +472,7 @@ jobs:
 
       - name: Upload to release
         id: upload_release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}

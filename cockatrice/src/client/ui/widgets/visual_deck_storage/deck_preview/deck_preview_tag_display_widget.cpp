@@ -50,10 +50,10 @@ void DeckPreviewTagDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     switch (event->button()) {
         case Qt::LeftButton:
-            setState(TagState::Selected);
+            setState(state != TagState::Selected ? TagState::Selected : TagState::NotSelected);
             break;
         case Qt::RightButton:
-            setState(TagState::Excluded);
+            setState(state != TagState::Excluded ? TagState::Excluded : TagState::NotSelected);
             break;
         case Qt::MiddleButton:
             setState(TagState::NotSelected);
