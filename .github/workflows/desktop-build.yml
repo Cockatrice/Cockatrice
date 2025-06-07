@@ -377,19 +377,16 @@ jobs:
     needs: configure
     runs-on: windows-2022
     env:
-      CMAKE_GENERATOR: 'Visual Studio 17 2022'
+      CMAKE_GENERATOR: 'Ninja'
 
     steps:
-      - name: Add msbuild to PATH
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v2
-        with:
-          msbuild-architecture: x64
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
@@ -413,7 +410,6 @@ jobs:
         env:
           PACKAGE_SUFFIX: '-Win${{matrix.target}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
