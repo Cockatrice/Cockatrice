@@ -920,6 +920,8 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
     game->removeArrowsRelatedToPlayer(ges, this);
     game->unattachCards(ges, this);
 
+    playerMutex.lock();
+
     // Return cards to their rightful owners before conceding the game
     static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
     for (const auto &card : zones.value("table")->getCards()) {
@@ -958,6 +960,8 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
             break;
         }
     }
+
+    playerMutex.unlock();
 
     // All borrowed cards have been returned, can now continue cleanup process
     clearZones();
