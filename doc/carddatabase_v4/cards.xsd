@@ -56,6 +56,7 @@
             <xs:element type="xs:integer" name="tablerow" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:boolean" name="cipt" minOccurs="0" maxOccurs="1" />
             <xs:element type="xs:boolean" name="upsidedown" minOccurs="0" maxOccurs="1" />
+            <xs:element type="xs:boolean" name="landscapeOrientation" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
     <xs:element name="cockatrice_carddatabase">
