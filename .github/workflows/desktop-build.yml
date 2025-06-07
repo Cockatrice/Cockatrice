@@ -278,6 +278,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
+          echo "::group::macOS Certificate"
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
             echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
@@ -288,6 +289,7 @@ jobs:
             security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
+          echo "::endgroup::"
           .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
