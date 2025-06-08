@@ -86,9 +86,9 @@ Cockatrice tries to use the [Google Developer Documentation Style Guide](https:/
    <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a></i></sub>
 </details>
 
-### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://transifex.com/cockatrice/cockatrice/)
+### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://explore.transifex.com/cockatrice/cockatrice/)
 
-Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://transifex.com/cockatrice/cockatrice/).<br>
+Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://explore.transifex.com/cockatrice/cockatrice/).<br>
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting invovled, and join a group of hundreds of others!<br>
 

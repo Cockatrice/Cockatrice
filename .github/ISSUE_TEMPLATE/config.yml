@@ -4,6 +4,6 @@ contact_links:
     url: https://discord.gg/3Z9yzmA
     about: Need help with using the client? Want to find some games? Try the Discord server!
   - name: 🌐 Translations (Help improve the localization of the app)
-    url: https://www.transifex.com/cockatrice/cockatrice/
+    url: https://explore.transifex.com/cockatrice/cockatrice/
     # it is not possible to add a link to the wiki to this description
     about: For more information and guidance check our Translation FAQ on our wiki!
