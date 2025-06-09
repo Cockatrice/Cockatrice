@@ -46,8 +46,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
             &VisualDeckStorageWidget::updateShowFolders);
     connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::showTagFilterChanged, this,
             &VisualDeckStorageWidget::updateTagsVisibility);
-    connect(quickSettingsWidget, &VisualDeckStorageQuickSettingsWidget::searchFolderNamesChanged, this,
-            &VisualDeckStorageWidget::updateSearchFilter);
 
     searchAndSortLayout->addWidget(deckPreviewColorIdentityFilterWidget);
     searchAndSortLayout->addWidget(sortWidget);
@@ -196,8 +194,7 @@ void VisualDeckStorageWidget::updateColorFilter()
 void VisualDeckStorageWidget::updateSearchFilter()
 {
     if (folderWidget) {
-        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText(),
-                                    quickSettingsWidget->getSearchFolderNames());
+        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
         folderWidget->updateVisibility();
     }
 }
