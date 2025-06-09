@@ -20,7 +20,7 @@ QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQ
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 SetQuery <- ('e'/'set') [:] FlexStringValue
-OracleQuery <- 'o' [:] RegexString
+OracleQuery <- 'o' [:] MatcherString
 
 
 CMCQuery <- ('cmc'/'mv') ws? NumericExpression
@@ -42,7 +42,7 @@ ColorEx <- Color / [mc]
 
 ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 
-FieldQuery <- String [:] RegexString / String ws? NumericExpression
+FieldQuery <- String [:] MatcherString / String ws? NumericExpression
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
@@ -52,8 +52,10 @@ String <- SingleApostropheString / UnescapedStringListPart+ / ["] <NonDoubleQuot
 StringValue <- String / [(] StringList [)]
 StringList <- StringListString (ws? [,] ws? StringListString)*
 StringListString <- UnescapedStringListPart+
-GenericQuery <- RegexString
-RegexString <- String
+GenericQuery <- MatcherString
+
+# A String that can either be a normal string or a regex search string
+MatcherString <- String
 
 FlexStringValue <- CompactStringSet / String / [(] StringList [)]
 CompactStringSet <- StringListString ([,+] StringListString)+
@@ -261,7 +263,7 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.sv()));
     };
 
-    search["RegexString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+    search["MatcherString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = std::any_cast<QString>(sv[0]);
         auto sanitizedTarget = QString(target);
         sanitizedTarget.replace("\\\"", "\"");
