@@ -263,12 +263,10 @@ static void setupParserRules()
 
     search["RegexString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = std::any_cast<QString>(sv[0]);
-        return [=](const QString &s) {
-            auto sanitizedTarget = QString(target);
-            sanitizedTarget.replace("\\\"", "\"");
-            sanitizedTarget.replace("\\'", "'");
-            return s.contains(sanitizedTarget, Qt::CaseInsensitive);
-        };
+        auto sanitizedTarget = QString(target);
+        sanitizedTarget.replace("\\\"", "\"");
+        sanitizedTarget.replace("\\'", "'");
+        return [=](const QString &s) { return s.contains(sanitizedTarget, Qt::CaseInsensitive); };
     };
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
