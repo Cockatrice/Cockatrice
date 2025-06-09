@@ -58,4 +58,9 @@ In this list of examples below, each entry has an explanation and can be clicked
 <dt>Grouping:</dt>
 <dd><a href="#t:angel -(angel or c:w)">t:angel -(angel or c:w)</a> <small>(Any angel that doesn't have angel in its name and isn't white)</small></dd>
 
+<dt>Regular Expression:</dt>
+<dd>[/^fell/](#/^fell/) <small>(Any card name that begins with "fell")</small></dd>
+<dd>[o:/counter target .* spell/](#o:/counter target .* spell/) <small>(Any card text with "counter target *something* spell")</small></dd>
+<dd>[o:/for each .* and\/or .*/](#o:/for each .* and\/or .*/) <small>(/'s can be escaped with a \)</small></dd>
+
 </dl>
