@@ -4,6 +4,7 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QRegularExpression>
 #include <QString>
 #include <functional>
 
@@ -55,7 +56,11 @@ StringListString <- UnescapedStringListPart+
 GenericQuery <- MatcherString
 
 # A String that can either be a normal string or a regex search string
-MatcherString <- String
+MatcherString <- RegexMatcher / NormalMatcher
+
+NormalMatcher <- String
+RegexMatcher <- '/' RegexMatcherString '/'
+RegexMatcherString <- ('\\/' / !'/' .)+
 
 FlexStringValue <- CompactStringSet / String / [(] StringList [)]
 CompactStringSet <- StringListString ([,+] StringListString)+
@@ -263,12 +268,22 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.sv()));
     };
 
-    search["MatcherString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+    search["NormalMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = std::any_cast<QString>(sv[0]);
         auto sanitizedTarget = QString(target);
         sanitizedTarget.replace("\\\"", "\"");
         sanitizedTarget.replace("\\'", "'");
         return [=](const QString &s) { return s.contains(sanitizedTarget, Qt::CaseInsensitive); };
+    };
+
+    search["RegexMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+        auto target = std::any_cast<QString>(sv[0]);
+        auto regex = QRegularExpression(target, QRegularExpression::CaseInsensitiveOption);
+        return [=](const QString &s) { return regex.match(s).hasMatch(); };
+    };
+
+    search["RegexMatcherString"] = [](const peg::SemanticValues &sv) -> QString {
+        return QString::fromStdString(sv.token_to_string());
     };
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
