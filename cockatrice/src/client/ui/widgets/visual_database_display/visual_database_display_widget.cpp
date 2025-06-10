@@ -95,7 +95,15 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
     clearFilterWidget->setIcon(QPixmap("theme:icons/delete"));
-    connect(clearFilterWidget, &QToolButton::clicked, this, [this] { filterModel->clear(); });
+    connect(clearFilterWidget, &QToolButton::clicked, this, [this] {
+        filterModel->blockSignals(true);
+        filterModel->filterTree()->blockSignals(true);
+        filterModel->clear();
+        filterModel->blockSignals(false);
+        filterModel->filterTree()->blockSignals(false);
+        emit filterModel->filterTree()->changed();
+        emit filterModel->layoutChanged();
+    });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
     quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));

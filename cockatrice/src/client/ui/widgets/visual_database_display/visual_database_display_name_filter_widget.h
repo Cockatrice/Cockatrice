@@ -35,11 +35,13 @@ private:
     QLineEdit *searchBox;
     FlowWidget *flowWidget;
     QPushButton *loadFromDeckButton;
+    QPushButton *loadFromClipboardButton;
 
     QMap<QString, QPushButton *> activeFilters; // Store active name filter buttons
 
 private slots:
     void actLoadFromDeck();
+    void actLoadFromClipboard();
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
