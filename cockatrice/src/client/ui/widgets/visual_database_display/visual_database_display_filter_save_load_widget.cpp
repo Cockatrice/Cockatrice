@@ -125,7 +125,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
 
     // Refresh the filter file list
     QDir dir(SettingsCache::instance().getFiltersPath());
-    QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Time);
+    QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Name);
 
     // Loop through the filter files and create widgets for them
     for (const QString &filename : filterFiles) {
