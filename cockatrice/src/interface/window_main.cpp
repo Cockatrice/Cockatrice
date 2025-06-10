@@ -696,6 +696,7 @@ void MainWindow::retranslateUi()
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
+    aImportPrecons->setText(tr("Import preconstructed Decks..."));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
 
@@ -754,6 +755,8 @@ void MainWindow::createActions()
     aStatusBar->setCheckable(true);
     aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
     connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
+    aImportPrecons = new QAction(this);
+    connect(aImportPrecons, &QAction::triggered, this, &MainWindow::actImportPrecons);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
@@ -832,6 +835,7 @@ void MainWindow::createMenus()
     helpMenu->addAction(aUpdate);
     helpMenu->addAction(aCheckCardUpdates);
     helpMenu->addAction(aCheckCardUpdatesBackground);
+    helpMenu->addAction(aImportPrecons);
     helpMenu->addSeparator();
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
@@ -1345,6 +1349,12 @@ void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompati
         DlgUpdate dlg(this);
         dlg.exec();
     }
+}
+
+void MainWindow::actImportPrecons()
+{
+    auto preconImporter = new DlgImportPrecons(this);
+    preconImporter->show();
 }
 
 void MainWindow::refreshShortcuts()
