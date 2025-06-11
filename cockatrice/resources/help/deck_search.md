@@ -4,9 +4,9 @@ The search bar recognizes a set of special commands.<br>
 In this list of examples below, each entry has an explanation and can be clicked to test the query. Note that all
 searches are case insensitive.
 <dl>
-<dt>Filename:</dt>
-<dd>[red deck wins](#red deck wins) <small>(Any deck filename containing the words red, deck, and wins)</small></dd>
-<dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck filename containing the exact phrase "red deck wins")</small></dd>
+<dt>Display Name (The deck name, or the filename if the deck name isn't set):</dt>
+<dd>[red deck wins](#red deck wins) <small>(Any deck with a display name containing the words red, deck, and wins)</small></dd>
+<dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck with a display name containing the exact phrase "red deck wins")</small></dd>
 
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>

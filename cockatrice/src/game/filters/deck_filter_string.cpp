@@ -131,8 +131,8 @@ static void setupParserRules()
 
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         auto name = std::any_cast<QString>(sv[0]);
-        return [=](const DeckPreviewWidget *, const ExtraDeckSearchInfo &info) {
-            return info.fileSearchName.contains(name, Qt::CaseInsensitive);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            return deck->getDisplayName().contains(name, Qt::CaseInsensitive);
         };
     };
 }

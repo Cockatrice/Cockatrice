@@ -27,6 +27,7 @@ public:
                                const QString &_filePath);
     void retranslateUi();
     QString getColorIdentity();
+    QString getDisplayName() const;
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
     QVBoxLayout *layout;
