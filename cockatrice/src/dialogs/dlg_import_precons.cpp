@@ -552,8 +552,9 @@ void LoadPreconsPage::importFinished()
     if (dynamic_cast<DlgImportPrecons *>(wizard())->doneWithParsing || watcher.future().result()) {
         wizard()->next();
     } else {
-        QMessageBox::critical(this, tr("Error"),
-                              tr("The file was retrieved successfully, but it does not contain any precon decks data."));
+        QMessageBox::critical(
+            this, tr("Error"),
+            tr("The file was retrieved successfully, but it does not contain any precon decks data."));
     }
 }
 
