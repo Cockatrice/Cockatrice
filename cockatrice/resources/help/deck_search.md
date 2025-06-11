@@ -8,6 +8,20 @@ searches are case insensitive.
 <dd>[red deck wins](#red deck wins) <small>(Any deck with a display name containing the words red, deck, and wins)</small></dd>
 <dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck with a display name containing the exact phrase "red deck wins")</small></dd>
 
+<dt>Deck <u>N</u>ame:</dt>
+<dd>[n:aggro](#n:aggro) <small>(Any deck with a name containing the word aggro)</small></dd>
+<dd>[n:red n:deck n:wins](#n:red n:deck n:wins) <small>(Any deck with a name containing the words red, deck, and wins)</small></dd>
+<dd>[n:"red deck wins"](#n:%22red deck wins%22) <small>(Any deck with a name containing the exact phrase "red deck wins")</small></dd>
+
+<dt><u>F</u>ile Name:</dt>
+<dd>[f:aggro](#f:aggro) <small>(Any deck with a filename containing the word aggro)</small></dd>
+<dd>[f:red f:deck f:wins](#f:red f:deck f:wins) <small>(Any deck with a filename containing the words red, deck, and wins)</small></dd>
+<dd>[f:"red deck wins"](#f:%22red deck wins%22) <small>(Any deck with a filename containing the exact phrase "red deck wins")</small></dd>
+
+<dt>Relative <u>P</u>ath (starting from the deck folder):</dt>
+<dd>[p:aggro](#p:aggro) <small>(Any deck that has "aggro" somewhere in its relative path)</small></dd>
+<dd>[p:edh/](#p:edh/) <small>(Any deck with "edh/" in its relative path, A.K.A. decks in the "edh" folder)</small></dd>
+
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>
 <dd><a href="#[[t:legendary]]">[[t:legendary]]</a> <small>(Any deck that contains at least one legendary)</small></dd>
