@@ -12,12 +12,13 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      QString _zoneName,
                                                      QString _activeGroupCriteria,
                                                      QStringList _activeSortCriteria,
+                                                     DisplayType _displayType,
                                                      int bannerOpacity,
                                                      int subBannerOpacity,
                                                      CardSizeWidget *_cardSizeWidget)
     : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
-      activeSortCriteria(_activeSortCriteria), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity),
-      cardSizeWidget(_cardSizeWidget)
+      activeSortCriteria(_activeSortCriteria), displayType(_displayType), bannerOpacity(bannerOpacity),
+      subBannerOpacity(subBannerOpacity), cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -60,7 +61,7 @@ void DeckCardZoneDisplayWidget::displayCards()
     deleteCardGroupIfItDoesNotExist();
 }
 
-void DeckCardZoneDisplayWidget::refreshDisplayType(const QString &_displayType)
+void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
 {
     displayType = _displayType;
     QLayoutItem *item;
@@ -102,7 +103,7 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
             continue;
         }
 
-        if (displayType == "overlap") {
+        if (displayType == DisplayType::Overlap) {
             auto *display_widget = new OverlappedCardGroupDisplayWidget(
                 cardGroupContainer, deckListModel, zoneName, cardGroup, activeGroupCriteria, activeSortCriteria,
                 subBannerOpacity, cardSizeWidget);
@@ -112,7 +113,7 @@ void DeckCardZoneDisplayWidget::addCardGroupIfItDoesNotExist()
             connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, display_widget,
                     &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
             cardGroupLayout->addWidget(display_widget);
-        } else if (displayType == "flat") {
+        } else if (displayType == DisplayType::Flat) {
             auto *display_widget = new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, zoneName,
                                                                   cardGroup, activeGroupCriteria, activeSortCriteria,
                                                                   subBannerOpacity, cardSizeWidget);

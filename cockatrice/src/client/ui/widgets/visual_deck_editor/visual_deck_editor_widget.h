@@ -50,7 +50,7 @@ signals:
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void cardAdditionRequested(CardInfoPtr card);
-    void displayTypeChanged(QString displayType);
+    void displayTypeChanged(DisplayType displayType);
 
 protected slots:
     void onHover(CardInfoPtr hoveredCard);

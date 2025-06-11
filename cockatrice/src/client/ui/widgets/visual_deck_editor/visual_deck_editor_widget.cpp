@@ -193,7 +193,7 @@ void VisualDeckEditorWidget::retranslateUi()
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
     sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
-    displayTypeButton->setText(tr("Flat Layout"));
+    displayTypeButton->setText(tr("Overlap Layout"));
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
@@ -212,14 +212,13 @@ void VisualDeckEditorWidget::updateDisplayType()
     // Update UI and emit signal
     switch (currentDisplayType) {
         case DisplayType::Flat:
-            emit displayTypeChanged("flat");
             displayTypeButton->setText(tr("Flat Layout"));
             break;
         case DisplayType::Overlap:
-            emit displayTypeChanged("overlap");
             displayTypeButton->setText(tr("Overlap Layout"));
             break;
     }
+    emit displayTypeChanged(currentDisplayType);
 }
 
 void VisualDeckEditorWidget::addZoneIfDoesNotExist()
@@ -239,8 +238,9 @@ void VisualDeckEditorWidget::addZoneIfDoesNotExist()
         if (found) {
             continue;
         }
-        DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-            zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria, 20, 10, cardSizeWidget);
+        DeckCardZoneDisplayWidget *zoneDisplayWidget =
+            new DeckCardZoneDisplayWidget(zoneContainer, deckListModel, zone, activeGroupCriteria, activeSortCriteria,
+                                          currentDisplayType, 20, 10, cardSizeWidget);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
         connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
