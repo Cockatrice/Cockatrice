@@ -298,7 +298,7 @@ if(ZLIB_FOUND)
 
   set(cockatrice_SOURCES ${cockatrice_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
 else()
-  message(STATUS "Oracle: zlib not found; ZIP support disabled")
+  message(STATUS "Cockatrice: zlib not found; ZIP support disabled")
 endif()
 
 # LibLZMA is required to support xz files
@@ -309,7 +309,7 @@ if(LIBLZMA_FOUND)
 
   set(cockatrice_SOURCES ${cockatrice_SOURCES} src/lzma/decompress.cpp)
 else()
-  message(STATUS "Oracle: LibLZMA not found; xz support disabled")
+  message(STATUS "Cockatrice: LibLZMA not found; xz support disabled")
 endif()
 
 if(Qt6_FOUND)
