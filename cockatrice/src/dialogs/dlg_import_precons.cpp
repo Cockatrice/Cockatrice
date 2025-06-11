@@ -332,7 +332,7 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
         QJsonObject commanderObj = commanderArray.first().toObject();
         QString commanderName = commanderObj.value("name").toString();
         QString commanderId = commanderObj.value("identifiers").toObject().value("scryfallId").toString();
-        precon->setBannerCard(QPair(commanderName, commanderId));
+        precon->setBannerCard(QPair<QString, QString>(commanderName, commanderId));
     } else {
         qInfo() << "No commander data found.";
     }
