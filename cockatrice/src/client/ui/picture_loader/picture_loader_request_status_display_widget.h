@@ -1,14 +1,10 @@
 #ifndef PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 #define PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
-#include "../../../../../../../../../../mnt/games-hdd/coding/CLionProjects/Cockatrice/cockatrice/src/client/ui/picture_loader/picture_loader_worker_work.h"
+#include "picture_loader_worker_work.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QWidget>
-
-struct PictureLoaderRequestStatus
-{
-};
 
 class PictureLoaderRequestStatusDisplayWidget : public QWidget
 {
@@ -37,11 +33,12 @@ public:
     int queryElapsedSeconds()
     {
         if (!finished) {
+            int elapsedTime = QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
             elapsedTime->setText(
-                QString::number(QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime())));
+                QString::number(elapsedTime));
             update();
             repaint();
-            return QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
+            return elapsedTime;
         }
         return elapsedTime->text().toInt();
     }

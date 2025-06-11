@@ -14,9 +14,9 @@
 #include <QPainter>
 #include <QPixmapCache>
 #include <QScreen>
+#include <QStatusBar>
 #include <QThread>
 #include <algorithm>
-#include <qstatusbar.h>
 #include <utility>
 
 // never cache more than 300 cards at once for a single deck

@@ -23,6 +23,9 @@ PictureLoaderStatusBar::PictureLoaderStatusBar(QWidget *parent) : QWidget(parent
 
 void PictureLoaderStatusBar::cleanOldEntries()
 {
+    if (!loadLog || !loadLog->popup) {
+        return;
+    }
     for (PictureLoaderRequestStatusDisplayWidget *statusDisplayWidget :
          loadLog->popup->findChildren<PictureLoaderRequestStatusDisplayWidget *>()) {
         statusDisplayWidget->queryElapsedSeconds();

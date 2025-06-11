@@ -7,24 +7,24 @@ PictureLoaderRequestStatusDisplayWidget::PictureLoaderRequestStatusDisplayWidget
 {
     layout = new QHBoxLayout(this);
 
-    name = new QLabel(this);
-    name->setText(worker->cardToDownload.getCard()->getName());
-    setShortname = new QLabel(this);
-    setShortname->setText(worker->cardToDownload.getSetName());
-    providerId = new QLabel(this);
-    providerId->setText(worker->cardToDownload.getCard()->getProperty("uuid"));
-    startTime = new QLabel(this);
-    startTime->setText(QDateTime::currentDateTime().toString());
-    elapsedTime = new QLabel(this);
-    elapsedTime->setText("0");
-    finished = new QLabel(this);
-    finished->setText("False");
-    url = new QLabel(this);
-    url->setText(_url.toString());
+    if (worker->cardToDownload.getCard()) {
+        name = new QLabel(this);
+        name->setText(worker->cardToDownload.getCard()->getName());
+        setShortname = new QLabel(this);
+        setShortname->setText(worker->cardToDownload.getSetName());
+        providerId = new QLabel(this);
+        providerId->setText(worker->cardToDownload.getCard()->getProperty("uuid"));
 
-    layout->addWidget(name);
-    layout->addWidget(setShortname);
-    layout->addWidget(providerId);
+        layout->addWidget(name);
+        layout->addWidget(setShortname);
+        layout->addWidget(providerId);
+    }
+
+    startTime = new QLabel(QDateTime::currentDateTime().toString(), this);
+    elapsedTime = new QLabel("0", this);
+    finished = new QLabel("False", this);
+    url = new QLabel(_url.toString(), this);
+
     layout->addWidget(startTime);
     layout->addWidget(elapsedTime);
     layout->addWidget(finished);
