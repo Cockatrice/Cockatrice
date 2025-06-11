@@ -52,7 +52,7 @@ DlgImportPrecons::DlgImportPrecons(QWidget *parent) : QWizard(parent)
 
 void DlgImportPrecons::retranslateUi()
 {
-    setWindowTitle(tr("Oracle Importer"));
+    setWindowTitle(tr("Preconstructed Deck Importer"));
 }
 
 void DlgImportPrecons::accept()
@@ -441,7 +441,7 @@ void LoadPreconsPage::readPreconsFromByteArrayRef(QByteArray &_data)
         processTarArchive(tarData);
         return;
 #else
-        zipDownloadFailed(tr("Sorry, this version of Oracle does not support xz compressed files."));
+        zipDownloadFailed(tr("Sorry, your computer does not support xz compressed files."));
         static_cast<DlgImportPrecons *>(wizard())->enableButtons();
         setEnabled(true);
         progressLabel->hide();
@@ -490,7 +490,7 @@ void LoadPreconsPage::readPreconsFromByteArrayRef(QByteArray &_data)
         importFinished(); // Continue processing
         return;
 #else
-        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
+        zipDownloadFailed(tr("Sorry, your computer does not support zipped files."));
         static_cast<DlgImportPrecons *>(wizard())->enableButtons();
         setEnabled(true);
         progressLabel->hide();
