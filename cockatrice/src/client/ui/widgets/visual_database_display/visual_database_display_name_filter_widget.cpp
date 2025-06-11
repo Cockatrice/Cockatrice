@@ -1,6 +1,6 @@
 #include "visual_database_display_name_filter_widget.h"
 
-#include "../../../../../../../../../../../mnt/games-hdd/coding/CLionProjects/Cockatrice/cockatrice/src/dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QHBoxLayout>
