@@ -4,7 +4,7 @@
 #include "../client/ui/widgets/general/layout_containers/flow_widget.h"
 #include "../deck/deck_list_model.h"
 
-#include <QCheckBox> // Include for the checkbox
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
 #include <QMap>

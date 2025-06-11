@@ -53,7 +53,8 @@ DlgGetCardPrices::DlgGetCardPrices(QWidget *parent, DeckListModel *_model) : QDi
     currencyComboBox->addItem("Euro (€)", QVariant(QString("eur")));
     currencyComboBox->addItem("US Dollar ($)", QVariant(QString("usd")));
     currencyComboBox->setCurrentIndex(0);
-    connect(currencyComboBox, &QComboBox::currentIndexChanged, this, &DlgGetCardPrices::onCurrencyChanged);
+    connect(currencyComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &DlgGetCardPrices::onCurrencyChanged);
 
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(7);
