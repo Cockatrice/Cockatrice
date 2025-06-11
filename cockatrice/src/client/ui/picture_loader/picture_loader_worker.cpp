@@ -111,6 +111,14 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
         if (reply->error() == QNetworkReply::NoError) {
             worker->picDownloadFinished(reply);
             emit imageLoadSuccessful(url, worker);
+
+            // If we hit a cached image, we get to make another request for free.
+            if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
+                if (!requestLoadQueue.isEmpty()) {
+                    auto request = requestLoadQueue.takeFirst();
+                    makeRequest(request.first, request.second);
+                }
+            }
         } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
             qInfo() << "Too many requests.";
         }
