@@ -26,6 +26,7 @@ private slots:
 private:
     QHBoxLayout *layout;
     QToolButton *button;
+
 public:
     SettingsPopupWidget *popup;
 };

@@ -57,7 +57,7 @@ private:
     bool picDownload, downloadRunning, loadQueueRunning;
     QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
     QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
-    QTimer requestTimer;                    // Timer for processing delayed requests
+    QTimer requestTimer; // Timer for processing delayed requests
     bool overrideAllCardArtWithPersonalPreference;
 
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);

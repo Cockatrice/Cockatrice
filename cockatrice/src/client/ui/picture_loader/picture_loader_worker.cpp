@@ -79,8 +79,6 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
         requestLoadQueue.append(qMakePair(url, worker));
         emit imageLoadQueued(url, worker);
     }
-
-
 }
 
 QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWorkerWork *worker)
