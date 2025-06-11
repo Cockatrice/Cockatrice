@@ -19,12 +19,12 @@
  ***************************************************************************/
 #include "window_main.h"
 
-#include "../../dialogs/dlg_import_precons.h"
 #include "../../dialogs/dlg_connect.h"
 #include "../../dialogs/dlg_edit_tokens.h"
 #include "../../dialogs/dlg_forgot_password_challenge.h"
 #include "../../dialogs/dlg_forgot_password_request.h"
 #include "../../dialogs/dlg_forgot_password_reset.h"
+#include "../../dialogs/dlg_import_precons.h"
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../dialogs/dlg_register.h"
 #include "../../dialogs/dlg_settings.h"
