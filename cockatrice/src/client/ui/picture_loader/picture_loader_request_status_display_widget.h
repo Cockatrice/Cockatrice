@@ -33,12 +33,11 @@ public:
     int queryElapsedSeconds()
     {
         if (!finished) {
-            int elapsedTime = QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
-            elapsedTime->setText(
-                QString::number(elapsedTime));
+            int elapsedSeconds = QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
+            elapsedTime->setText(QString::number(elapsedSeconds));
             update();
             repaint();
-            return elapsedTime;
+            return elapsedSeconds;
         }
         return elapsedTime->text().toInt();
     }
