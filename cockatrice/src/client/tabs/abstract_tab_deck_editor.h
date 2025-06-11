@@ -94,6 +94,7 @@ protected slots:
     bool actSaveDeck();
     virtual bool actSaveDeckAs();
     virtual void actLoadDeckFromClipboard();
+    void actFetchCardPrices();
     void actEditDeckInClipboard();
     void actEditDeckInClipboardRaw();
     void actSaveDeckToClipboard();

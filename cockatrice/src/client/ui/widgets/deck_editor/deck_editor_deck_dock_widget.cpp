@@ -1,6 +1,5 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../../dialogs/dlg_get_card_prices.h"
 #include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 
@@ -144,14 +143,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(bannerCardComboBox, 2, 1);
 
     upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
-
-    cardPricesButton = new QPushButton(this);
-    connect(cardPricesButton, &QPushButton::clicked, this, [this]() {
-        auto pricesDialog = new DlgGetCardPrices(this, deckModel);
-        pricesDialog->exec();
-    });
-
-    upperLayout->addWidget(cardPricesButton, 4, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -575,7 +566,6 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
-    cardPricesButton->setText(tr("Fetch Card Prices"));
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));

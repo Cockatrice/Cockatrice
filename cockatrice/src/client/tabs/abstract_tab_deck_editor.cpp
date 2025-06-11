@@ -4,6 +4,7 @@
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_stats_interface.h"
+#include "../../dialogs/dlg_get_card_prices.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../game/cards/card_database_manager.h"
@@ -411,6 +412,12 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
     }
 
     deckMenu->setSaveStatus(true);
+}
+
+void AbstractTabDeckEditor::actFetchCardPrices()
+{
+    auto pricesDialog = new DlgGetCardPrices(this, deckDockWidget->deckModel);
+    pricesDialog->exec();
 }
 
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)

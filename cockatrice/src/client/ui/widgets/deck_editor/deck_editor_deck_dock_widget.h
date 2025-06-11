@@ -64,7 +64,6 @@ private:
     QTextEdit *commentsEdit;
     QLabel *bannerCardLabel;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
-    QPushButton *cardPricesButton;
     QLabel *hashLabel1;
     LineEditUnfocusable *hashLabel;
 
