@@ -12,13 +12,17 @@ QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / DeckContentQuery / GenericQuery
+QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 
 DeckContentQuery <- CardSearch NumericExpression?
 CardSearch <- '[[' CardFilterString ']]'
 CardFilterString <- (!']]'.)*
+
+DeckNameQuery <- ([Dd] 'eck')? [Nn] 'ame'? [:] String
+FileNameQuery <- [Ff] ('ile' 'name'?)? [:] String
+PathQuery <- [Pp] 'ath'? [:] String
 
 GenericQuery <- String
 
@@ -127,6 +131,28 @@ static void setupParserRules()
 
     search["CardFilterString"] = [](const peg::SemanticValues &sv) -> QString {
         return QString::fromStdString(std::string(sv.sv()));
+    };
+
+    search["DeckNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto name = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            return deck->deckLoader->getName().contains(name, Qt::CaseInsensitive);
+        };
+    };
+
+    search["FileNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto name = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            auto filename = QFileInfo(deck->filePath).fileName();
+            return filename.contains(name, Qt::CaseInsensitive);
+        };
+    };
+
+    search["PathQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto name = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *, const ExtraDeckSearchInfo &info) {
+            return info.relativeFilePath.contains(name, Qt::CaseInsensitive);
+        };
     };
 
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
