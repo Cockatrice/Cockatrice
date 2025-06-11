@@ -215,7 +215,7 @@ void LoadPreconsPage::downloadPreconsFile(const QUrl &url)
     if (urlString == ALLDECKS_URL || urlString == ALLDECKS_URL_FALLBACK) {
         const auto versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
         auto *versionReply = dynamic_cast<DlgImportPrecons *>(wizard())->nam->get(QNetworkRequest(versionUrl));
-        connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
+        connect(versionReply, &QNetworkReply::finished, [versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
                 auto jsonData = versionReply->readAll();
                 QJsonParseError jsonError{};
