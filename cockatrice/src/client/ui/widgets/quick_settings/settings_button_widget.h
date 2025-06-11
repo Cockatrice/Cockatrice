@@ -13,6 +13,7 @@ class SettingsButtonWidget : public QWidget
 public:
     explicit SettingsButtonWidget(QWidget *parent = nullptr);
     void addSettingsWidget(QWidget *toAdd) const;
+    void removeSettingsWidget(QWidget *toRemove) const;
     void setButtonIcon(QPixmap iconMap);
 
 protected:
@@ -25,6 +26,7 @@ private slots:
 private:
     QHBoxLayout *layout;
     QToolButton *button;
+public:
     SettingsPopupWidget *popup;
 };
 

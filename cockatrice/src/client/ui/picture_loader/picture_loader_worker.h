@@ -74,6 +74,8 @@ private slots:
 signals:
     void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
+    void imageLoadQueued(const QUrl &url, PictureLoaderWorkerWork *worker);
+    void imageLoadSuccessful(const QUrl &url, PictureLoaderWorkerWork *worker);
 };
 
 #endif // PICTURE_LOADER_WORKER_H

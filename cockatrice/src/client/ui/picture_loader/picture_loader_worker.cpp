@@ -76,6 +76,7 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
         makeRequest(url, worker);
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
+        emit imageLoadQueued(url, worker);
     }
 
 
@@ -86,6 +87,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
+        emit imageLoadSuccessful(url, worker);
         return makeRequest(cachedRedirect, worker);
     }
 
@@ -109,6 +111,9 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
 
         if (reply->error() == QNetworkReply::NoError) {
             worker->picDownloadFinished(reply);
+            emit imageLoadSuccessful(url, worker);
+        } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
+            qInfo() << "Too many requests.";
         }
         reply->deleteLater();
     });
