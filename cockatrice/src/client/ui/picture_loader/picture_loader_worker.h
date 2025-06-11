@@ -2,14 +2,16 @@
 #define PICTURE_LOADER_WORKER_H
 
 #include "../../../game/cards/card_database.h"
-#include "picture_loader_worker_work.h"
 #include "../../../game/cards/card_info.h"
+#include "picture_loader_worker_work.h"
 #include "picture_to_load.h"
 
 #include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QObject>
+#include <QQueue>
 #include <QTimer>
 
 #define REDIRECT_HEADER_NAME "redirects"
@@ -27,13 +29,13 @@ class PictureLoaderWorker : public QObject
 public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
+    void queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker);
 
     void enqueueImageLoad(const CardInfoPtr &card);
     void clearNetworkCache();
 
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
-    void handleRateLimit(const QUrl &url, PictureLoaderWorkerWork *worker);
     void processQueuedRequests();
     void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
 
@@ -45,6 +47,7 @@ private:
     QList<PictureToLoad> loadQueue;
     QMutex mutex;
     QNetworkAccessManager *networkManager;
+    QNetworkDiskCache *cache;
     QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
     QString cacheFilePath;                             // Path to persistent storage
     static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
@@ -52,10 +55,8 @@ private:
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
-    bool rateLimited = false;
-    QTimer rateLimitTimer;
+    QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
     QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
-    QHash<QUrl, QDateTime> lastRequestTime; // Tracks the last request time for each URL
     QTimer requestTimer;                    // Timer for processing delayed requests
     bool overrideAllCardArtWithPersonalPreference;
 

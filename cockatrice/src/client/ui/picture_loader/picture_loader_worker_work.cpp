@@ -18,7 +18,7 @@ QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db40
 PictureLoaderWorkerWork::PictureLoaderWorkerWork(PictureLoaderWorker *_worker, const CardInfoPtr &toLoad)
     : QThread(nullptr), worker(_worker), cardToDownload(toLoad)
 {
-    connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::makeRequest,
+    connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest,
             Qt::QueuedConnection);
     connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully,
             Qt::QueuedConnection);

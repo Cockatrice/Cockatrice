@@ -33,13 +33,13 @@ PictureLoaderWorker::PictureLoaderWorker()
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     networkManager->setTransferTimeout();
 #endif
-    auto cache = new QNetworkDiskCache(this);
+    cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
                                static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
     // Note: the settings is in MB, but QNetworkDiskCache uses bytes
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache,
-            [cache](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
+    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, this,
+            [this](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
     networkManager->setCache(cache);
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
@@ -57,7 +57,8 @@ PictureLoaderWorker::PictureLoaderWorker()
     moveToThread(pictureLoaderThread);
 
     connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::processQueuedRequests);
-    requestTimer.setSingleShot(true);
+    requestTimer.setInterval(1000);
+    requestTimer.start();
 }
 
 PictureLoaderWorker::~PictureLoaderWorker()
@@ -65,33 +66,23 @@ PictureLoaderWorker::~PictureLoaderWorker()
     pictureLoaderThread->deleteLater();
 }
 
+void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker)
+{
+    QUrl cachedRedirect = getCachedRedirect(url);
+    if (!cachedRedirect.isEmpty()) {
+        queueRequest(cachedRedirect, worker);
+    }
+    if (cache->metaData(url).isValid()) {
+        makeRequest(url, worker);
+    } else {
+        requestLoadQueue.append(qMakePair(url, worker));
+    }
+
+
+}
+
 QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWorkerWork *worker)
 {
-    constexpr int urlRequestDelayMs = 100; // Minimum delay between requests to the same URL (in milliseconds)
-
-    // Check if we're rate-limited globally
-    if (rateLimited) {
-        requestQueue.append(qMakePair(url, worker));
-        return nullptr;
-    }
-
-    // Check if a request was recently made to this URL
-    QDateTime now = QDateTime::currentDateTimeUtc();
-    if (lastRequestTime.contains(url)) {
-        int elapsedMs = lastRequestTime[url].msecsTo(now);
-        if (elapsedMs < urlRequestDelayMs) {
-            // Queue the request if too soon to reissue
-            requestQueue.append(qMakePair(url, worker));
-            if (!requestTimer.isActive()) {
-                requestTimer.start(urlRequestDelayMs);
-            }
-            return nullptr;
-        }
-    }
-
-    // Update the last request time for this URL
-    lastRequestTime[url] = now;
-
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
@@ -118,10 +109,6 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
 
         if (reply->error() == QNetworkReply::NoError) {
             worker->picDownloadFinished(reply);
-        } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
-            handleRateLimit(url, worker);
-        } else {
-            worker->picDownloadFinished(reply);
         }
         reply->deleteLater();
     });
@@ -129,46 +116,13 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     return reply;
 }
 
-void PictureLoaderWorker::handleRateLimit(const QUrl &url, PictureLoaderWorkerWork *worker)
-{
-    // Prevent multiple rate-limit handling
-    if (!rateLimited) {
-        int retryAfter = 70;
-        rateLimited = true;
-        qWarning() << "Rate limit exceeded! Queuing requests for" << retryAfter << "seconds.";
-
-        // Start a timer to reset the rate-limited state
-        rateLimitTimer.singleShot(retryAfter * 1000, this, [this]() {
-            qWarning() << "Rate limit expired. Resuming queued requests.";
-            processQueuedRequests();
-        });
-    }
-
-    // Always queue the request even if already rate-limited
-    requestQueue.append(qMakePair(url, worker));
-}
-
 void PictureLoaderWorker::processQueuedRequests()
 {
-    qWarning() << "Resuming queued requests";
-    rateLimited = false;
-
-    if (!requestQueue.isEmpty()) {
-        // Process requests one by one, respecting the URL delay
-        auto request = requestQueue.takeFirst();
-        QDateTime now = QDateTime::currentDateTimeUtc();
-
-        if (lastRequestTime.contains(request.first)) {
-            int elapsedMs = lastRequestTime[request.first].msecsTo(now);
-            if (elapsedMs < 100) {
-                // Delay request if needed
-                requestQueue.prepend(request);       // Put back in the queue
-                requestTimer.start(100 - elapsedMs); // Schedule for the remaining time
-                return;
-            }
+    for (int i = 0; i < 10; i++) {
+        if (!requestLoadQueue.isEmpty()) {
+            auto request = requestLoadQueue.takeFirst();
+            makeRequest(request.first, request.second);
         }
-
-        makeRequest(request.first, request.second);
     }
 }
 
@@ -186,7 +140,7 @@ void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)
 {
     redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
-    // saveRedirectCache();
+    saveRedirectCache();
 }
 
 QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
