@@ -50,7 +50,7 @@ void PictureLoaderStatusBar::addSuccessfulImageLoad(const QUrl &url, PictureLoad
     progressBar->setValue(progressBar->value() + 1);
     for (PictureLoaderRequestStatusDisplayWidget *statusDisplayWidget :
          loadLog->popup->findChildren<PictureLoaderRequestStatusDisplayWidget *>()) {
-        if (statusDisplayWidget->getUrl() == url) {
+        if (statusDisplayWidget->getUrl() == url.toString()) {
             statusDisplayWidget->queryElapsedSeconds();
             statusDisplayWidget->setFinished();
         }
