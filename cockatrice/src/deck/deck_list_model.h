@@ -115,6 +115,7 @@ public:
                         const CardInfoPerSet &cardInfoSet,
                         const QString &zoneName,
                         bool abAddAnyway = false);
+    int findSortedInsertRow(InnerDecklistNode *parent, AbstractDecklistNode *newNode) const;
     void sort(int column, Qt::SortOrder order) override;
     void cleanList();
     DeckLoader *getDeckList() const

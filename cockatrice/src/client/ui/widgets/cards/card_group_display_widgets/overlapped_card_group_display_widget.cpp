@@ -30,10 +30,24 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
     banner->setBuddy(overlapWidget);
 
     layout->addWidget(overlapWidget);
+
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        OverlappedCardGroupDisplayWidget::removeFromLayout(indexToWidgetMap.value(idx));
+        indexToWidgetMap.value(idx)->deleteLater();
+        indexToWidgetMap.remove(idx);
+    }
+
+    qInfo() << "Initialized an overlap CardGroupDisplayWidget";
     OverlappedCardGroupDisplayWidget::updateCardDisplays();
 
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
             [this]() { overlapWidget->adjustMaxColumnsAndRows(); });
+
+    disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    disconnect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &OverlappedCardGroupDisplayWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &OverlappedCardGroupDisplayWidget::onCardRemoval);
 }
 
 void OverlappedCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)

@@ -31,11 +31,24 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
     banner->setBuddy(flowWidget);
 
     layout->addWidget(flowWidget);
+
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        FlatCardGroupDisplayWidget::removeFromLayout(indexToWidgetMap.value(idx));
+        indexToWidgetMap.value(idx)->deleteLater();
+        indexToWidgetMap.remove(idx);
+    }
+
+    qInfo() << "Initialized a flat CardGroupDisplayWidget";
     FlatCardGroupDisplayWidget::updateCardDisplays();
     // connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
+    disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    disconnect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &FlatCardGroupDisplayWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &FlatCardGroupDisplayWidget::onCardRemoval);
 }
 
-QWidget* FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
+QWidget *FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
 {
     QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(row, 0, trackedIndex));
 
@@ -57,8 +70,6 @@ QWidget* FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
     indexToWidgetMap.insert(index, widget);
     return widget;
 }
-
-
 
 void FlatCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
 {

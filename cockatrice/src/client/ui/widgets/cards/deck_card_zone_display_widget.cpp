@@ -41,39 +41,78 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
 }
 
+void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget)
+{
+    qInfo() << "Cleaning up invalid card group " << displayWidget->cardGroupCategory << " from "
+            << displayWidget->zoneName;
+    cardGroupLayout->removeWidget(displayWidget);
+    for (auto idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    displayWidget->deleteLater();
+    qInfo() << "Cleaned.";
+}
+
+void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
+{
+    auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
+    if (indexToWidgetMap.contains(index)) {
+        qInfo() << categoryName << " is already contained in the index to widget map";
+        return;
+    } else {
+        qInfo() << categoryName << " needs a widget";
+    }
+    if (displayType == "overlap") {
+        qInfo() << "It's getting an overlap widget.";
+        auto *display_widget = new OverlappedCardGroupDisplayWidget(
+            cardGroupContainer, deckListModel, index, zoneName, categoryName, activeGroupCriteria, activeSortCriteria,
+            subBannerOpacity, cardSizeWidget);
+        connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+        connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(display_widget, &CardGroupDisplayWidget::cleanupRequested, this,
+                &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
+        cardGroupLayout->addWidget(display_widget);
+        indexToWidgetMap.insert(index, display_widget);
+    } else if (displayType == "flat") {
+        qInfo() << "Getting a flat widget for christmas";
+        auto *display_widget =
+            new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, index, zoneName, categoryName,
+                                           activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
+        connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+                SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
+        connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(display_widget, &CardGroupDisplayWidget::cleanupRequested, this,
+                &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
+        cardGroupLayout->addWidget(display_widget);
+        indexToWidgetMap.insert(index, display_widget);
+    }
+}
+
+void DeckCardZoneDisplayWidget::displayCards()
+{
+    qInfo() << "Constructing Group Display Widgets for Zone Display widget";
+    qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " has "
+            << deckListModel->rowCount(trackedIndex.sibling(trackedIndex.row(), 0)) << " entries.";
+    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
+        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
+        constructAppropriateWidget(index);
+    }
+}
+
 void DeckCardZoneDisplayWidget::onCategoryAddition(const QModelIndex &parent, int first, int last)
 {
+    if (!trackedIndex.isValid()) {
+        emit requestCleanup(this);
+    }
     if (parent == trackedIndex) {
         qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " zone thinks it has a new category";
         for (int i = first; i <= last; i++) {
             QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
 
-            if (indexToWidgetMap.contains(index)) {
-                continue;
-            }
-
-            auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-            qInfo() << categoryName;
-
-            if (displayType == "overlap") {
-                auto *display_widget = new OverlappedCardGroupDisplayWidget(
-                    cardGroupContainer, deckListModel, index, zoneName, categoryName,
-                    activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
-                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-                cardGroupLayout->addWidget(display_widget);
-                indexToWidgetMap.insert(index, display_widget);
-            } else if (displayType == "flat") {
-                auto *display_widget = new FlatCardGroupDisplayWidget(
-                    cardGroupContainer, deckListModel, index, zoneName, categoryName,
-                    activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-                connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)),
-                        this, SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-                connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-                cardGroupLayout->addWidget(display_widget);
-                indexToWidgetMap.insert(index, display_widget);
-            }
+            constructAppropriateWidget(index);
         }
     }
 }
@@ -89,6 +128,9 @@ void DeckCardZoneDisplayWidget::onCategoryRemoval(const QModelIndex &parent, int
             indexToWidgetMap.value(idx)->deleteLater();
             indexToWidgetMap.remove(idx);
         }
+    }
+    if (!trackedIndex.isValid()) {
+        emit requestCleanup(this);
     }
 }
 
@@ -111,42 +153,7 @@ void DeckCardZoneDisplayWidget::onHover(CardInfoPtr card)
     emit cardHovered(card);
 }
 
-void DeckCardZoneDisplayWidget::displayCards()
-{
-    qInfo() << "Constructing Group Display Widgets for Zone Display widget";
-    qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " has " << deckListModel->rowCount(trackedIndex.sibling(trackedIndex.row(), 0)) << " entries.";
-    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
-        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
-
-        if (indexToWidgetMap.contains(index)) {
-            continue;
-        }
-        auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-        qInfo() << categoryName;
-
-        if (displayType == "overlap") {
-            auto *display_widget = new OverlappedCardGroupDisplayWidget(
-                cardGroupContainer, deckListModel, index, zoneName, categoryName,
-                activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-            connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-            cardGroupLayout->addWidget(display_widget);
-            indexToWidgetMap.insert(index, display_widget);
-        } else if (displayType == "flat") {
-            auto *display_widget = new FlatCardGroupDisplayWidget(
-                cardGroupContainer, deckListModel, index, zoneName, categoryName,
-                activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-            connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                    SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-            connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-            cardGroupLayout->addWidget(display_widget);
-            indexToWidgetMap.insert(index, display_widget);
-        }
-    }
-}
-
-void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
+void DeckCardZoneDisplayWidget::refreshDisplayType(const QString &_displayType)
 {
     displayType = _displayType;
     QLayoutItem *item;

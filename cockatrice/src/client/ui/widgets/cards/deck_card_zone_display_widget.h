@@ -6,6 +6,7 @@
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
 #include "../visual_deck_editor/visual_deck_editor_widget.h"
+#include "card_group_display_widgets/card_group_display_widget.h"
 #include "card_info_picture_with_text_overlay_widget.h"
 #include "card_size_widget.h"
 
@@ -36,6 +37,8 @@ public:
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
+    void cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget);
+    void constructAppropriateWidget(QPersistentModelIndex index);
     void displayCards();
     void refreshDisplayType(const DisplayType &displayType);
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
@@ -48,6 +51,7 @@ signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
     void cardHovered(CardInfoPtr card);
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
+    void requestCleanup(DeckCardZoneDisplayWidget *displayWidget);
 
 private:
     QString activeGroupCriteria;
