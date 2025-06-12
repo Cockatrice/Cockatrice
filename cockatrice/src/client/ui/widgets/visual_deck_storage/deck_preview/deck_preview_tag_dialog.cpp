@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const QStringList &activeTags, QWidget *parent)
@@ -56,9 +57,15 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const Q
     newTagInput = new QLineEdit(this);
     addTagButton = new QPushButton(this);
     editButton = new QPushButton(this);
-    connect(editButton, &QPushButton::clicked, this, [=]() {
-        auto defaultTagsEditor = new DlgDefaultTagsEditor(nullptr);
-        defaultTagsEditor->exec();
+    connect(editButton, &QPushButton::clicked, this, [this]() {
+        auto *editor = new DlgDefaultTagsEditor(this);
+        editor->setAttribute(Qt::WA_DeleteOnClose);
+        editor->setModal(true);
+        editor->show();
+        QTimer::singleShot(0, editor, [editor]() {
+            editor->raise();
+            editor->activateWindow();
+        });
     });
     addTagLayout->addWidget(newTagInput);
     addTagLayout->addWidget(addTagButton);

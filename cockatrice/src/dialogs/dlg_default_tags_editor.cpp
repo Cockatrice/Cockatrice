@@ -7,12 +7,10 @@
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)
 {
-    setWindowModality(Qt::WindowModal); // Steals focus from parent dialog
-
-    auto *mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
 
     // Input field + Add button (horizontal layout)
-    auto *inputLayout = new QHBoxLayout();
+    inputLayout = new QHBoxLayout();
     inputField = new QLineEdit(this);
     addButton = new QPushButton(this);
     inputLayout->addWidget(inputField);
@@ -26,7 +24,7 @@ DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(listWidget);
 
     // Button layout (Confirm and Cancel)
-    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout = new QHBoxLayout();
     confirmButton = new QPushButton(this);
     cancelButton = new QPushButton(this);
     buttonLayout->addWidget(confirmButton);
@@ -57,28 +55,30 @@ void DlgDefaultTagsEditor::loadStringList()
     listWidget->clear();
     QStringList tags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
     for (const QString &tag : tags) {
-        auto *item = new QListWidgetItem(listWidget);
+        auto *item = new QListWidgetItem(); // Create item but don't insert yet
+
         QWidget *widget = new QWidget(this);
         QHBoxLayout *layout = new QHBoxLayout(widget);
-        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setContentsMargins(2, 2, 2, 2);
+        layout->setSpacing(5);
 
-        // Editable tag label
         QLineEdit *lineEdit = new QLineEdit(tag, this);
         lineEdit->setFrame(false);
-        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         layout->addWidget(lineEdit);
 
-        // Delete button
         QPushButton *deleteButton = new QPushButton(tr("✖"), this);
-        deleteButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        deleteButton->setFixedWidth(25);
-        layout->addSpacing(5); // Adds spacing before the delete button
+        deleteButton->setFixedSize(25, 25);
         layout->addWidget(deleteButton);
 
         widget->setLayout(layout);
+
+        // Set item height explicitly to match the widget (widgets get squished without it)
+        item->setSizeHint(widget->sizeHint());
+
+        listWidget->addItem(item);
         listWidget->setItemWidget(item, widget);
 
-        // Delete button signal
         connect(deleteButton, &QPushButton::clicked, this, [this, item]() { deleteItem(item); });
     }
 }

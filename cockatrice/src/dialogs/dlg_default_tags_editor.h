@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 class DlgDefaultTagsEditor : public QDialog
 {
@@ -19,7 +20,10 @@ private slots:
     void confirmChanges();
 
 private:
+    QVBoxLayout *mainLayout;
+    QHBoxLayout *inputLayout;
     QListWidget *listWidget;
+    QHBoxLayout *buttonLayout;
     QLineEdit *inputField;
     QPushButton *addButton;
     QPushButton *confirmButton;
