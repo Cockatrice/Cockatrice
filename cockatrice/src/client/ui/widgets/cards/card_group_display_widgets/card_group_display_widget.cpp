@@ -28,17 +28,17 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
 
     layout->addWidget(banner);
     qInfo() << "Tracked index (default CardGroupDisplayWidget): " << cardGroupCategory << " (" << zoneName << ")"
-        << "_trackedIndex.isValid()=" << _trackedIndex.isValid()
-        << "row=" << _trackedIndex.row()
-        << "column=" << _trackedIndex.column()
-        << "parent(row)=" << _trackedIndex.parent().row()
-        << "parent(column)=" << _trackedIndex.parent().column();
+            << "_trackedIndex.isValid()=" << _trackedIndex.isValid() << "row=" << _trackedIndex.row()
+            << "column=" << _trackedIndex.column() << "parent(row)=" << _trackedIndex.parent().row()
+            << "parent(column)=" << _trackedIndex.parent().column();
 
-    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
-    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+    // CardGroupDisplayWidget::updateCardDisplays();
+
+    // connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    // connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
-QWidget* CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
+QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
 {
     QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(rowIndex, 0, trackedIndex));
 
@@ -73,13 +73,15 @@ void CardGroupDisplayWidget::updateCardDisplays()
 
 void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+        return;
+    }
     if (parent == trackedIndex) {
         qInfo() << "Tracked index (default CardGroupDisplayWidget): " << cardGroupCategory << " (" << zoneName << ")"
-    << "_trackedIndex.isValid()=" << trackedIndex.isValid()
-    << "row=" << trackedIndex.row()
-    << "column=" << trackedIndex.column()
-    << "parent(row)=" << trackedIndex.parent().row()
-    << "parent(column)=" << trackedIndex.parent().column();
+                << "_trackedIndex.isValid()=" << trackedIndex.isValid() << "row=" << trackedIndex.row()
+                << "column=" << trackedIndex.column() << "parent(row)=" << trackedIndex.parent().row()
+                << "parent(column)=" << trackedIndex.parent().column();
         qInfo() << "Card addition to " << cardGroupCategory;
         for (int i = first; i <= last; i++) {
             insertIntoLayout(constructWidgetForIndex(i), i);
@@ -100,6 +102,9 @@ void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first,
                 indexToWidgetMap.value(idx)->deleteLater();
                 indexToWidgetMap.remove(idx);
             }
+        }
+        if (!trackedIndex.isValid()) {
+            emit cleanupRequested(this);
         }
     }
 }

@@ -410,7 +410,10 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     if (!cardNode) {
         auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, cardSetName,
                                                cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
-        beginInsertRows(parentIndex, static_cast<int>(cardTypeNode->size()), static_cast<int>(cardTypeNode->size()));
+        // Determine the correct index
+        int insertRow = findSortedInsertRow(cardTypeNode, cardNode);
+
+        beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
         endInsertRows();
     } else {
@@ -420,9 +423,42 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
         cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
         deckList->refreshDeckHash();
     }
-    sort(lastKnownColumn, lastKnownOrder);
+    // sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);
     return nodeToIndex(cardNode);
+}
+
+int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, AbstractDecklistNode *newNode) const
+{
+    auto *newCard = dynamic_cast<const DecklistModelCardNode *>(newNode);
+    if (!newCard)
+        return parent->size(); // fallback: append at end
+
+    for (int i = 0; i < parent->size(); ++i) {
+        auto *existingCard = dynamic_cast<const DecklistModelCardNode *>(parent->at(i));
+        if (!existingCard)
+            continue;
+
+        bool lessThan = false;
+        switch (lastKnownColumn) {
+            case 0: // ByNumber
+                lessThan = lastKnownOrder == Qt::AscendingOrder
+                               ? newCard->getCardCollectorNumber() < existingCard->getCardCollectorNumber()
+                               : newCard->getCardCollectorNumber() > existingCard->getCardCollectorNumber();
+                break;
+            case 1: // ByName
+            default:
+                lessThan = lastKnownOrder == Qt::AscendingOrder
+                               ? newCard->getName().localeAwareCompare(existingCard->getName()) < 0
+                               : newCard->getName().localeAwareCompare(existingCard->getName()) > 0;
+                break;
+        }
+
+        if (lessThan)
+            return i;
+    }
+
+    return parent->size(); // insert at end if no earlier match
 }
 
 QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const

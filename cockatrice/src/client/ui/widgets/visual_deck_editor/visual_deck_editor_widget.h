@@ -17,6 +17,7 @@
 #include <QWidget>
 #include <qscrollarea.h>
 
+class DeckCardZoneDisplayWidget;
 enum class DisplayType
 {
     Flat,
@@ -41,6 +42,7 @@ public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void updateZoneWidgets();
     void updateDisplayType();
+    void cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget);
     void onCardAddition(const QModelIndex &parent, int first, int last);
     void onCardRemoval(const QModelIndex &parent, int first, int last);
     void constructZoneWidgetsFromDeckListModel();

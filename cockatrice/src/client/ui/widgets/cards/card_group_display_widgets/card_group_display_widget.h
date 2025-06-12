@@ -47,6 +47,7 @@ public slots:
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void cardHovered(CardInfoPtr card);
+    void cleanupRequested(CardGroupDisplayWidget *cardGroupDisplayWidget);
 
 protected:
     QVBoxLayout *layout;

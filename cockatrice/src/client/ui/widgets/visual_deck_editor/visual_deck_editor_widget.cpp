@@ -198,8 +198,19 @@ void VisualDeckEditorWidget::retranslateUi()
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
+
+void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
+{
     qInfo() << "Cleaning up invalid card zone " << displayWidget->zoneName;
+    zoneContainerLayout->removeWidget(displayWidget);
+    for (auto idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    displayWidget->deleteLater();
     qInfo() << "Cleaned.";
+}
 
 void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {
@@ -218,6 +229,8 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
                 activeSortCriteria, 20, 10, cardSizeWidget);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
+                    &VisualDeckEditorWidget::cleanupInvalidZones);
             connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
                     &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
             connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
@@ -249,7 +262,7 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
 void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 {
     qInfo() << "Constructing zone widgets";
-    for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); ++i) {
+    for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); i++) {
         QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
 
         if (indexToWidgetMap.contains(index)) {
@@ -263,6 +276,8 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
             activeSortCriteria, 20, 10, cardSizeWidget);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
+                &VisualDeckEditorWidget::cleanupInvalidZones);
         connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
                 &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
         connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
