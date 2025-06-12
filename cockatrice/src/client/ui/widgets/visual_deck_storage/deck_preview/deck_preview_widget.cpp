@@ -182,6 +182,15 @@ QString DeckPreviewWidget::getColorIdentity()
     return colorIdentity;
 }
 
+/**
+ * The display name is given by the deck name, or the filename if the deck name is not set.
+ */
+QString DeckPreviewWidget::getDisplayName() const
+{
+    return deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName()
+                                           : deckLoader->getName();
+}
+
 void DeckPreviewWidget::setFilePath(const QString &_filePath)
 {
     filePath = _filePath;
@@ -193,8 +202,7 @@ void DeckPreviewWidget::setFilePath(const QString &_filePath)
  */
 void DeckPreviewWidget::refreshBannerCardText()
 {
-    bannerCardDisplayWidget->setOverlayText(
-        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
+    bannerCardDisplayWidget->setOverlayText(getDisplayName());
 
     refreshBannerCardToolTip();
 }
