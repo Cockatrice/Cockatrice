@@ -31,6 +31,7 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
     banner->setBuddy(flowWidget);
 
     layout->addWidget(flowWidget);
+    qInfo() << "Initialized a flat CardGroupDisplayWidget";
     FlatCardGroupDisplayWidget::updateCardDisplays();
     // connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
 }

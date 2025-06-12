@@ -39,12 +39,27 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     // connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::decklistDataChanged);
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
+
+    qInfo() << "Tracked index:" << zoneName << "_trackedIndex.isValid()=" << _trackedIndex.isValid()
+            << "row=" << _trackedIndex.row() << "column=" << _trackedIndex.column()
+            << "parent(row)=" << _trackedIndex.parent().row() << "parent(column)=" << _trackedIndex.parent().column()
+            << "parent(valid)=" << _trackedIndex.parent().isValid();
 }
+    qInfo() << "Cleaning up invalid card group " << displayWidget->cardGroupCategory << " from " << displayWidget->zoneName;
+    qInfo() << "Cleaned.";
+        qInfo() << categoryName << " is already contained in the index to widget map";
+        qInfo() << categoryName << " needs a widget";
+        qInfo() << "It's getting an overlap widget.";
+        qInfo() << "Getting a flat widget for christmas";
+    qInfo() << "Constructing Group Display Widgets for Zone Display widget";
+    qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " has "
+            << deckListModel->rowCount(trackedIndex.sibling(trackedIndex.row(), 0)) << " entries.";
 
 void DeckCardZoneDisplayWidget::onCategoryAddition(const QModelIndex &parent, int first, int last)
 {
     if (parent == trackedIndex) {
-        qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " zone thinks it has a new category";
+        qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString()
+                << " zone thinks it has a new category";
         for (int i = first; i <= last; i++) {
             QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
 

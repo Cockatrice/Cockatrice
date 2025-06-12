@@ -198,6 +198,8 @@ void VisualDeckEditorWidget::retranslateUi()
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
+    qInfo() << "Cleaning up invalid card zone " << displayWidget->zoneName;
+    qInfo() << "Cleaned.";
 
 void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {

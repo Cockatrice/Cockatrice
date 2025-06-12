@@ -30,6 +30,7 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
     banner->setBuddy(overlapWidget);
 
     layout->addWidget(overlapWidget);
+    qInfo() << "Initialized an overlap CardGroupDisplayWidget";
     OverlappedCardGroupDisplayWidget::updateCardDisplays();
 
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
