@@ -21,8 +21,13 @@ set(oracle_SOURCES
     ../cockatrice/src/game/cards/card_database_manager.cpp
     ../cockatrice/src/game/cards/card_info.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader_request_status_display_widget.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader_status_bar.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_loader_worker.cpp
+    ../cockatrice/src/client/ui/picture_loader/picture_loader_worker_work.cpp
     ../cockatrice/src/client/ui/picture_loader/picture_to_load.cpp
+    ../cockatrice/src/client/ui/widgets/quick_settings/settings_button_widget.cpp
+    ../cockatrice/src/client/ui/widgets/quick_settings/settings_popup_widget.cpp
     ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
