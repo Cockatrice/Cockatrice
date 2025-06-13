@@ -57,7 +57,12 @@ OverlapLayout::~OverlapLayout()
 void OverlapLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
 {
     addChildWidget(toInsert);
-    itemList.insert(qBound(0, index, std::max(0, static_cast<int>(itemList.size()))), new QWidgetItem(toInsert));
+    int clampedIndex = qBound(0, index, std::max(0, static_cast<int>(itemList.size())));
+    itemList.insert(clampedIndex, new QWidgetItem(toInsert));
+
+    for (int i = clampedIndex; i < itemList.size(); ++i) {
+        dynamic_cast<QWidgetItem *>(itemList.at(i))->widget()->raise();
+    }
 
     invalidate();
 }
