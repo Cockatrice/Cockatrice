@@ -54,6 +54,14 @@ OverlapLayout::~OverlapLayout()
     }
 }
 
+void OverlapLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
+{
+    addChildWidget(toInsert);
+    itemList.insert(qBound(0, index, std::max(0, static_cast<int>(itemList.size()))), new QWidgetItem(toInsert));
+
+    invalidate();
+}
+
 /**
  * @brief Adds a new item to the layout.
  *

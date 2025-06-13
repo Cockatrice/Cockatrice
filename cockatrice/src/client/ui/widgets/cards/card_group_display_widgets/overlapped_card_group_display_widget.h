@@ -39,8 +39,7 @@ private:
 
     void insertIntoLayout(QWidget *toInsert, int insertAt) override
     {
-        Q_UNUSED(insertAt);
-        overlapWidget->addWidget(toInsert);
+        overlapWidget->insertWidgetAtIndex(toInsert, insertAt);
     }
 
     void removeFromLayout(QWidget *toRemove) override
