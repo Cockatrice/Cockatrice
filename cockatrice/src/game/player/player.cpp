@@ -849,6 +849,8 @@ void Player::retranslateUi()
         aCreateAnotherToken->setText(tr("C&reate another token"));
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 
+        mCardCounters->setTitle(tr("Ca&rd counters"));
+
         QMapIterator<int, AbstractCounter *> counterIterator(counters);
         while (counterIterator.hasNext()) {
             counterIterator.next().value()->retranslateUi();
@@ -898,7 +900,6 @@ void Player::retranslateUi()
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
-    mCardCounters->setTitle(tr("Ca&rd counters"));
     for (int i = 0; i < aAddCounter.size(); ++i) {
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
     }
