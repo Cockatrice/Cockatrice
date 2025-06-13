@@ -17,9 +17,9 @@ inline Q_LOGGING_CATEGORY(DeckFilterStringLog, "deck_filter_string");
 struct ExtraDeckSearchInfo
 {
     /**
-     * The filename used for filtering. Varies based on settings.
+     * The relative filepath starting from the deck folder
      */
-    QString fileSearchName;
+    QString relativeFilePath;
 };
 
 typedef std::function<bool(const DeckPreviewWidget *, const ExtraDeckSearchInfo &)> DeckFilter;
