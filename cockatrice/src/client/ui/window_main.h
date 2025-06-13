@@ -137,9 +137,11 @@ private:
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
-    QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aFullScreen, *aSettings, *aExit, *aAbout, *aTips,
-        *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets, *aEditTokens,
-        *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase, *aShow, *aOpenSettingsFolder;
+    QAction *aAbout, *aSettings, *aShow, *aExit;
+    QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
+    QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
+        *aReloadCardDatabase;
+    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aViewLog, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
