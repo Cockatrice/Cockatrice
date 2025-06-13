@@ -17,9 +17,9 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      int bannerOpacity,
                                                      int subBannerOpacity,
                                                      CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria),
-      activeSortCriteria(_activeSortCriteria), displayType(_displayType), bannerOpacity(bannerOpacity),
-      subBannerOpacity(subBannerOpacity), cardSizeWidget(_cardSizeWidget)
+    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName),
+      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria), displayType(_displayType),
+      bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity), cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);

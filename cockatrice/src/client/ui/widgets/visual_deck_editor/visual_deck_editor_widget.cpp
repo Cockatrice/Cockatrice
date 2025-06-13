@@ -221,10 +221,12 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
             }
 
             DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-                zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
+                zoneContainer, deckListModel, index,
+                deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
                 activeSortCriteria, currentDisplayType, 20, 10, cardSizeWidget);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this,
+                    &VisualDeckEditorWidget::onCardClick);
             connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
                     &VisualDeckEditorWidget::cleanupInvalidZones);
             connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
@@ -265,7 +267,8 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
         }
 
         DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-            zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
+            zoneContainer, deckListModel, index,
+            deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
             activeSortCriteria, currentDisplayType, 20, 10, cardSizeWidget);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);

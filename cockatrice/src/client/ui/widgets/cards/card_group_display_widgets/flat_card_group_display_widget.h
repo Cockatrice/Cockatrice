@@ -20,7 +20,7 @@ public:
                                CardSizeWidget *cardSizeWidget);
 
 public slots:
-    QWidget* constructWidgetForIndex(int row) override;
+    QWidget *constructWidgetForIndex(int row) override;
     void resizeEvent(QResizeEvent *event) override;
     void onCardAddition(const QModelIndex &parent, int first, int last) override;
     void onCardRemoval(const QModelIndex &parent, int first, int last) override;
@@ -28,12 +28,12 @@ public slots:
 private:
     FlowWidget *flowWidget;
 
-    QWidget* getLayoutParent() override
+    QWidget *getLayoutParent() override
     {
         return flowWidget;
     }
 
-    void addToLayout(QWidget* toAdd) override
+    void addToLayout(QWidget *toAdd) override
     {
         flowWidget->addWidget(toAdd);
     }
@@ -43,7 +43,7 @@ private:
         flowWidget->insertWidgetAtIndex(toInsert, insertAt);
     }
 
-    void removeFromLayout(QWidget* toRemove) override
+    void removeFromLayout(QWidget *toRemove) override
     {
         flowWidget->removeWidget(toRemove);
     }

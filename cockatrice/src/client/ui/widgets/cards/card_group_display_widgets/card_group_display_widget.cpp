@@ -16,9 +16,9 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                QStringList _activeSortCriteria,
                                                int bannerOpacity,
                                                CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName), cardGroupCategory(_cardGroupCategory),
-      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria),
-      cardSizeWidget(_cardSizeWidget)
+    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName),
+      cardGroupCategory(_cardGroupCategory), activeGroupCriteria(_activeGroupCriteria),
+      activeSortCriteria(_activeSortCriteria), cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);

@@ -28,7 +28,7 @@ public:
 
     DeckListModel *deckListModel;
     QPersistentModelIndex trackedIndex;
-    QHash<QPersistentModelIndex, QWidget*> indexToWidgetMap;
+    QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
     QString zoneName;
     QString cardGroupCategory;
     QString activeGroupCriteria;
@@ -38,7 +38,7 @@ public:
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(CardInfoPtr card);
-    virtual QWidget* constructWidgetForIndex(int rowIndex);
+    virtual QWidget *constructWidgetForIndex(int rowIndex);
     virtual void updateCardDisplays();
     virtual void onCardAddition(const QModelIndex &parent, int first, int last);
     virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
@@ -53,12 +53,12 @@ protected:
     QVBoxLayout *layout;
     BannerWidget *banner;
 
-    virtual QWidget* getLayoutParent()
+    virtual QWidget *getLayoutParent()
     {
         return this;
     }
 
-    virtual void addToLayout(QWidget* toAdd)
+    virtual void addToLayout(QWidget *toAdd)
     {
         layout->addWidget(toAdd);
     }
@@ -68,7 +68,7 @@ protected:
         layout->insertWidget(insertAt, toInsert);
     }
 
-    virtual void removeFromLayout(QWidget* toRemove)
+    virtual void removeFromLayout(QWidget *toRemove)
     {
         layout->removeWidget(toRemove);
     }

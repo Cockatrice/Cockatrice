@@ -65,7 +65,7 @@ private:
     QWidget *cardGroupContainer;
     QVBoxLayout *cardGroupLayout;
     OverlapWidget *overlapWidget;
-    QHash<QPersistentModelIndex, QWidget*> indexToWidgetMap;
+    QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
 };
 
 #endif // DECK_CARD_ZONE_DISPLAY_WIDGET_H

@@ -153,7 +153,8 @@ public:
 class AbstractDecklistCardNode : public AbstractDecklistNode
 {
 public:
-    explicit AbstractDecklistCardNode(InnerDecklistNode *_parent = nullptr, int position = -1) : AbstractDecklistNode(_parent, position)
+    explicit AbstractDecklistCardNode(InnerDecklistNode *_parent = nullptr, int position = -1)
+        : AbstractDecklistNode(_parent, position)
     {
     }
     virtual int getNumber() const = 0;

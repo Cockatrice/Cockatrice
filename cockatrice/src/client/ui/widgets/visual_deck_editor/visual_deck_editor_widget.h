@@ -86,7 +86,7 @@ private:
     QVBoxLayout *zoneContainerLayout;
     // OverlapControlWidget *overlapControlWidget;
     QWidget *container;
-    QHash<QPersistentModelIndex, QWidget*> indexToWidgetMap;
+    QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
 };
 
 #endif // VISUAL_DECK_EDITOR_H
