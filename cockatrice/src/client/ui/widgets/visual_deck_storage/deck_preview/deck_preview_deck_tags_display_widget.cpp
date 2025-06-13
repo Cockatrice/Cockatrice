@@ -154,16 +154,17 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             }
         }
     } else if (parentWidget()) {
-        // If we're the child of a TabDeckEditor, we are buried under a ton of childWidgets in the DeckInfoDock.
+        // If we're the child of an AbstractTabDeckEditor, we are buried under a ton of childWidgets in the
+        // DeckInfoDock.
         QWidget *currentParent = parentWidget();
         while (currentParent) {
-            if (qobject_cast<TabDeckEditor *>(currentParent)) {
+            if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
                 break;
             }
             currentParent = currentParent->parentWidget();
         }
-        if (qobject_cast<TabDeckEditor *>(currentParent)) {
-            auto *deckEditor = qobject_cast<TabDeckEditor *>(currentParent);
+        if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
+            auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
             DeckLoader loader;
