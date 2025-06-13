@@ -1290,6 +1290,7 @@ void MainWindow::refreshShortcuts()
     aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
     aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
     aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
+    aStatusBar->setShortcuts(shortcuts.getShortcut("MainWindow/aStatusBar"));
     aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
     aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));
