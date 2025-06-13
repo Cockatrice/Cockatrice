@@ -39,7 +39,6 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
     }
 
     FlatCardGroupDisplayWidget::updateCardDisplays();
-    // connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
     disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
     disconnect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 

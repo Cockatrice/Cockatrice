@@ -28,10 +28,10 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
 
     layout->addWidget(banner);
 
-    // CardGroupDisplayWidget::updateCardDisplays();
+    CardGroupDisplayWidget::updateCardDisplays();
 
-    // connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
-    // connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
 QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
@@ -78,7 +78,6 @@ void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first
 
 void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
 {
-    Q_UNUSED(parent);
     Q_UNUSED(first);
     Q_UNUSED(last);
     if (parent == trackedIndex) {

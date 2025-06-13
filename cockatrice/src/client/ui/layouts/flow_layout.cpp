@@ -551,7 +551,10 @@ void FlowLayout::addItem(QLayoutItem *item)
 void FlowLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
 {
     addChildWidget(toInsert);
-    items.insert(qBound(0, index, std::max(0, static_cast<int>(items.size()))), new QWidgetItem(toInsert));
+
+    // We don't want to fail on an index that violates the bounds, so we just clamp it.
+    int boundedIndex = qBound(0, index, qMax(0, static_cast<int>(items.size())));
+    items.insert(boundedIndex, new QWidgetItem(toInsert));
 
     invalidate();
 }
