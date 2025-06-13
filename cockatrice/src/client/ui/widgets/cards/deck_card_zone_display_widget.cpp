@@ -64,7 +64,7 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
     } else {
         qInfo() << categoryName << " needs a widget";
     }
-    if (displayType == "overlap") {
+    if (displayType == DisplayType::Overlap) {
         qInfo() << "It's getting an overlap widget.";
         auto *display_widget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, index, zoneName, categoryName, activeGroupCriteria, activeSortCriteria,
@@ -76,7 +76,7 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
         cardGroupLayout->addWidget(display_widget);
         indexToWidgetMap.insert(index, display_widget);
-    } else if (displayType == "flat") {
+    } else if (displayType == DisplayType::Flat) {
         qInfo() << "Getting a flat widget for christmas";
         auto *display_widget =
             new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, index, zoneName, categoryName,
@@ -153,7 +153,7 @@ void DeckCardZoneDisplayWidget::onHover(CardInfoPtr card)
     emit cardHovered(card);
 }
 
-void DeckCardZoneDisplayWidget::refreshDisplayType(const QString &_displayType)
+void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
 {
     displayType = _displayType;
     QLayoutItem *item;
