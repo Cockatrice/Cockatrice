@@ -33,6 +33,7 @@ set(oracle_SOURCES
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     ../cockatrice/src/settings/cache_settings.cpp
     ../cockatrice/src/settings/shortcuts_settings.cpp
+    ../cockatrice/src/settings/card_counter_settings.cpp
     ../cockatrice/src/settings/card_database_settings.cpp
     ../cockatrice/src/settings/servers_settings.cpp
     ../cockatrice/src/settings/settings_manager.cpp

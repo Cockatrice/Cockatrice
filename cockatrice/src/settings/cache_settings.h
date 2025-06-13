@@ -43,6 +43,7 @@ constexpr int NETWORK_CACHE_SIZE_MAX = 1024 * 1024;  // 1 TB
 #define DEFAULT_FONT_SIZE 12
 
 class QSettings;
+class CardCounterSettings;
 
 class SettingsCache : public QObject
 {
@@ -104,6 +105,7 @@ private:
     RecentsSettings *recentsSettings;
     CardOverrideSettings *cardOverrideSettings;
     DebugSettings *debugSettings;
+    CardCounterSettings *cardCounterSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -779,6 +781,8 @@ public:
     {
         return *debugSettings;
     }
+    CardCounterSettings &cardCounters() const;
+
     bool getIsPortableBuild() const
     {
         return isPortableBuild;
