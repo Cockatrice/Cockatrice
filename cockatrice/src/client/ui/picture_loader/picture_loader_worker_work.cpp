@@ -36,7 +36,7 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(PictureLoaderWorker *_worker, c
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
-    startNextPicDownload();
+    startWork();
 }
 
 PictureLoaderWorkerWork::~PictureLoaderWorkerWork()
@@ -44,7 +44,39 @@ PictureLoaderWorkerWork::~PictureLoaderWorkerWork()
     pictureLoaderThread->deleteLater();
 }
 
-bool PictureLoaderWorkerWork::cardImageExistsOnDisk(QString &setName, QString &correctedCardname, bool searchCustomPics)
+void PictureLoaderWorkerWork::startWork()
+{
+    QString setName = cardToDownload.getSetName();
+    QString cardName = cardToDownload.getCard()->getName();
+    QString correctedCardName = cardToDownload.getCard()->getCorrectedName();
+
+    qCDebug(PictureLoaderWorkerLog).nospace()
+        << "[card: " << cardName << " set: " << setName << "]: Trying to load picture";
+
+    // FIXME: This is a hack so that to keep old Cockatrice behavior
+    // (ignoring provider ID) when the "override all card art with personal
+    // preference" is set.
+    //
+    // Figure out a proper way to integrate the two systems at some point.
+    //
+    // Note: need to go through a member for
+    // overrideAllCardArtWithPersonalPreference as reading from the
+    // SettingsCache instance from the PictureLoaderWorker thread could
+    // cause race conditions.
+    //
+    // XXX: Reading from the CardDatabaseManager instance from the
+    // PictureLoaderWorker thread might not be safe either
+    bool searchCustomPics = overrideAllCardArtWithPersonalPreference ||
+                            CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
+                                cardName, cardToDownload.getCard()->getPixmapCacheKey());
+    if (!(searchCustomPics && cardImageExistsOnDisk(setName, correctedCardName, searchCustomPics))) {
+        startNextPicDownload();
+    }
+}
+
+bool PictureLoaderWorkerWork::cardImageExistsOnDisk(const QString &setName,
+                                                    const QString &correctedCardName,
+                                                    const bool searchCustomPics)
 {
     QImage image;
     QImageReader imgReader;
@@ -60,18 +92,18 @@ bool PictureLoaderWorkerWork::cardImageExistsOnDisk(QString &setName, QString &c
             QFileInfo thisFileInfo(thisPath);
 
             if (thisFileInfo.isFile() &&
-                (thisFileInfo.fileName() == correctedCardname || thisFileInfo.completeBaseName() == correctedCardname ||
-                 thisFileInfo.baseName() == correctedCardname)) {
+                (thisFileInfo.fileName() == correctedCardName || thisFileInfo.completeBaseName() == correctedCardName ||
+                 thisFileInfo.baseName() == correctedCardName)) {
                 picsPaths << thisPath; // Card found in the CUSTOM directory, somewhere
             }
         }
     }
 
     if (!setName.isEmpty()) {
-        picsPaths << picsPath + "/" + setName + "/" + correctedCardname
+        picsPaths << picsPath + "/" + setName + "/" + correctedCardName
                   // We no longer store downloaded images there, but don't just ignore
                   // stuff that old versions have put there.
-                  << picsPath + "/downloadedPics/" + setName + "/" + correctedCardname;
+                  << picsPath + "/downloadedPics/" + setName + "/" + correctedCardName;
     }
 
     // Iterates through the list of paths, searching for images with the desired
@@ -81,26 +113,27 @@ bool PictureLoaderWorkerWork::cardImageExistsOnDisk(QString &setName, QString &c
         imgReader.setFileName(_picsPath);
         if (imgReader.read(&image)) {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "[card: " << correctedCardname << " set: " << setName << "]: Picture found on disk.";
+                << "[card: " << correctedCardName << " set: " << setName << "]: Picture found on disk.";
             imageLoaded(cardToDownload.getCard(), image);
             return true;
         }
         imgReader.setFileName(_picsPath + ".full");
         if (imgReader.read(&image)) {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "[card: " << correctedCardname << " set: " << setName << "]: Picture.full found on disk.";
+                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.full found on disk.";
             imageLoaded(cardToDownload.getCard(), image);
             return true;
         }
         imgReader.setFileName(_picsPath + ".xlhq");
         if (imgReader.read(&image)) {
             qCDebug(PictureLoaderWorkerLog).nospace()
-                << "[card: " << correctedCardname << " set: " << setName << "]: Picture.xlhq found on disk.";
+                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.xlhq found on disk.";
             imageLoaded(cardToDownload.getCard(), image);
             return true;
         }
     }
-
+    qCDebug(PictureLoaderWorkerLog).nospace()
+        << "[card: " << correctedCardName << " set: " << setName << "]: Picture NOT found on disk.";
     return false;
 }
 
@@ -112,32 +145,6 @@ void PictureLoaderWorkerWork::startNextPicDownload()
         downloadRunning = false;
         picDownloadFailed();
     } else {
-        QString setName = cardToDownload.getSetName();
-        QString cardName = cardToDownload.getCard()->getName();
-        QString correctedCardName = cardToDownload.getCard()->getCorrectedName();
-
-        qCDebug(PictureLoaderWorkerLog).nospace()
-            << "[card: " << cardName << " set: " << setName << "]: Trying to load picture";
-
-        // FIXME: This is a hack so that to keep old Cockatrice behavior
-        // (ignoring provider ID) when the "override all card art with personal
-        // preference" is set.
-        //
-        // Figure out a proper way to integrate the two systems at some point.
-        //
-        // Note: need to go through a member for
-        // overrideAllCardArtWithPersonalPreference as reading from the
-        // SettingsCache instance from the PictureLoaderWorker thread could
-        // cause race conditions.
-        //
-        // XXX: Reading from the CardDatabaseManager instance from the
-        // PictureLoaderWorker thread might not be safe either
-        bool searchCustomPics = overrideAllCardArtWithPersonalPreference ||
-                                CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(
-                                    cardName, cardToDownload.getCard()->getPixmapCacheKey());
-        if (searchCustomPics && cardImageExistsOnDisk(setName, correctedCardName, searchCustomPics)) {
-            return;
-        }
         QUrl url(picUrl);
         qCDebug(PictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard()->getCorrectedName()

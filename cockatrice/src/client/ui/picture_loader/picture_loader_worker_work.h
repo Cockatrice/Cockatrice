@@ -26,6 +26,7 @@ class PictureLoaderWorkerWork : public QThread
 public:
     explicit PictureLoaderWorkerWork(PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
     ~PictureLoaderWorkerWork() override;
+    void startWork();
     PictureLoaderWorker *worker;
     PictureToLoad cardToDownload;
 
@@ -42,7 +43,7 @@ private:
     bool picDownload, downloadRunning, loadQueueRunning;
 
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName, bool searchCustomPics);
+    bool cardImageExistsOnDisk(const QString &setName, const QString &correctedCardName, bool searchCustomPics);
     bool imageIsBlackListed(const QByteArray &);
 
 private slots:
