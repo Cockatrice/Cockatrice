@@ -1,5 +1,6 @@
 #include "visual_database_display_name_filter_widget.h"
 
+#include "../../../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QHBoxLayout>
@@ -35,6 +36,13 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
     layout->addWidget(loadFromDeckButton);
 
     connect(loadFromDeckButton, &QPushButton::clicked, this, &VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck);
+
+    loadFromClipboardButton = new QPushButton(this);
+    layout->addWidget(loadFromClipboardButton);
+
+    connect(loadFromClipboardButton, &QPushButton::clicked, this,
+            &VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard);
+
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel); });
 
@@ -46,6 +54,8 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
     searchBox->setPlaceholderText(tr("Filter by name..."));
     loadFromDeckButton->setText(tr("Load from Deck"));
     loadFromDeckButton->setToolTip(tr("Apply all card names in currently loaded deck as exact match name filters"));
+    loadFromClipboardButton->setText(tr("Load from Clipboard"));
+    loadFromClipboardButton->setToolTip(tr("Apply all card names in clipboard as exact match name filters"));
 }
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
@@ -75,6 +85,20 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
     updateFilterModel();
 }
 
+void VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard()
+{
+    DlgLoadDeckFromClipboard dlg(this);
+    if (!dlg.exec())
+        return;
+
+    QStringList cardsInClipboard = dlg.getDeckList()->getCardList();
+    for (QString cardName : cardsInClipboard) {
+        createNameFilter(cardName);
+    }
+
+    updateFilterModel();
+}
+
 void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name)
 {
     if (activeFilters.contains(name))
@@ -85,7 +109,11 @@ void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name
     button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
                           "QPushButton:hover { background-color: red; color: white; }");
 
-    connect(button, &QPushButton::clicked, this, [this, name]() { removeNameFilter(name); });
+    connect(button, &QPushButton::clicked, this, [this, name]() {
+        removeNameFilter(name);
+        QTimer::singleShot(0, this,
+                           &VisualDatabaseDisplayNameFilterWidget::updateFilterModel); // Avoid concurrent modification
+    });
 
     flowWidget->addWidget(button);
     activeFilters[name] = button;
@@ -96,9 +124,6 @@ void VisualDatabaseDisplayNameFilterWidget::removeNameFilter(const QString &name
     if (activeFilters.contains(name)) {
         activeFilters[name]->deleteLater(); // Safe deletion
         activeFilters.remove(name);
-
-        QTimer::singleShot(0, this,
-                           &VisualDatabaseDisplayNameFilterWidget::updateFilterModel); // Avoid concurrent modification
     }
 }
 

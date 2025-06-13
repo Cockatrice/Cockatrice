@@ -2,6 +2,7 @@
 #define PICTURELOADER_H
 
 #include "../../../game/cards/card_info.h"
+#include "picture_loader_status_bar.h"
 #include "picture_loader_worker.h"
 
 #include <QLoggingCategory>
@@ -27,6 +28,7 @@ private:
     void operator=(PictureLoader const &);
 
     PictureLoaderWorker *worker;
+    PictureLoaderStatusBar *statusBar;
 
 public:
     static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);

@@ -4,10 +4,11 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QRegularExpression>
 #include <QString>
 #include <functional>
 
-peg::parser search(R"(
+static peg::parser search(R"(
 Start <- QueryPartList
 ~ws <- [ ]+
 QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
@@ -20,7 +21,7 @@ QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQ
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 SetQuery <- ('e'/'set') [:] FlexStringValue
-OracleQuery <- 'o' [:] RegexString
+OracleQuery <- 'o' [:] MatcherString
 
 
 CMCQuery <- ('cmc'/'mv') ws? NumericExpression
@@ -42,7 +43,7 @@ ColorEx <- Color / [mc]
 
 ColorQuery <- [cC] 'olor'? <[iI]?> <[:!]> ColorEx*
 
-FieldQuery <- String [:] RegexString / String ws? NumericExpression
+FieldQuery <- String [:] MatcherString / String ws? NumericExpression
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
@@ -52,8 +53,14 @@ String <- SingleApostropheString / UnescapedStringListPart+ / ["] <NonDoubleQuot
 StringValue <- String / [(] StringList [)]
 StringList <- StringListString (ws? [,] ws? StringListString)*
 StringListString <- UnescapedStringListPart+
-GenericQuery <- RegexString
-RegexString <- String
+GenericQuery <- MatcherString
+
+# A String that can either be a normal string or a regex search string
+MatcherString <- RegexMatcher / NormalMatcher
+
+NormalMatcher <- String
+RegexMatcher <- '/' RegexMatcherString '/'
+RegexMatcherString <- ('\\/' / !'/' .)+
 
 FlexStringValue <- CompactStringSet / String / [(] StringList [)]
 CompactStringSet <- StringListString ([,+] StringListString)+
@@ -63,7 +70,7 @@ NumericOperator <- [=:] / <[><!][=]?>
 NumericValue <- [0-9]+
 )");
 
-std::once_flag init;
+static std::once_flag init;
 
 static void setupParserRules()
 {
@@ -261,14 +268,22 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.sv()));
     };
 
-    search["RegexString"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+    search["NormalMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         auto target = std::any_cast<QString>(sv[0]);
-        return [=](const QString &s) {
-            auto sanitizedTarget = QString(target);
-            sanitizedTarget.replace("\\\"", "\"");
-            sanitizedTarget.replace("\\'", "'");
-            return s.contains(sanitizedTarget, Qt::CaseInsensitive);
-        };
+        auto sanitizedTarget = QString(target);
+        sanitizedTarget.replace("\\\"", "\"");
+        sanitizedTarget.replace("\\'", "'");
+        return [=](const QString &s) { return s.contains(sanitizedTarget, Qt::CaseInsensitive); };
+    };
+
+    search["RegexMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+        auto target = std::any_cast<QString>(sv[0]);
+        auto regex = QRegularExpression(target, QRegularExpression::CaseInsensitiveOption);
+        return [=](const QString &s) { return regex.match(s).hasMatch(); };
+    };
+
+    search["RegexMatcherString"] = [](const peg::SemanticValues &sv) -> QString {
+        return QString::fromStdString(sv.token_to_string());
     };
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {

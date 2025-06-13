@@ -7,12 +7,14 @@
 #include <QDebug>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QMainWindow>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmapCache>
 #include <QScreen>
+#include <QStatusBar>
 #include <QThread>
 #include <algorithm>
 #include <utility>
@@ -27,6 +29,16 @@ PictureLoader::PictureLoader() : QObject(nullptr)
     connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this, &PictureLoader::picDownloadChanged);
 
     connect(worker, &PictureLoaderWorker::imageLoaded, this, &PictureLoader::imageLoaded);
+
+    statusBar = new PictureLoaderStatusBar(nullptr);
+    QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
+    if (mainWindow) {
+        mainWindow->statusBar()->addPermanentWidget(statusBar);
+    }
+
+    connect(worker, &PictureLoaderWorker::imageLoadQueued, statusBar, &PictureLoaderStatusBar::addQueuedImageLoad);
+    connect(worker, &PictureLoaderWorker::imageLoadSuccessful, statusBar,
+            &PictureLoaderStatusBar::addSuccessfulImageLoad);
 }
 
 PictureLoader::~PictureLoader()

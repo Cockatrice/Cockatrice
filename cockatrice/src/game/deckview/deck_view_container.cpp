@@ -4,6 +4,7 @@
 #include "../../client/ui/picture_loader/picture_loader.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
+#include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
@@ -52,6 +53,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    loadFromClipboardButton = new QPushButton;
     unloadDeckButton = new QPushButton;
     readyStartButton = new ToggleButton;
     forceStartGameButton = new QPushButton;
@@ -59,6 +61,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     connect(loadLocalButton, &QPushButton::clicked, this, &DeckViewContainer::loadLocalDeck);
     connect(loadRemoteButton, &QPushButton::clicked, this, &DeckViewContainer::loadRemoteDeck);
+    connect(loadFromClipboardButton, &QPushButton::clicked, this, &DeckViewContainer::loadFromClipboard);
     connect(readyStartButton, &QPushButton::clicked, this, &DeckViewContainer::readyStart);
     connect(unloadDeckButton, &QPushButton::clicked, this, &DeckViewContainer::unloadDeck);
     connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
@@ -68,6 +71,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
+    buttonHBox->addWidget(loadFromClipboardButton);
     buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
@@ -118,6 +122,7 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
+    loadFromClipboardButton->setText(tr("Load from clipboard..."));
     unloadDeckButton->setText(tr("Unload deck"));
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
@@ -148,6 +153,7 @@ void DeckViewContainer::switchToDeckSelectView()
 
     setVisibility(loadLocalButton, true);
     setVisibility(loadRemoteButton, !parentGame->getIsLocalGame());
+    setVisibility(loadFromClipboardButton, true);
     setVisibility(unloadDeckButton, false);
     setVisibility(readyStartButton, false);
     setVisibility(sideboardLockButton, false);
@@ -172,6 +178,7 @@ void DeckViewContainer::switchToDeckLoadedView()
 
     setVisibility(loadLocalButton, false);
     setVisibility(loadRemoteButton, false);
+    setVisibility(loadFromClipboardButton, false);
     setVisibility(unloadDeckButton, true);
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
@@ -198,8 +205,11 @@ void DeckViewContainer::refreshShortcuts()
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+    loadFromClipboardButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromClipboardButton"));
+    unloadDeckButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/unloadDeckButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
+    forceStartGameButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/forceStartGameButton"));
 }
 
 /**
@@ -247,16 +257,24 @@ void DeckViewContainer::loadLocalDeck()
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
-    QString deckString;
     DeckLoader deck;
 
-    bool error = !deck.loadFromFile(filePath, fmt, true);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
+    bool success = deck.loadFromFile(filePath, fmt, true);
+
+    if (!success) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
+        return;
+    }
+
+    loadDeckFromDeckLoader(&deck);
+}
+
+void DeckViewContainer::loadDeckFromDeckLoader(const DeckLoader *deck)
+{
+    QString deckString = deck->writeToString_Native();
+
+    if (deckString.length() > MAX_FILE_LENGTH) {
+        QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));
         return;
     }
 
@@ -277,6 +295,18 @@ void DeckViewContainer::loadRemoteDeck()
         connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
         parentGame->sendGameCommand(pend, playerId);
     }
+}
+
+void DeckViewContainer::loadFromClipboard()
+{
+    auto dlg = DlgLoadDeckFromClipboard(this);
+
+    if (!dlg.exec()) {
+        return;
+    }
+
+    DeckLoader *deck = dlg.getDeckList();
+    loadDeckFromDeckLoader(deck);
 }
 
 void DeckViewContainer::deckSelectFinished(const Response &r)

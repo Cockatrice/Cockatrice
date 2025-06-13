@@ -1,13 +1,18 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
+#include "../../../game/cards/card_database.h"
 #include "../../../game/cards/card_info.h"
+#include "picture_loader_worker_work.h"
 #include "picture_to_load.h"
 
 #include <QLoggingCategory>
 #include <QMutex>
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QObject>
+#include <QQueue>
+#include <QTimer>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"
@@ -17,15 +22,22 @@
 
 inline Q_LOGGING_CATEGORY(PictureLoaderWorkerLog, "picture_loader.worker");
 
+class PictureLoaderWorkerWork;
 class PictureLoaderWorker : public QObject
 {
     Q_OBJECT
 public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
+    void queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker);
 
-    void enqueueImageLoad(CardInfoPtr card);
+    void enqueueImageLoad(const CardInfoPtr &card);
     void clearNetworkCache();
+
+public slots:
+    QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
+    void processQueuedRequests();
+    void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
 
 private:
     static QStringList md5Blacklist;
@@ -35,6 +47,7 @@ private:
     QList<PictureToLoad> loadQueue;
     QMutex mutex;
     QNetworkAccessManager *networkManager;
+    QNetworkDiskCache *cache;
     QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
     QString cacheFilePath;                             // Path to persistent storage
     static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
@@ -42,18 +55,11 @@ private:
     PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
     bool picDownload, downloadRunning, loadQueueRunning;
+    QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
+    QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
+    QTimer requestTimer; // Timer for processing delayed requests
     bool overrideAllCardArtWithPersonalPreference;
-    void startNextPicDownload();
 
-    /** Emit the `imageLoaded` signal and return `true` if a picture is found on
-        disk, return `false` otherwise.
-
-        If `searchCustomPics` is `true`, the CUSTOM folder is searched for a
-        matching image first; otherwise, only the set-based folders are used. */
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName, bool searchCustomPics);
-
-    bool imageIsBlackListed(const QByteArray &);
-    QNetworkReply *makeRequest(const QUrl &url);
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
     void loadRedirectCache();
@@ -61,18 +67,15 @@ private:
     void cleanStaleEntries();
 
 private slots:
-    void picDownloadFinished(QNetworkReply *reply);
-    void picDownloadFailed();
-
     void picDownloadChanged();
     void picsPathChanged();
     void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
-public slots:
-    void processLoadQueue();
 
 signals:
     void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
+    void imageLoadQueued(const QUrl &url, PictureLoaderWorkerWork *worker);
+    void imageLoadSuccessful(const QUrl &url, PictureLoaderWorkerWork *worker);
 };
 
 #endif // PICTURE_LOADER_WORKER_H

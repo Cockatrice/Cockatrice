@@ -46,6 +46,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
             &DeckPreviewWidget::updateTagsVisibility);
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
             &DeckPreviewWidget::updateBannerCardComboBoxVisibility);
+    connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::deckPreviewTooltipChanged, this,
+            &DeckPreviewWidget::refreshBannerCardToolTip);
 
     layout->addWidget(bannerCardDisplayWidget);
 }
@@ -79,7 +81,6 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 
     bannerCardDisplayWidget->setCard(bannerCard);
     bannerCardDisplayWidget->setFontSize(24);
-    refreshBannerCardText();
     setFilePath(deckLoader->getLastFileName());
 
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
@@ -103,6 +104,8 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     layout->addWidget(deckTagsDisplayWidget);
     layout->addWidget(bannerCardLabel);
     layout->addWidget(bannerCardComboBox);
+
+    refreshBannerCardText();
 
     retranslateUi();
 }
@@ -179,15 +182,42 @@ QString DeckPreviewWidget::getColorIdentity()
     return colorIdentity;
 }
 
+/**
+ * The display name is given by the deck name, or the filename if the deck name is not set.
+ */
+QString DeckPreviewWidget::getDisplayName() const
+{
+    return deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName()
+                                           : deckLoader->getName();
+}
+
 void DeckPreviewWidget::setFilePath(const QString &_filePath)
 {
     filePath = _filePath;
 }
 
+/**
+ * Refreshes the banner card text.
+ * This also calls `refreshBannerCardToolTip`, since those two often need to be updated together.
+ */
 void DeckPreviewWidget::refreshBannerCardText()
 {
-    bannerCardDisplayWidget->setOverlayText(
-        deckLoader->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName() : deckLoader->getName());
+    bannerCardDisplayWidget->setOverlayText(getDisplayName());
+
+    refreshBannerCardToolTip();
+}
+
+void DeckPreviewWidget::refreshBannerCardToolTip()
+{
+    auto type = visualDeckStorageWidget->settings()->getDeckPreviewTooltip();
+    switch (type) {
+        case VisualDeckStorageQuickSettingsWidget::TooltipType::None:
+            bannerCardDisplayWidget->setToolTip("");
+            break;
+        case VisualDeckStorageQuickSettingsWidget::TooltipType::Filepath:
+            bannerCardDisplayWidget->setToolTip(filePath);
+            break;
+    }
 }
 
 void DeckPreviewWidget::updateBannerCardComboBox()
@@ -260,11 +290,11 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
 void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
-    QVariant itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex());
-    deckLoader->setBannerCard(QPair<QString, QString>(bannerCardComboBox->currentText(), itemData.toString()));
+    auto nameAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckLoader->setBannerCard(nameAndId);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
-    bannerCardDisplayWidget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-        bannerCardComboBox->currentText(), itemData.toString()));
+    bannerCardDisplayWidget->setCard(
+        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(nameAndId.first, nameAndId.second));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

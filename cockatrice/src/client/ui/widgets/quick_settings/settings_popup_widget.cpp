@@ -29,6 +29,12 @@ void SettingsPopupWidget::addSettingsWidget(QWidget *toAdd) const
     containerLayout->addWidget(toAdd); // Add to containerWidget's layout
 }
 
+void SettingsPopupWidget::removeSettingsWidget(QWidget *toRemove) const
+{
+    containerLayout->removeWidget(toRemove);
+    toRemove->deleteLater();
+}
+
 void SettingsPopupWidget::adjustSizeToFitScreen()
 {
     QScreen *screen = QApplication::screenAt(this->pos());

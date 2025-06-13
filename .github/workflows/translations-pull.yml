@@ -51,7 +51,7 @@ jobs:
             *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`. Review [action runs][2].*<br>
             *After merging, all new languages and translations are available in the next build.*
             
-            [1]: https://app.transifex.com/cockatrice/cockatrice/
+            [1]: https://explore.transifex.com/cockatrice/cockatrice/
             [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
           labels: |
             CI

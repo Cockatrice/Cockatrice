@@ -111,10 +111,8 @@ private:
     GameScene *scene;
     GameView *gameView;
     QMap<int, DeckViewContainer *> deckViewContainers;
-    QVBoxLayout *cardVInfoLayout, *messageLogLayout, *gamePlayAreaVBox, *deckViewContainerLayout;
-    QHBoxLayout *cardHInfoLayout, *sayHLayout, *mainHLayout, *replayControlLayout;
-    QWidget *cardBoxLayoutWidget, *messageLogLayoutWidget, *gamePlayAreaWidget, *deckViewContainerWidget,
-        *replayControlWidget;
+    QVBoxLayout *deckViewContainerLayout;
+    QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;

@@ -275,7 +275,6 @@ SettingsCache::SettingsCache()
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
     visualDeckStorageShowTagFilter = settings->value("interface/visualdeckstorageshowtagfilter", true).toBool();
-    visualDeckStorageSearchFolderNames = settings->value("interface/visualdeckstoragesearchfoldernames", true).toBool();
     visualDeckStorageShowBannerCardComboBox =
         settings->value("interface/visualdeckstorageshowbannercardcombobox", true).toBool();
     visualDeckStorageShowTagsOnDeckPreviews =
@@ -284,6 +283,7 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstoragedrawunusedcoloridentities", true).toBool();
     visualDeckStorageUnusedColorIdentitiesOpacity =
         settings->value("interface/visualdeckstorageunusedcoloridentitiesopacity", 15).toInt();
+    visualDeckStorageTooltipType = settings->value("interface/visualdeckstoragetooltiptype", 0).toInt();
     visualDeckStoragePromptForConversion =
         settings->value("interface/visualdeckstoragepromptforconversion", true).toBool();
     visualDeckStorageAlwaysConvert = settings->value("interface/visualdeckstoragealwaysconvert", false).toBool();
@@ -734,12 +734,6 @@ void SettingsCache::setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTa
     emit visualDeckStorageShowTagFilterChanged(visualDeckStorageShowTagFilter);
 }
 
-void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value)
-{
-    visualDeckStorageSearchFolderNames = value;
-    settings->setValue("interface/visualdeckstoragesearchfoldernames", visualDeckStorageSearchFolderNames);
-}
-
 void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox)
 {
     visualDeckStorageShowBannerCardComboBox = _showBannerCardComboBox;
@@ -776,6 +770,12 @@ void SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visual
     settings->setValue("interface/visualdeckstorageunusedcoloridentitiesopacity",
                        visualDeckStorageUnusedColorIdentitiesOpacity);
     emit visualDeckStorageUnusedColorIdentitiesOpacityChanged(visualDeckStorageUnusedColorIdentitiesOpacity);
+}
+
+void SettingsCache::setVisualDeckStorageTooltipType(int value)
+{
+    visualDeckStorageTooltipType = value;
+    settings->setValue("interface/visualdeckstoragetooltiptype", visualDeckStorageTooltipType);
 }
 
 void SettingsCache::setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion)

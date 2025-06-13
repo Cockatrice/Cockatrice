@@ -26,6 +26,11 @@ void SettingsButtonWidget::addSettingsWidget(QWidget *toAdd) const
     popup->addSettingsWidget(toAdd);
 }
 
+void SettingsButtonWidget::removeSettingsWidget(QWidget *toRemove) const
+{
+    popup->removeSettingsWidget(toRemove);
+}
+
 void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
 {
     button->setIcon(iconMap);

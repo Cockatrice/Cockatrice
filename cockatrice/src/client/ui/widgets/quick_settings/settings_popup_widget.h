@@ -13,6 +13,7 @@ class SettingsPopupWidget : public QWidget
 public:
     explicit SettingsPopupWidget(QWidget *parent = nullptr);
     void addSettingsWidget(QWidget *toAdd) const;
+    void removeSettingsWidget(QWidget *toRemove) const;
     void adjustSizeToFitScreen();
 
 signals:

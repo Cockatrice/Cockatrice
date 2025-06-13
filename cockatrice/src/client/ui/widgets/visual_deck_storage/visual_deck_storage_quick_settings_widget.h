@@ -7,6 +7,7 @@ class CardSizeWidget;
 class QLabel;
 class QSpinBox;
 class QCheckBox;
+class QComboBox;
 
 /**
  * The VDS's quick settings menu.
@@ -22,12 +23,23 @@ class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
     QCheckBox *showBannerCardComboBoxCheckBox;
     QCheckBox *showTagFilterCheckBox;
     QCheckBox *showTagsOnDeckPreviewsCheckBox;
-    QCheckBox *searchFolderNamesCheckBox;
     QLabel *unusedColorIdentitiesOpacityLabel;
     QSpinBox *unusedColorIdentitiesOpacitySpinBox;
+    QLabel *deckPreviewTooltipLabel;
+    QComboBox *deckPreviewTooltipComboBox;
     CardSizeWidget *cardSizeWidget;
 
 public:
+    /**
+     * The info to display in the deck preview's banner card tooltip.
+     */
+    enum TooltipType
+    {
+        None,
+        Filepath
+    };
+    Q_ENUM(TooltipType)
+
     explicit VisualDeckStorageQuickSettingsWidget(QWidget *parent = nullptr);
 
     void retranslateUi();
@@ -37,8 +49,8 @@ public:
     bool getShowBannerCardComboBox() const;
     bool getShowTagFilter() const;
     bool getShowTagsOnDeckPreviews() const;
-    bool getSearchFolderNames() const;
     int getUnusedColorIdentitiesOpacity() const;
+    TooltipType getDeckPreviewTooltip() const;
     int getCardSize() const;
 
 signals:
@@ -47,8 +59,8 @@ signals:
     void showBannerCardComboBoxChanged(bool enabled);
     void showTagFilterChanged(bool enabled);
     void showTagsOnDeckPreviewsChanged(bool enabled);
-    void searchFolderNamesChanged(bool enabled);
     void unusedColorIdentitiesOpacityChanged(int opacity);
+    void deckPreviewTooltipChanged(TooltipType tooltip);
     void cardSizeChanged(int scale);
 };
 

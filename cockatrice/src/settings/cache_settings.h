@@ -148,10 +148,10 @@ private:
     bool visualDeckStorageShowBannerCardComboBox;
     bool visualDeckStorageShowTagsOnDeckPreviews;
     bool visualDeckStorageShowTagFilter;
-    bool visualDeckStorageSearchFolderNames;
     int visualDeckStorageCardSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
+    int visualDeckStorageTooltipType;
     bool visualDeckStoragePromptForConversion;
     bool visualDeckStorageAlwaysConvert;
     bool visualDeckStorageInGame;
@@ -454,10 +454,6 @@ public:
     {
         return visualDeckStorageShowTagFilter;
     }
-    bool getVisualDeckStorageSearchFolderNames() const
-    {
-        return visualDeckStorageSearchFolderNames;
-    }
     bool getVisualDeckStorageShowBannerCardComboBox() const
     {
         return visualDeckStorageShowBannerCardComboBox;
@@ -477,6 +473,10 @@ public:
     int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
     {
         return visualDeckStorageUnusedColorIdentitiesOpacity;
+    }
+    int getVisualDeckStorageTooltipType() const
+    {
+        return visualDeckStorageTooltipType;
     }
     bool getVisualDeckStoragePromptForConversion() const
     {
@@ -850,12 +850,12 @@ public slots:
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
-    void setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(QT_STATE_CHANGED_T _visualDeckStorageDrawUnusedColorIdentities);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _visualDeckStorageUnusedColorIdentitiesOpacity);
+    void setVisualDeckStorageTooltipType(int value);
     void setVisualDeckStoragePromptForConversion(bool _visualDeckStoragePromptForConversion);
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);

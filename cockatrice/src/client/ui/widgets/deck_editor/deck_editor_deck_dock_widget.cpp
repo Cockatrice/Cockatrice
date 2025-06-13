@@ -104,6 +104,20 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
     deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
 
+    activeGroupCriteriaLabel = new QLabel(this);
+
+    activeGroupCriteriaComboBox = new QComboBox(this);
+    activeGroupCriteriaComboBox->addItem(tr("Main Type"), DeckListModelGroupCriteria::MAIN_TYPE);
+    activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
+    activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
+    connect(activeGroupCriteriaComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        deckModel->setActiveGroupCriteria(
+            static_cast<DeckListModelGroupCriteria>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
+        deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
+        deckView->expandAll();
+        deckView->expandAll();
+    });
+
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -143,6 +157,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(bannerCardComboBox, 2, 1);
 
     upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
+
+    upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -286,11 +303,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     });
 
     for (const auto &pair : pairList) {
-        QVariantMap dataMap;
-        dataMap["name"] = pair.first;
-        dataMap["uuid"] = pair.second;
-
-        bannerCardComboBox->addItem(pair.first, dataMap);
+        bannerCardComboBox->addItem(pair.first, QVariant::fromValue(pair));
     }
 
     // Try to restore the previous selection by finding the currentText
@@ -298,7 +311,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
         if (deckModel->getDeckList()->getBannerCard().second !=
-            bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap()["uuid"].toString()) {
+            bannerCardComboBox->currentData().value<QPair<QString, QString>>().second) {
             setBannerCard(restoredIndex);
         }
     } else {
@@ -318,9 +331,8 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
-    QVariantMap itemData = bannerCardComboBox->itemData(bannerCardComboBox->currentIndex()).toMap();
-    deckModel->getDeckList()->setBannerCard(
-        QPair<QString, QString>(itemData["name"].toString(), itemData["uuid"].toString()));
+    auto cardAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckModel->getDeckList()->setBannerCard(cardAndId);
     emit deckModified();
 }
 
@@ -578,6 +590,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showBannerCardCheckBox->setText(tr("Show banner card selection menu"));
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
+    activeGroupCriteriaLabel->setText(tr("Group by:"));
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));

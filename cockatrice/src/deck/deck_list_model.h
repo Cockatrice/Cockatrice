@@ -12,6 +12,13 @@ class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
+enum DeckListModelGroupCriteria
+{
+    MAIN_TYPE,
+    MANA_COST,
+    COLOR
+};
+
 class DecklistModelCardNode : public AbstractDecklistCardNode
 {
 private:
@@ -85,6 +92,7 @@ signals:
 public:
     explicit DeckListModel(QObject *parent = nullptr);
     ~DeckListModel() override;
+    QString getSortCriteriaForCard(CardInfoPtr info);
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
@@ -113,10 +121,12 @@ public:
     QList<CardInfoPtr> getCardsAsCardInfoPtrs() const;
     QList<CardInfoPtr> getCardsAsCardInfoPtrsForZone(QString zoneName) const;
     QList<QString> *getZones() const;
+    void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
 
 private:
     DeckLoader *deckList;
     InnerDecklistNode *root;
+    DeckListModelGroupCriteria activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;
     Qt::SortOrder lastKnownOrder;
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);

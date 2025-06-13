@@ -1,6 +1,11 @@
 #include "visual_deck_storage_search_widget.h"
 
+#include "../../../../game/filters/deck_filter_string.h"
+#include "../../../../game/filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
+
+#include <QAction>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
@@ -17,7 +22,13 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
     setLayout(layout);
 
     searchBar = new QLineEdit(this);
-    searchBar->setPlaceholderText(tr("Search by filename"));
+    searchBar->setPlaceholderText(tr("Search by filename (or search expression)"));
+    searchBar->setClearButtonEnabled(true);
+    searchBar->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+
+    auto help = searchBar->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    connect(help, &QAction::triggered, this, [this] { createDeckSearchSyntaxHelpWindow(searchBar); });
+
     layout->addWidget(searchBar);
 
     // Add a debounce timer for the search bar to limit frequent updates
@@ -41,37 +52,29 @@ QString VisualDeckStorageSearchWidget::getSearchText()
 }
 
 /**
- * Gets the filename used for the search.
+ * Converts the filepath into a relative filepath starting from the deck folder.
+ * If the file isn't in the deck folder, then this will just return the filename.
  *
- * if includeFolderName is true, then this returns the relative filepath starting from the deck folder.
- * If the file isn't in the deck folder, or includeFolderName is false, then this will just return the filename.
- *
- * @param filePath The filePath to convert into a search name
+ * @param filePath The filepath to convert into a relative filepath
  */
-static QString getFileSearchName(const QString &filePath, bool includeFolderName)
+static QString toRelativeFilepath(const QString &filePath)
 {
     QString deckPath = SettingsCache::instance().getDeckPath();
-    if (includeFolderName && filePath.startsWith(deckPath)) {
-        return filePath.mid(deckPath.length()).toLower();
+    if (filePath.startsWith(deckPath)) {
+        return filePath.mid(deckPath.length());
     }
 
     QFileInfo fileInfo(filePath);
-    QString fileName = fileInfo.fileName().toLower();
+    QString fileName = fileInfo.fileName();
     return fileName;
 }
 
-void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets,
-                                                  const QString &searchText,
-                                                  bool includeFolderName)
+void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
 {
-    if (searchText.isEmpty() || searchText.isNull()) {
-        for (auto widget : widgets) {
-            widget->filteredBySearch = false;
-        }
-    }
+    auto filterString = DeckFilterString(searchText);
 
-    for (auto file : widgets) {
-        QString fileSearchName = getFileSearchName(file->filePath, includeFolderName);
-        file->filteredBySearch = !fileSearchName.contains(searchText.toLower());
+    for (auto widget : widgets) {
+        QString relativeFilePath = toRelativeFilepath(widget->filePath);
+        widget->filteredBySearch = !filterString.check(widget, {relativeFilePath});
     }
 }

@@ -345,10 +345,10 @@ public:
     }
 
     bool readElement(QXmlStreamReader *xml);
-    void write(QXmlStreamWriter *xml);
+    void write(QXmlStreamWriter *xml) const;
     bool loadFromXml(QXmlStreamReader *xml);
     bool loadFromString_Native(const QString &nativeString);
-    QString writeToString_Native();
+    QString writeToString_Native() const;
     bool loadFromFile_Native(QIODevice *device);
     bool saveToFile_Native(QIODevice *device);
     bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata);
