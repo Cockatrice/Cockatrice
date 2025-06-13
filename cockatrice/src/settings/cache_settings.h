@@ -123,6 +123,7 @@ inline QStringList defaultTags = {
 };
 
 class QSettings;
+class CardCounterSettings;
 
 class SettingsCache : public QObject
 {
@@ -185,6 +186,7 @@ private:
     RecentsSettings *recentsSettings;
     CardOverrideSettings *cardOverrideSettings;
     DebugSettings *debugSettings;
+    CardCounterSettings *cardCounterSettings;
 
     QByteArray mainWindowGeometry;
     QByteArray tokenDialogGeometry;
@@ -870,6 +872,8 @@ public:
     {
         return *debugSettings;
     }
+    CardCounterSettings &cardCounters() const;
+
     bool getIsPortableBuild() const
     {
         return isPortableBuild;

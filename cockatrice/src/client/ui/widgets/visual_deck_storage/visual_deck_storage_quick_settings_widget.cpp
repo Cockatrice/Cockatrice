@@ -42,14 +42,6 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
 
-    // search folder names checkbox
-    searchFolderNamesCheckBox = new QCheckBox(this);
-    searchFolderNamesCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageSearchFolderNames());
-    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
-            &VisualDeckStorageQuickSettingsWidget::searchFolderNamesChanged);
-    connect(searchFolderNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageSearchFolderNames);
-
     // draw unused color identities checkbox
     drawUnusedColorIdentitiesCheckBox = new QCheckBox(this);
     drawUnusedColorIdentitiesCheckBox->setChecked(
@@ -113,7 +105,6 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     this->addSettingsWidget(showTagFilterCheckBox);
     this->addSettingsWidget(showTagsOnDeckPreviewsCheckBox);
     this->addSettingsWidget(showBannerCardComboBoxCheckBox);
-    this->addSettingsWidget(searchFolderNamesCheckBox);
     this->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
     this->addSettingsWidget(unusedColorIdentityOpacityWidget);
     this->addSettingsWidget(deckPreviewTooltipWidget);
@@ -130,7 +121,6 @@ void VisualDeckStorageQuickSettingsWidget::retranslateUi()
     showTagFilterCheckBox->setText(tr("Show Tag Filter"));
     showTagsOnDeckPreviewsCheckBox->setText(tr("Show Tags On Deck Previews"));
     showBannerCardComboBoxCheckBox->setText(tr("Show Banner Card Selection Option"));
-    searchFolderNamesCheckBox->setText(tr("Include Folder Names in Search"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
     unusedColorIdentitiesOpacityLabel->setText(tr("Unused Color Identities Opacity"));
     unusedColorIdentitiesOpacitySpinBox->setSuffix("%");
@@ -163,11 +153,6 @@ bool VisualDeckStorageQuickSettingsWidget::getShowTagFilter() const
 bool VisualDeckStorageQuickSettingsWidget::getShowTagsOnDeckPreviews() const
 {
     return showTagsOnDeckPreviewsCheckBox->isChecked();
-}
-
-bool VisualDeckStorageQuickSettingsWidget::getSearchFolderNames() const
-{
-    return searchFolderNamesCheckBox->isChecked();
 }
 
 int VisualDeckStorageQuickSettingsWidget::getUnusedColorIdentitiesOpacity() const

@@ -1,8 +1,10 @@
 #include "cache_settings.h"
 
 #include "../client/network/release_channel.h"
+#include "card_counter_settings.h"
 #include "card_override_settings.h"
 
+#include <QAbstractListModel>
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -178,6 +180,8 @@ SettingsCache::SettingsCache()
     recentsSettings = new RecentsSettings(settingsPath, this);
     cardOverrideSettings = new CardOverrideSettings(settingsPath, this);
     debugSettings = new DebugSettings(settingsPath, this);
+
+    cardCounterSettings = new CardCounterSettings(settingsPath, this);
 
     if (!QFile(settingsPath + "global.ini").exists())
         translateLegacySettings();
@@ -1438,4 +1442,9 @@ void SettingsCache::resetPaths()
 SettingsCache &SettingsCache::instance()
 {
     return *settingsCache;
+}
+
+CardCounterSettings &SettingsCache::cardCounters() const
+{
+    return *cardCounterSettings;
 }
