@@ -161,6 +161,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_forgot_password_challenge.cpp
     src/dialogs/dlg_forgot_password_request.cpp
     src/dialogs/dlg_forgot_password_reset.cpp
+    src/dialogs/dlg_import_precons.cpp
     src/dialogs/dlg_load_deck.cpp
     src/dialogs/dlg_load_deck_from_clipboard.cpp
     src/dialogs/dlg_load_remote_deck.cpp
@@ -218,6 +219,7 @@ set(cockatrice_SOURCES
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
     src/main.cpp
+    src/qt-json/json.cpp
     src/server/chat_view/chat_view.cpp
     src/server/handle_public_servers.cpp
     src/server/local_client.cpp
@@ -284,6 +286,28 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
+# Libz is required to support zipped files
+find_package(ZLIB)
+if(ZLIB_FOUND)
+  include_directories(${ZLIB_INCLUDE_DIRS})
+  add_definitions("-DHAS_ZLIB")
+
+  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
+else()
+  message(STATUS "Cockatrice: zlib not found; ZIP support disabled")
+endif()
+
+# LibLZMA is required to support xz files
+find_package(LibLZMA)
+if(LIBLZMA_FOUND)
+  include_directories(${LIBLZMA_INCLUDE_DIRS})
+  add_definitions("-DHAS_LZMA")
+
+  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/lzma/decompress.cpp)
+else()
+  message(STATUS "Cockatrice: LibLZMA not found; xz support disabled")
+endif()
+
 if(Qt6_FOUND)
   qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 elseif(Qt5_FOUND)
@@ -344,11 +368,18 @@ elseif(Qt5_FOUND)
   endif()
 endif()
 
-if(Qt5_FOUND)
-  target_link_libraries(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
-else()
-  target_link_libraries(cockatrice PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES})
+if(Qt5_FOUND OR Qt6_FOUND)
+  target_link_libraries(cockatrice PRIVATE cockatrice_common ${COCKATRICE_QT_MODULES})
 endif()
+
+if(ZLIB_FOUND)
+  target_link_libraries(cockatrice PRIVATE ${ZLIB_LIBRARIES})
+endif()
+
+if(LIBLZMA_FOUND)
+  target_link_libraries(cockatrice PRIVATE ${LIBLZMA_LIBRARIES})
+endif()
+
 
 if(UNIX)
   if(APPLE)

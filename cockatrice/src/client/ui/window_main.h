@@ -105,6 +105,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void actImportPrecons();
 
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
@@ -138,7 +139,7 @@ private:
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
     QAction *aConnect, *aDisconnect, *aSinglePlayer, *aWatchReplay, *aFullScreen, *aSettings, *aExit, *aAbout, *aTips,
-        *aCheckCardUpdates, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets, *aEditTokens,
+        *aCheckCardUpdates, *aImportPrecons, *aRegister, *aForgotPassword, *aUpdate, *aViewLog, *aManageSets, *aEditTokens,
         *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet, *aReloadCardDatabase, *aShow, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
