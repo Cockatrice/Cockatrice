@@ -245,6 +245,7 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     deckModel->getDeckList()->setName(name);
+    deckEditor->setModified(name.isEmpty());
     emit nameChanged();
     emit deckModified();
 }
@@ -252,6 +253,7 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 void DeckEditorDeckDockWidget::updateComments()
 {
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
+    deckEditor->setModified(commentsEdit->toPlainText().isEmpty());
     emit commentsChanged();
     emit deckModified();
 }
@@ -333,6 +335,7 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
     auto cardAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     deckModel->getDeckList()->setBannerCard(cardAndId);
+    deckEditor->setModified(true);
     emit deckModified();
 }
 
