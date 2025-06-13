@@ -237,6 +237,7 @@ SettingsCache::SettingsCache()
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
+    showStatusBar = settings->value("personal/showStatusBar", true).toBool();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
@@ -587,6 +588,13 @@ void SettingsCache::setPicDownload(QT_STATE_CHANGED_T _picDownload)
     picDownload = static_cast<bool>(_picDownload);
     settings->setValue("personal/picturedownload", picDownload);
     emit picDownloadChanged();
+}
+
+void SettingsCache::setShowStatusBar(bool value)
+{
+    showStatusBar = value;
+    settings->setValue("personal/showStatusBar", showStatusBar);
+    emit showStatusBarChanged(value);
 }
 
 void SettingsCache::setNotificationsEnabled(QT_STATE_CHANGED_T _notificationsEnabled)

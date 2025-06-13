@@ -55,6 +55,7 @@ signals:
     void cardDatabasePathChanged();
     void themeChanged();
     void picDownloadChanged();
+    void showStatusBarChanged(bool state);
     void displayCardNamesChanged();
     void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);
     void bumpSetsWithCardsInDeckToTopChanged();
@@ -222,6 +223,7 @@ private:
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
     bool roundCardCorners;
+    bool showStatusBar;
 
 public:
     SettingsCache();
@@ -332,6 +334,10 @@ public:
     bool getPicDownload() const
     {
         return picDownload;
+    }
+    bool getShowStatusBar() const
+    {
+        return showStatusBar;
     }
     bool getNotificationsEnabled() const
     {
@@ -828,6 +834,7 @@ public slots:
     void setChatMentionColor(const QString &_chatMentionColor);
     void setChatHighlightColor(const QString &_chatHighlightColor);
     void setPicDownload(QT_STATE_CHANGED_T _picDownload);
+    void setShowStatusBar(bool value);
     void setNotificationsEnabled(QT_STATE_CHANGED_T _notificationsEnabled);
     void setSpectatorNotificationsEnabled(QT_STATE_CHANGED_T _spectatorNotificationsEnabled);
     void setBuddyConnectNotificationsEnabled(QT_STATE_CHANGED_T _buddyConnectNotificationsEnabled);

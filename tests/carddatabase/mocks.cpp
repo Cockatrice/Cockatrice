@@ -164,6 +164,9 @@ void SettingsCache::setTabLogOpen(bool /*value*/)
 void SettingsCache::setPicDownload(QT_STATE_CHANGED_T /* _picDownload */)
 {
 }
+void SettingsCache::setShowStatusBar(bool /* value */)
+{
+}
 void SettingsCache::setNotificationsEnabled(QT_STATE_CHANGED_T /* _notificationsEnabled */)
 {
 }
