@@ -29,9 +29,9 @@ class PictureLoaderWorker : public QObject
 public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
-    void queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker);
 
-    void enqueueImageLoad(const CardInfoPtr &card);
+    void enqueueImageLoad(const CardInfoPtr &card);                      // Starts a thread for the image to be loaded
+    void queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker); // Queues network requests for load threads
     void clearNetworkCache();
 
 public slots:
@@ -43,22 +43,15 @@ private:
     static QStringList md5Blacklist;
 
     QThread *pictureLoaderThread;
-    QString picsPath, customPicsPath;
-    QList<PictureToLoad> loadQueue;
-    QMutex mutex;
     QNetworkAccessManager *networkManager;
     QNetworkDiskCache *cache;
     QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
     QString cacheFilePath;                             // Path to persistent storage
     static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
-    QList<PictureToLoad> cardsToDownload;
-    PictureToLoad cardBeingLoaded;
     PictureToLoad cardBeingDownloaded;
-    bool picDownload, downloadRunning, loadQueueRunning;
+    bool picDownload;
     QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
-    QList<QPair<QUrl, PictureLoaderWorkerWork *>> requestQueue;
     QTimer requestTimer; // Timer for processing delayed requests
-    bool overrideAllCardArtWithPersonalPreference;
 
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
@@ -66,13 +59,7 @@ private:
     void saveRedirectCache() const;
     void cleanStaleEntries();
 
-private slots:
-    void picDownloadChanged();
-    void picsPathChanged();
-    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
-
 signals:
-    void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
     void imageLoadQueued(const QUrl &url, PictureLoaderWorkerWork *worker);
     void imageLoadSuccessful(const QUrl &url, PictureLoaderWorkerWork *worker);

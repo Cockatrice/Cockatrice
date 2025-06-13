@@ -15,17 +15,8 @@
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
-PictureLoaderWorker::PictureLoaderWorker()
-    : QObject(nullptr), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath()),
-      picDownload(SettingsCache::instance().getPicDownload()), downloadRunning(false), loadQueueRunning(false),
-      overrideAllCardArtWithPersonalPreference(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference())
+PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload())
 {
-    connect(&SettingsCache::instance(), SIGNAL(picsPathChanged()), this, SLOT(picsPathChanged()));
-    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
-            &PictureLoaderWorker::setOverrideAllCardArtWithPersonalPreference);
-
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
     // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
@@ -211,24 +202,6 @@ void PictureLoaderWorker::cleanStaleEntries()
             ++it;
         }
     }
-}
-
-void PictureLoaderWorker::picDownloadChanged()
-{
-    QMutexLocker locker(&mutex);
-    picDownload = SettingsCache::instance().getPicDownload();
-}
-
-void PictureLoaderWorker::picsPathChanged()
-{
-    QMutexLocker locker(&mutex);
-    picsPath = SettingsCache::instance().getPicsPath();
-    customPicsPath = SettingsCache::instance().getCustomPicsPath();
-}
-
-void PictureLoaderWorker::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference)
-{
-    overrideAllCardArtWithPersonalPreference = _overrideAllCardArtWithPersonalPreference;
 }
 
 void PictureLoaderWorker::clearNetworkCache()
