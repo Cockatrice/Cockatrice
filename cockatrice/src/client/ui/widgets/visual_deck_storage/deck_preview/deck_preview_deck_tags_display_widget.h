@@ -6,6 +6,8 @@
 
 #include <QWidget>
 
+inline bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath);
+
 class DeckPreviewWidget;
 class DeckPreviewDeckTagsDisplayWidget : public QWidget
 {

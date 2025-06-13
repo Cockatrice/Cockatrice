@@ -28,18 +28,27 @@ public:
     ~PictureLoaderWorkerWork() override;
     PictureLoaderWorker *worker;
     PictureToLoad cardToDownload;
+
 public slots:
     void picDownloadFinished(QNetworkReply *reply);
     void picDownloadFailed();
 
 private:
+    QString picsPath, customPicsPath;
+    bool overrideAllCardArtWithPersonalPreference;
     static QStringList md5Blacklist;
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
     bool picDownload, downloadRunning, loadQueueRunning;
+
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName);
+    bool cardImageExistsOnDisk(QString &setName, QString &correctedCardName, bool searchCustomPics);
     bool imageIsBlackListed(const QByteArray &);
+
+private slots:
+    void picDownloadChanged();
+    void picsPathChanged();
+    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
 
 signals:
     void startLoadQueue();
