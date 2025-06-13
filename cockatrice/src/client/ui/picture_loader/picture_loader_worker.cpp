@@ -121,6 +121,8 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
             }
         } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
             qInfo() << "Too many requests.";
+        } else {
+            worker->picDownloadFinished(reply);
         }
         reply->deleteLater();
     });
