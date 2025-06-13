@@ -64,7 +64,6 @@ void OverlappedCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent,
 
 void OverlappedCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
 {
-    Q_UNUSED(parent);
     Q_UNUSED(first);
     Q_UNUSED(last);
     if (parent == trackedIndex) {

@@ -35,8 +35,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     banner->setBuddy(cardGroupContainer);
 
     displayCards();
-    // connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::displayCards);
-    // connect(deckListModel, &DeckListModel::dataChanged, this, &DeckCardZoneDisplayWidget::decklistDataChanged);
+
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
 }
@@ -60,27 +59,27 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
         return;
     }
     if (displayType == DisplayType::Overlap) {
-        auto *display_widget = new OverlappedCardGroupDisplayWidget(
+        auto *displayWidget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, index, zoneName, categoryName, activeGroupCriteria, activeSortCriteria,
             subBannerOpacity, cardSizeWidget);
-        connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+        connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                 SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-        connect(display_widget, &CardGroupDisplayWidget::cleanupRequested, this,
+        connect(displayWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
-        cardGroupLayout->addWidget(display_widget);
-        indexToWidgetMap.insert(index, display_widget);
+        cardGroupLayout->addWidget(displayWidget);
+        indexToWidgetMap.insert(index, displayWidget);
     } else if (displayType == DisplayType::Flat) {
-        auto *display_widget =
+        auto *displayWidget =
             new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, index, zoneName, categoryName,
                                            activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-        connect(display_widget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
+        connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                 SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(display_widget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
-        connect(display_widget, &CardGroupDisplayWidget::cleanupRequested, this,
+        connect(displayWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
-        cardGroupLayout->addWidget(display_widget);
-        indexToWidgetMap.insert(index, display_widget);
+        cardGroupLayout->addWidget(displayWidget);
+        indexToWidgetMap.insert(index, displayWidget);
     }
 }
 

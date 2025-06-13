@@ -61,7 +61,6 @@ void FlatCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int f
 
 void FlatCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
 {
-    Q_UNUSED(parent);
     Q_UNUSED(first);
     Q_UNUSED(last);
     if (parent == trackedIndex) {
