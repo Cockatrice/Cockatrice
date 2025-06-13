@@ -424,7 +424,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
         cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
         deckList->refreshDeckHash();
     }
-    // sort(lastKnownColumn, lastKnownOrder);
+    sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);
     return nodeToIndex(cardNode);
 }
