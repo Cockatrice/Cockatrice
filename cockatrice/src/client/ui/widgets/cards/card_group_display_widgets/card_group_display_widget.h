@@ -40,8 +40,8 @@ public slots:
     void onHover(CardInfoPtr card);
     virtual QWidget* constructWidgetForIndex(int rowIndex);
     virtual void updateCardDisplays();
-    void onCardAddition(const QModelIndex &parent, int first, int last);
-    void onCardRemoval(const QModelIndex &parent, int first, int last);
+    virtual void onCardAddition(const QModelIndex &parent, int first, int last);
+    virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
     void resizeEvent(QResizeEvent *event) override;
 
 signals:
@@ -65,7 +65,6 @@ protected:
 
     virtual void insertIntoLayout(QWidget *toInsert, int insertAt)
     {
-        qInfo() << "Default card group insert";
         layout->insertWidget(insertAt, toInsert);
     }
 

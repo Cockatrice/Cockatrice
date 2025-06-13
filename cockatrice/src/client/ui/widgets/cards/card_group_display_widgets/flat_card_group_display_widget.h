@@ -22,6 +22,8 @@ public:
 public slots:
     QWidget* constructWidgetForIndex(int row) override;
     void resizeEvent(QResizeEvent *event) override;
+    void onCardAddition(const QModelIndex &parent, int first, int last) override;
+    void onCardRemoval(const QModelIndex &parent, int first, int last) override;
 
 private:
     FlowWidget *flowWidget;
@@ -38,7 +40,6 @@ private:
 
     void insertIntoLayout(QWidget *toInsert, int insertAt) override
     {
-        qInfo() << "Flat card group insertion at " << insertAt;
         flowWidget->insertWidgetAtIndex(toInsert, insertAt);
     }
 

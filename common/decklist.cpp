@@ -71,10 +71,15 @@ void SideboardPlan::write(QXmlStreamWriter *xml)
     xml->writeEndElement();
 }
 
-AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent) : parent(_parent), sortMethod(Default)
+AbstractDecklistNode::AbstractDecklistNode(InnerDecklistNode *_parent, int position)
+    : parent(_parent), sortMethod(Default)
 {
     if (parent) {
-        parent->append(this);
+        if (position == -1) {
+            parent->append(this);
+        } else {
+            parent->insert(position, this);
+        }
     }
 }
 
@@ -274,7 +279,7 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
             } else if (childName == "card") {
                 DecklistCardNode *newCard = new DecklistCardNode(
                     xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(),
-                    this, xml->attributes().value("setShortName").toString(),
+                    this, -1, xml->attributes().value("setShortName").toString(),
                     xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());
                 newCard->readElement(xml);
             }
@@ -725,7 +730,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
         QString zoneName = getCardZoneFromName(cardName, sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
 
         // make new entry in decklist
-        new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), setCode, collectorNumber);
+        new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), -1, setCode, collectorNumber);
     }
 
     refreshDeckHash();
@@ -856,6 +861,7 @@ int DeckList::getSideboardSize() const
 
 DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const QString &zoneName,
+                                    const int position,
                                     const QString &cardSetName,
                                     const QString &cardSetCollectorNumber,
                                     const QString &cardProviderId)
@@ -865,7 +871,8 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node = new DecklistCardNode(cardName, 1, zoneNode, cardSetName, cardSetCollectorNumber, cardProviderId);
+    auto *node =
+        new DecklistCardNode(cardName, 1, zoneNode, position, cardSetName, cardSetCollectorNumber, cardProviderId);
     refreshDeckHash();
 
     return node;

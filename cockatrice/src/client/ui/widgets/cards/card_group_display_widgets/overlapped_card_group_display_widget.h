@@ -19,22 +19,31 @@ public:
                                      int bannerOpacity,
                                      CardSizeWidget *cardSizeWidget);
 
+public slots:
+    void onCardAddition(const QModelIndex &parent, int first, int last) override;
+    void onCardRemoval(const QModelIndex &parent, int first, int last) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
     OverlapWidget *overlapWidget;
 
-    QWidget* getLayoutParent() override
+    QWidget *getLayoutParent() override
     {
         return overlapWidget;
     }
 
-    void addToLayout(QWidget* toAdd) override
+    void addToLayout(QWidget *toAdd) override
     {
         overlapWidget->addWidget(toAdd);
     }
 
-    void removeFromLayout(QWidget* toRemove) override
+    void insertIntoLayout(QWidget *toInsert, int insertAt) override
+    {
+        Q_UNUSED(insertAt);
+        overlapWidget->addWidget(toInsert);
+    }
+
+    void removeFromLayout(QWidget *toRemove) override
     {
         overlapWidget->removeWidget(toRemove);
     }

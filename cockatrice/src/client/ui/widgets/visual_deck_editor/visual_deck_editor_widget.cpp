@@ -201,15 +201,13 @@ void VisualDeckEditorWidget::retranslateUi()
 
 void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
 {
-    qInfo() << "Cleaning up invalid card zone " << displayWidget->zoneName;
     zoneContainerLayout->removeWidget(displayWidget);
     for (auto idx : indexToWidgetMap.keys()) {
         if (!idx.isValid()) {
             indexToWidgetMap.remove(idx);
         }
     }
-    displayWidget->deleteLater();
-    qInfo() << "Cleaned.";
+    delete displayWidget;
 }
 
 void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
@@ -221,8 +219,6 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
             if (indexToWidgetMap.contains(index)) {
                 continue;
             }
-
-            qInfo() << "Created zone for " << deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
 
             DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
                 zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
@@ -261,15 +257,12 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
 
 void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 {
-    qInfo() << "Constructing zone widgets";
     for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); i++) {
         QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
 
         if (indexToWidgetMap.contains(index)) {
             continue;
         }
-
-        qInfo() << deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
 
         DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
             zoneContainer, deckListModel, index, deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,

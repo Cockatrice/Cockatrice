@@ -43,7 +43,6 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
     }
     auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
-    qInfo() << cardName;
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
@@ -59,9 +58,6 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
 
 void CardGroupDisplayWidget::updateCardDisplays()
 {
-    qInfo() << "Constructing Card Display Widgets for Card Group Display widget";
-    qInfo() << deckListModel->data(trackedIndex.sibling(trackedIndex.row(), 1), Qt::EditRole).toString() << " has "
-            << deckListModel->rowCount(trackedIndex.sibling(trackedIndex.row(), 0)) << " entries.";
     for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
         addToLayout(constructWidgetForIndex(i));
     }

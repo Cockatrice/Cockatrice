@@ -408,13 +408,14 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     const auto cardSetName = cardInfoSet.getPtr().isNull() ? "" : cardInfoSet.getPtr()->getCorrectedShortName();
 
     if (!cardNode) {
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, cardSetName,
-                                               cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
         // Determine the correct index
-        int insertRow = findSortedInsertRow(cardTypeNode, cardNode);
+        int insertRow = findSortedInsertRow(cardTypeNode, cardInfo);
+
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
+                                               cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
-        cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode);
+        cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode, insertRow);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
@@ -428,14 +429,14 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     return nodeToIndex(cardNode);
 }
 
-int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, AbstractDecklistNode *newNode) const
+int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const
 {
-    auto *newCard = dynamic_cast<const DecklistModelCardNode *>(newNode);
-    if (!newCard)
+    if (!cardInfo) {
         return parent->size(); // fallback: append at end
+    }
 
     for (int i = 0; i < parent->size(); ++i) {
-        auto *existingCard = dynamic_cast<const DecklistModelCardNode *>(parent->at(i));
+        auto *existingCard = dynamic_cast<DecklistModelCardNode *>(parent->at(i));
         if (!existingCard)
             continue;
 
@@ -443,14 +444,14 @@ int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, AbstractDeckli
         switch (lastKnownColumn) {
             case 0: // ByNumber
                 lessThan = lastKnownOrder == Qt::AscendingOrder
-                               ? newCard->getCardCollectorNumber() < existingCard->getCardCollectorNumber()
-                               : newCard->getCardCollectorNumber() > existingCard->getCardCollectorNumber();
+                               ? cardInfo->getProperty("collectorNumber") < existingCard->getCardCollectorNumber()
+                               : cardInfo->getProperty("collectorNumber") > existingCard->getCardCollectorNumber();
                 break;
             case 1: // ByName
             default:
                 lessThan = lastKnownOrder == Qt::AscendingOrder
-                               ? newCard->getName().localeAwareCompare(existingCard->getName()) < 0
-                               : newCard->getName().localeAwareCompare(existingCard->getName()) > 0;
+                               ? cardInfo->getName().localeAwareCompare(existingCard->getName()) < 0
+                               : cardInfo->getName().localeAwareCompare(existingCard->getName()) > 0;
                 break;
         }
 

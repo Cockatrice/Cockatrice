@@ -37,7 +37,6 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
         indexToWidgetMap.remove(idx);
     }
 
-    qInfo() << "Initialized an overlap CardGroupDisplayWidget";
     OverlappedCardGroupDisplayWidget::updateCardDisplays();
 
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
@@ -48,6 +47,38 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &OverlappedCardGroupDisplayWidget::onCardAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &OverlappedCardGroupDisplayWidget::onCardRemoval);
+}
+
+void OverlappedCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
+{
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+        return;
+    }
+    if (parent == trackedIndex) {
+        for (int i = first; i <= last; i++) {
+            insertIntoLayout(constructWidgetForIndex(i), i);
+        }
+    }
+}
+
+void OverlappedCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    if (parent == trackedIndex) {
+        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+            if (!idx.isValid()) {
+                removeFromLayout(indexToWidgetMap.value(idx));
+                indexToWidgetMap.value(idx)->deleteLater();
+                indexToWidgetMap.remove(idx);
+            }
+        }
+        if (!trackedIndex.isValid()) {
+            emit cleanupRequested(this);
+        }
+    }
 }
 
 void OverlappedCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)

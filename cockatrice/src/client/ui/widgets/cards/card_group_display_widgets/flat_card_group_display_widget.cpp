@@ -38,7 +38,6 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
         indexToWidgetMap.remove(idx);
     }
 
-    qInfo() << "Initialized a flat CardGroupDisplayWidget";
     FlatCardGroupDisplayWidget::updateCardDisplays();
     // connect(deckListModel, &DeckListModel::dataChanged, this, &FlatCardGroupDisplayWidget::updateCardDisplays);
     disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
@@ -46,6 +45,38 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &FlatCardGroupDisplayWidget::onCardAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &FlatCardGroupDisplayWidget::onCardRemoval);
+}
+
+void FlatCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
+{
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+        return;
+    }
+    if (parent == trackedIndex) {
+        for (int i = first; i <= last; i++) {
+            insertIntoLayout(constructWidgetForIndex(i), i);
+        }
+    }
+}
+
+void FlatCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    if (parent == trackedIndex) {
+        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+            if (!idx.isValid()) {
+                removeFromLayout(indexToWidgetMap.value(idx));
+                indexToWidgetMap.value(idx)->deleteLater();
+                indexToWidgetMap.remove(idx);
+            }
+        }
+        if (!trackedIndex.isValid()) {
+            emit cleanupRequested(this);
+        }
+    }
 }
 
 QWidget *FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
@@ -57,7 +88,6 @@ QWidget *FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
     }
     auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
-    qInfo() << cardName;
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(flowWidget, true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());

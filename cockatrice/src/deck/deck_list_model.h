@@ -25,8 +25,8 @@ private:
     DecklistCardNode *dataNode;
 
 public:
-    DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent)
-        : AbstractDecklistCardNode(_parent), dataNode(_dataNode)
+    DecklistModelCardNode(DecklistCardNode *_dataNode, InnerDecklistNode *_parent, int position = -1)
+        : AbstractDecklistCardNode(_parent, position), dataNode(_dataNode)
     {
     }
     int getNumber() const override
@@ -115,7 +115,7 @@ public:
                         const CardInfoPerSet &cardInfoSet,
                         const QString &zoneName,
                         bool abAddAnyway = false);
-    int findSortedInsertRow(InnerDecklistNode *parent, AbstractDecklistNode *newNode) const;
+    int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;
     void sort(int column, Qt::SortOrder order) override;
     void cleanList();
     DeckLoader *getDeckList() const
