@@ -101,9 +101,9 @@ void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &ma
 
         DecklistCardNode *addedCard;
         if (node->getName() == DECK_ZONE_SIDE)
-            addedCard = sideboard.addCard(card->getName(), node->getName());
+            addedCard = sideboard.addCard(card->getName(), node->getName(), -1);
         else
-            addedCard = mainboard.addCard(card->getName(), node->getName());
+            addedCard = mainboard.addCard(card->getName(), node->getName(), -1);
         addedCard->setNumber(card->getNumber());
     };
 

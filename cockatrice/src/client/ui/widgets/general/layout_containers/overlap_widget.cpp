@@ -59,6 +59,12 @@ void OverlapWidget::addWidget(QWidget *widgetToAdd) const
     overlapLayout->addWidget(widgetToAdd);
 }
 
+void OverlapWidget::insertWidgetAtIndex(QWidget *toInsert, int index)
+{
+    overlapLayout->insertWidgetAtIndex(toInsert, index);
+    update();
+}
+
 void OverlapWidget::removeWidget(QWidget *widgetToRemove) const
 {
     overlapLayout->removeWidget(widgetToRemove);

@@ -11,6 +11,7 @@ class OverlappedCardGroupDisplayWidget : public CardGroupDisplayWidget
 public:
     OverlappedCardGroupDisplayWidget(QWidget *parent,
                                      DeckListModel *deckListModel,
+                                     QPersistentModelIndex trackedIndex,
                                      QString zoneName,
                                      QString cardGroupCategory,
                                      QString activeGroupCriteria,
@@ -18,13 +19,33 @@ public:
                                      int bannerOpacity,
                                      CardSizeWidget *cardSizeWidget);
 
-    void resizeEvent(QResizeEvent *event) override;
-
 public slots:
-    void updateCardDisplays() override;
+    void onCardAddition(const QModelIndex &parent, int first, int last) override;
+    void onCardRemoval(const QModelIndex &parent, int first, int last) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     OverlapWidget *overlapWidget;
+
+    QWidget *getLayoutParent() override
+    {
+        return overlapWidget;
+    }
+
+    void addToLayout(QWidget *toAdd) override
+    {
+        overlapWidget->addWidget(toAdd);
+    }
+
+    void insertIntoLayout(QWidget *toInsert, int insertAt) override
+    {
+        overlapWidget->insertWidgetAtIndex(toInsert, insertAt);
+    }
+
+    void removeFromLayout(QWidget *toRemove) override
+    {
+        overlapWidget->removeWidget(toRemove);
+    }
 };
 
 #endif // OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H

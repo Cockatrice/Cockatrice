@@ -9,6 +9,7 @@
 
 OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *parent,
                                                                    DeckListModel *_deckListModel,
+                                                                   QPersistentModelIndex _trackedIndex,
                                                                    QString _zoneName,
                                                                    QString _cardGroupCategory,
                                                                    QString _activeGroupCriteria,
@@ -17,6 +18,7 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
                                                                    CardSizeWidget *_cardSizeWidget)
     : CardGroupDisplayWidget(parent,
                              _deckListModel,
+                             _trackedIndex,
                              _zoneName,
                              _cardGroupCategory,
                              _activeGroupCriteria,
@@ -28,89 +30,54 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
     banner->setBuddy(overlapWidget);
 
     layout->addWidget(overlapWidget);
+
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        OverlappedCardGroupDisplayWidget::removeFromLayout(indexToWidgetMap.value(idx));
+        indexToWidgetMap.value(idx)->deleteLater();
+        indexToWidgetMap.remove(idx);
+    }
+
     OverlappedCardGroupDisplayWidget::updateCardDisplays();
-    connect(deckListModel, &DeckListModel::dataChanged, this, &OverlappedCardGroupDisplayWidget::updateCardDisplays);
+
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
             [this]() { overlapWidget->adjustMaxColumnsAndRows(); });
+
+    disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    disconnect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &OverlappedCardGroupDisplayWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &OverlappedCardGroupDisplayWidget::onCardRemoval);
 }
 
-void OverlappedCardGroupDisplayWidget::updateCardDisplays()
+void OverlappedCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {
-    overlapWidget->setUpdatesEnabled(false);
-    // Retrieve and sort cards
-    QList<CardInfoPtr> cardsInZone = getCardsMatchingGroup(deckListModel->getCardsAsCardInfoPtrsForZone(zoneName));
-
-    // Show or hide widget
-    bool shouldBeVisible = !cardsInZone.isEmpty();
-    if (shouldBeVisible != isVisible()) {
-        setVisible(shouldBeVisible);
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+        return;
     }
-
-    // Retrieve existing widgets
-    QList<CardInfoPictureWithTextOverlayWidget *> existingWidgets =
-        overlapWidget->findChildren<CardInfoPictureWithTextOverlayWidget *>();
-
-    QHash<QString, QList<CardInfoPictureWithTextOverlayWidget *>> widgetMap;
-    for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
-        widgetMap[widget->getInfo()->getName()].append(widget);
-    }
-
-    QList<CardInfoPictureWithTextOverlayWidget *> sortedWidgets;
-    QSet<CardInfoPictureWithTextOverlayWidget *> usedWidgets;
-
-    // Ensure widgets are ordered to match the sorted cards
-    for (const CardInfoPtr &card : cardsInZone) {
-        QString name = card->getName();
-        CardInfoPictureWithTextOverlayWidget *widget = nullptr;
-
-        if (!widgetMap[name].isEmpty()) {
-            // Reuse an existing widget
-            widget = widgetMap[name].takeFirst();
-        } else {
-            // Create a new widget if needed
-            widget = new CardInfoPictureWithTextOverlayWidget(overlapWidget, true);
-            widget->setScaleFactor(cardSizeWidget->getSlider()->value());
-            widget->setCard(card);
-
-            connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
-                    &OverlappedCardGroupDisplayWidget::onClick);
-            connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this,
-                    &OverlappedCardGroupDisplayWidget::onHover);
-            connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget,
-                    &CardInfoPictureWidget::setScaleFactor);
-
-            overlapWidget->addWidget(widget);
-        }
-
-        // Store in sorted order
-        sortedWidgets.append(widget);
-        usedWidgets.insert(widget);
-    }
-
-    // Remove extra widgets
-    for (CardInfoPictureWithTextOverlayWidget *widget : existingWidgets) {
-        if (!usedWidgets.contains(widget)) {
-            overlapWidget->layout()->removeWidget(widget);
-            widget->deleteLater();
+    if (parent == trackedIndex) {
+        for (int i = first; i <= last; i++) {
+            insertIntoLayout(constructWidgetForIndex(i), i);
         }
     }
+}
 
-    // **Reorder widgets in place**
-    for (int i = 0; i < sortedWidgets.size(); ++i) {
-        sortedWidgets[i]->setParent(nullptr); // Temporarily detach
+void OverlappedCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    if (parent == trackedIndex) {
+        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+            if (!idx.isValid()) {
+                removeFromLayout(indexToWidgetMap.value(idx));
+                indexToWidgetMap.value(idx)->deleteLater();
+                indexToWidgetMap.remove(idx);
+            }
+        }
+        if (!trackedIndex.isValid()) {
+            emit cleanupRequested(this);
+        }
     }
-    for (int i = 0; i < sortedWidgets.size(); ++i) {
-        overlapWidget->addWidget(sortedWidgets[i]); // Reattach in correct order
-    }
-
-    // Ensure proper layering
-    for (CardInfoPictureWithTextOverlayWidget *widget : sortedWidgets) {
-        widget->raise();
-    }
-
-    overlapWidget->adjustMaxColumnsAndRows();
-    overlapWidget->setUpdatesEnabled(true);
-    overlapWidget->update();
 }
 
 void OverlappedCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)

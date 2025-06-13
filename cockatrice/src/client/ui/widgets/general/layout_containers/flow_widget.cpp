@@ -88,6 +88,12 @@ void FlowWidget::addWidget(QWidget *widget_to_add) const
     flowLayout->addWidget(widget_to_add);
 }
 
+void FlowWidget::insertWidgetAtIndex(QWidget *toInsert, int index)
+{
+    flowLayout->insertWidgetAtIndex(toInsert, index);
+    update();
+}
+
 void FlowWidget::removeWidget(QWidget *widgetToRemove) const
 {
     flowLayout->removeWidget(widgetToRemove);

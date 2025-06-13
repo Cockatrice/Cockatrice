@@ -18,6 +18,7 @@ public:
                   Qt::Orientation overlapDirection = Qt::Vertical,
                   Qt::Orientation flowDirection = Qt::Horizontal);
     ~OverlapLayout();
+    void insertWidgetAtIndex(QWidget *toInsert, int index);
 
     void addItem(QLayoutItem *item) override;
     int count() const override;

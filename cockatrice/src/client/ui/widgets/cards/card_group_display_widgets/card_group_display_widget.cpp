@@ -9,15 +9,16 @@
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
+                                               QPersistentModelIndex _trackedIndex,
                                                QString _zoneName,
                                                QString _cardGroupCategory,
                                                QString _activeGroupCriteria,
                                                QStringList _activeSortCriteria,
                                                int bannerOpacity,
                                                CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), zoneName(_zoneName), cardGroupCategory(_cardGroupCategory),
-      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria),
-      cardSizeWidget(_cardSizeWidget)
+    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName),
+      cardGroupCategory(_cardGroupCategory), activeGroupCriteria(_activeGroupCriteria),
+      activeSortCriteria(_activeSortCriteria), cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -26,42 +27,70 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     banner = new BannerWidget(this, cardGroupCategory, Qt::Orientation::Vertical, bannerOpacity);
 
     layout->addWidget(banner);
+
     CardGroupDisplayWidget::updateCardDisplays();
+
+    connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+}
+
+QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
+{
+    QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(rowIndex, 0, trackedIndex));
+
+    if (indexToWidgetMap.contains(index)) {
+        return indexToWidgetMap[index];
+    }
+    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
+    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
+
+    auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
+    widget->setScaleFactor(cardSizeWidget->getSlider()->value());
+    widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardProviderId));
+
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &CardGroupDisplayWidget::onClick);
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::onHover);
+    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
+
+    indexToWidgetMap.insert(index, widget);
+    return widget;
 }
 
 void CardGroupDisplayWidget::updateCardDisplays()
 {
+    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
+        addToLayout(constructWidgetForIndex(i));
+    }
 }
 
-QList<CardInfoPtr> CardGroupDisplayWidget::getCardsMatchingGroup(QList<CardInfoPtr> cardsToSort)
+void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {
-    cardsToSort = sortCardList(cardsToSort, activeSortCriteria, Qt::SortOrder::AscendingOrder);
-
-    QList<CardInfoPtr> activeList;
-    for (const CardInfoPtr &info : cardsToSort) {
-        if (info && info->getProperty(activeGroupCriteria) == cardGroupCategory) {
-            activeList.append(info);
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+        return;
+    }
+    if (parent == trackedIndex) {
+        for (int i = first; i <= last; i++) {
+            insertIntoLayout(constructWidgetForIndex(i), i);
         }
     }
-
-    return activeList;
 }
 
-QList<CardInfoPtr> CardGroupDisplayWidget::sortCardList(QList<CardInfoPtr> cardsToSort,
-                                                        const QStringList properties,
-                                                        Qt::SortOrder order = Qt::AscendingOrder)
+void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
 {
-    CardInfoComparator comparator(properties, order);
-    std::sort(cardsToSort.begin(), cardsToSort.end(), comparator);
-
-    return cardsToSort;
-}
-
-void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
-{
-    if (activeSortCriteria != _activeSortCriteria) {
-        activeSortCriteria = _activeSortCriteria;
-        updateCardDisplays(); // Refresh display with new sorting
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    if (parent == trackedIndex) {
+        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+            if (!idx.isValid()) {
+                removeFromLayout(indexToWidgetMap.value(idx));
+                indexToWidgetMap.value(idx)->deleteLater();
+                indexToWidgetMap.remove(idx);
+            }
+        }
+        if (!trackedIndex.isValid()) {
+            emit cleanupRequested(this);
+        }
     }
 }
 

@@ -548,6 +548,17 @@ void FlowLayout::addItem(QLayoutItem *item)
     }
 }
 
+void FlowLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
+{
+    addChildWidget(toInsert);
+
+    // We don't want to fail on an index that violates the bounds, so we just clamp it.
+    int boundedIndex = qBound(0, index, qMax(0, static_cast<int>(items.size())));
+    items.insert(boundedIndex, new QWidgetItem(toInsert));
+
+    invalidate();
+}
+
 /**
  * @brief Retrieves the count of items in the layout.
  * @return The number of layout items.

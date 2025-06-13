@@ -56,7 +56,7 @@ protected:
     DeckSortMethod sortMethod;
 
 public:
-    explicit AbstractDecklistNode(InnerDecklistNode *_parent = nullptr);
+    explicit AbstractDecklistNode(InnerDecklistNode *_parent = nullptr, int position = -1);
     virtual ~AbstractDecklistNode() = default;
     virtual void setSortMethod(DeckSortMethod method)
     {
@@ -88,8 +88,8 @@ class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDeck
     class compareFunctor;
 
 public:
-    explicit InnerDecklistNode(QString _name = QString(), InnerDecklistNode *_parent = nullptr)
-        : AbstractDecklistNode(_parent), name(std::move(_name))
+    explicit InnerDecklistNode(QString _name = QString(), InnerDecklistNode *_parent = nullptr, int position = -1)
+        : AbstractDecklistNode(_parent, position), name(std::move(_name))
     {
     }
     explicit InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent = nullptr);
@@ -153,7 +153,8 @@ public:
 class AbstractDecklistCardNode : public AbstractDecklistNode
 {
 public:
-    explicit AbstractDecklistCardNode(InnerDecklistNode *_parent = nullptr) : AbstractDecklistNode(_parent)
+    explicit AbstractDecklistCardNode(InnerDecklistNode *_parent = nullptr, int position = -1)
+        : AbstractDecklistNode(_parent, position)
     {
     }
     virtual int getNumber() const = 0;
@@ -190,10 +191,11 @@ public:
     explicit DecklistCardNode(QString _name = QString(),
                               int _number = 1,
                               InnerDecklistNode *_parent = nullptr,
+                              int position = -1,
                               QString _cardSetShortName = QString(),
                               QString _cardSetNumber = QString(),
                               QString _cardProviderId = QString())
-        : AbstractDecklistCardNode(_parent), name(std::move(_name)), number(_number),
+        : AbstractDecklistCardNode(_parent, position), name(std::move(_name)), number(_number),
           cardSetShortName(std::move(_cardSetShortName)), cardSetNumber(std::move(_cardSetNumber)),
           cardProviderId(std::move(_cardProviderId))
     {
@@ -373,6 +375,7 @@ public:
     }
     DecklistCardNode *addCard(const QString &cardName,
                               const QString &zoneName,
+                              int position,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
                               const QString &cardProviderId = QString());
