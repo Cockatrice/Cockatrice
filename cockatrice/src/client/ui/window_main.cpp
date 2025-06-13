@@ -62,6 +62,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPixmapCache>
+#include <QStatusBar>
 #include <QSystemTrayIcon>
 #include <QThread>
 #include <QTimer>
@@ -665,6 +666,7 @@ void MainWindow::retranslateUi()
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
+    aStatusBar->setText(tr("Show Status Bar"));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -709,6 +711,10 @@ void MainWindow::createActions()
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
+    aStatusBar = new QAction(this);
+    aStatusBar->setCheckable(true);
+    aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::showStatusBarChanged);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
@@ -795,8 +801,10 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
+    cockatriceMenu->addAction(aStatusBar);
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
+
     cockatriceMenu->addAction(aSettings);
     cockatriceMenu->addAction(aExit);
 
@@ -877,6 +885,11 @@ MainWindow::MainWindow(QWidget *parent)
     if (QSystemTrayIcon::isSystemTrayAvailable()) {
         createTrayIcon();
     }
+
+    // status bar
+    connect(&SettingsCache::instance(), &SettingsCache::showStatusBarChanged, this,
+            [this](bool show) { statusBar()->setVisible(show); });
+    statusBar()->setVisible(SettingsCache::instance().getShowStatusBar());
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
