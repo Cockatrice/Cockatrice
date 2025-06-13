@@ -13,8 +13,10 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags, const QStringList &activeTags, QWidget *parent)
-    : QDialog(parent), activeTags_(activeTags), knownTags_(knownTags)
+DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
+                                           const QStringList &_activeTags,
+                                           QWidget *parent)
+    : QDialog(parent), activeTags(_activeTags), knownTags_(knownTags)
 {
     resize(400, 500);
 
@@ -110,19 +112,19 @@ void DeckPreviewTagDialog::retranslateUi()
 void DeckPreviewTagDialog::refreshTagList()
 {
     // First, clear the current tags in the list view
-    tagListView_->clear();
+    tagListView->clear();
 
     // Get the updated list of tags from SettingsCache
     QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
-    QStringList combinedTags = defaultTags + knownTags_ + activeTags_;
+    QStringList combinedTags = defaultTags + knownTags_ + activeTags;
     combinedTags.removeDuplicates();
 
     // Re-populate the tag list view
     for (const auto &tag : combinedTags) {
-        auto *item = new QListWidgetItem(tagListView_);
-        auto *tagWidget = new DeckPreviewTagItemWidget(tag, activeTags_.contains(tag), this);
-        tagListView_->addItem(item);
-        tagListView_->setItemWidget(item, tagWidget);
+        auto *item = new QListWidgetItem(tagListView);
+        auto *tagWidget = new DeckPreviewTagItemWidget(tag, activeTags.contains(tag), this);
+        tagListView->addItem(item);
+        tagListView->setItemWidget(item, tagWidget);
 
         connect(tagWidget->checkBox(), &QCheckBox::toggled, this, &DeckPreviewTagDialog::onCheckboxStateChanged);
     }

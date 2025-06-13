@@ -39,7 +39,7 @@ private:
     QPushButton *okButton;
     QPushButton *editButton;
     QPushButton *cancelButton;
-    QStringList activeTags_;
+    QStringList activeTags;
     QStringList knownTags_;
 };
 
