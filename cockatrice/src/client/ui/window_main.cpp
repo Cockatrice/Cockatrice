@@ -714,7 +714,7 @@ void MainWindow::createActions()
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
     aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::showStatusBarChanged);
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
