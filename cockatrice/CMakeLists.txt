@@ -153,6 +153,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/dialogs/dlg_create_game.cpp
     src/dialogs/dlg_create_token.cpp
+    src/dialogs/dlg_default_tags_editor.cpp
     src/dialogs/dlg_edit_avatar.cpp
     src/dialogs/dlg_edit_password.cpp
     src/dialogs/dlg_edit_tokens.cpp

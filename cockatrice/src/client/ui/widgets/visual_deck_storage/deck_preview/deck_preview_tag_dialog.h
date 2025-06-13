@@ -25,6 +25,7 @@ private slots:
     void addTag();
     void onCheckboxStateChanged();
     void retranslateUi();
+    void refreshTagList();
 
 private:
     QVBoxLayout *mainLayout;
@@ -36,8 +37,10 @@ private:
     QPushButton *addTagButton;
     QHBoxLayout *buttonLayout;
     QPushButton *okButton;
+    QPushButton *editButton;
     QPushButton *cancelButton;
     QStringList activeTags;
+    QStringList knownTags_;
 };
 
 #endif // DECK_PREVIEW_TAG_DIALOG_H
