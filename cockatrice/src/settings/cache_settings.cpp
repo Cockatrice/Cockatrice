@@ -237,7 +237,7 @@ SettingsCache::SettingsCache()
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
-    showStatusBar = settings->value("personal/showStatusBar", true).toBool();
+    showStatusBar = settings->value("personal/showStatusBar", false).toBool();
 
     mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
     tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
