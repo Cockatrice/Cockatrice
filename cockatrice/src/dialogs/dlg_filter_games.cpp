@@ -37,6 +37,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideIgnoredUserGames = new QCheckBox(tr("Hide 'ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
+    hideNotBuddyCreatedGames = new QCheckBox(tr("Hide games not created by buddy"));
+    hideNotBuddyCreatedGames->setChecked(gamesProxyModel->getHideNotBuddyCreatedGames());
+
     maxGameAgeComboBox = new QComboBox();
     maxGameAgeComboBox->setEditable(false);
     maxGameAgeComboBox->addItems(gameAgeMap.values());
@@ -111,6 +114,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     restrictionsLayout->addWidget(hidePasswordProtectedGames, 2, 0);
     restrictionsLayout->addWidget(hideBuddiesOnlyGames, 3, 0);
     restrictionsLayout->addWidget(hideIgnoredUserGames, 4, 0);
+    restrictionsLayout->addWidget(hideNotBuddyCreatedGames, 5, 0);
 
     auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
@@ -207,6 +211,11 @@ bool DlgFilterGames::getHidePasswordProtectedGames() const
 bool DlgFilterGames::getHideIgnoredUserGames() const
 {
     return hideIgnoredUserGames->isChecked();
+}
+
+bool DlgFilterGames::getHideNotBuddyCreatedGames() const
+{
+    return hideNotBuddyCreatedGames->isChecked();
 }
 
 QString DlgFilterGames::getGameNameFilter() const

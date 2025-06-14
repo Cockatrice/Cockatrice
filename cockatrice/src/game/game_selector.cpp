@@ -160,6 +160,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setHideGamesThatStarted(dlg.getHideGamesThatStarted());
     gameListProxyModel->setHidePasswordProtectedGames(dlg.getHidePasswordProtectedGames());
     gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
+    gameListProxyModel->setHideNotBuddyCreatedGames(dlg.getHideNotBuddyCreatedGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());

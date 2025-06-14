@@ -314,6 +314,12 @@ void GamesProxyModel::setHidePasswordProtectedGames(bool _showPasswordProtectedG
     invalidateFilter();
 }
 
+void GamesProxyModel::setHideNotBuddyCreatedGames(bool value)
+{
+    hideNotBuddyCreatedGames = value;
+    invalidateFilter();
+}
+
 void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
 {
     gameNameFilter = _gameNameFilter;
@@ -391,6 +397,7 @@ void GamesProxyModel::resetFilterParameters()
     hidePasswordProtectedGames = false;
     hideBuddiesOnlyGames = false;
     hideIgnoredUserGames = false;
+    hideNotBuddyCreatedGames = false;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -408,8 +415,8 @@ void GamesProxyModel::resetFilterParameters()
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
 {
     return !hideFullGames && !hideGamesThatStarted && !hidePasswordProtectedGames && !hideBuddiesOnlyGames &&
-           !hideIgnoredUserGames && gameNameFilter.isEmpty() && creatorNameFilter.isEmpty() &&
-           gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
+           !hideIgnoredUserGames && !hideNotBuddyCreatedGames && gameNameFilter.isEmpty() &&
+           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
            maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAge == DEFAULT_MAX_GAME_AGE &&
            !showOnlyIfSpectatorsCanWatch && !showSpectatorPasswordProtected && !showOnlyIfSpectatorsCanChat &&
            !showOnlyIfSpectatorsCanSeeHands;
@@ -423,6 +430,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     hidePasswordProtectedGames = gameFilters.isHidePasswordProtectedGames();
     hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
     hideBuddiesOnlyGames = gameFilters.isHideBuddiesOnlyGames();
+    hideNotBuddyCreatedGames = gameFilters.isHideNotBuddyCreatedGames();
     gameNameFilter = gameFilters.getGameNameFilter();
     creatorNameFilter = gameFilters.getCreatorNameFilter();
     maxPlayersFilterMin = gameFilters.getMinPlayers();
@@ -452,6 +460,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setHideGamesThatStarted(hideGamesThatStarted);
     gameFilters.setHidePasswordProtectedGames(hidePasswordProtectedGames);
     gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
+    gameFilters.setHideNotBuddyCreatedGames(hideNotBuddyCreatedGames);
     gameFilters.setGameNameFilter(gameNameFilter);
     gameFilters.setCreatorNameFilter(creatorNameFilter);
 
@@ -496,6 +505,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         return false;
     }
     if (hideIgnoredUserGames && userListProxy->isUserIgnored(QString::fromStdString(game.creator_info().name()))) {
+        return false;
+    }
+    if (hideNotBuddyCreatedGames && !userListProxy->isUserBuddy(QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
     if (hideFullGames && game.player_count() == game.max_players())
