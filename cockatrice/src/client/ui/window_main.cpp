@@ -666,7 +666,6 @@ void MainWindow::retranslateUi()
     aFullScreen->setText(tr("&Full screen"));
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
-    aStatusBar->setText(tr("Show Status Bar"));
     aSettings->setText(tr("&Settings..."));
     aSettings->setIcon(QPixmap("theme:icons/settings"));
     aExit->setText(tr("&Exit"));
@@ -692,6 +691,7 @@ void MainWindow::retranslateUi()
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
+    aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
 
@@ -711,10 +711,6 @@ void MainWindow::createActions()
     connect(aSinglePlayer, &QAction::triggered, this, &MainWindow::actSinglePlayer);
     aWatchReplay = new QAction(this);
     connect(aWatchReplay, &QAction::triggered, this, &MainWindow::actWatchReplay);
-    aStatusBar = new QAction(this);
-    aStatusBar->setCheckable(true);
-    aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
     aFullScreen = new QAction(this);
     aFullScreen->setCheckable(true);
     connect(aFullScreen, &QAction::toggled, this, &MainWindow::actFullScreen);
@@ -748,6 +744,10 @@ void MainWindow::createActions()
     connect(aUpdate, &QAction::triggered, this, &MainWindow::actUpdate);
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, &QAction::triggered, this, &MainWindow::actCheckCardUpdates);
+    aStatusBar = new QAction(this);
+    aStatusBar->setCheckable(true);
+    aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
@@ -801,7 +801,6 @@ void MainWindow::createMenus()
     cockatriceMenu->addAction(aSinglePlayer);
     cockatriceMenu->addAction(aWatchReplay);
     cockatriceMenu->addSeparator();
-    cockatriceMenu->addAction(aStatusBar);
     cockatriceMenu->addAction(aFullScreen);
     cockatriceMenu->addSeparator();
 
@@ -827,6 +826,7 @@ void MainWindow::createMenus()
     helpMenu->addAction(aUpdate);
     helpMenu->addAction(aCheckCardUpdates);
     helpMenu->addSeparator();
+    helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
     helpMenu->addAction(aOpenSettingsFolder);
 }
@@ -1290,7 +1290,6 @@ void MainWindow::refreshShortcuts()
     aDisconnect->setShortcuts(shortcuts.getShortcut("MainWindow/aDisconnect"));
     aSinglePlayer->setShortcuts(shortcuts.getShortcut("MainWindow/aSinglePlayer"));
     aWatchReplay->setShortcuts(shortcuts.getShortcut("MainWindow/aWatchReplay"));
-    aStatusBar->setShortcuts(shortcuts.getShortcut("MainWindow/aStatusBar"));
     aFullScreen->setShortcuts(shortcuts.getShortcut("MainWindow/aFullScreen"));
     aRegister->setShortcuts(shortcuts.getShortcut("MainWindow/aRegister"));
     aSettings->setShortcuts(shortcuts.getShortcut("MainWindow/aSettings"));
@@ -1299,6 +1298,7 @@ void MainWindow::refreshShortcuts()
     aEditTokens->setShortcuts(shortcuts.getShortcut("MainWindow/aEditTokens"));
     aOpenCustomFolder->setShortcuts(shortcuts.getShortcut("MainWindow/aOpenCustomFolder"));
     aCheckCardUpdates->setShortcuts(shortcuts.getShortcut("MainWindow/aCheckCardUpdates"));
+    aStatusBar->setShortcuts(shortcuts.getShortcut("MainWindow/aStatusBar"));
 }
 
 void MainWindow::notifyUserAboutUpdate()
