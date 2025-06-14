@@ -293,7 +293,7 @@ void MessageLogWidget::logMoveCard(Player *player,
     }
 
     QString finalStr;
-    bool usesNewX = false;
+    std::optional<QString> fourthArg;
     if (targetZoneName == TABLE_ZONE_NAME) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
@@ -316,7 +316,7 @@ void MessageLogWidget::logMoveCard(Player *player,
             finalStr = tr("%1 puts %2%3 on top of their library.");
         } else {
             ++newX;
-            usesNewX = true;
+            fourthArg = QString::number(newX);
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
     } else if (targetZoneName == SIDEBOARD_ZONE_NAME) {
@@ -325,16 +325,17 @@ void MessageLogWidget::logMoveCard(Player *player,
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
     } else {
+        fourthArg = targetZoneName;
         finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
     }
 
-    if (usesNewX) {
-        appendHtmlServerMessage(
-            finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(newX));
-    } else {
-        appendHtmlServerMessage(
-            finalStr.arg(sanitizeHtml(player->getName())).arg(cardStr).arg(nameFrom.second).arg(targetZoneName));
+    QString message = finalStr.arg(sanitizeHtml(player->getName()), cardStr, nameFrom.second);
+
+    if (fourthArg.has_value()) {
+        message = message.arg(fourthArg.value());
     }
+
+    appendHtmlServerMessage(message);
 }
 
 void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty)
