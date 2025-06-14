@@ -14,6 +14,7 @@ public:
     bool isHideGamesThatStarted();
     bool isHidePasswordProtectedGames();
     bool isHideIgnoredUserGames();
+    bool isHideNotBuddyCreatedGames();
     QString getGameNameFilter();
     QString getCreatorNameFilter();
     int getMinPlayers();
@@ -30,6 +31,7 @@ public:
     void setHideFullGames(bool hide);
     void setHideGamesThatStarted(bool hide);
     void setHidePasswordProtectedGames(bool hide);
+    void setHideNotBuddyCreatedGames(bool hide);
     void setGameNameFilter(QString gameName);
     void setCreatorNameFilter(QString creatorName);
     void setMinPlayers(int min);

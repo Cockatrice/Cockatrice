@@ -80,6 +80,7 @@ private:
     bool hideFullGames;
     bool hideGamesThatStarted;
     bool hidePasswordProtectedGames;
+    bool hideNotBuddyCreatedGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
@@ -115,6 +116,11 @@ public:
         return hidePasswordProtectedGames;
     }
     void setHidePasswordProtectedGames(bool _showPasswordProtectedGames);
+    bool getHideNotBuddyCreatedGames() const
+    {
+        return hideNotBuddyCreatedGames;
+    }
+    void setHideNotBuddyCreatedGames(bool value);
     QString getGameNameFilter() const
     {
         return gameNameFilter;

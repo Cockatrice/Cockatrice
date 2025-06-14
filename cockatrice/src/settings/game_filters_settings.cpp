@@ -72,6 +72,17 @@ bool GameFiltersSettings::isHideIgnoredUserGames()
     return !(previous == QVariant()) && previous.toBool();
 }
 
+void GameFiltersSettings::setHideNotBuddyCreatedGames(bool hide)
+{
+    setValue(hide, "hide_not_buddy_created_games", "filter_games");
+}
+
+bool GameFiltersSettings::isHideNotBuddyCreatedGames()
+{
+    QVariant previous = getValue("hide_not_buddy_created_games", "filter_games");
+    return !(previous == QVariant()) && previous.toBool();
+}
+
 void GameFiltersSettings::setGameNameFilter(QString gameName)
 {
     setValue(gameName, "game_name_filter", "filter_games");
