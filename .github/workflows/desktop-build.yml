@@ -164,16 +164,18 @@ jobs:
         run: source .ci/docker.sh --build
 
       - name: Build ${{matrix.build_type}}${{ matrix.build_type == 'Debug' && ' and run Tests' || '' }}
+        if: matrix.package != 'skip' && matrix.build_type != 'Release'
         shell: bash
         env:
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
           if [[ "${{matrix.build_type}}" == "Debug" ]]; then
-            RUN --server --debug --test --ccache "$CCACHE_SIZE"
+            RUN --server --debug --test --dir "$BUILD_DIR" --ccache "$CCACHE_SIZE"
           else
-            RUN --server --release --package "${{matrix.package}}" --dir build --ccache "$CCACHE_SIZE"
+            RUN --server --release --package "${{matrix.package}}" --dir "$BUILD_DIR" --ccache "$CCACHE_SIZE"
             .ci/name_build.sh
           fi
 
@@ -224,7 +226,7 @@ jobs:
       matrix:
         build_type: ${{ fromJson(needs.configure.outputs.build_types) }}
         exclude:
-         - build_type: Debug
+          - build_type: Debug
         include:
           - target: 13
             soc: Intel
@@ -401,7 +403,7 @@ jobs:
       matrix:
         build_type: ${{ fromJson(needs.configure.outputs.build_types) }}
         exclude:
-         - build_type: Debug
+          - build_type: Debug
         include:
           - target: 7
             qt_version: 5.15.*
