@@ -405,13 +405,14 @@ jobs:
           path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
-      - name: Upload pdb database
+      - name: Upload PDBs (Program Databases)
         uses: actions/upload-artifact@v4
         with:
-          name: Windows${{matrix.target}}-debug-pdbs
+          name: Windows${{matrix.target}}-Release-PDBs
           path: |
             build/cockatrice/Release/*.pdb
             build/servatrice/Release/*.pdb
+            build/oracle/Release/*.pdb
           if-no-files-found: error
 
       - name: Upload to release
