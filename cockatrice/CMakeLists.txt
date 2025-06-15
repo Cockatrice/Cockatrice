@@ -50,6 +50,7 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_deck_editor.cpp
     src/client/tabs/tab_deck_storage.cpp
     src/client/tabs/tab_game.cpp
+    src/client/tabs/tab_home.cpp
     src/client/tabs/tab_logs.cpp
     src/client/tabs/tab_message.cpp
     src/client/tabs/tab_replays.cpp
@@ -100,6 +101,8 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/client/ui/widgets/general/home_styled_button.cpp
+    src/client/ui/widgets/general/home_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/bar_widget.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp
