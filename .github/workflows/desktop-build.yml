@@ -85,12 +85,25 @@ jobs:
           gh release create "$tag_name" --draft --verify-tag $args \
               --target "$target" --title "$release_name" \
               --notes-file "$body_path"
+      - name: Define build types
+        id: set_build_types
+        shell: bash
+        run: |
+          build_types='["Debug"]'
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
+            build_types='["Debug", "Release"]'
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+            build_types='["Release"]'
+          fi
+          echo "build_types=$build_types" >> $GITHUB_OUTPUT
 
   build-linux:
     strategy:
       fail-fast: false
       matrix:
-        # These names correspond to the files in ".ci/$distro$version"
+        # Dynamically expand build matrix according to needed Release/Debug build types
+        build_type: ${{ fromJson(needs.configure.outputs.build_types) }}
+        # The below builds correspond to the files in ".ci/$distro$version"
         include:
           - distro: Arch
             package: skip    # We are packaged in Arch already
@@ -99,7 +112,6 @@ jobs:
           - distro: Debian
             version: 11
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 12
@@ -108,7 +120,6 @@ jobs:
           - distro: Fedora
             version: 41
             package: RPM
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 42
@@ -117,22 +128,21 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
             package: DEB
 
-    name: ${{matrix.distro}} ${{matrix.version}}
+    name: ${{matrix.distro}} ${{matrix.version}} ${{matrix.build_type}}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}-${{matrix.build_type}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 500M
+      CCACHE_SIZE: 400M
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -146,36 +156,26 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+          key: ccache-${{matrix.distro}}${{matrix.version}}-${{matrix.build_type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-${{matrix.build_type}}-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
         run: source .ci/docker.sh --build
 
-      - name: Build debug and test
-        if: matrix.test != 'skip'
+      - name: Build ${{matrix.build_type}}${{ matrix.build_type == 'Debug' && ' and run Tests' || '' }}
         shell: bash
         env:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-        run: |
-          source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
-
-      - name: Build release package
-        id: build
-        if: matrix.package != 'skip'
-        shell: bash
-        env:
-          BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
-          package: '${{matrix.package}}'
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE"
-          .ci/name_build.sh
+          if [[ "${{matrix.build_type}}" == "Debug" ]]; then
+            RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          else
+            RUN --server --release --package "${{matrix.package}}" --dir build --ccache "$CCACHE_SIZE"
+            .ci/name_build.sh
+          fi
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -222,41 +222,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        build_type: ${{ fromJson(needs.configure.outputs.build_types) }}
+        exclude:
+         - build_type: Debug
         include:
           - target: 13
             soc: Intel
             os: macos-13
             xcode: "14.3.1"
-            type: Release
             make_package: 1
 
           - target: 14
             soc: Apple
             os: macos-14
             xcode: "15.4"
-            type: Release
             make_package: 1
 
           - target: 15
             soc: Apple
             os: macos-15
             xcode: "16.2"
-            type: Release
             make_package: 1
 
-          - target: 15
-            soc: Apple
-            os: macos-15
-            xcode: "16.2"
-            type: Debug
-
-    name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+    name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }} ${{ matrix.build_type }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
-      CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
-      CCACHE_SIZE: 500M
+      CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}-${{matrix.build_type}}
+      CCACHE_SIZE: 400M
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
@@ -282,14 +276,14 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.os}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.os}}-${{matrix.type}}-
+          key: ccache-macOS${{matrix.target}}-${{matrix.build_type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-macOS${{matrix.target}}-${{matrix.build_type}}-
 
       - name: Build & Sign on Xcode ${{matrix.xcode}}
         shell: bash
         id: build
         env:
-          BUILDTYPE: '${{matrix.type}}'
+          BUILDTYPE: '${{matrix.build_type}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -309,6 +303,23 @@ jobs:
             security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
           fi
           .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+
+          if [[ "${{matrix.build_type}}" == "Debug" ]]; then
+            .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+          else
+            .ci/compile.sh --server --ccache "$CCACHE_SIZE"
+          fi
+
+      - name: Build ${{matrix.build_type}}${{ matrix.build_type == 'Debug' && ' and run Tests' || '' }}
+        run: |
+          source .ci/docker.sh
+          if [[ "${{matrix.build_type}}" == "Debug" ]]; then
+            RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          else
+            RUN --server --release --package "${{matrix.package}}" --dir build --ccache "$CCACHE_SIZE"
+            .ci/name_build.sh
+          fi
+
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -399,6 +410,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        build_type: ${{ fromJson(needs.configure.outputs.build_types) }}
+        exclude:
+         - build_type: Debug
         include:
           - target: 7
             qt_version: 5.15.*
