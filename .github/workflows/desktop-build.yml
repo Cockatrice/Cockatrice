@@ -244,7 +244,7 @@ jobs:
             xcode: "16.2"
             make_package: 1
 
-    name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }} ${{ matrix.build_type }}
+    name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }} ${{ matrix.build_type }}
     needs: configure
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
@@ -309,17 +309,6 @@ jobs:
           else
             .ci/compile.sh --server --ccache "$CCACHE_SIZE"
           fi
-
-      - name: Build ${{matrix.build_type}}${{ matrix.build_type == 'Debug' && ' and run Tests' || '' }}
-        run: |
-          source .ci/docker.sh
-          if [[ "${{matrix.build_type}}" == "Debug" ]]; then
-            RUN --server --debug --test --ccache "$CCACHE_SIZE"
-          else
-            RUN --server --release --package "${{matrix.package}}" --dir build --ccache "$CCACHE_SIZE"
-            .ci/name_build.sh
-          fi
-
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
