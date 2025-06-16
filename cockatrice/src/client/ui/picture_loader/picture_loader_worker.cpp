@@ -2,10 +2,10 @@
 
 #include "../../../game/cards/card_database_manager.h"
 #include "../../../settings/cache_settings.h"
+#include "picture_loader_local.h"
 #include "picture_loader_worker_work.h"
 
 #include <QDirIterator>
-#include <QJsonDocument>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
@@ -43,9 +43,13 @@ PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(Setti
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
             &PictureLoaderWorker::saveRedirectCache);
 
+    localLoader = new PictureLoaderLocal(this);
+
     pictureLoaderThread = new QThread;
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
+
+    connect(this, &PictureLoaderWorker::imageLoadEnqueued, this, &PictureLoaderWorker::handleImageLoadEnqueued);
 
     connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::processQueuedRequests);
     requestTimer.setInterval(1000);
@@ -133,13 +137,38 @@ void PictureLoaderWorker::processQueuedRequests()
 
 void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
 {
-    auto worker = new PictureLoaderWorkerWork(this, card);
-    Q_UNUSED(worker);
+    // Send call through a connection to ensure the handling is run on the pictureLoader thread
+    emit imageLoadEnqueued(card);
 }
 
-void PictureLoaderWorker::imageLoadedSuccessfully(CardInfoPtr card, const QImage &image)
+void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
 {
-    emit imageLoaded(std::move(card), image);
+    // deduplicate loads for the same card
+    if (currentlyLoading.contains(card)) {
+        qCDebug(PictureLoaderWorkerLog())
+            << "Skipping enqueued" << card->getName() << "because it's already being loaded";
+        return;
+    }
+    currentlyLoading.insert(card);
+
+    // try to load image from local first
+    QImage image = localLoader->tryLoad(card);
+    if (!image.isNull()) {
+        imageLoadedSuccessfully(card, image);
+    } else {
+        // queue up to load image from remote only after local loading failed
+        new PictureLoaderWorkerWork(this, card);
+    }
+}
+
+/**
+ * Called when image loading is done
+ * Contrary to the name, this is called on both success and failure. Failures are indicated by an empty QImage.
+ */
+void PictureLoaderWorker::imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image)
+{
+    currentlyLoading.remove(card);
+    emit imageLoaded(card, image);
 }
 
 void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl)

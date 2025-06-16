@@ -24,10 +24,9 @@ class PictureLoaderWorkerWork : public QThread
 {
     Q_OBJECT
 public:
-    explicit PictureLoaderWorkerWork(PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
+    explicit PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
     ~PictureLoaderWorkerWork() override;
-    void startWork();
-    PictureLoaderWorker *worker;
+
     PictureToLoad cardToDownload;
 
 public slots:
@@ -35,21 +34,16 @@ public slots:
     void picDownloadFailed();
 
 private:
-    QString picsPath, customPicsPath;
-    bool overrideAllCardArtWithPersonalPreference;
     static QStringList md5Blacklist;
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
     bool picDownload, downloadRunning, loadQueueRunning;
 
     void startNextPicDownload();
-    bool cardImageExistsOnDisk(const QString &setName, const QString &correctedCardName, bool searchCustomPics);
     bool imageIsBlackListed(const QByteArray &);
 
 private slots:
     void picDownloadChanged();
-    void picsPathChanged();
-    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
 
 signals:
     void startLoadQueue();
