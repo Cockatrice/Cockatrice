@@ -321,7 +321,11 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
 {
     QByteArray itemData = event->mimeData()->data("application/x-setentrywidget");
     QString draggedSetName = QString::fromUtf8(itemData);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QPoint adjustedPos = event->position().toPoint() + QPoint(0, scrollArea->verticalScrollBar()->value());
+#else
+    QPoint adjustedPos = event->pos() + QPoint(0, scrollArea->verticalScrollBar()->value());
+#endif
     int dropIndex = -1;
     for (int i = 0; i < listLayout->count(); ++i) {
         QWidget *widget = listLayout->itemAt(i)->widget();
@@ -433,7 +437,11 @@ SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_se
     QHBoxLayout *headerLayout = new QHBoxLayout();
     CardSetPtr set = CardDatabaseManager::getInstance()->getSet(setName);
     checkBox = new QCheckBox("(" + set->getShortName() + ") - " + set->getLongName(), this);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     connect(checkBox, &QCheckBox::checkStateChanged, parent, &DlgSelectSetForCards::updateLayoutOrder);
+#else
+    connect(checkBox, &QCheckBox::stateChanged, parent, &DlgSelectSetForCards::updateLayoutOrder);
+#endif
     expandButton = new QPushButton("+", this);
     countLabel = new QLabel(QString::number(count), this);
 
@@ -503,7 +511,11 @@ void SetEntryWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void SetEntryWidget::enterEvent(QEnterEvent *event)
+#else
+void SetEntryWidget::enterEvent(QEvent *event)
+#endif
 {
     QWidget::enterEvent(event); // Call the base class handler
     // Highlight the widget by changing the background color only for the widget itself

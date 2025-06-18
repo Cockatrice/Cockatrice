@@ -59,7 +59,6 @@ private:
     QPushButton *setAllToPreferredButton;
 
     QMap<QString, int> getSetsForCards();
-    void updateCardAvailability();
 };
 
 class SetEntryWidget : public QWidget
@@ -73,7 +72,6 @@ public:
     QStringList getAllCardsForSet();
     void populateCardList();
     void updateCardDisplayWidgets();
-    void updateCardState(bool checked);
     bool isChecked() const;
     DlgSelectSetForCards *parent;
     QString setName;
