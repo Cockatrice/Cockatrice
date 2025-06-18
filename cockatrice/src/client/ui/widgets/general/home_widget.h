@@ -17,6 +17,7 @@ public:
     QGroupBox *createUpdatesButtonGroup(const QString &title);
     QGroupBox *createNavigationButtonGroup(const QString &title);
     QGroupBox *createPlayButtonGroup(const QString &title);
+    QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
@@ -26,6 +27,7 @@ private:
     TabSupervisor *tabSupervisor;
     QPixmap background;
     QPixmap overlay;
+    QPair<QColor, QColor> gradientColors;
 };
 
 #endif // HOME_WIDGET_H

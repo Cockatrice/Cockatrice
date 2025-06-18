@@ -4,6 +4,7 @@
 #include "home_styled_button.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -11,6 +12,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
 {
     layout = new QGridLayout(this);
+
+    gradientColors = extractDominantColors(background);
 
     layout->addWidget(createSettingsButtonGroup("Settings"), 0, 0, Qt::AlignTop | Qt::AlignLeft);
     layout->addWidget(createUpdatesButtonGroup("Updates"), 0, 2, Qt::AlignTop | Qt::AlignRight);
@@ -32,6 +35,7 @@ QGroupBox *HomeWidget::createSettingsButtonGroup(const QString &title)
     QGroupBox {
         font-size: 20px;
         color: white;         /* Title text color */
+        background: transparent;
     }
 
     QGroupBox::title {
@@ -42,7 +46,7 @@ QGroupBox *HomeWidget::createSettingsButtonGroup(const QString &title)
 )");
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    layout->addWidget(new HomeStyledButton("Settings"));
+    layout->addWidget(new HomeStyledButton("Settings", gradientColors));
     box->setLayout(layout);
     return box;
 }
@@ -54,6 +58,7 @@ QGroupBox *HomeWidget::createUpdatesButtonGroup(const QString &title)
     QGroupBox {
         font-size: 20px;
         color: white;         /* Title text color */
+        background: transparent;
     }
 
     QGroupBox::title {
@@ -64,7 +69,7 @@ QGroupBox *HomeWidget::createUpdatesButtonGroup(const QString &title)
 )");
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    layout->addWidget(new HomeStyledButton("Updates"));
+    layout->addWidget(new HomeStyledButton("Updates", gradientColors));
     box->setLayout(layout);
     return box;
 }
@@ -76,6 +81,7 @@ QGroupBox *HomeWidget::createNavigationButtonGroup(const QString &title)
     QGroupBox {
         font-size: 20px;
         color: white;         /* Title text color */
+        background: transparent;
     }
 
     QGroupBox::title {
@@ -87,20 +93,24 @@ QGroupBox *HomeWidget::createNavigationButtonGroup(const QString &title)
     box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    auto replaybutton = new HomeStyledButton("View Replays");
+    auto replaybutton = new HomeStyledButton("View Replays", gradientColors);
     connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     layout->addWidget(replaybutton);
-    auto edhrecButton = new HomeStyledButton("Browse EDHRec");
+    auto edhrecButton = new HomeStyledButton("Browse EDHRec", gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     layout->addWidget(edhrecButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton("Browse Card Database");
+    auto visualDatabaseDisplayButton = new HomeStyledButton("Browse Card Database", gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     layout->addWidget(visualDatabaseDisplayButton);
-    auto visualDeckStorageButton = new HomeStyledButton("Browse Decks");
+    auto visualDeckStorageButton = new HomeStyledButton("Browse Decks", gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     layout->addWidget(visualDeckStorageButton);
+    auto visualDeckEditorButton = new HomeStyledButton("Create New Deck", gradientColors);
+    connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
+            [this] { tabSupervisor->addVisualDeckEditorTab(nullptr); });
+    layout->addWidget(visualDeckEditorButton);
     box->setLayout(layout);
     return box;
 }
@@ -112,6 +122,7 @@ QGroupBox *HomeWidget::createPlayButtonGroup(const QString &title)
     QGroupBox {
         font-size: 20px;
         color: white;         /* Title text color */
+        background: transparent;
     }
 
     QGroupBox::title {
@@ -124,27 +135,89 @@ QGroupBox *HomeWidget::createPlayButtonGroup(const QString &title)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
 
-    auto connectButton = new HomeStyledButton("Connect");
+    auto connectButton = new HomeStyledButton("Connect", gradientColors);
     layout->addWidget(connectButton, 1); // stretch factor 1
 
-    auto playButton = new HomeStyledButton("Play");
+    auto playButton = new HomeStyledButton("Play", gradientColors);
     layout->addWidget(playButton, 1);
 
     box->setLayout(layout);
     return box;
 }
 
+QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
+{
+    // Step 1: Downscale image for performance
+    QImage image = pixmap.toImage()
+                       .scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation)
+                       .convertToFormat(QImage::Format_RGB32);
+
+    QMap<QRgb, int> colorCount;
+
+    // Step 2: Count quantized colors
+    for (int y = 0; y < image.height(); ++y) {
+        const QRgb *scanLine = reinterpret_cast<const QRgb *>(image.scanLine(y));
+        for (int x = 0; x < image.width(); ++x) {
+            QColor color = QColor::fromRgb(scanLine[x]);
+
+            int r = color.red() & 0xF0;
+            int g = color.green() & 0xF0;
+            int b = color.blue() & 0xF0;
+
+            QRgb quantized = qRgb(r, g, b);
+            colorCount[quantized]++;
+        }
+    }
+
+    // Step 3: Sort by frequency
+    QVector<QPair<QRgb, int>> sortedColors;
+    for (auto it = colorCount.constBegin(); it != colorCount.constEnd(); ++it) {
+        sortedColors.append(qMakePair(it.key(), it.value()));
+    }
+
+    std::sort(sortedColors.begin(), sortedColors.end(),
+              [](const QPair<QRgb, int> &a, const QPair<QRgb, int> &b) { return a.second > b.second; });
+
+    // Step 4: Pick top two distinct colors
+    QColor first = QColor(sortedColors.value(0).first);
+    QColor second = first;
+
+    for (int i = 1; i < sortedColors.size(); ++i) {
+        QColor candidate = QColor(sortedColors[i].first);
+        if (candidate != first) {
+            second = candidate;
+            break;
+        }
+    }
+
+    return QPair<QColor, QColor>(first, second);
+}
+
 void HomeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    // Draw background to fill the widget
-    painter.drawPixmap(rect(), background);
+    // Draw zoomed background
+    QSize widgetSize = size();
+    QSize bgSize = background.size();
+    QSize scaledSize = bgSize.scaled(widgetSize, Qt::KeepAspectRatioByExpanding);
+    QPoint topLeft((widgetSize.width() - scaledSize.width()) / 2, (widgetSize.height() - scaledSize.height()) / 2);
+    painter.drawPixmap(topLeft,
+                       background.scaled(scaledSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
-    // Draw overlay image centered
+    // Draw translucent black overlay with rounded corners
+    QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset
+    QPainterPath roundedRectPath;
+    roundedRectPath.addRoundedRect(overlayRect, 20, 20); // 20px corner radius
+
+    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillPath(roundedRectPath, semiTransparentBlack);
+
+    // Draw centered overlay image
     QSize overlaySize = overlay.size();
     QPoint center((width() - overlaySize.width()) / 2, (height() - overlaySize.height()) / 2);
     painter.drawPixmap(center, overlay);
 
-    QWidget::paintEvent(event); // optional, depending on behavior
+    QWidget::paintEvent(event);
 }
