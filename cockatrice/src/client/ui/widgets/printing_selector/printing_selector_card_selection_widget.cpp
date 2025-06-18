@@ -1,5 +1,7 @@
 #include "printing_selector_card_selection_widget.h"
 
+#include "../../../../dialogs/dlg_select_set_for_cards.h"
+
 /**
  * @brief Constructs a PrintingSelectorCardSelectionWidget for navigating through cards in the deck.
  *
@@ -16,12 +18,18 @@ PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(Printin
     previousCardButton = new QPushButton(this);
     previousCardButton->setText(tr("Previous Card in Deck"));
 
+    selectSetForCardsButton = new QPushButton(this);
+    connect(selectSetForCardsButton, &QPushButton::clicked, this,
+            &PrintingSelectorCardSelectionWidget::selectSetForCards);
+    selectSetForCardsButton->setText(tr("Bulk Selection"));
+
     nextCardButton = new QPushButton(this);
     nextCardButton->setText(tr("Next Card in Deck"));
 
     connectSignals();
 
     cardSelectionBarLayout->addWidget(previousCardButton);
+    cardSelectionBarLayout->addWidget(selectSetForCardsButton);
     cardSelectionBarLayout->addWidget(nextCardButton);
 }
 
@@ -35,4 +43,12 @@ void PrintingSelectorCardSelectionWidget::connectSignals()
 {
     connect(previousCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectPreviousCard);
     connect(nextCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectNextCard);
+}
+
+void PrintingSelectorCardSelectionWidget::selectSetForCards()
+{
+    DlgSelectSetForCards *setSelectionDialog = new DlgSelectSetForCards(nullptr, parent->getDeckModel());
+    if (!setSelectionDialog->exec()) {
+        return;
+    }
 }
