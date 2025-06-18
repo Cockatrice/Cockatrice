@@ -1,14 +1,5 @@
 import type { QTableProps } from 'quasar';
-
-interface Games {
-  age: string;
-  description: string;
-  creator: string;
-  type: string;
-  restrictions: string;
-  players: string;
-  spectators: string | number;
-}
+import type { Games } from 'src/models/models';
 
 const restrictions = ['🔒 password', 'reg. users only', 'buddies only'];
 
