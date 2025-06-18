@@ -128,6 +128,8 @@ DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_mode
     mainLayout->addWidget(buttonBox);
 
     retranslateUi();
+    setWindowFlags(Qt::Window);
+    showMaximized();
 }
 
 void DlgSelectSetForCards::retranslateUi()

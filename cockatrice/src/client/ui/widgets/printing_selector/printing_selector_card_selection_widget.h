@@ -16,10 +16,14 @@ public:
 
     void connectSignals();
 
+public slots:
+    void selectSetForCards();
+
 private:
     PrintingSelector *parent;
     QHBoxLayout *cardSelectionBarLayout;
     QPushButton *previousCardButton;
+    QPushButton *selectSetForCardsButton;
     QPushButton *nextCardButton;
 };
 

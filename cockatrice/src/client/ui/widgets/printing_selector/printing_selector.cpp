@@ -88,13 +88,6 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     sortAndOptionsLayout->addWidget(searchBar);
     sortAndOptionsLayout->addWidget(displayOptionsWidget);
-    searchAndSetLayout->addWidget(searchBar);
-
-    selectSetForCardsButton = new QPushButton(this);
-    connect(selectSetForCardsButton, &QPushButton::clicked, this, &PrintingSelector::selectSetForCards);
-    searchAndSetLayout->addWidget(selectSetForCardsButton);
-
-    layout->addLayout(searchAndSetLayout);
 
     layout->addWidget(sortAndOptionsContainer);
 
@@ -114,7 +107,6 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 void PrintingSelector::retranslateUi()
 {
     navigationCheckBox->setText(tr("Display Navigation Buttons"));
-    selectSetForCardsButton->setText(tr("Bulk Selection"));
 
     if (warningLabel) {
         warningLabel->setText(
@@ -276,12 +268,4 @@ void PrintingSelector::getAllSetsForCurrentCard()
 void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
 {
     cardSelectionBar->setVisible(_state);
-}
-
-void PrintingSelector::selectSetForCards()
-{
-    DlgSelectSetForCards *setSelectionDialog = new DlgSelectSetForCards(nullptr, deckModel);
-    if (!setSelectionDialog->exec()) {
-        return;
-    }
 }

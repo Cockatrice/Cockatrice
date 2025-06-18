@@ -30,6 +30,10 @@ public:
 
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
+    DeckListModel *getDeckModel() const
+    {
+        return deckModel;
+    };
 
 public slots:
     void retranslateUi();
@@ -37,7 +41,6 @@ public slots:
     void selectPreviousCard();
     void selectNextCard();
     void toggleVisibilityNavigationButtons(bool _state);
-    void selectSetForCards();
 
 private slots:
     void printingsInDeckChanged();
@@ -51,7 +54,6 @@ private:
     QLabel *warningLabel;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
-    QPushButton *selectSetForCardsButton;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
