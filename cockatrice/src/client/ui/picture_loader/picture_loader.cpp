@@ -148,6 +148,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
 void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
 {
     if (image.isNull()) {
+        qCDebug(PictureLoaderLog) << "Caching NULL pixmap for" << card->getName();
         QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());
     } else {
         if (card->getUpsideDownArt()) {

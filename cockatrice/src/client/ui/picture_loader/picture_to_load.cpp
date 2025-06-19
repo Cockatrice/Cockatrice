@@ -13,33 +13,47 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
     : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
-        for (const auto &cardInfoPerSetList : card->getSets()) {
-            for (const auto &set : cardInfoPerSetList) {
-                sortedSets << set.getPtr();
-            }
-        }
-        if (sortedSets.empty()) {
-            sortedSets << CardSet::newInstance("", "", "", QDate());
-        }
-        std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
-
-        // If the user hasn't disabled arts other than their personal preference...
-        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-            // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-            for (const auto &cardInfoPerSetList : card->getSets()) {
-                for (const auto &set : cardInfoPerSetList) {
-                    if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                        card->getPixmapCacheKey()) {
-                        long long setIndex = sortedSets.indexOf(set.getPtr());
-                        CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                        sortedSets.prepend(setForCardProviderID);
-                    }
-                }
-            }
-        }
+        sortedSets = extractSetsSorted(card);
         // The first time called, nextSet will also populate the Urls for the first set.
         nextSet();
     }
+}
+
+/**
+ * Extracts a list of all the sets from the card, sorted in priority order.
+ * If the card does not contain any sets, then a dummy set will be inserted into the list.
+ *
+ * @return A list of sets. Will not be empty.
+ */
+QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
+{
+    QList<CardSetPtr> sortedSets;
+    for (const auto &cardInfoPerSetList : card->getSets()) {
+        for (const auto &set : cardInfoPerSetList) {
+            sortedSets << set.getPtr();
+        }
+    }
+    if (sortedSets.empty()) {
+        sortedSets << CardSet::newInstance("", "", "", QDate());
+    }
+    std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
+
+    // If the user hasn't disabled arts other than their personal preference...
+    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
+        for (const auto &cardInfoPerSetList : card->getSets()) {
+            for (const auto &set : cardInfoPerSetList) {
+                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+                    card->getPixmapCacheKey()) {
+                    long long setIndex = sortedSets.indexOf(set.getPtr());
+                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+                    sortedSets.prepend(setForCardProviderID);
+                }
+            }
+        }
+    }
+
+    return sortedSets;
 }
 
 void PictureToLoad::populateSetUrls()

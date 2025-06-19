@@ -67,6 +67,7 @@ set(cockatrice_SOURCES
     src/client/ui/line_edit_completer.cpp
     src/client/ui/phases_toolbar.cpp
     src/client/ui/picture_loader/picture_loader.cpp
+    src/client/ui/picture_loader/picture_loader_local.cpp
     src/client/ui/picture_loader/picture_loader_request_status_display_widget.cpp
     src/client/ui/picture_loader/picture_loader_status_bar.cpp
     src/client/ui/picture_loader/picture_loader_worker.cpp
