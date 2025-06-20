@@ -1,22 +1,63 @@
 <template>
   <div class="game">
     <!-- GRID SYSTEM, 2 columns -->
-    <div class="play-area-container">
+    <div class="play-area-container" @contextmenu.prevent="openContextMenu($event)">
       <!-- the left side of the screen, the playmats -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 100%">
-        <!-- FOR THE OTHER PLAYER -->
-        <div class="play-view-area">
-          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
-          POSITIONS
+        <!-- FOR THE OTHER PLAYERS -->
+        <div
+          v-for="i in numberOfPlayers"
+          :key="i"
+          :class="[
+            'play-view-area',
+            i <= Math.ceil(numberOfPlayers / 2) ? 'flipped' : '',
+            'bg-red',
+          ]"
+        >
+          <!-- find the total number of players, divide by 2, that is how many draw areas should be flipped, the rest normal, rounded up -->
+          <div
+            class="draw-view-area bg-blue"
+            style="height: 20%; position: absolute; bottom: 0; width: 100%; border-radius: 12px"
+          ></div>
+
+          <p class="text-center" style="color: white; font-weight: bold; font-size: 24px">
+            Player {{ i }}'s Area
+          </p>
+
+          <!--  -->
+          <div v-for="(stack, index) in cardStacksOpponent" :key="index">
+            <div
+              v-for="(card, i) in stack"
+              :key="card.id"
+              class="card"
+              :style="cardStyle(card, i)"
+              @mouseover="startPeekTimer(card)"
+              @mouseleave="cancelPeekTimer(card)"
+            >
+              {{ card.name }}
+            </div>
+          </div>
         </div>
-        <div class="play-view-area">
-          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
-          POSITIONS
-        </div>
-        <div class="play-view-area">
-          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
-          POSITIONS
-        </div>
+
+        <!-- <div class="play-view-area flipped">
+          <div
+            class="draw-view-area bg-yellow"
+            style="height: 20%; position: absolute; bottom: 0; width: 100%; border-radius: 12px"
+          ></div>
+          <div v-for="(stack, index) in cardStacksOpponent" :key="index">
+            <div
+              v-for="(card, i) in stack"
+              :key="card.id"
+              class="card"
+              :style="cardStyle(card, i)"
+              @dblclick="toggleTap(card)"
+              @mouseover="startPeekTimer(card)"
+              @mouseleave="cancelPeekTimer(card)"
+            >
+              {{ card.name }}
+            </div>
+          </div>
+        </div> -->
 
         <!-- FOR OUR PLAYER -->
         <div class="play-area">
@@ -87,11 +128,25 @@
       <button @click="clearBoard">Clear</button>
       <button @click="connect()">CONNECT TO SOCKET</button>
     </div>
+
+    <!-- Custom Context Menu -->
+    <div
+      v-if="contextMenu.visible"
+      :style="{ top: `${contextMenu.y - 20}px`, left: `${contextMenu.x - 20}px` }"
+      class="context-menu"
+      @click.self="contextMenu.visible = false"
+      @mouseleave="closeContextMenu"
+    >
+      <ul>
+        <!-- <li @click="action1">Action 1</li>
+        <li @click="action2">Action 2</li> -->
+      </ul>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import type { CSSProperties } from 'vue';
 import socket from '../socket.js'; // Import your socket connection module
 
@@ -105,12 +160,25 @@ interface Card {
   peek?: boolean; // optional: if the card is currently being peeked (hovered)
 }
 
+interface Player {
+  username: string; // Player's username
+  cards: Card[]; // Array of cards owned by the player
+}
+
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  item?: unknown; // Replace `unknown` with your actual item type
+}
+
 // Constants defining card size in pixels
 const CARD_WIDTH = 60;
 const CARD_HEIGHT = 90;
 
 // Reactive state holding all cards
 const cards = ref<Card[]>([]);
+const everyCard = ref<Player[]>([]); // This will hold all cards, including those not currently displayed
 
 // Currently dragged card (or null if none)
 const dragging = ref<Card | null>(null);
@@ -128,10 +196,24 @@ const drawArea = ref<HTMLElement | null>(null);
 const hoverTimers = new Map<number, number>();
 
 const username = ref('Player1'); // Replace with actual username logic
+const numberOfPlayers = ref(3); // Replace with actual number of other players logic
 
+// get the cards from updateCards from the server
+socket.on('updateCards', (data) => {
+  console.log('Received updated cards from server:', data.player.cards);
+  // set returned data to everyCard, (each Object will have its own username, and cards) which will then be iterated over to show the cards in the red spaces
+  everyCard.value = data.player.cards.map((card: Card) => ({
+    username: data.player.username,
+    cards: [card],
+  }));
+
+  // log the received cards
+  console.log('Every card:', everyCard.value);
+});
 const connect = () => {
-  socket.connect();
-  socket.emit('join', username.value,  'game-room');
+  console.log('Connecting to WebSocket server...');
+
+  socket.emit('join', username.value, 'game-room');
   // Here you would typically initialize your WebSocket connection
 };
 
@@ -145,7 +227,22 @@ const emitCardsToServer = () => {
   });
 };
 
-//send this players cards to the websocket server so it can store them
+const contextMenu = reactive<ContextMenuState>({
+  visible: false,
+  x: 0,
+  y: 0,
+});
+
+const openContextMenu = (event: MouseEvent , item?: unknown) => {
+  contextMenu.x = event.clientX;
+  contextMenu.y = event.clientY;
+  contextMenu.item = item;
+  contextMenu.visible = true;
+};
+
+const closeContextMenu = () => {
+  contextMenu.visible = false;
+};
 
 // Computed array of cards currently peeked (hovered), should be limited to only one card at a time
 const peekedCards = computed(() => {
@@ -299,6 +396,9 @@ const dragMove = (e: MouseEvent) => {
     c.x += dx;
     c.y += dy;
   }
+
+  // emit updated cards to server
+  emitCardsToServer();
 };
 
 /**
@@ -340,6 +440,9 @@ const stopDrag = () => {
   // Remove event listeners
   window.removeEventListener('mousemove', dragMove);
   window.removeEventListener('mouseup', stopDrag);
+
+  //emit updated cards to server
+  emitCardsToServer();
 };
 
 /**
@@ -359,6 +462,9 @@ const toggleTap = (card: Card) => {
   for (const c of sameStack) {
     c.tapped = shouldTap;
   }
+
+  // emit all tapped cards to server
+  emitCardsToServer();
 };
 
 /**
@@ -372,6 +478,22 @@ const cardStacks = computed(() => {
     const key = `${card.x},${card.y}`;
     if (!groups[key]) groups[key] = [];
     groups[key].push(card);
+  }
+  // Return all groups as under a single array called cardStacks
+  return Object.values(groups);
+});
+
+// need to create stacking logic for everyCard, so that it can be displayed in the red areas
+// This will be used to display cards in the opponent's areas
+const cardStacksOpponent = computed(() => {
+  const groups: Record<string, Card[]> = {};
+  for (const player of everyCard.value) {
+    for (const card of player.cards) {
+      // Use x,y as unique key for group
+      const key = `${card.x},${card.y}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(card);
+    }
   }
   // Return all groups as under a single array called cardStacks
   return Object.values(groups);
@@ -543,5 +665,20 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
   border: 3px solid #e17055;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   transform: scale(1.05);
+}
+
+.flipped {
+  transform: scaleY(-1) scaleX(-1); /* Flip the card */
+}
+
+.context-menu {
+  position: absolute;
+  height: 200px;
+  width: 150px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 </style>
