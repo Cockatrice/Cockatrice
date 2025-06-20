@@ -94,6 +94,7 @@
 import { ref, computed } from 'vue';
 import type { CSSProperties } from 'vue';
 import socket from '../socket.js'; // Import your socket connection module
+
 // Define the Card interface, which describes the shape of a card object
 interface Card {
   id: number;
@@ -126,10 +127,25 @@ const drawArea = ref<HTMLElement | null>(null);
 
 const hoverTimers = new Map<number, number>();
 
+const username = ref('Player1'); // Replace with actual username logic
+
 const connect = () => {
   socket.connect();
+  socket.emit('join', username.value,  'game-room');
   // Here you would typically initialize your WebSocket connection
 };
+
+const emitCardsToServer = () => {
+  // should emit cards under the current users username
+  socket.emit('sync-cards', {
+    room: 'game-room',
+    // add the current user's username here
+    username: username.value, // Replace with actual username logic
+    cards: cards.value,
+  });
+};
+
+//send this players cards to the websocket server so it can store them
 
 // Computed array of cards currently peeked (hovered), should be limited to only one card at a time
 const peekedCards = computed(() => {
@@ -201,6 +217,8 @@ const addCard = () => {
   });
 
   cardId.value++;
+
+  emitCardsToServer(); // <-- sync to server
 };
 
 /**
