@@ -96,7 +96,7 @@ public:
     {
         return nodeToIndex(root);
     };
-    QString getSortCriteriaForCard(CardInfoPtr info);
+    QString getGroupCriteriaForCard(CardInfoPtr info) const;
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
