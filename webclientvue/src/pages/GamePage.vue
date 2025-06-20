@@ -1,27 +1,37 @@
 <template>
   <div class="game">
+    <!-- GRID SYSTEM, 2 columns -->
     <div class="play-area-container">
-      <div>
-        <!-- This div is a container for the main play area -->
+      <!-- the left side of the screen, the playmats -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 100%">
+        <!-- FOR THE OTHER PLAYER -->
         <div class="play-view-area">
-          <!-- Render stacks of cards -->
-          <div v-for="(stack, index) in cardStacks" :key="index" class="card-stack">
-            <!-- Cards in stack rendering is handled below, this is commented out old version -->
-            <!-- <div
-          v-for="(card, i) in stack"
-          :key="card.id"
-          class="card"
-          :style="cardStyle(card, i)"
-          @mousedown="startDrag(card, $event)"
-          @dblclick="toggleTap(card)"
-        >
-          {{ card.name }}
-        </div> -->
-          </div>
+          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
+          POSITIONS
+        </div>
+        <div class="play-view-area">
+          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
+          POSITIONS
+        </div>
+        <div class="play-view-area">
+          THIS AREA IS FOR THE OTHER PLAYER, WEBSOCKETS TO TRANSMIT ARRAY OF CARDS AND THEIR
+          POSITIONS
         </div>
 
+        <!-- FOR OUR PLAYER -->
         <div class="play-area">
-          <div class="bg-black" ref="playArea" style="height: 100%">
+          <div class="playAreaStyles" ref="playArea">
+            <p
+              class="absolute"
+              style="
+                color: white;
+                font-size: 36px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                font-weight: bold;
+              "
+            >
+              PLAY AREA
+            </p>
             <div v-for="(stack, index) in cardStacks" :key="index" class="card-stack">
               <div
                 v-for="(card, i) in stack"
@@ -30,34 +40,44 @@
                 :style="cardStyle(card, i)"
                 @mousedown="startDrag(card, $event)"
                 @dblclick="toggleTap(card)"
-                @mouseover="card.peek = true"
-                @mouseleave="card.peek = false"
+                @mouseover="startPeekTimer(card)"
+                @mouseleave="cancelPeekTimer(card)"
               >
                 {{ card.name }}
               </div>
             </div>
 
-            <div
-              class="bg-yellow absolute"
-              ref="drawArea"
-              style="overflow-x: scroll; height: 20%; width: 100%; bottom: 0;"
-            ></div>
+            <!-- relative container to make sure absolute draw area stays in bounds -->
+            <div class="draw-area" ref="drawArea" style="height: 20%; width: 100%">
+              <p
+                style="
+                  font-size: 36px;
+                  color: white;
+                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                  font-weight: bold;
+                "
+                class="absolute"
+              >
+                DRAW AREA
+              </p>
+            </div>
           </div>
-
-          <!-- For each stack in computed cardStacks, render each card -->
         </div>
       </div>
 
-      <div class="bg-green flex justify-center items-center">
+      <!-- This is the other stuff area -->
+      <div class="peek-area flex justify-center items-center">
         <!-- Show enlarged "peeked" cards here -->
         <div
           v-for="card in peekedCards"
           :key="card.id"
-          class="card"
+          class="card peeked-card"
           :style="{ position: 'relative', width: '200px', height: '260px', zIndex: 100 }"
         >
           <div class="text-center">{{ card.name }}</div>
-          <div class="text-center" style="font-size: 12px; color: #666">Peeked</div>
+          <div class="text-center" style="font-size: 12px; color: #888; margin-top: 8px">
+            Peeked
+          </div>
         </div>
       </div>
     </div>
@@ -65,6 +85,7 @@
     <div class="controls">
       <button @click="addCard()">Add Card P1</button>
       <button @click="clearBoard">Clear</button>
+      <button @click="connect()">CONNECT TO SOCKET</button>
     </div>
   </div>
 </template>
@@ -72,7 +93,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { CSSProperties } from 'vue';
-
+import socket from '../socket.js'; // Import your socket connection module
 // Define the Card interface, which describes the shape of a card object
 interface Card {
   id: number;
@@ -101,11 +122,40 @@ const cardId = ref(1);
 
 // Reference to the play area DOM element (used for boundary calculations)
 const playArea = ref<HTMLElement | null>(null);
-
 const drawArea = ref<HTMLElement | null>(null);
 
-// Computed array of cards currently peeked (hovered)
-const peekedCards = computed(() => cards.value.filter((c) => c.peek));
+const hoverTimers = new Map<number, number>();
+
+const connect = () => {
+  socket.connect();
+  // Here you would typically initialize your WebSocket connection
+};
+
+// Computed array of cards currently peeked (hovered), should be limited to only one card at a time
+const peekedCards = computed(() => {
+  return cards.value.filter((card) => card.peek);
+});
+
+const startPeekTimer = (card: Card) => {
+  cancelPeekTimer(card); // Clear any existing timer first
+
+  const timerId = window.setTimeout(() => {
+    for (const c of cards.value) {
+      c.peek = c.id === card.id; // Only one card is peeked
+    }
+  }, 250); // 1 second delay
+
+  hoverTimers.set(card.id, timerId);
+};
+
+const cancelPeekTimer = (card: Card) => {
+  const timerId = hoverTimers.get(card.id);
+  if (timerId !== undefined) {
+    clearTimeout(timerId);
+    hoverTimers.delete(card.id);
+  }
+  card.peek = false; // Reset peek on leave
+};
 
 // The array of cards being dragged together (stack)
 const draggedStack = ref<Card[]>([]);
@@ -182,7 +232,7 @@ const startDrag = (card: Card, e: MouseEvent) => {
   // Get all cards at the same position (stack)
   const stack = cards.value.filter((c) => c.x === card.x && c.y === card.y);
 
-  // The last card in the stack array is the top visually
+  // topCard is the last card in the stack (topmost visually)
   const topCard = stack[stack.length - 1];
 
   if (card.id === topCard?.id) {
@@ -226,7 +276,7 @@ const dragMove = (e: MouseEvent) => {
   const dx = newX - dragging.value.x;
   const dy = newY - dragging.value.y;
 
-  // Move all cards in the dragged stack by the delta
+  // Move all cards in the dragged stack by the delta, this is the actual moving logic, everything else is just setting up the drag
   for (const c of draggedStack.value) {
     c.x += dx;
     c.y += dy;
@@ -242,7 +292,6 @@ const dragMove = (e: MouseEvent) => {
  */
 const stopDrag = () => {
   if (!dragging.value) return;
-
   const draggedCards = draggedStack.value;
 
   // Remove dragged cards from original cards array
@@ -306,7 +355,7 @@ const cardStacks = computed(() => {
     if (!groups[key]) groups[key] = [];
     groups[key].push(card);
   }
-  // Return all groups as array of stacks
+  // Return all groups as under a single array called cardStacks
   return Object.values(groups);
 });
 
@@ -325,7 +374,7 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
   transition: 'transform 0.2s ease', // Smooth rotation transition
   zIndex: 10 + index, // Higher index cards appear on top
   backgroundImage: 'url(/mtgCardBack.jpg)', // Background image for card
-   backgroundSize: '100% 100%',
+  backgroundSize: '100% 100%',
 });
 </script>
 
@@ -335,43 +384,111 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
   display: flex;
   flex-direction: column;
   height: 100vh;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
 }
 
 /* Control buttons container */
 .controls {
-  padding: 10px;
-  background: #eee;
+  padding: 0px;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
   gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.controls button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.controls button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.controls button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Play area where cards are rendered */
 .play-area {
-  height: 50%;
-  width: 50%;
-  background: #4a5568;
-  position: absolute;
-  bottom: 0;
-  overflow: hidden; /* prevent overflow outside play area */
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 
-/* Upper play view area (red background) */
+/* Upper play view area (opponent areas) */
 .play-view-area {
-  background: red;
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  overflow: hidden;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #c0392b 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   top: 0;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Container for play area and other UI elements */
 .play-area-container {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 4fr 1fr;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  gap: 8px;
+}
+
+.playAreaStyles {
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 50%, #229954 100%);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  overflow-y: hidden;
+}
+
+.draw-area {
+  margin-top: auto;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f4e79 100%);
+  border-radius: 12px 12px 0 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  height: 20%;
+  width: 100%;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  overflow-y: hidden;
+  white-space: nowrap; /* Prevent line breaks so cards line up horizontally */
+  position: relative;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.peek-area {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #663399 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Each card stack container is absolutely positioned */
@@ -383,14 +500,30 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
 .card {
   width: 60px; /* matches CARD_WIDTH */
   height: 90px; /* matches CARD_HEIGHT */
-  background: #edf2f7;
-  border: 1px solid #2d3748;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  border: 2px solid #495057;
+  border-radius: 8px;
   text-align: center;
   line-height: 90px; /* vertically center card name */
   user-select: none; /* disable text selection */
   cursor: grab;
   font-size: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  color: #212529;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border-color: #6c757d;
+}
+
+.peeked-card {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 50%, #fdcb6e 100%);
+  border: 3px solid #e17055;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05);
 }
 </style>
