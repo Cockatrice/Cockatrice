@@ -128,6 +128,23 @@ function ccachestatsverbose() {
 }
 
 # Compile
+if [[ $RUNNER_OS == macOS ]]; then
+  echo "::group::Signing Certificate"
+  if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
+    echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+    security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+    security default-keychain -s build.keychain
+    security set-keychain-settings -t 3600 -l build.keychain
+    security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+    security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+    security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+    echo "macOS signing certificate successfully imported and keychain configured."
+  else
+    echo "No signing certificate configured. Skipping set up of keychain in macOS environment."
+  fi
+  echo "::endgroup::"
+fi
+
 if [[ $USE_CCACHE ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose

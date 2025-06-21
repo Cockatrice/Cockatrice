@@ -285,7 +285,7 @@ jobs:
           key: ccache-${{matrix.os}}-${{matrix.type}}-${{env.BRANCH_NAME}}
           restore-keys: ccache-${{matrix.os}}-${{matrix.type}}-
 
-      - name: Build & Sign on Xcode ${{matrix.xcode}}
+      - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
         id: build
         env:
@@ -297,18 +297,7 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-        run: |
-          if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
-          then
-            echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-            security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            security default-keychain -s build.keychain
-            security set-keychain-settings -t 3600 -l build.keychain
-            security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-          fi
-          .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
