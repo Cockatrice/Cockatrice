@@ -75,7 +75,7 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << " set: " << cardToDownload.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
             << ", no more url combinations to try: BAILING OUT";
-        imageLoaded(cardToDownload.getCard(), QImage());
+        emit imageLoaded(cardToDownload.getCard(), QImage());
     }
 }
 
@@ -92,7 +92,7 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
 
             networkManager->cache()->remove(reply->url());
 
-            requestImageDownload(reply->url(), this);
+            emit requestImageDownload(reply->url(), this);
         } else {
             qCDebug(PictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
@@ -115,7 +115,7 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: following "
             << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
-        requestImageDownload(redirectUrl, this);
+        emit requestImageDownload(redirectUrl, this);
         reply->deleteLater();
         return;
     }
@@ -153,10 +153,10 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
         movie.start();
         movie.stop();
 
-        imageLoaded(cardToDownload.getCard(), movie.currentImage());
+        emit imageLoaded(cardToDownload.getCard(), movie.currentImage());
         logSuccessMessage = true;
     } else if (imgReader.read(&testImage)) {
-        imageLoaded(cardToDownload.getCard(), testImage);
+        emit imageLoaded(cardToDownload.getCard(), testImage);
         logSuccessMessage = true;
     } else {
         qCDebug(PictureLoaderWorkerWorkLog).nospace()
