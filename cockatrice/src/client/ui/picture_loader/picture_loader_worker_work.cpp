@@ -16,7 +16,7 @@
 QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
 PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad)
-    : QThread(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
+    : QObject(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
 {
     // Hook up signals to the orchestrator
     connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest,
@@ -32,12 +32,12 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
 
     connect(pictureLoaderThread, &QThread::started, this, &PictureLoaderWorkerWork::startNextPicDownload);
 
-    pictureLoaderThread->start(QThread::LowPriority);
-}
+    // clean up worker once loading finishes
+    connect(this, &PictureLoaderWorkerWork::imageLoaded, this, &QObject::deleteLater);
+    connect(this, &QObject::destroyed, pictureLoaderThread, &QThread::quit);
+    connect(pictureLoaderThread, &QThread::finished, pictureLoaderThread, &QObject::deleteLater);
 
-PictureLoaderWorkerWork::~PictureLoaderWorkerWork()
-{
-    pictureLoaderThread->deleteLater();
+    pictureLoaderThread->start(QThread::LowPriority);
 }
 
 void PictureLoaderWorkerWork::startNextPicDownload()
