@@ -340,7 +340,7 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
@@ -443,7 +443,7 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: ${{steps.build.outputs.path}}
+          subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
