@@ -115,8 +115,8 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: following "
             << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
-        emit requestImageDownload(redirectUrl, this);
         reply->deleteLater();
+        emit requestImageDownload(redirectUrl, this);
         return;
     }
 
@@ -129,8 +129,8 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << " set: " << cardToDownload.getSetName()
             << "]: Picture found, but blacklisted, will consider it as not found";
 
-        picDownloadFailed();
         reply->deleteLater();
+        picDownloadFailed();
         return;
     }
 
