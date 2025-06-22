@@ -73,7 +73,6 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << ", no more url combinations to try: BAILING OUT";
         imageLoaded(cardToDownload.getCard(), QImage());
     }
-    emit startLoadQueue();
 }
 
 void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
