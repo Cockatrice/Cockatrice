@@ -78,6 +78,7 @@ public:
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
     QString exportDeckToDecklist(DecklistWebsite website);
+    void setProviderIdToPreferredPrinting();
 
     void resolveSetNameAndNumberToProviderID();
 

@@ -166,13 +166,16 @@ AbstractDecklistNode *InnerDecklistNode::findCardChildByNameProviderIdAndNumber(
                                                                                 const QString &_cardNumber)
 {
     for (const auto &i : *this) {
-        if (i != nullptr && i->getName() == _name) {
-            if (i->getCardCollectorNumber() == _cardNumber) {
-                if (i->getCardProviderId() == _providerId) {
-                    return i;
-                }
-            }
+        if (!i || i->getName() != _name) {
+            continue;
         }
+        if (_cardNumber != "" && i->getCardCollectorNumber() != _cardNumber) {
+            continue;
+        }
+        if (_providerId != "" && i->getCardProviderId() != _providerId) {
+            continue;
+        }
+        return i;
     }
     return nullptr;
 }

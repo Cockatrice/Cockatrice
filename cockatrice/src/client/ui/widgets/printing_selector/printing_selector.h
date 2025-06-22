@@ -9,6 +9,7 @@
 
 #include <QCheckBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -29,6 +30,10 @@ public:
 
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
+    DeckListModel *getDeckModel() const
+    {
+        return deckModel;
+    };
 
 public slots:
     void retranslateUi();

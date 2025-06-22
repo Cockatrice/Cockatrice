@@ -1,5 +1,6 @@
 #include "printing_selector.h"
 
+#include "../../../../dialogs/dlg_select_set_for_cards.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../picture_loader/picture_loader.h"
 #include "printing_selector_card_display_widget.h"

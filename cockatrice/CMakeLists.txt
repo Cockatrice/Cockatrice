@@ -170,6 +170,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_move_top_cards_until.cpp
     src/dialogs/dlg_register.cpp
     src/dialogs/dlg_roll_dice.cpp
+    src/dialogs/dlg_select_set_for_cards.cpp
     src/dialogs/dlg_settings.cpp
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
