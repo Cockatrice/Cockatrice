@@ -16,7 +16,7 @@
 QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
 PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad)
-    : QThread(nullptr), cardToDownload(toLoad)
+    : QThread(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
 {
     // Hook up signals to the orchestrator
     connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest,
@@ -70,7 +70,7 @@ void PictureLoaderWorkerWork::picDownloadFailed()
     if (cardToDownload.nextUrl() || cardToDownload.nextSet()) {
         startNextPicDownload();
     } else {
-        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+        qCWarning(PictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard()->getCorrectedName()
             << " set: " << cardToDownload.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
