@@ -29,7 +29,7 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
-QString DeckListModel::getSortCriteriaForCard(CardInfoPtr info)
+QString DeckListModel::getGroupCriteriaForCard(CardInfoPtr info) const
 {
     if (!info) {
         return "unknown";
@@ -67,15 +67,15 @@ void DeckListModel::rebuildTree()
             }
 
             CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
-            QString cardType = getSortCriteriaForCard(info);
+            QString groupCriteria = getGroupCriteriaForCard(info);
 
-            auto *cardTypeNode = dynamic_cast<InnerDecklistNode *>(node->findChild(cardType));
+            auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
 
-            if (!cardTypeNode) {
-                cardTypeNode = new InnerDecklistNode(cardType, node);
+            if (!groupNode) {
+                groupNode = new InnerDecklistNode(groupCriteria, node);
             }
 
-            new DecklistModelCardNode(currentCard, cardTypeNode);
+            new DecklistModelCardNode(currentCard, groupNode);
         }
     }
 
@@ -332,28 +332,24 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
                                                    const QString &providerId,
                                                    const QString &cardNumber) const
 {
-    InnerDecklistNode *zoneNode, *typeNode;
-    CardInfoPtr info;
-    QString cardType;
-
-    zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
+    InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (!zoneNode) {
         return nullptr;
     }
 
-    info = CardDatabaseManager::getInstance()->getCard(cardName);
+    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(cardName);
     if (!info) {
         return nullptr;
     }
 
-    cardType = info->getMainCardType();
-    typeNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(cardType));
-    if (!typeNode) {
+    QString groupCriteria = getGroupCriteriaForCard(info);
+    InnerDecklistNode *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria));
+    if (!groupNode) {
         return nullptr;
     }
 
     return dynamic_cast<DecklistModelCardNode *>(
-        typeNode->findCardChildByNameProviderIdAndNumber(cardName, providerId, cardNumber));
+        groupNode->findCardChildByNameProviderIdAndNumber(cardName, providerId, cardNumber));
 }
 
 QModelIndex DeckListModel::findCard(const QString &cardName,
@@ -361,9 +357,7 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
                                     const QString &providerId,
                                     const QString &cardNumber) const
 {
-    DecklistModelCardNode *cardNode;
-
-    cardNode = findCardNode(cardName, zoneName, providerId, cardNumber);
+    DecklistModelCardNode *cardNode = findCardNode(cardName, zoneName, providerId, cardNumber);
     if (!cardNode) {
         return {};
     }
@@ -399,23 +393,23 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
 
     InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
 
-    const QString cardType = cardInfo->getMainCardType();
-    InnerDecklistNode *cardTypeNode = createNodeIfNeeded(cardType, zoneNode);
+    QString groupCriteria = getGroupCriteriaForCard(cardInfo);
+    InnerDecklistNode *groupNode = createNodeIfNeeded(groupCriteria, zoneNode);
 
-    const QModelIndex parentIndex = nodeToIndex(cardTypeNode);
-    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(cardTypeNode->findCardChildByNameProviderIdAndNumber(
+    const QModelIndex parentIndex = nodeToIndex(groupNode);
+    auto *cardNode = dynamic_cast<DecklistModelCardNode *>(groupNode->findCardChildByNameProviderIdAndNumber(
         cardName, cardInfoSet.getProperty("uuid"), cardInfoSet.getProperty("num")));
     const auto cardSetName = cardInfoSet.getPtr().isNull() ? "" : cardInfoSet.getPtr()->getCorrectedShortName();
 
     if (!cardNode) {
         // Determine the correct index
-        int insertRow = findSortedInsertRow(cardTypeNode, cardInfo);
+        int insertRow = findSortedInsertRow(groupNode, cardInfo);
 
         auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
                                                cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
-        cardNode = new DecklistModelCardNode(decklistCard, cardTypeNode, insertRow);
+        cardNode = new DecklistModelCardNode(decklistCard, groupNode, insertRow);
         endInsertRows();
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
