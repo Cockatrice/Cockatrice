@@ -46,7 +46,6 @@ private slots:
     void picDownloadChanged();
 
 signals:
-    void startLoadQueue();
     void imageLoaded(CardInfoPtr card, const QImage &image);
     void requestImageDownload(const QUrl &url, PictureLoaderWorkerWork *instance);
 };

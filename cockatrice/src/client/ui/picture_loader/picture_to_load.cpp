@@ -84,6 +84,11 @@ void PictureToLoad::populateSetUrls()
     (void)nextUrl();
 }
 
+/**
+ * Advances the currentSet to the next set in the list. Then repopulates the url list with the urls from that set.
+ * If we are already at the end of the list, then currentSet is set to empty.
+ * @return If we are already at the end of the list
+ */
 bool PictureToLoad::nextSet()
 {
     if (!sortedSets.isEmpty()) {
@@ -95,6 +100,11 @@ bool PictureToLoad::nextSet()
     return false;
 }
 
+/**
+ * Advances the currentUrl to the next url in the list.
+ * If we are already at the end of the list, then currentUrl is set to empty.
+ * @return If we are already at the end of the list
+ */
 bool PictureToLoad::nextUrl()
 {
     if (!currentSetUrls.isEmpty()) {

@@ -16,7 +16,7 @@
 QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
 PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad)
-    : QThread(nullptr), cardToDownload(toLoad)
+    : QThread(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
 {
     // Hook up signals to the orchestrator
     connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest,
@@ -57,6 +57,10 @@ void PictureLoaderWorkerWork::startNextPicDownload()
     }
 }
 
+/**
+ * Starts another pic download using the next possible url combination for the card.
+ * If all possibilities are exhausted, then concludes the image loading with an empty QImage.
+ */
 void PictureLoaderWorkerWork::picDownloadFailed()
 {
     /* Take advantage of short-circuiting here to call the nextUrl until one
@@ -66,14 +70,13 @@ void PictureLoaderWorkerWork::picDownloadFailed()
     if (cardToDownload.nextUrl() || cardToDownload.nextSet()) {
         startNextPicDownload();
     } else {
-        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+        qCWarning(PictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard()->getCorrectedName()
             << " set: " << cardToDownload.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
             << ", no more url combinations to try: BAILING OUT";
-        imageLoaded(cardToDownload.getCard(), QImage());
+        emit imageLoaded(cardToDownload.getCard(), QImage());
     }
-    emit startLoadQueue();
 }
 
 void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
@@ -89,7 +92,7 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
 
             networkManager->cache()->remove(reply->url());
 
-            requestImageDownload(reply->url(), this);
+            emit requestImageDownload(reply->url(), this);
         } else {
             qCDebug(PictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
@@ -97,7 +100,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
                 << " failed for url " << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
 
             picDownloadFailed();
-            startNextPicDownload();
         }
 
         reply->deleteLater();
@@ -113,8 +115,8 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: following "
             << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
-        requestImageDownload(redirectUrl, this);
         reply->deleteLater();
+        emit requestImageDownload(redirectUrl, this);
         return;
     }
 
@@ -127,9 +129,8 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << " set: " << cardToDownload.getSetName()
             << "]: Picture found, but blacklisted, will consider it as not found";
 
-        picDownloadFailed();
         reply->deleteLater();
-        startNextPicDownload();
+        picDownloadFailed();
         return;
     }
 
@@ -152,10 +153,10 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
         movie.start();
         movie.stop();
 
-        imageLoaded(cardToDownload.getCard(), movie.currentImage());
+        emit imageLoaded(cardToDownload.getCard(), movie.currentImage());
         logSuccessMessage = true;
     } else if (imgReader.read(&testImage)) {
-        imageLoaded(cardToDownload.getCard(), testImage);
+        emit imageLoaded(cardToDownload.getCard(), testImage);
         logSuccessMessage = true;
     } else {
         qCDebug(PictureLoaderWorkerWorkLog).nospace()
@@ -171,8 +172,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: Image successfully "
             << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
-    } else {
-        startNextPicDownload();
     }
 
     reply->deleteLater();
