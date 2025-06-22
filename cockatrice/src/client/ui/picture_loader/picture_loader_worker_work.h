@@ -20,12 +20,12 @@
 inline Q_LOGGING_CATEGORY(PictureLoaderWorkerWorkLog, "picture_loader.worker");
 
 class PictureLoaderWorker;
-class PictureLoaderWorkerWork : public QThread
+
+class PictureLoaderWorkerWork : public QObject
 {
     Q_OBJECT
 public:
     explicit PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
-    ~PictureLoaderWorkerWork() override;
 
     PictureToLoad cardToDownload;
 
@@ -46,6 +46,11 @@ private slots:
     void picDownloadChanged();
 
 signals:
+    /**
+     * Emitted when this worker has successfully loaded the image or has exhausted all attempts at loading the image.
+     * Failures are represented by an empty QImage.
+     * Note that this object will delete itself as this signal is emitted.
+     */
     void imageLoaded(CardInfoPtr card, const QImage &image);
     void requestImageDownload(const QUrl &url, PictureLoaderWorkerWork *instance);
 };
