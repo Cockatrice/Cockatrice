@@ -57,6 +57,10 @@ void PictureLoaderWorkerWork::startNextPicDownload()
     }
 }
 
+/**
+ * Starts another pic download using the next possible url combination for the card.
+ * If all possibilities are exhausted, then concludes the image loading with an empty QImage.
+ */
 void PictureLoaderWorkerWork::picDownloadFailed()
 {
     /* Take advantage of short-circuiting here to call the nextUrl until one
@@ -96,7 +100,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
                 << " failed for url " << reply->url().toDisplayString() << " (" << reply->errorString() << ")";
 
             picDownloadFailed();
-            startNextPicDownload();
         }
 
         reply->deleteLater();
@@ -128,7 +131,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
 
         picDownloadFailed();
         reply->deleteLater();
-        startNextPicDownload();
         return;
     }
 
@@ -170,8 +172,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: Image successfully "
             << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
-    } else {
-        startNextPicDownload();
     }
 
     reply->deleteLater();
