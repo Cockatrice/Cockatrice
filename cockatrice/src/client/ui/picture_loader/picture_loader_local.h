@@ -5,6 +5,7 @@
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <QTimer>
 
 inline Q_LOGGING_CATEGORY(PictureLoaderLocalLog, "picture_loader.local");
 
@@ -26,8 +27,9 @@ private:
     bool overrideAllCardArtWithPersonalPreference;
 
     QMultiHash<QString, QString> customFolderIndex; // multimap of cardName to picPaths
+    QTimer *refreshTimer;
 
-    void createIndex();
+    void refreshIndex();
 
     QImage
     tryLoadCardImageFromDisk(const QString &setName, const QString &correctedCardName, bool searchCustomPics) const;

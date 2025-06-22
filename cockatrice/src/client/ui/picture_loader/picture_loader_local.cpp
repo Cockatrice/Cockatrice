@@ -7,6 +7,8 @@
 #include <QDirIterator>
 #include <QMovie>
 
+static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
+
 PictureLoaderLocal::PictureLoaderLocal(QObject *parent)
     : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
       customPicsPath(SettingsCache::instance().getCustomPicsPath()),
@@ -17,11 +19,17 @@ PictureLoaderLocal::PictureLoaderLocal(QObject *parent)
     connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
             &PictureLoaderLocal::setOverrideAllCardArtWithPersonalPreference);
 
-    createIndex();
+    refreshIndex();
+
+    refreshTimer = new QTimer(this);
+    connect(refreshTimer, &QTimer::timeout, this, &PictureLoaderLocal::refreshIndex);
+    refreshTimer->start(REFRESH_INTERVAL_MS);
 }
 
-void PictureLoaderLocal::createIndex()
+void PictureLoaderLocal::refreshIndex()
 {
+    customFolderIndex.clear();
+
     QDirIterator it(customPicsPath, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
     // Recursively check all subdirectories of the CUSTOM folder
@@ -37,8 +45,8 @@ void PictureLoaderLocal::createIndex()
         }
     }
 
-    qCInfo(PictureLoaderLocalLog) << "Finished indexing local image folder CUSTOM; map now has"
-                                  << customFolderIndex.size() << "entries.";
+    qCDebug(PictureLoaderLocalLog) << "Finished indexing local image folder CUSTOM; map now has"
+                                   << customFolderIndex.size() << "entries.";
 }
 
 /**
