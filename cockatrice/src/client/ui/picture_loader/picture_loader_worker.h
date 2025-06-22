@@ -3,6 +3,7 @@
 
 #include "../../../game/cards/card_database.h"
 #include "../../../game/cards/card_info.h"
+#include "picture_loader_local.h"
 #include "picture_loader_worker_work.h"
 #include "picture_to_load.h"
 
@@ -37,7 +38,7 @@ public:
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
     void processQueuedRequests();
-    void imageLoadedSuccessfully(CardInfoPtr card, const QImage &image);
+    void imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image);
 
 private:
     static QStringList md5Blacklist;
@@ -48,10 +49,12 @@ private:
     QHash<QUrl, QPair<QUrl, QDateTime>> redirectCache; // Stores redirect and timestamp
     QString cacheFilePath;                             // Path to persistent storage
     static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
-    PictureToLoad cardBeingDownloaded;
     bool picDownload;
     QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
     QTimer requestTimer; // Timer for processing delayed requests
+
+    PictureLoaderLocal *localLoader;
+    QSet<CardInfoPtr> currentlyLoading; // for deduplication purposes
 
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
@@ -59,7 +62,11 @@ private:
     void saveRedirectCache() const;
     void cleanStaleEntries();
 
+private slots:
+    void handleImageLoadEnqueued(const CardInfoPtr &card);
+
 signals:
+    void imageLoadEnqueued(const CardInfoPtr &card);
     void imageLoaded(CardInfoPtr card, const QImage &image);
     void imageLoadQueued(const QUrl &url, PictureLoaderWorkerWork *worker);
     void imageLoadSuccessful(const QUrl &url, PictureLoaderWorkerWork *worker);

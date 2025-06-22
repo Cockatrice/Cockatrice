@@ -41,6 +41,8 @@ public:
     bool nextSet();
     bool nextUrl();
     void populateSetUrls();
+
+    static QList<CardSetPtr> extractSetsSorted(const CardInfoPtr &card);
 };
 
 #endif // PICTURE_TO_LOAD_H
