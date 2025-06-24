@@ -89,7 +89,7 @@ GeneralSettingsPage::GeneralSettingsPage()
             &SettingsCache::setCheckUpdatesOnStartup);
     connect(&startupCardUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckCardUpdatesOnStartup);
-    connect(&cardUpdateCheckIntervalSpinBox, &QSpinBox::valueChanged, &settings,
+    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
             &SettingsCache::setCardUpdateCheckInterval);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
     connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
