@@ -114,6 +114,7 @@ public:
     {
     }
     void retranslateUi() override;
+
 protected:
     void initializePage() override;
 };
