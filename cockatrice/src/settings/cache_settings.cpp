@@ -194,6 +194,9 @@ SettingsCache::SettingsCache()
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
+    checkCardUpdatesOnStartup = settings->value("personal/startupCardUpdateCheck", true).toBool();
+    cardUpdateCheckInterval = settings->value("personal/cardUpdateCheckInterval", 7).toInt();
+    lastCardUpdateCheck = settings->value("personal/lastCardUpdateCheck", QDateTime::currentDateTime().date()).toDate();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
     updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
@@ -1361,6 +1364,24 @@ void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
 {
     checkUpdatesOnStartup = static_cast<bool>(value);
     settings->setValue("personal/startupUpdateCheck", checkUpdatesOnStartup);
+}
+
+void SettingsCache::setCheckCardUpdatesOnStartup(QT_STATE_CHANGED_T value)
+{
+    checkCardUpdatesOnStartup = static_cast<bool>(value);
+    settings->setValue("personal/startupCardUpdateCheck", checkCardUpdatesOnStartup);
+}
+
+void SettingsCache::setCardUpdateCheckInterval(int value)
+{
+    cardUpdateCheckInterval = value;
+    settings->setValue("personal/cardUpdateCheckInterval", cardUpdateCheckInterval);
+}
+
+void SettingsCache::setLastCardUpdateCheck(QDate value)
+{
+    lastCardUpdateCheck = value;
+    settings->setValue("personal/lastCardUpdateCheck", lastCardUpdateCheck);
 }
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)

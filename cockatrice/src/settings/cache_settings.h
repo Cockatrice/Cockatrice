@@ -13,6 +13,7 @@
 #include "servers_settings.h"
 #include "shortcuts_settings.h"
 
+#include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
 #include <QSize>
@@ -198,6 +199,9 @@ private:
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
     bool checkUpdatesOnStartup;
+    bool checkCardUpdatesOnStartup;
+    int cardUpdateCheckInterval;
+    QDate lastCardUpdateCheck;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -437,6 +441,23 @@ public:
     bool getCheckUpdatesOnStartup() const
     {
         return checkUpdatesOnStartup;
+    }
+    bool getCheckCardUpdatesOnStartup() const
+    {
+        return checkCardUpdatesOnStartup;
+    }
+    int getCardUpdateCheckInterval() const
+    {
+        return cardUpdateCheckInterval;
+    }
+    QDate getLastCardUpdateCheck() const
+    {
+        return lastCardUpdateCheck;
+    }
+    bool getCardUpdateCheckRequired() const
+    {
+        return getLastCardUpdateCheck().daysTo(QDateTime::currentDateTime().date()) >= getCardUpdateCheckInterval() &&
+               getLastCardUpdateCheck() != QDateTime::currentDateTime().date();
     }
     bool getNotifyAboutUpdates() const
     {
@@ -1007,6 +1028,9 @@ public slots:
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
+    void setCheckCardUpdatesOnStartup(QT_STATE_CHANGED_T value);
+    void setCardUpdateCheckInterval(int value);
+    void setLastCardUpdateCheck(QDate value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);

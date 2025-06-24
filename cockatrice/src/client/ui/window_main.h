@@ -56,6 +56,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public slots:
     void actCheckCardUpdates();
+    void actCheckCardUpdatesBackground();
     void actCheckServerUpdates();
     void actCheckClientUpdates();
 private slots:
@@ -131,6 +132,7 @@ private:
     {
         return "oracle";
     };
+    void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
 
     void startLocalGame(int numberPlayers);
@@ -141,7 +143,8 @@ private:
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
-    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aStatusBar, *aViewLog, *aOpenSettingsFolder;
+    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
+        *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;

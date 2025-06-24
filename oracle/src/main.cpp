@@ -8,6 +8,7 @@
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLibraryInfo>
+#include <QTimer>
 #include <QTranslator>
 
 QTranslator *translator, *qtTranslator;
@@ -16,6 +17,7 @@ ThemeManager *themeManager;
 const QString translationPrefix = "oracle";
 QString translationPath;
 bool isSpoilersOnly;
+bool isBackgrounded;
 
 void installNewTranslator()
 {
@@ -57,10 +59,13 @@ int main(int argc, char *argv[])
 
     // If the program is opened with the -s flag, it will only do spoilers. Otherwise it will do MTGJSON/Tokens
     QCommandLineParser parser;
-    QCommandLineOption showProgressOption("s", QCoreApplication::translate("main", "Only run in spoiler mode"));
-    parser.addOption(showProgressOption);
+    QCommandLineOption spoilersOnlyOption("s", QCoreApplication::translate("main", "Only run in spoiler mode"));
+    QCommandLineOption backgroundOption("b", QCoreApplication::translate("main", "Run in no-confirm background mode"));
+    parser.addOption(spoilersOnlyOption);
+    parser.addOption(backgroundOption);
     parser.process(app);
-    isSpoilersOnly = parser.isSet(showProgressOption);
+    isSpoilersOnly = parser.isSet(spoilersOnlyOption);
+    isBackgrounded = parser.isSet(backgroundOption);
 
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
@@ -84,6 +89,10 @@ int main(int argc, char *argv[])
     QGuiApplication::setDesktopFileName("oracle");
 
     wizard.show();
+
+    if (isBackgrounded) {
+        QTimer::singleShot(0, &wizard, [&wizard]() { wizard.runInBackground(); });
+    }
 
     return app.exec();
 }

@@ -3,6 +3,7 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QTimer>
 #include <QWizard>
 #include <utility>
 
@@ -56,12 +57,20 @@ public:
     }
     bool saveTokensToFile(const QString &fileName);
 
+    void runInBackground()
+    {
+        backgroundMode = true;
+        hide();
+        currentPage()->initializePage();
+    }
+
 public:
     OracleImporter *importer;
     QSettings *settings;
     QNetworkAccessManager *nam;
     bool downloadedPlainXml = false;
     QByteArray xmlData;
+    bool backgroundMode = false;
 
 private slots:
     void updateLanguage();
@@ -92,6 +101,9 @@ private:
 
 private slots:
     void languageBoxChanged(int index);
+
+protected slots:
+    void initializePage() override;
 };
 
 class OutroPage : public OracleWizardPage
@@ -102,6 +114,8 @@ public:
     {
     }
     void retranslateUi() override;
+protected:
+    void initializePage() override;
 };
 
 class LoadSetsPage : public OracleWizardPage
@@ -167,7 +181,7 @@ class LoadSpoilersPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadSpoilersPage(QWidget * = nullptr){};
+    explicit LoadSpoilersPage(QWidget * = nullptr) {};
     void retranslateUi() override;
 
 protected:
@@ -182,7 +196,7 @@ class LoadTokensPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadTokensPage(QWidget * = nullptr){};
+    explicit LoadTokensPage(QWidget * = nullptr) {};
     void retranslateUi() override;
 
 protected:
@@ -191,6 +205,7 @@ protected:
     QString getDefaultSavePath() override;
     QString getWindowTitle() override;
     QString getFileType() override;
+    void initializePage() override;
 };
 
 #endif
