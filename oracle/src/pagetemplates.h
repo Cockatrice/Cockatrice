@@ -13,7 +13,7 @@ class OracleWizardPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    explicit OracleWizardPage(QWidget *parent = nullptr) : QWizardPage(parent) {};
+    explicit OracleWizardPage(QWidget *parent = nullptr) : QWizardPage(parent){};
     virtual void retranslateUi() = 0;
 
 signals:
