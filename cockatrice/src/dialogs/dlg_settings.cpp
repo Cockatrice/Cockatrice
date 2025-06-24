@@ -353,7 +353,7 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
-    startupCardUpdateCheckCheckBox.setText(tr("Automatically update card database in the background on startup."));
+    startupCardUpdateCheckCheckBox.setText(tr("Automatically update card database in the background on startup"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
