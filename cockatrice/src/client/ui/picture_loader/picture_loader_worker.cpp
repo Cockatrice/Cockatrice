@@ -92,34 +92,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     QNetworkReply *reply = networkManager->get(req);
 
     // Connect reply handling
-    connect(reply, &QNetworkReply::finished, this, [this, reply, url, worker]() {
-        QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-        if (redirectTarget.isValid()) {
-            QUrl redirectUrl = redirectTarget.toUrl();
-            if (redirectUrl.isRelative()) {
-                redirectUrl = url.resolved(redirectUrl);
-            }
-            cacheRedirect(url, redirectUrl);
-        }
-
-        if (reply->error() == QNetworkReply::NoError) {
-            worker->picDownloadFinished(reply);
-            emit imageLoadSuccessful(url, worker);
-
-            // If we hit a cached image, we get to make another request for free.
-            if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
-                if (!requestLoadQueue.isEmpty()) {
-                    auto request = requestLoadQueue.takeFirst();
-                    makeRequest(request.first, request.second);
-                }
-            }
-        } else if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
-            qInfo() << "Too many requests.";
-        } else {
-            worker->picDownloadFinished(reply);
-        }
-        reply->deleteLater();
-    });
+    connect(reply, &QNetworkReply::finished, worker, [reply, worker] { worker->handleNetworkReply(reply); });
 
     return reply;
 }
@@ -127,10 +100,18 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
 void PictureLoaderWorker::processQueuedRequests()
 {
     for (int i = 0; i < 10; i++) {
-        if (!requestLoadQueue.isEmpty()) {
-            auto request = requestLoadQueue.takeFirst();
-            makeRequest(request.first, request.second);
-        }
+        processSingleRequest();
+    }
+}
+
+/**
+ * Immediately processes a single queued request
+ */
+void PictureLoaderWorker::processSingleRequest()
+{
+    if (!requestLoadQueue.isEmpty()) {
+        auto request = requestLoadQueue.takeFirst();
+        makeRequest(request.first, request.second);
     }
 }
 
@@ -174,6 +155,11 @@ void PictureLoaderWorker::cacheRedirect(const QUrl &originalUrl, const QUrl &red
 {
     redirectCache[originalUrl] = qMakePair(redirectUrl, QDateTime::currentDateTimeUtc());
     // saveRedirectCache();
+}
+
+void PictureLoaderWorker::removedCachedUrl(const QUrl &url)
+{
+    networkManager->cache()->remove(url);
 }
 
 QUrl PictureLoaderWorker::getCachedRedirect(const QUrl &originalUrl) const
