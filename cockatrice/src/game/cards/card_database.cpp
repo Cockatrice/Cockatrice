@@ -245,8 +245,9 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
-    qCInfo(CardDatabaseLoadingLog) << "Path =" << path << "Status =" << tempLoadStatus << "Cards =" << cards.size()
-                                   << "Sets =" << sets.size() << QString("%1ms").arg(msecs);
+    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
+                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
+                                   << QString("%1ms").arg(msecs);
 
     return tempLoadStatus;
 }

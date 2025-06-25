@@ -64,6 +64,11 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
             }
         }
     }
+
+    if (xml.hasError()) {
+        QString preamble = tr("Parse error at line %1 col %2:").arg(xml.lineNumber()).arg(xml.columnNumber());
+        qCWarning(CockatriceXml3Log).noquote() << preamble << xml.errorString();
+    }
 }
 
 void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
