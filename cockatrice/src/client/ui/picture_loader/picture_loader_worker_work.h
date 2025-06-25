@@ -31,7 +31,6 @@ public:
 
 public slots:
     void picDownloadFinished(QNetworkReply *reply);
-    void picDownloadFailed();
 
 private:
     QThread *pictureLoaderThread;
@@ -39,6 +38,7 @@ private:
     bool picDownload, downloadRunning, loadQueueRunning;
 
     void startNextPicDownload();
+    void picDownloadFailed();
     QImage tryLoadImageFromReply(QNetworkReply *reply);
     void concludeImageLoad(const QImage &image);
 
