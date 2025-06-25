@@ -40,6 +40,8 @@ private:
     bool picDownload, downloadRunning, loadQueueRunning;
 
     void startNextPicDownload();
+    QImage tryLoadImageFromReply(QNetworkReply *reply);
+    void concludeImageLoad(const QImage &image);
     bool imageIsBlackListed(const QByteArray &);
 
 private slots:

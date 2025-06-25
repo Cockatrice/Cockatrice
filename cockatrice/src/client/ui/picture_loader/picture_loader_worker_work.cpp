@@ -32,8 +32,7 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
 
     connect(pictureLoaderThread, &QThread::started, this, &PictureLoaderWorkerWork::startNextPicDownload);
 
-    // clean up worker once loading finishes
-    connect(this, &PictureLoaderWorkerWork::imageLoaded, this, &QObject::deleteLater);
+    // clean up threads once loading finishes
     connect(this, &QObject::destroyed, pictureLoaderThread, &QThread::quit);
     connect(pictureLoaderThread, &QThread::finished, pictureLoaderThread, &QObject::deleteLater);
 
@@ -75,7 +74,7 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << " set: " << cardToDownload.getSetName() << "]: Picture NOT found, "
             << (picDownload ? "download failed" : "downloads disabled")
             << ", no more url combinations to try: BAILING OUT";
-        emit imageLoaded(cardToDownload.getCard(), QImage());
+        concludeImageLoad(QImage());
     }
 }
 
@@ -134,15 +133,34 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
         return;
     }
 
-    QImage testImage;
+    QImage image = tryLoadImageFromReply(reply);
 
-    QImageReader imgReader;
-    imgReader.setDecideFormatFromContent(true);
-    imgReader.setDevice(reply);
+    if (image.isNull()) {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName() << "]: Possible " << (isFromCache ? "cached" : "downloaded")
+            << " picture at " << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
 
-    bool logSuccessMessage = false;
+        reply->deleteLater();
+        picDownloadFailed();
+    } else {
+        qCDebug(PictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
+            << " set: " << cardToDownload.getSetName() << "]: Image successfully "
+            << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
 
-    static const int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
+        reply->deleteLater();
+        concludeImageLoad(image);
+    }
+}
+
+/**
+ * @param reply The reply to load the image from
+ * @return The loaded image, or an empty QImage if loading failed
+ */
+QImage PictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
+{
+    static constexpr int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
     auto replyHeader = reply->peek(riffHeaderSize);
 
     if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
@@ -153,28 +171,24 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
         movie.start();
         movie.stop();
 
-        emit imageLoaded(cardToDownload.getCard(), movie.currentImage());
-        logSuccessMessage = true;
-    } else if (imgReader.read(&testImage)) {
-        emit imageLoaded(cardToDownload.getCard(), testImage);
-        logSuccessMessage = true;
-    } else {
-        qCDebug(PictureLoaderWorkerWorkLog).nospace()
-            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
-            << " set: " << cardToDownload.getSetName() << "]: Possible " << (isFromCache ? "cached" : "downloaded")
-            << " picture at " << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
-
-        picDownloadFailed();
+        return movie.currentImage();
     }
 
-    if (logSuccessMessage) {
-        qCDebug(PictureLoaderWorkerWorkLog).nospace()
-            << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
-            << " set: " << cardToDownload.getSetName() << "]: Image successfully "
-            << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
-    }
+    QImageReader imgReader;
+    imgReader.setDecideFormatFromContent(true);
+    imgReader.setDevice(reply);
 
-    reply->deleteLater();
+    return imgReader.read();
+}
+
+/**
+ * Call this method when the image has finished being loaded.
+ * @param image The image that was loaded. Empty QImage indicates failure.
+ */
+void PictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
+{
+    emit imageLoaded(cardToDownload.getCard(), image);
+    this->deleteLater();
 }
 
 void PictureLoaderWorkerWork::picDownloadChanged()
