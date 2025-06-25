@@ -13,7 +13,7 @@
 #include <QThread>
 
 // Card back returned by gatherer when card is not found
-QStringList PictureLoaderWorkerWork::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
+static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};
 
 PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad)
     : QObject(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
@@ -76,6 +76,12 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << ", no more url combinations to try: BAILING OUT";
         concludeImageLoad(QImage());
     }
+}
+
+static bool imageIsBlackListed(const QByteArray &picData)
+{
+    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
+    return MD5_BLACKLIST.contains(md5sum);
 }
 
 void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
@@ -194,10 +200,4 @@ void PictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 void PictureLoaderWorkerWork::picDownloadChanged()
 {
     picDownload = SettingsCache::instance().getPicDownload();
-}
-
-bool PictureLoaderWorkerWork::imageIsBlackListed(const QByteArray &picData)
-{
-    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
-    return md5Blacklist.contains(md5sum);
 }

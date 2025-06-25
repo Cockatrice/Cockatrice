@@ -34,7 +34,6 @@ public slots:
     void picDownloadFailed();
 
 private:
-    static QStringList md5Blacklist;
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
     bool picDownload, downloadRunning, loadQueueRunning;
@@ -42,7 +41,6 @@ private:
     void startNextPicDownload();
     QImage tryLoadImageFromReply(QNetworkReply *reply);
     void concludeImageLoad(const QImage &image);
-    bool imageIsBlackListed(const QByteArray &);
 
 private slots:
     void picDownloadChanged();
