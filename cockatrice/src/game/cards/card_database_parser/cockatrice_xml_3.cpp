@@ -273,6 +273,11 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 }
             }
 
+            if (name.isEmpty()) {
+                qCWarning(CockatriceXml3Log) << "Encountered card with empty name; skipping";
+                continue;
+            }
+
             properties.insert("colors", colors);
             CardInfoPtr newCard =
                 CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
