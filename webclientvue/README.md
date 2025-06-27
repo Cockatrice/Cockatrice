@@ -59,3 +59,10 @@ Let's say you setup the routing already and now you need a way to navigate to a 
 ### Customize the configuration
 
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+
+#TODOs:
+
+- Create a gaming layout that isn't connected to the routing system
+- Decide how we will go about routing to each game. Will probably require some knowledge of the websocket data structure and a slug
+- Working login
+- Working websocket
