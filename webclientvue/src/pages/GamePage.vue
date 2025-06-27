@@ -679,6 +679,7 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px;
+  z-index: 100;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 </style>
