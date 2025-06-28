@@ -71,6 +71,7 @@ private:
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
     QCheckBox startupUpdateCheckCheckBox;
+    QLabel startupCardUpdateCheckBehaviorLabel;
     QComboBox startupCardUpdateCheckBehaviorSelector;
     QLabel cardUpdateCheckIntervalLabel;
     QSpinBox cardUpdateCheckIntervalSpinBox;

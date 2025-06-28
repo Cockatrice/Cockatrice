@@ -78,6 +78,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     // updates
     SettingsCache &settings = SettingsCache::instance();
     startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
+
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
     startupCardUpdateCheckBehaviorSelector.addItem("");
     startupCardUpdateCheckBehaviorSelector.addItem("");
@@ -125,7 +126,8 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
     personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 0, 1, 2);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 5, 0);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 1);
     personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 6, 0);
     personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 6, 1);
     personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 7, 1);
@@ -375,6 +377,7 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
+    startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
                                                        tr("Prompt for update"));
