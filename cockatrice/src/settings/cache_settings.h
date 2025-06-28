@@ -199,6 +199,8 @@ private:
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
     bool checkUpdatesOnStartup;
+    bool startupCardUpdateCheckPromptForUpdate;
+    bool startupCardUpdateCheckAlwaysUpdate;
     bool checkCardUpdatesOnStartup;
     int cardUpdateCheckInterval;
     QDate lastCardUpdateCheck;
@@ -442,9 +444,13 @@ public:
     {
         return checkUpdatesOnStartup;
     }
-    bool getCheckCardUpdatesOnStartup() const
+    bool getStartupCardUpdateCheckPromptForUpdate()
     {
-        return checkCardUpdatesOnStartup;
+        return startupCardUpdateCheckPromptForUpdate;
+    }
+    bool getStartupCardUpdateCheckAlwaysUpdate()
+    {
+        return startupCardUpdateCheckAlwaysUpdate;
     }
     int getCardUpdateCheckInterval() const
     {
@@ -1028,7 +1034,8 @@ public slots:
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
-    void setCheckCardUpdatesOnStartup(QT_STATE_CHANGED_T value);
+    void setStartupCardUpdateCheckPromptForUpdate(bool value);
+    void setStartupCardUpdateCheckAlwaysUpdate(bool value);
     void setCardUpdateCheckInterval(int value);
     void setLastCardUpdateCheck(QDate value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);

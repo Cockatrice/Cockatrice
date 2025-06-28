@@ -52,6 +52,13 @@
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
 #define WIKI_TRANSLATION_FAQ "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 
+enum startupCardUpdateCheckBehaviorIndex
+{
+    startupCardUpdateCheckBehaviorIndexNone,
+    startupCardUpdateCheckBehaviorIndexPrompt,
+    startupCardUpdateCheckBehaviorIndexAlways
+};
+
 GeneralSettingsPage::GeneralSettingsPage()
 {
     QStringList languageCodes = findQmFiles();
@@ -71,7 +78,17 @@ GeneralSettingsPage::GeneralSettingsPage()
     // updates
     SettingsCache &settings = SettingsCache::instance();
     startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
-    startupCardUpdateCheckCheckBox.setChecked(settings.getCheckCardUpdatesOnStartup());
+    startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
+    startupCardUpdateCheckBehaviorSelector.addItem("");
+    startupCardUpdateCheckBehaviorSelector.addItem("");
+    if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexPrompt);
+    } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexAlways);
+    } else {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexNone);
+    }
+
     cardUpdateCheckIntervalSpinBox.setMinimum(1);
     cardUpdateCheckIntervalSpinBox.setMaximum(30);
     cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
@@ -87,8 +104,13 @@ GeneralSettingsPage::GeneralSettingsPage()
             &GeneralSettingsPage::languageBoxChanged);
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
-    connect(&startupCardUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setCheckCardUpdatesOnStartup);
+    connect(&startupCardUpdateCheckBehaviorSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [](int index) {
+                SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(
+                    index == startupCardUpdateCheckBehaviorIndexPrompt);
+                SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(
+                    index == startupCardUpdateCheckBehaviorIndexAlways);
+            });
     connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
             &SettingsCache::setCardUpdateCheckInterval);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
@@ -103,7 +125,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
     personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&startupCardUpdateCheckCheckBox, 5, 0, 1, 2);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 0, 1, 2);
     personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 6, 0);
     personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 6, 1);
     personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 7, 1);
@@ -353,7 +375,11 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
-    startupCardUpdateCheckCheckBox.setText(tr("Automatically update card database in the background on startup"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
+                                                       tr("Prompt for update"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexAlways,
+                                                       tr("Always update in the background"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));

@@ -194,7 +194,9 @@ SettingsCache::SettingsCache()
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
     checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
-    checkCardUpdatesOnStartup = settings->value("personal/startupCardUpdateCheck", true).toBool();
+    startupCardUpdateCheckPromptForUpdate =
+        settings->value("personal/startupCardUpdateCheckPromptForUpdate", true).toBool();
+    startupCardUpdateCheckAlwaysUpdate = settings->value("personal/startupCardUpdateCheckAlwaysUpdate", false).toBool();
     cardUpdateCheckInterval = settings->value("personal/cardUpdateCheckInterval", 7).toInt();
     lastCardUpdateCheck = settings->value("personal/lastCardUpdateCheck", QDateTime::currentDateTime().date()).toDate();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
@@ -1366,10 +1368,15 @@ void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
     settings->setValue("personal/startupUpdateCheck", checkUpdatesOnStartup);
 }
 
-void SettingsCache::setCheckCardUpdatesOnStartup(QT_STATE_CHANGED_T value)
+void SettingsCache::setStartupCardUpdateCheckPromptForUpdate(bool value)
 {
-    checkCardUpdatesOnStartup = static_cast<bool>(value);
-    settings->setValue("personal/startupCardUpdateCheck", checkCardUpdatesOnStartup);
+    startupCardUpdateCheckPromptForUpdate = value;
+    settings->setValue("personal/startupCardUpdateCheckPromptForUpdate", startupCardUpdateCheckPromptForUpdate);
+}
+void SettingsCache::setStartupCardUpdateCheckAlwaysUpdate(bool value)
+{
+    startupCardUpdateCheckAlwaysUpdate = value;
+    settings->setValue("personal/startupCardUpdateCheckAlwaysUpdate", startupCardUpdateCheckAlwaysUpdate);
 }
 
 void SettingsCache::setCardUpdateCheckInterval(int value)

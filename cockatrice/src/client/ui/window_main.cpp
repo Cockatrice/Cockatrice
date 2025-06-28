@@ -27,6 +27,7 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../dialogs/dlg_register.h"
 #include "../../dialogs/dlg_settings.h"
+#include "../../dialogs/dlg_startup_card_check.h"
 #include "../../dialogs/dlg_tip_of_the_day.h"
 #include "../../dialogs/dlg_update.h"
 #include "../../dialogs/dlg_view_log.h"
@@ -62,6 +63,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPixmapCache>
+#include <QRadioButton>
 #include <QStatusBar>
 #include <QSystemTrayIcon>
 #include <QThread>
@@ -69,6 +71,7 @@
 #include <QWindow>
 #include <QtConcurrent>
 #include <QtNetwork>
+#include <qbuttongroup.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -949,7 +952,33 @@ void MainWindow::startupConfigCheck()
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
         if (SettingsCache::instance().getCardUpdateCheckRequired()) {
-            actCheckCardUpdatesBackground();
+            if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+                auto startupCardCheckDialog = new DlgStartupCardCheck(this);
+
+                if (startupCardCheckDialog->exec() == QDialog::Accepted) {
+                    switch (startupCardCheckDialog->group->checkedId()) {
+                        case 0: // foreground
+                            actCheckCardUpdates();
+                            break;
+                        case 1: // background
+                            actCheckCardUpdatesBackground();
+                            break;
+                        case 2: // background + always
+                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(true);
+                            actCheckCardUpdatesBackground();
+                            break;
+                        case 3: // don't prompt again + don't run
+                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(false);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+                actCheckCardUpdatesBackground();
+            }
         }
 
         const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });

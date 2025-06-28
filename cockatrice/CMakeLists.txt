@@ -172,6 +172,7 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_roll_dice.cpp
     src/dialogs/dlg_select_set_for_cards.cpp
     src/dialogs/dlg_settings.cpp
+    src/dialogs/dlg_startup_card_check.cpp
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
