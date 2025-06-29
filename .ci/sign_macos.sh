@@ -56,22 +56,7 @@ if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
   # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
   # characteristics. Visit the Notarization docs for more information and strategies on how to optimize it if
   # you're curious
-  # Submit for notarization and capture output
-  NOTARY_OUTPUT=$(xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait --output-format json)
-  
-  # Parse the submission ID from the JSON output
-  SUBMISSION_ID=$(echo "$NOTARY_OUTPUT" | jq -r '.id')
-  
-  # Parse the status field in the JSON
-  STATUS=$(echo "$NOTARY_OUTPUT" | jq -r '.status')
-  
-  if [[ "$STATUS" != "Accepted" ]]; then
-    echo "Notarization failed (status: $STATUS). Fetching detailed log..."
-    # Fetch and print the notarization log
-    xcrun notarytool log "$SUBMISSION_ID" --keychain-profile "notarytool-profile"
-  exit 1
-  fi
-
+  xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
 else
   echo "No Apple ID configured."
 fi
