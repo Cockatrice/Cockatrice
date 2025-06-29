@@ -33,7 +33,7 @@ echo "::endgroup::"
 echo "::group::Sign app"
 if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
   security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose=3 "$APP_PATH"
+  /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$APP_PATH"
 else
   echo "No signing certificate configured."
 fi
