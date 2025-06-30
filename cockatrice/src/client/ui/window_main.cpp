@@ -53,6 +53,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QButtonGroup>
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -71,7 +72,6 @@
 #include <QWindow>
 #include <QtConcurrent>
 #include <QtNetwork>
-#include <qbuttongroup.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
