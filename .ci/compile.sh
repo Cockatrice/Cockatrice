@@ -114,6 +114,11 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
+#if [[ $RUNNER_OS == Windows ]]; then
+#  VCPKG_TOOLCHAIN_FILE="D:/a/Cockatrice/vcpkg/scripts/buildsystems/vcpkg.cmake"
+#  flags+=("-DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE" "-DVCPKG_TARGET_TRIPLET=x64-windows")
+#fi
+
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 
@@ -151,19 +156,13 @@ if [[ $USE_CCACHE ]]; then
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+echo "::group::Configure CMake"
 cmake --version
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-if [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
-else
-  cmake --build . "${buildflags[@]}"
-fi
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
@@ -182,6 +181,27 @@ if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
+fi
+
+if [[ $RUNNER_OS == Windows ]]; then
+  echo "Searching for liblzma.dll after build..."
+  FOUND_DLL=$(find . -name "liblzma.dll" 2>/dev/null)
+  
+  if [ -n "$FOUND_DLL" ]; then
+    echo "liblzma.dll found at:"
+    echo "$FOUND_DLL"
+
+    echo "Cleaning up duplicate debug DLLs"
+    rm -f ./oracle/liblzma.dll
+    rm -f ./vcpkg_installed/x64-windows/debug/bin/liblzma.dll
+
+    find . -iname "liblzma.dll"
+    
+  else
+    echo "ERROR: liblzma.dll not found after build!"
+    exit 1
+  fi
+  
 fi
 
 if [[ $MAKE_PACKAGE ]]; then
