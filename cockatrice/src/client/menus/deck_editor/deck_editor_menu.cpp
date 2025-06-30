@@ -51,6 +51,9 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     connect(aSaveDeckToClipboardRawNoSetInfo, &QAction::triggered, deckEditor,
             &AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo);
 
+    aFetchCardPrices = new QAction(QString(), this);
+    connect(aFetchCardPrices, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actFetchCardPrices);
+
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actPrintDeck);
 
@@ -96,6 +99,7 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addMenu(editDeckInClipboardMenu);
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
+    addAction(aFetchCardPrices);
     addAction(aPrintDeck);
     addMenu(analyzeDeckMenu);
     addSeparator();
@@ -119,6 +123,7 @@ void DeckEditorMenu::setSaveStatus(bool newStatus)
     aSaveDeckToClipboardRaw->setEnabled(newStatus);
     aSaveDeckToClipboardRawNoSetInfo->setEnabled(newStatus);
     saveDeckToClipboardMenu->setEnabled(newStatus);
+    aFetchCardPrices->setEnabled(newStatus);
     aPrintDeck->setEnabled(newStatus);
     analyzeDeckMenu->setEnabled(newStatus);
 }
@@ -164,6 +169,7 @@ void DeckEditorMenu::retranslateUi()
     aSaveDeckToClipboardRaw->setText(tr("Not Annotated"));
     aSaveDeckToClipboardRawNoSetInfo->setText(tr("Not Annotated (No set info)"));
 
+    aFetchCardPrices->setText(tr("Fetch card prices..."));
     aPrintDeck->setText(tr("&Print deck..."));
 
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
