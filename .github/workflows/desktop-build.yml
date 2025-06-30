@@ -216,6 +216,8 @@ jobs:
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
         shell: bash
+        env:
+          GH_TOKEN: ${{github.token}}
         run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
 
   build-macos:
@@ -381,6 +383,8 @@ jobs:
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
         shell: bash
+        env:
+          GH_TOKEN: ${{github.token}}
         run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
 
   build-windows:
