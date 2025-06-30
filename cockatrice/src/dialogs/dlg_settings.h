@@ -71,6 +71,11 @@ private:
     QGroupBox *pathsGroupBox;
     QComboBox languageBox;
     QCheckBox startupUpdateCheckCheckBox;
+    QLabel startupCardUpdateCheckBehaviorLabel;
+    QComboBox startupCardUpdateCheckBehaviorSelector;
+    QLabel cardUpdateCheckIntervalLabel;
+    QSpinBox cardUpdateCheckIntervalSpinBox;
+    QLabel lastCardUpdateCheckDateLabel;
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;

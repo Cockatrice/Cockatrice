@@ -27,6 +27,7 @@
 #include "../../dialogs/dlg_manage_sets.h"
 #include "../../dialogs/dlg_register.h"
 #include "../../dialogs/dlg_settings.h"
+#include "../../dialogs/dlg_startup_card_check.h"
 #include "../../dialogs/dlg_tip_of_the_day.h"
 #include "../../dialogs/dlg_update.h"
 #include "../../dialogs/dlg_view_log.h"
@@ -52,6 +53,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QButtonGroup>
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -62,6 +64,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPixmapCache>
+#include <QRadioButton>
 #include <QStatusBar>
 #include <QSystemTrayIcon>
 #include <QThread>
@@ -691,6 +694,7 @@ void MainWindow::retranslateUi()
     aTips->setText(tr("&Tip of the Day"));
     aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
+    aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
@@ -744,6 +748,8 @@ void MainWindow::createActions()
     connect(aUpdate, &QAction::triggered, this, &MainWindow::actUpdate);
     aCheckCardUpdates = new QAction(this);
     connect(aCheckCardUpdates, &QAction::triggered, this, &MainWindow::actCheckCardUpdates);
+    aCheckCardUpdatesBackground = new QAction(this);
+    connect(aCheckCardUpdatesBackground, &QAction::triggered, this, &MainWindow::actCheckCardUpdatesBackground);
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
     aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
@@ -825,6 +831,7 @@ void MainWindow::createMenus()
     helpMenu->addSeparator();
     helpMenu->addAction(aUpdate);
     helpMenu->addAction(aCheckCardUpdates);
+    helpMenu->addAction(aCheckCardUpdatesBackground);
     helpMenu->addSeparator();
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
@@ -943,6 +950,37 @@ void MainWindow::startupConfigCheck()
     } else {
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
+
+        if (SettingsCache::instance().getCardUpdateCheckRequired()) {
+            if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+                auto startupCardCheckDialog = new DlgStartupCardCheck(this);
+
+                if (startupCardCheckDialog->exec() == QDialog::Accepted) {
+                    switch (startupCardCheckDialog->group->checkedId()) {
+                        case 0: // foreground
+                            actCheckCardUpdates();
+                            break;
+                        case 1: // background
+                            actCheckCardUpdatesBackground();
+                            break;
+                        case 2: // background + always
+                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(true);
+                            actCheckCardUpdatesBackground();
+                            break;
+                        case 3: // don't prompt again + don't run
+                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(false);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+                actCheckCardUpdatesBackground();
+            }
+        }
+
         const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
@@ -1152,6 +1190,16 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
 /* CARD UPDATER */
 void MainWindow::actCheckCardUpdates()
 {
+    createCardUpdateProcess();
+}
+
+void MainWindow::actCheckCardUpdatesBackground()
+{
+    createCardUpdateProcess(true);
+}
+
+void MainWindow::createCardUpdateProcess(bool background)
+{
     if (cardUpdateProcess) {
         QMessageBox::information(this, tr("Information"), tr("A card database update is already running."));
         return;
@@ -1213,13 +1261,19 @@ void MainWindow::actCheckCardUpdates()
         return;
     }
 
-    cardUpdateProcess->start(updaterCmd, QStringList());
+    if (!background) {
+        cardUpdateProcess->start(updaterCmd, QStringList());
+    } else {
+        cardUpdateProcess->start(updaterCmd, QStringList("-b"));
+        statusBar()->showMessage(tr("Card database update running."));
+    }
 }
 
 void MainWindow::exitCardDatabaseUpdate()
 {
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
+    statusBar()->clearMessage();
 
     const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 }
@@ -1256,8 +1310,11 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
 }
 
-void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus)
+void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
 {
+    if (exitStatus == QProcess::NormalExit) {
+        SettingsCache::instance().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
+    }
     exitCardDatabaseUpdate();
 }
 

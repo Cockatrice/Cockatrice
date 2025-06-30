@@ -16,6 +16,9 @@ public:
     explicit OracleWizardPage(QWidget *parent = nullptr) : QWizardPage(parent){};
     virtual void retranslateUi() = 0;
 
+signals:
+    void readyToContinue();
+
 protected:
     inline OracleWizard *wizard()
     {

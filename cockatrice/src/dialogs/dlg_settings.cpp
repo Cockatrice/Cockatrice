@@ -52,6 +52,13 @@
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
 #define WIKI_TRANSLATION_FAQ "https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ"
 
+enum startupCardUpdateCheckBehaviorIndex
+{
+    startupCardUpdateCheckBehaviorIndexNone,
+    startupCardUpdateCheckBehaviorIndexPrompt,
+    startupCardUpdateCheckBehaviorIndexAlways
+};
+
 GeneralSettingsPage::GeneralSettingsPage()
 {
     QStringList languageCodes = findQmFiles();
@@ -71,6 +78,21 @@ GeneralSettingsPage::GeneralSettingsPage()
     // updates
     SettingsCache &settings = SettingsCache::instance();
     startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
+
+    startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
+    startupCardUpdateCheckBehaviorSelector.addItem("");
+    startupCardUpdateCheckBehaviorSelector.addItem("");
+    if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexPrompt);
+    } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexAlways);
+    } else {
+        startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexNone);
+    }
+
+    cardUpdateCheckIntervalSpinBox.setMinimum(1);
+    cardUpdateCheckIntervalSpinBox.setMaximum(30);
+    cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
     newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
 
@@ -83,6 +105,15 @@ GeneralSettingsPage::GeneralSettingsPage()
             &GeneralSettingsPage::languageBoxChanged);
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setCheckUpdatesOnStartup);
+    connect(&startupCardUpdateCheckBehaviorSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [](int index) {
+                SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(
+                    index == startupCardUpdateCheckBehaviorIndexPrompt);
+                SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(
+                    index == startupCardUpdateCheckBehaviorIndexAlways);
+            });
+    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setCardUpdateCheckInterval);
     connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
     connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setNotifyAboutNewVersion);
@@ -95,9 +126,14 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
     personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&updateNotificationCheckBox, 5, 0, 1, 2);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 6, 0, 1, 2);
-    personalGrid->addWidget(&showTipsOnStartup, 7, 0, 1, 2);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 5, 0);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 1);
+    personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 6, 0);
+    personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 6, 1);
+    personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 7, 1);
+    personalGrid->addWidget(&updateNotificationCheckBox, 8, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 9, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 10, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -341,12 +377,26 @@ void GeneralSettingsPage::retranslateUi()
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
+    startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
+                                                       tr("Prompt for update"));
+    startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexAlways,
+                                                       tr("Always update in the background"));
+    cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
+    cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
     resetAllPathsButton->setText(tr("Reset all paths"));
 
     const auto &settings = SettingsCache::instance();
+
+    QDate lastCheckDate = settings.getLastCardUpdateCheck();
+    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+
+    lastCardUpdateCheckDateLabel.setText(
+        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
 
     // We can't change the strings after they're put into the QComboBox, so this is our workaround
     int oldIndex = updateReleaseChannelBox.currentIndex();

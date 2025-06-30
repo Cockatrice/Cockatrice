@@ -408,6 +408,18 @@ void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings 
 void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T /* value */)
 {
 }
+void SettingsCache::setStartupCardUpdateCheckPromptForUpdate(bool /* value */)
+{
+}
+void SettingsCache::setStartupCardUpdateCheckAlwaysUpdate(bool /* value */)
+{
+}
+void SettingsCache::setCardUpdateCheckInterval(int /* value */)
+{
+}
+void SettingsCache::setLastCardUpdateCheck(QDate /* value */)
+{
+}
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T /* _notifyaboutupdate */)
 {
 }

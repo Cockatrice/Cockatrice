@@ -70,7 +70,7 @@ bool SimpleDownloadFilePage::validatePage()
 
     QUrl url = QUrl::fromUserInput(urlLineEdit->text());
     if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid."));
+        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid: ") + url.toString());
         return false;
     }
 

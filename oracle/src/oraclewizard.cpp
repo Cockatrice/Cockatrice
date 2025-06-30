@@ -64,15 +64,23 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 
     nam = new QNetworkAccessManager(this);
 
+    QList<OracleWizardPage *> pages;
+
     if (!isSpoilersOnly) {
-        addPage(new IntroPage);
-        addPage(new LoadSetsPage);
-        addPage(new SaveSetsPage);
-        addPage(new LoadTokensPage);
-        addPage(new OutroPage);
+        pages << new IntroPage << new LoadSetsPage << new SaveSetsPage << new LoadTokensPage << new OutroPage;
     } else {
-        addPage(new LoadSpoilersPage);
-        addPage(new OutroPage);
+        pages << new LoadSpoilersPage << new OutroPage;
+    }
+
+    for (OracleWizardPage *page : pages) {
+        addPage(page);
+
+        // Connect background auto-advance
+        connect(page, &OracleWizardPage::readyToContinue, this, [this]() {
+            if (backgroundMode) {
+                next();
+            }
+        });
     }
 
     retranslateUi();
@@ -169,6 +177,13 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
     setLayout(layout);
 }
 
+void IntroPage::initializePage()
+{
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
+    }
+}
+
 QStringList IntroPage::findQmFiles()
 {
     QDir dir(translationPath);
@@ -212,6 +227,14 @@ void OutroPage::retranslateUi()
                 tr("If the card databases don't reload automatically, restart the Cockatrice client."));
 }
 
+void OutroPage::initializePage()
+{
+    if (wizard()->backgroundMode) {
+        wizard()->accept();
+        exit(0);
+    }
+}
+
 LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
 {
     urlRadioButton = new QRadioButton(this);
@@ -252,6 +275,12 @@ void LoadSetsPage::initializePage()
 
     progressLabel->hide();
     progressBar->hide();
+
+    if (wizard()->backgroundMode) {
+        if (isEnabled()) {
+            validatePage();
+        }
+    }
 }
 
 void LoadSetsPage::retranslateUi()
@@ -616,6 +645,10 @@ void SaveSetsPage::initializePage()
     if (!wizard()->importer->startImport()) {
         QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
     }
+
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
+    }
 }
 
 void SaveSetsPage::retranslateUi()
@@ -689,6 +722,15 @@ bool SaveSetsPage::validatePage()
     }
 
     return true;
+}
+
+void LoadTokensPage::initializePage()
+{
+    SimpleDownloadFilePage::initializePage();
+
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
+    }
 }
 
 QString LoadTokensPage::getDefaultUrl()
