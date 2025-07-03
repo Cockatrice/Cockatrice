@@ -34,8 +34,7 @@ public slots:
 
 private:
     QThread *pictureLoaderThread;
-    QNetworkAccessManager *networkManager;
-    bool picDownload, downloadRunning, loadQueueRunning;
+    bool picDownload;
 
     void startNextPicDownload();
     void picDownloadFailed();

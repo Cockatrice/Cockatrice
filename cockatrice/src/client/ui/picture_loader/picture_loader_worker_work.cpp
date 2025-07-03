@@ -45,7 +45,6 @@ void PictureLoaderWorkerWork::startNextPicDownload()
     QString picUrl = cardToDownload.getCurrentUrl();
 
     if (picUrl.isEmpty()) {
-        downloadRunning = false;
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
