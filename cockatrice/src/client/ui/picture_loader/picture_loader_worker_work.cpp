@@ -194,10 +194,7 @@ QImage PictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
 void PictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 {
     emit imageLoaded(cardToDownload.getCard(), image);
-
-    // Delayed delete is a dumb hack to prevent segfaults due to calling methods on a deleted Work
-    // TODO: find a more proper way to structure this whole thing
-    QTimer::singleShot(2000, this, &QObject::deleteLater);
+    deleteLater();
 }
 
 void PictureLoaderWorkerWork::picDownloadChanged()

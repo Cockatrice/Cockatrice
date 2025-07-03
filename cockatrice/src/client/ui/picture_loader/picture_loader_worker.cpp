@@ -67,8 +67,7 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         queueRequest(cachedRedirect, worker);
-    }
-    if (cache->metaData(url).isValid()) {
+    } else if (cache->metaData(url).isValid()) {
         makeRequest(url, worker);
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
