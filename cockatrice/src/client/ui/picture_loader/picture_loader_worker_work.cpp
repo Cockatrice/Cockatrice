@@ -98,12 +98,11 @@ void PictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
     if (reply->error()) {
         handleFailedReply(reply);
     } else {
-        handleSuccessfulReply(reply);
-
-        // If we hit a cached image, we get to make another request for free.
         if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
             emit cachedImageHit();
         }
+
+        handleSuccessfulReply(reply);
     }
 
     reply->deleteLater();
