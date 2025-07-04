@@ -31,6 +31,10 @@ public:
     explicit FilterString(const QString &exp);
     bool check(const CardData &card) const
     {
+        if (card.isNull()) {
+            static CardInfoPtr blankCard = CardInfo::newInstance("");
+            return result(blankCard);
+        }
         return result(card);
     }
 
