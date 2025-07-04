@@ -55,10 +55,6 @@ signals:
     void imageLoaded(CardInfoPtr card, const QImage &image);
     void requestImageDownload(const QUrl &url, PictureLoaderWorkerWork *instance);
 
-    /**
-     * We hit a cached image from the network cache; we get to make another request for free.
-     */
-    void cachedImageHit();
     void urlRedirected(const QUrl &originalUrl, const QUrl &redirectUrl);
     void cachedUrlInvalidated(const QUrl &url);
 };

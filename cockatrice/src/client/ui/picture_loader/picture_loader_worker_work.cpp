@@ -20,7 +20,6 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
 {
     // Hook up signals to the orchestrator
     connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest);
-    connect(this, &PictureLoaderWorkerWork::cachedImageHit, worker, &PictureLoaderWorker::processSingleRequest);
     connect(this, &PictureLoaderWorkerWork::urlRedirected, worker, &PictureLoaderWorker::cacheRedirect);
     connect(this, &PictureLoaderWorkerWork::cachedUrlInvalidated, worker, &PictureLoaderWorker::removedCachedUrl);
     connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully);
@@ -97,10 +96,6 @@ void PictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
     if (reply->error()) {
         handleFailedReply(reply);
     } else {
-        if (reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool()) {
-            emit cachedImageHit();
-        }
-
         handleSuccessfulReply(reply);
     }
 

@@ -12,7 +12,6 @@
 #include <QThread>
 #include <utility>
 
-
 PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload())
 {
     networkManager = new QNetworkAccessManager(this);
@@ -66,6 +65,7 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
     if (!cachedRedirect.isEmpty()) {
         queueRequest(cachedRedirect, worker);
     } else if (cache->metaData(url).isValid()) {
+        // If we hit a cached url, we get to make the request for free, since it won't contribute towards the rate-limit
         makeRequest(url, worker);
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
