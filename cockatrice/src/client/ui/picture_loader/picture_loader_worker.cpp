@@ -12,8 +12,6 @@
 #include <QThread>
 #include <utility>
 
-// Card back returned by gatherer when card is not found
-QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
 
 PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload())
 {

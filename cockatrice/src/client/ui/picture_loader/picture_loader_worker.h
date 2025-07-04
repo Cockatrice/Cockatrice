@@ -44,8 +44,6 @@ public slots:
     void removedCachedUrl(const QUrl &url);
 
 private:
-    static QStringList md5Blacklist;
-
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
     QNetworkDiskCache *cache;
