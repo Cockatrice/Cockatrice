@@ -12,7 +12,10 @@
 #include <QThread>
 #include <utility>
 
-PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload())
+static constexpr int MAX_REQUESTS_PER_SEC = 10;
+
+PictureLoaderWorker::PictureLoaderWorker()
+    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestCounter(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -48,7 +51,7 @@ PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(Setti
 
     connect(this, &PictureLoaderWorker::imageLoadEnqueued, this, &PictureLoaderWorker::handleImageLoadEnqueued);
 
-    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::processQueuedRequests);
+    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::resetRequestCounter);
     requestTimer.setInterval(1000);
     requestTimer.start();
 }
@@ -70,6 +73,7 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
         emit imageLoadQueued(url, worker);
+        processQueuedRequests();
     }
 }
 
@@ -95,22 +99,31 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     return reply;
 }
 
+void PictureLoaderWorker::resetRequestCounter()
+{
+    requestCounter = MAX_REQUESTS_PER_SEC;
+    processQueuedRequests();
+}
+
 void PictureLoaderWorker::processQueuedRequests()
 {
-    for (int i = 0; i < 10; i++) {
-        processSingleRequest();
+    while (requestCounter > 0 && processSingleRequest()) {
+        --requestCounter;
     }
 }
 
 /**
- * Immediately processes a single queued request
+ * Immediately processes a single queued request. No-ops if the load queue is empty
+ * @return If a request was processed
  */
-void PictureLoaderWorker::processSingleRequest()
+bool PictureLoaderWorker::processSingleRequest()
 {
     if (!requestLoadQueue.isEmpty()) {
         auto request = requestLoadQueue.takeFirst();
         makeRequest(request.first, request.second);
+        return true;
     }
+    return false;
 }
 
 void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
