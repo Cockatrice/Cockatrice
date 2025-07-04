@@ -38,7 +38,7 @@ public:
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
     void processQueuedRequests();
-    void processSingleRequest();
+    bool processSingleRequest();
     void imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image);
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     void removedCachedUrl(const QUrl &url);
@@ -52,7 +52,9 @@ private:
     static constexpr int CacheTTLInDays = 30;          // TODO: Make user configurable
     bool picDownload;
     QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
-    QTimer requestTimer; // Timer for processing delayed requests
+
+    int requestCounter;
+    QTimer requestTimer; // Timer for refreshing request counter
 
     PictureLoaderLocal *localLoader;
     QSet<CardInfoPtr> currentlyLoading; // for deduplication purposes
@@ -63,6 +65,7 @@ private:
     void cleanStaleEntries();
 
 private slots:
+    void resetRequestCounter();
     void handleImageLoadEnqueued(const CardInfoPtr &card);
 
 signals:
