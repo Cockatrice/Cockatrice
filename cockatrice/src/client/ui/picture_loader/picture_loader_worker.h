@@ -53,8 +53,8 @@ private:
     bool picDownload;
     QQueue<QPair<QUrl, PictureLoaderWorkerWork *>> requestLoadQueue;
 
-    int requestCounter;
-    QTimer requestTimer; // Timer for refreshing request counter
+    int requestQuota;
+    QTimer requestTimer; // Timer for refreshing request quota
 
     PictureLoaderLocal *localLoader;
     QSet<CardInfoPtr> currentlyLoading; // for deduplication purposes
@@ -65,7 +65,7 @@ private:
     void cleanStaleEntries();
 
 private slots:
-    void resetRequestCounter();
+    void resetRequestQuota();
     void handleImageLoadEnqueued(const CardInfoPtr &card);
 
 signals:

@@ -15,7 +15,7 @@
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
 
 PictureLoaderWorker::PictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestCounter(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -51,7 +51,7 @@ PictureLoaderWorker::PictureLoaderWorker()
 
     connect(this, &PictureLoaderWorker::imageLoadEnqueued, this, &PictureLoaderWorker::handleImageLoadEnqueued);
 
-    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::resetRequestCounter);
+    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::resetRequestQuota);
     requestTimer.setInterval(1000);
     requestTimer.start();
 }
@@ -99,16 +99,19 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     return reply;
 }
 
-void PictureLoaderWorker::resetRequestCounter()
+void PictureLoaderWorker::resetRequestQuota()
 {
-    requestCounter = MAX_REQUESTS_PER_SEC;
+    requestQuota = MAX_REQUESTS_PER_SEC;
     processQueuedRequests();
 }
 
+/**
+ * Keeps processing requests from the queue until the quota runs out or the request queue runs out.
+ */
 void PictureLoaderWorker::processQueuedRequests()
 {
-    while (requestCounter > 0 && processSingleRequest()) {
-        --requestCounter;
+    while (requestQuota > 0 && processSingleRequest()) {
+        --requestQuota;
     }
 }
 
