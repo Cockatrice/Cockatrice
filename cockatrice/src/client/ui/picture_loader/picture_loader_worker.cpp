@@ -106,7 +106,7 @@ void PictureLoaderWorker::resetRequestQuota()
 }
 
 /**
- * Keeps processing requests from the queue until the quota runs out or the request queue runs out.
+ * Keeps processing requests from the queue until it is empty or until the quota runs out.
  */
 void PictureLoaderWorker::processQueuedRequests()
 {
