@@ -15,8 +15,8 @@ public:
     explicit PictureLoaderStatusBar(QWidget *parent);
 
 public slots:
-    void addQueuedImageLoad(const QUrl &url, PictureLoaderWorkerWork *worker);
-    void addSuccessfulImageLoad(const QUrl &url, PictureLoaderWorkerWork *worker);
+    void addQueuedImageLoad(const QUrl &url, const CardInfoPtr &card, const QString &setName);
+    void addSuccessfulImageLoad(const QUrl &url);
     void cleanOldEntries();
 
 private:
