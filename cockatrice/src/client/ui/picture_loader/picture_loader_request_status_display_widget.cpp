@@ -2,23 +2,22 @@
 
 PictureLoaderRequestStatusDisplayWidget::PictureLoaderRequestStatusDisplayWidget(QWidget *parent,
                                                                                  const QUrl &_url,
-                                                                                 PictureLoaderWorkerWork *worker)
+                                                                                 const CardInfoPtr &card,
+                                                                                 const QString &setName)
     : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
 
-    if (worker->cardToDownload.getCard()) {
-        name = new QLabel(this);
-        name->setText(worker->cardToDownload.getCard()->getName());
-        setShortname = new QLabel(this);
-        setShortname->setText(worker->cardToDownload.getSetName());
-        providerId = new QLabel(this);
-        providerId->setText(worker->cardToDownload.getCard()->getProperty("uuid"));
+    name = new QLabel(this);
+    name->setText(card->getName());
+    setShortname = new QLabel(this);
+    setShortname->setText(setName);
+    providerId = new QLabel(this);
+    providerId->setText(card->getProperty("uuid"));
 
-        layout->addWidget(name);
-        layout->addWidget(setShortname);
-        layout->addWidget(providerId);
-    }
+    layout->addWidget(name);
+    layout->addWidget(setShortname);
+    layout->addWidget(providerId);
 
     startTime = new QLabel(QDateTime::currentDateTime().toString(), this);
     elapsedTime = new QLabel("0", this);

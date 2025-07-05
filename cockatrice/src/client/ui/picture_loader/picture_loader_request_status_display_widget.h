@@ -10,8 +10,10 @@ class PictureLoaderRequestStatusDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
-    PictureLoaderRequestStatusDisplayWidget(QWidget *parent, const QUrl &url, PictureLoaderWorkerWork *worker);
-    PictureLoaderWorkerWork *worker;
+    PictureLoaderRequestStatusDisplayWidget(QWidget *parent,
+                                            const QUrl &url,
+                                            const CardInfoPtr &card,
+                                            const QString &setName);
 
     void setFinished()
     {
