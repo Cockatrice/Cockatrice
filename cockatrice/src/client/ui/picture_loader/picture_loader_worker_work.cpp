@@ -19,10 +19,10 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
     : QObject(nullptr), cardToDownload(toLoad), picDownload(SettingsCache::instance().getPicDownload())
 {
     // Hook up signals to the orchestrator
-    connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest,
-            Qt::QueuedConnection);
-    connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully,
-            Qt::QueuedConnection);
+    connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest);
+    connect(this, &PictureLoaderWorkerWork::urlRedirected, worker, &PictureLoaderWorker::cacheRedirect);
+    connect(this, &PictureLoaderWorkerWork::cachedUrlInvalidated, worker, &PictureLoaderWorker::removedCachedUrl);
+    connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully);
 
     // Hook up signals to settings
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
@@ -44,7 +44,6 @@ void PictureLoaderWorkerWork::startNextPicDownload()
     QString picUrl = cardToDownload.getCurrentUrl();
 
     if (picUrl.isEmpty()) {
-        downloadRunning = false;
         picDownloadFailed();
     } else {
         QUrl url(picUrl);
@@ -78,24 +77,51 @@ void PictureLoaderWorkerWork::picDownloadFailed()
     }
 }
 
+/**
+ *
+ * @param reply The reply. Takes ownership of the object
+ */
+void PictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
+{
+    QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    if (redirectTarget.isValid()) {
+        QUrl url = reply->request().url();
+        QUrl redirectUrl = redirectTarget.toUrl();
+        if (redirectUrl.isRelative()) {
+            redirectUrl = url.resolved(redirectUrl);
+        }
+        emit urlRedirected(url, redirectUrl);
+    }
+
+    if (reply->error()) {
+        handleFailedReply(reply);
+    } else {
+        handleSuccessfulReply(reply);
+    }
+
+    reply->deleteLater();
+}
+
 static bool imageIsBlackListed(const QByteArray &picData)
 {
     QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
     return MD5_BLACKLIST.contains(md5sum);
 }
 
-void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
+void PictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
 {
-    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+    if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
+        qCWarning(PictureLoaderWorkerWorkLog) << "Too many requests.";
+    } else {
+        bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
-    if (reply->error()) {
         if (isFromCache) {
             qCDebug(PictureLoaderWorkerWorkLog).nospace()
                 << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
                 << " set: " << cardToDownload.getSetName() << "]: Removing corrupted cache file for url "
                 << reply->url().toDisplayString() << " and retrying (" << reply->errorString() << ")";
 
-            networkManager->cache()->remove(reply->url());
+            emit cachedUrlInvalidated(reply->url());
 
             emit requestImageDownload(reply->url(), this);
         } else {
@@ -106,10 +132,12 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
 
             picDownloadFailed();
         }
-
-        reply->deleteLater();
-        return;
     }
+}
+
+void PictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
+{
+    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
     // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
@@ -120,7 +148,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << "PictureLoader: [card: " << cardToDownload.getCard()->getName()
             << " set: " << cardToDownload.getSetName() << "]: following "
             << (isFromCache ? "cached redirect" : "redirect") << " to " << redirectUrl.toDisplayString();
-        reply->deleteLater();
         emit requestImageDownload(redirectUrl, this);
         return;
     }
@@ -134,7 +161,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << " set: " << cardToDownload.getSetName()
             << "]: Picture found, but blacklisted, will consider it as not found";
 
-        reply->deleteLater();
         picDownloadFailed();
         return;
     }
@@ -147,7 +173,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << " set: " << cardToDownload.getSetName() << "]: Possible " << (isFromCache ? "cached" : "downloaded")
             << " picture at " << reply->url().toDisplayString() << " could not be loaded: " << reply->errorString();
 
-        reply->deleteLater();
         picDownloadFailed();
     } else {
         qCDebug(PictureLoaderWorkerWorkLog).nospace()
@@ -155,7 +180,6 @@ void PictureLoaderWorkerWork::picDownloadFinished(QNetworkReply *reply)
             << " set: " << cardToDownload.getSetName() << "]: Image successfully "
             << (isFromCache ? "loaded from cached" : "downloaded from") << " url " << reply->url().toDisplayString();
 
-        reply->deleteLater();
         concludeImageLoad(image);
     }
 }

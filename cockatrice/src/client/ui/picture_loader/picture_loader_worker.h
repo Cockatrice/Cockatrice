@@ -38,11 +38,12 @@ public:
 public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
     void processQueuedRequests();
+    void processSingleRequest();
     void imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image);
+    void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
+    void removedCachedUrl(const QUrl &url);
 
 private:
-    static QStringList md5Blacklist;
-
     QThread *pictureLoaderThread;
     QNetworkAccessManager *networkManager;
     QNetworkDiskCache *cache;
@@ -56,7 +57,6 @@ private:
     PictureLoaderLocal *localLoader;
     QSet<CardInfoPtr> currentlyLoading; // for deduplication purposes
 
-    void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
     void loadRedirectCache();
     void saveRedirectCache() const;
