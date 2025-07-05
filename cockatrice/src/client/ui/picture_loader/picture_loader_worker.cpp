@@ -148,7 +148,7 @@ void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
     // try to load image from local first
     QImage image = localLoader->tryLoad(card);
     if (!image.isNull()) {
-        imageLoadedSuccessfully(card, image);
+        handleImageLoaded(card, image);
     } else {
         // queue up to load image from remote only after local loading failed
         new PictureLoaderWorkerWork(this, card);
@@ -156,10 +156,9 @@ void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
 }
 
 /**
- * Called when image loading is done
- * Contrary to the name, this is called on both success and failure. Failures are indicated by an empty QImage.
+ * Called when image loading is done. Failures are indicated by an empty QImage.
  */
-void PictureLoaderWorker::imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image)
+void PictureLoaderWorker::handleImageLoaded(const CardInfoPtr &card, const QImage &image)
 {
     currentlyLoading.remove(card);
     emit imageLoaded(card, image);

@@ -39,7 +39,7 @@ public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
     void processQueuedRequests();
     bool processSingleRequest();
-    void imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image);
+    void handleImageLoaded(const CardInfoPtr &card, const QImage &image);
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     void removedCachedUrl(const QUrl &url);
 
