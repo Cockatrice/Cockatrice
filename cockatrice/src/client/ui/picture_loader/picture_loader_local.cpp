@@ -59,84 +59,81 @@ QImage PictureLoaderLocal::tryLoad(const CardInfoPtr &toLoad) const
 {
     CardSetPtr set = PictureToLoad::extractSetsSorted(toLoad).first();
 
-    QString setName = set ? set->getCorrectedShortName() : QString();
+    CardInfoPerSet setInstance = CardDatabaseManager::getInstance()->getSetInfoForCard(toLoad);
+
     QString cardName = toLoad->getName();
     QString correctedCardName = toLoad->getCorrectedName();
 
-    // FIXME: This is a hack so that to keep old Cockatrice behavior
-    // (ignoring provider ID) when the "override all card art with personal
-    // preference" is set.
-    //
-    // Figure out a proper way to integrate the two systems at some point.
-    //
-    // Note: need to go through a member for
-    // overrideAllCardArtWithPersonalPreference as reading from the
-    // SettingsCache instance from the PictureLoaderWorker thread could
-    // cause race conditions.
-    //
-    // XXX: Reading from the CardDatabaseManager instance from the
-    // PictureLoaderWorker thread might not be safe either
-    bool searchCustomPics =
-        overrideAllCardArtWithPersonalPreference ||
-        CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(cardName, toLoad->getPixmapCacheKey());
-    if (searchCustomPics) {
-        qCDebug(PictureLoaderLocalLog).nospace()
-            << "[card: " << cardName << " set: " << setName << "]: Attempting to load picture from local";
-        return tryLoadCardImageFromDisk(setName, correctedCardName, searchCustomPics);
+    QString setName, collectorNumber, providerId;
+
+    if (setInstance.getPtr()) {
+        setName = setInstance.getPtr()->getCorrectedShortName();
+        collectorNumber = setInstance.getProperty("num");
+        providerId = setInstance.getProperty("uuid");
     }
 
     qCDebug(PictureLoaderLocalLog).nospace()
-        << "[card: " << cardName << " set: " << setName << "]: Skipping load picture from local";
-
-    return QImage();
+        << "[card: " << cardName << " set: " << setName << "]: Attempting to load picture from local";
+    return tryLoadCardImageFromDisk(setName, correctedCardName, collectorNumber, providerId);
 }
 
 QImage PictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
                                                     const QString &correctedCardName,
-                                                    const bool searchCustomPics) const
+                                                    const QString &collectorNumber,
+                                                    const QString &providerId) const
 {
     QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
-    QList<QString> picsPaths = QList<QString>();
 
-    if (searchCustomPics) {
-        picsPaths << customFolderIndex.values(correctedCardName);
-    }
+    // Order is cardName_providerId, cardName_setName_collectorNumber, setName-collectorNumber-cardName and then just
+    // generically cardName, if the user has decided to override every printing. Most-to-least specific.
 
-    if (!setName.isEmpty()) {
-        picsPaths << picsPath + "/" + setName + "/" + correctedCardName
-                  // We no longer store downloaded images there, but don't just ignore
-                  // stuff that old versions have put there.
-                  << picsPath + "/downloadedPics/" + setName + "/" + correctedCardName;
-    }
+    const QStringList nameVariants = {!providerId.isEmpty() ? QString("%1_%2").arg(correctedCardName, providerId)
+                                                            : QString(),
+                                      (!setName.isEmpty() && !collectorNumber.isEmpty())
+                                          ? QString("%1_%2_%3").arg(correctedCardName, setName, collectorNumber)
+                                          : QString(),
+                                      (!setName.isEmpty() && !collectorNumber.isEmpty())
+                                          ? QString("%1-%2-%3").arg(setName, collectorNumber, correctedCardName)
+                                          : QString(),
+                                      correctedCardName};
 
-    // Iterates through the list of paths, searching for images with the desired
-    // name with any QImageReader-supported extension
-    for (const auto &_picsPath : picsPaths) {
-        if (!QFileInfo(_picsPath).isFile()) {
+    for (const QString &nameVariant : nameVariants) {
+        if (nameVariant.isEmpty()) {
             continue;
         }
 
-        imgReader.setFileName(_picsPath);
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture found on disk.";
-            return image;
+        QStringList candidatePaths;
+        const auto matches = customFolderIndex.values(nameVariant);
+
+        for (const QString &path : matches) {
+            candidatePaths << path;
         }
-        imgReader.setFileName(_picsPath + ".full");
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.full found on disk.";
-            return image;
+
+        if (!setName.isEmpty()) {
+            candidatePaths << picsPath + "/" + setName + "/" + nameVariant;
+            candidatePaths << picsPath + "/downloadedPics/" + setName + "/" + nameVariant;
         }
-        imgReader.setFileName(_picsPath + ".xlhq");
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.xlhq found on disk.";
-            return image;
+
+        for (const QString &path : candidatePaths) {
+            for (const QString suffix : {"", ".full", ".xlhq"}) {
+                QString fullPath = path + suffix;
+                QFileInfo fi(fullPath);
+                if (!fi.exists() || !fi.isFile()) {
+                    continue;
+                }
+
+                imgReader.setFileName(fullPath);
+                if (imgReader.read(&image)) {
+                    qCDebug(PictureLoaderLocalLog).nospace()
+                        << "[card: " << correctedCardName << " set: " << setName << "] Found picture at: " << fullPath;
+                    return image;
+                }
+            }
         }
     }
+
     qCDebug(PictureLoaderLocalLog).nospace()
         << "[card: " << correctedCardName << " set: " << setName << "]: Picture NOT found on disk.";
     return QImage();

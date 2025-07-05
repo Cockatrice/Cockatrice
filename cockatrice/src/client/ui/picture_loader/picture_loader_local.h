@@ -31,8 +31,10 @@ private:
 
     void refreshIndex();
 
-    QImage
-    tryLoadCardImageFromDisk(const QString &setName, const QString &correctedCardName, bool searchCustomPics) const;
+    QImage tryLoadCardImageFromDisk(const QString &setName,
+                                    const QString &correctedCardName,
+                                    const QString &collectorNumber,
+                                    const QString &providerId) const;
 
 private slots:
     void picsPathChanged();
