@@ -12,7 +12,10 @@
 #include <QThread>
 #include <utility>
 
-PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload())
+static constexpr int MAX_REQUESTS_PER_SEC = 10;
+
+PictureLoaderWorker::PictureLoaderWorker()
+    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -48,7 +51,7 @@ PictureLoaderWorker::PictureLoaderWorker() : QObject(nullptr), picDownload(Setti
 
     connect(this, &PictureLoaderWorker::imageLoadEnqueued, this, &PictureLoaderWorker::handleImageLoadEnqueued);
 
-    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::processQueuedRequests);
+    connect(&requestTimer, &QTimer::timeout, this, &PictureLoaderWorker::resetRequestQuota);
     requestTimer.setInterval(1000);
     requestTimer.start();
 }
@@ -69,7 +72,8 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
         makeRequest(url, worker);
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
-        emit imageLoadQueued(url, worker);
+        emit imageLoadQueued(url, worker->cardToDownload.getCard(), worker->cardToDownload.getSetName());
+        processQueuedRequests();
     }
 }
 
@@ -78,7 +82,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
-        emit imageLoadSuccessful(url, worker);
+        emit imageLoadSuccessful(url);
         return makeRequest(cachedRedirect, worker);
     }
 
@@ -95,22 +99,34 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     return reply;
 }
 
+void PictureLoaderWorker::resetRequestQuota()
+{
+    requestQuota = MAX_REQUESTS_PER_SEC;
+    processQueuedRequests();
+}
+
+/**
+ * Keeps processing requests from the queue until it is empty or until the quota runs out.
+ */
 void PictureLoaderWorker::processQueuedRequests()
 {
-    for (int i = 0; i < 10; i++) {
-        processSingleRequest();
+    while (requestQuota > 0 && processSingleRequest()) {
+        --requestQuota;
     }
 }
 
 /**
- * Immediately processes a single queued request
+ * Immediately processes a single queued request. No-ops if the load queue is empty
+ * @return If a request was processed
  */
-void PictureLoaderWorker::processSingleRequest()
+bool PictureLoaderWorker::processSingleRequest()
 {
     if (!requestLoadQueue.isEmpty()) {
         auto request = requestLoadQueue.takeFirst();
         makeRequest(request.first, request.second);
+        return true;
     }
+    return false;
 }
 
 void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
@@ -132,7 +148,7 @@ void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
     // try to load image from local first
     QImage image = localLoader->tryLoad(card);
     if (!image.isNull()) {
-        imageLoadedSuccessfully(card, image);
+        handleImageLoaded(card, image);
     } else {
         // queue up to load image from remote only after local loading failed
         new PictureLoaderWorkerWork(this, card);
@@ -140,10 +156,9 @@ void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
 }
 
 /**
- * Called when image loading is done
- * Contrary to the name, this is called on both success and failure. Failures are indicated by an empty QImage.
+ * Called when image loading is done. Failures are indicated by an empty QImage.
  */
-void PictureLoaderWorker::imageLoadedSuccessfully(const CardInfoPtr &card, const QImage &image)
+void PictureLoaderWorker::handleImageLoaded(const CardInfoPtr &card, const QImage &image)
 {
     currentlyLoading.remove(card);
     emit imageLoaded(card, image);

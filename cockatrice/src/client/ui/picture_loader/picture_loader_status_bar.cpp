@@ -38,15 +38,14 @@ void PictureLoaderStatusBar::cleanOldEntries()
     }
 }
 
-void PictureLoaderStatusBar::addQueuedImageLoad(const QUrl &url, PictureLoaderWorkerWork *worker)
+void PictureLoaderStatusBar::addQueuedImageLoad(const QUrl &url, const CardInfoPtr &card, const QString &setName)
 {
-    loadLog->addSettingsWidget(new PictureLoaderRequestStatusDisplayWidget(loadLog, url, worker));
+    loadLog->addSettingsWidget(new PictureLoaderRequestStatusDisplayWidget(loadLog, url, card, setName));
     progressBar->setMaximum(progressBar->maximum() + 1);
 }
 
-void PictureLoaderStatusBar::addSuccessfulImageLoad(const QUrl &url, PictureLoaderWorkerWork *worker)
+void PictureLoaderStatusBar::addSuccessfulImageLoad(const QUrl &url)
 {
-    Q_UNUSED(worker)
     progressBar->setValue(progressBar->value() + 1);
     for (PictureLoaderRequestStatusDisplayWidget *statusDisplayWidget :
          loadLog->popup->findChildren<PictureLoaderRequestStatusDisplayWidget *>()) {

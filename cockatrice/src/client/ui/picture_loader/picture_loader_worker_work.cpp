@@ -22,7 +22,7 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
     connect(this, &PictureLoaderWorkerWork::requestImageDownload, worker, &PictureLoaderWorker::queueRequest);
     connect(this, &PictureLoaderWorkerWork::urlRedirected, worker, &PictureLoaderWorker::cacheRedirect);
     connect(this, &PictureLoaderWorkerWork::cachedUrlInvalidated, worker, &PictureLoaderWorker::removedCachedUrl);
-    connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::imageLoadedSuccessfully);
+    connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::handleImageLoaded);
 
     // Hook up signals to settings
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
