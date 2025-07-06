@@ -53,6 +53,11 @@ signals:
      * Note that this object will delete itself as this signal is emitted.
      */
     void imageLoaded(CardInfoPtr card, const QImage &image);
+
+    /**
+     * Emitted when a request did not return a 400 or 500 response
+     */
+    void requestSucceeded(const QUrl &url);
     void requestImageDownload(const QUrl &url, PictureLoaderWorkerWork *instance);
 
     void urlRedirected(const QUrl &originalUrl, const QUrl &redirectUrl);
