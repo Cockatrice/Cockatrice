@@ -72,7 +72,7 @@ void PictureLoaderWorker::queueRequest(const QUrl &url, PictureLoaderWorkerWork 
         makeRequest(url, worker);
     } else {
         requestLoadQueue.append(qMakePair(url, worker));
-        emit imageLoadQueued(url, worker->cardToDownload.getCard(), worker->cardToDownload.getSetName());
+        emit imageRequestQueued(url, worker->cardToDownload.getCard(), worker->cardToDownload.getSetName());
         processQueuedRequests();
     }
 }
@@ -82,7 +82,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
-        emit requestSucceeded(url);
+        emit imageRequestSucceeded(url);
         return makeRequest(cachedRedirect, worker);
     }
 

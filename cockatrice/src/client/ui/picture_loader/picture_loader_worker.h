@@ -71,8 +71,8 @@ private slots:
 signals:
     void imageLoadEnqueued(const CardInfoPtr &card);
     void imageLoaded(CardInfoPtr card, const QImage &image);
-    void imageLoadQueued(const QUrl &url, const CardInfoPtr &card, const QString &setName);
-    void requestSucceeded(const QUrl &url);
+    void imageRequestQueued(const QUrl &url, const CardInfoPtr &card, const QString &setName);
+    void imageRequestSucceeded(const QUrl &url);
 };
 
 #endif // PICTURE_LOADER_WORKER_H

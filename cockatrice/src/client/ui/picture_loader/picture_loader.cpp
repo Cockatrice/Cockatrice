@@ -36,8 +36,9 @@ PictureLoader::PictureLoader() : QObject(nullptr)
         mainWindow->statusBar()->addPermanentWidget(statusBar);
     }
 
-    connect(worker, &PictureLoaderWorker::imageLoadQueued, statusBar, &PictureLoaderStatusBar::addQueuedImageLoad);
-    connect(worker, &PictureLoaderWorker::requestSucceeded, statusBar, &PictureLoaderStatusBar::addSuccessfulImageLoad);
+    connect(worker, &PictureLoaderWorker::imageRequestQueued, statusBar, &PictureLoaderStatusBar::addQueuedImageLoad);
+    connect(worker, &PictureLoaderWorker::imageRequestSucceeded, statusBar,
+            &PictureLoaderStatusBar::addSuccessfulImageLoad);
 }
 
 PictureLoader::~PictureLoader()
