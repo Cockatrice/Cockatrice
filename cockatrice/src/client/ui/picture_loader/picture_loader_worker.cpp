@@ -82,7 +82,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     // Check for cached redirects
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
-        emit imageLoadSuccessful(url);
+        emit requestSucceeded(url);
         return makeRequest(cachedRedirect, worker);
     }
 

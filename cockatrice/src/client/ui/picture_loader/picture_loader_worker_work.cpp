@@ -23,6 +23,7 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
     connect(this, &PictureLoaderWorkerWork::urlRedirected, worker, &PictureLoaderWorker::cacheRedirect);
     connect(this, &PictureLoaderWorkerWork::cachedUrlInvalidated, worker, &PictureLoaderWorker::removedCachedUrl);
     connect(this, &PictureLoaderWorkerWork::imageLoaded, worker, &PictureLoaderWorker::handleImageLoaded);
+    connect(this, &PictureLoaderWorkerWork::requestSucceeded, worker, &PictureLoaderWorker::requestSucceeded);
 
     // Hook up signals to settings
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
@@ -97,6 +98,7 @@ void PictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
         handleFailedReply(reply);
     } else {
         handleSuccessfulReply(reply);
+        emit requestSucceeded(reply->url());
     }
 
     reply->deleteLater();

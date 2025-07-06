@@ -37,8 +37,7 @@ PictureLoader::PictureLoader() : QObject(nullptr)
     }
 
     connect(worker, &PictureLoaderWorker::imageLoadQueued, statusBar, &PictureLoaderStatusBar::addQueuedImageLoad);
-    connect(worker, &PictureLoaderWorker::imageLoadSuccessful, statusBar,
-            &PictureLoaderStatusBar::addSuccessfulImageLoad);
+    connect(worker, &PictureLoaderWorker::requestSucceeded, statusBar, &PictureLoaderStatusBar::addSuccessfulImageLoad);
 }
 
 PictureLoader::~PictureLoader()
