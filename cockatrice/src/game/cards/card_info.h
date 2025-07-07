@@ -15,14 +15,14 @@
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 
 class CardInfo;
-class CardInfoPerSet;
+class PrintingInfo;
 class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
 
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
-typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
+typedef QMap<QString, QList<PrintingInfo>> PrintingInfoPerSetMap;
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
 typedef QHash<QString, CardSetPtr> SetNameMap;
@@ -142,20 +142,23 @@ public:
     void defaultSort();
 };
 
-class CardInfoPerSet
+/**
+ * Info relating to a specific printing for a card.
+ */
+class PrintingInfo
 {
 public:
-    explicit CardInfoPerSet(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
-    ~CardInfoPerSet() = default;
+    explicit PrintingInfo(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
+    ~PrintingInfo() = default;
 
-    bool operator==(const CardInfoPerSet &other) const
+    bool operator==(const PrintingInfo &other) const
     {
         return this->set == other.set && this->properties == other.properties;
     }
 
 private:
     CardSetPtr set;
-    // per-set card properties;
+    // per-printing card properties;
     QVariantHash properties;
 
 public:
@@ -201,7 +204,7 @@ private:
     // the cards thare are reverse-related to me
     QList<CardRelation *> reverseRelatedCardsToMe;
     // card sets
-    CardInfoPerSetMap sets;
+    PrintingInfoPerSetMap sets;
     // cached set names
     QString setsNames;
     // positioning properties; used by UI
@@ -217,7 +220,7 @@ public:
                       QVariantHash _properties,
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
-                      CardInfoPerSetMap _sets,
+                      PrintingInfoPerSetMap _sets,
                       bool _cipt,
                       bool _landscapeOrientation,
                       int _tableRow,
@@ -240,7 +243,7 @@ public:
                                    QVariantHash _properties,
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
-                                   CardInfoPerSetMap _sets,
+                                   PrintingInfoPerSetMap _sets,
                                    bool _cipt,
                                    bool _landscapeOrientation,
                                    int _tableRow,
@@ -308,7 +311,7 @@ public:
     {
         return properties.contains(propertyName);
     }
-    const CardInfoPerSetMap &getSets() const
+    const PrintingInfoPerSetMap &getSets() const
     {
         return sets;
     }
@@ -398,7 +401,7 @@ public:
         return getSetProperty(set, "picurl");
     }
     QString getCorrectedName() const;
-    void addToSet(const CardSetPtr &_set, CardInfoPerSet _info = CardInfoPerSet());
+    void addToSet(const CardSetPtr &_set, PrintingInfo _info = PrintingInfo());
     void combineLegalities(const QVariantHash &props);
     void emitPixmapUpdated()
     {

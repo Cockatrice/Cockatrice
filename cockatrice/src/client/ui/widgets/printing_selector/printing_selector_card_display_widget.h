@@ -21,7 +21,7 @@ public:
                                       QTreeView *_deckView,
                                       QSlider *_cardSizeSlider,
                                       CardInfoPtr _rootCard,
-                                      const CardInfoPerSet &_setInfoForCard,
+                                      const PrintingInfo &_setInfoForCard,
                                       QString &_currentZone);
 
 public slots:
@@ -39,7 +39,7 @@ private:
     QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
     CardInfoPtr setCard;
-    CardInfoPerSet setInfoForCard;
+    PrintingInfo setInfoForCard;
     QString currentZone;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };

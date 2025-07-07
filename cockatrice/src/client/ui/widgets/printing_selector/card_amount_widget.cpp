@@ -21,7 +21,7 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    QTreeView *deckView,
                                    QSlider *cardSizeSlider,
                                    CardInfoPtr &rootCard,
-                                   CardInfoPerSet &setInfoForCard,
+                                   PrintingInfo &setInfoForCard,
                                    const QString &zoneName)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
       rootCard(rootCard), setInfoForCard(setInfoForCard), zoneName(zoneName), hovered(false)

@@ -144,7 +144,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            auto _sets = CardInfoPerSetMap();
+            auto _sets = PrintingInfoPerSetMap();
             int tableRow = 0;
             bool cipt = false;
             bool landscapeOrientation = false;
@@ -184,7 +184,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
-                        CardInfoPerSet setInfo(set);
+                        PrintingInfo setInfo(set);
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL")
@@ -310,7 +310,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
 
     // sets
     for (const auto &cardInfoPerSetList : info->getSets()) {
-        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+        for (const PrintingInfo &set : cardInfoPerSetList) {
             xml.writeStartElement("set");
             for (const QString &propName : set.getProperties()) {
                 xml.writeAttribute(propName, set.getProperty(propName));

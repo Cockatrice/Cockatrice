@@ -372,7 +372,7 @@ QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, con
 }
 
 QModelIndex DeckListModel::addCard(const QString &cardName,
-                                   const CardInfoPerSet &cardInfoSet,
+                                   const PrintingInfo &cardInfoSet,
                                    const QString &zoneName,
                                    bool abAddAnyway)
 {

@@ -76,7 +76,7 @@ void PrintingSelectorCardSortingWidget::updateSortSetting()
  * @param cardInfoPerSets The list of card sets to be sorted.
  * @return A sorted list of card sets.
  */
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(const CardInfoPerSetMap &cardInfoPerSets)
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingInfoPerSetMap &cardInfoPerSets)
 {
     QList<CardSetPtr> sortedSets;
 
@@ -98,7 +98,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(const CardInfo
         std::sort(sortedSets.begin(), sortedSets.end(), SetReleaseDateComparator());
     }
 
-    QList<CardInfoPerSet> sortedCardInfoPerSets;
+    QList<PrintingInfo> sortedCardInfoPerSets;
     // Reconstruct sorted list of CardInfoPerSet
     for (const auto &set : sortedSets) {
         for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
@@ -130,14 +130,14 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::sortSets(const CardInfo
  * @param searchText The search text used to filter the card sets.
  * @return A filtered list of card sets.
  */
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<CardInfoPerSet> &sets,
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::filterSets(const QList<PrintingInfo> &sets,
                                                                     const QString &searchText)
 {
     if (searchText.isEmpty()) {
         return sets;
     }
 
-    QList<CardInfoPerSet> filteredSets;
+    QList<PrintingInfo> filteredSets;
 
     for (const auto &set : sets) {
         const QString longName = set.getPtr()->getLongName().toLower();
@@ -151,7 +151,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::filterSets(const QList<
     return filteredSets;
 }
 
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<CardInfoPerSet> &sets,
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<PrintingInfo> &sets,
                                                                                 const QString &cardName)
 {
     auto setsToUse = sets;
@@ -180,7 +180,7 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPinnedPrintings(
  * @param deckModel The model representing the deck.
  * @return A list of card sets with the printings contained in the deck prepended.
  */
-QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<PrintingInfo> &sets,
                                                                                 const CardInfoPtr &selectedCard,
                                                                                 DeckListModel *deckModel)
 {
@@ -188,8 +188,8 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(
         return {};
     }
 
-    CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
-    QList<QPair<CardInfoPerSet, int>> countList;
+    PrintingInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
+    QList<QPair<PrintingInfo, int>> countList;
 
     // Collect sets with their counts
     for (const auto &cardInfoPerSetList : cardInfoPerSets) {
@@ -209,16 +209,16 @@ QList<CardInfoPerSet> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(
 
     // Sort sets by count in descending numerical order
     std::sort(countList.begin(), countList.end(),
-              [](const QPair<CardInfoPerSet, int> &a, const QPair<CardInfoPerSet, int> &b) {
+              [](const QPair<PrintingInfo, int> &a, const QPair<PrintingInfo, int> &b) {
                   return a.second > b.second; // Ensure numerical comparison
               });
 
     // Create a copy of the original list to modify
-    QList<CardInfoPerSet> result = sets;
+    QList<PrintingInfo> result = sets;
 
     // Prepend sorted sets and remove them from the original list
     for (const auto &pair : countList) {
-        auto it = std::find_if(result.begin(), result.end(), [&pair](const CardInfoPerSet &item) {
+        auto it = std::find_if(result.begin(), result.end(), [&pair](const PrintingInfo &item) {
             return item.getProperty("uuid") == pair.first.getProperty("uuid");
         });
         if (it != result.end()) {

@@ -95,7 +95,7 @@ public:
     SplitCardPart(const QString &_name,
                   const QString &_text,
                   const QVariantHash &_properties,
-                  const CardInfoPerSet &setInfo);
+                  const PrintingInfo &setInfo);
     inline const QString &getName() const
     {
         return name;
@@ -108,7 +108,7 @@ public:
     {
         return properties;
     }
-    inline const CardInfoPerSet &getSetInfo() const
+    inline const PrintingInfo &getSetInfo() const
     {
         return setInfo;
     }
@@ -117,7 +117,7 @@ private:
     QString name;
     QString text;
     QVariantHash properties;
-    CardInfoPerSet setInfo;
+    PrintingInfo setInfo;
 };
 
 class OracleImporter : public QObject
@@ -143,7 +143,7 @@ private:
                         bool isToken,
                         QVariantHash properties,
                         const QList<CardRelation *> &relatedCards,
-                        const CardInfoPerSet &setInfo);
+                        const PrintingInfo &setInfo);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);

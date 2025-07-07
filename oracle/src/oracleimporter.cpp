@@ -12,7 +12,7 @@
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
-                             const CardInfoPerSet &_setInfo)
+                             const PrintingInfo &_setInfo)
     : name(_name), text(_text), properties(_properties), setInfo(_setInfo)
 {
 }
@@ -129,7 +129,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                     bool isToken,
                                     QVariantHash properties,
                                     const QList<CardRelation *> &relatedCards,
-                                    const CardInfoPerSet &setInfo)
+                                    const PrintingInfo &setInfo)
 {
     // Workaround for card name weirdness
     name = name.replace("Æ", "AE");
@@ -200,7 +200,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
-    CardInfoPerSetMap setsInfo;
+    PrintingInfoPerSetMap setsInfo;
     setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
@@ -242,7 +242,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     static constexpr bool isToken = false;
     static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
     QVariantHash properties;
-    CardInfoPerSet setInfo;
+    PrintingInfo setInfo;
     QList<CardRelation *> relatedCards;
     QList<QString> allNameProps;
 
@@ -281,7 +281,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // per-set properties
-        setInfo = CardInfoPerSet(currentSet);
+        setInfo = PrintingInfo(currentSet);
         QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();

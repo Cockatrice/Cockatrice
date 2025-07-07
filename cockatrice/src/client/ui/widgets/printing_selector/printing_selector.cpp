@@ -224,11 +224,11 @@ void PrintingSelector::getAllSetsForCurrentCard()
         return;
     }
 
-    CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
-    const QList<CardInfoPerSet> sortedSets = sortToolBar->sortSets(cardInfoPerSets);
-    const QList<CardInfoPerSet> filteredSets =
+    PrintingInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
+    const QList<PrintingInfo> sortedSets = sortToolBar->sortSets(cardInfoPerSets);
+    const QList<PrintingInfo> filteredSets =
         sortToolBar->filterSets(sortedSets, searchBar->getSearchText().trimmed().toLower());
-    QList<CardInfoPerSet> setsToUse;
+    QList<PrintingInfo> setsToUse;
 
     if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
         setsToUse = sortToolBar->prependPrintingsInDeck(filteredSets, selectedCard, deckModel);

@@ -215,7 +215,7 @@ void SetList::defaultSort()
     });
 }
 
-CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set) : set(_set)
+PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {
 }
 
@@ -225,7 +225,7 @@ CardInfo::CardInfo(const QString &_name,
                    QVariantHash _properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
-                   CardInfoPerSetMap _sets,
+                   PrintingInfoPerSetMap _sets,
                    bool _cipt,
                    bool _landscapeOrientation,
                    int _tableRow,
@@ -248,7 +248,7 @@ CardInfo::~CardInfo()
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
     return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                       CardInfoPerSetMap(), false, false, 0, false);
+                       PrintingInfoPerSetMap(), false, false, 0, false);
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
@@ -257,7 +257,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   QVariantHash _properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
-                                  CardInfoPerSetMap _sets,
+                                  PrintingInfoPerSetMap _sets,
                                   bool _cipt,
                                   bool _landscapeOrientation,
                                   int _tableRow,
@@ -268,7 +268,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
     ptr->setSmartPointer(ptr);
 
     for (const auto &cardInfoPerSetList : _sets) {
-        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+        for (const PrintingInfo &set : cardInfoPerSetList) {
             set.getPtr()->append(ptr);
             break;
         }
@@ -289,7 +289,7 @@ QString CardInfo::getCorrectedName() const
     return result.remove(rmrx).replace(spacerx, space);
 }
 
-void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
+void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
 {
     if (!_set->contains(smartThis)) {
         _set->append(smartThis);

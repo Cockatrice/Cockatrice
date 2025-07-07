@@ -24,7 +24,7 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    QTreeView *deckView,
                                                    QSlider *cardSizeSlider,
                                                    CardInfoPtr rootCard,
-                                                   CardInfoPerSet setInfoForCard)
+                                                   PrintingInfo setInfoForCard)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
       rootCard(rootCard), setInfoForCard(setInfoForCard)
 {

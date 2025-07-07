@@ -230,9 +230,9 @@ void VisualDatabaseDisplayWidget::populateCards()
 
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
             if (setFilter) {
-                CardInfoPerSetMap setMap = info->getSets();
+                PrintingInfoPerSetMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
-                    for (CardInfoPerSet cardSetInstance : setMap[setFilter->term()]) {
+                    for (PrintingInfo cardSetInstance : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                             name.toString(), cardSetInstance.getProperty("uuid")));
                     }
@@ -296,9 +296,9 @@ void VisualDatabaseDisplayWidget::loadNextPage()
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
             if (setFilter) {
-                CardInfoPerSetMap setMap = info->getSets();
+                PrintingInfoPerSetMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
-                    for (CardInfoPerSet cardSetInstance : setMap[setFilter->term()]) {
+                    for (PrintingInfo cardSetInstance : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                             name.toString(), cardSetInstance.getProperty("uuid")));
                     }

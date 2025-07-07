@@ -324,7 +324,7 @@ struct SetProviderIdToPreferred
     void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
     {
         Q_UNUSED(node);
-        CardInfoPerSet preferredSet = CardDatabaseManager::getInstance()->getSpecificSetForCard(
+        PrintingInfo preferredSet = CardDatabaseManager::getInstance()->getSpecificSetForCard(
             card->getName(),
             CardDatabaseManager::getInstance()->getPreferredPrintingProviderIdForCard(card->getName()));
         QString providerId = preferredSet.getProperty("uuid");
