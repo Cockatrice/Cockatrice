@@ -20,7 +20,6 @@ class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
 
-typedef QMap<QString, QString> QStringMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
 typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
