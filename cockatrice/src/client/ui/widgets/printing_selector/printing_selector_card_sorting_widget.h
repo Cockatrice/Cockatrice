@@ -12,7 +12,7 @@ class PrintingSelectorCardSortingWidget : public QWidget
     Q_OBJECT
 public:
     explicit PrintingSelectorCardSortingWidget(PrintingSelector *parent);
-    QList<PrintingInfo> sortSets(const PrintingInfoPerSetMap &perSetMap);
+    QList<PrintingInfo> sortSets(const SetToPrintingsMap &setMap);
     QList<PrintingInfo> filterSets(const QList<PrintingInfo> &printings, const QString &searchText);
     QList<PrintingInfo> prependPinnedPrintings(const QList<PrintingInfo> &printings, const QString &cardName);
     QList<PrintingInfo> prependPrintingsInDeck(const QList<PrintingInfo> &printings,

@@ -316,7 +316,7 @@ PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
         return PrintingInfo(nullptr);
     }
 
-    PrintingInfoPerSetMap setMap = cardInfo->getSets();
+    SetToPrintingsMap setMap = cardInfo->getSets();
     if (setMap.empty()) {
         return PrintingInfo(nullptr);
     }
@@ -349,7 +349,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName, const QS
         return PrintingInfo(nullptr);
     }
 
-    PrintingInfoPerSetMap setMap = cardInfo->getSets();
+    SetToPrintingsMap setMap = cardInfo->getSets();
     if (setMap.empty()) {
         return PrintingInfo(nullptr);
     }
@@ -378,7 +378,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
         return PrintingInfo(nullptr);
     }
 
-    PrintingInfoPerSetMap setMap = cardInfo->getSets();
+    SetToPrintingsMap setMap = cardInfo->getSets();
     if (setMap.empty()) {
         return PrintingInfo(nullptr);
     }
@@ -426,7 +426,7 @@ bool CardDatabase::isProviderIdForPreferredPrinting(const QString &cardName, con
 
 PrintingInfo CardDatabase::getSetInfoForCard(const CardInfoPtr &_card)
 {
-    const PrintingInfoPerSetMap &setMap = _card->getSets();
+    const SetToPrintingsMap &setMap = _card->getSets();
     if (setMap.empty()) {
         return PrintingInfo(nullptr);
     }

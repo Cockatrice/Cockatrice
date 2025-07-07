@@ -67,7 +67,7 @@ void AbstractCardItem::refreshCardInfo()
         QVariantHash properties = QVariantHash();
 
         info = CardInfo::newInstance(name, "", true, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                                     PrintingInfoPerSetMap(), false, false, -1, false);
+                                     SetToPrintingsMap(), false, false, -1, false);
     }
     if (info.data()) {
         connect(info.data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);

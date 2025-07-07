@@ -200,7 +200,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
-    PrintingInfoPerSetMap setsInfo;
+    SetToPrintingsMap setsInfo;
     setsInfo[printingInfo.getSet()->getShortName()].append(printingInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);

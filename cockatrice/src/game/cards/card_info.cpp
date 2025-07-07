@@ -225,7 +225,7 @@ CardInfo::CardInfo(const QString &_name,
                    QVariantHash _properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
-                   PrintingInfoPerSetMap _sets,
+                   SetToPrintingsMap _sets,
                    bool _cipt,
                    bool _landscapeOrientation,
                    int _tableRow,
@@ -248,7 +248,7 @@ CardInfo::~CardInfo()
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
     return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                       PrintingInfoPerSetMap(), false, false, 0, false);
+                       SetToPrintingsMap(), false, false, 0, false);
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
@@ -257,7 +257,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   QVariantHash _properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
-                                  PrintingInfoPerSetMap _sets,
+                                  SetToPrintingsMap _sets,
                                   bool _cipt,
                                   bool _landscapeOrientation,
                                   int _tableRow,

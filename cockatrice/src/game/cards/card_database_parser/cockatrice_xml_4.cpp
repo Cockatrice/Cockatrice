@@ -144,7 +144,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            auto _sets = PrintingInfoPerSetMap();
+            auto _sets = SetToPrintingsMap();
             int tableRow = 0;
             bool cipt = false;
             bool landscapeOrientation = false;
