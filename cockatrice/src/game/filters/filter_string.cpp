@@ -130,9 +130,9 @@ static void setupParserRules()
         const auto rarity = std::any_cast<QString>(sv[0]);
         return [=](const CardData &x) -> bool {
             QList<PrintingInfo> infos;
-            for (const auto &setsValue : x->getSets().values()) {
-                for (const auto &cardInfoPerSet : setsValue) {
-                    infos.append(cardInfoPerSet);
+            for (const auto &printings : x->getSets()) {
+                for (const auto &printing : printings) {
+                    infos.append(printing);
                 }
             }
 

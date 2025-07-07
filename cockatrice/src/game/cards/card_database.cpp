@@ -147,12 +147,12 @@ CardInfoPtr CardDatabase::getCardByNameAndProviderId(const QString &cardName, co
         return info;
     }
 
-    for (const auto &cardInfoPerSetList : info->getSets()) {
-        for (const auto &set : cardInfoPerSetList) {
-            if (set.getProperty("uuid") == providerId) {
+    for (const auto &printings : info->getSets()) {
+        for (const auto &printing : printings) {
+            if (printing.getProperty("uuid") == providerId) {
                 CardInfoPtr cardFromSpecificSet = info->clone();
                 cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) +
-                                                       QString("_") + QString(set.getProperty("uuid")));
+                                                       QString("_") + QString(printing.getProperty("uuid")));
                 return cardFromSpecificSet;
             }
         }
@@ -354,8 +354,8 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName, const QS
         return PrintingInfo(nullptr);
     }
 
-    for (const auto &cardInfoPerSetList : setMap) {
-        for (auto &cardInfoForSet : cardInfoPerSetList) {
+    for (const auto &printings : setMap) {
+        for (auto &cardInfoForSet : printings) {
             if (cardInfoForSet.getProperty("uuid") == providerId) {
                 return cardInfoForSet;
             }
@@ -383,8 +383,8 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
         return PrintingInfo(nullptr);
     }
 
-    for (const auto &cardInfoPerSetList : setMap) {
-        for (auto &cardInfoForSet : cardInfoPerSetList) {
+    for (const auto &printings : setMap) {
+        for (auto &cardInfoForSet : printings) {
             if (collectorNumber != nullptr) {
                 if (cardInfoForSet.getSet()->getShortName() == setShortName &&
                     cardInfoForSet.getProperty("num") == collectorNumber) {
@@ -431,8 +431,8 @@ PrintingInfo CardDatabase::getSetInfoForCard(const CardInfoPtr &_card)
         return PrintingInfo(nullptr);
     }
 
-    for (const auto &cardInfoPerSetList : setMap) {
-        for (const auto &cardInfoForSet : cardInfoPerSetList) {
+    for (const auto &printings : setMap) {
+        for (const auto &cardInfoForSet : printings) {
             if (QLatin1String("card_") + _card->getName() + QString("_") + cardInfoForSet.getProperty("uuid") ==
                 _card->getPixmapCacheKey()) {
                 return cardInfoForSet;

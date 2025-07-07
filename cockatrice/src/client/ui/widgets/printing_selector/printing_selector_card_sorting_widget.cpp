@@ -99,13 +99,13 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const SetToPrint
     }
 
     QList<PrintingInfo> sortedPrintings;
-    // Reconstruct sorted list of CardInfoPerSet
+    // Reconstruct sorted list of PrintingInfo
     for (const auto &set : sortedSets) {
         for (auto it = setMap.begin(); it != setMap.end(); ++it) {
-            for (const auto &cardInfoPerSet : it.value()) {
-                if (cardInfoPerSet.getSet() == set) {
-                    if (!sortedPrintings.contains(cardInfoPerSet)) {
-                        sortedPrintings << cardInfoPerSet;
+            for (const auto &printingInfo : it.value()) {
+                if (printingInfo.getSet() == set) {
+                    if (!sortedPrintings.contains(printingInfo)) {
+                        sortedPrintings << printingInfo;
                     }
                 }
             }

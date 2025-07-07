@@ -316,10 +316,10 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for (const auto &cardInfoPerSetList : sets) {
-        for (const auto &set : cardInfoPerSetList) {
-            if (set.getSet()->getEnabled()) {
-                setList << set.getSet()->getShortName();
+    for (const auto &printings : sets) {
+        for (const auto &printing : printings) {
+            if (printing.getSet()->getEnabled()) {
+                setList << printing.getSet()->getShortName();
             }
             break;
         }

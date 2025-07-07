@@ -28,9 +28,9 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
 QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
 {
     QList<CardSetPtr> sortedSets;
-    for (const auto &cardInfoPerSetList : card->getSets()) {
-        for (const auto &set : cardInfoPerSetList) {
-            sortedSets << set.getSet();
+    for (const auto &printings : card->getSets()) {
+        for (const auto &printing : printings) {
+            sortedSets << printing.getSet();
         }
     }
     if (sortedSets.empty()) {
@@ -41,11 +41,11 @@ QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
     // If the user hasn't disabled arts other than their personal preference...
     if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        for (const auto &cardInfoPerSetList : card->getSets()) {
-            for (const auto &set : cardInfoPerSetList) {
-                if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
+        for (const auto &printings : card->getSets()) {
+            for (const auto &printing : printings) {
+                if (QLatin1String("card_") + card->getName() + QString("_") + QString(printing.getProperty("uuid")) ==
                     card->getPixmapCacheKey()) {
-                    long long setIndex = sortedSets.indexOf(set.getSet());
+                    long long setIndex = sortedSets.indexOf(printing.getSet());
                     CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
                     sortedSets.prepend(setForCardProviderID);
                 }
