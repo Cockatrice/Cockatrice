@@ -367,8 +367,7 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
 
 QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    return addCard(cardName, CardDatabaseManager::getInstance()->getPreferredPrinting(cardName), zoneName,
-                   abAddAnyway);
+    return addCard(cardName, CardDatabaseManager::getInstance()->getPreferredPrinting(cardName), zoneName, abAddAnyway);
 }
 
 QModelIndex DeckListModel::addCard(const QString &cardName,
