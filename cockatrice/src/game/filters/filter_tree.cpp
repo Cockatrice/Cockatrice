@@ -217,8 +217,8 @@ bool FilterItem::acceptSet(const CardInfoPtr info) const
     bool status = false;
     for (const auto &cardInfoPerSetList : info->getSets()) {
         for (const auto &set : cardInfoPerSetList) {
-            if (set.getPtr()->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
-                set.getPtr()->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
+            if (set.getSet()->getShortName().compare(term, Qt::CaseInsensitive) == 0 ||
+                set.getSet()->getLongName().compare(term, Qt::CaseInsensitive) == 0) {
                 status = true;
                 break;
             }

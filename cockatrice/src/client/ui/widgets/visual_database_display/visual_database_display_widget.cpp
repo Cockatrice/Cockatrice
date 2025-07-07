@@ -232,9 +232,9 @@ void VisualDatabaseDisplayWidget::populateCards()
             if (setFilter) {
                 PrintingInfoPerSetMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
-                    for (PrintingInfo cardSetInstance : setMap[setFilter->term()]) {
+                    for (PrintingInfo printing : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                            name.toString(), cardSetInstance.getProperty("uuid")));
+                            name.toString(), printing.getProperty("uuid")));
                     }
                 }
             } else {
@@ -298,9 +298,9 @@ void VisualDatabaseDisplayWidget::loadNextPage()
             if (setFilter) {
                 PrintingInfoPerSetMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
-                    for (PrintingInfo cardSetInstance : setMap[setFilter->term()]) {
+                    for (PrintingInfo printing : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                            name.toString(), cardSetInstance.getProperty("uuid")));
+                            name.toString(), printing.getProperty("uuid")));
                     }
                 }
             } else {

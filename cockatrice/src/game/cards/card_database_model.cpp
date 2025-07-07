@@ -100,7 +100,7 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
 
     for (const auto &cardInfoPerSetList : card->getSets()) {
         for (const auto &set : cardInfoPerSetList) {
-            if (set.getPtr()->getEnabled())
+            if (set.getSet()->getEnabled())
                 return true;
         }
     }

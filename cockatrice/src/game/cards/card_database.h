@@ -69,10 +69,10 @@ public:
     [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
     QList<CardInfoPtr> getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const;
     [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
-    [[nodiscard]] PrintingInfo getPreferredSetForCard(const QString &cardName) const;
-    [[nodiscard]] PrintingInfo getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
+    [[nodiscard]] PrintingInfo getSpecificPrinting(const QString &cardName, const QString &providerId) const;
     PrintingInfo
-    getSpecificSetForCard(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
+    getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
     [[nodiscard]] CardInfoPtr guessCard(const QString &cardName, const QString &providerId = QString()) const;
 

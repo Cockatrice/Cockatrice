@@ -367,17 +367,17 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
 
 QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    return addCard(cardName, CardDatabaseManager::getInstance()->getPreferredSetForCard(cardName), zoneName,
+    return addCard(cardName, CardDatabaseManager::getInstance()->getPreferredPrinting(cardName), zoneName,
                    abAddAnyway);
 }
 
 QModelIndex DeckListModel::addCard(const QString &cardName,
-                                   const PrintingInfo &cardInfoSet,
+                                   const PrintingInfo &printingInfo,
                                    const QString &zoneName,
                                    bool abAddAnyway)
 {
     CardInfoPtr cardInfo =
-        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, cardInfoSet.getProperty("uuid"));
+        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, printingInfo.getProperty("uuid"));
 
     if (cardInfo == nullptr) {
         if (abAddAnyway) {
@@ -398,15 +398,15 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
 
     const QModelIndex parentIndex = nodeToIndex(groupNode);
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(groupNode->findCardChildByNameProviderIdAndNumber(
-        cardName, cardInfoSet.getProperty("uuid"), cardInfoSet.getProperty("num")));
-    const auto cardSetName = cardInfoSet.getPtr().isNull() ? "" : cardInfoSet.getPtr()->getCorrectedShortName();
+        cardName, printingInfo.getProperty("uuid"), printingInfo.getProperty("num")));
+    const auto cardSetName = printingInfo.getSet().isNull() ? "" : printingInfo.getSet()->getCorrectedShortName();
 
     if (!cardNode) {
         // Determine the correct index
         int insertRow = findSortedInsertRow(groupNode, cardInfo);
 
         auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
-                                               cardInfoSet.getProperty("num"), cardInfoSet.getProperty("uuid"));
+                                               printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, groupNode, insertRow);
@@ -414,8 +414,8 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
     } else {
         cardNode->setNumber(cardNode->getNumber() + 1);
         cardNode->setCardSetShortName(cardSetName);
-        cardNode->setCardCollectorNumber(cardInfoSet.getProperty("num"));
-        cardNode->setCardProviderId(cardInfoSet.getProperty("uuid"));
+        cardNode->setCardCollectorNumber(printingInfo.getProperty("num"));
+        cardNode->setCardProviderId(printingInfo.getProperty("uuid"));
         deckList->refreshDeckHash();
     }
     sort(lastKnownColumn, lastKnownOrder);

@@ -477,7 +477,7 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
 
     // Third argument (true) says create the card no matter what, even if not in DB
     QModelIndex newCardIndex = deckModel->addCard(
-        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardProviderID), otherZoneName,
+        cardName, CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, cardProviderID), otherZoneName,
         true);
     recursiveExpand(newCardIndex);
 

@@ -73,9 +73,9 @@ void CardDatabase::addCard(CardInfoPtr card)
     // if card already exists just add the new set property
     if (cards.contains(card->getName())) {
         CardInfoPtr sameCard = cards[card->getName()];
-        for (const auto &cardInfoPerSetList : card->getSets()) {
-            for (const PrintingInfo &set : cardInfoPerSetList) {
-                sameCard->addToSet(set.getPtr(), set);
+        for (const auto &printings : card->getSets()) {
+            for (const PrintingInfo &printing : printings) {
+                sameCard->addToSet(printing.getSet(), printing);
             }
         }
         return;
@@ -309,7 +309,7 @@ void CardDatabase::refreshPreferredPrintings()
     }
 }
 
-PrintingInfo CardDatabase::getPreferredSetForCard(const QString &cardName) const
+PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
     if (!cardInfo) {
@@ -322,27 +322,27 @@ PrintingInfo CardDatabase::getPreferredSetForCard(const QString &cardName) const
     }
 
     CardSetPtr preferredSet = nullptr;
-    PrintingInfo preferredCard;
+    PrintingInfo preferredPrinting;
     SetPriorityComparator comparator;
 
-    for (const auto &cardInfoPerSetList : setMap) {
-        for (auto &cardInfoForSet : cardInfoPerSetList) {
-            CardSetPtr currentSet = cardInfoForSet.getPtr();
+    for (const auto &printings : setMap) {
+        for (auto &printing : printings) {
+            CardSetPtr currentSet = printing.getSet();
             if (!preferredSet || comparator(currentSet, preferredSet)) {
                 preferredSet = currentSet;
-                preferredCard = cardInfoForSet;
+                preferredPrinting = printing;
             }
         }
     }
 
     if (preferredSet) {
-        return preferredCard;
+        return preferredPrinting;
     }
 
     return PrintingInfo(nullptr);
 }
 
-PrintingInfo CardDatabase::getSpecificSetForCard(const QString &cardName, const QString &providerId) const
+PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName, const QString &providerId) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
     if (!cardInfo) {
@@ -363,15 +363,15 @@ PrintingInfo CardDatabase::getSpecificSetForCard(const QString &cardName, const 
     }
 
     if (providerId.isNull()) {
-        return getPreferredSetForCard(cardName);
+        return getPreferredPrinting(cardName);
     }
 
     return PrintingInfo(nullptr);
 }
 
-PrintingInfo CardDatabase::getSpecificSetForCard(const QString &cardName,
-                                                 const QString &setShortName,
-                                                    const QString &collectorNumber) const
+PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
+                                               const QString &setShortName,
+                                               const QString &collectorNumber) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
     if (!cardInfo) {
@@ -386,12 +386,12 @@ PrintingInfo CardDatabase::getSpecificSetForCard(const QString &cardName,
     for (const auto &cardInfoPerSetList : setMap) {
         for (auto &cardInfoForSet : cardInfoPerSetList) {
             if (collectorNumber != nullptr) {
-                if (cardInfoForSet.getPtr()->getShortName() == setShortName &&
+                if (cardInfoForSet.getSet()->getShortName() == setShortName &&
                     cardInfoForSet.getProperty("num") == collectorNumber) {
                     return cardInfoForSet;
                 }
             } else {
-                if (cardInfoForSet.getPtr()->getShortName() == setShortName) {
+                if (cardInfoForSet.getSet()->getShortName() == setShortName) {
                     return cardInfoForSet;
                 }
             }
@@ -403,8 +403,8 @@ PrintingInfo CardDatabase::getSpecificSetForCard(const QString &cardName,
 
 QString CardDatabase::getPreferredPrintingProviderIdForCard(const QString &cardName)
 {
-    PrintingInfo preferredSetCardInfo = getPreferredSetForCard(cardName);
-    QString preferredPrintingProviderId = preferredSetCardInfo.getProperty(QString("uuid"));
+    PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
+    QString preferredPrintingProviderId = preferredPrinting.getProperty(QString("uuid"));
     if (preferredPrintingProviderId.isEmpty()) {
         CardInfoPtr defaultCardInfo = getCard(cardName);
         if (defaultCardInfo.isNull()) {

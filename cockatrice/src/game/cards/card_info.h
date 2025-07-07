@@ -162,7 +162,7 @@ private:
     QVariantHash properties;
 
 public:
-    CardSetPtr getPtr() const
+    CardSetPtr getSet() const
     {
         return set;
     }

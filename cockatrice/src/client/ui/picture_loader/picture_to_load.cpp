@@ -30,7 +30,7 @@ QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
     QList<CardSetPtr> sortedSets;
     for (const auto &cardInfoPerSetList : card->getSets()) {
         for (const auto &set : cardInfoPerSetList) {
-            sortedSets << set.getPtr();
+            sortedSets << set.getSet();
         }
     }
     if (sortedSets.empty()) {
@@ -45,7 +45,7 @@ QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
             for (const auto &set : cardInfoPerSetList) {
                 if (QLatin1String("card_") + card->getName() + QString("_") + QString(set.getProperty("uuid")) ==
                     card->getPixmapCacheKey()) {
-                    long long setIndex = sortedSets.indexOf(set.getPtr());
+                    long long setIndex = sortedSets.indexOf(set.getSet());
                     CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
                     sortedSets.prepend(setForCardProviderID);
                 }

@@ -112,7 +112,7 @@ public:
                          const QString &cardNumber = "") const;
     QModelIndex addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway);
     QModelIndex addCard(const ::QString &cardName,
-                        const PrintingInfo &cardInfoSet,
+                        const PrintingInfo &printingInfo,
                         const QString &zoneName,
                         bool abAddAnyway = false);
     int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;

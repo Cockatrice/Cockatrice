@@ -343,9 +343,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // sets
-    const PrintingInfoPerSetMap sets = info->getSets();
-    for (const auto &cardInfoPerSetList : sets) {
-        for (const PrintingInfo &set : cardInfoPerSetList) {
+    const PrintingInfoPerSetMap perSetMap = info->getSets();
+    for (const auto &printings : perSetMap) {
+        for (const PrintingInfo &set : printings) {
             xml.writeStartElement("set");
             xml.writeAttribute("rarity", set.getProperty("rarity"));
             xml.writeAttribute("muId", set.getProperty("muid"));
@@ -361,7 +361,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
                 xml.writeAttribute("picURL", tmpString);
             }
 
-            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeCharacters(set.getSet()->getShortName());
             xml.writeEndElement();
         }
     }

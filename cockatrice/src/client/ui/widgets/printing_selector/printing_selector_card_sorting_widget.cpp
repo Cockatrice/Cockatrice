@@ -73,16 +73,16 @@ void PrintingSelectorCardSortingWidget::updateSortSetting()
  * - Contained in Deck
  * - Potential Cards in Deck
  *
- * @param cardInfoPerSets The list of card sets to be sorted.
- * @return A sorted list of card sets.
+ * @param perSetMap The list of card sets to be sorted.
+ * @return A sorted list of printings.
  */
-QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingInfoPerSetMap &cardInfoPerSets)
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingInfoPerSetMap &perSetMap)
 {
     QList<CardSetPtr> sortedSets;
 
-    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
-        for (const auto &set : cardInfoPerSetList) {
-            sortedSets << set.getPtr();
+    for (const auto &printingInfos : perSetMap) {
+        for (const auto &set : printingInfos) {
+            sortedSets << set.getSet();
             break;
         }
     }
@@ -98,14 +98,14 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingIn
         std::sort(sortedSets.begin(), sortedSets.end(), SetReleaseDateComparator());
     }
 
-    QList<PrintingInfo> sortedCardInfoPerSets;
+    QList<PrintingInfo> sortedPrintings;
     // Reconstruct sorted list of CardInfoPerSet
     for (const auto &set : sortedSets) {
-        for (auto it = cardInfoPerSets.begin(); it != cardInfoPerSets.end(); ++it) {
+        for (auto it = perSetMap.begin(); it != perSetMap.end(); ++it) {
             for (const auto &cardInfoPerSet : it.value()) {
-                if (cardInfoPerSet.getPtr() == set) {
-                    if (!sortedCardInfoPerSets.contains(cardInfoPerSet)) {
-                        sortedCardInfoPerSets << cardInfoPerSet;
+                if (cardInfoPerSet.getSet() == set) {
+                    if (!sortedPrintings.contains(cardInfoPerSet)) {
+                        sortedPrintings << cardInfoPerSet;
                     }
                 }
             }
@@ -113,10 +113,10 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingIn
     }
 
     if (descendingSort) {
-        std::reverse(sortedCardInfoPerSets.begin(), sortedCardInfoPerSets.end());
+        std::reverse(sortedPrintings.begin(), sortedPrintings.end());
     }
 
-    return sortedCardInfoPerSets;
+    return sortedPrintings;
 }
 
 /**
@@ -126,81 +126,81 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const PrintingIn
  * text. If the search text matches either the long or short name of a card set, that set is included in the filtered
  * list.
  *
- * @param sets The list of card sets to be filtered.
+ * @param printings The list of printings to be filtered.
  * @param searchText The search text used to filter the card sets.
  * @return A filtered list of card sets.
  */
-QList<PrintingInfo> PrintingSelectorCardSortingWidget::filterSets(const QList<PrintingInfo> &sets,
-                                                                    const QString &searchText)
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::filterSets(const QList<PrintingInfo> &printings,
+                                                                  const QString &searchText)
 {
     if (searchText.isEmpty()) {
-        return sets;
+        return printings;
     }
 
-    QList<PrintingInfo> filteredSets;
+    QList<PrintingInfo> filteredPrintings;
 
-    for (const auto &set : sets) {
-        const QString longName = set.getPtr()->getLongName().toLower();
-        const QString shortName = set.getPtr()->getShortName().toLower();
+    for (const auto &printing : printings) {
+        const QString longName = printing.getSet()->getLongName().toLower();
+        const QString shortName = printing.getSet()->getShortName().toLower();
 
         if (longName.contains(searchText) || shortName.contains(searchText)) {
-            filteredSets << set;
+            filteredPrintings << printing;
         }
     }
 
-    return filteredSets;
+    return filteredPrintings;
 }
 
-QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<PrintingInfo> &sets,
-                                                                                const QString &cardName)
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPinnedPrintings(const QList<PrintingInfo> &printings,
+                                                                              const QString &cardName)
 {
-    auto setsToUse = sets;
+    auto printingsToUse = printings;
     const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
     if (!cardProviderId.isEmpty()) {
-        for (int i = 0; i < setsToUse.size(); ++i) {
-            const auto &card = setsToUse[i];
+        for (int i = 0; i < printingsToUse.size(); ++i) {
+            const auto &card = printingsToUse[i];
             if (card.getProperty("uuid") == cardProviderId) {
-                setsToUse.move(i, 0);
+                printingsToUse.move(i, 0);
                 break;
             }
         }
     }
 
-    return setsToUse;
+    return printingsToUse;
 }
 
 /**
- * @brief Prepend card printings that are contained in the deck to the list of card sets.
+ * @brief Prepend card printings that are contained in the deck to the list of printings.
  *
- * This function adjusts the list of card sets by moving the printings that are already contained in the deck to the
+ * This function adjusts the list of printings by moving the printings that are already contained in the deck to the
  * beginning of the list, sorted by the count of cards in the deck.
  *
- * @param sets The original list of card sets.
+ * @param printings The original list of printings.
  * @param selectedCard The currently selected card.
  * @param deckModel The model representing the deck.
- * @return A list of card sets with the printings contained in the deck prepended.
+ * @return A list of printings with the printings contained in the deck prepended.
  */
-QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<PrintingInfo> &sets,
-                                                                                const CardInfoPtr &selectedCard,
-                                                                                DeckListModel *deckModel)
+QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<PrintingInfo> &printings,
+                                                                              const CardInfoPtr &selectedCard,
+                                                                              DeckListModel *deckModel)
 {
     if (!selectedCard) {
         return {};
     }
 
-    PrintingInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
+    PrintingInfoPerSetMap perSetMap = selectedCard->getSets();
     QList<QPair<PrintingInfo, int>> countList;
 
     // Collect sets with their counts
-    for (const auto &cardInfoPerSetList : cardInfoPerSets) {
-        for (const auto &cardInfoPerSet : cardInfoPerSetList) {
+    for (const auto &printingList : perSetMap) {
+        for (const auto &printing : printingList) {
             QModelIndex find_card =
-                deckModel->findCard(selectedCard->getName(), DECK_ZONE_MAIN, cardInfoPerSet.getProperty("uuid"));
+                deckModel->findCard(selectedCard->getName(), DECK_ZONE_MAIN, printing.getProperty("uuid"));
             if (find_card.isValid()) {
                 int count =
                     deckModel->data(find_card, Qt::DisplayRole).toInt(); // Ensure the count is treated as an integer
                 if (count > 0) {
-                    countList.append(qMakePair(cardInfoPerSet, count));
+                    countList.append(qMakePair(printing, count));
                 }
             }
             break;
@@ -214,7 +214,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(co
               });
 
     // Create a copy of the original list to modify
-    QList<PrintingInfo> result = sets;
+    QList<PrintingInfo> result = printings;
 
     // Prepend sorted sets and remove them from the original list
     for (const auto &pair : countList) {
