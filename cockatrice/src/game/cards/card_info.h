@@ -160,15 +160,15 @@ private:
     QVariantHash properties;
 
 public:
-    const CardSetPtr getPtr() const
+    CardSetPtr getPtr() const
     {
         return set;
     }
-    const QStringList getProperties() const
+    QStringList getProperties() const
     {
         return properties.keys();
     }
-    const QString getProperty(const QString &propertyName) const
+    QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -292,11 +292,11 @@ public:
     {
         return isToken;
     }
-    const QStringList getProperties() const
+    QStringList getProperties() const
     {
         return properties.keys();
     }
-    const QString getProperty(const QString &propertyName) const
+    QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -317,7 +317,7 @@ public:
     {
         return setsNames;
     }
-    const QString getSetProperty(const QString &setName, const QString &propertyName) const
+    QString getSetProperty(const QString &setName, const QString &propertyName) const
     {
         if (!sets.contains(setName))
             return "";
@@ -345,7 +345,7 @@ public:
     {
         return reverseRelatedCardsToMe;
     }
-    const QList<CardRelation *> getAllRelatedCards() const
+    QList<CardRelation *> getAllRelatedCards() const
     {
         QList<CardRelation *> result;
         result.append(getRelatedCards());
