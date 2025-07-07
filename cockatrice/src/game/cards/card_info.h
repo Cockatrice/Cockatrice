@@ -204,7 +204,7 @@ private:
     // the cards thare are reverse-related to me
     QList<CardRelation *> reverseRelatedCardsToMe;
     // card sets
-    SetToPrintingsMap sets;
+    SetToPrintingsMap setsToPrintings;
     // cached set names
     QString setsNames;
     // positioning properties; used by UI
@@ -229,7 +229,7 @@ public:
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
           text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
-          sets(other.sets), setsNames(other.setsNames), cipt(other.cipt),
+          setsToPrintings(other.setsToPrintings), setsNames(other.setsNames), cipt(other.cipt),
           landscapeOrientation(other.landscapeOrientation), tableRow(other.tableRow), upsideDownArt(other.upsideDownArt)
     {
     }
@@ -313,7 +313,7 @@ public:
     }
     const SetToPrintingsMap &getSets() const
     {
-        return sets;
+        return setsToPrintings;
     }
     const QString &getSetsNames() const
     {
@@ -321,17 +321,17 @@ public:
     }
     QString getSetProperty(const QString &setName, const QString &propertyName) const
     {
-        if (!sets.contains(setName))
+        if (!setsToPrintings.contains(setName))
             return "";
 
-        for (const auto &set : sets[setName]) {
+        for (const auto &set : setsToPrintings[setName]) {
             if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
                 this->getPixmapCacheKey()) {
                 return set.getProperty(propertyName);
             }
         }
 
-        return sets[setName][0].getProperty(propertyName);
+        return setsToPrintings[setName][0].getProperty(propertyName);
     }
 
     // related cards

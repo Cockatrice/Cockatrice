@@ -231,7 +231,7 @@ CardInfo::CardInfo(const QString &_name,
                    int _tableRow,
                    bool _upsideDownArt)
     : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt),
+      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), cipt(_cipt),
       landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
@@ -294,8 +294,8 @@ void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
     if (!_set->contains(smartThis)) {
         _set->append(smartThis);
     }
-    if (!sets[_set->getShortName()].contains(_info)) {
-        sets[_set->getShortName()].append(_info);
+    if (!setsToPrintings[_set->getShortName()].contains(_info)) {
+        setsToPrintings[_set->getShortName()].append(_info);
     }
 
     refreshCachedSetNames();
@@ -316,7 +316,7 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for (const auto &printings : sets) {
+    for (const auto &printings : setsToPrintings) {
         for (const auto &printing : printings) {
             if (printing.getSet()->getEnabled()) {
                 setList << printing.getSet()->getShortName();
