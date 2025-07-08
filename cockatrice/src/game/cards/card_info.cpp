@@ -215,7 +215,7 @@ void SetList::defaultSort()
     });
 }
 
-CardInfoPerSet::CardInfoPerSet(const CardSetPtr &_set) : set(_set)
+PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {
 }
 
@@ -225,13 +225,13 @@ CardInfo::CardInfo(const QString &_name,
                    QVariantHash _properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
-                   CardInfoPerSetMap _sets,
+                   SetToPrintingsMap _sets,
                    bool _cipt,
                    bool _landscapeOrientation,
                    int _tableRow,
                    bool _upsideDownArt)
     : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), sets(std::move(_sets)), cipt(_cipt),
+      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), cipt(_cipt),
       landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
 {
     pixmapCacheKey = QLatin1String("card_") + name;
@@ -248,7 +248,7 @@ CardInfo::~CardInfo()
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
     return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                       CardInfoPerSetMap(), false, false, 0, false);
+                       SetToPrintingsMap(), false, false, 0, false);
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
@@ -257,7 +257,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   QVariantHash _properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
-                                  CardInfoPerSetMap _sets,
+                                  SetToPrintingsMap _sets,
                                   bool _cipt,
                                   bool _landscapeOrientation,
                                   int _tableRow,
@@ -267,9 +267,9 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                  _sets, _cipt, _landscapeOrientation, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
-    for (const auto &cardInfoPerSetList : _sets) {
-        for (const CardInfoPerSet &set : cardInfoPerSetList) {
-            set.getPtr()->append(ptr);
+    for (const auto &printings : _sets) {
+        for (const PrintingInfo &printing : printings) {
+            printing.getSet()->append(ptr);
             break;
         }
     }
@@ -289,13 +289,13 @@ QString CardInfo::getCorrectedName() const
     return result.remove(rmrx).replace(spacerx, space);
 }
 
-void CardInfo::addToSet(const CardSetPtr &_set, const CardInfoPerSet _info)
+void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
 {
     if (!_set->contains(smartThis)) {
         _set->append(smartThis);
     }
-    if (!sets[_set->getShortName()].contains(_info)) {
-        sets[_set->getShortName()].append(_info);
+    if (!setsToPrintings[_set->getShortName()].contains(_info)) {
+        setsToPrintings[_set->getShortName()].append(_info);
     }
 
     refreshCachedSetNames();
@@ -316,10 +316,10 @@ void CardInfo::refreshCachedSetNames()
 {
     QStringList setList;
     // update the cached list of set names
-    for (const auto &cardInfoPerSetList : sets) {
-        for (const auto &set : cardInfoPerSetList) {
-            if (set.getPtr()->getEnabled()) {
-                setList << set.getPtr()->getShortName();
+    for (const auto &printings : setsToPrintings) {
+        for (const auto &printing : printings) {
+            if (printing.getSet()->getEnabled()) {
+                setList << printing.getSet()->getShortName();
             }
             break;
         }

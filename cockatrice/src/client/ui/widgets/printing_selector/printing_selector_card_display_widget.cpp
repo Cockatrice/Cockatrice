@@ -24,7 +24,7 @@
  * @param _deckView The QTreeView instance displaying the deck.
  * @param _cardSizeSlider The slider controlling the size of the displayed card.
  * @param _rootCard The root card object, representing the card to be displayed.
- * @param _setInfoForCard The set-specific information for the card being displayed.
+ * @param _printingInfo The printing info for the card being displayed.
  * @param _currentZone The current zone in which the card is located.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
@@ -33,10 +33,10 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
-                                                                     const CardInfoPerSet &_setInfoForCard,
+                                                                     const PrintingInfo &_printingInfo,
                                                                      QString &_currentZone)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard),
+      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), printingInfo(_printingInfo),
       currentZone(_currentZone)
 {
     layout = new QVBoxLayout(this);
@@ -45,15 +45,15 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
 
     // Create the overlay widget for the card display
     overlayWidget = new PrintingSelectorCardOverlayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider,
-                                                          rootCard, setInfoForCard);
+                                                          rootCard, _printingInfo);
     connect(overlayWidget, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
             [this]() { emit cardPreferenceChanged(); });
 
     // Create the widget to display the set name and collector's number
     const QString combinedSetName =
-        QString(setInfoForCard.getPtr()->getLongName() + " (" + setInfoForCard.getPtr()->getShortName() + ")");
+        QString(_printingInfo.getSet()->getLongName() + " (" + _printingInfo.getSet()->getShortName() + ")");
     setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
-        this, combinedSetName, setInfoForCard.getProperty("num"), cardSizeSlider);
+        this, combinedSetName, _printingInfo.getProperty("num"), cardSizeSlider);
 
     // Add the widgets to the layout
     layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);

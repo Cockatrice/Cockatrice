@@ -224,27 +224,27 @@ void PrintingSelector::getAllSetsForCurrentCard()
         return;
     }
 
-    CardInfoPerSetMap cardInfoPerSets = selectedCard->getSets();
-    const QList<CardInfoPerSet> sortedSets = sortToolBar->sortSets(cardInfoPerSets);
-    const QList<CardInfoPerSet> filteredSets =
-        sortToolBar->filterSets(sortedSets, searchBar->getSearchText().trimmed().toLower());
-    QList<CardInfoPerSet> setsToUse;
+    SetToPrintingsMap setMap = selectedCard->getSets();
+    const QList<PrintingInfo> sortedPrintings = sortToolBar->sortSets(setMap);
+    const QList<PrintingInfo> filteredPrintings =
+        sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());
+    QList<PrintingInfo> printingsToUse;
 
     if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
-        setsToUse = sortToolBar->prependPrintingsInDeck(filteredSets, selectedCard, deckModel);
+        printingsToUse = sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckModel);
     } else {
-        setsToUse = filteredSets;
+        printingsToUse = filteredPrintings;
     }
-    setsToUse = sortToolBar->prependPinnedPrintings(setsToUse, selectedCard->getName());
+    printingsToUse = sortToolBar->prependPinnedPrintings(printingsToUse, selectedCard->getName());
 
     // Defer widget creation
     currentIndex = 0;
 
     connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
-        for (int i = 0; i < BATCH_SIZE && currentIndex < setsToUse.size(); ++i, ++currentIndex) {
+        for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
                                                                             cardSizeWidget->getSlider(), selectedCard,
-                                                                            setsToUse[currentIndex], currentZone);
+                                                                            printingsToUse[currentIndex], currentZone);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
             connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
@@ -252,7 +252,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         }
 
         // Stop timer when done
-        if (currentIndex >= setsToUse.size()) {
+        if (currentIndex >= printingsToUse.size()) {
             widgetLoadingBufferTimer->stop();
         }
     });

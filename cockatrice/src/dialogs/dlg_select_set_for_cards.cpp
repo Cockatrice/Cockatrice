@@ -152,7 +152,7 @@ void DlgSelectSetForCards::actOK()
                 continue;
             }
             model->removeRow(find_card.row(), find_card.parent());
-            model->addCard(card, CardDatabaseManager::getInstance()->getSpecificSetForCard(card, modifiedSet, ""),
+            model->addCard(card, CardDatabaseManager::getInstance()->getSpecificPrinting(card, modifiedSet, ""),
                            DECK_ZONE_MAIN);
         }
     }
@@ -226,8 +226,8 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
             if (!infoPtr)
                 continue;
 
-            CardInfoPerSetMap infoPerSetMap = infoPtr->getSets();
-            for (auto it = infoPerSetMap.begin(); it != infoPerSetMap.end(); ++it) {
+            SetToPrintingsMap setMap = infoPtr->getSets();
+            for (auto it = setMap.begin(); it != setMap.end(); ++it) {
                 setCounts[it.key()]++;
             }
         }
@@ -297,7 +297,7 @@ void DlgSelectSetForCards::updateCardLists()
             } else {
                 CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
                     currentCard->getName(), CardDatabaseManager::getInstance()
-                                                ->getSpecificSetForCard(currentCard->getName(), foundSetName, "")
+                                                ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
                                                 .getProperty("uuid"));
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
                 picture_widget->setCard(infoPtr);
@@ -380,8 +380,8 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
             if (!infoPtr)
                 continue;
 
-            CardInfoPerSetMap infoPerSetMap = infoPtr->getSets();
-            for (auto it = infoPerSetMap.begin(); it != infoPerSetMap.end(); ++it) {
+            SetToPrintingsMap setMap = infoPtr->getSets();
+            for (auto it = setMap.begin(); it != setMap.end(); ++it) {
                 setCards[it.key()].append(currentCard->getName());
             }
         }
@@ -628,7 +628,7 @@ void SetEntryWidget::updateCardDisplayWidgets()
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
         picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
             cardName,
-            CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, setName, nullptr).getProperty("uuid")));
+            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid")));
         cardListContainer->addWidget(picture_widget);
     }
 
@@ -636,7 +636,7 @@ void SetEntryWidget::updateCardDisplayWidgets()
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
         picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
             cardName,
-            CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, setName, nullptr).getProperty("uuid")));
+            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid")));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }
 }

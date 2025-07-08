@@ -12,12 +12,12 @@ class PrintingSelectorCardSortingWidget : public QWidget
     Q_OBJECT
 public:
     explicit PrintingSelectorCardSortingWidget(PrintingSelector *parent);
-    QList<CardInfoPerSet> sortSets(const CardInfoPerSetMap &cardInfoPerSets);
-    QList<CardInfoPerSet> filterSets(const QList<CardInfoPerSet> &sets, const QString &searchText);
-    QList<CardInfoPerSet> prependPinnedPrintings(const QList<CardInfoPerSet> &sets, const QString &cardName);
-    QList<CardInfoPerSet> prependPrintingsInDeck(const QList<CardInfoPerSet> &sets,
-                                                 const CardInfoPtr &selectedCard,
-                                                 DeckListModel *deckModel);
+    QList<PrintingInfo> sortSets(const SetToPrintingsMap &setMap);
+    QList<PrintingInfo> filterSets(const QList<PrintingInfo> &printings, const QString &searchText);
+    QList<PrintingInfo> prependPinnedPrintings(const QList<PrintingInfo> &printings, const QString &cardName);
+    QList<PrintingInfo> prependPrintingsInDeck(const QList<PrintingInfo> &printings,
+                                               const CardInfoPtr &selectedCard,
+                                               DeckListModel *deckModel);
 
 public slots:
     void updateSortOrder();
