@@ -195,11 +195,11 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
         if (canBeCommander(info)) {
-            edhRecCommander = menu.addAction(tr("Show on EDHREC (Commander)"));
+            edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
                     [this, info] { deckEditor->getTabSupervisor()->addEdhrecTab(info, true); });
         }
-        edhRecCard = menu.addAction(tr("Show on EDHREC (Card)"));
+        edhRecCard = menu.addAction(tr("Show on EDHRec (Card)"));
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);

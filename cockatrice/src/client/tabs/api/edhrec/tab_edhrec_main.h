@@ -24,7 +24,7 @@ public:
     QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
-        return tr("EDHREC: ") + cardName;
+        return tr("EDHRec: ") + cardName;
     }
 
     CardSizeWidget *getCardSizeSlider()
