@@ -51,7 +51,6 @@ private:
     QWidget *sortAndOptionsContainer;
     QHBoxLayout *sortAndOptionsLayout;
     QCheckBox *navigationCheckBox;
-    QLabel *warningLabel;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     FlowWidget *flowWidget;
