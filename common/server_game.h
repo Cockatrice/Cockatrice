@@ -67,6 +67,7 @@ private:
     bool spectatorsCanTalk;
     bool spectatorsSeeEverything;
     int startingLifeTotal;
+    bool shareDecklistsOnLoad;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -106,7 +107,8 @@ public:
                 bool _spectatorsNeedPassword,
                 bool _spectatorsCanTalk,
                 bool _spectatorsSeeEverything,
-                int startingLifeTotal,
+                int _startingLifeTotal,
+                bool _shareDecklistsOnLoad,
                 Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
@@ -167,6 +169,10 @@ public:
     int getStartingLifeTotal() const
     {
         return startingLifeTotal;
+    }
+    bool getShareDecklistsOnLoad() const
+    {
+        return shareDecklistsOnLoad;
     }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);

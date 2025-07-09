@@ -7,6 +7,7 @@
 #include "../../game/cards/card_database.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/deckview/deck_view_container.h"
+#include "../../game/deckview/tabbed_deck_view_container.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
 #include "../../game/player/player.h"
@@ -288,9 +289,9 @@ void TabGame::retranslateUi()
     QMapIterator<int, Player *> i(players);
     while (i.hasNext())
         i.next().value()->retranslateUi();
-    QMapIterator<int, DeckViewContainer *> j(deckViewContainers);
+    QMapIterator<int, TabbedDeckViewContainer *> j(deckViewContainers);
     while (j.hasNext())
-        j.next().value()->retranslateUi();
+        j.next().value()->playerDeckView->retranslateUi();
 
     scene->retranslateUi();
 }
@@ -582,8 +583,8 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
         if (clients.size() == 1)
             newPlayer->setShortcutsActive();
 
-        auto *deckView = new DeckViewContainer(playerId, this);
-        connect(deckView, &DeckViewContainer::newCardAdded, this, &TabGame::newCardAdded);
+        auto *deckView = new TabbedDeckViewContainer(playerId, this);
+        connect(deckView->playerDeckView, &DeckViewContainer::newCardAdded, this, &TabGame::newCardAdded);
         deckViewContainers.insert(playerId, deckView);
         deckViewContainerLayout->addWidget(deckView);
 
@@ -591,8 +592,8 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
         QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getName());
         if (!deckPath.isEmpty()) {
             QTimer::singleShot(0, this, [deckView, deckPath] {
-                deckView->loadDeckFromFile(deckPath);
-                deckView->readyAndUpdate();
+                deckView->playerDeckView->loadDeckFromFile(deckPath);
+                deckView->playerDeckView->readyAndUpdate();
             });
         }
     }
@@ -777,11 +778,11 @@ void TabGame::startGame(bool _resuming)
 {
     currentPhase = -1;
 
-    QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
+    QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
     while (i.hasNext()) {
         i.next();
-        i.value()->setReadyStart(false);
-        i.value()->setVisualDeckStorageExists(false);
+        i.value()->playerDeckView->setReadyStart(false);
+        i.value()->playerDeckView->setVisualDeckStorageExists(false);
         i.value()->hide();
     }
 
@@ -803,7 +804,7 @@ void TabGame::stopGame()
     currentPhase = -1;
     activePlayer = -1;
 
-    QMapIterator<int, DeckViewContainer *> i(deckViewContainers);
+    QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
     while (i.hasNext()) {
         i.next();
         i.value()->show();
@@ -871,16 +872,16 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
             }
             player->processPlayerInfo(playerInfo);
             if (player->getLocal()) {
-                DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
+                TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
                     PictureLoader::cacheCardPixmaps(
-                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
-                    deckViewContainer->setDeck(newDeck);
+                                            CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
+                    deckViewContainer->playerDeckView->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }
-                deckViewContainer->setReadyStart(prop.ready_start());
-                deckViewContainer->setSideboardLocked(prop.sideboard_locked());
+                deckViewContainer->playerDeckView->setReadyStart(prop.ready_start());
+                deckViewContainer->playerDeckView->setSideboardLocked(prop.sideboard_locked());
             }
         }
     }
@@ -926,7 +927,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
         case GameEventContext::READY_START: {
             bool ready = prop.ready_start();
             if (player->getLocal())
-                deckViewContainers.value(player->getId())->setReadyStart(ready);
+                deckViewContainers.value(player->getId())->playerDeckView->setReadyStart(ready);
             if (ready)
                 messageLog->logReadyStart(player);
             else
@@ -957,11 +958,20 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
             Context_DeckSelect deckSelect = context.GetExtension(Context_DeckSelect::ext);
             messageLog->logDeckSelect(player, QString::fromStdString(deckSelect.deck_hash()),
                                       deckSelect.sideboard_size());
+            if (deckSelect.has_deck_list() && eventPlayerId != localPlayerId) {
+                DeckList loader;
+                loader.loadFromString_Native(QString::fromStdString(deckSelect.deck_list()));
+                QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
+                while (i.hasNext()) {
+                    i.next();
+                    i.value()->addOpponentDeckView(loader, eventPlayerId, player->getName());
+                }
+            }
             break;
         }
         case GameEventContext::SET_SIDEBOARD_LOCK: {
             if (player->getLocal())
-                deckViewContainers.value(player->getId())->setSideboardLocked(prop.sideboard_locked());
+                deckViewContainers.value(player->getId())->playerDeckView->setSideboardLocked(prop.sideboard_locked());
             messageLog->logSetSideboardLock(player, prop.sideboard_locked());
             break;
         }

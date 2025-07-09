@@ -13,6 +13,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 
+class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
@@ -105,7 +106,7 @@ private:
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
-    QMap<int, DeckViewContainer *> deckViewContainers;
+    QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
