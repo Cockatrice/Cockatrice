@@ -11,13 +11,10 @@ static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 
 PictureLoaderLocal::PictureLoaderLocal(QObject *parent)
     : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath()),
-      overrideAllCardArtWithPersonalPreference(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference())
+      customPicsPath(SettingsCache::instance().getCustomPicsPath())
 {
     // Hook up signals to settings
     connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoaderLocal::picsPathChanged);
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
-            &PictureLoaderLocal::setOverrideAllCardArtWithPersonalPreference);
 
     refreshIndex();
 
@@ -89,15 +86,15 @@ QImage PictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
     // Order is cardName_providerId, cardName_setName_collectorNumber, setName-collectorNumber-cardName and then just
     // generically cardName, if the user has decided to override every printing. Most-to-least specific.
 
-    const QStringList nameVariants = {!providerId.isEmpty() ? QString("%1_%2").arg(correctedCardName, providerId)
-                                                            : QString(),
-                                      (!setName.isEmpty() && !collectorNumber.isEmpty())
-                                          ? QString("%1_%2_%3").arg(correctedCardName, setName, collectorNumber)
-                                          : QString(),
-                                      (!setName.isEmpty() && !collectorNumber.isEmpty())
-                                          ? QString("%1-%2-%3").arg(setName, collectorNumber, correctedCardName)
-                                          : QString(),
-                                      correctedCardName};
+    QStringList nameVariants;
+    if (!providerId.isEmpty()) {
+        nameVariants << QString("%1_%2").arg(correctedCardName, providerId);
+    }
+    if (!setName.isEmpty() && !collectorNumber.isEmpty()) {
+        nameVariants << QString("%1_%2_%3").arg(correctedCardName, setName, collectorNumber)
+                     << QString("%1-%2-%3").arg(setName, collectorNumber, correctedCardName);
+    }
+    nameVariants << correctedCardName;
 
     for (const QString &nameVariant : nameVariants) {
         if (nameVariant.isEmpty()) {
@@ -143,9 +140,4 @@ void PictureLoaderLocal::picsPathChanged()
 {
     picsPath = SettingsCache::instance().getPicsPath();
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
-}
-
-void PictureLoaderLocal::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference)
-{
-    overrideAllCardArtWithPersonalPreference = _overrideAllCardArtWithPersonalPreference;
 }
