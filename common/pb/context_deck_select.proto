@@ -7,4 +7,5 @@ message Context_DeckSelect {
     }
     optional string deck_hash = 1;
     optional int32 sideboard_size = 2 [default = -1];
+    optional string deck_list = 3;
 }

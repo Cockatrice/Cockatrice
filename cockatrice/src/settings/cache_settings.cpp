@@ -355,6 +355,7 @@ SettingsCache::SettingsCache()
     spectatorsCanSeeEverything = settings->value("game/spectatorscanseeeverything", false).toBool();
     createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
     defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
+    shareDecklistsOnLoad = settings->value("game/sharedecklistsonload", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -1360,7 +1361,13 @@ void SettingsCache::setDefaultStartingLifeTotal(const int _defaultStartingLifeTo
 {
     defaultStartingLifeTotal = _defaultStartingLifeTotal;
     settings->setValue("game/defaultstartinglifetotal", defaultStartingLifeTotal);
-};
+}
+
+void SettingsCache::setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad)
+{
+    shareDecklistsOnLoad = _shareDecklistsOnLoad;
+    settings->setValue("game/sharedecklistsonload", shareDecklistsOnLoad);
+}
 
 void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
 {
@@ -1373,6 +1380,7 @@ void SettingsCache::setStartupCardUpdateCheckPromptForUpdate(bool value)
     startupCardUpdateCheckPromptForUpdate = value;
     settings->setValue("personal/startupCardUpdateCheckPromptForUpdate", startupCardUpdateCheckPromptForUpdate);
 }
+
 void SettingsCache::setStartupCardUpdateCheckAlwaysUpdate(bool value)
 {
     startupCardUpdateCheckAlwaysUpdate = value;

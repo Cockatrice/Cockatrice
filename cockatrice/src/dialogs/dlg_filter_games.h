@@ -27,6 +27,7 @@ private:
     QCheckBox *hidePasswordProtectedGames;
     QCheckBox *hideIgnoredUserGames;
     QCheckBox *hideNotBuddyCreatedGames;
+    QCheckBox *hideOpenDecklistGames;
     QLineEdit *gameNameFilterEdit;
     QLineEdit *creatorNameFilterEdit;
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
@@ -57,6 +58,8 @@ public:
     void setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden);
     bool getHideBuddiesOnlyGames() const;
     void setHideBuddiesOnlyGames(bool _hideBuddiesOnlyGames);
+    bool getHideOpenDecklistGames() const;
+    void setHideOpenDecklistGames(bool _hideOpenDecklistGames);
     bool getHideIgnoredUserGames() const;
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
     bool getHideNotBuddyCreatedGames() const;

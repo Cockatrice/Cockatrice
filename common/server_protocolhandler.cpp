@@ -818,6 +818,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     QString description = nameFromStdString(cmd.description());
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
+    bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
         return Response::RespInternalError;
@@ -828,7 +830,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     Server_Game *game = new Server_Game(
         copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
         cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
-        cmd.spectators_can_talk(), cmd.spectators_see_everything(), startingLifeTotal, room);
+        cmd.spectators_can_talk(), cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
