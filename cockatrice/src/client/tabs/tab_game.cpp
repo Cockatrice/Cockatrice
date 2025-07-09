@@ -387,8 +387,6 @@ void TabGame::closeRequest(bool forced)
     close();
 }
 
-
-
 void TabGame::incrementGameTime()
 {
     int seconds = ++secondsElapsed;
