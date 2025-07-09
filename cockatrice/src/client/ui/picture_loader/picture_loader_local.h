@@ -24,7 +24,6 @@ public:
 
 private:
     QString picsPath, customPicsPath;
-    bool overrideAllCardArtWithPersonalPreference;
 
     QMultiHash<QString, QString> customFolderIndex; // multimap of cardName to picPaths
     QTimer *refreshTimer;
@@ -38,7 +37,6 @@ private:
 
 private slots:
     void picsPathChanged();
-    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
 };
 
 #endif // PICTURE_LOADER_LOCAL_H
