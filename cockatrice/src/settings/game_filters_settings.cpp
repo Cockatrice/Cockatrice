@@ -83,6 +83,17 @@ bool GameFiltersSettings::isHideNotBuddyCreatedGames()
     return !(previous == QVariant()) && previous.toBool();
 }
 
+void GameFiltersSettings::setHideOpenDecklistGames(bool hide)
+{
+    setValue(hide, "hide_open_decklist_games", "filter_games");
+}
+
+bool GameFiltersSettings::isHideOpenDecklistGames()
+{
+    QVariant previous = getValue("hide_open_decklist_games", "filter_games");
+    return !(previous == QVariant()) && previous.toBool();
+}
+
 void GameFiltersSettings::setGameNameFilter(QString gameName)
 {
     setValue(gameName, "game_name_filter", "filter_games");

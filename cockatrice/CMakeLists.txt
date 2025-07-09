@@ -197,6 +197,7 @@ set(cockatrice_SOURCES
     src/game/cards/card_search_model.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
+    src/game/deckview/tabbed_deck_view_container.cpp
     src/game/filters/deck_filter_string.cpp
     src/game/filters/filter_builder.cpp
     src/game/filters/filter_card.cpp
