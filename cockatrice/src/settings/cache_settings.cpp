@@ -1361,13 +1361,13 @@ void SettingsCache::setDefaultStartingLifeTotal(const int _defaultStartingLifeTo
 {
     defaultStartingLifeTotal = _defaultStartingLifeTotal;
     settings->setValue("game/defaultstartinglifetotal", defaultStartingLifeTotal);
-};
+}
 
 void SettingsCache::setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad)
 {
     shareDecklistsOnLoad = _shareDecklistsOnLoad;
     settings->setValue("game/sharedecklistsonload", shareDecklistsOnLoad);
-};
+}
 
 void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
 {
@@ -1380,6 +1380,7 @@ void SettingsCache::setStartupCardUpdateCheckPromptForUpdate(bool value)
     startupCardUpdateCheckPromptForUpdate = value;
     settings->setValue("personal/startupCardUpdateCheckPromptForUpdate", startupCardUpdateCheckPromptForUpdate);
 }
+
 void SettingsCache::setStartupCardUpdateCheckAlwaysUpdate(bool value)
 {
     startupCardUpdateCheckAlwaysUpdate = value;
