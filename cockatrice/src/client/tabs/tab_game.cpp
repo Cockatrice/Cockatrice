@@ -69,38 +69,16 @@
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), secondsElapsed(0), hostId(-1), localPlayerId(-1),
       isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(true), judge(false), gameStateKnown(false),
-      resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), replay(_replay), currentReplayStep(0),
-      sayLabel(nullptr), sayEdit(nullptr)
+      resuming(false), currentPhase(-1), activeCard(nullptr), gameClosed(false), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-    gameInfo.CopyFrom(replay->game_info());
-    gameInfo.set_spectators_omniscient(true);
-
-    // Create list: event number -> time [ms]
-    // Distribute simultaneous events evenly across 1 second.
-    unsigned int lastEventTimestamp = 0;
-    const int eventCount = replay->event_list_size();
-    for (int i = 0; i < eventCount; ++i) {
-        int j = i + 1;
-        while ((j < eventCount) && (replay->event_list(j).seconds_elapsed() == lastEventTimestamp))
-            ++j;
-
-        const int numberEventsThisSecond = j - i;
-        for (int k = 0; k < numberEventsThisSecond; ++k)
-            replayTimeline.append(replay->event_list(i + k).seconds_elapsed() * 1000 +
-                                  (int)((qreal)k / (qreal)numberEventsThisSecond * 1000));
-
-        if (j < eventCount)
-            lastEventTimestamp = replay->event_list(j).seconds_elapsed();
-        i += numberEventsThisSecond - 1;
-    }
 
     createCardInfoDock(true);
     createPlayerListDock(true);
     createMessageDock(true);
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
-    createReplayDock();
+    createReplayDock(_replay);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
@@ -131,9 +109,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
       gameInfo(event.game_info()), roomGameTypes(_roomGameTypes), hostId(event.host_id()),
       localPlayerId(event.player_id()), isLocalGame(_tabSupervisor->getIsLocalGame()), spectator(event.spectator()),
       judge(event.judge()), gameStateKnown(false), resuming(event.resuming()), currentPhase(-1), activeCard(nullptr),
-      gameClosed(false), replay(nullptr), replayPlayButton(nullptr), replayFastForwardButton(nullptr),
-      aReplaySkipForward(nullptr), aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr),
-      aReplaySkipBackwardBig(nullptr), replayDock(nullptr)
+      gameClosed(false)
 {
     // THIS CTOR IS USED ON GAMES
     gameInfo.set_started(false);
@@ -143,10 +119,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMessageDock();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
+    createReplayDock(nullptr);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+    replayDock->setHidden(true);
 
     mainWidget = new QStackedWidget(this);
     mainWidget->addWidget(deckViewContainerWidget);
@@ -168,6 +146,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
 
+void TabGame::loadReplay(GameReplay *replay)
+{
+    gameInfo.CopyFrom(replay->game_info());
+    gameInfo.set_spectators_omniscient(true);
+}
+
 void TabGame::addMentionTag(const QString &value)
 {
     sayEdit->insert(value + " ");
@@ -180,6 +164,15 @@ void TabGame::linkCardToChat(const QString &cardName)
     sayEdit->setFocus();
 }
 
+void TabGame::resetChatAndPhase()
+{
+    // reset chat log
+    messageLog->clearChat();
+
+    // reset phase markers
+    setActivePhase(-1);
+}
+
 void TabGame::emitUserEvent()
 {
     bool globalEvent = !spectator || SettingsCache::instance().getSpectatorNotificationsEnabled();
@@ -189,12 +182,13 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    delete replay;
+    delete replayManager->replay;
 }
 
 void TabGame::updatePlayerListDockTitle()
 {
-    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString tabText =
+        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
     QString userCountInfo = QString(" %1/%2").arg(players.size()).arg(gameInfo.max_players());
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
                                    (playerListDock->isWindow() ? tabText : QString()));
@@ -208,7 +202,8 @@ bool TabGame::isMainPlayerConceded() const
 
 void TabGame::retranslateUi()
 {
-    QString tabText = " | " + (replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
+    QString tabText =
+        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameInfo.game_id());
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -379,24 +374,6 @@ void TabGame::refreshShortcuts()
     if (aFocusChat) {
         aFocusChat->setShortcuts(shortcuts.getShortcut("Player/aFocusChat"));
     }
-    if (aReplaySkipForward) {
-        aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
-    }
-    if (aReplaySkipBackward) {
-        aReplaySkipBackward->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackward"));
-    }
-    if (aReplaySkipForwardBig) {
-        aReplaySkipForwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipForwardBig"));
-    }
-    if (aReplaySkipBackwardBig) {
-        aReplaySkipBackwardBig->setShortcuts(shortcuts.getShortcut("Replays/aSkipBackwardBig"));
-    }
-    if (replayPlayButton) {
-        replayPlayButton->setShortcut(shortcuts.getSingleShortcut("Replays/playButton"));
-    }
-    if (replayFastForwardButton) {
-        replayFastForwardButton->setShortcut(shortcuts.getSingleShortcut("Replays/fastForwardButton"));
-    }
 }
 
 void TabGame::closeRequest(bool forced)
@@ -410,41 +387,7 @@ void TabGame::closeRequest(bool forced)
     close();
 }
 
-void TabGame::replayNextEvent(Player::EventProcessingOptions options)
-{
-    processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()), nullptr, options);
-}
 
-void TabGame::replayFinished()
-{
-    replayPlayButton->setChecked(false);
-}
-
-void TabGame::replayPlayButtonToggled(bool checked)
-{
-    if (checked) { // start replay
-        timelineWidget->startReplay();
-    } else { // pause replay
-        timelineWidget->stopReplay();
-    }
-}
-
-void TabGame::replayFastForwardButtonToggled(bool checked)
-{
-    timelineWidget->setTimeScaleFactor(checked ? ReplayTimelineWidget::FAST_FORWARD_SCALE_FACTOR : 1.0);
-}
-
-/**
- * @brief Handles everything that needs to be reset when doing a replay rewind.
- */
-void TabGame::replayRewind()
-{
-    // reset chat log
-    messageLog->clearChat();
-
-    // reset phase markers
-    setActivePhase(-1);
-}
 
 void TabGame::incrementGameTime()
 {
@@ -513,7 +456,7 @@ bool TabGame::leaveGame()
                 return false;
         }
 
-        if (!replay)
+        if (!replayManager->replay)
             sendGameCommand(Command_LeaveGame());
     }
     return true;
@@ -1231,7 +1174,7 @@ QString TabGame::getTabText() const
     QString gameId(QString::number(gameInfo.game_id()));
 
     QString tabText;
-    if (replay)
+    if (replayManager->replay)
         tabText.append(tr("Replay") + " ");
     if (!gameTypeInfo.isEmpty())
         tabText.append(gameTypeInfo + " ");
@@ -1418,7 +1361,7 @@ void TabGame::createViewMenuItems()
 void TabGame::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    if (replayDock) {
+    if (replayManager->replay) {
         restoreGeometry(layouts.getReplayPlayAreaGeometry());
         restoreState(layouts.getReplayPlayAreaLayoutState());
 
@@ -1454,7 +1397,7 @@ void TabGame::loadLayout()
     aMessageLayoutDockFloating->setChecked(messageLayoutDock->isFloating());
     aPlayerListDockFloating->setChecked(playerListDock->isFloating());
 
-    if (replayDock) {
+    if (replayManager->replay) {
         aReplayDockVisible->setChecked(replayDock->isVisible());
         aReplayDockFloating->setEnabled(aReplayDockVisible->isChecked());
         aReplayDockFloating->setChecked(replayDock->isFloating());
@@ -1547,67 +1490,15 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     gamePlayAreaWidget->setLayout(gamePlayAreaVBox);
 }
 
-void TabGame::createReplayDock()
+void TabGame::createReplayDock(GameReplay *replay)
 {
-    // timeline widget
-    timelineWidget = new ReplayTimelineWidget;
-    timelineWidget->setTimeline(replayTimeline);
-    connect(timelineWidget, &ReplayTimelineWidget::processNextEvent, this, &TabGame::replayNextEvent);
-    connect(timelineWidget, &ReplayTimelineWidget::replayFinished, this, &TabGame::replayFinished);
-    connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &TabGame::replayRewind);
-
-    // timeline skip shortcuts
-    aReplaySkipForward = new QAction(timelineWidget);
-    timelineWidget->addAction(aReplaySkipForward);
-    connect(aReplaySkipForward, &QAction::triggered, this,
-            [this] { timelineWidget->skipByAmount(ReplayTimelineWidget::SMALL_SKIP_MS); });
-
-    aReplaySkipBackward = new QAction(timelineWidget);
-    timelineWidget->addAction(aReplaySkipBackward);
-    connect(aReplaySkipBackward, &QAction::triggered, this,
-            [this] { timelineWidget->skipByAmount(-ReplayTimelineWidget::SMALL_SKIP_MS); });
-
-    aReplaySkipForwardBig = new QAction(timelineWidget);
-    timelineWidget->addAction(aReplaySkipForwardBig);
-    connect(aReplaySkipForwardBig, &QAction::triggered, this,
-            [this] { timelineWidget->skipByAmount(ReplayTimelineWidget::BIG_SKIP_MS); });
-
-    aReplaySkipBackwardBig = new QAction(timelineWidget);
-    timelineWidget->addAction(aReplaySkipBackwardBig);
-    connect(aReplaySkipBackwardBig, &QAction::triggered, this,
-            [this] { timelineWidget->skipByAmount(-ReplayTimelineWidget::BIG_SKIP_MS); });
-
-    // buttons
-    replayPlayButton = new QToolButton;
-    replayPlayButton->setIconSize(QSize(32, 32));
-    QIcon playButtonIcon = QIcon();
-    playButtonIcon.addPixmap(QPixmap("theme:replay/start"), QIcon::Normal, QIcon::Off);
-    playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
-    replayPlayButton->setIcon(playButtonIcon);
-    replayPlayButton->setCheckable(true);
-    connect(replayPlayButton, &QToolButton::toggled, this, &TabGame::replayPlayButtonToggled);
-
-    replayFastForwardButton = new QToolButton;
-    replayFastForwardButton->setIconSize(QSize(32, 32));
-    replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
-    replayFastForwardButton->setCheckable(true);
-    connect(replayFastForwardButton, &QToolButton::toggled, this, &TabGame::replayFastForwardButtonToggled);
-
-    // putting everything together
-    auto replayControlLayout = new QHBoxLayout;
-    replayControlLayout->addWidget(timelineWidget, 10);
-    replayControlLayout->addWidget(replayPlayButton);
-    replayControlLayout->addWidget(replayFastForwardButton);
-
-    auto replayControlWidget = new QWidget();
-    replayControlWidget->setObjectName("replayControlWidget");
-    replayControlWidget->setLayout(replayControlLayout);
+    replayManager = new ReplayManager(this, replay);
 
     replayDock = new QDockWidget(this);
     replayDock->setObjectName("replayDock");
     replayDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    replayDock->setWidget(replayControlWidget);
+    replayDock->setWidget(replayManager);
     replayDock->setFloating(false);
 
     replayDock->installEventFilter(this);
@@ -1765,7 +1656,7 @@ void TabGame::createMessageDock(bool bReplay)
 void TabGame::hideEvent(QHideEvent *event)
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    if (replay) {
+    if (replayManager->replay) {
         layouts.setReplayPlayAreaState(saveState());
         layouts.setReplayPlayAreaGeometry(saveGeometry());
         layouts.setReplayCardInfoSize(cardInfoDock->size());
