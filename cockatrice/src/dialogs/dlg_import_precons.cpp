@@ -14,11 +14,11 @@
 #include <decklist.h>
 
 #ifdef HAS_LZMA
-#include "../../src/lzma/decompress.h"
+#include "../../src/utility/external/lzma/decompress.h"
 #endif
 
 #ifdef HAS_ZLIB
-#include "../../src/zip/unzip.h"
+#include "../../src/utility/external/zip/unzip.h"
 #endif
 
 #define ZIP_SIGNATURE "PK"
@@ -319,7 +319,7 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
         int count = cardObj.value("count").toInt();
         QString scryfallId = cardObj.value("identifiers").toObject().value("scryfallId").toString();
 
-        DecklistCardNode *addedCard = precon->addCard(name, "main", setCode, number, scryfallId);
+        DecklistCardNode *addedCard = precon->addCard(name, "main", -1, setCode, number, scryfallId);
         if (count != 1) {
             addedCard->setNumber(count);
         }

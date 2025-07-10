@@ -223,7 +223,7 @@ set(cockatrice_SOURCES
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
     src/main.cpp
-    src/qt-json/json.cpp
+    src/utility/external/qt-json/json.cpp
     src/server/chat_view/chat_view.cpp
     src/server/handle_public_servers.cpp
     src/server/local_client.cpp
@@ -296,7 +296,7 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
   add_definitions("-DHAS_ZLIB")
 
-  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
+  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/utility/external/zip/unzip.cpp src/utility/external/zip/zipglobal.cpp)
 else()
   message(STATUS "Cockatrice: zlib not found; ZIP support disabled")
 endif()
@@ -307,7 +307,7 @@ if(LIBLZMA_FOUND)
   include_directories(${LIBLZMA_INCLUDE_DIRS})
   add_definitions("-DHAS_LZMA")
 
-  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/lzma/decompress.cpp)
+  set(cockatrice_SOURCES ${cockatrice_SOURCES} src/utility/external/lzma/decompress.cpp)
 else()
   message(STATUS "Cockatrice: LibLZMA not found; xz support disabled")
 endif()
