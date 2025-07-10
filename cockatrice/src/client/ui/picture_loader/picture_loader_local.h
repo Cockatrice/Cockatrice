@@ -24,19 +24,19 @@ public:
 
 private:
     QString picsPath, customPicsPath;
-    bool overrideAllCardArtWithPersonalPreference;
 
     QMultiHash<QString, QString> customFolderIndex; // multimap of cardName to picPaths
     QTimer *refreshTimer;
 
     void refreshIndex();
 
-    QImage
-    tryLoadCardImageFromDisk(const QString &setName, const QString &correctedCardName, bool searchCustomPics) const;
+    QImage tryLoadCardImageFromDisk(const QString &setName,
+                                    const QString &correctedCardName,
+                                    const QString &collectorNumber,
+                                    const QString &providerId) const;
 
 private slots:
     void picsPathChanged();
-    void setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference);
 };
 
 #endif // PICTURE_LOADER_LOCAL_H
