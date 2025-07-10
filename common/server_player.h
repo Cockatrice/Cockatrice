@@ -96,6 +96,10 @@ public:
                   Server_AbstractUserInterface *_handler);
     ~Server_Player() override;
     void prepareDestroy();
+    const DeckList *getDeckList() const
+    {
+        return deck;
+    }
     Server_AbstractUserInterface *getUserInterface() const
     {
         return userInterface;

@@ -882,6 +882,14 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 }
                 deckViewContainer->playerDeckView->setReadyStart(prop.ready_start());
                 deckViewContainer->playerDeckView->setSideboardLocked(prop.sideboard_locked());
+            } else {
+                DeckList loader;
+                loader.loadFromString_Native(QString::fromStdString(playerInfo.deck_list()));
+                QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
+                while (i.hasNext()) {
+                    i.next();
+                    i.value()->addOpponentDeckView(loader, playerId, player->getName());
+                }
             }
         }
     }
@@ -967,6 +975,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
                     i.value()->addOpponentDeckView(loader, eventPlayerId, player->getName());
                 }
             }
+            qInfo() << "lol, lmao even";
             break;
         }
         case GameEventContext::SET_SIDEBOARD_LOCK: {

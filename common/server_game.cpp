@@ -21,6 +21,7 @@
 
 #include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
+#include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "pb/event_delete_arrow.pb.h"
 #include "pb/event_game_closed.pb.h"
@@ -512,6 +513,21 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
     userInterface->playerAddedToGame(gameId, room->getId(), newPlayer->getPlayerId());
 
     createGameJoinedEvent(newPlayer, rc, false);
+
+    Event_PlayerPropertiesChanged event;
+    GameEventStorage ges;
+
+    if (getShareDecklistsOnLoad()) {
+        for (const auto &player : players) {
+            Context_DeckSelect context;
+            if (player->getDeckList() != nullptr) {
+                context.set_deck_list(player->getDeckList()->writeToString_Native().toStdString());
+                ges.setGameEventContext(context);
+                ges.enqueueGameEvent(event, player->getPlayerId());
+                ges.sendToGame(this);
+            }
+        }
+    }
 }
 
 void Server_Game::removePlayer(Server_Player *player, Event_Leave::LeaveReason reason)
