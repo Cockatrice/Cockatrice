@@ -102,6 +102,7 @@ protected slots:
     void actSaveDeckToClipboardRaw();
     void actSaveDeckToClipboardRawNoSetInfo();
     void actPrintDeck();
+    void actLoadDeckFromWebsite();
     void actExportDeckDecklist();
     void actExportDeckDecklistXyz();
     void actAnalyzeDeckDeckstats();

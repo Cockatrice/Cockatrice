@@ -5,6 +5,7 @@
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../dialogs/dlg_load_deck_from_website.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
@@ -54,6 +55,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
     loadFromClipboardButton = new QPushButton;
+    loadFromWebsiteButton = new QPushButton;
     unloadDeckButton = new QPushButton;
     readyStartButton = new ToggleButton;
     forceStartGameButton = new QPushButton;
@@ -62,6 +64,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     connect(loadLocalButton, &QPushButton::clicked, this, &DeckViewContainer::loadLocalDeck);
     connect(loadRemoteButton, &QPushButton::clicked, this, &DeckViewContainer::loadRemoteDeck);
     connect(loadFromClipboardButton, &QPushButton::clicked, this, &DeckViewContainer::loadFromClipboard);
+    connect(loadFromWebsiteButton, &QPushButton::clicked, this, &DeckViewContainer::loadFromWebsite);
     connect(readyStartButton, &QPushButton::clicked, this, &DeckViewContainer::readyStart);
     connect(unloadDeckButton, &QPushButton::clicked, this, &DeckViewContainer::unloadDeck);
     connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
@@ -72,6 +75,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
     buttonHBox->addWidget(loadFromClipboardButton);
+    buttonHBox->addWidget(loadFromWebsiteButton);
     buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
@@ -123,6 +127,7 @@ void DeckViewContainer::retranslateUi()
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
     loadFromClipboardButton->setText(tr("Load from clipboard..."));
+    loadFromWebsiteButton->setText(tr("Load from website..."));
     unloadDeckButton->setText(tr("Unload deck"));
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
@@ -154,6 +159,7 @@ void DeckViewContainer::switchToDeckSelectView()
     setVisibility(loadLocalButton, true);
     setVisibility(loadRemoteButton, !parentGame->getIsLocalGame());
     setVisibility(loadFromClipboardButton, true);
+    setVisibility(loadFromWebsiteButton, true);
     setVisibility(unloadDeckButton, false);
     setVisibility(readyStartButton, false);
     setVisibility(sideboardLockButton, false);
@@ -179,6 +185,7 @@ void DeckViewContainer::switchToDeckLoadedView()
     setVisibility(loadLocalButton, false);
     setVisibility(loadRemoteButton, false);
     setVisibility(loadFromClipboardButton, false);
+    setVisibility(loadFromWebsiteButton, false);
     setVisibility(unloadDeckButton, true);
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
@@ -306,6 +313,18 @@ void DeckViewContainer::loadFromClipboard()
     }
 
     DeckLoader *deck = dlg.getDeckList();
+    loadDeckFromDeckLoader(deck);
+}
+
+void DeckViewContainer::loadFromWebsite()
+{
+    auto dlg = DlgLoadDeckFromWebsite(this);
+
+    if (!dlg.exec()) {
+        return;
+    }
+
+    DeckLoader *deck = dlg.getDeck();
     loadDeckFromDeckLoader(deck);
 }
 
