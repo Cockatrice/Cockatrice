@@ -6,6 +6,7 @@
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 #include <QNetworkReply>
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
@@ -58,6 +59,7 @@ void DlgLoadDeckFromWebsite::accept()
         auto jsonParser = createParserForProvider(info.provider);
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
             qWarning() << "No parser found for provider";
+            QMessageBox::warning(this, tr("Load Deck from Website"), tr("No parser available for this deck provider."));
             QDialog::reject();
             return;
         }
@@ -71,6 +73,7 @@ void DlgLoadDeckFromWebsite::accept()
 
         if (reply->error() != QNetworkReply::NoError) {
             qWarning() << "Network error:" << reply->errorString();
+            QMessageBox::warning(this, tr("Load Deck from Website"), tr("Network error: %1").arg(reply->errorString()));
             reply->deleteLater();
             QDialog::reject();
             return;
@@ -84,6 +87,7 @@ void DlgLoadDeckFromWebsite::accept()
             QString deckText = QString::fromUtf8(responseData);
             if (deckText.isEmpty()) {
                 qWarning() << "Response is empty";
+                QMessageBox::warning(this, tr("Load Deck from Website"), tr("Received empty deck data."));
                 QDialog::reject();
                 return;
             }
@@ -104,6 +108,8 @@ void DlgLoadDeckFromWebsite::accept()
         QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
             qWarning() << "JSON parse error:" << parseError.errorString();
+            QMessageBox::warning(this, tr("Load Deck from Website"),
+                                 tr("Failed to parse deck data: %1").arg(parseError.errorString()));
             QDialog::reject();
             return;
         }
@@ -113,6 +119,8 @@ void DlgLoadDeckFromWebsite::accept()
 
     } else {
         qInfo() << "URL not recognized";
+        QMessageBox::warning(this, tr("Load Deck from Website"),
+                             tr("The provided URL is not recognized as a valid deck URL."));
         QDialog::reject();
     }
 }
