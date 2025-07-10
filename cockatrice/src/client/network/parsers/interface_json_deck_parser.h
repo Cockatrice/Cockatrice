@@ -36,9 +36,9 @@ public:
             QString collectorNumber = card.value("collectorNumber").toString();
             QString providerId = card.value("uid").toString();
 
-            for (int i = 0; i < quantity; i++) {
+            DecklistCardNode *newCard =
                 list->addCard(cardName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
-            }
+            newCard->setNumber(quantity);
         }
 
         return list;
@@ -81,9 +81,9 @@ public:
             QString collectorNumber = card.value("cn").toString();
             QString providerId = card.value("scryfall_id").toString();
 
-            for (int i = 0; i < quantity; i++) {
+            DecklistCardNode *newCard =
                 list->addCard(cardName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
-            }
+            newCard->setNumber(quantity);
         }
 
         for (auto entry : obj.value("sideboard").toObject()) {
@@ -95,9 +95,9 @@ public:
             QString collectorNumber = card.value("cn").toString();
             QString providerId = card.value("scryfall_id").toString();
 
-            for (int i = 0; i < quantity; i++) {
+            DecklistCardNode *newCard =
                 list->addCard(cardName, DECK_ZONE_SIDE, -1, setName, collectorNumber, providerId);
-            }
+            newCard->setNumber(quantity);
         }
 
         return list;
