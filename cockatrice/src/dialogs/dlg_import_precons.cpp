@@ -562,15 +562,18 @@ SavePreconsPage::SavePreconsPage(QWidget *parent) : QWizardPage(parent)
 {
     saveLabel = new QLabel(this);
 
-    folderListWidget = new QListWidget(this);
-    folderListWidget->setSelectionMode(QAbstractItemView::NoSelection);
-    folderListWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    folderTreeWidget = new QTreeWidget(this);
+    folderTreeWidget->setHeaderHidden(true);
+    folderTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
+    folderTreeWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     auto *layout = new QGridLayout(this);
     layout->addWidget(saveLabel, 0, 0);
-    layout->addWidget(folderListWidget, 1, 0);
+    layout->addWidget(folderTreeWidget, 1, 0);
 
     setLayout(layout);
+
+    connect(folderTreeWidget, &QTreeWidget::itemChanged, this, &SavePreconsPage::onItemChanged);
 
     retranslateUi();
 }
@@ -582,17 +585,44 @@ void SavePreconsPage::cleanupPage()
 void SavePreconsPage::initializePage()
 {
     QDir tempDir(dynamic_cast<DlgImportPrecons *>(wizard())->getTempDir());
-    QStringList dirs = tempDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    folderTreeWidget->clear();
 
-    folderListWidget->clear();
+    for (const QString &dirName : tempDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        QString absPath = tempDir.absoluteFilePath(dirName);
+        QTreeWidgetItem *item = new QTreeWidgetItem(folderTreeWidget, QStringList() << dirName);
+        item->setData(0, Qt::UserRole, absPath);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate);
+        item->setCheckState(0, Qt::Unchecked);
 
-    for (const QString &dirName : dirs) {
-        QListWidgetItem *item = new QListWidgetItem(dirName, folderListWidget);
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(Qt::Unchecked);
+        populateFolderTree(item, absPath);
     }
 
     retranslateUi();
+}
+
+void SavePreconsPage::populateFolderTree(QTreeWidgetItem *parent, const QString &path)
+{
+    QDir dir(path);
+    for (const QString &subdir : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        QString absPath = dir.absoluteFilePath(subdir);
+        QTreeWidgetItem *child = new QTreeWidgetItem(parent, QStringList() << subdir);
+        child->setData(0, Qt::UserRole, absPath);
+        child->setFlags(child->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate);
+        child->setCheckState(0, Qt::Unchecked);
+
+        populateFolderTree(child, absPath);
+    }
+}
+
+void SavePreconsPage::onItemChanged(QTreeWidgetItem *item, int column)
+{
+    Q_UNUSED(column);
+    Qt::CheckState state = item->checkState(0);
+
+    // Propagate to children only — Qt will auto-update parents
+    for (int i = 0; i < item->childCount(); ++i) {
+        item->child(i)->setCheckState(0, state);
+    }
 }
 
 void SavePreconsPage::retranslateUi()
@@ -610,21 +640,32 @@ void SavePreconsPage::retranslateUi()
 
 bool SavePreconsPage::validatePage()
 {
-    for (int i = 0; i < folderListWidget->count(); ++i) {
-        QListWidgetItem *item = folderListWidget->item(i);
-        if (item->checkState() == Qt::Checked) {
-            QString folderName = item->text();
-            QString srcPath = dynamic_cast<DlgImportPrecons *>(wizard())->getTempDir() + "/" + folderName;
-
-            QString destPath = QDir::cleanPath(SettingsCache::instance().getDeckPath() + QDir::separator() + "Precons" +
-                                               QDir::separator() + folderName);
-            copyDirectory(srcPath, destPath);
-        }
+    for (int i = 0; i < folderTreeWidget->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *item = folderTreeWidget->topLevelItem(i);
+        copyCheckedFolders(item);
     }
 
     QDir(dynamic_cast<DlgImportPrecons *>(wizard())->getTempDir()).removeRecursively();
-
     return true;
+}
+
+void SavePreconsPage::copyCheckedFolders(QTreeWidgetItem *item)
+{
+    Qt::CheckState state = item->checkState(0);
+    if (state == Qt::Unchecked)
+        return;
+
+    QString srcPath = item->data(0, Qt::UserRole).toString();
+    QString relativePath = QDir(dynamic_cast<DlgImportPrecons *>(wizard())->getTempDir()).relativeFilePath(srcPath);
+    QString destPath = QDir::cleanPath(SettingsCache::instance().getDeckPath() + QDir::separator() + "Precons" +
+                                       QDir::separator() + relativePath);
+
+    if (!copyDirectory(srcPath, destPath))
+        qWarning() << "Failed to copy" << srcPath;
+
+    for (int i = 0; i < item->childCount(); ++i) {
+        copyCheckedFolders(item->child(i));
+    }
 }
 
 bool SavePreconsPage::copyDirectory(const QString &srcPath, const QString &destPath)

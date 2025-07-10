@@ -11,6 +11,7 @@
 #include <QRadioButton>
 #include <QSettings>
 #include <QTextEdit>
+#include <QTreeWidget>
 #include <QWidget>
 #include <QWizardPage>
 
@@ -99,13 +100,16 @@ public:
     void retranslateUi();
 
 private:
-    QListWidget *folderListWidget;
+    QTreeWidget *folderTreeWidget;
     QLabel *saveLabel;
 
 protected:
     void initializePage() override;
+    void populateFolderTree(QTreeWidgetItem *parent, const QString &path);
+    void onItemChanged(QTreeWidgetItem *item, int column);
     void cleanupPage() override;
     bool validatePage() override;
+    void copyCheckedFolders(QTreeWidgetItem *item);
     bool copyDirectory(const QString &srcPath, const QString &destPath);
 
 };
