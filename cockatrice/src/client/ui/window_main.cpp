@@ -697,7 +697,7 @@ void MainWindow::retranslateUi()
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
-    aImportPrecons->setText(tr("Import precons"));
+    aImportPrecons->setText(tr("Import preconstructed Decks..."));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
 

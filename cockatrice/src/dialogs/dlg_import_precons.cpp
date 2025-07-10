@@ -119,7 +119,7 @@ void LoadPreconsPage::initializePage()
 void LoadPreconsPage::retranslateUi()
 {
     setTitle(tr("Source selection"));
-    setSubTitle(tr("Please specify a compatible source for the list of precons. "
+    setSubTitle(tr("Please specify a compatible source for the list of preconstructed Decks. "
                    "You can specify a URL address that will be downloaded or "
                    "use an existing file from your computer."));
 
@@ -136,7 +136,7 @@ void LoadPreconsPage::actRestoreDefaultUrl()
 
 void LoadPreconsPage::actLoadPreconsFile()
 {
-    QFileDialog dialog(this, tr("Load precons file"));
+    QFileDialog dialog(this, tr("Load preconstructed Deck file"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
     QString extensions = "*.json *.xml";
@@ -554,7 +554,7 @@ void LoadPreconsPage::importFinished()
     } else {
         QMessageBox::critical(
             this, tr("Error"),
-            tr("The file was retrieved successfully, but it does not contain any precon decks data."));
+            tr("The file was retrieved successfully, but it does not contain any preconstructed decks data."));
     }
 }
 
@@ -628,7 +628,7 @@ void SavePreconsPage::onItemChanged(QTreeWidgetItem *item, int column)
 void SavePreconsPage::retranslateUi()
 {
     setTitle(tr("Precons imported"));
-    setSubTitle(tr("The following precon types have been found:"));
+    setSubTitle(tr("The following preconstructed deck types have been found:"));
 
     saveLabel->setText(tr("Select the product types you'd like to import and then press \"Save\" to store the imported "
                           "preconstructed decks in your deck folder. \n (Note: It is not recommended to import all "
