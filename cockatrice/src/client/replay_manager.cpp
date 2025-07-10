@@ -87,6 +87,10 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
     setLayout(replayControlLayout);
 
     connect(this, &ReplayManager::requestChatAndPhaseReset, game, &TabGame::resetChatAndPhase);
+
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+            &ReplayManager::refreshShortcuts);
+    refreshShortcuts();
 }
 
 void ReplayManager::replayNextEvent(Player::EventProcessingOptions options)

@@ -96,7 +96,6 @@ private:
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
 
-
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
     QLabel *timeElapsedLabel;
