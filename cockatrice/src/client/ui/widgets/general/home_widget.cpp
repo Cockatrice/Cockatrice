@@ -1,5 +1,6 @@
 #include "home_widget.h"
 
+#include "../../../../game/cards/card_database_manager.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "home_styled_button.h"
 
@@ -11,7 +12,14 @@
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
 {
+    setAttribute(Qt::WA_OpaquePaintEvent);
     layout = new QGridLayout(this);
+
+    backgroundSource = new CardInfoPictureArtCropWidget(this);
+
+    backgroundSource->setCard(CardDatabaseManager::getInstance()->getRandomCard());
+
+    background = backgroundSource->getProcessedBackground(size());
 
     gradientColors = extractDominantColors(background);
 
@@ -26,6 +34,42 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout->setColumnStretch(2, 1);
 
     setLayout(layout);
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &HomeWidget::startCardShuffleTimer);
+
+    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
+        startCardShuffleTimer();
+    }
+}
+
+void HomeWidget::startCardShuffleTimer()
+{
+    cardChangeTimer = new QTimer(this);
+    connect(cardChangeTimer, &QTimer::timeout, this, &HomeWidget::updateRandomCard);
+    cardChangeTimer->start(5000); // 20 seconds
+}
+
+void HomeWidget::updateRandomCard()
+{
+    CardInfoPtr newCard = CardDatabaseManager::getInstance()->getRandomCard();
+    if (!newCard)
+        return;
+
+    connect(newCard.data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
+    backgroundSource->setCard(newCard);
+}
+
+void HomeWidget::updateBackgroundProperties()
+{
+    background = backgroundSource->getProcessedBackground(size());
+
+    gradientColors = extractDominantColors(background);
+    for (HomeStyledButton *button : findChildren<HomeStyledButton *>()) {
+        button->updateStylesheet(gradientColors);
+        button->update();
+    }
+    update(); // Triggers repaint
 }
 
 QGroupBox *HomeWidget::createSettingsButtonGroup(const QString &title)
@@ -197,13 +241,17 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    // Draw zoomed background
+    // Update background if we have a source
+    if (backgroundSource) {
+        background = backgroundSource->getProcessedBackground(size());
+    }
+
+    // Draw already-scaled background centered
     QSize widgetSize = size();
     QSize bgSize = background.size();
-    QSize scaledSize = bgSize.scaled(widgetSize, Qt::KeepAspectRatioByExpanding);
-    QPoint topLeft((widgetSize.width() - scaledSize.width()) / 2, (widgetSize.height() - scaledSize.height()) / 2);
-    painter.drawPixmap(topLeft,
-                       background.scaled(scaledSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    QPoint topLeft((widgetSize.width() - bgSize.width()) / 2, (widgetSize.height() - bgSize.height()) / 2);
+
+    painter.drawPixmap(topLeft, background);
 
     // Draw translucent black overlay with rounded corners
     QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset

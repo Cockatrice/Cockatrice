@@ -53,6 +53,7 @@ protected:
     QVector<ICardDatabaseParser *> availableParsers;
 
 private:
+    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 
@@ -85,6 +86,7 @@ public:
     ExactCard getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const;
 
     [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
+    [[nodiscard]] ExactCard getRandomCard();
 
     /*
      * Get a card by its simple name. The name will be simplified in this

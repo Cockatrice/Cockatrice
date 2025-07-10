@@ -11,6 +11,7 @@ class HomeStyledButton : public QPushButton
     Q_OBJECT
 public:
     HomeStyledButton(const QString &text, QPair<QColor, QColor> gradientColors, QWidget *parent = nullptr);
+    void updateStylesheet(const QPair<QColor, QColor> &colors);
     QString generateButtonStylesheet(const QPair<QColor, QColor> &colors);
 public slots:
     void paintEvent(QPaintEvent *event) override;

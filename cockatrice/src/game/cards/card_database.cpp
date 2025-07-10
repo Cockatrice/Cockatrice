@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <algorithm>
+#include <qrandom.h>
 #include <utility>
 
 CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
@@ -211,6 +212,17 @@ ExactCard CardDatabase::guessCard(const CardRef &cardRef) const
     }
 
     return ExactCard(temp, findPrintingWithId(temp, cardRef.providerId));
+}
+
+CardInfoPtr CardDatabase::getRandomCard()
+{
+    if (cards.isEmpty()) return nullptr;
+
+    const auto keys = cards.keys();
+    int randomIndex = QRandomGenerator::global()->bounded(keys.size());
+    const QString &randomKey = keys.at(randomIndex);
+
+    return getCardFromMap(cards, randomKey);
 }
 
 CardSetPtr CardDatabase::getSet(const QString &setName)

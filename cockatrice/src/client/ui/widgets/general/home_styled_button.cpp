@@ -12,6 +12,12 @@ HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _g
     setStyleSheet(generateButtonStylesheet(gradientColors));
 }
 
+void HomeStyledButton::updateStylesheet(const QPair<QColor, QColor> &colors)
+{
+    gradientColors = colors;
+    setStyleSheet(generateButtonStylesheet(gradientColors));
+}
+
 QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &colors)
 {
     QColor base1 = colors.first;
