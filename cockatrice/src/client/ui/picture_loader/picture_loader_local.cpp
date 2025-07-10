@@ -56,15 +56,15 @@ QImage PictureLoaderLocal::tryLoad(const CardInfoPtr &toLoad) const
 {
     CardSetPtr set = PictureToLoad::extractSetsSorted(toLoad).first();
 
-    CardInfoPerSet setInstance = CardDatabaseManager::getInstance()->getSetInfoForCard(toLoad);
+    PrintingInfo setInstance = CardDatabaseManager::getInstance()->getSetInfoForCard(toLoad);
 
     QString cardName = toLoad->getName();
     QString correctedCardName = toLoad->getCorrectedName();
 
     QString setName, collectorNumber, providerId;
 
-    if (setInstance.getPtr()) {
-        setName = setInstance.getPtr()->getCorrectedShortName();
+    if (setInstance.getSet()) {
+        setName = setInstance.getSet()->getCorrectedShortName();
         collectorNumber = setInstance.getProperty("num");
         providerId = setInstance.getProperty("uuid");
     }
