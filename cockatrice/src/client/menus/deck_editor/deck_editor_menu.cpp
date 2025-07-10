@@ -54,6 +54,9 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     aPrintDeck = new QAction(QString(), this);
     connect(aPrintDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actPrintDeck);
 
+    aLoadDeckFromWebsite = new QAction(QString(), this);
+    connect(aLoadDeckFromWebsite, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeckFromWebsite);
+
     aExportDeckDecklist = new QAction(QString(), this);
     connect(aExportDeckDecklist, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actExportDeckDecklist);
 
@@ -97,6 +100,7 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addMenu(saveDeckToClipboardMenu);
     addSeparator();
     addAction(aPrintDeck);
+    addAction(aLoadDeckFromWebsite);
     addMenu(analyzeDeckMenu);
     addSeparator();
     addAction(deckEditor->filterDockWidget->aClearFilterOne);
@@ -166,6 +170,7 @@ void DeckEditorMenu::retranslateUi()
 
     aPrintDeck->setText(tr("&Print deck..."));
 
+    aLoadDeckFromWebsite->setText(tr("Load deck from online service..."));
     analyzeDeckMenu->setTitle(tr("&Send deck to online service"));
     aExportDeckDecklist->setText(tr("Create decklist (decklist.org)"));
     aExportDeckDecklistXyz->setText(tr("Create decklist (decklist.xyz)"));

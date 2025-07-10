@@ -44,7 +44,7 @@ class DeckViewContainer : public QWidget
     Q_OBJECT
 private:
     QVBoxLayout *deckViewLayout;
-    QPushButton *loadLocalButton, *loadRemoteButton, *loadFromClipboardButton;
+    QPushButton *loadLocalButton, *loadRemoteButton, *loadFromClipboardButton, *loadFromWebsiteButton;
     QPushButton *unloadDeckButton, *forceStartGameButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
@@ -60,6 +60,7 @@ private slots:
     void loadLocalDeck();
     void loadRemoteDeck();
     void loadFromClipboard();
+    void loadFromWebsite();
     void unloadDeck();
     void readyStart();
     void forceStart();
