@@ -573,8 +573,6 @@ SavePreconsPage::SavePreconsPage(QWidget *parent) : QWizardPage(parent)
 
     setLayout(layout);
 
-    connect(folderTreeWidget, &QTreeWidget::itemChanged, this, &SavePreconsPage::onItemChanged);
-
     retranslateUi();
 }
 
@@ -611,17 +609,6 @@ void SavePreconsPage::populateFolderTree(QTreeWidgetItem *parent, const QString 
         child->setCheckState(0, Qt::Unchecked);
 
         populateFolderTree(child, absPath);
-    }
-}
-
-void SavePreconsPage::onItemChanged(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column);
-    Qt::CheckState state = item->checkState(0);
-
-    // Propagate to children only — Qt will auto-update parents
-    for (int i = 0; i < item->childCount(); ++i) {
-        item->child(i)->setCheckState(0, state);
     }
 }
 
