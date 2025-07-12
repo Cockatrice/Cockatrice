@@ -44,11 +44,9 @@ void CardDatabase::clear()
 {
     clearDatabaseMutex->lock();
 
-    QHashIterator<QString, CardInfoPtr> i(cards);
-    while (i.hasNext()) {
-        i.next();
-        if (i.value()) {
-            removeCard(i.value());
+    for (const auto &card : cards.values()) {
+        if (card) {
+            removeCard(card);
         }
     }
 
@@ -197,13 +195,7 @@ void CardDatabase::addSet(CardSetPtr set)
 
 SetList CardDatabase::getSetList() const
 {
-    SetList result;
-    QHashIterator<QString, CardSetPtr> i(sets);
-    while (i.hasNext()) {
-        i.next();
-        result << i.value();
-    }
-    return result;
+    return static_cast<SetList>(sets.values());
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
@@ -462,9 +454,8 @@ void CardDatabase::refreshCachedReverseRelatedCards()
 QStringList CardDatabase::getAllMainCardTypes() const
 {
     QSet<QString> types;
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
-    while (cardIterator.hasNext()) {
-        types.insert(cardIterator.next().value()->getMainCardType());
+    for (const auto &card : cards.values()) {
+        types.insert(card->getMainCardType());
     }
     return types.values();
 }
@@ -472,10 +463,9 @@ QStringList CardDatabase::getAllMainCardTypes() const
 QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
 {
     QMap<QString, int> typeCounts;
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
 
-    while (cardIterator.hasNext()) {
-        QString type = cardIterator.next().value()->getMainCardType();
+    for (const auto &card : cards.values()) {
+        QString type = card->getMainCardType();
         typeCounts[type]++;
     }
 
@@ -485,10 +475,9 @@ QMap<QString, int> CardDatabase::getAllMainCardTypesWithCount() const
 QMap<QString, int> CardDatabase::getAllSubCardTypesWithCount() const
 {
     QMap<QString, int> typeCounts;
-    QHashIterator<QString, CardInfoPtr> cardIterator(cards);
 
-    while (cardIterator.hasNext()) {
-        QString type = cardIterator.next().value()->getCardType();
+    for (const auto &card : cards.values()) {
+        QString type = card->getCardType();
 
         QStringList parts = type.split(" — ");
 
