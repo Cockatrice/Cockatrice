@@ -397,15 +397,16 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
 QString CardDatabase::getPreferredPrintingProviderIdForCard(const QString &cardName)
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
-    QString preferredPrintingProviderId = preferredPrinting.getProperty(QString("uuid"));
-    if (preferredPrintingProviderId.isEmpty()) {
-        CardInfoPtr defaultCardInfo = getCard(cardName);
-        if (defaultCardInfo.isNull()) {
-            return cardName;
-        }
-        return defaultCardInfo->getName();
+    QString uuid = preferredPrinting.getProperty("uuid");
+    if (!uuid.isEmpty()) {
+        return uuid;
     }
-    return preferredPrintingProviderId;
+
+    CardInfoPtr defaultCardInfo = getCard(cardName);
+    if (defaultCardInfo.isNull()) {
+        return cardName;
+    }
+    return defaultCardInfo->getName();
 }
 
 bool CardDatabase::isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId)
