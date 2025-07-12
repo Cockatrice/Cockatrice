@@ -27,15 +27,9 @@
 
 #include <QVariant>
 
-Server_Card::Server_Card(QString _name,
-                         QString _provider_id,
-                         int _id,
-                         int _coord_x,
-                         int _coord_y,
-                         Server_CardZone *_zone)
-    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), name(_name), provider_id(_provider_id), tapped(false),
-      attacking(false), facedown(false), color(), ptString(), annotation(), destroyOnZoneChange(false),
-      doesntUntap(false), parentCard(0), stashedCard(nullptr)
+Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
+    : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), cardRef(cardRef), tapped(false), attacking(false),
+      facedown(false), destroyOnZoneChange(false), doesntUntap(false), parentCard(0), stashedCard(nullptr)
 {
 }
 
@@ -134,10 +128,10 @@ void Server_Card::setParentCard(Server_Card *_parentCard)
 
 void Server_Card::getInfo(ServerInfo_Card *info)
 {
-    QString displayedName = facedown ? QString() : name;
+    QString displayedName = facedown ? QString() : cardRef.name;
 
     info->set_id(id);
-    info->set_provider_id(provider_id.toStdString());
+    info->set_provider_id(cardRef.providerId.toStdString());
     info->set_name(displayedName.toStdString());
     info->set_x(coord_x);
     info->set_y(coord_y);

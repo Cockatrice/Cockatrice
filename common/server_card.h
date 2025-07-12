@@ -20,6 +20,7 @@
 #ifndef SERVER_CARD_H
 #define SERVER_CARD_H
 
+#include "card_ref.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/serverinfo_card.pb.h"
 #include "server_arrowtarget.h"
@@ -38,8 +39,7 @@ private:
     Server_CardZone *zone;
     int id;
     int coord_x, coord_y;
-    QString name;
-    QString provider_id;
+    CardRef cardRef;
     QMap<int, int> counters;
     bool tapped;
     bool attacking;
@@ -55,12 +55,7 @@ private:
     Server_Card *stashedCard;
 
 public:
-    Server_Card(QString _name,
-                QString _provider_id,
-                int _id,
-                int _coord_x,
-                int _coord_y,
-                Server_CardZone *_zone = nullptr);
+    Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone = nullptr);
     ~Server_Card() override;
 
     Server_CardZone *getZone() const
@@ -76,9 +71,13 @@ public:
     {
         return id;
     }
+    CardRef getCardRef() const
+    {
+        return cardRef;
+    }
     QString getProviderId() const
     {
-        return provider_id;
+        return cardRef.providerId;
     }
     int getX() const
     {
@@ -90,7 +89,7 @@ public:
     }
     QString getName() const
     {
-        return name;
+        return cardRef.name;
     }
     const QMap<int, int> &getCounters() const
     {
@@ -152,7 +151,7 @@ public:
     }
     void setName(const QString &_name)
     {
-        name = _name;
+        cardRef.name = _name;
     }
     void setCounter(int _id, int value, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)

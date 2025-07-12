@@ -1,6 +1,8 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
+#include "card_ref.h"
+
 #include <QMap>
 #include <QVector>
 
@@ -246,6 +248,10 @@ public:
     {
         return false;
     }
+    CardRef toCardRef() const
+    {
+        return {name, cardProviderId};
+    }
 };
 
 class DeckList : public QObject
@@ -253,13 +259,13 @@ class DeckList : public QObject
     Q_OBJECT
 private:
     QString name, comments;
-    QPair<QString, QString> bannerCard;
+    CardRef bannerCard;
     QString lastLoadedTimestamp;
     QStringList tags;
     QMap<QString, SideboardPlan *> sideboardPlans;
     InnerDecklistNode *root;
-    void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result) const;
-    void getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const;
+    static void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result);
+    static void getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result);
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
     /**
@@ -305,7 +311,7 @@ public slots:
         tags.clear();
         emit deckTagsChanged();
     }
-    void setBannerCard(const QPair<QString, QString> &_bannerCard = QPair<QString, QString>())
+    void setBannerCard(const CardRef &_bannerCard = {})
     {
         bannerCard = _bannerCard;
     }
@@ -331,7 +337,7 @@ public:
     {
         return tags;
     }
-    QPair<QString, QString> getBannerCard() const
+    CardRef getBannerCard() const
     {
         return bannerCard;
     }
@@ -365,7 +371,7 @@ public:
         return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
-    QMap<QString, QString> getCardListWithProviderId() const;
+    QList<CardRef> getCardRefList() const;
 
     int getSideboardSize() const;
 

@@ -162,7 +162,7 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
     PictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(getDeckList()->getCardListWithProviderId()));
+        CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(getDeckList()->getCardRefList()));
     setModified(false);
 
     // If they load a deck, make the deck list appear

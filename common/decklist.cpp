@@ -424,7 +424,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
         } else if (childName == "bannerCard") {
             QString providerId = xml->attributes().value("providerId").toString();
             QString cardName = xml->readElementText();
-            bannerCard = QPair<QString, QString>(cardName, providerId);
+            bannerCard = {cardName, providerId};
         } else if (childName == "tags") {
             tags.clear(); // Clear existing tags
             while (xml->readNextStartElement()) {
@@ -456,8 +456,8 @@ void DeckList::write(QXmlStreamWriter *xml) const
     xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
     xml->writeTextElement("deckname", name);
     xml->writeStartElement("bannerCard");
-    xml->writeAttribute("providerId", bannerCard.second);
-    xml->writeCharacters(bannerCard.first);
+    xml->writeAttribute("providerId", bannerCard.providerId);
+    xml->writeCharacters(bannerCard.name);
     xml->writeEndElement();
     xml->writeTextElement("comments", comments);
 
@@ -805,7 +805,7 @@ void DeckList::cleanList(bool preserveMetadata)
     refreshDeckHash();
 }
 
-void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result) const
+void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
 {
     for (int i = 0; i < item->size(); ++i) {
         auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
@@ -818,15 +818,15 @@ void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
     }
 }
 
-void DeckList::getCardListWithProviderIdHelper(InnerDecklistNode *item, QMap<QString, QString> &result) const
+void DeckList::getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result)
 {
     for (int i = 0; i < item->size(); ++i) {
         auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
 
         if (node) {
-            result.insert(node->getName(), node->getCardProviderId());
+            result.append(node->toCardRef());
         } else {
-            getCardListWithProviderIdHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
+            getCardRefListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
         }
     }
 }
@@ -838,10 +838,10 @@ QStringList DeckList::getCardList() const
     return result.values();
 }
 
-QMap<QString, QString> DeckList::getCardListWithProviderId() const
+QList<CardRef> DeckList::getCardRefList() const
 {
-    QMap<QString, QString> result;
-    getCardListWithProviderIdHelper(root, result);
+    QList<CardRef> result;
+    getCardRefListHelper(root, result);
     return result;
 }
 
