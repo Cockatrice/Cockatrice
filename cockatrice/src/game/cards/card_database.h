@@ -52,7 +52,6 @@ protected:
     QVector<ICardDatabaseParser *> availableParsers;
 
 private:
-    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 

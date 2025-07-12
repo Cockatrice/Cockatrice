@@ -113,14 +113,14 @@ void CardDatabase::removeCard(CardInfoPtr card)
 
 CardInfoPtr CardDatabase::getCard(const QString &cardName) const
 {
-    return getCardFromMap(cards, cardName);
+    return cards.value(cardName);
 }
 
 QList<CardInfoPtr> CardDatabase::getCards(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
     for (const QString &cardName : cardNames) {
-        CardInfoPtr ptr = getCardFromMap(cards, cardName);
+        CardInfoPtr ptr = cards.value(cardName);
         if (ptr)
             cardInfos.append(ptr);
     }
@@ -162,7 +162,7 @@ CardInfoPtr CardDatabase::getCardByNameAndProviderId(const QString &cardName, co
 
 CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
 {
-    return getCardFromMap(simpleNameCards, CardInfo::simplifyName(cardName));
+    return simpleNameCards.value(CardInfo::simplifyName(cardName));
 }
 
 CardInfoPtr CardDatabase::guessCard(const QString &cardName, const QString &providerId) const
@@ -204,14 +204,6 @@ SetList CardDatabase::getSetList() const
         result << i.value();
     }
     return result;
-}
-
-CardInfoPtr CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
-{
-    if (cardMap.contains(cardName))
-        return cardMap.value(cardName);
-
-    return {};
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
