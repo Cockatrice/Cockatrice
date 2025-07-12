@@ -195,7 +195,11 @@ void CardDatabase::addSet(CardSetPtr set)
 
 SetList CardDatabase::getSetList() const
 {
-    return static_cast<SetList>(sets.values());
+    SetList result;
+    for (auto set : sets.values()) {
+        result << set;
+    }
+    return result;
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
