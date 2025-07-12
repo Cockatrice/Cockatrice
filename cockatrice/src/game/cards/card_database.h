@@ -2,6 +2,7 @@
 #define CARDDATABASE_H
 
 #include "card_info.h"
+#include "card_ref.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -67,18 +68,18 @@ public:
 
     [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
-    QList<CardInfoPtr> getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const;
-    [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
+    QList<CardInfoPtr> getCardsByNameAndProviderId(const QList<CardRef> &cardRefs) const;
+    [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const CardRef &cardRef) const;
 
     [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
     [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
-    [[nodiscard]] PrintingInfo getSpecificPrinting(const QString &cardName, const QString &providerId) const;
+    [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
     PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
-    bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
+    bool isProviderIdForPreferredPrinting(const CardRef &cardRef);
 
-    [[nodiscard]] CardInfoPtr guessCard(const QString &cardName, const QString &providerId = QString()) const;
+    [[nodiscard]] CardInfoPtr guessCard(const CardRef &cardRef) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
