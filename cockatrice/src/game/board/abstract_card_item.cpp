@@ -57,7 +57,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::refreshCardInfo()
 {
-    info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardRef);
+    info = CardDatabaseManager::getInstance()->getCard(cardRef);
 
     if (!info && !cardRef.name.isEmpty()) {
         QVariantHash properties = QVariantHash();

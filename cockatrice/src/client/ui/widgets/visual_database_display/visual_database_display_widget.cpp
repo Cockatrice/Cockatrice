@@ -228,12 +228,12 @@ void VisualDatabaseDisplayWidget::populateCards()
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         qCDebug(VisualDatabaseDisplayLog) << name.toString();
 
-        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
+        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(name.toString())) {
             if (setFilter) {
                 SetToPrintingsMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                        addCard(CardDatabaseManager::getInstance()->getCard(
                             {name.toString(), printing.getProperty("uuid")}));
                     }
                 }
@@ -294,12 +294,12 @@ void VisualDatabaseDisplayWidget::loadNextPage()
     for (int row = start; row < end; ++row) {
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
-        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(name.toString())) {
+        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(name.toString())) {
             if (setFilter) {
                 SetToPrintingsMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                        addCard(CardDatabaseManager::getInstance()->getCard(
                             {name.toString(), printing.getProperty("uuid")}));
                     }
                 }

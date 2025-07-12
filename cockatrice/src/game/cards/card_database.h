@@ -66,18 +66,19 @@ public:
     void clear();
     void removeCard(CardInfoPtr card);
 
-    [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
-    [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
-    QList<CardInfoPtr> getCardsByNameAndProviderId(const QList<CardRef> &cardRefs) const;
-    [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const CardRef &cardRef) const;
+    [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
+    [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
+
+    QList<CardInfoPtr> getCards(const QList<CardRef> &cardRefs) const;
+    [[nodiscard]] CardInfoPtr getCard(const CardRef &cardRef) const;
 
     [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
     [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
     [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
     PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
-    QString getPreferredPrintingProviderIdForCard(const QString &cardName);
-    bool isProviderIdForPreferredPrinting(const CardRef &cardRef);
+    QString getPreferredPrintingProviderId(const QString &cardName);
+    bool isPreferredPrinting(const CardRef &cardRef);
 
     [[nodiscard]] CardInfoPtr guessCard(const CardRef &cardRef) const;
 

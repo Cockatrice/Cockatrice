@@ -1886,7 +1886,7 @@ void Player::actCreateAnotherToken()
 void Player::actCreatePredefinedToken()
 {
     auto *action = static_cast<QAction *>(sender());
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(action->text());
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(action->text());
     if (!cardInfo) {
         return;
     }
@@ -1912,8 +1912,8 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            {cardRelation->getName(), sourceCard->getProviderId()});
+        CardInfoPtr cardInfo =
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), sourceCard->getProviderId()});
         setLastToken(cardInfo);
     }
 }
@@ -1993,7 +1993,7 @@ void Player::actCreateAllRelatedCards()
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -2040,7 +2040,7 @@ void Player::createCard(const CardItem *sourceCard,
                         CardRelation::AttachType attachType,
                         bool persistent)
 {
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(dbCardName);
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr) {
         return;
@@ -4076,7 +4076,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -4122,10 +4122,10 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            {cardRelation->getName(), currentCardSet.getProperty("uuid")});
+        CardInfoPtr relatedCard =
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), currentCardSet.getProperty("uuid")});
         if (relatedCard == nullptr) {
-            relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+            relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         }
         if (relatedCard == nullptr) {
             continue;

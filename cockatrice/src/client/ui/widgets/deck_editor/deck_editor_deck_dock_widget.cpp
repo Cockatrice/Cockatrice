@@ -227,8 +227,7 @@ CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         QString cardName = current.sibling(current.row(), 1).data().toString();
         QString providerId = current.sibling(current.row(), 4).data().toString();
-        if (CardInfoPtr selectedCard =
-                CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId})) {
+        if (CardInfoPtr selectedCard = CardDatabaseManager::getInstance()->getCard({cardName, providerId})) {
             return selectedCard;
         }
     }
@@ -287,8 +286,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info =
-                    CardDatabaseManager::getInstance()->getCardByNameAndProviderId(currentCard->toCardRef());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
                 if (info) {
                     bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
                 }

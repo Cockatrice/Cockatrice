@@ -222,7 +222,7 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
             if (!currentCard)
                 continue;
 
-            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
             if (!infoPtr)
                 continue;
 
@@ -290,12 +290,12 @@ void DlgSelectSetForCards::updateCardLists()
 
             if (!found) {
                 // The card was not in any selected set
-                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
                 picture_widget->setCard(infoPtr);
                 uneditedCardsFlowWidget->addWidget(picture_widget);
             } else {
-                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(
                     {currentCard->getName(), CardDatabaseManager::getInstance()
                                                  ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
                                                  .getProperty("uuid")});
@@ -376,7 +376,7 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
             if (!currentCard)
                 continue;
 
-            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
             if (!infoPtr)
                 continue;
 
@@ -628,7 +628,7 @@ void SetEntryWidget::updateCardDisplayWidgets()
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
         QString providerId =
             CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid");
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId}));
+        picture_widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, providerId}));
         cardListContainer->addWidget(picture_widget);
     }
 
@@ -636,7 +636,7 @@ void SetEntryWidget::updateCardDisplayWidgets()
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
         QString providerId =
             CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid");
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId}));
+        picture_widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, providerId}));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }
 }

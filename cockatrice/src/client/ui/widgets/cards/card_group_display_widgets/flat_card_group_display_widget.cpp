@@ -89,7 +89,7 @@ QWidget *FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(flowWidget, true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
-    widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, cardProviderId}));
+    widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, cardProviderId}));
 
     connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &FlatCardGroupDisplayWidget::onClick);
     connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &FlatCardGroupDisplayWidget::onHover);

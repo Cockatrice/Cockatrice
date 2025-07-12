@@ -136,16 +136,16 @@ void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
 void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QString cardName = current.sibling(current.row(), 0).data().toString();
-    const QString cardProviderID = CardDatabaseManager::getInstance()->getPreferredPrintingProviderIdForCard(cardName);
+    const QString cardProviderID = CardDatabaseManager::getInstance()->getPreferredPrintingProviderId(cardName);
 
     if (!current.isValid()) {
         return;
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        CardInfoPtr card = CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, cardProviderID});
+        CardInfoPtr card = CardDatabaseManager::getInstance()->getCard({cardName, cardProviderID});
         if (!card) {
-            card = CardDatabaseManager::getInstance()->getCard(cardName);
+            card = CardDatabaseManager::getInstance()->getCardInfo(cardName);
         }
         emit cardChanged(card);
     }
@@ -180,7 +180,7 @@ CardInfoPtr DeckEditorDatabaseDisplayWidget::currentCardInfo() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return CardDatabaseManager::getInstance()->getCard(cardName);
+    return CardDatabaseManager::getInstance()->getCardInfo(cardName);
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
