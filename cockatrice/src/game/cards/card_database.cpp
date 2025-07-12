@@ -296,6 +296,11 @@ void CardDatabase::refreshPreferredPrintings()
 PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
 {
     CardInfoPtr cardInfo = getCard(cardName);
+    return getPreferredPrinting(cardInfo);
+}
+
+PrintingInfo CardDatabase::getPreferredPrinting(const CardInfoPtr &cardInfo) const
+{
     if (!cardInfo) {
         return PrintingInfo(nullptr);
     }

@@ -69,6 +69,7 @@ public:
     QList<CardInfoPtr> getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const;
     [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
     [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
+    [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
     [[nodiscard]] PrintingInfo getSpecificPrinting(const QString &cardName, const QString &providerId) const;
     PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
