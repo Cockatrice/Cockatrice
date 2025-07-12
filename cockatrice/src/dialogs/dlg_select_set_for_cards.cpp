@@ -296,9 +296,9 @@ void DlgSelectSetForCards::updateCardLists()
                 uneditedCardsFlowWidget->addWidget(picture_widget);
             } else {
                 CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), CardDatabaseManager::getInstance()
-                                                ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
-                                                .getProperty("uuid"));
+                    {currentCard->getName(), CardDatabaseManager::getInstance()
+                                                 ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
+                                                 .getProperty("uuid")});
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
                 picture_widget->setCard(infoPtr);
                 modifiedCardsFlowWidget->addWidget(picture_widget);
@@ -626,17 +626,17 @@ void SetEntryWidget::updateCardDisplayWidgets()
 
     for (const QString &cardName : possibleCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardName,
-            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid")));
+        QString providerId =
+            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid");
+        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId}));
         cardListContainer->addWidget(picture_widget);
     }
 
     for (const QString &cardName : unusedCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardName,
-            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid")));
+        QString providerId =
+            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getProperty("uuid");
+        picture_widget->setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId}));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }
 }

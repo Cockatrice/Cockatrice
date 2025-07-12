@@ -18,14 +18,9 @@
 #include <QMenu>
 #include <QPainter>
 
-CardItem::CardItem(Player *_owner,
-                   QGraphicsItem *parent,
-                   const QString &_name,
-                   const QString &_providerId,
-                   int _cardid,
-                   CardZone *_zone)
-    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZone *_zone)
+    : AbstractCardItem(parent, cardRef, _owner, _cardid), zone(_zone), attacking(false), destroyOnZoneChange(false),
+      doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 

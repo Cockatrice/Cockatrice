@@ -44,8 +44,8 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture = new CardInfoPictureWidget(this);
     cardInfoPicture->setMinimumSize(0, 0);
     cardInfoPicture->setScaleFactor(cardSizeSlider->value());
-    setCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(rootCard->getName(),
-                                                                             _printingInfo.getProperty("uuid"));
+    setCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
+        {rootCard->getName(), _printingInfo.getProperty("uuid")});
     cardInfoPicture->setCard(setCard);
     mainLayout->addWidget(cardInfoPicture);
 
@@ -177,7 +177,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
         auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
         connect(pinAction, &QAction::triggered, this, [this, cardProviderId]() {
-            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(rootCard->getName(), cardProviderId);
+            SettingsCache::instance().cardOverrides().setCardPreferenceOverride({rootCard->getName(), cardProviderId});
             emit cardPreferenceChanged();
         });
     } else {

@@ -234,7 +234,7 @@ void VisualDatabaseDisplayWidget::populateCards()
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                            name.toString(), printing.getProperty("uuid")));
+                            {name.toString(), printing.getProperty("uuid")}));
                     }
                 }
             } else {
@@ -300,7 +300,7 @@ void VisualDatabaseDisplayWidget::loadNextPage()
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
                         addCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                            name.toString(), printing.getProperty("uuid")));
+                            {name.toString(), printing.getProperty("uuid")}));
                     }
                 }
             } else {

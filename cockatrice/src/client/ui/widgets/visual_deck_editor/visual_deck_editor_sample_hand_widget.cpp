@@ -101,8 +101,8 @@ QList<CardInfoPtr> VisualDeckEditorSampleHandWidget::getRandomCards(int amountTo
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
+                CardInfoPtr info =
+                    CardDatabaseManager::getInstance()->getCardByNameAndProviderId(currentCard->toCardRef());
                 if (info) {
                     mainDeckCards.append(info);
                 }

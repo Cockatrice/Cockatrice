@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_CARD_OVERRIDE_SETTINGS_H
 #define COCKATRICE_CARD_OVERRIDE_SETTINGS_H
 
+#include "card_ref.h"
 #include "settings_manager.h"
 
 #include <QObject>
@@ -11,7 +12,7 @@ class CardOverrideSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    void setCardPreferenceOverride(const QString &cardName, const QString &providerId);
+    void setCardPreferenceOverride(const CardRef &cardRef);
 
     void deleteCardPreferenceOverride(const QString &cardName);
 

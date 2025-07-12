@@ -3,6 +3,7 @@
 
 #include "../cards/card_info.h"
 #include "arrow_target.h"
+#include "card_ref.h"
 
 class Player;
 
@@ -15,8 +16,7 @@ class AbstractCardItem : public ArrowTarget
 protected:
     CardInfoPtr info;
     int id;
-    QString name;
-    QString providerId;
+    CardRef cardRef;
     bool tapped;
     bool facedown;
     int tapAngle;
@@ -34,7 +34,7 @@ public slots:
 
 signals:
     void hovered(AbstractCardItem *card);
-    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
+    void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(QString cardName);
     void sigPixmapUpdated();
     void cardShiftClicked(QString cardName);
@@ -49,8 +49,7 @@ public:
         return Type;
     }
     explicit AbstractCardItem(QGraphicsItem *parent = nullptr,
-                              const QString &_name = QString(),
-                              const QString &_providerId = QString(),
+                              const CardRef &cardRef = {},
                               Player *_owner = nullptr,
                               int _id = -1);
     ~AbstractCardItem() override;
@@ -73,14 +72,18 @@ public:
     }
     QString getName() const
     {
-        return name;
+        return cardRef.name;
     }
     void setName(const QString &_name = QString());
     QString getProviderId() const
     {
-        return providerId;
+        return cardRef.providerId;
     }
     void setProviderId(const QString &_providerId = QString());
+    CardRef getCardRef() const
+    {
+        return cardRef;
+    }
     qreal getRealZValue() const
     {
         return realZValue;
@@ -105,7 +108,7 @@ public:
     void processHoverEvent();
     void deleteCardInfoPopup()
     {
-        emit deleteCardInfoPopup(name);
+        emit deleteCardInfoPopup(cardRef.name);
     }
 
 protected:

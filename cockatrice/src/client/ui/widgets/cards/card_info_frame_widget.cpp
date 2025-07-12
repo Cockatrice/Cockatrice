@@ -166,12 +166,12 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
 
 void CardInfoFrameWidget::setCard(const QString &cardName)
 {
-    setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->guessCard({cardName}));
 }
 
-void CardInfoFrameWidget::setCard(const QString &cardName, const QString &providerId)
+void CardInfoFrameWidget::setCard(const CardRef &cardRef)
 {
-    setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId));
+    setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardRef));
 }
 
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)

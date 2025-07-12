@@ -594,7 +594,7 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
 QString DeckLoader::getCompleteCardName(const QString &cardName) const
 {
     if (CardDatabaseManager::getInstance()) {
-        CardInfoPtr temp = CardDatabaseManager::getInstance()->guessCard(cardName);
+        CardInfoPtr temp = CardDatabaseManager::getInstance()->guessCard({cardName});
         if (temp) {
             return temp->getName();
         }

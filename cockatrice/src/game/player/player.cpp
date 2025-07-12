@@ -1849,7 +1849,7 @@ void Player::actCreateToken()
 
     lastTokenInfo = dlg.getTokenInfo();
 
-    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard(lastTokenInfo.name);
+    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard->getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
@@ -1913,7 +1913,7 @@ void Player::actCreateRelatedCard()
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
         CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardRelation->getName(), sourceCard->getProviderId());
+            {cardRelation->getName(), sourceCard->getProviderId()});
         setLastToken(cardInfo);
     }
 }
@@ -2253,8 +2253,8 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
     }
 
-    CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()),
-                                  QString::fromStdString(event.card_provider_id()), event.card_id());
+    CardRef cardRef = {QString::fromStdString(event.card_name()), QString::fromStdString(event.card_provider_id())};
+    CardItem *card = new CardItem(this, nullptr, cardRef, event.card_id());
     // use db PT if not provided in event and not face-down
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
@@ -4096,7 +4096,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         QString relatedCardName = relatedCard->getName();
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
-            game->viewCardInfo(relatedCardName, currentCardSet.getProperty("uuid"));
+            game->viewCardInfo({relatedCardName, currentCardSet.getProperty("uuid")});
         });
     }
 }
@@ -4123,7 +4123,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
         CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardRelation->getName(), currentCardSet.getProperty("uuid"));
+            {cardRelation->getName(), currentCardSet.getProperty("uuid")});
         if (relatedCard == nullptr) {
             relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
         }

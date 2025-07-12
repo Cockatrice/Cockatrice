@@ -2,6 +2,7 @@
 #define CARDINFOWIDGET_H
 
 #include "../../../../game/cards/card_info.h"
+#include "card_ref.h"
 
 #include <QComboBox>
 #include <QFrame>
@@ -22,14 +23,11 @@ private:
     CardInfoTextWidget *text;
 
 public:
-    explicit CardInfoDisplayWidget(const QString &cardName,
-                                   const QString &providerId,
-                                   QWidget *parent = nullptr,
-                                   Qt::WindowFlags f = {});
+    explicit CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
 public slots:
     void setCard(CardInfoPtr card);
-    void setCard(const QString &cardName, const QString &providerId = QString());
+    void setCard(const CardRef &cardRef);
     void setCard(AbstractCardItem *card);
 
 private slots:

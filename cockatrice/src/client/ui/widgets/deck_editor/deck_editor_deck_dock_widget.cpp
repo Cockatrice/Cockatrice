@@ -228,7 +228,7 @@ CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
         QString cardName = current.sibling(current.row(), 1).data().toString();
         QString providerId = current.sibling(current.row(), 4).data().toString();
         if (CardInfoPtr selectedCard =
-                CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId)) {
+                CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, providerId})) {
             return selectedCard;
         }
     }
@@ -287,11 +287,10 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
+                CardInfoPtr info =
+                    CardDatabaseManager::getInstance()->getCardByNameAndProviderId(currentCard->toCardRef());
                 if (info) {
-                    bannerCardSet.insert(
-                        QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
+                    bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
                 }
             }
         }
@@ -312,13 +311,13 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     int restoredIndex = bannerCardComboBox->findText(currentText);
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
-        if (deckModel->getDeckList()->getBannerCard().second !=
+        if (deckModel->getDeckList()->getBannerCard().providerId !=
             bannerCardComboBox->currentData().value<QPair<QString, QString>>().second) {
             setBannerCard(restoredIndex);
         }
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().first);
+        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().name);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
         } else {
@@ -333,8 +332,8 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
-    auto cardAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
-    deckModel->getDeckList()->setBannerCard(cardAndId);
+    auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckModel->getDeckList()->setBannerCard({name, id});
     deckEditor->setModified(true);
     emit deckModified();
 }
@@ -360,7 +359,7 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
-    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard().first);
+    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard().name);
     updateBannerCardComboBox();
     updateHash();
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
@@ -476,9 +475,9 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no matter what, even if not in DB
-    QModelIndex newCardIndex =
-        deckModel->addCard(cardName, CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, cardProviderID),
-                           otherZoneName, true);
+    QModelIndex newCardIndex = deckModel->addCard(
+        cardName, CardDatabaseManager::getInstance()->getSpecificPrinting({cardName, cardProviderID}), otherZoneName,
+        true);
     recursiveExpand(newCardIndex);
 
     return true;

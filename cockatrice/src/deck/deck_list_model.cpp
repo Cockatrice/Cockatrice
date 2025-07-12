@@ -376,7 +376,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
                                    bool abAddAnyway)
 {
     CardInfoPtr cardInfo =
-        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, printingInfo.getProperty("uuid"));
+        CardDatabaseManager::getInstance()->getCardByNameAndProviderId({cardName, printingInfo.getProperty("uuid")});
 
     if (cardInfo == nullptr) {
         if (abAddAnyway) {
@@ -559,8 +559,8 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
+                CardInfoPtr info =
+                    CardDatabaseManager::getInstance()->getCardByNameAndProviderId(currentCard->toCardRef());
                 if (info) {
                     cards.append(info);
                 } else {
@@ -593,8 +593,8 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName
                 if (!currentCard)
                     continue;
                 for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                        currentCard->getName(), currentCard->getCardProviderId());
+                    CardInfoPtr info =
+                        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(currentCard->toCardRef());
                     if (info) {
                         cards.append(info);
                     } else {

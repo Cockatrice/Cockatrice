@@ -141,8 +141,7 @@ void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const
 
     for (auto *view : views) {
         if (view->prepareAddCard(x)) {
-            view->addCard(new CardItem(player, nullptr, card->getName(), card->getProviderId(), card->getId()),
-                          reorganize, x, y);
+            view->addCard(new CardItem(player, nullptr, card->getCardRef(), card->getId()), reorganize, x, y);
         }
     }
 
