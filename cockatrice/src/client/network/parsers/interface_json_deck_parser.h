@@ -26,6 +26,9 @@ public:
         list->setName(deckName);
         list->setComments(deckDescription);
 
+        QString outputText;
+        QTextStream outStream(&outputText);
+
         for (auto entry : obj.value("cards").toArray()) {
             auto quantity = entry.toObject().value("quantity").toInt();
 
@@ -34,12 +37,12 @@ public:
             QString cardName = oracleCard.value("name").toString();
             QString setName = card.value("edition").toObject().value("editioncode").toString().toUpper();
             QString collectorNumber = card.value("collectorNumber").toString();
-            QString providerId = card.value("uid").toString();
 
-            DecklistCardNode *newCard =
-                list->addCard(cardName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
-            newCard->setNumber(quantity);
+            outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
+
+        list->loadFromStream_Plain(outStream, false);
+        list->resolveSetNameAndNumberToProviderID();
 
         return list;
     }
@@ -58,6 +61,36 @@ public:
         list->setName(deckName);
         list->setComments(deckDescription);
 
+        QString outputText;
+        QTextStream outStream(&outputText);
+
+        for (auto entry : obj.value("mainboard").toObject()) {
+            auto quantity = entry.toObject().value("quantity").toInt();
+
+            auto card = entry.toObject().value("card").toObject();
+            QString cardName = card.value("name").toString();
+            QString setName = card.value("set").toString().toUpper();
+            QString collectorNumber = card.value("cn").toString();
+
+            outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
+        }
+
+        outStream << '\n';
+
+        for (auto entry : obj.value("sideboard").toObject()) {
+            auto quantity = entry.toObject().value("quantity").toInt();
+
+            auto card = entry.toObject().value("card").toObject();
+            QString cardName = card.value("name").toString();
+            QString setName = card.value("set").toString().toUpper();
+            QString collectorNumber = card.value("cn").toString();
+
+            outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
+        }
+
+        list->loadFromStream_Plain(outStream, false);
+        list->resolveSetNameAndNumberToProviderID();
+
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
             for (auto it = commandersObj.begin(); it != commandersObj.end(); ++it) {
@@ -70,34 +103,6 @@ public:
                 list->setBannerCard(QPair<QString, QString>(commanderName, providerId));
                 list->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
-        }
-
-        for (auto entry : obj.value("mainboard").toObject()) {
-            auto quantity = entry.toObject().value("quantity").toInt();
-
-            auto card = entry.toObject().value("card").toObject();
-            QString cardName = card.value("name").toString();
-            QString setName = card.value("set").toString().toUpper();
-            QString collectorNumber = card.value("cn").toString();
-            QString providerId = card.value("scryfall_id").toString();
-
-            DecklistCardNode *newCard =
-                list->addCard(cardName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
-            newCard->setNumber(quantity);
-        }
-
-        for (auto entry : obj.value("sideboard").toObject()) {
-            auto quantity = entry.toObject().value("quantity").toInt();
-
-            auto card = entry.toObject().value("card").toObject();
-            QString cardName = card.value("name").toString();
-            QString setName = card.value("set").toString().toUpper();
-            QString collectorNumber = card.value("cn").toString();
-            QString providerId = card.value("scryfall_id").toString();
-
-            DecklistCardNode *newCard =
-                list->addCard(cardName, DECK_ZONE_SIDE, -1, setName, collectorNumber, providerId);
-            newCard->setNumber(quantity);
         }
 
         return list;
