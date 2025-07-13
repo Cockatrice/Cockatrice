@@ -12,6 +12,12 @@ Webatrice built with vue and quasar
 npm install
 ```
 
+## If you've never used Quasar before, install the CLI:
+
+```terminal
+npm i -g @quasar/cli
+```
+
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 
 ```terminal
@@ -63,6 +69,8 @@ See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-
 #TODOs:
 
 - Create a gaming layout that isn't connected to the routing system
-- Decide how we will go about routing to each game. Will probably require some knowledge of the websocket data structure and a slug
 - Working login
 - Working websocket
+- Decide how we will go about routing to each game. Will probably require some knowledge of the websocket data structure and a slug
+- Admin functionailty/tools
+- Polish UI
