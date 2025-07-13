@@ -77,8 +77,8 @@ public:
     [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
     PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
-    QString getPreferredPrintingProviderId(const QString &cardName);
-    bool isPreferredPrinting(const CardRef &cardRef);
+    QString getPreferredPrintingProviderId(const QString &cardName) const;
+    bool isPreferredPrinting(const CardRef &cardRef) const;
 
     [[nodiscard]] CardInfoPtr guessCard(const CardRef &cardRef) const;
 

@@ -427,7 +427,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
     return PrintingInfo(nullptr);
 }
 
-QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName)
+QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) const
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
     QString uuid = preferredPrinting.getProperty("uuid");
@@ -442,7 +442,7 @@ QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName)
     return defaultCardInfo->getName();
 }
 
-bool CardDatabase::isPreferredPrinting(const CardRef &cardRef)
+bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
 {
     if (cardRef.providerId.startsWith("card_")) {
         return cardRef.providerId ==
