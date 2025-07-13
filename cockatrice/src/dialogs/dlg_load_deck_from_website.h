@@ -10,6 +10,8 @@
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
 
+inline Q_LOGGING_CATEGORY(DlgLoadDeckFromWebsiteLog, "dlg_load_deck_from_website");
+
 class DlgLoadDeckFromWebsite : public QDialog
 {
     Q_OBJECT

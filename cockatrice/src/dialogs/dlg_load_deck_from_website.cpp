@@ -54,12 +54,14 @@ void DlgLoadDeckFromWebsite::accept()
 {
     ParsedDeckInfo info;
     if (DeckLinkToApiTransformer::parseDeckUrl(urlEdit->text(), info)) {
-        qInfo() << info.baseUrl << info.deckID << info.fullUrl;
+        qCInfo(DlgLoadDeckFromWebsiteLog) << info.baseUrl << info.deckID << info.fullUrl;
 
         auto jsonParser = createParserForProvider(info.provider);
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
-            qWarning() << "No parser found for provider";
-            QMessageBox::warning(this, tr("Load Deck from Website"), tr("No parser available for this deck provider."));
+            qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
+            QMessageBox::warning(this, tr("Load Deck from Website"),
+                                 tr("No parser available for this deck provider.\n (Archidekt, Deckstats, Moxfield, "
+                                    "and TappedOut are supported.)"));
             QDialog::reject();
             return;
         }
@@ -72,7 +74,7 @@ void DlgLoadDeckFromWebsite::accept()
         loop.exec();
 
         if (reply->error() != QNetworkReply::NoError) {
-            qWarning() << "Network error:" << reply->errorString();
+            qCWarning(DlgLoadDeckFromWebsiteLog) << "Network error:" << reply->errorString();
             QMessageBox::warning(this, tr("Load Deck from Website"), tr("Network error: %1").arg(reply->errorString()));
             reply->deleteLater();
             QDialog::reject();
@@ -86,7 +88,7 @@ void DlgLoadDeckFromWebsite::accept()
         if (info.provider == DeckProvider::Deckstats || info.provider == DeckProvider::TappedOut) {
             QString deckText = QString::fromUtf8(responseData);
             if (deckText.isEmpty()) {
-                qWarning() << "Response is empty";
+                qCWarning(DlgLoadDeckFromWebsiteLog) << "Response is empty";
                 QMessageBox::warning(this, tr("Load Deck from Website"), tr("Received empty deck data."));
                 QDialog::reject();
                 return;
@@ -107,7 +109,7 @@ void DlgLoadDeckFromWebsite::accept()
         QJsonParseError parseError;
         QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
-            qWarning() << "JSON parse error:" << parseError.errorString();
+            qCWarning(DlgLoadDeckFromWebsiteLog) << "JSON parse error:" << parseError.errorString();
             QMessageBox::warning(this, tr("Load Deck from Website"),
                                  tr("Failed to parse deck data: %1").arg(parseError.errorString()));
             QDialog::reject();
@@ -118,9 +120,14 @@ void DlgLoadDeckFromWebsite::accept()
         QDialog::accept();
 
     } else {
-        qInfo() << "URL not recognized";
+        qCInfo(DlgLoadDeckFromWebsiteLog) << "URL not recognized";
         QMessageBox::warning(this, tr("Load Deck from Website"),
-                             tr("The provided URL is not recognized as a valid deck URL."));
+                             tr("The provided URL is not recognized as a valid deck URL.\n"
+                                "Valid deck URLs look like this:\n\n"
+                                "https://archidekt.com/decks/9999999\n"
+                                "https://deckstats.net/decks/99999/9999999-your-deck-name/en\n"
+                                "https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz\n"
+                                "https://tappedout.net/mtg-decks/your-deck-name/"));
         QDialog::reject();
     }
 }
