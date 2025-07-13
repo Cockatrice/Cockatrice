@@ -18,10 +18,10 @@ static const QString DECKSTATS_SUFFIX = "?include_comments=1&export_mtgarena=1";
 
 bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
 {
-    QRegularExpression rxTappedOut("tappedout\\.net/(?:mtg-decks/)?([^/?#]+)");
-    QRegularExpression rxArchidekt("archidekt\\.com/decks/(\\d+)");
-    QRegularExpression rxMoxfield("moxfield\\.com/decks/([a-zA-Z0-9_-]+)");
-    QRegularExpression rxDeckstats("deckstats\\.net/decks/(\\d+/[a-zA-Z0-9_-]+)");
+    static QRegularExpression rxTappedOut("tappedout\\.net/(?:mtg-decks/)?([^/?#]+)");
+    static QRegularExpression rxArchidekt("archidekt\\.com/decks/(\\d+)");
+    static QRegularExpression rxMoxfield("moxfield\\.com/decks/([a-zA-Z0-9_-]+)");
+    static QRegularExpression rxDeckstats("deckstats\\.net/decks/(\\d+/[a-zA-Z0-9_-]+)");
 
     QRegularExpressionMatch match;
 
