@@ -49,8 +49,8 @@ if(NOT GTEST_FOUND)
   add_dependencies(filter_string_test gtest)
 endif()
 
-target_link_libraries(carddatabase_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
-target_link_libraries(filter_string_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(carddatabase_test cockatrice_common Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(filter_string_test cockatrice_common Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 
 add_test(NAME carddatabase_test COMMAND carddatabase_test)
 add_test(NAME filter_string_test COMMAND filter_string_test)
