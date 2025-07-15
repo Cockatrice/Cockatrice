@@ -166,7 +166,8 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     // It can be assumed that in an invisible zone, all cards are equal.
     if ((c->getId() == -1) || (c->getName().isEmpty())) {
         c->setId(cardId);
-        c->setName(cardName);
+        // TODO: also set providerId
+        c->setCardRef({cardName});
     }
     return c;
 }

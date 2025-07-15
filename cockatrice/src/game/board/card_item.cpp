@@ -241,8 +241,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     }
 
     setId(_info.id());
-    setProviderId(QString::fromStdString(_info.provider_id()));
-    setName(QString::fromStdString(_info.name()));
+    setCardRef({QString::fromStdString(_info.name()), QString::fromStdString(_info.provider_id())});
     setAttacking(_info.attacking());
     setFaceDown(_info.face_down());
     setPT(QString::fromStdString(_info.pt()));

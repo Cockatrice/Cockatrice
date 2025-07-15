@@ -2197,7 +2197,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
 
     // remove revealed card name on top of decks
     if (absStart == 0 && !cardList.isEmpty()) {
-        cardList.first()->setName("");
+        cardList.first()->setCardRef({});
         zone->update();
     }
 
@@ -2392,10 +2392,10 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
         card->deleteCardInfoPopup();
     }
     if (event.has_card_name()) {
-        card->setName(QString::fromStdString(event.card_name()));
-    }
-    if (event.has_new_card_provider_id()) {
-        card->setProviderId(QString::fromStdString(event.new_card_provider_id()));
+        QString name = QString::fromStdString(event.card_name());
+        QString providerId =
+            event.has_new_card_provider_id() ? QString::fromStdString(event.new_card_provider_id()) : "";
+        card->setCardRef({name, providerId});
     }
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
@@ -2555,8 +2555,9 @@ void Player::eventDrawCards(const Event_DrawCards &event)
         for (int i = 0; i < listSize; ++i) {
             const ServerInfo_Card &cardInfo = event.cards(i);
             CardItem *card = _deck->takeCard(0, cardInfo.id());
-            card->setProviderId(QString::fromStdString(cardInfo.provider_id()));
-            card->setName(QString::fromStdString(cardInfo.name()));
+            QString cardName = QString::fromStdString(cardInfo.name());
+            QString providerId = QString::fromStdString(cardInfo.provider_id());
+            card->setCardRef({cardName, providerId});
             _hand->addCard(card, false, -1);
         }
     } else {
@@ -2599,11 +2600,12 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
     if (peeking) {
         for (const auto &card : cardList) {
             QString cardName = QString::fromStdString(card->name());
+            QString providerId = QString::fromStdString(card->provider_id());
             CardItem *cardItem = zone->getCard(card->id(), QString());
             if (!cardItem) {
                 continue;
             }
-            cardItem->setName(cardName);
+            cardItem->setCardRef({cardName, providerId});
             emit logRevealCards(this, zone, card->id(), cardName, this, true, 1);
         }
     } else {
@@ -2616,8 +2618,8 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
             // Handle case of revealing top card of library in-place
             if (cardId == 0 && dynamic_cast<PileZone *>(zone)) {
                 auto card = zone->getCards().first();
-                card->setName(cardName);
-                card->setProviderId(QString::fromStdString(cardList.first()->provider_id()));
+                QString providerId = QString::fromStdString(cardList.first()->provider_id());
+                card->setCardRef({cardName, providerId});
                 zone->update();
                 showZoneView = false;
             }

@@ -184,22 +184,9 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->restore();
 }
 
-void AbstractCardItem::setName(const QString &_name)
+void AbstractCardItem::setCardRef(const CardRef &_cardRef)
 {
-    if (cardRef.name == _name)
-        return;
-
-    emit deleteCardInfoPopup(cardRef.name);
-    if (info)
-        disconnect(info.data(), nullptr, this, nullptr);
-    cardRef.name = _name;
-
-    refreshCardInfo();
-}
-
-void AbstractCardItem::setProviderId(const QString &_providerId)
-{
-    if (cardRef.providerId == _providerId) {
+    if (cardRef == _cardRef) {
         return;
     }
 
@@ -207,7 +194,7 @@ void AbstractCardItem::setProviderId(const QString &_providerId)
     if (info) {
         disconnect(info.data(), nullptr, this, nullptr);
     }
-    cardRef.providerId = _providerId;
+    cardRef = _cardRef;
 
     refreshCardInfo();
 }

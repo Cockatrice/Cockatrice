@@ -74,12 +74,11 @@ public:
     {
         return cardRef.name;
     }
-    void setName(const QString &_name = QString());
     QString getProviderId() const
     {
         return cardRef.providerId;
     }
-    void setProviderId(const QString &_providerId = QString());
+    void setCardRef(const CardRef &_cardRef);
     CardRef getCardRef() const
     {
         return cardRef;

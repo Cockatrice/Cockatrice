@@ -149,9 +149,9 @@ public:
         coord_x = x;
         coord_y = y;
     }
-    void setName(const QString &_name)
+    void setCardRef(const CardRef &_cardRef)
     {
-        cardRef.name = _name;
+        cardRef = _cardRef;
     }
     void setCounter(int _id, int value, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)
