@@ -198,7 +198,7 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
  */
 CardInfoPtr CardDatabase::guessCard(const CardRef &cardRef) const
 {
-    CardInfoPtr temp = cardRef.providerId.isEmpty() ? getCardInfo(cardRef.name) : getCard(cardRef);
+    CardInfoPtr temp = getCard(cardRef);
 
     if (temp == nullptr) { // get card by simple name instead
         temp = getCardBySimpleName(cardRef.name);
