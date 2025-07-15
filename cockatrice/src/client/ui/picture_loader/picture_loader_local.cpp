@@ -11,13 +11,10 @@ static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 
 PictureLoaderLocal::PictureLoaderLocal(QObject *parent)
     : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath()),
-      overrideAllCardArtWithPersonalPreference(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference())
+      customPicsPath(SettingsCache::instance().getCustomPicsPath())
 {
     // Hook up signals to settings
     connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &PictureLoaderLocal::picsPathChanged);
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
-            &PictureLoaderLocal::setOverrideAllCardArtWithPersonalPreference);
 
     refreshIndex();
 
@@ -59,84 +56,94 @@ QImage PictureLoaderLocal::tryLoad(const CardInfoPtr &toLoad) const
 {
     CardSetPtr set = PictureToLoad::extractSetsSorted(toLoad).first();
 
-    QString setName = set ? set->getCorrectedShortName() : QString();
+    PrintingInfo setInstance = CardDatabaseManager::getInstance()->getSetInfoForCard(toLoad);
+
     QString cardName = toLoad->getName();
     QString correctedCardName = toLoad->getCorrectedName();
 
-    // FIXME: This is a hack so that to keep old Cockatrice behavior
-    // (ignoring provider ID) when the "override all card art with personal
-    // preference" is set.
-    //
-    // Figure out a proper way to integrate the two systems at some point.
-    //
-    // Note: need to go through a member for
-    // overrideAllCardArtWithPersonalPreference as reading from the
-    // SettingsCache instance from the PictureLoaderWorker thread could
-    // cause race conditions.
-    //
-    // XXX: Reading from the CardDatabaseManager instance from the
-    // PictureLoaderWorker thread might not be safe either
-    bool searchCustomPics =
-        overrideAllCardArtWithPersonalPreference ||
-        CardDatabaseManager::getInstance()->isProviderIdForPreferredPrinting(cardName, toLoad->getPixmapCacheKey());
-    if (searchCustomPics) {
-        qCDebug(PictureLoaderLocalLog).nospace()
-            << "[card: " << cardName << " set: " << setName << "]: Attempting to load picture from local";
-        return tryLoadCardImageFromDisk(setName, correctedCardName, searchCustomPics);
+    QString setName, collectorNumber, providerId;
+
+    if (setInstance.getSet()) {
+        setName = setInstance.getSet()->getCorrectedShortName();
+        collectorNumber = setInstance.getProperty("num");
+        providerId = setInstance.getProperty("uuid");
     }
 
     qCDebug(PictureLoaderLocalLog).nospace()
-        << "[card: " << cardName << " set: " << setName << "]: Skipping load picture from local";
-
-    return QImage();
+        << "[card: " << cardName << " set: " << setName << "]: Attempting to load picture from local";
+    return tryLoadCardImageFromDisk(setName, correctedCardName, collectorNumber, providerId);
 }
 
 QImage PictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
                                                     const QString &correctedCardName,
-                                                    const bool searchCustomPics) const
+                                                    const QString &collectorNumber,
+                                                    const QString &providerId) const
 {
     QImage image;
     QImageReader imgReader;
     imgReader.setDecideFormatFromContent(true);
-    QList<QString> picsPaths = QList<QString>();
 
-    if (searchCustomPics) {
-        picsPaths << customFolderIndex.values(correctedCardName);
+    // Most-to-least specific, these will fall through in order.
+    QStringList nameVariants;
+
+    // cardName_providerId
+    if (!providerId.isEmpty()) {
+        nameVariants << QString("%1-%2").arg(correctedCardName, providerId)
+                     << QString("%1_%2").arg(correctedCardName, providerId);
     }
-
+    // cardName_setName_collectorNumber & setName-collectorNumber-cardName
+    if (!setName.isEmpty() && !collectorNumber.isEmpty()) {
+        nameVariants << QString("%1_%2_%3").arg(correctedCardName, setName, collectorNumber)
+                     << QString("%1-%2-%3").arg(setName, collectorNumber, correctedCardName);
+    }
+    // cardName_setName
     if (!setName.isEmpty()) {
-        picsPaths << picsPath + "/" + setName + "/" + correctedCardName
-                  // We no longer store downloaded images there, but don't just ignore
-                  // stuff that old versions have put there.
-                  << picsPath + "/downloadedPics/" + setName + "/" + correctedCardName;
+        nameVariants << QString("%1_%2").arg(correctedCardName, setName)
+                     << QString("%1-%2").arg(setName, correctedCardName);
     }
 
-    // Iterates through the list of paths, searching for images with the desired
-    // name with any QImageReader-supported extension
-    for (const auto &_picsPath : picsPaths) {
-        if (!QFileInfo(_picsPath).isFile()) {
+    // cardName
+    nameVariants << correctedCardName;
+
+    for (const QString &nameVariant : nameVariants) {
+        if (nameVariant.isEmpty()) {
             continue;
         }
 
-        imgReader.setFileName(_picsPath);
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture found on disk.";
-            return image;
+        QStringList candidatePaths = customFolderIndex.values(nameVariant);
+
+        if (!setName.isEmpty()) {
+            candidatePaths << picsPath + "/" + setName + "/" + nameVariant;
+            candidatePaths << picsPath + "/downloadedPics/" + setName + "/" + nameVariant;
         }
-        imgReader.setFileName(_picsPath + ".full");
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.full found on disk.";
-            return image;
-        }
-        imgReader.setFileName(_picsPath + ".xlhq");
-        if (imgReader.read(&image)) {
-            qCDebug(PictureLoaderLocalLog).nospace()
-                << "[card: " << correctedCardName << " set: " << setName << "]: Picture.xlhq found on disk.";
-            return image;
+
+        for (const QString &path : candidatePaths) {
+            QFileInfo fileInfo(path);
+            QDir dir = fileInfo.dir();
+            QString baseName = fileInfo.fileName();
+
+            if (!dir.exists()) {
+                continue;
+            }
+
+            QStringList files = dir.entryList(QDir::Files);
+            for (const QString &file : files) {
+                if (!file.startsWith(baseName)) {
+                    continue;
+                }
+
+                QString fullPath = dir.filePath(file);
+                imgReader.setFileName(fullPath);
+
+                if (imgReader.read(&image)) {
+                    qCDebug(PictureLoaderLocalLog).nospace()
+                        << "[card: " << correctedCardName << " set: " << setName << "] Found picture at: " << fullPath;
+                    return image;
+                }
+            }
         }
     }
+
     qCDebug(PictureLoaderLocalLog).nospace()
         << "[card: " << correctedCardName << " set: " << setName << "]: Picture NOT found on disk.";
     return QImage();
@@ -146,9 +153,4 @@ void PictureLoaderLocal::picsPathChanged()
 {
     picsPath = SettingsCache::instance().getPicsPath();
     customPicsPath = SettingsCache::instance().getCustomPicsPath();
-}
-
-void PictureLoaderLocal::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArtWithPersonalPreference)
-{
-    overrideAllCardArtWithPersonalPreference = _overrideAllCardArtWithPersonalPreference;
 }
