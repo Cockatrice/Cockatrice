@@ -6,6 +6,7 @@
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../dialogs/dlg_load_deck_from_website.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
 #include "../../server/pending_command.h"
@@ -465,6 +466,28 @@ void AbstractTabDeckEditor::actPrintDeck()
     auto *dlg = new QPrintPreviewDialog(this);
     connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
     dlg->exec();
+}
+
+void AbstractTabDeckEditor::actLoadDeckFromWebsite()
+{
+    auto deckOpenLocation = confirmOpen();
+
+    if (deckOpenLocation == CANCELLED) {
+        return;
+    }
+
+    DlgLoadDeckFromWebsite dlg(this);
+    if (!dlg.exec())
+        return;
+
+    if (deckOpenLocation == NEW_TAB) {
+        emit openDeckEditor(dlg.getDeck());
+    } else {
+        setDeck(dlg.getDeck());
+        setModified(true);
+    }
+
+    deckMenu->setSaveStatus(true);
 }
 
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
