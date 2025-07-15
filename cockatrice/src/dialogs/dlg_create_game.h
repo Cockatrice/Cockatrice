@@ -36,12 +36,13 @@ private:
     QMap<int, QRadioButton *> gameTypeCheckBoxes;
 
     QGroupBox *generalGroupBox, *spectatorsGroupBox, *gameSetupOptionsGroupBox;
-    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel, *startingLifeTotalLabel;
+    QLabel *descriptionLabel, *passwordLabel, *maxPlayersLabel, *startingLifeTotalLabel, *shareDecklistsOnLoadLabel;
     QLineEdit *descriptionEdit, *passwordEdit;
     QSpinBox *maxPlayersEdit, *startingLifeTotalEdit;
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
         *spectatorsSeeEverythingCheckBox, *createGameAsSpectatorCheckBox;
+    QCheckBox *shareDecklistsOnLoadCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;

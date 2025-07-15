@@ -15,6 +15,8 @@ public:
     bool isHidePasswordProtectedGames();
     bool isHideIgnoredUserGames();
     bool isHideNotBuddyCreatedGames();
+    void setHideOpenDecklistGames(bool hide);
+    bool isHideOpenDecklistGames();
     QString getGameNameFilter();
     QString getCreatorNameFilter();
     int getMinPlayers();

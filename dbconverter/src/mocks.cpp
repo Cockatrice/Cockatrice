@@ -402,6 +402,9 @@ void SettingsCache::setCreateGameAsSpectator(const bool /* _createGameAsSpectato
 void SettingsCache::setDefaultStartingLifeTotal(const int /* _startingLifeTotal */)
 {
 }
+void SettingsCache::setShareDecklistsOnLoad(const bool /* _shareDecklistsOnLoad */)
+{
+}
 void SettingsCache::setRememberGameSettings(const bool /* _rememberGameSettings */)
 {
 }
