@@ -109,11 +109,24 @@ void CardDatabase::removeCard(CardInfoPtr card)
     emit cardRemoved(card);
 }
 
+/**
+ * Looks up the generic cardInfo (the CardInfoPtr that does not refer to a specific printing) corresponding to the
+ * cardName.
+ *
+ * @param cardName The card name to look up
+ * @return A generic CardInfoPtr, or null if not corresponding CardInfo is found.
+ */
 CardInfoPtr CardDatabase::getCardInfo(const QString &cardName) const
 {
     return cards.value(cardName);
 }
 
+/**
+ * Looks up the generic cardInfos (the CardInfoPtr that does not refer to a specific printing) for a list of card names.
+ *
+ * @param cardNames The card names to look up
+ * @return A List of generic CardInfoPtr. Any failed lookups will be ignored and dropped from the resulting list
+ */
 QList<CardInfoPtr> CardDatabase::getCardInfos(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
@@ -126,6 +139,14 @@ QList<CardInfoPtr> CardDatabase::getCardInfos(const QStringList &cardNames) cons
     return cardInfos;
 }
 
+/**
+ * Looks up the CardInfoPtrs corresponding to the CardRefs
+ *
+ * @param cardRefs The cards to look up. If providerId is null for an entry, will look up the generic CardInfo for that
+ * entry's cardName.
+ * @return A list of specific printings of cards. Any failed lookups will be ignored and dropped from the resulting
+ * list.
+ */
 QList<CardInfoPtr> CardDatabase::getCards(const QList<CardRef> &cardRefs) const
 {
     QList<CardInfoPtr> cardInfos;
@@ -138,6 +159,12 @@ QList<CardInfoPtr> CardDatabase::getCards(const QList<CardRef> &cardRefs) const
     return cardInfos;
 }
 
+/**
+ * Looks up the CardInfoPtr corresponding to the CardRef
+ *
+ * @param cardRef The card to look up. If providerId is null, will look up the generic CardInfo for the cardName.
+ * @return A specific printing of a card, or null if not found.
+ */
 CardInfoPtr CardDatabase::getCard(const CardRef &cardRef) const
 {
     auto info = getCardInfo(cardRef.name);
@@ -163,6 +190,12 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return simpleNameCards.value(CardInfo::simplifyName(cardName));
 }
 
+/**
+ * Looks up the CardInfoPtr by CardRef, simplifying the name if required.
+ *
+ * @param cardRef The card to look up. If providerId is null, will look up the generic CardInfo for the cardName.
+ * @return A specific printing of a card, or null if not found.
+ */
 CardInfoPtr CardDatabase::guessCard(const CardRef &cardRef) const
 {
     CardInfoPtr temp = cardRef.providerId.isEmpty() ? getCardInfo(cardRef.name) : getCard(cardRef);
