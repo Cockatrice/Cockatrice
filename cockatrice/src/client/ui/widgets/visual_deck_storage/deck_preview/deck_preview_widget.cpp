@@ -20,14 +20,14 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
                                      const QString &_filePath)
     : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath),
-      colorIdentityWidget(nullptr), deckTagsDisplayWidget(nullptr)
+      checkInitializeUiTimer(QTimer(this))
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
     deckLoader = new DeckLoader();
     deckLoader->setParent(this);
-    connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
+    connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::onDeckLoadFinished);
     /* TODO: We shouldn't update the tags on *every* deck load, since it's kinda expensive. We should instead count how
      many deck loads have finished already and if we've loaded all decks and THEN load all the tags at once. */
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
@@ -50,6 +50,10 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
             &DeckPreviewWidget::refreshBannerCardToolTip);
 
     layout->addWidget(bannerCardDisplayWidget);
+
+    checkInitializeUiTimer.setInterval(10);
+    connect(&checkInitializeUiTimer, &QTimer::timeout, this, &DeckPreviewWidget::tryInitializeUi);
+    checkInitializeUiTimer.start();
 }
 
 void DeckPreviewWidget::retranslateUi()
@@ -69,11 +73,46 @@ void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
+void DeckPreviewWidget::onDeckLoadFinished()
 {
-    if (!deckLoadSuccess) {
+    deckLoaded = true;
+    tryInitializeUi();
+}
+
+/**
+ * Attempts to initialize the child widgets.
+ * No-ops if the child widgets aren't ready to be created yet or have already been created.
+ *
+ * DeckPreviewWidget delays the creation of its child widgets until it is on screen.
+ * This significantly improves the performance of the VDS.
+ */
+void DeckPreviewWidget::tryInitializeUi()
+{
+    // stop if child widgets are already created from initializeUi
+    if (colorIdentityWidget) {
         return;
     }
+
+    // stop if deck isn't loaded yet
+    if (!deckLoaded) {
+        return;
+    }
+
+    // stop if this widget is offscreen
+    if (this->visibleRegion().isNull()) {
+        return;
+    }
+
+    initializeUi();
+}
+
+/**
+ * Initializes the child widgets of the DeckPreviewWidget.
+ */
+void DeckPreviewWidget::initializeUi()
+{
+    checkInitializeUiTimer.stop();
+
     auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
                           ? CardInfoPtr()
                           : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(

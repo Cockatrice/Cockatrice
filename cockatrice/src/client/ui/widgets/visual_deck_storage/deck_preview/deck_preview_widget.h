@@ -38,6 +38,8 @@ public:
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget = nullptr;
     QLabel *bannerCardLabel = nullptr;
     QComboBox *bannerCardComboBox = nullptr;
+    QTimer checkInitializeUiTimer;
+    bool deckLoaded = false;
     bool filteredBySearch = false;
     bool filteredByColor = false;
     bool filteredByTags = false;
@@ -55,20 +57,25 @@ public slots:
     void setBannerCard(int);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
-    void initializeUi(bool deckLoadSuccess);
     void updateVisibility();
     void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
-    void resizeEvent(QResizeEvent *event) override;
 
 private:
     QMenu *createRightClickMenu();
     void addSetBannerCardMenu(QMenu *menu);
 
 private slots:
+    void onDeckLoadFinished();
+    void tryInitializeUi();
+    void initializeUi();
+
     void actRenameDeck();
     void actRenameFile();
     void actDeleteFile();
+
+protected slots:
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 class NoScrollFilter : public QObject
