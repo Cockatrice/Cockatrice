@@ -154,7 +154,7 @@ void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const
     emit cardCountChanged();
 }
 
-CardItem *CardZone::getCard(int cardId, const QString &cardName)
+CardItem *CardZone::getCard(int cardId)
 {
     CardItem *c = cards.findCard(cardId);
     if (!c) {
@@ -162,12 +162,10 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
         return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
-    // so we need to give the card an id and a name as it comes out.
+    // so we need to give the card an id as it comes out.
     // It can be assumed that in an invisible zone, all cards are equal.
-    if ((c->getId() == -1) || (c->getName().isEmpty())) {
+    if (c->getId() == -1) {
         c->setId(cardId);
-        // TODO: also set providerId
-        c->setCardRef({cardName});
     }
     return c;
 }
