@@ -1324,6 +1324,7 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
     event.set_card_id(card->getId());
     if (!faceDown) {
         event.set_card_name(card->getName().toStdString());
+        event.set_card_provider_id(card->getProviderId().toStdString());
     }
     event.set_face_down(faceDown);
     ges.enqueueGameEvent(event, playerId);

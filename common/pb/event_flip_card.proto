@@ -9,4 +9,5 @@ message Event_FlipCard {
     optional sint32 card_id = 2;
     optional string card_name = 3;
     optional bool face_down = 4;
+    optional string card_provider_id = 5;
 }
