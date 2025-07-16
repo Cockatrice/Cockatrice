@@ -37,7 +37,7 @@ public:
         ImageAndTextView
     };
 
-    explicit CardInfoFrameWidget(const QString &cardName = QString(), QWidget *parent = nullptr);
+    explicit CardInfoFrameWidget(QWidget *parent = nullptr);
     CardInfoPtr getInfo()
     {
         return info;

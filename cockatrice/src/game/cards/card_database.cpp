@@ -142,7 +142,7 @@ QList<CardInfoPtr> CardDatabase::getCardInfos(const QStringList &cardNames) cons
 /**
  * Looks up the CardInfoPtrs corresponding to the CardRefs
  *
- * @param cardRefs The cards to look up. If providerId is null for an entry, will look up the generic CardInfo for that
+ * @param cardRefs The cards to look up. If providerId is empty for an entry, will look up the generic CardInfo for that
  * entry's cardName.
  * @return A list of specific printings of cards. Any failed lookups will be ignored and dropped from the resulting
  * list.
@@ -162,7 +162,7 @@ QList<CardInfoPtr> CardDatabase::getCards(const QList<CardRef> &cardRefs) const
 /**
  * Looks up the CardInfoPtr corresponding to the CardRef
  *
- * @param cardRef The card to look up. If providerId is null, will look up the generic CardInfo for the cardName.
+ * @param cardRef The card to look up. If providerId is empty, will look up the generic CardInfo for the cardName.
  * @return A specific printing of a card, or null if not found.
  */
 CardInfoPtr CardDatabase::getCard(const CardRef &cardRef) const
@@ -172,17 +172,16 @@ CardInfoPtr CardDatabase::getCard(const CardRef &cardRef) const
         return info;
     }
 
-    for (const auto &printings : info->getSets()) {
-        for (const auto &printing : printings) {
-            if (printing.getProperty("uuid") == cardRef.providerId) {
-                CardInfoPtr cardFromSpecificSet = info->clone();
-                cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) +
-                                                       QString("_") + QString(printing.getProperty("uuid")));
-                return cardFromSpecificSet;
-            }
-        }
+    PrintingInfo printing = findPrintingWithId(info, cardRef.providerId);
+
+    if (!printing.getSet()) {
+        return {};
     }
-    return {};
+
+    CardInfoPtr cardFromSpecificSet = info->clone();
+    cardFromSpecificSet->setPixmapCacheKey(QLatin1String("card_") + QString(info->getName()) + QString("_") +
+                                           QString(printing.getProperty("uuid")));
+    return cardFromSpecificSet;
 }
 
 CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
@@ -193,7 +192,7 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
 /**
  * Looks up the CardInfoPtr by CardRef, simplifying the name if required.
  *
- * @param cardRef The card to look up. If providerId is null, will look up the generic CardInfo for the cardName.
+ * @param cardRef The card to look up. If providerId is empty, will look up the generic CardInfo for the cardName.
  * @return A specific printing of a card, or null if not found.
  */
 CardInfoPtr CardDatabase::guessCard(const CardRef &cardRef) const
@@ -330,6 +329,26 @@ void CardDatabase::refreshPreferredPrintings()
     }
 }
 
+/**
+ * Finds the PrintingInfo in the cardInfo that has the given uuid field.
+ *
+ * @param cardInfo The CardInfo to search
+ * @param providerId The uuid to look for
+ * @return The PrintingInfo, or a default-constructed PrintingInfo if not found.
+ */
+PrintingInfo CardDatabase::findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId)
+{
+    for (const auto &printings : cardInfo->getSets()) {
+        for (const auto &printing : printings) {
+            if (printing.getProperty("uuid") == providerId) {
+                return printing;
+            }
+        }
+    }
+
+    return PrintingInfo();
+}
+
 PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
 {
     CardInfoPtr cardInfo = getCardInfo(cardName);
@@ -375,24 +394,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const CardRef &cardRef) const
         return PrintingInfo(nullptr);
     }
 
-    SetToPrintingsMap setMap = cardInfo->getSets();
-    if (setMap.empty()) {
-        return PrintingInfo(nullptr);
-    }
-
-    for (const auto &printings : setMap) {
-        for (auto &cardInfoForSet : printings) {
-            if (cardInfoForSet.getProperty("uuid") == cardRef.providerId) {
-                return cardInfoForSet;
-            }
-        }
-    }
-
-    if (cardRef.providerId.isNull()) {
-        return getPreferredPrinting(cardRef.name);
-    }
-
-    return PrintingInfo(nullptr);
+    return findPrintingWithId(cardInfo, cardRef.providerId);
 }
 
 PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,

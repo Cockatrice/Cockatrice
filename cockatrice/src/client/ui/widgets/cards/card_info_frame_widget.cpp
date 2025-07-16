@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 #include <utility>
 
-CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *parent)
+CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     : QTabWidget(parent), info(nullptr), viewTransformationButton(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
@@ -60,9 +60,6 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     tab3->setLayout(tab3Layout);
 
     setViewMode(SettingsCache::instance().getCardInfoViewMode());
-
-    // TODO: Change this to be by UUID
-    setCard(CardDatabaseManager::getInstance()->getCardInfo(cardName));
 }
 
 void CardInfoFrameWidget::retranslateUi()
