@@ -17,6 +17,7 @@ set(cockatrice_SOURCES
     src/client/network/sets_model.cpp
     src/client/network/spoiler_background_updater.cpp
     src/client/network/parsers/deck_link_to_api_transformer.cpp
+    src/client/replay_manager.cpp
     src/client/sound_engine.cpp
     src/client/tabs/abstract_tab_deck_editor.cpp
     src/client/tabs/api/edhrec/tab_edhrec.cpp

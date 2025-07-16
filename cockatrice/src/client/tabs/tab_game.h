@@ -3,6 +3,7 @@
 
 #include "../../client/tearoff_menu.h"
 #include "../../game/player/player.h"
+#include "../replay_manager.h"
 #include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_game.pb.h"
@@ -20,6 +21,7 @@ class AbstractClient;
 class CardDatabase;
 class GameView;
 class GameScene;
+class ReplayManager;
 class CardInfoFrameWidget;
 class MessageLogWidget;
 class QTimer;
@@ -88,18 +90,11 @@ private:
     int activePlayer;
     CardItem *activeCard;
     bool gameClosed;
+    ReplayManager *replayManager;
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
-
-    // Replay related members
-    GameReplay *replay;
-    int currentReplayStep;
-    QList<int> replayTimeline;
-    ReplayTimelineWidget *timelineWidget;
-    QToolButton *replayPlayButton, *replayFastForwardButton;
-    QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
@@ -160,7 +155,7 @@ private:
     void createMessageDock(bool bReplay = false);
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
-    void createReplayDock();
+    void createReplayDock(GameReplay *replay);
     QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
     void gameClosing(TabGame *tab);
@@ -171,13 +166,8 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
     void openDeckEditor(const DeckLoader *deck);
     void notIdle();
-private slots:
-    void replayNextEvent(Player::EventProcessingOptions options);
-    void replayFinished();
-    void replayPlayButtonToggled(bool checked);
-    void replayFastForwardButtonToggled(bool checked);
-    void replayRewind();
 
+private slots:
     void incrementGameTime();
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
@@ -217,6 +207,7 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void loadReplay(GameReplay *replay);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
@@ -267,6 +258,7 @@ public slots:
     void sendGameCommand(PendingCommand *pend, int playerId = -1);
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
     void viewCardInfo(const CardRef &cardRef = {}) const;
+    void resetChatAndPhase();
 };
 
 #endif
