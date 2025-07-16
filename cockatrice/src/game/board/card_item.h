@@ -51,8 +51,7 @@ public:
     }
     explicit CardItem(Player *_owner,
                       QGraphicsItem *parent = nullptr,
-                      const QString &_name = QString(),
-                      const QString &_providerId = QString(),
+                      const CardRef &cardRef = {},
                       int _cardid = -1,
                       CardZone *_zone = nullptr);
     ~CardItem() override;

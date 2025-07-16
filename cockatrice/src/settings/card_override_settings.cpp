@@ -5,9 +5,9 @@ CardOverrideSettings::CardOverrideSettings(const QString &settingPath, QObject *
 {
 }
 
-void CardOverrideSettings::setCardPreferenceOverride(const QString &cardName, const QString &providerId)
+void CardOverrideSettings::setCardPreferenceOverride(const CardRef &cardRef)
 {
-    setValue(providerId, cardName, "cards");
+    setValue(cardRef.providerId, cardRef.name, "cards");
 }
 
 void CardOverrideSettings::deleteCardPreferenceOverride(const QString &cardName)

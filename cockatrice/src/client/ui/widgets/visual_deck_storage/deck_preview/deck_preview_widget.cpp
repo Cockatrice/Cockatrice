@@ -74,10 +74,9 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     if (!deckLoadSuccess) {
         return;
     }
-    auto bannerCard = deckLoader->getBannerCard().first.isEmpty()
+    auto bannerCard = deckLoader->getBannerCard().name.isEmpty()
                           ? CardInfoPtr()
-                          : CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                                deckLoader->getBannerCard().first, deckLoader->getBannerCard().second);
+                          : CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard());
 
     bannerCardDisplayWidget->setCard(bannerCard);
     bannerCardDisplayWidget->setFontSize(24);
@@ -91,7 +90,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     bannerCardComboBox = new QComboBox(this);
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     bannerCardComboBox->setObjectName("bannerCardComboBox");
-    bannerCardComboBox->setCurrentText(deckLoader->getBannerCard().first);
+    bannerCardComboBox->setCurrentText(deckLoader->getBannerCard().name);
     bannerCardComboBox->installEventFilter(new NoScrollFilter());
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
@@ -161,7 +160,7 @@ QString DeckPreviewWidget::getColorIdentity()
     QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)
 
     for (const QString &cardName : cardList) {
-        CardInfoPtr currentCard = CardDatabaseManager::getInstance()->getCard(cardName);
+        CardInfoPtr currentCard = CardDatabaseManager::getInstance()->getCardInfo(cardName);
         if (currentCard) {
             QString colors = currentCard->getColors(); // Assuming this returns something like "WUB"
             for (const QChar &color : colors) {
@@ -274,7 +273,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
         bannerCardComboBox->setCurrentIndex(restoredIndex);
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckLoader->getBannerCard().first);
+        int bannerIndex = bannerCardComboBox->findText(deckLoader->getBannerCard().name);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
         } else {
@@ -290,11 +289,11 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
 void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
-    auto nameAndId = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
-    deckLoader->setBannerCard(nameAndId);
+    auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    CardRef cardRef = {name, id};
+    deckLoader->setBannerCard(cardRef);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
-    bannerCardDisplayWidget->setCard(
-        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(nameAndId.first, nameAndId.second));
+    bannerCardDisplayWidget->setCard(CardDatabaseManager::getInstance()->getCard(cardRef));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

@@ -1849,7 +1849,7 @@ void Player::actCreateToken()
 
     lastTokenInfo = dlg.getTokenInfo();
 
-    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard(lastTokenInfo.name);
+    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard->getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
@@ -1886,7 +1886,7 @@ void Player::actCreateAnotherToken()
 void Player::actCreatePredefinedToken()
 {
     auto *action = static_cast<QAction *>(sender());
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(action->text());
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(action->text());
     if (!cardInfo) {
         return;
     }
@@ -1912,8 +1912,8 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardRelation->getName(), sourceCard->getProviderId());
+        CardInfoPtr cardInfo =
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), sourceCard->getProviderId()});
         setLastToken(cardInfo);
     }
 }
@@ -1993,7 +1993,7 @@ void Player::actCreateAllRelatedCards()
      * then assign the first to the "Create another" shortcut.
      */
     if (cardRelation != nullptr && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         setLastToken(cardInfo);
     }
 }
@@ -2040,7 +2040,7 @@ void Player::createCard(const CardItem *sourceCard,
                         CardRelation::AttachType attachType,
                         bool persistent)
 {
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard(dbCardName);
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(dbCardName);
 
     if (cardInfo == nullptr || sourceCard == nullptr) {
         return;
@@ -2197,7 +2197,7 @@ void Player::eventShuffle(const Event_Shuffle &event)
 
     // remove revealed card name on top of decks
     if (absStart == 0 && !cardList.isEmpty()) {
-        cardList.first()->setName("");
+        cardList.first()->setCardRef({});
         zone->update();
     }
 
@@ -2253,8 +2253,8 @@ void Player::eventCreateToken(const Event_CreateToken &event)
         return;
     }
 
-    CardItem *card = new CardItem(this, nullptr, QString::fromStdString(event.card_name()),
-                                  QString::fromStdString(event.card_provider_id()), event.card_id());
+    CardRef cardRef = {QString::fromStdString(event.card_name()), QString::fromStdString(event.card_provider_id())};
+    CardItem *card = new CardItem(this, nullptr, cardRef, event.card_id());
     // use db PT if not provided in event and not face-down
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
@@ -2292,7 +2292,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event,
             emit logSetTapped(this, nullptr, event.attr_value() == "1");
         }
     } else {
-        CardItem *card = zone->getCard(event.card_id(), QString());
+        CardItem *card = zone->getCard(event.card_id());
         if (!card) {
             qWarning() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
@@ -2308,7 +2308,7 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id(), QString());
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -2392,10 +2392,10 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
         card->deleteCardInfoPopup();
     }
     if (event.has_card_name()) {
-        card->setName(QString::fromStdString(event.card_name()));
-    }
-    if (event.has_new_card_provider_id()) {
-        card->setProviderId(QString::fromStdString(event.new_card_provider_id()));
+        QString name = QString::fromStdString(event.card_name());
+        QString providerId =
+            event.has_new_card_provider_id() ? QString::fromStdString(event.new_card_provider_id()) : "";
+        card->setCardRef({name, providerId});
     }
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
@@ -2467,10 +2467,17 @@ void Player::eventFlipCard(const Event_FlipCard &event)
     if (!zone) {
         return;
     }
-    CardItem *card = zone->getCard(event.card_id(), QString::fromStdString(event.card_name()));
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
+
+    QString cardName = QString::fromStdString(event.card_name());
+    if (!event.face_down()) {
+        // TODO: also set providerId
+        card->setCardRef({cardName});
+    }
+
     emit logFlipCard(this, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
     updateCardMenu(card);
@@ -2483,7 +2490,7 @@ void Player::eventDestroyCard(const Event_DestroyCard &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id(), QString());
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -2510,7 +2517,7 @@ void Player::eventAttachCard(const Event_AttachCard &event)
         if (targetPlayer) {
             targetZone = targetPlayer->getZones().value(QString::fromStdString(event.target_zone()), 0);
             if (targetZone) {
-                targetCard = targetZone->getCard(event.target_card_id(), QString());
+                targetCard = targetZone->getCard(event.target_card_id());
             }
         }
     }
@@ -2520,7 +2527,7 @@ void Player::eventAttachCard(const Event_AttachCard &event)
         return;
     }
 
-    CardItem *startCard = startZone->getCard(event.card_id(), QString());
+    CardItem *startCard = startZone->getCard(event.card_id());
     if (!startCard) {
         return;
     }
@@ -2555,8 +2562,9 @@ void Player::eventDrawCards(const Event_DrawCards &event)
         for (int i = 0; i < listSize; ++i) {
             const ServerInfo_Card &cardInfo = event.cards(i);
             CardItem *card = _deck->takeCard(0, cardInfo.id());
-            card->setProviderId(QString::fromStdString(cardInfo.provider_id()));
-            card->setName(QString::fromStdString(cardInfo.name()));
+            QString cardName = QString::fromStdString(cardInfo.name());
+            QString providerId = QString::fromStdString(cardInfo.provider_id());
+            card->setCardRef({cardName, providerId});
             _hand->addCard(card, false, -1);
         }
     } else {
@@ -2599,11 +2607,12 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
     if (peeking) {
         for (const auto &card : cardList) {
             QString cardName = QString::fromStdString(card->name());
-            CardItem *cardItem = zone->getCard(card->id(), QString());
+            QString providerId = QString::fromStdString(card->provider_id());
+            CardItem *cardItem = zone->getCard(card->id());
             if (!cardItem) {
                 continue;
             }
-            cardItem->setName(cardName);
+            cardItem->setCardRef({cardName, providerId});
             emit logRevealCards(this, zone, card->id(), cardName, this, true, 1);
         }
     } else {
@@ -2616,8 +2625,8 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
             // Handle case of revealing top card of library in-place
             if (cardId == 0 && dynamic_cast<PileZone *>(zone)) {
                 auto card = zone->getCards().first();
-                card->setName(cardName);
-                card->setProviderId(QString::fromStdString(cardList.first()->provider_id()));
+                QString providerId = QString::fromStdString(cardList.first()->provider_id());
+                card->setCardRef({cardName, providerId});
                 zone->update();
                 showZoneView = false;
             }
@@ -2854,7 +2863,7 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
         for (int j = 0; j < cardListSize; ++j) {
             const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
             if (cardInfo.has_attach_player_id()) {
-                CardItem *startCard = zone->getCard(cardInfo.id(), QString());
+                CardItem *startCard = zone->getCard(cardInfo.id());
                 CardItem *targetCard =
                     game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()),
                                   cardInfo.attach_card_id());
@@ -3043,10 +3052,10 @@ ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
         return nullptr;
     }
 
-    CardItem *startCard = startZone->getCard(arrow.start_card_id(), QString());
+    CardItem *startCard = startZone->getCard(arrow.start_card_id());
     CardItem *targetCard = nullptr;
     if (targetZone) {
-        targetCard = targetZone->getCard(arrow.target_card_id(), QString());
+        targetCard = targetZone->getCard(arrow.target_card_id());
     }
     if (!startCard || (!targetCard && arrow.has_target_card_id())) {
         return nullptr;
@@ -4076,7 +4085,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -4096,7 +4105,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         QString relatedCardName = relatedCard->getName();
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
-            game->viewCardInfo(relatedCardName, currentCardSet.getProperty("uuid"));
+            game->viewCardInfo({relatedCardName, currentCardSet.getProperty("uuid")});
         });
     }
 }
@@ -4122,10 +4131,10 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-            cardRelation->getName(), currentCardSet.getProperty("uuid"));
+        CardInfoPtr relatedCard =
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), currentCardSet.getProperty("uuid")});
         if (relatedCard == nullptr) {
-            relatedCard = CardDatabaseManager::getInstance()->getCard(cardRelation->getName());
+            relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         }
         if (relatedCard == nullptr) {
             continue;

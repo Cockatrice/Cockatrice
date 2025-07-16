@@ -332,8 +332,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(newDeck.getCardListWithProviderId()));
+    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }

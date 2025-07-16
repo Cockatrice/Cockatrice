@@ -55,7 +55,7 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
                 if (info) {
                     auto devotion = countManaSymbols(info->getManaCost());
                     mergeManaCounts(manaDevotionMap, devotion);

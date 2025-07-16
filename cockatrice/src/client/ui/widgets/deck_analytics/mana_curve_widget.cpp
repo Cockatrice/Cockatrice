@@ -53,7 +53,7 @@ std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
                 if (info) {
                     int cmc = info->getCmc().toInt();
                     manaCurveMap[cmc]++;

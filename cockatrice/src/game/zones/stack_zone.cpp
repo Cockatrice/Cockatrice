@@ -34,7 +34,7 @@ void StackZone::addCardImpl(CardItem *card, int x, int /*y*/)
 
     if (!cards.getContentsKnown()) {
         card->setId(-1);
-        card->setName();
+        card->setCardRef({});
     }
     card->setParentItem(this);
     card->resetState(true);

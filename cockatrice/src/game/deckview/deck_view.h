@@ -25,8 +25,7 @@ private:
 
 public:
     explicit DeckViewCard(QGraphicsItem *parent = nullptr,
-                          const QString &_name = QString(),
-                          const QString &_providerId = QString(),
+                          const CardRef &cardRef = {},
                           const QString &_originZone = QString());
     ~DeckViewCard() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

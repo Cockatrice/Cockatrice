@@ -66,7 +66,7 @@ void DeckListModel::rebuildTree()
                 continue;
             }
 
-            CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->getName());
+            CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
             QString groupCriteria = getGroupCriteriaForCard(info);
 
             auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
@@ -337,7 +337,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
         return nullptr;
     }
 
-    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(cardName);
+    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(cardName);
     if (!info) {
         return nullptr;
     }
@@ -375,8 +375,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
                                    const QString &zoneName,
                                    bool abAddAnyway)
 {
-    CardInfoPtr cardInfo =
-        CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, printingInfo.getProperty("uuid"));
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard({cardName, printingInfo.getProperty("uuid")});
 
     if (cardInfo == nullptr) {
         if (abAddAnyway) {
@@ -559,8 +558,7 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                    currentCard->getName(), currentCard->getCardProviderId());
+                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
                 if (info) {
                     cards.append(info);
                 } else {
@@ -593,8 +591,7 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName
                 if (!currentCard)
                     continue;
                 for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(
-                        currentCard->getName(), currentCard->getCardProviderId());
+                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
                     if (info) {
                         cards.append(info);
                     } else {
