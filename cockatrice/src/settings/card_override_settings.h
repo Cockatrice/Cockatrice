@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_CARD_OVERRIDE_SETTINGS_H
 #define COCKATRICE_CARD_OVERRIDE_SETTINGS_H
 
-#include "card_ref.h"
+#include "../common/card_ref.h"
 #include "settings_manager.h"
 
 #include <QObject>
