@@ -227,8 +227,8 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
                 continue;
 
             SetToPrintingsMap setMap = infoPtr->getSets();
-            for (auto it = setMap.begin(); it != setMap.end(); ++it) {
-                setCounts[it.key()]++;
+            for (auto &setName : setMap.keys()) {
+                setCounts[setName]++;
             }
         }
     }
