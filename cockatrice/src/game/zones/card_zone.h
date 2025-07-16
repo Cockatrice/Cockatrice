@@ -103,7 +103,7 @@ public:
     }
     void addCard(CardItem *card, bool reorganize, int x, int y = -1);
     // getCard() finds a card by id.
-    CardItem *getCard(int cardId, const QString &cardName);
+    CardItem *getCard(int cardId);
     // takeCard() finds a card by position and removes it from the zone and from all of its views.
     virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
     void removeCard(CardItem *card);

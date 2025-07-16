@@ -2292,7 +2292,7 @@ void Player::eventSetCardAttr(const Event_SetCardAttr &event,
             emit logSetTapped(this, nullptr, event.attr_value() == "1");
         }
     } else {
-        CardItem *card = zone->getCard(event.card_id(), QString());
+        CardItem *card = zone->getCard(event.card_id());
         if (!card) {
             qWarning() << "Player::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
@@ -2308,7 +2308,7 @@ void Player::eventSetCardCounter(const Event_SetCardCounter &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id(), QString());
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -2467,10 +2467,17 @@ void Player::eventFlipCard(const Event_FlipCard &event)
     if (!zone) {
         return;
     }
-    CardItem *card = zone->getCard(event.card_id(), QString::fromStdString(event.card_name()));
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
+
+    QString cardName = QString::fromStdString(event.card_name());
+    if (!event.face_down()) {
+        // TODO: also set providerId
+        card->setCardRef({cardName});
+    }
+
     emit logFlipCard(this, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
     updateCardMenu(card);
@@ -2483,7 +2490,7 @@ void Player::eventDestroyCard(const Event_DestroyCard &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id(), QString());
+    CardItem *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -2510,7 +2517,7 @@ void Player::eventAttachCard(const Event_AttachCard &event)
         if (targetPlayer) {
             targetZone = targetPlayer->getZones().value(QString::fromStdString(event.target_zone()), 0);
             if (targetZone) {
-                targetCard = targetZone->getCard(event.target_card_id(), QString());
+                targetCard = targetZone->getCard(event.target_card_id());
             }
         }
     }
@@ -2520,7 +2527,7 @@ void Player::eventAttachCard(const Event_AttachCard &event)
         return;
     }
 
-    CardItem *startCard = startZone->getCard(event.card_id(), QString());
+    CardItem *startCard = startZone->getCard(event.card_id());
     if (!startCard) {
         return;
     }
@@ -2601,7 +2608,7 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
         for (const auto &card : cardList) {
             QString cardName = QString::fromStdString(card->name());
             QString providerId = QString::fromStdString(card->provider_id());
-            CardItem *cardItem = zone->getCard(card->id(), QString());
+            CardItem *cardItem = zone->getCard(card->id());
             if (!cardItem) {
                 continue;
             }
@@ -2856,7 +2863,7 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
         for (int j = 0; j < cardListSize; ++j) {
             const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
             if (cardInfo.has_attach_player_id()) {
-                CardItem *startCard = zone->getCard(cardInfo.id(), QString());
+                CardItem *startCard = zone->getCard(cardInfo.id());
                 CardItem *targetCard =
                     game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()),
                                   cardInfo.attach_card_id());
@@ -3045,10 +3052,10 @@ ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
         return nullptr;
     }
 
-    CardItem *startCard = startZone->getCard(arrow.start_card_id(), QString());
+    CardItem *startCard = startZone->getCard(arrow.start_card_id());
     CardItem *targetCard = nullptr;
     if (targetZone) {
-        targetCard = targetZone->getCard(arrow.target_card_id(), QString());
+        targetCard = targetZone->getCard(arrow.target_card_id());
     }
     if (!startCard || (!targetCard && arrow.has_target_card_id())) {
         return nullptr;

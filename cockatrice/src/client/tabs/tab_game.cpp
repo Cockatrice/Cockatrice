@@ -1215,7 +1215,7 @@ CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) co
     if (!zone)
         return nullptr;
 
-    return zone->getCard(cardId, QString());
+    return zone->getCard(cardId);
 }
 
 QString TabGame::getTabText() const
