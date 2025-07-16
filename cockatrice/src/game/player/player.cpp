@@ -2472,10 +2472,10 @@ void Player::eventFlipCard(const Event_FlipCard &event)
         return;
     }
 
-    QString cardName = QString::fromStdString(event.card_name());
     if (!event.face_down()) {
-        // TODO: also set providerId
-        card->setCardRef({cardName});
+        QString cardName = QString::fromStdString(event.card_name());
+        QString providerId = QString::fromStdString(event.card_provider_id());
+        card->setCardRef({cardName, providerId});
     }
 
     emit logFlipCard(this, card->getName(), event.face_down());
