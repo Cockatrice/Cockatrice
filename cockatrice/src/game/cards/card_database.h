@@ -52,7 +52,6 @@ protected:
     QVector<ICardDatabaseParser *> availableParsers;
 
 private:
-    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 
@@ -65,15 +64,20 @@ public:
     ~CardDatabase() override;
     void clear();
     void removeCard(CardInfoPtr card);
+
     [[nodiscard]] CardInfoPtr getCard(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCards(const QStringList &cardNames) const;
     QList<CardInfoPtr> getCardsByNameAndProviderId(const QMap<QString, QString> &cardNames) const;
     [[nodiscard]] CardInfoPtr getCardByNameAndProviderId(const QString &cardName, const QString &providerId) const;
-    [[nodiscard]] CardInfoPerSet getPreferredSetForCard(const QString &cardName) const;
-    [[nodiscard]] CardInfoPerSet getSpecificSetForCard(const QString &cardName, const QString &providerId) const;
-    CardInfoPerSet
-    getSpecificSetForCard(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
+
+    [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
+    [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
+    [[nodiscard]] PrintingInfo getSpecificPrinting(const QString &cardName, const QString &providerId) const;
+    PrintingInfo
+    getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
     QString getPreferredPrintingProviderIdForCard(const QString &cardName);
+    bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
+
     [[nodiscard]] CardInfoPtr guessCard(const QString &cardName, const QString &providerId = QString()) const;
 
     /*
@@ -83,8 +87,7 @@ public:
     [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
-    bool isProviderIdForPreferredPrinting(const QString &cardName, const QString &providerId);
-    static CardInfoPerSet getSetInfoForCard(const CardInfoPtr &_card);
+    static PrintingInfo getSetInfoForCard(const CardInfoPtr &_card);
     const CardNameMap &getCardList() const
     {
         return cards;

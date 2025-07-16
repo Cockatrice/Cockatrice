@@ -129,14 +129,14 @@ static void setupParserRules()
     search["RarityQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto rarity = std::any_cast<QString>(sv[0]);
         return [=](const CardData &x) -> bool {
-            QList<CardInfoPerSet> infos;
-            for (const auto &setsValue : x->getSets().values()) {
-                for (const auto &cardInfoPerSet : setsValue) {
-                    infos.append(cardInfoPerSet);
+            QList<PrintingInfo> infos;
+            for (const auto &printings : x->getSets()) {
+                for (const auto &printing : printings) {
+                    infos.append(printing);
                 }
             }
 
-            auto matchesRarity = [&rarity](const CardInfoPerSet &info) { return rarity == info.getProperty("rarity"); };
+            auto matchesRarity = [&rarity](const PrintingInfo &info) { return rarity == info.getProperty("rarity"); };
             return std::any_of(infos.begin(), infos.end(), matchesRarity);
         };
     };

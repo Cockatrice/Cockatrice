@@ -144,7 +144,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            auto _sets = CardInfoPerSetMap();
+            auto _sets = SetToPrintingsMap();
             int tableRow = 0;
             bool cipt = false;
             bool landscapeOrientation = false;
@@ -184,12 +184,12 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
-                        CardInfoPerSet setInfo(set);
+                        PrintingInfo printingInfo(set);
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL")
                                 attrName = "picurl";
-                            setInfo.setProperty(attrName, attr.value().toString());
+                            printingInfo.setProperty(attrName, attr.value().toString());
                         }
 
                         // This is very much a hack and not the right place to
@@ -199,8 +199,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         // However, this is also true of the `set->getEnabled()`
                         // check above (which is currently bugged as well), so
                         // we'll fix both at the same time.
-                        if (includeRebalancedCards || setInfo.getProperty("isRebalanced") != "true") {
-                            _sets[setName].append(setInfo);
+                        if (includeRebalancedCards || printingInfo.getProperty("isRebalanced") != "true") {
+                            _sets[setName].append(printingInfo);
                         }
                     }
                     // related cards
@@ -309,14 +309,14 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeEndElement();
 
     // sets
-    for (const auto &cardInfoPerSetList : info->getSets()) {
-        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+    for (const auto &printings : info->getSets()) {
+        for (const PrintingInfo &set : printings) {
             xml.writeStartElement("set");
             for (const QString &propName : set.getProperties()) {
                 xml.writeAttribute(propName, set.getProperty(propName));
             }
 
-            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeCharacters(set.getSet()->getShortName());
             xml.writeEndElement();
         }
     }

@@ -12,8 +12,8 @@
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
-                             const CardInfoPerSet &_setInfo)
-    : name(_name), text(_text), properties(_properties), setInfo(_setInfo)
+                             const PrintingInfo &_printingInfo)
+    : name(_name), text(_text), properties(_properties), printingInfo(_printingInfo)
 {
 }
 
@@ -129,14 +129,14 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                     bool isToken,
                                     QVariantHash properties,
                                     const QList<CardRelation *> &relatedCards,
-                                    const CardInfoPerSet &setInfo)
+                                    const PrintingInfo &printingInfo)
 {
     // Workaround for card name weirdness
     name = name.replace("Æ", "AE");
     name = name.replace("’", "'");
     if (cards.contains(name)) {
         CardInfoPtr card = cards.value(name);
-        card->addToSet(setInfo.getPtr(), setInfo);
+        card->addToSet(printingInfo.getSet(), printingInfo);
         if (card->getProperties().filter(formatRegex).empty()) {
             card->combineLegalities(properties);
         }
@@ -200,13 +200,13 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // insert the card and its properties
     QList<CardRelation *> reverseRelatedCards;
-    CardInfoPerSetMap setsInfo;
-    setsInfo[setInfo.getPtr()->getShortName()].append(setInfo);
+    SetToPrintingsMap setsInfo;
+    setsInfo[printingInfo.getSet()->getShortName()].append(printingInfo);
     CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
                                                 setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
 
     if (name.isEmpty()) {
-        qDebug() << "warning: an empty card was added to set" << setInfo.getPtr()->getShortName();
+        qDebug() << "warning: an empty card was added to set" << printingInfo.getSet()->getShortName();
     }
     cards.insert(name, newCard);
 
@@ -242,7 +242,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     static constexpr bool isToken = false;
     static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
     QVariantHash properties;
-    CardInfoPerSet setInfo;
+    PrintingInfo printingInfo;
     QList<CardRelation *> relatedCards;
     QList<QString> allNameProps;
 
@@ -281,7 +281,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // per-set properties
-        setInfo = CardInfoPerSet(currentSet);
+        printingInfo = PrintingInfo(currentSet);
         QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();
@@ -289,7 +289,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             QString xmlPropertyName = it2.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
-                setInfo.setProperty(xmlPropertyName, propertyValue);
+                printingInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
         // Identifiers
@@ -300,12 +300,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             auto xmlPropertyName = it3.value();
             auto propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
-                setInfo.setProperty(xmlPropertyName, propertyValue);
+                printingInfo.setProperty(xmlPropertyName, propertyValue);
             }
         }
 
         QString numComponent;
-        const QString numProperty = setInfo.getProperty("num");
+        const QString numProperty = printingInfo.getProperty("num");
         const QChar lastChar = numProperty.isEmpty() ? QChar() : numProperty.back();
 
         // Un-Sets do some wonky stuff. Split up these cards as individual entries.
@@ -353,7 +353,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         // split cards are considered a single card, enqueue for later merging
         if (layout == "split" || layout == "aftermath" || layout == "adventure") {
             auto _faceName = getStringPropertyFromMap(card, "faceName");
-            SplitCardPart split(_faceName, text, properties, setInfo);
+            SplitCardPart split(_faceName, text, properties, printingInfo);
             auto found_iter = splitCards.find(name + numProperty);
             if (found_iter == splitCards.end()) {
                 splitCards.insert(name + numProperty, {{split}, name});
@@ -404,7 +404,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 }
             }
 
-            CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, setInfo);
+            CardInfoPtr newCard = addCard(name + numComponent, text, isToken, properties, relatedCards, printingInfo);
             numCards++;
         }
     }
@@ -430,7 +430,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
             if (properties.isEmpty()) {
                 properties = tmp.getProperties();
-                setInfo = tmp.getSetInfo();
+                printingInfo = tmp.getPrintingInfo();
             } else {
                 const QVariantHash &tmpProps = tmp.getProperties();
                 for (const QString &prop : tmpProps.keys()) {
@@ -451,7 +451,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 }
             }
         }
-        CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, setInfo);
+        CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, printingInfo);
         numCards++;
     }
 

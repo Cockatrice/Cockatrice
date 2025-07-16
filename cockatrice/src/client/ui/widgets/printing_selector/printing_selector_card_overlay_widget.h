@@ -20,7 +20,7 @@ public:
                                                QTreeView *_deckView,
                                                QSlider *_cardSizeSlider,
                                                CardInfoPtr _rootCard,
-                                               const CardInfoPerSet &_setInfoForCard);
+                                               const PrintingInfo &_printingInfo);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -45,7 +45,7 @@ private:
     QSlider *cardSizeSlider;
     CardInfoPtr rootCard;
     CardInfoPtr setCard;
-    CardInfoPerSet setInfoForCard;
+    PrintingInfo printingInfo;
 };
 
 #endif // PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

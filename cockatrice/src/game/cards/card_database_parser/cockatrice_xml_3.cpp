@@ -160,7 +160,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QVariantHash properties = QVariantHash();
             QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
-            auto _sets = CardInfoPerSetMap();
+            auto _sets = SetToPrintingsMap();
             int tableRow = 0;
             bool cipt = false;
             bool landscapeOrientation = false;
@@ -209,7 +209,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // NOTE: attributes must be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                    CardInfoPerSet setInfo(internalAddSet(setName));
+                    PrintingInfo setInfo(internalAddSet(setName));
                     if (attrs.hasAttribute("muId")) {
                         setInfo.setProperty("muid", attrs.value("muId").toString());
                     }
@@ -343,9 +343,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // sets
-    const CardInfoPerSetMap sets = info->getSets();
-    for (const auto &cardInfoPerSetList : sets) {
-        for (const CardInfoPerSet &set : cardInfoPerSetList) {
+    const SetToPrintingsMap setMap = info->getSets();
+    for (const auto &printings : setMap) {
+        for (const PrintingInfo &set : printings) {
             xml.writeStartElement("set");
             xml.writeAttribute("rarity", set.getProperty("rarity"));
             xml.writeAttribute("muId", set.getProperty("muid"));
@@ -361,7 +361,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
                 xml.writeAttribute("picURL", tmpString);
             }
 
-            xml.writeCharacters(set.getPtr()->getShortName());
+            xml.writeCharacters(set.getSet()->getShortName());
             xml.writeEndElement();
         }
     }

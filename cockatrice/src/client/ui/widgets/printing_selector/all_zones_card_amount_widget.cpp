@@ -16,7 +16,7 @@
  * @param deckView Pointer to the QTreeView for the deck display.
  * @param cardSizeSlider Pointer to the QSlider used for dynamic font resizing.
  * @param rootCard The root card for the widget.
- * @param setInfoForCard The set information for the card.
+ * @param printingInfo The printing information for the card.
  */
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    AbstractTabDeckEditor *deckEditor,
@@ -24,9 +24,9 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    QTreeView *deckView,
                                                    QSlider *cardSizeSlider,
                                                    CardInfoPtr rootCard,
-                                                   CardInfoPerSet setInfoForCard)
+                                                   PrintingInfo printingInfo)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard), setInfoForCard(setInfoForCard)
+      rootCard(rootCard), printingInfo(printingInfo)
 {
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignHCenter);
@@ -36,10 +36,10 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
 
     zoneLabelMainboard = new ShadowBackgroundLabel(this, tr("Mainboard"));
     buttonBoxMainboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
-                                              setInfoForCard, DECK_ZONE_MAIN);
+                                              printingInfo, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
     buttonBoxSideboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
-                                              setInfoForCard, DECK_ZONE_SIDE);
+                                              printingInfo, DECK_ZONE_SIDE);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);

@@ -22,7 +22,7 @@
  * @param _deckView The QTreeView instance displaying the deck.
  * @param _cardSizeSlider The slider controlling the size of the card.
  * @param _rootCard The root card object that contains information about the card.
- * @param _setInfoForCard The set-specific information for the card being displayed.
+ * @param _printingInfo The printing-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *_deckEditor,
@@ -30,9 +30,9 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
                                                                      CardInfoPtr _rootCard,
-                                                                     const CardInfoPerSet &_setInfoForCard)
+                                                                     const PrintingInfo &_printingInfo)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), setInfoForCard(_setInfoForCard)
+      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), printingInfo(_printingInfo)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);
@@ -45,13 +45,13 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setMinimumSize(0, 0);
     cardInfoPicture->setScaleFactor(cardSizeSlider->value());
     setCard = CardDatabaseManager::getInstance()->getCardByNameAndProviderId(rootCard->getName(),
-                                                                             setInfoForCard.getProperty("uuid"));
+                                                                             _printingInfo.getProperty("uuid"));
     cardInfoPicture->setCard(setCard);
     mainLayout->addWidget(cardInfoPicture);
 
     // Add AllZonesCardAmountWidget
     allZonesCardAmountWidget =
-        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, setCard, setInfoForCard);
+        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, setCard, _printingInfo);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
     // Set initial visibility based on amounts
@@ -172,7 +172,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 
     const auto &preferredProviderId =
         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard->getName());
-    const auto &cardProviderId = setInfoForCard.getProperty("uuid");
+    const auto &cardProviderId = printingInfo.getProperty("uuid");
 
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
         auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));

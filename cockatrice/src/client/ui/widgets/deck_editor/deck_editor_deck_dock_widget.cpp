@@ -476,9 +476,9 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
     // Third argument (true) says create the card no matter what, even if not in DB
-    QModelIndex newCardIndex = deckModel->addCard(
-        cardName, CardDatabaseManager::getInstance()->getSpecificSetForCard(cardName, cardProviderID), otherZoneName,
-        true);
+    QModelIndex newCardIndex =
+        deckModel->addCard(cardName, CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, cardProviderID),
+                           otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     return true;

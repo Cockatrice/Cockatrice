@@ -15,15 +15,14 @@
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 
 class CardInfo;
-class CardInfoPerSet;
+class PrintingInfo;
 class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
 
-typedef QMap<QString, QString> QStringMap;
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
-typedef QMap<QString, QList<CardInfoPerSet>> CardInfoPerSetMap;
+typedef QMap<QString, QList<PrintingInfo>> SetToPrintingsMap;
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
 typedef QHash<QString, CardSetPtr> SetNameMap;
@@ -143,32 +142,35 @@ public:
     void defaultSort();
 };
 
-class CardInfoPerSet
+/**
+ * Info relating to a specific printing for a card.
+ */
+class PrintingInfo
 {
 public:
-    explicit CardInfoPerSet(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
-    ~CardInfoPerSet() = default;
+    explicit PrintingInfo(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
+    ~PrintingInfo() = default;
 
-    bool operator==(const CardInfoPerSet &other) const
+    bool operator==(const PrintingInfo &other) const
     {
         return this->set == other.set && this->properties == other.properties;
     }
 
 private:
     CardSetPtr set;
-    // per-set card properties;
+    // per-printing card properties;
     QVariantHash properties;
 
 public:
-    const CardSetPtr getPtr() const
+    CardSetPtr getSet() const
     {
         return set;
     }
-    const QStringList getProperties() const
+    QStringList getProperties() const
     {
         return properties.keys();
     }
-    const QString getProperty(const QString &propertyName) const
+    QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -202,7 +204,7 @@ private:
     // the cards thare are reverse-related to me
     QList<CardRelation *> reverseRelatedCardsToMe;
     // card sets
-    CardInfoPerSetMap sets;
+    SetToPrintingsMap setsToPrintings;
     // cached set names
     QString setsNames;
     // positioning properties; used by UI
@@ -218,7 +220,7 @@ public:
                       QVariantHash _properties,
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
-                      CardInfoPerSetMap _sets,
+                      SetToPrintingsMap _sets,
                       bool _cipt,
                       bool _landscapeOrientation,
                       int _tableRow,
@@ -227,7 +229,7 @@ public:
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
           text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
-          sets(other.sets), setsNames(other.setsNames), cipt(other.cipt),
+          setsToPrintings(other.setsToPrintings), setsNames(other.setsNames), cipt(other.cipt),
           landscapeOrientation(other.landscapeOrientation), tableRow(other.tableRow), upsideDownArt(other.upsideDownArt)
     {
     }
@@ -241,7 +243,7 @@ public:
                                    QVariantHash _properties,
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
-                                   CardInfoPerSetMap _sets,
+                                   SetToPrintingsMap _sets,
                                    bool _cipt,
                                    bool _landscapeOrientation,
                                    int _tableRow,
@@ -292,11 +294,11 @@ public:
     {
         return isToken;
     }
-    const QStringList getProperties() const
+    QStringList getProperties() const
     {
         return properties.keys();
     }
-    const QString getProperty(const QString &propertyName) const
+    QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -309,27 +311,27 @@ public:
     {
         return properties.contains(propertyName);
     }
-    const CardInfoPerSetMap &getSets() const
+    const SetToPrintingsMap &getSets() const
     {
-        return sets;
+        return setsToPrintings;
     }
     const QString &getSetsNames() const
     {
         return setsNames;
     }
-    const QString getSetProperty(const QString &setName, const QString &propertyName) const
+    QString getSetProperty(const QString &setName, const QString &propertyName) const
     {
-        if (!sets.contains(setName))
+        if (!setsToPrintings.contains(setName))
             return "";
 
-        for (const auto &set : sets[setName]) {
+        for (const auto &set : setsToPrintings[setName]) {
             if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
                 this->getPixmapCacheKey()) {
                 return set.getProperty(propertyName);
             }
         }
 
-        return sets[setName][0].getProperty(propertyName);
+        return setsToPrintings[setName][0].getProperty(propertyName);
     }
 
     // related cards
@@ -345,7 +347,7 @@ public:
     {
         return reverseRelatedCardsToMe;
     }
-    const QList<CardRelation *> getAllRelatedCards() const
+    QList<CardRelation *> getAllRelatedCards() const
     {
         QList<CardRelation *> result;
         result.append(getRelatedCards());
@@ -399,7 +401,7 @@ public:
         return getSetProperty(set, "picurl");
     }
     QString getCorrectedName() const;
-    void addToSet(const CardSetPtr &_set, CardInfoPerSet _info = CardInfoPerSet());
+    void addToSet(const CardSetPtr &_set, PrintingInfo _info = PrintingInfo());
     void combineLegalities(const QVariantHash &props);
     void emitPixmapUpdated()
     {

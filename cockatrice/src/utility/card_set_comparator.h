@@ -47,12 +47,12 @@ public:
      * Enabled sets have priority over disabled sets
      * Both groups follow the user-defined order
      */
-    inline bool operator()(const CardInfoPerSet &a, const CardInfoPerSet &b) const
+    inline bool operator()(const PrintingInfo &a, const PrintingInfo &b) const
     {
-        if (a.getPtr()->getEnabled()) {
-            return !b.getPtr()->getEnabled() || a.getPtr()->getSortKey() < b.getPtr()->getSortKey();
+        if (a.getSet()->getEnabled()) {
+            return !b.getSet()->getEnabled() || a.getSet()->getSortKey() < b.getSet()->getSortKey();
         } else {
-            return !b.getPtr()->getEnabled() && a.getPtr()->getSortKey() < b.getPtr()->getSortKey();
+            return !b.getSet()->getEnabled() && a.getSet()->getSortKey() < b.getSet()->getSortKey();
         }
     }
 };
