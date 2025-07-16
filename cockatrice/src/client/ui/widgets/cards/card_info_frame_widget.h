@@ -2,6 +2,7 @@
 #define CARDFRAME_H
 
 #include "../../../../game/cards/card_info.h"
+#include "card_ref.h"
 
 #include <QPushButton>
 #include <QTabWidget>
@@ -46,7 +47,7 @@ public:
 public slots:
     void setCard(CardInfoPtr card);
     void setCard(const QString &cardName);
-    void setCard(const QString &cardName, const QString &providerId);
+    void setCard(const CardRef &cardRef);
     void setCard(AbstractCardItem *card);
     void viewTransformation();
     void clearCard();

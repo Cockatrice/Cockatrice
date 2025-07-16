@@ -929,8 +929,8 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 DeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
                 if (playerInfo.has_deck_list()) {
                     DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                    PictureLoader::cacheCardPixmaps(CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(
-                        newDeck.getCardListWithProviderId()));
+                    PictureLoader::cacheCardPixmaps(
+                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
                     deckViewContainer->setDeck(newDeck);
                     player->setDeck(newDeck);
                 }
@@ -1625,9 +1625,9 @@ void TabGame::createDeckViewContainerWidget(bool bReplay)
     deckViewContainerWidget->setLayout(deckViewContainerLayout);
 }
 
-void TabGame::viewCardInfo(const QString &cardName, const QString &providerId) const
+void TabGame::viewCardInfo(const CardRef &cardRef) const
 {
-    cardInfoFrameWidget->setCard(cardName, providerId);
+    cardInfoFrameWidget->setCard(cardRef);
 }
 
 void TabGame::createCardInfoDock(bool bReplay)

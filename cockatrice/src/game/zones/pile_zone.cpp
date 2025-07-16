@@ -66,11 +66,11 @@ void PileZone::addCardImpl(CardItem *card, int x, int /*y*/)
     cards.insert(x, card);
     card->setPos(0, 0);
     if (!contentsKnown()) {
-        card->setName(QString());
+        card->setCardRef({});
         card->setId(-1);
         // If we obscure a previously revealed card, its name has to be forgotten
         if (cards.size() > x + 1)
-            cards.at(x + 1)->setName(QString());
+            cards.at(x + 1)->setCardRef({});
     }
     card->setVisible(false);
     card->resetState();

@@ -26,6 +26,9 @@ elseif(Qt5_FOUND)
   )
 endif()
 
+# Include directories
+include_directories(../common) # Required due to card_ref.h
+
 # Build servatrice binary and link it
 add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_MOC_SRCS} ${dbconverter_SOURCES})
 

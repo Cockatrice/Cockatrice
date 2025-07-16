@@ -62,7 +62,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(const QString &cardName, QWidget *paren
     setViewMode(SettingsCache::instance().getCardInfoViewMode());
 
     // TODO: Change this to be by UUID
-    setCard(CardDatabaseManager::getInstance()->getCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->getCardInfo(cardName));
 }
 
 void CardInfoFrameWidget::retranslateUi()
@@ -166,12 +166,12 @@ void CardInfoFrameWidget::setCard(CardInfoPtr card)
 
 void CardInfoFrameWidget::setCard(const QString &cardName)
 {
-    setCard(CardDatabaseManager::getInstance()->guessCard(cardName));
+    setCard(CardDatabaseManager::getInstance()->guessCard({cardName}));
 }
 
-void CardInfoFrameWidget::setCard(const QString &cardName, const QString &providerId)
+void CardInfoFrameWidget::setCard(const CardRef &cardRef)
 {
-    setCard(CardDatabaseManager::getInstance()->getCardByNameAndProviderId(cardName, providerId));
+    setCard(CardDatabaseManager::getInstance()->getCard(cardRef));
 }
 
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)

@@ -582,9 +582,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
         case HoveredCard: {
             if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-                emit showCardInfoPopup(event->globalPosition().toPoint(), hoveredContent, QString());
+                emit showCardInfoPopup(event->globalPosition().toPoint(), {hoveredContent});
 #else
-                emit showCardInfoPopup(event->globalPos(), hoveredContent, QString());
+                emit showCardInfoPopup(event->globalPos(), {hoveredContent});
 #endif
             break;
         }

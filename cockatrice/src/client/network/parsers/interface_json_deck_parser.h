@@ -100,7 +100,7 @@ public:
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
 
-                list->setBannerCard(QPair<QString, QString>(commanderName, providerId));
+                list->setBannerCard({commanderName, providerId});
                 list->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
         }

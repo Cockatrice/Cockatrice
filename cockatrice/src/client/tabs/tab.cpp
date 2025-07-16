@@ -14,14 +14,13 @@ Tab::Tab(TabSupervisor *_tabSupervisor)
     setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId)
+void Tab::showCardInfoPopup(const QPoint &pos, const CardRef &cardRef)
 {
     if (infoPopup) {
         infoPopup->deleteLater();
     }
-    currentCardName = cardName;
-    currentProviderId = providerId;
-    infoPopup = new CardInfoDisplayWidget(cardName, providerId, nullptr,
+    currentCard = cardRef;
+    infoPopup = new CardInfoDisplayWidget(currentCard, nullptr,
                                           Qt::Widget | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint |
                                               Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -37,7 +36,7 @@ void Tab::showCardInfoPopup(const QPoint &pos, const QString &cardName, const QS
 void Tab::deleteCardInfoPopup(const QString &cardName)
 {
     if (infoPopup) {
-        if ((currentCardName == cardName) || (cardName == "_")) {
+        if (currentCard.name == cardName || cardName == "_") {
             infoPopup->deleteLater();
             infoPopup = 0;
         }

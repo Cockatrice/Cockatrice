@@ -210,9 +210,7 @@ void Server_Player::setupZones()
                 continue;
             }
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                z->insertCard(
-                    new Server_Card(currentCard->getName(), currentCard->getCardProviderId(), nextCardId++, 0, 0, z),
-                    -1, 0);
+                z->insertCard(new Server_Card(currentCard->toCardRef(), nextCardId++, 0, 0, z), -1, 0);
             }
         }
     }
@@ -1517,7 +1515,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
         yCoord = 0;
     }
 
-    auto *card = new Server_Card(cardName, cardProviderId, newCardId(), xCoord, yCoord);
+    auto *card = new Server_Card({cardName, cardProviderId}, newCardId(), xCoord, yCoord);
     card->moveToThread(thread());
     // Client should already prevent face-down tokens from having attributes; this just an extra server-side check
     if (!cmd.face_down()) {

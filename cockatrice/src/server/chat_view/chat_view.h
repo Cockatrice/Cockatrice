@@ -109,7 +109,7 @@ protected:
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void cardNameHovered(QString cardName);
-    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
+    void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(QString cardName);
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();

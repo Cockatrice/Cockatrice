@@ -1,6 +1,8 @@
 #ifndef TAB_H
 #define TAB_H
 
+#include "card_ref.h"
+
 #include <QMainWindow>
 
 class QMenu;
@@ -27,12 +29,12 @@ protected:
         tabMenus.append(menu);
     }
 protected slots:
-    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
+    void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(const QString &cardName);
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    QString currentCardName, currentProviderId;
+    CardRef currentCard;
     bool contentsChanged;
     CardInfoDisplayWidget *infoPopup;
     QList<QMenu *> tabMenus;

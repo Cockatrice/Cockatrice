@@ -141,8 +141,7 @@ void CardZone::addCard(CardItem *card, const bool reorganize, const int x, const
 
     for (auto *view : views) {
         if (view->prepareAddCard(x)) {
-            view->addCard(new CardItem(player, nullptr, card->getName(), card->getProviderId(), card->getId()),
-                          reorganize, x, y);
+            view->addCard(new CardItem(player, nullptr, card->getCardRef(), card->getId()), reorganize, x, y);
         }
     }
 
@@ -167,7 +166,8 @@ CardItem *CardZone::getCard(int cardId, const QString &cardName)
     // It can be assumed that in an invisible zone, all cards are equal.
     if ((c->getId() == -1) || (c->getName().isEmpty())) {
         c->setId(cardId);
-        c->setName(cardName);
+        // TODO: also set providerId
+        c->setCardRef({cardName});
     }
     return c;
 }

@@ -79,6 +79,7 @@ elseif(Qt5_FOUND)
 endif()
 
 include_directories(../cockatrice/src)
+include_directories(../common)
 
 # Libz is required to support zipped files
 find_package(ZLIB)
