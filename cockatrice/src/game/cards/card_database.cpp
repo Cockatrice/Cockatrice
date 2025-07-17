@@ -340,7 +340,7 @@ PrintingInfo CardDatabase::findPrintingWithId(const CardInfoPtr &cardInfo, const
 {
     for (const auto &printings : cardInfo->getSets()) {
         for (const auto &printing : printings) {
-            if (printing.getProperty("uuid") == providerId) {
+            if (printing.getUuid() == providerId) {
                 return printing;
             }
         }
@@ -432,7 +432,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
 QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) const
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
-    QString uuid = preferredPrinting.getProperty("uuid");
+    QString uuid = preferredPrinting.getUuid();
     if (!uuid.isEmpty()) {
         return uuid;
     }
@@ -462,7 +462,7 @@ PrintingInfo CardDatabase::getSetInfoForCard(const CardInfoPtr &_card)
 
     for (const auto &printings : setMap) {
         for (const auto &cardInfoForSet : printings) {
-            if (QLatin1String("card_") + _card->getName() + QString("_") + cardInfoForSet.getProperty("uuid") ==
+            if (QLatin1String("card_") + _card->getName() + QString("_") + cardInfoForSet.getUuid() ==
                 _card->getPixmapCacheKey()) {
                 return cardInfoForSet;
             }

@@ -488,7 +488,7 @@ void DeckEditorDeckDockWidget::actDecrementCard(CardInfoPtr info, QString zoneNa
     if (info->getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("uuid");
+    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getUuid();
     QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
 
     QModelIndex idx = deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);

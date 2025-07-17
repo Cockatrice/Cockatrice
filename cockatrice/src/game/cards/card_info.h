@@ -178,6 +178,8 @@ public:
     {
         properties.insert(_name, _value);
     }
+
+    QString getUuid() const;
 };
 
 class CardInfo : public QObject

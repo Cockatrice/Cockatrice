@@ -152,8 +152,8 @@ void CardAmountWidget::addPrinting(const QString &zone)
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
     }
-    newCardIndex = deckModel->findCard(rootCard->getName(), zone, printingInfo.getProperty("uuid"),
-                                       printingInfo.getProperty("num"));
+    newCardIndex =
+        deckModel->findCard(rootCard->getName(), zone, printingInfo.getUuid(), printingInfo.getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
     deckEditor->setModified(true);
@@ -235,8 +235,8 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QModelIndex idx = deckModel->findCard(rootCard->getName(), zone, printingInfo.getProperty("uuid"),
-                                          printingInfo.getProperty("num"));
+    QModelIndex idx =
+        deckModel->findCard(rootCard->getName(), zone, printingInfo.getUuid(), printingInfo.getProperty("num"));
     offsetCountAtIndex(idx, -1);
     deckEditor->setModified(true);
 }
@@ -249,7 +249,7 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
  */
 int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
-    if (printingInfo.getProperty("uuid").isEmpty()) {
+    if (printingInfo.getUuid().isEmpty()) {
         return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
     }
 
