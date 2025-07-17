@@ -375,7 +375,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
                                    const QString &zoneName,
                                    bool abAddAnyway)
 {
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard({cardName, printingInfo.getProperty("uuid")});
+    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard({cardName, printingInfo.getUuid()});
 
     if (cardInfo == nullptr) {
         if (abAddAnyway) {
@@ -396,7 +396,7 @@ QModelIndex DeckListModel::addCard(const QString &cardName,
 
     const QModelIndex parentIndex = nodeToIndex(groupNode);
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(groupNode->findCardChildByNameProviderIdAndNumber(
-        cardName, printingInfo.getProperty("uuid"), printingInfo.getProperty("num")));
+        cardName, printingInfo.getUuid(), printingInfo.getProperty("num")));
     const auto cardSetName = printingInfo.getSet().isNull() ? "" : printingInfo.getSet()->getCorrectedShortName();
 
     if (!cardNode) {

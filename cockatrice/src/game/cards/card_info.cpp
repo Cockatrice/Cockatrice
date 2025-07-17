@@ -219,6 +219,14 @@ PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {
 }
 
+/**
+ * Gets the uuid property of the printing, or an empty string if the property isn't present
+ */
+QString PrintingInfo::getUuid() const
+{
+    return properties.value("uuid").toString();
+}
+
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,

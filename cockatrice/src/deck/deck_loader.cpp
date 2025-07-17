@@ -325,7 +325,7 @@ struct SetProviderIdToPreferred
     {
         Q_UNUSED(node);
         PrintingInfo preferredPrinting = CardDatabaseManager::getInstance()->getPreferredPrinting(card->getName());
-        QString providerId = preferredPrinting.getProperty("uuid");
+        QString providerId = preferredPrinting.getUuid();
         QString setShortName = preferredPrinting.getSet()->getShortName();
         QString collectorNumber = preferredPrinting.getProperty("num");
 
@@ -359,7 +359,7 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
         QString providerId =
             CardDatabaseManager::getInstance()
                 ->getSpecificPrinting(card->getName(), card->getCardSetShortName(), card->getCardCollectorNumber())
-                .getProperty("uuid");
+                .getUuid();
 
         // Set the providerId on the card
         card->setCardProviderId(providerId);

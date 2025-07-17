@@ -4105,7 +4105,7 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         QString relatedCardName = relatedCard->getName();
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
-            game->viewCardInfo({relatedCardName, currentCardSet.getProperty("uuid")});
+            game->viewCardInfo({relatedCardName, currentCardSet.getUuid()});
         });
     }
 }
@@ -4132,7 +4132,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
         CardInfoPtr relatedCard =
-            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), currentCardSet.getProperty("uuid")});
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), currentCardSet.getUuid()});
         if (relatedCard == nullptr) {
             relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         }

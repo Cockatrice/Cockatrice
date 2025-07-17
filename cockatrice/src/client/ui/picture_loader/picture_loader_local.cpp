@@ -66,7 +66,7 @@ QImage PictureLoaderLocal::tryLoad(const CardInfoPtr &toLoad) const
     if (setInstance.getSet()) {
         setName = setInstance.getSet()->getCorrectedShortName();
         collectorNumber = setInstance.getProperty("num");
-        providerId = setInstance.getProperty("uuid");
+        providerId = setInstance.getUuid();
     }
 
     qCDebug(PictureLoaderLocalLog).nospace()
