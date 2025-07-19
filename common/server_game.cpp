@@ -677,6 +677,11 @@ void Server_Game::nextTurn()
 {
     QMutexLocker locker(&gameMutex);
 
+    if (players.isEmpty()) {
+        qWarning() << "Server_Game::nextTurn was called while players is empty; gameId = " << gameId;
+        return;
+    }
+
     const QList<int> keys = players.keys();
     int listPos = -1;
     if (activePlayer != -1)
