@@ -1,7 +1,7 @@
 #ifndef CARD_PICTURE_ENLARGED_WIDGET_H
 #define CARD_PICTURE_ENLARGED_WIDGET_H
 
-#include "../../../../game/cards/card_info.h"
+#include "../../../../game/cards/exact_card.h"
 
 #include <QPixmap>
 #include <QWidget>
@@ -15,7 +15,7 @@ public:
     explicit CardInfoPictureEnlargedWidget(QWidget *parent = nullptr);
 
     // Sets the card pixmap to display
-    void setCardPixmap(CardInfoPtr card, QSize size);
+    void setCardPixmap(const ExactCard &_card, QSize size);
 
 protected:
     // Handles the painting event for the enlarged card
@@ -28,8 +28,8 @@ private:
     // Tracks if the pixmap needs to be refreshed/redrawn
     bool pixmapDirty;
 
-    // Card information (card data pointer)
-    CardInfoPtr info;
+    // Card information
+    ExactCard card;
 
     // Loads the enlarged card pixmap
     void loadPixmap(const QSize &size);

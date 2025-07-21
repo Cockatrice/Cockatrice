@@ -52,14 +52,12 @@ void PictureLoaderLocal::refreshIndex()
  * @param toLoad The card to load
  * @return The loaded image, or an empty QImage if loading failed.
  */
-QImage PictureLoaderLocal::tryLoad(const CardInfoPtr &toLoad) const
+QImage PictureLoaderLocal::tryLoad(const ExactCard &toLoad) const
 {
-    CardSetPtr set = PictureToLoad::extractSetsSorted(toLoad).first();
+    PrintingInfo setInstance = toLoad.getPrinting();
 
-    PrintingInfo setInstance = CardDatabaseManager::getInstance()->getSetInfoForCard(toLoad);
-
-    QString cardName = toLoad->getName();
-    QString correctedCardName = toLoad->getCorrectedName();
+    QString cardName = toLoad.getName();
+    QString correctedCardName = toLoad.getInfo().getCorrectedName();
 
     QString setName, collectorNumber, providerId;
 

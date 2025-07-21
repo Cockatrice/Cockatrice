@@ -1,7 +1,7 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../../game/cards/card_info.h"
+#include "../../../../game/cards/exact_card.h"
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QPropertyAnimation>
@@ -22,23 +22,23 @@ public:
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
     ~CardInfoPictureWidget();
-    CardInfoPtr getInfo()
+    ExactCard getCard()
     {
-        return info;
+        return exactCard;
     }
     [[nodiscard]] QSize sizeHint() const override;
 
 public slots:
-    void setCard(CardInfoPtr card);
+    void setCard(const ExactCard &card);
     void setScaleFactor(int scale); // New slot for scaling
     void setHoverToZoomEnabled(bool enabled);
     void setRaiseOnEnterEnabled(bool enabled);
     void updatePixmap();
 
 signals:
-    void hoveredOnCard(CardInfoPtr hoveredCard);
+    void hoveredOnCard(const ExactCard &hoveredCard);
     void cardScaleFactorChanged(int _scale);
-    void cardChanged(CardInfoPtr card);
+    void cardChanged(const ExactCard &card);
     void cardClicked();
 
 protected:
@@ -62,7 +62,7 @@ protected:
     void showEnlargedPixmap() const;
 
 private:
-    CardInfoPtr info;
+    ExactCard exactCard;
     qreal magicTheGatheringCardAspectRatio = 1.396;
     qreal yuGiOhCardAspectRatio = 1.457;
     qreal aspectRatio = magicTheGatheringCardAspectRatio;

@@ -19,8 +19,7 @@ public:
                                                DeckListModel *_deckModel,
                                                QTreeView *_deckView,
                                                QSlider *_cardSizeSlider,
-                                               CardInfoPtr _rootCard,
-                                               const PrintingInfo &_printingInfo);
+                                               const ExactCard &_rootCard);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -43,9 +42,7 @@ private:
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;
-    CardInfoPtr rootCard;
-    CardInfoPtr setCard;
-    PrintingInfo printingInfo;
+    ExactCard rootCard;
 };
 
 #endif // PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

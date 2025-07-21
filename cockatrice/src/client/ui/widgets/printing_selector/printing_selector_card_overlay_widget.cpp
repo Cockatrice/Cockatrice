@@ -22,17 +22,15 @@
  * @param _deckView The QTreeView instance displaying the deck.
  * @param _cardSizeSlider The slider controlling the size of the card.
  * @param _rootCard The root card object that contains information about the card.
- * @param _printingInfo The printing-specific information for the card being displayed.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
-                                                                     CardInfoPtr _rootCard,
-                                                                     const PrintingInfo &_printingInfo)
+                                                                     const ExactCard &_rootCard)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(std::move(_rootCard)), printingInfo(_printingInfo)
+      cardSizeSlider(_cardSizeSlider), rootCard(_rootCard)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);
@@ -44,13 +42,12 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture = new CardInfoPictureWidget(this);
     cardInfoPicture->setMinimumSize(0, 0);
     cardInfoPicture->setScaleFactor(cardSizeSlider->value());
-    setCard = CardDatabaseManager::getInstance()->getCard({rootCard->getName(), _printingInfo.getUuid()});
-    cardInfoPicture->setCard(setCard);
+    cardInfoPicture->setCard(_rootCard);
     mainLayout->addWidget(cardInfoPicture);
 
     // Add AllZonesCardAmountWidget
     allZonesCardAmountWidget =
-        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, setCard, _printingInfo);
+        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, _rootCard);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
     // Set initial visibility based on amounts
@@ -119,7 +116,7 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
-    deckEditor->updateCard(setCard);
+    deckEditor->updateCard(rootCard);
 
     // Check if either mainboard or sideboard amount is greater than 0
     if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
@@ -170,19 +167,20 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     menu.addMenu(preferenceMenu);
 
     const auto &preferredProviderId =
-        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard->getName());
-    const auto &cardProviderId = printingInfo.getUuid();
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard.getName());
+    const auto &cardProviderId = rootCard.getPrinting().getUuid();
 
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
         auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
-        connect(pinAction, &QAction::triggered, this, [this, cardProviderId]() {
-            SettingsCache::instance().cardOverrides().setCardPreferenceOverride({rootCard->getName(), cardProviderId});
+        connect(pinAction, &QAction::triggered, this, [this] {
+            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(
+                {rootCard.getName(), rootCard.getPrinting().getUuid()});
             emit cardPreferenceChanged();
         });
     } else {
         auto *unpinAction = preferenceMenu->addAction(tr("Unpin Printing"));
-        connect(unpinAction, &QAction::triggered, this, [this, cardProviderId]() {
-            SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard->getName());
+        connect(unpinAction, &QAction::triggered, this, [this] {
+            SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard.getName());
             emit cardPreferenceChanged();
         });
     }
@@ -190,7 +188,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     // filling out the related cards submenu
     auto *relatedMenu = new QMenu(tr("Show Related cards"));
     menu.addMenu(relatedMenu);
-    auto relatedCards = rootCard->getAllRelatedCards();
+    auto relatedCards = rootCard.getInfo().getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         relatedMenu->setDisabled(true);
     } else {
@@ -198,7 +196,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             const QString &relatedCardName = rel->getName();
             QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
-                deckEditor->updateCard(CardDatabaseManager::getInstance()->getCardInfo(relatedCardName));
+                deckEditor->updateCard(CardDatabaseManager::getInstance()->getCard({relatedCardName}));
                 deckEditor->showPrintingSelector();
             });
         }

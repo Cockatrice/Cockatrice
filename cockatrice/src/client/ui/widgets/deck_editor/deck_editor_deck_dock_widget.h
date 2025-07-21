@@ -24,7 +24,7 @@ public:
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
     void createDeckDock();
-    CardInfoPtr getCurrentCard();
+    ExactCard getCurrentCard();
     void retranslateUi();
     QString getDeckName()
     {
@@ -42,7 +42,7 @@ public slots:
     DeckLoader *getDeckList();
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
-    void actDecrementCard(CardInfoPtr info, QString zoneName);
+    void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
     void actSwapCard();
     void actRemoveCard();
@@ -54,7 +54,7 @@ signals:
     void hashChanged();
     void deckChanged();
     void deckModified();
-    void cardChanged(CardInfoPtr _card);
+    void cardChanged(const ExactCard &_card);
 
 private:
     AbstractTabDeckEditor *deckEditor;

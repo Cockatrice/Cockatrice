@@ -25,7 +25,7 @@ class PictureLoaderWorkerWork : public QObject
 {
     Q_OBJECT
 public:
-    explicit PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const CardInfoPtr &toLoad);
+    explicit PictureLoaderWorkerWork(const PictureLoaderWorker *worker, const ExactCard &toLoad);
 
     PictureToLoad cardToDownload;
 
@@ -52,7 +52,7 @@ signals:
      * Failures are represented by an empty QImage.
      * Note that this object will delete itself as this signal is emitted.
      */
-    void imageLoaded(CardInfoPtr card, const QImage &image);
+    void imageLoaded(const ExactCard &card, const QImage &image);
 
     /**
      * Emitted when a request did not return a 400 or 500 response

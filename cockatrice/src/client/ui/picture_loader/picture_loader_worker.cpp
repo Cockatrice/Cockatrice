@@ -129,21 +129,21 @@ bool PictureLoaderWorker::processSingleRequest()
     return false;
 }
 
-void PictureLoaderWorker::enqueueImageLoad(const CardInfoPtr &card)
+void PictureLoaderWorker::enqueueImageLoad(const ExactCard &card)
 {
     // Send call through a connection to ensure the handling is run on the pictureLoader thread
     emit imageLoadEnqueued(card);
 }
 
-void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
+void PictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
 {
     // deduplicate loads for the same card
-    if (currentlyLoading.contains(card)) {
+    if (currentlyLoading.contains(card.getPixmapCacheKey())) {
         qCDebug(PictureLoaderWorkerLog())
-            << "Skipping enqueued" << card->getName() << "because it's already being loaded";
+            << "Skipping enqueued" << card.getName() << "because it's already being loaded";
         return;
     }
-    currentlyLoading.insert(card);
+    currentlyLoading.insert(card.getPixmapCacheKey());
 
     // try to load image from local first
     QImage image = localLoader->tryLoad(card);
@@ -158,9 +158,9 @@ void PictureLoaderWorker::handleImageLoadEnqueued(const CardInfoPtr &card)
 /**
  * Called when image loading is done. Failures are indicated by an empty QImage.
  */
-void PictureLoaderWorker::handleImageLoaded(const CardInfoPtr &card, const QImage &image)
+void PictureLoaderWorker::handleImageLoaded(const ExactCard &card, const QImage &image)
 {
-    currentlyLoading.remove(card);
+    currentlyLoading.remove(card.getPixmapCacheKey());
     emit imageLoaded(card, image);
 }
 

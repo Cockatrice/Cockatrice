@@ -36,7 +36,7 @@ public:
 
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
-    void onHover(CardInfoPtr card);
+    void onHover(const ExactCard &card);
     void cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget);
     void constructAppropriateWidget(QPersistentModelIndex index);
     void displayCards();
@@ -49,7 +49,7 @@ public slots:
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
-    void cardHovered(CardInfoPtr card);
+    void cardHovered(const ExactCard &card);
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void requestCleanup(DeckCardZoneDisplayWidget *displayWidget);
 

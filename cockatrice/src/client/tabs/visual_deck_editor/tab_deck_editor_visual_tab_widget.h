@@ -37,14 +37,14 @@ public:
     VisualDeckEditorSampleHandWidget *sampleHandWidget;
 
 public slots:
-    void onCardChanged(CardInfoPtr activeCard);
-    void onCardChangedDatabaseDisplay(CardInfoPtr activeCard);
+    void onCardChanged(const ExactCard &activeCard);
+    void onCardChangedDatabaseDisplay(const ExactCard &activeCard);
     void onCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void onCardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 signals:
-    void cardChanged(CardInfoPtr activeCard);
-    void cardChangedDatabaseDisplay(CardInfoPtr activeCard);
+    void cardChanged(const ExactCard &activeCard);
+    void cardChangedDatabaseDisplay(const ExactCard &activeCard);
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 

@@ -9,8 +9,8 @@
 #include <QUrl>
 #include <algorithm>
 
-PictureToLoad::PictureToLoad(CardInfoPtr _card)
-    : card(std::move(_card)), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
+PictureToLoad::PictureToLoad(const ExactCard &_card)
+    : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
 {
     if (card) {
         sortedSets = extractSetsSorted(card);
@@ -25,10 +25,10 @@ PictureToLoad::PictureToLoad(CardInfoPtr _card)
  *
  * @return A list of sets. Will not be empty.
  */
-QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
+QList<CardSetPtr> PictureToLoad::extractSetsSorted(const ExactCard &card)
 {
     QList<CardSetPtr> sortedSets;
-    for (const auto &printings : card->getSets()) {
+    for (const auto &printings : card.getInfo().getSets()) {
         for (const auto &printing : printings) {
             sortedSets << printing.getSet();
         }
@@ -41,19 +41,43 @@ QList<CardSetPtr> PictureToLoad::extractSetsSorted(const CardInfoPtr &card)
     // If the user hasn't disabled arts other than their personal preference...
     if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        for (const auto &printings : card->getSets()) {
-            for (const auto &printing : printings) {
-                if (QLatin1String("card_") + card->getName() + QString("_") + QString(printing.getProperty("uuid")) ==
-                    card->getPixmapCacheKey()) {
-                    long long setIndex = sortedSets.indexOf(printing.getSet());
-                    CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
-                    sortedSets.prepend(setForCardProviderID);
-                }
-            }
+        qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
+        if (setIndex > 0) { // we don't need to move the set if it's already first
+            CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+            sortedSets.prepend(setForCardProviderID);
         }
     }
 
     return sortedSets;
+}
+
+/**
+ * Finds the PrintingInfo corresponding to the exactCards's card name that belongs to a given set and has the
+ * exactCards's providerId.
+ * If the set name is in the CardInfo, but no printings in that set match the card's providerId, then the first
+ * PrintingInfo for the set is returned.
+ *
+ * This method only exists to maintain existing behavior.
+ * TODO: check if going through all sets is still necessary after the ExactCard refactor.
+ *
+ * @param card The card to look in
+ * @param setName The set's short name
+ * @return A PrintingInfo, or a default-constructed PrintingInfo if the set name is not in the CardInfo.
+ */
+static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
+{
+    SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
+
+    if (!setsToPrintings.contains(setName))
+        return PrintingInfo();
+
+    for (const auto &printing : setsToPrintings[setName]) {
+        if (printing.getUuid() == card.getPrinting().getUuid()) {
+            return printing;
+        }
+    }
+
+    return setsToPrintings[setName][0];
 }
 
 void PictureToLoad::populateSetUrls()
@@ -64,7 +88,7 @@ void PictureToLoad::populateSetUrls()
     currentSetUrls.clear();
 
     if (card && currentSet) {
-        QString setCustomURL = card->getCustomPicURL(currentSet->getShortName());
+        QString setCustomURL = findPrintingForSet(card, currentSet->getShortName()).getProperty("picurl");
 
         if (!setCustomURL.isEmpty()) {
             currentSetUrls.append(setCustomURL);
@@ -214,16 +238,16 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
     QString setName = getSetName();
 
     // name
-    QString cardName = card->getName();
+    QString cardName = card.getName();
     transformMap["!name!"] = cardName;
-    transformMap["!name_lower!"] = card->getName().toLower();
-    transformMap["!corrected_name!"] = card->getCorrectedName();
-    transformMap["!corrected_name_lower!"] = card->getCorrectedName().toLower();
+    transformMap["!name_lower!"] = card.getName().toLower();
+    transformMap["!corrected_name!"] = card.getInfo().getCorrectedName();
+    transformMap["!corrected_name_lower!"] = card.getInfo().getCorrectedName().toLower();
 
     // card properties
     if (parse(
-            urlTemplate, "prop", cardName, setName, [&](const QString &name) { return card->getProperty(name); },
-            transformMap)) {
+            urlTemplate, "prop", cardName, setName,
+            [&](const QString &name) { return card.getInfo().getProperty(name); }, transformMap)) {
         return QString();
     }
 
@@ -235,7 +259,8 @@ QString PictureToLoad::transformUrl(const QString &urlTemplate) const
 
         if (parse(
                 urlTemplate, "set", cardName, setName,
-                [&](const QString &name) { return card->getSetProperty(set->getShortName(), name); }, transformMap)) {
+                [&](const QString &name) { return findPrintingForSet(card, set->getShortName()).getProperty(name); },
+                transformMap)) {
             return QString();
         }
     }

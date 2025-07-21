@@ -1,7 +1,7 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "../game/cards/card_info.h"
+#include "../game/cards/exact_card.h"
 #include "decklist.h"
 
 #include <QAbstractItemModel>
@@ -111,10 +111,7 @@ public:
                          const QString &providerId = "",
                          const QString &cardNumber = "") const;
     QModelIndex addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway);
-    QModelIndex addCard(const ::QString &cardName,
-                        const PrintingInfo &printingInfo,
-                        const QString &zoneName,
-                        bool abAddAnyway = false);
+    QModelIndex addCard(const ExactCard &card, const QString &zoneName);
     int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;
     void sort(int column, Qt::SortOrder order) override;
     void cleanList();
@@ -123,8 +120,8 @@ public:
         return deckList;
     }
     void setDeckList(DeckLoader *_deck);
-    QList<CardInfoPtr> getCardsAsCardInfoPtrs() const;
-    QList<CardInfoPtr> getCardsAsCardInfoPtrsForZone(QString zoneName) const;
+    QList<ExactCard> getCards() const;
+    QList<ExactCard> getCardsForZone(const QString &zoneName) const;
     QList<QString> *getZones() const;
     void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
 

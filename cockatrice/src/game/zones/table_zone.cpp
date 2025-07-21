@@ -140,9 +140,9 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
         ctm->set_card_id(item->getId());
         ctm->set_face_down(item->getFaceDown());
         if (startZone->getName() != name && !item->getFaceDown()) {
-            const auto &info = item->getItem()->getInfo();
-            if (info) {
-                ctm->set_pt(info->getPowTough().toStdString());
+            const auto &card = item->getItem()->getCard();
+            if (card) {
+                ctm->set_pt(card.getInfo().getPowTough().toStdString());
             }
         }
     }
