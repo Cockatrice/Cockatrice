@@ -1,7 +1,7 @@
 #ifndef PICTURE_TO_LOAD_H
 #define PICTURE_TO_LOAD_H
 
-#include "../../../game/cards/card_info.h"
+#include "../../../game/cards/exact_card.h"
 
 #include <QLoggingCategory>
 
@@ -10,7 +10,7 @@ inline Q_LOGGING_CATEGORY(PictureToLoadLog, "picture_loader.picture_to_load");
 class PictureToLoad
 {
 private:
-    CardInfoPtr card;
+    ExactCard card;
     QList<CardSetPtr> sortedSets;
     QList<QString> urlTemplates;
     QList<QString> currentSetUrls;
@@ -18,15 +18,11 @@ private:
     CardSetPtr currentSet;
 
 public:
-    explicit PictureToLoad(CardInfoPtr _card = CardInfoPtr());
+    explicit PictureToLoad(const ExactCard &_card);
 
-    CardInfoPtr getCard() const
+    const ExactCard &getCard() const
     {
         return card;
-    }
-    void clear()
-    {
-        card.clear();
     }
     QString getCurrentUrl() const
     {
@@ -42,7 +38,7 @@ public:
     bool nextUrl();
     void populateSetUrls();
 
-    static QList<CardSetPtr> extractSetsSorted(const CardInfoPtr &card);
+    static QList<CardSetPtr> extractSetsSorted(const ExactCard &card);
 };
 
 #endif // PICTURE_TO_LOAD_H

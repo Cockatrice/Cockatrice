@@ -209,7 +209,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     retranslateUi();
 }
 
-CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
+ExactCard DeckEditorDeckDockWidget::getCurrentCard()
 {
     QModelIndex current = deckView->selectionModel()->currentIndex();
     if (!current.isValid())
@@ -227,7 +227,7 @@ CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         QString cardName = current.sibling(current.row(), 1).data().toString();
         QString providerId = current.sibling(current.row(), 4).data().toString();
-        if (CardInfoPtr selectedCard = CardDatabaseManager::getInstance()->getCard({cardName, providerId})) {
+        if (ExactCard selectedCard = CardDatabaseManager::getInstance()->getCard({cardName, providerId})) {
             return selectedCard;
         }
     }
@@ -236,7 +236,7 @@ CardInfoPtr DeckEditorDeckDockWidget::getCurrentCard()
 
 void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const QModelIndex & /*previous*/)
 {
-    if (CardInfoPtr card = getCurrentCard()) {
+    if (ExactCard card = getCurrentCard()) {
         emit cardChanged(card);
     }
 }
@@ -286,8 +286,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
-                if (info) {
+                if (CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef())) {
                     bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
                 }
             }
@@ -472,26 +471,26 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
-    // Third argument (true) says create the card no matter what, even if not in DB
-    QModelIndex newCardIndex = deckModel->addCard(
-        cardName, CardDatabaseManager::getInstance()->getSpecificPrinting({cardName, cardProviderID}), otherZoneName,
-        true);
+    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName, cardProviderID});
+    QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
+                                    // Third argument (true) says create the card no matter what, even if not in DB
+                                    : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
     recursiveExpand(newCardIndex);
 
     return true;
 }
 
-void DeckEditorDeckDockWidget::actDecrementCard(CardInfoPtr info, QString zoneName)
+void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString zoneName)
 {
-    if (!info)
+    if (!card)
         return;
-    if (info->getIsToken())
+    if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getUuid();
-    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+    QString providerId = card.getPrinting().getUuid();
+    QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex idx = deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
+    QModelIndex idx = deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
     if (!idx.isValid()) {
         return;
     }
@@ -564,7 +563,6 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
     QMenu menu;
-    const CardInfoPtr info = getCurrentCard();
 
     QAction *selectPrinting = menu.addAction(tr("Select Printing"));
 

@@ -198,6 +198,7 @@ set(cockatrice_SOURCES
     src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     src/game/cards/card_info.cpp
     src/game/cards/card_search_model.cpp
+    src/game/cards/exact_card.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
     src/game/filters/deck_filter_string.cpp

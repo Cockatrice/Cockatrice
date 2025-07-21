@@ -46,12 +46,12 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     this->addNewTab(sampleHandWidget, tr("Sample Hand"));
 }
 
-void TabDeckEditorVisualTabWidget::onCardChanged(CardInfoPtr activeCard)
+void TabDeckEditorVisualTabWidget::onCardChanged(const ExactCard &activeCard)
 {
     emit cardChanged(activeCard);
 }
 
-void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(CardInfoPtr activeCard)
+void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(const ExactCard &activeCard)
 {
     emit cardChangedDatabaseDisplay(activeCard);
 }

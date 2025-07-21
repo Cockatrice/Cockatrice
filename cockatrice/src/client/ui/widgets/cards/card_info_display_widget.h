@@ -1,7 +1,7 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "../../../../game/cards/card_info.h"
+#include "../../../../game/cards/exact_card.h"
 #include "card_ref.h"
 
 #include <QComboBox>
@@ -18,7 +18,7 @@ class CardInfoDisplayWidget : public QFrame
 
 private:
     qreal aspectRatio;
-    CardInfoPtr info;
+    ExactCard exactCard;
     CardInfoPictureWidget *pic;
     CardInfoTextWidget *text;
 
@@ -26,7 +26,7 @@ public:
     explicit CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
 public slots:
-    void setCard(CardInfoPtr card);
+    void setCard(const ExactCard &card);
     void setCard(const CardRef &cardRef);
     void setCard(AbstractCardItem *card);
 

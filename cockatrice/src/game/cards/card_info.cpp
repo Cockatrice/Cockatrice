@@ -242,15 +242,9 @@ CardInfo::CardInfo(const QString &_name,
       reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), cipt(_cipt),
       landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
 {
-    pixmapCacheKey = QLatin1String("card_") + name;
     simpleName = CardInfo::simplifyName(name);
 
     refreshCachedSetNames();
-}
-
-CardInfo::~CardInfo()
-{
-    PictureLoader::clearPixmapCache(smartThis);
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)

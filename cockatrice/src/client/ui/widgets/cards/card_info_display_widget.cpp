@@ -12,7 +12,7 @@
 #include <utility>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)
-    : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH), info(nullptr)
+    : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();
@@ -43,32 +43,32 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *pa
     resize(width(), sizeHint().height());
 }
 
-void CardInfoDisplayWidget::setCard(CardInfoPtr card)
+void CardInfoDisplayWidget::setCard(const ExactCard &card)
 {
-    if (info)
-        disconnect(info.data(), nullptr, this, nullptr);
-    info = std::move(card);
-    if (info)
-        connect(info.data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
+    if (exactCard)
+        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
+    exactCard = card;
+    if (exactCard)
+        connect(exactCard.getCardPtr().data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
 
-    text->setCard(info);
-    pic->setCard(info);
+    text->setCard(exactCard.getCardPtr());
+    pic->setCard(exactCard);
 }
 
 void CardInfoDisplayWidget::setCard(const CardRef &cardRef)
 {
     setCard(CardDatabaseManager::getInstance()->guessCard(cardRef));
-    if (info == nullptr) {
+    if (exactCard.isEmpty()) {
         text->setInvalidCardName(cardRef.name);
     }
 }
 
 void CardInfoDisplayWidget::setCard(AbstractCardItem *card)
 {
-    setCard(card->getInfo());
+    setCard(card->getCard());
 }
 
 void CardInfoDisplayWidget::clear()
 {
-    setCard((CardInfoPtr) nullptr);
+    setCard(ExactCard());
 }

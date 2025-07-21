@@ -137,7 +137,7 @@ void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithT
 {
     emit cardClicked(event, card, zoneName);
 }
-void DeckCardZoneDisplayWidget::onHover(CardInfoPtr card)
+void DeckCardZoneDisplayWidget::onHover(const ExactCard &card)
 {
     emit cardHovered(card);
 }
@@ -181,10 +181,10 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
 {
     QList<QString> groupCriteriaValues;
 
-    QList<CardInfoPtr> cardsInZone = deckListModel->getCardsAsCardInfoPtrsForZone(zoneName);
+    QList<ExactCard> cardsInZone = deckListModel->getCardsForZone(zoneName);
 
-    for (CardInfoPtr cardInZone : cardsInZone) {
-        groupCriteriaValues.append(cardInZone->getProperty(activeGroupCriteria));
+    for (const ExactCard &cardInZone : cardsInZone) {
+        groupCriteriaValues.append(cardInZone.getInfo().getProperty(activeGroupCriteria));
     }
 
     groupCriteriaValues.removeDuplicates();

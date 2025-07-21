@@ -19,7 +19,7 @@ public:
     CardInfoFrameWidget *cardInfo;
 
 public slots:
-    void updateCard(CardInfoPtr _card);
+    void updateCard(const ExactCard &_card);
 };
 
 #endif // DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H

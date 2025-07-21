@@ -31,8 +31,7 @@
  * Initializes the widget with a minimum height and sets the pixmap to a dirty state for initial loading.
  */
 CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverToZoomEnabled, const bool _raiseOnEnter)
-    : QWidget(parent), info(nullptr), pixmapDirty(true), hoverToZoomEnabled(_hoverToZoomEnabled),
-      raiseOnEnter(_raiseOnEnter)
+    : QWidget(parent), pixmapDirty(true), hoverToZoomEnabled(_hoverToZoomEnabled), raiseOnEnter(_raiseOnEnter)
 {
     setMinimumHeight(baseHeight);
     if (hoverToZoomEnabled) {
@@ -77,16 +76,16 @@ CardInfoPictureWidget::~CardInfoPictureWidget()
  * Disconnects any existing signal connections from the previous card info and connects to the `pixmapUpdated`
  * signal of the new card to automatically update the pixmap when the card image changes.
  */
-void CardInfoPictureWidget::setCard(CardInfoPtr card)
+void CardInfoPictureWidget::setCard(const ExactCard &card)
 {
-    if (info) {
-        disconnect(info.data(), nullptr, this, nullptr);
+    if (exactCard.getCardPtr()) {
+        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
     }
 
-    info = std::move(card);
+    exactCard = card;
 
-    if (info) {
-        connect(info.data(), &CardInfo::pixmapUpdated, this, &CardInfoPictureWidget::updatePixmap);
+    if (exactCard.getCardPtr()) {
+        connect(exactCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &CardInfoPictureWidget::updatePixmap);
     }
 
     updatePixmap();
@@ -158,8 +157,8 @@ void CardInfoPictureWidget::updatePixmap()
 void CardInfoPictureWidget::loadPixmap()
 {
     PictureLoader::getCardBackLoadingInProgressPixmap(resizedPixmap, size());
-    if (info) {
-        PictureLoader::getPixmap(resizedPixmap, info, size());
+    if (exactCard) {
+        PictureLoader::getPixmap(resizedPixmap, exactCard, size());
     } else {
         PictureLoader::getCardBackLoadingFailedPixmap(resizedPixmap, size());
     }
@@ -188,7 +187,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
     if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
-        if (info && info->getLandscapeOrientation()) {
+        if (exactCard.getInfo().getLandscapeOrientation()) {
             // Rotate pixmap 90 degrees to the left
             QTransform transform;
             transform.rotate(90);
@@ -257,7 +256,7 @@ void CardInfoPictureWidget::enterEvent(QEvent *event)
     }
 
     // Emit signal indicating a card is being hovered on
-    emit hoveredOnCard(info);
+    emit hoveredOnCard(exactCard);
 
     if (raiseOnEnter) {
         if (animation->state() == QAbstractAnimation::Running) {
@@ -357,7 +356,7 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
 {
     auto *cardMenu = new QMenu(this);
 
-    if (!info) {
+    if (!exactCard) {
         return cardMenu;
     }
 
@@ -371,7 +370,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
 {
     auto viewRelatedCards = new QMenu(tr("View related cards"));
 
-    QList<CardRelation *> relatedCards = info->getAllRelatedCards();
+    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
 
     auto relatedCardExists = [](const CardRelation *cardRelation) {
         return CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName()) != nullptr;
@@ -388,7 +387,8 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
         const auto &relatedCardName = relatedCard->getName();
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
-            emit cardChanged(CardDatabaseManager::getInstance()->getCardInfo(relatedCardName));
+            emit cardChanged(
+                CardDatabaseManager::getInstance()->getCard({relatedCardName, exactCard.getPrinting().getUuid()}));
         });
         viewRelatedCards->addAction(viewCard);
     }
@@ -428,14 +428,14 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
 
         QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
-            deckEditorTab->updateCard(info);
-            deckEditorTab->actAddCard(info);
+            deckEditorTab->updateCard(exactCard);
+            deckEditorTab->actAddCard(exactCard);
         });
 
         QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
         connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
-            deckEditorTab->updateCard(info);
-            deckEditorTab->actAddCardToSideboard(info);
+            deckEditorTab->updateCard(exactCard);
+            deckEditorTab->actAddCardToSideboard(exactCard);
         });
     }
 
@@ -450,12 +450,12 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
  */
 void CardInfoPictureWidget::showEnlargedPixmap() const
 {
-    if (!info) {
+    if (!exactCard) {
         return;
     }
 
     const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * aspectRatio * 2));
-    enlargedPixmapWidget->setCardPixmap(info, enlargedSize);
+    enlargedPixmapWidget->setCardPixmap(exactCard, enlargedSize);
 
     const QPoint cursorPos = QCursor::pos();
     const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();

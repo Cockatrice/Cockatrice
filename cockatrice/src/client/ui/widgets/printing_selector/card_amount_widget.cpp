@@ -12,7 +12,6 @@
  * @param deckView Pointer to the QTreeView displaying the deck.
  * @param cardSizeSlider Pointer to the QSlider for adjusting font size.
  * @param rootCard The root card to manage within the widget.
- * @param printingInfo Printing info for the root card.
  * @param zoneName The zone name (e.g., DECK_ZONE_MAIN or DECK_ZONE_SIDE).
  */
 CardAmountWidget::CardAmountWidget(QWidget *parent,
@@ -20,11 +19,10 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    DeckListModel *deckModel,
                                    QTreeView *deckView,
                                    QSlider *cardSizeSlider,
-                                   CardInfoPtr &rootCard,
-                                   PrintingInfo &printingInfo,
+                                   const ExactCard &rootCard,
                                    const QString &zoneName)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard), printingInfo(printingInfo), zoneName(zoneName), hovered(false)
+      rootCard(rootCard), zoneName(zoneName), hovered(false)
 {
     layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -142,18 +140,18 @@ void CardAmountWidget::updateCardCount()
  */
 void CardAmountWidget::addPrinting(const QString &zone)
 {
-    auto newCardIndex = deckModel->addCard(rootCard->getName(), printingInfo, zone);
+    auto newCardIndex = deckModel->addCard(rootCard, zone);
     recursiveExpand(newCardIndex);
-    QModelIndex find_card = deckModel->findCard(rootCard->getName(), zone);
+    QModelIndex find_card = deckModel->findCard(rootCard.getName(), zone);
     if (find_card.isValid() && find_card != newCardIndex) {
         auto amount = deckModel->data(find_card, Qt::DisplayRole);
         for (int i = 0; i < amount.toInt() - 1; i++) {
-            deckModel->addCard(rootCard->getName(), printingInfo, zone);
+            deckModel->addCard(rootCard, zone);
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
     }
-    newCardIndex =
-        deckModel->findCard(rootCard->getName(), zone, printingInfo.getUuid(), printingInfo.getProperty("num"));
+    newCardIndex = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
+                                       rootCard.getPrinting().getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
     deckEditor->setModified(true);
@@ -235,8 +233,8 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QModelIndex idx =
-        deckModel->findCard(rootCard->getName(), zone, printingInfo.getUuid(), printingInfo.getProperty("num"));
+    QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
+                                          rootCard.getPrinting().getProperty("num"));
     offsetCountAtIndex(idx, -1);
     deckEditor->setModified(true);
 }
@@ -249,7 +247,7 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
  */
 int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
-    if (printingInfo.getUuid().isEmpty()) {
+    if (rootCard.getPrinting().getUuid().isEmpty()) {
         return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
     }
 
@@ -286,7 +284,7 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
             }
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                if (currentCard->getCardProviderId() == printingInfo.getProperty("uuid")) {
+                if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
                     count++;
                 }
             }

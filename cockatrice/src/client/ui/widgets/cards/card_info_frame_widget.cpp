@@ -12,12 +12,13 @@
 #include <utility>
 
 CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
-    : QTabWidget(parent), info(nullptr), viewTransformationButton(nullptr), cardTextOnly(false)
+    : QTabWidget(parent), viewTransformationButton(nullptr), cardTextOnly(false)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();
     pic->setObjectName("pic");
-    connect(pic, &CardInfoPictureWidget::cardChanged, this, qOverload<CardInfoPtr>(&CardInfoFrameWidget::setCard));
+    connect(pic, &CardInfoPictureWidget::cardChanged, this,
+            qOverload<const ExactCard &>(&CardInfoFrameWidget::setCard));
 
     text = new CardInfoTextWidget();
     text->setObjectName("text");
@@ -129,13 +130,9 @@ void CardInfoFrameWidget::setViewMode(int mode)
     SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
-static bool hasTransformation(const CardInfoPtr &info)
+static bool hasTransformation(const CardInfo &info)
 {
-    if (!info) {
-        return false;
-    }
-
-    for (const auto &cardRelation : info->getAllRelatedCards()) {
+    for (const auto &cardRelation : info.getAllRelatedCards()) {
         if (cardRelation->getDoesTransform()) {
             return true;
         }
@@ -143,22 +140,22 @@ static bool hasTransformation(const CardInfoPtr &info)
     return false;
 }
 
-void CardInfoFrameWidget::setCard(CardInfoPtr card)
+void CardInfoFrameWidget::setCard(const ExactCard &card)
 {
-    if (info) {
-        disconnect(info.data(), nullptr, this, nullptr);
+    if (exactCard) {
+        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
     }
 
-    info = std::move(card);
+    exactCard = card;
 
-    if (info) {
-        connect(info.data(), &QObject::destroyed, this, &CardInfoFrameWidget::clearCard);
+    if (exactCard) {
+        connect(exactCard.getCardPtr().data(), &QObject::destroyed, this, &CardInfoFrameWidget::clearCard);
     }
 
-    setViewTransformationButtonVisibility(hasTransformation(info));
+    setViewTransformationButtonVisibility(hasTransformation(exactCard.getInfo()));
 
-    text->setCard(info);
-    pic->setCard(info);
+    text->setCard(exactCard.getCardPtr());
+    pic->setCard(exactCard);
 }
 
 void CardInfoFrameWidget::setCard(const QString &cardName)
@@ -174,14 +171,14 @@ void CardInfoFrameWidget::setCard(const CardRef &cardRef)
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)
 {
     if (card) {
-        setCard(card->getInfo());
+        setCard(card->getCard());
     }
 }
 
 void CardInfoFrameWidget::viewTransformation()
 {
-    if (info) {
-        const auto &cardRelations = info->getAllRelatedCards();
+    if (exactCard) {
+        const auto &cardRelations = exactCard.getInfo().getAllRelatedCards();
         for (const auto &cardRelation : cardRelations) {
             if (cardRelation->getDoesTransform()) {
                 setCard(cardRelation->getName());
@@ -193,5 +190,5 @@ void CardInfoFrameWidget::viewTransformation()
 
 void CardInfoFrameWidget::clearCard()
 {
-    setCard((CardInfoPtr) nullptr);
+    setCard(ExactCard());
 }

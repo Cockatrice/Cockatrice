@@ -1,7 +1,7 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include "../../../game/cards/card_info.h"
+#include "../../../game/cards/exact_card.h"
 
 #include <QLoggingCategory>
 #include <QObject>
@@ -20,7 +20,7 @@ class PictureLoaderLocal : public QObject
 public:
     explicit PictureLoaderLocal(QObject *parent);
 
-    QImage tryLoad(const CardInfoPtr &toLoad) const;
+    QImage tryLoad(const ExactCard &toLoad) const;
 
 private:
     QString picsPath, customPicsPath;

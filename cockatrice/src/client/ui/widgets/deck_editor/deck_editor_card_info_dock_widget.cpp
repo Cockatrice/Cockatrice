@@ -34,7 +34,7 @@ void DeckEditorCardInfoDockWidget::createCardInfoDock()
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 }
 
-void DeckEditorCardInfoDockWidget::updateCard(CardInfoPtr _card)
+void DeckEditorCardInfoDockWidget::updateCard(const ExactCard &_card)
 {
     cardInfo->setCard(_card);
 }

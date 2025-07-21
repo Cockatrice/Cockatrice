@@ -37,7 +37,7 @@ public:
 
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
-    void onHover(CardInfoPtr card);
+    void onHover(const ExactCard &card);
     virtual QWidget *constructWidgetForIndex(int rowIndex);
     virtual void updateCardDisplays();
     virtual void onCardAddition(const QModelIndex &parent, int first, int last);
@@ -46,7 +46,7 @@ public slots:
 
 signals:
     void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
-    void cardHovered(CardInfoPtr card);
+    void cardHovered(const ExactCard &card);
     void cleanupRequested(CardGroupDisplayWidget *cardGroupDisplayWidget);
 
 protected:

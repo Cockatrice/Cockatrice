@@ -108,14 +108,14 @@ void PictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
     }
 }
 
-void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
+void PictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize size)
 {
     if (!card) {
         qCWarning(PictureLoaderLog) << "getPixmap called with null card!";
         return;
     }
 
-    QString key = card->getPixmapCacheKey();
+    QString key = card.getPixmapCacheKey();
     QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + "x" + QString::number(size.height());
 
     if (QPixmapCache::find(sizeKey, &pixmap)) {
@@ -132,7 +132,7 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
 
         QScreen *screen = qApp->primaryScreen();
         qreal dpr = screen ? screen->devicePixelRatio() : 1.0;
-        qCDebug(PictureLoaderLog) << "Scaling cached image for" << card->getName();
+        qCDebug(PictureLoaderLog) << "Scaling cached image for" << card.getName();
 
         pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         pixmap.setDevicePixelRatio(dpr);
@@ -141,36 +141,35 @@ void PictureLoader::getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size)
     }
 
     // add the card to the load queue
-    qCDebug(PictureLoaderLog) << "Enqueuing " << card->getName() << " for " << card->getPixmapCacheKey();
+    qCDebug(PictureLoaderLog) << "Enqueuing " << card.getName() << " for " << card.getPixmapCacheKey();
     getInstance().worker->enqueueImageLoad(card);
 }
 
-void PictureLoader::imageLoaded(CardInfoPtr card, const QImage &image)
+void PictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 {
     if (image.isNull()) {
-        qCDebug(PictureLoaderLog) << "Caching NULL pixmap for" << card->getName();
-        QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap());
+        qCDebug(PictureLoaderLog) << "Caching NULL pixmap for" << card.getName();
+        QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap());
     } else {
-        if (card->getUpsideDownArt()) {
+        if (card.getInfo().getUpsideDownArt()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
             QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
 #else
             QImage mirrorImage = image.mirrored(true, true);
 #endif
-            QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
+            QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
         } else {
-            QPixmapCache::insert(card->getPixmapCacheKey(), QPixmap::fromImage(image));
+            QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap::fromImage(image));
         }
     }
 
-    card->emitPixmapUpdated();
-}
+    // imageLoaded should only be reached if the exactCard isn't already in cache.
+    // (plus there's a deduplication mechanism in PictureLoaderWorker)
+    // It should be safe to connect the CardInfo here without worrying about redundant connections.
+    connect(card.getCardPtr().data(), &QObject::destroyed, this,
+            [cacheKey = card.getPixmapCacheKey()] { QPixmapCache::remove(cacheKey); });
 
-void PictureLoader::clearPixmapCache(CardInfoPtr card)
-{
-    if (card) {
-        QPixmapCache::remove(card->getPixmapCacheKey());
-    }
+    card.emitPixmapUpdated();
 }
 
 void PictureLoader::clearPixmapCache()
@@ -183,17 +182,17 @@ void PictureLoader::clearNetworkCache()
     getInstance().worker->clearNetworkCache();
 }
 
-void PictureLoader::cacheCardPixmaps(QList<CardInfoPtr> cards)
+void PictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)
 {
     QPixmap tmp;
     int max = qMin(cards.size(), CACHED_CARD_PER_DECK_MAX);
     for (int i = 0; i < max; ++i) {
-        const CardInfoPtr &card = cards.at(i);
+        const ExactCard &card = cards.at(i);
         if (!card) {
             continue;
         }
 
-        QString key = card->getPixmapCacheKey();
+        QString key = card.getPixmapCacheKey();
         if (QPixmapCache::find(key, &tmp)) {
             continue;
         }

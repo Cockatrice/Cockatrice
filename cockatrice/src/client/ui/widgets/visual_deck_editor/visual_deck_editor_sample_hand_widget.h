@@ -14,7 +14,7 @@ class VisualDeckEditorSampleHandWidget : public QWidget
     Q_OBJECT
 public:
     VisualDeckEditorSampleHandWidget(QWidget *parent, DeckListModel *deckListModel);
-    QList<CardInfoPtr> getRandomCards(int amountToGet);
+    QList<ExactCard> getRandomCards(int amountToGet);
 
 public slots:
     void updateDisplay();

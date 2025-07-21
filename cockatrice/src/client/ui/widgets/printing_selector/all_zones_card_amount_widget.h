@@ -16,8 +16,7 @@ public:
                                       DeckListModel *deckModel,
                                       QTreeView *deckView,
                                       QSlider *cardSizeSlider,
-                                      CardInfoPtr rootCard,
-                                      PrintingInfo printingInfo);
+                                      const ExactCard &rootCard);
     int getMainboardAmount();
     int getSideboardAmount();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -35,8 +34,7 @@ private:
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;
-    CardInfoPtr rootCard;
-    PrintingInfo printingInfo;
+    ExactCard rootCard;
     QLabel *zoneLabelMainboard;
     CardAmountWidget *buttonBoxMainboard;
     QLabel *zoneLabelSideboard;

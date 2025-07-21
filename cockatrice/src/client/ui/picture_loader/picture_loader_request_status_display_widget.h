@@ -12,7 +12,7 @@ class PictureLoaderRequestStatusDisplayWidget : public QWidget
 public:
     PictureLoaderRequestStatusDisplayWidget(QWidget *parent,
                                             const QUrl &url,
-                                            const CardInfoPtr &card,
+                                            const ExactCard &card,
                                             const QString &setName);
 
     void setFinished()

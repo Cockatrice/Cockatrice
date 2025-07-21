@@ -57,20 +57,27 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::refreshCardInfo()
 {
-    info = CardDatabaseManager::getInstance()->getCard(cardRef);
+    exactCard = CardDatabaseManager::getInstance()->getCard(cardRef);
 
-    if (!info && !cardRef.name.isEmpty()) {
-        QVariantHash properties = QVariantHash();
-
-        info = CardInfo::newInstance(cardRef.name, "", true, QVariantHash(), QList<CardRelation *>(),
-                                     QList<CardRelation *>(), SetToPrintingsMap(), false, false, -1, false);
+    if (!exactCard && !cardRef.name.isEmpty()) {
+        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, false, false, -1, false);
+        exactCard = ExactCard(info);
     }
-    if (info.data()) {
-        connect(info.data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
+    if (exactCard) {
+        connect(exactCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
     }
 
     cacheBgColor();
     update();
+}
+
+/**
+ * Convenience method to get the CardInfo of the exactCard
+ * @return A const reference to the CardInfo, or an empty CardInfo if card was null
+ */
+const CardInfo &AbstractCardItem::getCardInfo() const
+{
+    return exactCard.getInfo();
 }
 
 void AbstractCardItem::setRealZValue(qreal _zValue)
@@ -116,7 +123,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if (translatedSize.width() > 10) {
-            PictureLoader::getPixmap(translatedPixmap, info, translatedSize.toSize());
+            PictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
             if (translatedPixmap.isNull())
                 paintImage = false;
         } else {
@@ -191,8 +198,8 @@ void AbstractCardItem::setCardRef(const CardRef &_cardRef)
     }
 
     emit deleteCardInfoPopup(cardRef.name);
-    if (info) {
-        disconnect(info.data(), nullptr, this, nullptr);
+    if (exactCard) {
+        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
     }
     cardRef = _cardRef;
 
@@ -224,8 +231,7 @@ void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
     if (color.isEmpty()) {
-        if (info)
-            colorChar = info->getColorChar();
+        colorChar = exactCard.getInfo().getColorChar();
     } else {
         colorChar = color.at(0);
     }

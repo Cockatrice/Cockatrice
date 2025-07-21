@@ -107,7 +107,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (!getFaceDown() && info && pt == info->getPowTough()) {
+        if (!getFaceDown() && pt == exactCard.getInfo().getPowTough()) {
             painter->setPen(Qt::white);
         } else {
             painter->setPen(QColor(255, 150, 0)); // dark orange

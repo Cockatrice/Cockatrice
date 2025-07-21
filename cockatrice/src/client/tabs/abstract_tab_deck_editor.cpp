@@ -72,10 +72,10 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
-void AbstractTabDeckEditor::updateCard(CardInfoPtr _card)
+void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
-    cardInfoDockWidget->updateCard(_card);
-    printingSelectorDockWidget->printingSelector->setCard(_card, DECK_ZONE_MAIN);
+    cardInfoDockWidget->updateCard(card);
+    printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr(), DECK_ZONE_MAIN);
 }
 
 void AbstractTabDeckEditor::onDeckChanged()
@@ -88,14 +88,14 @@ void AbstractTabDeckEditor::onDeckModified()
     deckMenu->setSaveStatus(!isBlankNewDeck());
 }
 
-void AbstractTabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneName)
+void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneName)
 {
-    if (!info)
+    if (!card)
         return;
-    if (info->getIsToken())
+    if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QModelIndex newCardIndex = deckDockWidget->deckModel->addPreferredPrintingCard(info->getName(), zoneName, false);
+    QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
     // recursiveExpand(newCardIndex);
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
@@ -103,39 +103,39 @@ void AbstractTabDeckEditor::addCardHelper(const CardInfoPtr info, QString zoneNa
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
-void AbstractTabDeckEditor::actAddCard(CardInfoPtr info)
+void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
 {
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
-        actAddCardToSideboard(info);
+        actAddCardToSideboard(card);
     else
-        addCardHelper(info, DECK_ZONE_MAIN);
+        addCardHelper(card, DECK_ZONE_MAIN);
     deckMenu->setSaveStatus(true);
 }
 
-void AbstractTabDeckEditor::actAddCardToSideboard(CardInfoPtr info)
+void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
 {
-    addCardHelper(info, DECK_ZONE_SIDE);
+    addCardHelper(card, DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
-void AbstractTabDeckEditor::actDecrementCard(CardInfoPtr info)
+void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
 {
-    emit decrementCard(info, DECK_ZONE_MAIN);
+    emit decrementCard(card, DECK_ZONE_MAIN);
 }
 
-void AbstractTabDeckEditor::actDecrementCardFromSideboard(CardInfoPtr info)
+void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
 {
-    emit decrementCard(info, DECK_ZONE_SIDE);
+    emit decrementCard(card, DECK_ZONE_SIDE);
 }
 
-void AbstractTabDeckEditor::actSwapCard(CardInfoPtr info, QString zoneName)
+void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zoneName)
 {
-    QString providerId = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getUuid();
-    QString collectorNumber = CardDatabaseManager::getInstance()->getSetInfoForCard(info).getProperty("num");
+    QString providerId = card.getPrinting().getUuid();
+    QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex foundCard = deckDockWidget->deckModel->findCard(info->getName(), zoneName, providerId, collectorNumber);
+    QModelIndex foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
     if (!foundCard.isValid()) {
-        foundCard = deckDockWidget->deckModel->findCard(info->getName(), zoneName);
+        foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
     }
 
     deckDockWidget->swapCard(foundCard);

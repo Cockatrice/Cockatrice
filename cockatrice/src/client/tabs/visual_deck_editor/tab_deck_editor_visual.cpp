@@ -153,15 +153,15 @@ QString TabDeckEditorVisual::getTabText() const
     return result;
 }
 
-void TabDeckEditorVisual::changeModelIndexAndCardInfo(const CardInfoPtr &activeCard)
+void TabDeckEditorVisual::changeModelIndexAndCardInfo(const ExactCard &activeCard)
 {
     updateCard(activeCard);
     changeModelIndexToCard(activeCard);
 }
 
-void TabDeckEditorVisual::changeModelIndexToCard(const CardInfoPtr &activeCard)
+void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
 {
-    QString cardName = activeCard->getName();
+    QString cardName = activeCard.getName();
     QModelIndex index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_MAIN);
     if (!index.isValid()) {
         index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_SIDE);
@@ -174,9 +174,9 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
                                                     QString zoneName)
 {
     if (event->button() == Qt::LeftButton) {
-        actSwapCard(instance->getInfo(), zoneName);
+        actSwapCard(instance->getCard(), zoneName);
     } else if (event->button() == Qt::RightButton) {
-        actDecrementCard(instance->getInfo());
+        actDecrementCard(instance->getCard());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
@@ -186,9 +186,9 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
                                                           CardInfoPictureWithTextOverlayWidget *instance)
 {
     if (event->button() == Qt::LeftButton) {
-        actAddCard(instance->getInfo());
+        actAddCard(instance->getCard());
     } else if (event->button() == Qt::RightButton) {
-        actDecrementCard(instance->getInfo());
+        actDecrementCard(instance->getCard());
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
@@ -205,7 +205,8 @@ bool TabDeckEditorVisual::actSaveDeckAs()
 
 void TabDeckEditorVisual::showPrintingSelector()
 {
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getInfo(), DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr(),
+                                                          DECK_ZONE_MAIN);
     printingSelectorDockWidget->printingSelector->updateDisplay();
     aPrintingSelectorDockVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);

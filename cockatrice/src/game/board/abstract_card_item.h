@@ -1,7 +1,7 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "../cards/card_info.h"
+#include "../cards/exact_card.h"
 #include "arrow_target.h"
 #include "card_ref.h"
 
@@ -14,7 +14,7 @@ class AbstractCardItem : public ArrowTarget
 {
     Q_OBJECT
 protected:
-    CardInfoPtr info;
+    ExactCard exactCard;
     int id;
     CardRef cardRef;
     bool tapped;
@@ -58,10 +58,11 @@ public:
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    CardInfoPtr getInfo() const
+    ExactCard getCard() const
     {
-        return info;
+        return exactCard;
     }
+    const CardInfo &getCardInfo() const;
     int getId() const
     {
         return id;

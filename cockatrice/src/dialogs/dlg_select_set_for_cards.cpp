@@ -152,8 +152,9 @@ void DlgSelectSetForCards::actOK()
                 continue;
             }
             model->removeRow(find_card.row(), find_card.parent());
-            model->addCard(card, CardDatabaseManager::getInstance()->getSpecificPrinting(card, modifiedSet, ""),
-                           DECK_ZONE_MAIN);
+            CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(card);
+            PrintingInfo printing = CardDatabaseManager::getInstance()->getSpecificPrinting(card, modifiedSet, "");
+            model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
         }
     }
     accept();
@@ -290,17 +291,17 @@ void DlgSelectSetForCards::updateCardLists()
 
             if (!found) {
                 // The card was not in any selected set
-                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
+                ExactCard card = CardDatabaseManager::getInstance()->getCard({currentCard->getName()});
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
-                picture_widget->setCard(infoPtr);
+                picture_widget->setCard(card);
                 uneditedCardsFlowWidget->addWidget(picture_widget);
             } else {
-                CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCard(
+                ExactCard card = CardDatabaseManager::getInstance()->getCard(
                     {currentCard->getName(), CardDatabaseManager::getInstance()
                                                  ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
                                                  .getUuid()});
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
-                picture_widget->setCard(infoPtr);
+                picture_widget->setCard(card);
                 modifiedCardsFlowWidget->addWidget(picture_widget);
             }
         }

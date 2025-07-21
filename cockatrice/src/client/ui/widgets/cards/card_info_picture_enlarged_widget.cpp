@@ -13,8 +13,7 @@
  *
  * Sets the widget's window flags to keep it displayed as a tooltip overlay.
  */
-CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent)
-    : QWidget(parent), pixmapDirty(true), info(nullptr)
+CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent) : QWidget(parent), pixmapDirty(true)
 {
     setWindowFlags(Qt::ToolTip); // Keeps this widget on top of everything
     setAttribute(Qt::WA_TranslucentBackground);
@@ -35,8 +34,8 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent)
  */
 void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
 {
-    if (info) {
-        PictureLoader::getPixmap(enlargedPixmap, info, size);
+    if (card) {
+        PictureLoader::getPixmap(enlargedPixmap, card, size);
     } else {
         PictureLoader::getCardBackPixmap(enlargedPixmap, size);
     }
@@ -45,14 +44,14 @@ void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
 
 /**
  * @brief Sets the pixmap for the widget based on a provided card.
- * @param card The card information to load.
+ * @param _card The card information to load.
  * @param size The desired size for the pixmap.
  *
  * Sets the widget's pixmap to the card image and resizes the widget to match the specified size. Triggers a repaint.
  */
-void CardInfoPictureEnlargedWidget::setCardPixmap(CardInfoPtr card, const QSize size)
+void CardInfoPictureEnlargedWidget::setCardPixmap(const ExactCard &_card, const QSize size)
 {
-    info = std::move(card);
+    card = _card;
     loadPixmap(size);
 
     setFixedSize(size); // Set the widget size to the enlarged size

@@ -22,8 +22,7 @@ public:
                               DeckListModel *deckModel,
                               QTreeView *deckView,
                               QSlider *cardSizeSlider,
-                              CardInfoPtr &rootCard,
-                              PrintingInfo &printingInfo,
+                              const ExactCard &rootCard,
                               const QString &zoneName);
     int countCardsInZone(const QString &deckZone);
 
@@ -40,8 +39,7 @@ private:
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;
-    CardInfoPtr rootCard;
-    PrintingInfo printingInfo;
+    ExactCard rootCard;
     QString zoneName;
     QHBoxLayout *layout;
     DynamicFontSizePushButton *incrementButton;

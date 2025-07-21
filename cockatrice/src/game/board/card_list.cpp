@@ -77,12 +77,12 @@ void CardList::sortBy(const QList<SortOption> &option)
  * @param c The card info
  * @param appendAtEnd For multicolor cards, whether to also append the entire color string at the end.
  */
-static QString getColorSortString(CardInfoPtr c, bool appendAtEnd)
+static QString getColorSortString(const CardInfo &c, bool appendAtEnd)
 {
-    QString colors = c->getColors();
+    QString colors = c.getColors();
     switch (colors.size()) {
         case 0: {
-            if (c->getCardType().contains("Land")) {
+            if (c.getCardType().contains("Land")) {
                 return "a_land";
             } else {
                 return "b_colorless";
@@ -119,33 +119,36 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
         case NoSort:
             return [](CardItem *) { return ""; };
         case SortByMainType:
-            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getMainCardType() : ""; };
+            return [](CardItem *c) { return c->getCardInfo().getMainCardType(); };
         case SortByManaValue:
             // getCmc returns the int as a string. We pad with 0's so that string comp also works on it
-            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCmc().rightJustified(4, '0') : ""; };
+            return [](CardItem *c) { return c->getCard() ? c->getCardInfo().getCmc().rightJustified(4, '0') : ""; };
         case SortByColorGrouping:
-            return [](CardItem *c) { return c->getInfo() ? getColorSortString(c->getInfo(), false) : ""; };
+            return [](CardItem *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), false) : ""; };
         case SortByName:
             return [](CardItem *c) { return c->getName(); };
         case SortByType:
-            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getCardType() : ""; };
+            return [](CardItem *c) { return c->getCardInfo().getCardType(); };
         case SortByManaCost:
             return [](CardItem *c) {
-                auto info = c->getInfo();
-                if (!info)
-                    return QString("");
+                if (!c->getCard()) {
+                    return QString();
+                }
+
+                auto info = c->getCardInfo();
 
                 // calculation copied from CardDatabaseModel.
                 // we pad the cmc and also append the mana cost to the end so same cmc cards still have a sort order
-                return QString("%1%2").arg(info->getCmc(), 4, QChar('0')).arg(info->getManaCost());
+                return QString("%1%2").arg(info.getCmc(), 4, QChar('0')).arg(info.getManaCost());
             };
         case SortByColors:
-            return [](CardItem *c) { return c->getInfo() ? getColorSortString(c->getInfo(), true) : ""; };
+            return [](CardItem *c) { return c->getCard() ? getColorSortString(c->getCardInfo(), true) : ""; };
         case SortByPt:
             // do the same padding trick as above
-            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getPowTough().rightJustified(10, '0') : ""; };
+            return
+                [](CardItem *c) { return c->getCard() ? c->getCardInfo().getPowTough().rightJustified(10, '0') : ""; };
         case SortBySet:
-            return [](CardItem *c) { return c->getInfo() ? c->getInfo()->getSetsNames() : ""; };
+            return [](CardItem *c) { return c->getCardInfo().getSetsNames(); };
         case SortByPrinting:
             return [](CardItem *c) { return c->getProviderId(); };
     }

@@ -152,7 +152,7 @@ void ZoneViewZone::reorganizeCards()
     // filter cards
     CardList cardsToDisplay = CardList(cards.getContentsKnown());
     for (auto card : cards) {
-        if (filterString.check(card->getInfo())) {
+        if (filterString.check(card->getCard().getCardPtr())) {
             card->show();
             cardsToDisplay.append(card);
         } else {

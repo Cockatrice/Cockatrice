@@ -58,12 +58,12 @@ public slots:
 
 signals:
     void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void cardHoveredDatabaseDisplay(CardInfoPtr hoveredCard);
+    void cardHoveredDatabaseDisplay(const ExactCard &hoveredCard);
 
 protected slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
-    void onHover(const CardInfoPtr &hoveredCard);
-    void addCard(const CardInfoPtr &cardToAdd);
+    void onHover(const ExactCard &hoveredCard);
+    void addCard(const ExactCard &cardToAdd);
     void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void wheelEvent(QWheelEvent *event) override;
     void modelDirty() const;
@@ -87,7 +87,7 @@ private:
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
     QTreeView *databaseView;
-    QList<CardInfoPtr> *cards;
+    QList<ExactCard> *cards;
     QVBoxLayout *mainLayout;
     QScrollArea *scrollArea;
     FlowWidget *flowWidget;

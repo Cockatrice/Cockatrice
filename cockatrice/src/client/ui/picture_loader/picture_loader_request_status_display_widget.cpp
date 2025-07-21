@@ -2,18 +2,18 @@
 
 PictureLoaderRequestStatusDisplayWidget::PictureLoaderRequestStatusDisplayWidget(QWidget *parent,
                                                                                  const QUrl &_url,
-                                                                                 const CardInfoPtr &card,
+                                                                                 const ExactCard &card,
                                                                                  const QString &setName)
     : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
 
     name = new QLabel(this);
-    name->setText(card->getName());
+    name->setText(card.getName());
     setShortname = new QLabel(this);
     setShortname->setText(setName);
     providerId = new QLabel(this);
-    providerId->setText(card->getProperty("uuid"));
+    providerId->setText(card.getPrinting().getUuid());
 
     layout->addWidget(name);
     layout->addWidget(setShortname);

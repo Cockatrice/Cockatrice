@@ -1,7 +1,7 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include "../../../../game/cards/card_info.h"
+#include "../../../../game/cards/exact_card.h"
 #include "card_ref.h"
 
 #include <QPushButton>
@@ -17,7 +17,7 @@ class CardInfoFrameWidget : public QTabWidget
 {
     Q_OBJECT
 private:
-    CardInfoPtr info;
+    ExactCard exactCard;
     CardInfoPictureWidget *pic;
     CardInfoTextWidget *text;
     QPushButton *viewTransformationButton;
@@ -38,14 +38,14 @@ public:
     };
 
     explicit CardInfoFrameWidget(QWidget *parent = nullptr);
-    CardInfoPtr getInfo()
+    ExactCard getCard()
     {
-        return info;
+        return exactCard;
     }
     void retranslateUi();
 
 public slots:
-    void setCard(CardInfoPtr card);
+    void setCard(const ExactCard &card);
     void setCard(const QString &cardName);
     void setCard(const CardRef &cardRef);
     void setCard(AbstractCardItem *card);

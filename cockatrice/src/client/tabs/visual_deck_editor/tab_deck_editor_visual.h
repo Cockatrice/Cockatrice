@@ -34,8 +34,8 @@ public:
     explicit TabDeckEditorVisual(TabSupervisor *_tabSupervisor);
     void retranslateUi() override;
     QString getTabText() const override;
-    void changeModelIndexAndCardInfo(const CardInfoPtr &activeCard);
-    void changeModelIndexToCard(const CardInfoPtr &activeCard);
+    void changeModelIndexAndCardInfo(const ExactCard &activeCard);
+    void changeModelIndexToCard(const ExactCard &activeCard);
     void createDeckAnalyticsDock();
     void createMenus() override;
     void createSearchAndDatabaseFrame();

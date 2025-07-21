@@ -2,7 +2,7 @@
 #define CARDDATABASE_H
 
 #include "../common/card_ref.h"
-#include "card_info.h"
+#include "exact_card.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -69,8 +69,10 @@ public:
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
 
-    QList<CardInfoPtr> getCards(const QList<CardRef> &cardRefs) const;
-    [[nodiscard]] CardInfoPtr getCard(const CardRef &cardRef) const;
+    QList<ExactCard> getCards(const QList<CardRef> &cardRefs) const;
+    [[nodiscard]] ExactCard getCard(const CardRef &cardRef) const;
+
+    [[nodiscard]] ExactCard getPreferredCard(const CardInfoPtr &cardInfo) const;
 
     static PrintingInfo findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId);
     [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
@@ -81,7 +83,7 @@ public:
     QString getPreferredPrintingProviderId(const QString &cardName) const;
     bool isPreferredPrinting(const CardRef &cardRef) const;
 
-    [[nodiscard]] CardInfoPtr guessCard(const CardRef &cardRef) const;
+    [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
 
     /*
      * Get a card by its simple name. The name will be simplified in this
@@ -90,7 +92,6 @@ public:
     [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
 
     CardSetPtr getSet(const QString &setName);
-    static PrintingInfo getSetInfoForCard(const CardInfoPtr &_card);
     const CardNameMap &getCardList() const
     {
         return cards;
@@ -111,7 +112,6 @@ public:
 
 public slots:
     LoadStatus loadCardDatabases();
-    void refreshPreferredPrintings();
     void addCard(CardInfoPtr card);
     void addSet(CardSetPtr set);
 protected slots:

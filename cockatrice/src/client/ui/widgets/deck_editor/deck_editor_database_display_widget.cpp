@@ -15,11 +15,11 @@
 #include <QToolButton>
 #include <QTreeView>
 
-static bool canBeCommander(const CardInfoPtr &cardInfo)
+static bool canBeCommander(const CardInfo &cardInfo)
 {
-    return ((cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
-             cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive))) ||
-           cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
+    return (cardInfo.getCardType().contains("Legendary", Qt::CaseInsensitive) &&
+            cardInfo.getCardType().contains("Creature", Qt::CaseInsensitive)) ||
+           cardInfo.getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 
 DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeckEditor *parent)
@@ -136,42 +136,38 @@ void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
 void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     const QString cardName = current.sibling(current.row(), 0).data().toString();
-    const QString cardProviderID = CardDatabaseManager::getInstance()->getPreferredPrintingProviderId(cardName);
 
     if (!current.isValid()) {
         return;
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        CardInfoPtr card = CardDatabaseManager::getInstance()->getCard({cardName, cardProviderID});
-        if (!card) {
-            card = CardDatabaseManager::getInstance()->getCardInfo(cardName);
-        }
+        ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
         emit cardChanged(card);
     }
 }
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck()
 {
-    emit addCardToMainDeck(currentCardInfo());
+    emit addCardToMainDeck(currentCard());
 }
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
 {
-    emit addCardToSideboard(currentCardInfo());
+    emit addCardToSideboard(currentCard());
 }
 
 void DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck()
 {
-    emit decrementCardFromMainDeck(currentCardInfo());
+    emit decrementCardFromMainDeck(currentCard());
 }
 
 void DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard()
 {
-    emit decrementCardFromSideboard(currentCardInfo());
+    emit decrementCardFromSideboard(currentCard());
 }
 
-CardInfoPtr DeckEditorDatabaseDisplayWidget::currentCardInfo() const
+ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
 {
     const QModelIndex currentIndex = databaseView->selectionModel()->currentIndex();
     if (!currentIndex.isValid()) {
@@ -180,37 +176,37 @@ CardInfoPtr DeckEditorDatabaseDisplayWidget::currentCardInfo() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return CardDatabaseManager::getInstance()->getCardInfo(cardName);
+    return CardDatabaseManager::getInstance()->getCard({cardName});
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
 {
     QMenu menu;
-    const CardInfoPtr info = currentCardInfo();
+    ExactCard card = currentCard();
 
-    if (info) {
+    if (card) {
         // add to deck and sideboard options
         QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
-        if (canBeCommander(info)) {
+        if (canBeCommander(card.getInfo())) {
             edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
-                    [this, info] { deckEditor->getTabSupervisor()->addEdhrecTab(info, true); });
+                    [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr(), true); });
         }
         edhRecCard = menu.addAction(tr("Show on EDHRec (Card)"));
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-        connect(selectPrinting, &QAction::triggered, this, [this, info] { deckEditor->showPrintingSelector(); });
+        connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
         connect(edhRecCard, &QAction::triggered, this,
-                [this, info] { deckEditor->getTabSupervisor()->addEdhrecTab(info); });
+                [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr()); });
 
         // filling out the related cards submenu
         auto *relatedMenu = new QMenu(tr("Show Related cards"));
         menu.addMenu(relatedMenu);
-        auto relatedCards = info->getAllRelatedCards();
+        auto relatedCards = card.getInfo().getAllRelatedCards();
         if (relatedCards.isEmpty()) {
             relatedMenu->setDisabled(true);
         } else {

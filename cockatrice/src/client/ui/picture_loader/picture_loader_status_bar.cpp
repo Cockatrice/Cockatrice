@@ -38,7 +38,7 @@ void PictureLoaderStatusBar::cleanOldEntries()
     }
 }
 
-void PictureLoaderStatusBar::addQueuedImageLoad(const QUrl &url, const CardInfoPtr &card, const QString &setName)
+void PictureLoaderStatusBar::addQueuedImageLoad(const QUrl &url, const ExactCard &card, const QString &setName)
 {
     loadLog->addSettingsWidget(new PictureLoaderRequestStatusDisplayWidget(loadLog, url, card, setName));
     progressBar->setMaximum(progressBar->maximum() + 1);

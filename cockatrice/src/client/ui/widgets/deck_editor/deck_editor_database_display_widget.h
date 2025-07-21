@@ -22,16 +22,16 @@ public:
     CardDatabaseDisplayModel *databaseDisplayModel;
 
 public slots:
-    CardInfoPtr currentCardInfo() const;
+    ExactCard currentCard() const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();
 
 signals:
-    void addCardToMainDeck(CardInfoPtr card);
-    void addCardToSideboard(CardInfoPtr card);
-    void decrementCardFromMainDeck(CardInfoPtr card);
-    void decrementCardFromSideboard(CardInfoPtr card);
-    void cardChanged(CardInfoPtr _card);
+    void addCardToMainDeck(const ExactCard &card);
+    void addCardToSideboard(const ExactCard &card);
+    void decrementCardFromMainDeck(const ExactCard &card);
+    void decrementCardFromSideboard(const ExactCard &card);
+    void cardChanged(const ExactCard &_card);
 
 private:
     KeySignals searchKeySignals;

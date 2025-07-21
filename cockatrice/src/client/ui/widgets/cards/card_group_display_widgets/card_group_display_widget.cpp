@@ -99,7 +99,7 @@ void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithText
     emit cardClicked(event, card);
 }
 
-void CardGroupDisplayWidget::onHover(CardInfoPtr card)
+void CardGroupDisplayWidget::onHover(const ExactCard &card)
 {
     emit cardHovered(card);
 }
