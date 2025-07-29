@@ -234,4 +234,5 @@ void PictureLoaderWorker::cleanStaleEntries()
 void PictureLoaderWorker::clearNetworkCache()
 {
     networkManager->cache()->clear();
+    redirectCache.clear();
 }
