@@ -417,6 +417,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aCreateAnotherToken, &QAction::triggered, this, &Player::actCreateAnotherToken);
         aCreateAnotherToken->setEnabled(false);
 
+        aIncrementAllCardCountersOnTable = new QAction(this);
+        connect(aIncrementAllCardCountersOnTable, &QAction::triggered, this, &Player::incrementAllCardCountersOnTable);
+
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
 
@@ -424,6 +427,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
+        playerMenu->addAction(aIncrementAllCardCountersOnTable);
         playerMenu->addSeparator();
         playerMenu->addAction(aUntapAll);
         playerMenu->addSeparator();
@@ -465,6 +469,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
         mCardCounters = nullptr;
+        aIncrementAllCardCountersOnTable = nullptr;
     }
 
     aTap = new QAction(this);
@@ -910,6 +915,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
+    aIncrementAllCardCountersOnTable->setText(tr("Increment all counters on permanents you control"));
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
@@ -997,7 +1003,8 @@ void Player::setShortcutsActive()
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
     }
-
+    aIncrementAllCardCountersOnTable->setShortcut(
+        shortcuts.getSingleShortcut("Player/aIncrementAllCardCountersOnTable"));
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
     aViewHand->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
@@ -1084,6 +1091,7 @@ void Player::setShortcutsInactive()
     aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
     aMoveBottomCardToExile->setShortcut(QKeySequence());
     aMoveBottomCardsToExile->setShortcut(QKeySequence());
+    aIncrementAllCardCountersOnTable->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext()) {
