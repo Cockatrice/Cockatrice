@@ -29,7 +29,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
       databaseDisplayModel(database_display_model)
 {
-    cards = new QList<CardInfoPtr>;
+    cards = new QList<ExactCard>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);
 
@@ -183,12 +183,12 @@ void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWit
     emit cardClickedDatabaseDisplay(event, instance);
 }
 
-void VisualDatabaseDisplayWidget::onHover(const CardInfoPtr &hoveredCard)
+void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
 {
     emit cardHoveredDatabaseDisplay(hoveredCard);
 }
 
-void VisualDatabaseDisplayWidget::addCard(const CardInfoPtr &cardToAdd)
+void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
 {
     cards->append(cardToAdd);
     auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
@@ -233,11 +233,11 @@ void VisualDatabaseDisplayWidget::populateCards()
                 SetToPrintingsMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(CardDatabaseManager::getInstance()->getCard({name.toString(), printing.getUuid()}));
+                        addCard(ExactCard(info, printing));
                     }
                 }
             } else {
-                addCard(info);
+                addCard(CardDatabaseManager::getInstance()->getPreferredCard(info));
             }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
@@ -298,11 +298,11 @@ void VisualDatabaseDisplayWidget::loadNextPage()
                 SetToPrintingsMap setMap = info->getSets();
                 if (setMap.contains(setFilter->term())) {
                     for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(CardDatabaseManager::getInstance()->getCard({name.toString(), printing.getUuid()}));
+                        addCard(ExactCard(info, printing));
                     }
                 }
             } else {
-                addCard(info);
+                addCard(CardDatabaseManager::getInstance()->getPreferredCard(info));
             }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card " << name.toString() << " not found in database!";
@@ -335,7 +335,9 @@ void VisualDatabaseDisplayWidget::sortCardList(const QStringList &properties,
                                                Qt::SortOrder order = Qt::AscendingOrder) const
 {
     CardInfoComparator comparator(properties, order);
-    std::sort(cards->begin(), cards->end(), comparator);
+    std::sort(cards->begin(), cards->end(), [comparator](const ExactCard &a, const ExactCard &b) {
+        return comparator(a.getCardPtr(), b.getCardPtr());
+    });
 }
 
 void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)

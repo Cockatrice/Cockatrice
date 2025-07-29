@@ -31,13 +31,12 @@ private:
     PictureLoaderStatusBar *statusBar;
 
 public:
-    static void getPixmap(QPixmap &pixmap, CardInfoPtr card, QSize size);
+    static void getPixmap(QPixmap &pixmap, const ExactCard &card, QSize size);
     static void getCardBackPixmap(QPixmap &pixmap, QSize size);
     static void getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize size);
     static void getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size);
-    static void clearPixmapCache(CardInfoPtr card);
     static void clearPixmapCache();
-    static void cacheCardPixmaps(QList<CardInfoPtr> cards);
+    static void cacheCardPixmaps(const QList<ExactCard> &cards);
     static bool hasCustomArt();
 
 public slots:
@@ -48,6 +47,6 @@ private slots:
     void picsPathChanged();
 
 public slots:
-    void imageLoaded(CardInfoPtr card, const QImage &image);
+    void imageLoaded(const ExactCard &card, const QImage &image);
 };
 #endif

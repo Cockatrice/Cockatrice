@@ -1488,7 +1488,7 @@ void Player::moveOneCardUntil(CardItem *card)
 {
     moveTopCardTimer->stop();
 
-    const bool isMatch = card && movingCardsUntilFilter.check(card->getInfo());
+    const bool isMatch = card && movingCardsUntilFilter.check(card->getCard().getCardPtr());
 
     if (isMatch && movingCardsUntilAutoPlay) {
         // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
@@ -1849,12 +1849,12 @@ void Player::actCreateToken()
 
     lastTokenInfo = dlg.getTokenInfo();
 
-    CardInfoPtr correctedCard = CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name});
+    ExactCard correctedCard = CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name});
     if (correctedCard) {
-        lastTokenInfo.name = correctedCard->getName();
-        lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard->getTableRow());
+        lastTokenInfo.name = correctedCard.getName();
+        lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard.getInfo().getTableRow());
         if (lastTokenInfo.pt.isEmpty()) {
-            lastTokenInfo.pt = correctedCard->getPowTough();
+            lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
     }
 
@@ -1904,7 +1904,7 @@ void Player::actCreateRelatedCard()
     }
     auto *action = static_cast<QAction *>(sender());
     // If there is a better way of passing a CardRelation through a QAction, please add it here.
-    auto relatedCards = sourceCard->getInfo()->getAllRelatedCards();
+    auto relatedCards = sourceCard->getCardInfo().getAllRelatedCards();
     CardRelation *cardRelation = relatedCards.at(action->data().toInt());
 
     /*
@@ -1912,9 +1912,9 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        CardInfoPtr cardInfo =
+        ExactCard cardInfo =
             CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), sourceCard->getProviderId()});
-        setLastToken(cardInfo);
+        setLastToken(cardInfo.getCardPtr());
     }
 }
 
@@ -1925,7 +1925,7 @@ void Player::actCreateAllRelatedCards()
         return;
     }
 
-    auto relatedCards = sourceCard->getInfo()->getAllRelatedCards();
+    auto relatedCards = sourceCard->getCardInfo().getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
@@ -2259,9 +2259,9 @@ void Player::eventCreateToken(const Event_CreateToken &event)
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
     } else if (!event.face_down()) {
-        CardInfoPtr dbCard = card->getInfo();
+        ExactCard dbCard = card->getCard();
         if (dbCard) {
-            card->setPT(dbCard->getPowTough());
+            card->setPT(dbCard.getInfo().getPowTough());
         }
     }
     card->setColor(QString::fromStdString(event.color()));
@@ -2895,12 +2895,14 @@ void Player::playCard(CardItem *card, bool faceDown)
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(card->getId());
 
-    CardInfoPtr info = card->getInfo();
-    if (!info) {
+    ExactCard exactCard = card->getCard();
+    if (!exactCard) {
         return;
     }
 
-    int tableRow = info->getTableRow();
+    const CardInfo &info = exactCard.getInfo();
+
+    int tableRow = info.getTableRow();
     bool playToStack = SettingsCache::instance().getPlayToStack();
     QString currentZone = card->getZone()->getName();
     if (currentZone == "stack" && tableRow == 3) {
@@ -2913,13 +2915,13 @@ void Player::playCard(CardItem *card, bool faceDown)
         cmd.set_x(-1);
         cmd.set_y(0);
     } else {
-        tableRow = faceDown ? 2 : info->getTableRow();
+        tableRow = faceDown ? 2 : info.getTableRow();
         QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         if (!faceDown) {
-            cardToMove->set_pt(info->getPowTough().toStdString());
+            cardToMove->set_pt(info.getPowTough().toStdString());
         }
-        cardToMove->set_tapped(!faceDown && info->getCipt());
+        cardToMove->set_tapped(!faceDown && info.getCipt());
         if (tableRow != 3)
             cmd.set_target_zone("table");
         cmd.set_x(gridPoint.x());
@@ -2945,12 +2947,14 @@ void Player::playCardToTable(const CardItem *card, bool faceDown)
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(card->getId());
 
-    CardInfoPtr info = card->getInfo();
-    if (!info) {
+    ExactCard exactCard = card->getCard();
+    if (!exactCard) {
         return;
     }
 
-    int tableRow = faceDown ? 2 : info->getTableRow();
+    const CardInfo &info = exactCard.getInfo();
+
+    int tableRow = faceDown ? 2 : info.getTableRow();
     // default instant/sorcery cards to the noncreatures row
     if (tableRow > 2) {
         tableRow = 1;
@@ -2959,9 +2963,9 @@ void Player::playCardToTable(const CardItem *card, bool faceDown)
     QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
     cardToMove->set_face_down(faceDown);
     if (!faceDown) {
-        cardToMove->set_pt(info->getPowTough().toStdString());
+        cardToMove->set_pt(info.getPowTough().toStdString());
     }
-    cardToMove->set_tapped(!faceDown && info->getCipt());
+    cardToMove->set_tapped(!faceDown && info.getCipt());
     cmd.set_target_zone("table");
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
@@ -3280,9 +3284,9 @@ void Player::cardMenuAction()
                     cmd->set_card_id(card->getId());
                     cmd->set_face_down(!card->getFaceDown());
                     if (card->getFaceDown()) {
-                        CardInfoPtr ci = card->getInfo();
-                        if (ci) {
-                            cmd->set_pt(ci->getPowTough().toStdString());
+                        ExactCard ec = card->getCard();
+                        if (ec) {
+                            cmd->set_pt(ec.getInfo().getPowTough().toStdString());
                         }
                     }
                     commandList.append(cmd);
@@ -3468,9 +3472,9 @@ void Player::actResetPT()
         auto *card = static_cast<CardItem *>(item);
         QString ptString;
         if (!card->getFaceDown()) { // leave the pt empty if the card is face down
-            CardInfoPtr info = card->getInfo();
-            if (info) {
-                ptString = info->getPowTough();
+            ExactCard ec = card->getCard();
+            if (ec) {
+                ptString = ec.getInfo().getPowTough();
             }
         }
         if (ptString == card->getPT()) {
@@ -4077,13 +4081,13 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
     if (!card || !cardMenu) {
         return;
     }
-    auto cardInfo = card->getInfo();
-    if (!cardInfo) {
+    auto exactCard = card->getCard();
+    if (!exactCard) {
         return;
     }
 
     bool atLeastOneGoodRelationFound = false;
-    QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
+    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
         CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
         if (relatedCard != nullptr) {
@@ -4096,17 +4100,14 @@ void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         return;
     }
 
-    const auto &currentCardSet = CardDatabase::getSetInfoForCard(cardInfo);
-
     cardMenu->addSeparator();
     auto viewRelatedCards = new QMenu(tr("View related cards"));
     cardMenu->addMenu(viewRelatedCards);
     for (const CardRelation *relatedCard : relatedCards) {
         QString relatedCardName = relatedCard->getName();
+        CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, game, [this, relatedCardName, currentCardSet] {
-            game->viewCardInfo({relatedCardName, currentCardSet.getUuid()});
-        });
+        connect(viewCard, &QAction::triggered, game, [this, cardRef] { game->viewCardInfo(cardRef); });
     }
 }
 
@@ -4115,36 +4116,34 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     if (!card || !cardMenu) {
         return;
     }
-    auto cardInfo = card->getInfo();
-    if (!cardInfo) {
+    auto exactCard = card->getCard();
+    if (!exactCard) {
         return;
     }
 
-    QList<CardRelation *> relatedCards = cardInfo->getAllRelatedCards();
+    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
-
-    const auto &currentCardSet = CardDatabase::getSetInfoForCard(cardInfo);
 
     cardMenu->addSeparator();
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard =
-            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), currentCardSet.getUuid()});
-        if (relatedCard == nullptr) {
-            relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
+        ExactCard relatedCard =
+            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), exactCard.getPrinting().getUuid()});
+        if (!relatedCard) {
+            relatedCard = CardDatabaseManager::getInstance()->getCard({cardRelation->getName()});
         }
-        if (relatedCard == nullptr) {
+        if (!relatedCard) {
             continue;
         }
 
         QString relatedCardName;
-        if (relatedCard->getPowTough().size() > 0) {
-            relatedCardName = relatedCard->getPowTough() + " " + relatedCard->getName(); // "n/n name"
+        if (relatedCard.getInfo().getPowTough().size() > 0) {
+            relatedCardName = relatedCard.getInfo().getPowTough() + " " + relatedCard.getName(); // "n/n name"
         } else {
-            relatedCardName = relatedCard->getName(); // "name"
+            relatedCardName = relatedCard.getName(); // "name"
         }
 
         QString text = tr("Token: ");

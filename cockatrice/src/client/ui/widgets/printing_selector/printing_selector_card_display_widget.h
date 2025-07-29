@@ -20,8 +20,7 @@ public:
                                       DeckListModel *_deckModel,
                                       QTreeView *_deckView,
                                       QSlider *_cardSizeSlider,
-                                      CardInfoPtr _rootCard,
-                                      const PrintingInfo &_printingInfo,
+                                      const ExactCard &_rootCard,
                                       QString &_currentZone);
 
 public slots:
@@ -37,9 +36,7 @@ private:
     DeckListModel *deckModel;
     QTreeView *deckView;
     QSlider *cardSizeSlider;
-    CardInfoPtr rootCard;
-    CardInfoPtr setCard;
-    PrintingInfo printingInfo;
+    ExactCard rootCard;
     QString currentZone;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };

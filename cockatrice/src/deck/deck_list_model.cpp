@@ -367,36 +367,40 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
 
 QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    return addCard(cardName, CardDatabaseManager::getInstance()->getPreferredPrinting(cardName), zoneName, abAddAnyway);
-}
+    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
 
-QModelIndex DeckListModel::addCard(const QString &cardName,
-                                   const PrintingInfo &printingInfo,
-                                   const QString &zoneName,
-                                   bool abAddAnyway)
-{
-    CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCard({cardName, printingInfo.getUuid()});
-
-    if (cardInfo == nullptr) {
+    if (!card) {
         if (abAddAnyway) {
             // We need to keep this card added no matter what
             // This is usually called from tab_deck_editor
             // So we'll create a new CardInfo with the name
             // and default values for all fields
-            cardInfo = CardInfo::newInstance(cardName);
+            card = ExactCard(CardInfo::newInstance(cardName));
         } else {
             return {};
         }
     }
 
+    return addCard(card, zoneName);
+}
+
+QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneName)
+{
+    if (!card) {
+        return {};
+    }
+
     InnerDecklistNode *zoneNode = createNodeIfNeeded(zoneName, root);
+
+    CardInfoPtr cardInfo = card.getCardPtr();
+    PrintingInfo printingInfo = card.getPrinting();
 
     QString groupCriteria = getGroupCriteriaForCard(cardInfo);
     InnerDecklistNode *groupNode = createNodeIfNeeded(groupCriteria, zoneNode);
 
     const QModelIndex parentIndex = nodeToIndex(groupNode);
     auto *cardNode = dynamic_cast<DecklistModelCardNode *>(groupNode->findCardChildByNameProviderIdAndNumber(
-        cardName, printingInfo.getUuid(), printingInfo.getProperty("num")));
+        card.getName(), printingInfo.getUuid(), printingInfo.getProperty("num")));
     const auto cardSetName = printingInfo.getSet().isNull() ? "" : printingInfo.getSet()->getCorrectedShortName();
 
     if (!cardNode) {
@@ -538,9 +542,9 @@ void DeckListModel::setDeckList(DeckLoader *_deck)
     rebuildTree();
 }
 
-QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
+QList<ExactCard> DeckListModel::getCards() const
 {
-    QList<CardInfoPtr> cards;
+    QList<ExactCard> cards;
     DeckList *decklist = getDeckList();
     if (!decklist) {
         return cards;
@@ -558,9 +562,9 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
-                if (info) {
-                    cards.append(info);
+                ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                if (card) {
+                    cards.append(card);
                 } else {
                     qDebug() << "Card not found in database!";
                 }
@@ -570,9 +574,9 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrs() const
     return cards;
 }
 
-QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName) const
+QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
 {
-    QList<CardInfoPtr> cards;
+    QList<ExactCard> cards;
     DeckList *decklist = getDeckList();
     if (!decklist) {
         return cards;
@@ -591,9 +595,9 @@ QList<CardInfoPtr> DeckListModel::getCardsAsCardInfoPtrsForZone(QString zoneName
                 if (!currentCard)
                     continue;
                 for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
-                    if (info) {
-                        cards.append(info);
+                    ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                    if (card) {
+                        cards.append(card);
                     } else {
                         qDebug() << "Card not found in database!";
                     }

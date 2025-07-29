@@ -16,17 +16,15 @@
  * @param deckView Pointer to the QTreeView for the deck display.
  * @param cardSizeSlider Pointer to the QSlider used for dynamic font resizing.
  * @param rootCard The root card for the widget.
- * @param printingInfo The printing information for the card.
  */
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    AbstractTabDeckEditor *deckEditor,
                                                    DeckListModel *deckModel,
                                                    QTreeView *deckView,
                                                    QSlider *cardSizeSlider,
-                                                   CardInfoPtr rootCard,
-                                                   PrintingInfo printingInfo)
+                                                   const ExactCard &rootCard)
     : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard), printingInfo(printingInfo)
+      rootCard(rootCard)
 {
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignHCenter);
@@ -35,11 +33,11 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     setContentsMargins(5, 5, 5, 5); // Padding around the text
 
     zoneLabelMainboard = new ShadowBackgroundLabel(this, tr("Mainboard"));
-    buttonBoxMainboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
-                                              printingInfo, DECK_ZONE_MAIN);
+    buttonBoxMainboard =
+        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
-    buttonBoxSideboard = new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard,
-                                              printingInfo, DECK_ZONE_SIDE);
+    buttonBoxSideboard =
+        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, DECK_ZONE_SIDE);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);

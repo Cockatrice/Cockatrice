@@ -10,6 +10,7 @@ set(dbconverter_SOURCES
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
     ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
     ../cockatrice/src/game/cards/card_info.cpp
+    ../cockatrice/src/game/cards/exact_card.cpp
     ../cockatrice/src/settings/settings_manager.cpp
     ${VERSION_STRING_CPP}
 )

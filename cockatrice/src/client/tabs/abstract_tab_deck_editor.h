@@ -71,11 +71,11 @@ public:
 public slots:
     virtual void onDeckChanged();
     virtual void onDeckModified();
-    void updateCard(CardInfoPtr _card);
-    void actAddCard(CardInfoPtr info);
-    void actAddCardToSideboard(CardInfoPtr info);
-    void actDecrementCard(CardInfoPtr info);
-    void actDecrementCardFromSideboard(CardInfoPtr info);
+    void updateCard(const ExactCard &card);
+    void actAddCard(const ExactCard &card);
+    void actAddCardToSideboard(const ExactCard &card);
+    void actDecrementCard(const ExactCard &card);
+    void actDecrementCardFromSideboard(const ExactCard &card);
     void actOpenRecent(const QString &fileName);
     void filterTreeChanged(FilterTree *filterTree);
     void closeRequest(bool forced = false) override;
@@ -85,7 +85,7 @@ public slots:
 signals:
     void openDeckEditor(const DeckLoader *deckLoader);
     void deckEditorClosing(AbstractTabDeckEditor *tab);
-    void decrementCard(CardInfoPtr card, QString zoneName);
+    void decrementCard(const ExactCard &card, QString zoneName);
 
 protected slots:
     // Deck Operations
@@ -142,8 +142,8 @@ protected:
     bool isBlankNewDeck() const;
 
     // Helper functions for card actions
-    void addCardHelper(CardInfoPtr info, QString zoneName);
-    void actSwapCard(CardInfoPtr info, QString zoneName);
+    void addCardHelper(const ExactCard &card, QString zoneName);
+    void actSwapCard(const ExactCard &card, const QString &zoneName);
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
     // UI Menu Elements

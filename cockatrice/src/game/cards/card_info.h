@@ -148,7 +148,7 @@ public:
 class PrintingInfo
 {
 public:
-    explicit PrintingInfo(const CardSetPtr &_set = QSharedPointer<CardSet>(nullptr));
+    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
     ~PrintingInfo() = default;
 
     bool operator==(const PrintingInfo &other) const
@@ -191,8 +191,6 @@ private:
     QString name;
     // The name without punctuation or capitalization, for better card name recognition.
     QString simpleName;
-    // The key used to identify this card in the cache
-    QString pixmapCacheKey;
     // card text
     QString text;
     // whether this is not a "real" card but a token
@@ -228,14 +226,13 @@ public:
                       int _tableRow,
                       bool _upsideDownArt);
     CardInfo(const CardInfo &other)
-        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), pixmapCacheKey(other.pixmapCacheKey),
-          text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
+        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
+          isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), setsNames(other.setsNames), cipt(other.cipt),
           landscapeOrientation(other.landscapeOrientation), tableRow(other.tableRow), upsideDownArt(other.upsideDownArt)
     {
     }
-    ~CardInfo() override;
 
     static CardInfoPtr newInstance(const QString &_name);
 
@@ -272,14 +269,6 @@ public:
     const QString &getSimpleName() const
     {
         return simpleName;
-    }
-    void setPixmapCacheKey(QString _pixmapCacheKey)
-    {
-        pixmapCacheKey = _pixmapCacheKey;
-    }
-    const QString &getPixmapCacheKey() const
-    {
-        return pixmapCacheKey;
     }
 
     const QString &getText() const
@@ -320,20 +309,6 @@ public:
     const QString &getSetsNames() const
     {
         return setsNames;
-    }
-    QString getSetProperty(const QString &setName, const QString &propertyName) const
-    {
-        if (!setsToPrintings.contains(setName))
-            return "";
-
-        for (const auto &set : setsToPrintings[setName]) {
-            if (QLatin1String("card_") + this->getName() + QString("_") + QString(set.getProperty("uuid")) ==
-                this->getPixmapCacheKey()) {
-                return set.getProperty(propertyName);
-            }
-        }
-
-        return setsToPrintings[setName][0].getProperty(propertyName);
     }
 
     // related cards
@@ -397,18 +372,9 @@ public:
     const QString getPowTough() const;
     void setPowTough(const QString &value);
 
-    // methods using per-set properties
-    QString getCustomPicURL(const QString &set) const
-    {
-        return getSetProperty(set, "picurl");
-    }
     QString getCorrectedName() const;
     void addToSet(const CardSetPtr &_set, PrintingInfo _info = PrintingInfo());
     void combineLegalities(const QVariantHash &props);
-    void emitPixmapUpdated()
-    {
-        emit pixmapUpdated();
-    }
     void refreshCachedSetNames();
 
     /**
@@ -418,7 +384,11 @@ public:
     static QString simplifyName(const QString &name);
 
 signals:
-    void pixmapUpdated();
+    /**
+     * Emit this when a pixmap for this card finishes loading.
+     * @param printing The specific printing the pixmap is for.
+     */
+    void pixmapUpdated(const PrintingInfo &printing);
     void cardInfoChanged(CardInfoPtr card);
 };
 

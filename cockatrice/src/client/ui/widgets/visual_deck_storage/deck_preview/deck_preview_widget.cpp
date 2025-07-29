@@ -75,7 +75,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
         return;
     }
     auto bannerCard = deckLoader->getBannerCard().name.isEmpty()
-                          ? CardInfoPtr()
+                          ? ExactCard()
                           : CardDatabaseManager::getInstance()->getCard(deckLoader->getBannerCard());
 
     bannerCardDisplayWidget->setCard(bannerCard);

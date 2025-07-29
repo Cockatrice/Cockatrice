@@ -31,7 +31,7 @@ public:
     explicit PictureLoaderWorker();
     ~PictureLoaderWorker() override;
 
-    void enqueueImageLoad(const CardInfoPtr &card);                      // Starts a thread for the image to be loaded
+    void enqueueImageLoad(const ExactCard &card);                        // Starts a thread for the image to be loaded
     void queueRequest(const QUrl &url, PictureLoaderWorkerWork *worker); // Queues network requests for load threads
     void clearNetworkCache();
 
@@ -39,7 +39,7 @@ public slots:
     QNetworkReply *makeRequest(const QUrl &url, PictureLoaderWorkerWork *workThread);
     void processQueuedRequests();
     bool processSingleRequest();
-    void handleImageLoaded(const CardInfoPtr &card, const QImage &image);
+    void handleImageLoaded(const ExactCard &card, const QImage &image);
     void cacheRedirect(const QUrl &originalUrl, const QUrl &redirectUrl);
     void removedCachedUrl(const QUrl &url);
 
@@ -57,7 +57,7 @@ private:
     QTimer requestTimer; // Timer for refreshing request quota
 
     PictureLoaderLocal *localLoader;
-    QSet<CardInfoPtr> currentlyLoading; // for deduplication purposes
+    QSet<QString> currentlyLoading; // for deduplication purposes. Contains pixmapCacheKey
 
     QUrl getCachedRedirect(const QUrl &originalUrl) const;
     void loadRedirectCache();
@@ -66,12 +66,12 @@ private:
 
 private slots:
     void resetRequestQuota();
-    void handleImageLoadEnqueued(const CardInfoPtr &card);
+    void handleImageLoadEnqueued(const ExactCard &card);
 
 signals:
-    void imageLoadEnqueued(const CardInfoPtr &card);
-    void imageLoaded(CardInfoPtr card, const QImage &image);
-    void imageRequestQueued(const QUrl &url, const CardInfoPtr &card, const QString &setName);
+    void imageLoadEnqueued(const ExactCard &card);
+    void imageLoaded(const ExactCard &card, const QImage &image);
+    void imageRequestQueued(const QUrl &url, const ExactCard &card, const QString &setName);
     void imageRequestSucceeded(const QUrl &url);
 };
 

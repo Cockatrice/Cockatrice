@@ -38,7 +38,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
     layout->addWidget(cardSizeWidget);
 
-    for (CardInfoPtr card : getRandomCards(handSizeSpinBox->value())) {
+    for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
@@ -64,7 +64,7 @@ void VisualDeckEditorSampleHandWidget::setDeckModel(DeckListModel *deckModel)
 void VisualDeckEditorSampleHandWidget::updateDisplay()
 {
     flowWidget->clearLayout();
-    for (CardInfoPtr card : getRandomCards(handSizeSpinBox->value())) {
+    for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
@@ -74,10 +74,10 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     }
 }
 
-QList<CardInfoPtr> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
+QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
-    QList<CardInfoPtr> mainDeckCards;
-    QList<CardInfoPtr> randomCards;
+    QList<ExactCard> mainDeckCards;
+    QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
     DeckList *decklist = deckListModel->getDeckList();
@@ -101,9 +101,9 @@ QList<CardInfoPtr> VisualDeckEditorSampleHandWidget::getRandomCards(int amountTo
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
-                if (info) {
-                    mainDeckCards.append(info);
+                ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                if (card) {
+                    mainDeckCards.append(card);
                 }
             }
         }
@@ -124,7 +124,7 @@ QList<CardInfoPtr> VisualDeckEditorSampleHandWidget::getRandomCards(int amountTo
     }
 
     std::sort(randomCards.begin(), randomCards.end(),
-              [](const CardInfoPtr &a, const CardInfoPtr &b) { return a->getCmc() < b->getCmc(); });
+              [](const ExactCard &a, const ExactCard &b) { return a.getInfo().getCmc() < b.getInfo().getCmc(); });
 
     return randomCards;
 }
