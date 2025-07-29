@@ -3038,6 +3038,24 @@ void Player::clearCounters()
     counters.clear();
 }
 
+void Player::incrementAllCardCountersOnTable()
+{
+    // Get all cards on the table
+    const CardList &tableCards = table->getCards();
+
+    for (CardItem *card : tableCards) {
+        // Get all counters on this card
+        const QMap<int, int> &cardCounters = card->getCounters();
+
+        // Increment each existing counter by 1
+        for (auto it = cardCounters.begin(); it != cardCounters.end(); ++it) {
+            int counterId = it.key();
+            int currentValue = it.value();
+            card->setCounter(counterId, currentValue + 1);
+        }
+    }
+}
+
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
 {
     const QMap<int, Player *> &playerList = game->getPlayers();

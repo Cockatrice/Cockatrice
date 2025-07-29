@@ -420,6 +420,7 @@ public:
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
+    void incrementAllCardCountersOnTable();
 
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
