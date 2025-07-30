@@ -915,7 +915,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
-    aIncrementAllCardCountersOnTable->setText(tr("Increment all counters on permanents you control"));
+    aIncrementAllCardCountersOnTable->setText(tr("Increment all counters"));
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));

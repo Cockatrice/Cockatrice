@@ -414,7 +414,7 @@ private:
                                                  parseSequenceString("Ctrl+\\"),
                                                  ShortcutGroup::Player_Counters)},
         {"Player/aIncrementAllCardCountersOnTable",
-         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Increment All Counters"),
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Increment all counters"),
                      parseSequenceString("Ctrl+Shift+A"),
                      ShortcutGroup::Playing_Area)},
         {"Player/aIncP", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Add Power (+1/+0)"),
