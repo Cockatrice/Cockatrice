@@ -210,6 +210,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aViewLibrary, &QAction::triggered, this, &Player::actViewLibrary);
         aViewHand = new QAction(this);
         connect(aViewHand, &QAction::triggered, this, &Player::actViewHand);
+        aSortHand = new QAction(this);
+        connect(aSortHand, &QAction::triggered, this, &Player::actSortHand);
 
         aViewTopCards = new QAction(this);
         connect(aViewTopCards, &QAction::triggered, this, &Player::actViewTopCards);
@@ -298,6 +300,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     if (local || judge) {
         handMenu = playerMenu->addTearOffMenu(QString());
         handMenu->addAction(aViewHand);
+        handMenu->addAction(aSortHand);
         playerLists.append(mRevealHand = handMenu->addMenu(QString()));
         playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));
         handMenu->addSeparator();
@@ -791,6 +794,7 @@ void Player::retranslateUi()
 
         aViewLibrary->setText(tr("&View library"));
         aViewHand->setText(tr("&View hand"));
+        aSortHand->setText(tr("&Sort hand"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         aViewBottomCards->setText(tr("View bottom cards of library..."));
         mRevealLibrary->setTitle(tr("Reveal &library to..."));
@@ -954,6 +958,7 @@ void Player::setShortcutsActive()
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
     aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
+    aSortHand->setShortcut(shortcuts.getSingleShortcut("Player/aSortHand"));
 
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
@@ -1084,6 +1089,7 @@ void Player::setShortcutsInactive()
     aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
     aMoveBottomCardToExile->setShortcut(QKeySequence());
     aMoveBottomCardsToExile->setShortcut(QKeySequence());
+    aSortHand->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext()) {
@@ -1152,6 +1158,11 @@ void Player::actViewLibrary()
 void Player::actViewHand()
 {
     static_cast<GameScene *>(scene())->toggleZoneView(this, "hand", -1);
+}
+
+void Player::actSortHand()
+{
+    hand->sortHand();
 }
 
 void Player::actViewTopCards()
