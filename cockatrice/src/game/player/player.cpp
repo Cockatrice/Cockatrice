@@ -427,7 +427,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
-        playerMenu->addAction(aIncrementAllCardCountersOnTable);
+        countersMenu->addAction(aIncrementAllCardCountersOnTable);
         playerMenu->addSeparator();
         playerMenu->addAction(aUntapAll);
         playerMenu->addSeparator();
@@ -469,7 +469,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
         mCardCounters = nullptr;
-        aIncrementAllCardCountersOnTable = nullptr;
     }
 
     aTap = new QAction(this);
