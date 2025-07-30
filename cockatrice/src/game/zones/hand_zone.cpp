@@ -127,6 +127,15 @@ void HandZone::reorganizeCards()
     update();
 }
 
+void HandZone::sortHand()
+{
+    if (cards.isEmpty()) {
+        return;
+    }
+    cards.sortBy({CardList::SortByType, CardList::SortByName});
+    reorganizeCards();
+}
+
 void HandZone::setWidth(qreal _width)
 {
     if (SettingsCache::instance().getHorizontalHand()) {
