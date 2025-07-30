@@ -652,22 +652,7 @@ void Server_Game::setActivePlayer(int _activePlayer)
 void Server_Game::setActivePhase(int _activePhase)
 {
     QMutexLocker locker(&gameMutex);
-
-    for (Server_Player *player : players.values()) {
-        QList<Server_Arrow *> toDelete = player->getArrows().values();
-        for (int i = 0; i < toDelete.size(); ++i) {
-            Server_Arrow *a = toDelete[i];
-
-            Event_DeleteArrow event;
-            event.set_arrow_id(a->getId());
-            sendGameEventContainer(prepareGameEvent(event, player->getPlayerId()));
-
-            player->deleteArrow(a->getId());
-        }
-    }
-
     activePhase = _activePhase;
-
     Event_SetActivePhase event;
     event.set_phase(activePhase);
     sendGameEventContainer(prepareGameEvent(event, -1));
