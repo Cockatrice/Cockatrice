@@ -276,7 +276,7 @@ private:
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCountersOnTable;
+        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCounters;
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
@@ -420,7 +420,7 @@ public:
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
-    void incrementAllCardCountersOnTable();
+    void incrementAllCardCounters();
 
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
