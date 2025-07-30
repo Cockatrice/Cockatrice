@@ -417,8 +417,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aCreateAnotherToken, &QAction::triggered, this, &Player::actCreateAnotherToken);
         aCreateAnotherToken->setEnabled(false);
 
-        aIncrementAllCardCountersOnTable = new QAction(this);
-        connect(aIncrementAllCardCountersOnTable, &QAction::triggered, this, &Player::incrementAllCardCountersOnTable);
+        aIncrementAllCardCounters = new QAction(this);
+        connect(aIncrementAllCardCounters, &QAction::triggered, this, &Player::incrementAllCardCounters);
 
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
@@ -427,7 +427,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
-        countersMenu->addAction(aIncrementAllCardCountersOnTable);
+        playerMenu->addAction(aIncrementAllCardCounters);
         playerMenu->addSeparator();
         playerMenu->addAction(aUntapAll);
         playerMenu->addSeparator();
@@ -914,7 +914,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
-    aIncrementAllCardCountersOnTable->setText(tr("Increment all counters"));
+    aIncrementAllCardCounters->setText(tr("Increment all card counters"));
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
@@ -1002,8 +1002,7 @@ void Player::setShortcutsActive()
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
     }
-    aIncrementAllCardCountersOnTable->setShortcut(
-        shortcuts.getSingleShortcut("Player/aIncrementAllCardCountersOnTable"));
+    aIncrementAllCardCounters->setShortcut(shortcuts.getSingleShortcut("Player/aIncrementAllCardCounters"));
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
     aViewHand->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
@@ -1090,7 +1089,7 @@ void Player::setShortcutsInactive()
     aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
     aMoveBottomCardToExile->setShortcut(QKeySequence());
     aMoveBottomCardsToExile->setShortcut(QKeySequence());
-    aIncrementAllCardCountersOnTable->setShortcut(QKeySequence());
+    aIncrementAllCardCounters->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext()) {
@@ -3045,21 +3044,48 @@ void Player::clearCounters()
     counters.clear();
 }
 
-void Player::incrementAllCardCountersOnTable()
+void Player::incrementAllCardCounters()
 {
-    // Get all cards on the table
-    const CardList &tableCards = table->getCards();
+    QList<CardItem *> cardsToUpdate;
 
-    for (CardItem *card : tableCards) {
-        // Get all counters on this card
-        const QMap<int, int> &cardCounters = card->getCounters();
-
-        // Increment each existing counter by 1
-        for (auto it = cardCounters.begin(); it != cardCounters.end(); ++it) {
-            int counterId = it.key();
-            int currentValue = it.value();
-            card->setCounter(counterId, currentValue + 1);
+    auto selectedItems = scene()->selectedItems();
+    if (!selectedItems.isEmpty()) {
+        // If cards are selected, only update those
+        for (const auto &item : selectedItems) {
+            auto *card = static_cast<CardItem *>(item);
+            cardsToUpdate.append(card);
         }
+    } else {
+        // If no cards selected, update all cards on table
+        const CardList &tableCards = table->getCards();
+        cardsToUpdate = tableCards;
+    }
+
+    QList<const ::google::protobuf::Message *> commandList;
+
+    for (const auto *card : cardsToUpdate) {
+        const auto &cardCounters = card->getCounters();
+
+        QMapIterator<int, int> counterIterator(cardCounters);
+        while (counterIterator.hasNext()) {
+            counterIterator.next();
+            int counterId = counterIterator.key();
+            int currentValue = counterIterator.value();
+            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+                continue;
+            }
+
+            auto cmd = std::make_unique<Command_SetCardCounter>();
+            cmd->set_zone(card->getZone()->getName().toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_counter_id(counterId);
+            cmd->set_counter_value(currentValue + 1);
+            commandList.append(cmd.release());
+        }
+    }
+
+    if (!commandList.isEmpty()) {
+        sendGameCommand(prepareGameCommand(commandList));
     }
 }
 
