@@ -132,7 +132,7 @@ void HandZone::sortHand()
     if (cards.isEmpty()) {
         return;
     }
-    cards.sortBy({CardList::SortByMainType, CardList::SortByName});
+    cards.sortBy({CardList::SortByMainType, CardList::SortByManaValue, CardList::SortByColorGrouping});
     reorganizeCards();
 }
 
