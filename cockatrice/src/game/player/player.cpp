@@ -1002,7 +1002,7 @@ void Player::setShortcutsActive()
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
     }
-    aIncrementAllCardCounters->setShortcut(shortcuts.getSingleShortcut("Player/aIncrementAllCardCounters"));
+    aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
     aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
     aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
     aViewHand->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
