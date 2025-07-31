@@ -959,38 +959,11 @@ void Player::setShortcutsActive()
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
     aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
 
-    QList<QKeySequence> addCCShortCuts;
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCYellow"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCGreen"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCCyan"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCPurple"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCMagenta"));
-
-    QList<QKeySequence> removeCCShortCuts;
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCRed"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCYellow"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCGreen"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCCyan"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCPurple"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCMagenta"));
-
-    QList<QKeySequence> setCCShortCuts;
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCRed"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCYellow"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCGreen"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCCyan"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCPurple"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCMagenta"));
-
-    for (int i = 0; i < addCCShortCuts.size(); ++i) {
-        aAddCounter[i]->setShortcut(addCCShortCuts.at(i));
-    }
-    for (int i = 0; i < removeCCShortCuts.size(); ++i) {
-        aRemoveCounter[i]->setShortcut(removeCCShortCuts.at(i));
-    }
-    for (int i = 0; i < setCCShortCuts.size(); ++i) {
-        aSetCounter[i]->setShortcut(setCCShortCuts.at(i));
+    static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
+    for (int i = 0; i < aAddCounter.size(); i++) {
+        aAddCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aCC" + colorWords[i]));
+        aRemoveCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aRC" + colorWords[i]));
+        aSetCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aSC" + colorWords[i]));
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
