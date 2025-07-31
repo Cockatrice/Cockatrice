@@ -187,16 +187,26 @@ static void setupParserRules()
 
         return QString::fromStdString(std::string(sv.sv())).toLower();
     };
+
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+        // Extract common matching logic
+        auto createMatcher = [](const QString &target) -> std::function<bool(const QString &)> {
+            return [target](const QString &s) -> bool {
+                if (s.contains(target, Qt::CaseInsensitive)) {
+                    return true;
+                }
+                return s.split(" ").contains(target, Qt::CaseInsensitive);
+            };
+        };
+
         if (sv.choice() == 0) {
             const auto target = std::any_cast<QString>(sv[0]);
-            return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
+            return createMatcher(target);
         }
 
         const auto target = std::any_cast<QStringList>(sv[0]);
-        return [=](const QString &s) {
-            auto containsString = [&s](const QString &str) { return s.split(" ").contains(str, Qt::CaseInsensitive); };
-            return std::any_of(target.begin(), target.end(), containsString);
+        return [=](const QString &s) -> bool {
+            return std::any_of(target.begin(), target.end(), [&](const QString &str) { return createMatcher(str)(s); });
         };
     };
 
