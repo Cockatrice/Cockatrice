@@ -202,6 +202,9 @@ private slots:
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
 
+protected slots:
+    void closeEvent(QCloseEvent *event) override;
+
 public:
     TabGame(TabSupervisor *_tabSupervisor,
             QList<AbstractClient *> &_clients,
@@ -212,7 +215,7 @@ public:
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest(bool forced = false) override;
+    bool closeRequest() override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;

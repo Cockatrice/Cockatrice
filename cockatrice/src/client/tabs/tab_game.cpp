@@ -376,15 +376,19 @@ void TabGame::refreshShortcuts()
     }
 }
 
-void TabGame::closeRequest(bool forced)
+bool TabGame::closeRequest()
 {
-    if (!forced && !leaveGame()) {
-        return;
+    if (!leaveGame()) {
+        return false;
     }
 
-    emit gameClosing(this);
+    return close();
+}
 
-    close();
+void TabGame::closeEvent(QCloseEvent *event)
+{
+    emit gameClosing(this);
+    event->accept();
 }
 
 void TabGame::incrementGameTime()

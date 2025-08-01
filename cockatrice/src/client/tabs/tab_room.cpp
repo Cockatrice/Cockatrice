@@ -173,11 +173,11 @@ void TabRoom::actShowPopup(const QString &message)
     }
 }
 
-void TabRoom::closeRequest(bool /*forced*/)
+void TabRoom::closeEvent(QCloseEvent *event)
 {
     sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
     emit roomClosing(this);
-    close();
+    event->accept();
 }
 
 void TabRoom::tabActivated()

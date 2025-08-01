@@ -78,7 +78,7 @@ public slots:
     void actDecrementCardFromSideboard(const ExactCard &card);
     void actOpenRecent(const QString &fileName);
     void filterTreeChanged(FilterTree *filterTree);
-    void closeRequest(bool forced = false) override;
+    bool closeRequest() override;
     virtual void showPrintingSelector() = 0;
     virtual void dockTopLevelChanged(bool topLevel) = 0;
 
@@ -117,6 +117,7 @@ protected slots:
     virtual void freeDocksSize() = 0;
     virtual void refreshShortcuts() = 0;
 
+    void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
     virtual void dockVisibleTriggered() = 0;
     virtual void dockFloatingTriggered() = 0;

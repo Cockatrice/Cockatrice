@@ -549,6 +549,12 @@ void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
     databaseDisplayDockWidget->setFilterTree(filterTree);
 }
 
+void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
+{
+    emit deckEditorClosing(this);
+    event->accept();
+}
+
 // Method uses to sync docks state with menu items state
 bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
@@ -592,12 +598,11 @@ bool AbstractTabDeckEditor::confirmClose()
     return true;
 }
 
-void AbstractTabDeckEditor::closeRequest(bool forced)
+bool AbstractTabDeckEditor::closeRequest()
 {
-    if (!forced && !confirmClose()) {
-        return;
+    if (!confirmClose()) {
+        return false;
     }
 
-    emit deckEditorClosing(this);
-    close();
+    return close();
 }
