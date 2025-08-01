@@ -47,7 +47,6 @@ public:
                const ServerInfo_User &_otherUserInfo);
     ~TabMessage() override;
     void retranslateUi() override;
-    bool closeRequest() override;
     void tabActivated() override;
     QString getUserName() const;
     QString getTabText() const override;

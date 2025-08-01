@@ -39,7 +39,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     vbox->addWidget(sayEdit);
 
     aLeave = new QAction(this);
-    connect(aLeave, &QAction::triggered, this, [this] { closeRequest(); });
+    connect(aLeave, &QAction::triggered, this, &TabMessage::closeRequest);
 
     messageMenu = new QMenu(this);
     messageMenu->addAction(aLeave);
@@ -84,11 +84,6 @@ QString TabMessage::getUserName() const
 QString TabMessage::getTabText() const
 {
     return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
-}
-
-bool TabMessage::closeRequest()
-{
-    return close();
 }
 
 void TabMessage::closeEvent(QCloseEvent *event)

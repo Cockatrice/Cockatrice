@@ -364,7 +364,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager
         // If managed, all close requests should go through the menu action
         connect(closeButton, &CloseButton::clicked, this, [manager] { checkAndTrigger(manager, false); });
     } else {
-        connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
+        connect(closeButton, &CloseButton::clicked, tab, &Tab::closeRequest);
     }
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
