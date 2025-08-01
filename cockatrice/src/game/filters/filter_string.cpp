@@ -206,7 +206,8 @@ static void setupParserRules()
 
         const auto target = std::any_cast<QStringList>(sv[0]);
         return [=](const QString &s) -> bool {
-            return std::any_of(target.begin(), target.end(), [&](const QString &str) { return createMatcher(str)(s); });
+            auto containsString = [&](const QString &str) { return createMatcher(str)(s); };
+            return std::any_of(target.begin(), target.end(), containsString);
         };
     };
 
