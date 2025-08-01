@@ -21,12 +21,14 @@ protected:
         cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
         notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead");
         truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth");
+        doctor = CardDatabaseManager::getInstance()->getCardBySimpleName("Doctor");
     }
     // void TearDown() override {}
 
     CardData cat;
     CardData notDeadAfterAll;
     CardData truth;
+    CardData doctor;
 };
 
 QUERY(Empty, cat, "", true)
@@ -34,6 +36,9 @@ QUERY(Typing, cat, "t", true)
 
 QUERY(NonMatchingType, cat, "t:kithkin", false)
 QUERY(MatchingType, cat, "t:creature", true)
+QUERY(MatchingCreatureType, cat, "t:cat", true)
+QUERY(PartialMatchingType, cat, "t:ca", false)
+QUERY(MatchingMultiWordType, doctor, "t:\"Time Lord\"", true)
 QUERY(Not1, cat, "NOT t:kithkin", true)
 QUERY(Not2, cat, "NOT t:creature", false)
 QUERY(NonKeyword1, cat, "not t:kithkin", false)
