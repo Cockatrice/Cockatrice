@@ -182,7 +182,16 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
 
 TabSupervisor::~TabSupervisor()
 {
-    stop();
+    // Note: this used to call stop(), but stop() is doing a bunch of stuff including emitting some signals,
+    // and we don't want to do that in a destructor.
+
+    for (auto &localClient : localClients) {
+        localClient->deleteLater();
+    }
+    localClients.clear();
+
+    delete userInfo;
+    userInfo = nullptr;
 }
 
 void TabSupervisor::retranslateUi()
@@ -267,26 +276,6 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
         if (!tab->confirmClose()) {
             event->ignore();
         }
-    }
-
-    // Close the game tabs in order to make sure they store their layout.
-    QSet<int> gameTabsToRemove;
-    for (auto it = gameTabs.begin(), end = gameTabs.end(); it != end; ++it) {
-        if (it.value()->close()) {
-            // Hotfix: the tab owns the `QMenu`s so they need to be cleared,
-            // otherwise we end up with use-after-free bugs.
-            if (it.value() == currentWidget()) {
-                emit setMenu();
-            }
-
-            gameTabsToRemove.insert(it.key());
-        } else {
-            event->ignore();
-        }
-    }
-
-    for (auto tabId : gameTabsToRemove) {
-        gameTabs.remove(tabId);
     }
 }
 
