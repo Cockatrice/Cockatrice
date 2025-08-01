@@ -189,24 +189,31 @@ static void setupParserRules()
     };
 
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        // Extract common matching logic
-        auto createMatcher = [](const QString &target) -> StringMatcher {
-            return [target](const QString &s) -> bool {
-                if (s.contains(target, Qt::CaseInsensitive)) {
+        // Extract common matching logic with strict matching option
+        auto createMatcher = [](const QString &target, bool strictMatch = true) -> StringMatcher {
+            return [target, strictMatch](const QString &s) -> bool {
+                if (!strictMatch && s.contains(target, Qt::CaseInsensitive)) {
                     return true;
                 }
-                return s.split(" ").contains(target, Qt::CaseInsensitive);
+
+                // For strict mode, try both exact word matching and substring matching
+                if (s.split(" ").contains(target, Qt::CaseInsensitive)) {
+                    return true;
+                }
+
+                // Also check if the target appears as a substring (for multi-word terms)
+                return s.contains(target, Qt::CaseInsensitive);
             };
         };
 
         if (sv.choice() == 0) {
             const auto target = std::any_cast<QString>(sv[0]);
-            return createMatcher(target);
+            return createMatcher(target, true); // Use strict matching
         }
 
         const auto target = std::any_cast<QStringList>(sv[0]);
         return [=](const QString &s) -> bool {
-            auto containsString = [&](const QString &str) { return createMatcher(str)(s); };
+            auto containsString = [&](const QString &str) { return createMatcher(str, true)(s); };
             return std::any_of(target.begin(), target.end(), containsString);
         };
     };
