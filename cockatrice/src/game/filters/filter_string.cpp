@@ -190,7 +190,7 @@ static void setupParserRules()
 
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         // Extract common matching logic
-        auto createMatcher = [](const QString &target) -> std::function<bool(const QString &)> {
+        auto createMatcher = [](const QString &target) -> StringMatcher {
             return [target](const QString &s) -> bool {
                 if (s.contains(target, Qt::CaseInsensitive)) {
                     return true;
