@@ -44,6 +44,8 @@ class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
 class Command_ReplayDeleteMatch;
+class Command_ReplayGetCode;
+class Command_ReplaySubmitCode;
 
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
@@ -97,6 +99,9 @@ private:
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer &rc);
+    QString createHashForReplay(int gameId);
+    Response::ResponseCode cmdReplayGetCode(const Command_ReplayGetCode &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
