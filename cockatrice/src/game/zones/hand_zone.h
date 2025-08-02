@@ -19,6 +19,7 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void reorganizeCards() override;
+    void sortHand();
     void setWidth(qreal _width);
 
 protected:
