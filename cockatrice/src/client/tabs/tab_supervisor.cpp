@@ -182,7 +182,16 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
 
 TabSupervisor::~TabSupervisor()
 {
-    stop();
+    // Note: this used to call stop(), but stop() is doing a bunch of stuff including emitting some signals,
+    // and we don't want to do that in a destructor.
+
+    for (auto &localClient : localClients) {
+        localClient->deleteLater();
+    }
+    localClients.clear();
+
+    delete userInfo;
+    userInfo = nullptr;
 }
 
 void TabSupervisor::retranslateUi()
@@ -267,26 +276,6 @@ void TabSupervisor::closeEvent(QCloseEvent *event)
         if (!tab->confirmClose()) {
             event->ignore();
         }
-    }
-
-    // Close the game tabs in order to make sure they store their layout.
-    QSet<int> gameTabsToRemove;
-    for (auto it = gameTabs.begin(), end = gameTabs.end(); it != end; ++it) {
-        if (it.value()->close()) {
-            // Hotfix: the tab owns the `QMenu`s so they need to be cleared,
-            // otherwise we end up with use-after-free bugs.
-            if (it.value() == currentWidget()) {
-                emit setMenu();
-            }
-
-            gameTabsToRemove.insert(it.key());
-        } else {
-            event->ignore();
-        }
-    }
-
-    for (auto tabId : gameTabsToRemove) {
-        gameTabs.remove(tabId);
     }
 }
 
@@ -375,7 +364,7 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager
         // If managed, all close requests should go through the menu action
         connect(closeButton, &CloseButton::clicked, this, [manager] { checkAndTrigger(manager, false); });
     } else {
-        connect(closeButton, &CloseButton::clicked, tab, [tab] { tab->closeRequest(); });
+        connect(closeButton, &CloseButton::clicked, tab, &Tab::closeRequest);
     }
     tabBar()->setTabButton(tabIndex, closeSide, closeButton);
 }
@@ -469,16 +458,16 @@ void TabSupervisor::stop()
         emit localGameEnded();
     } else {
         if (tabAccount) {
-            tabAccount->closeRequest(true);
+            tabAccount->close();
         }
         if (tabServer) {
-            tabServer->closeRequest(true);
+            tabServer->close();
         }
         if (tabAdmin) {
-            tabAdmin->closeRequest(true);
+            tabAdmin->close();
         }
         if (tabLog) {
-            tabLog->closeRequest(true);
+            tabLog->close();
         }
     }
 
@@ -497,7 +486,7 @@ void TabSupervisor::stop()
     }
 
     for (const auto tab : tabsToDelete) {
-        tab->closeRequest(true);
+        tab->close();
     }
 
     userListManager->handleDisconnect();
@@ -521,7 +510,7 @@ void TabSupervisor::openTabVisualDeckStorage()
 {
     tabVisualDeckStorage = new TabDeckStorageVisual(this);
     myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
-    connect(tabVisualDeckStorage, &Tab::closed, this, [this] {
+    connect(tabVisualDeckStorage, &QObject::destroyed, this, [this] {
         tabVisualDeckStorage = nullptr;
         aTabVisualDeckStorage->setChecked(false);
     });
@@ -544,7 +533,7 @@ void TabSupervisor::openTabServer()
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer, aTabServer);
-    connect(tabServer, &Tab::closed, this, [this] {
+    connect(tabServer, &QObject::destroyed, this, [this] {
         tabServer = nullptr;
         aTabServer->setChecked(false);
     });
@@ -569,7 +558,7 @@ void TabSupervisor::openTabAccount()
     connect(tabAccount, &TabAccount::userJoined, this, &TabSupervisor::processUserJoined);
     connect(tabAccount, &TabAccount::userLeft, this, &TabSupervisor::processUserLeft);
     myAddTab(tabAccount, aTabAccount);
-    connect(tabAccount, &Tab::closed, this, [this] {
+    connect(tabAccount, &QObject::destroyed, this, [this] {
         tabAccount = nullptr;
         aTabAccount->setChecked(false);
     });
@@ -592,7 +581,7 @@ void TabSupervisor::openTabDeckStorage()
     tabDeckStorage = new TabDeckStorage(this, client, userInfo);
     connect(tabDeckStorage, &TabDeckStorage::openDeckEditor, this, &TabSupervisor::openDeckInNewTab);
     myAddTab(tabDeckStorage, aTabDeckStorage);
-    connect(tabDeckStorage, &Tab::closed, this, [this] {
+    connect(tabDeckStorage, &QObject::destroyed, this, [this] {
         tabDeckStorage = nullptr;
         aTabDeckStorage->setChecked(false);
     });
@@ -615,7 +604,7 @@ void TabSupervisor::openTabReplays()
     tabReplays = new TabReplays(this, client, userInfo);
     connect(tabReplays, &TabReplays::openReplay, this, &TabSupervisor::openReplay);
     myAddTab(tabReplays, aTabReplays);
-    connect(tabReplays, &Tab::closed, this, [this] {
+    connect(tabReplays, &QObject::destroyed, this, [this] {
         tabReplays = nullptr;
         aTabReplays->setChecked(false);
     });
@@ -638,7 +627,7 @@ void TabSupervisor::openTabAdmin()
     tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
     connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
     myAddTab(tabAdmin, aTabAdmin);
-    connect(tabAdmin, &Tab::closed, this, [this] {
+    connect(tabAdmin, &QObject::destroyed, this, [this] {
         tabAdmin = nullptr;
         aTabAdmin->setChecked(false);
     });
@@ -660,7 +649,7 @@ void TabSupervisor::openTabLog()
 {
     tabLog = new TabLog(this, client);
     myAddTab(tabLog, aTabLog);
-    connect(tabLog, &Tab::closed, this, [this] {
+    connect(tabLog, &QObject::destroyed, this, [this] {
         tabLog = nullptr;
         aTabAdmin->setChecked(false);
     });

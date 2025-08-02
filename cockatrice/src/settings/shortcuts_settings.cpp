@@ -115,6 +115,13 @@ ShortcutKey ShortcutsSettings::getShortcut(const QString &name) const
     return getDefaultShortcut(name);
 }
 
+/**
+ * Gets the first shortcut for the given action.
+ *
+ * NOTE: In most cases you should be using ShortcutsSettings::getShortcut instead,
+ * as that will return all shortcuts if there are multiple shortcuts.
+ * The only reason to use this method is if an object does not accept multiple shortcuts, such as with QButtons.
+ */
 QKeySequence ShortcutsSettings::getSingleShortcut(const QString &name) const
 {
     return getShortcut(name).at(0);

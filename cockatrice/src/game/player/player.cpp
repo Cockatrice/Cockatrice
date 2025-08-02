@@ -420,6 +420,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(aCreateAnotherToken, &QAction::triggered, this, &Player::actCreateAnotherToken);
         aCreateAnotherToken->setEnabled(false);
 
+        aIncrementAllCardCounters = new QAction(this);
+        connect(aIncrementAllCardCounters, &QAction::triggered, this, &Player::incrementAllCardCounters);
+
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
 
@@ -427,6 +430,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
+        playerMenu->addAction(aIncrementAllCardCounters);
         playerMenu->addSeparator();
         playerMenu->addAction(aUntapAll);
         playerMenu->addSeparator();
@@ -914,6 +918,7 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
+    aIncrementAllCardCounters->setText(tr("Increment all card counters"));
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
@@ -964,38 +969,11 @@ void Player::setShortcutsActive()
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
     aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
 
-    QList<QKeySequence> addCCShortCuts;
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCRed"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCYellow"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCGreen"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCCyan"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCPurple"));
-    addCCShortCuts.append(shortcuts.getSingleShortcut("Player/aCCMagenta"));
-
-    QList<QKeySequence> removeCCShortCuts;
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCRed"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCYellow"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCGreen"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCCyan"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCPurple"));
-    removeCCShortCuts.append(shortcuts.getSingleShortcut("Player/aRCMagenta"));
-
-    QList<QKeySequence> setCCShortCuts;
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCRed"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCYellow"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCGreen"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCCyan"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCPurple"));
-    setCCShortCuts.append(shortcuts.getSingleShortcut("Player/aSCMagenta"));
-
-    for (int i = 0; i < addCCShortCuts.size(); ++i) {
-        aAddCounter[i]->setShortcut(addCCShortCuts.at(i));
-    }
-    for (int i = 0; i < removeCCShortCuts.size(); ++i) {
-        aRemoveCounter[i]->setShortcut(removeCCShortCuts.at(i));
-    }
-    for (int i = 0; i < setCCShortCuts.size(); ++i) {
-        aSetCounter[i]->setShortcut(setCCShortCuts.at(i));
+    static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
+    for (int i = 0; i < aAddCounter.size(); i++) {
+        aAddCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aCC" + colorWords[i]));
+        aRemoveCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aRC" + colorWords[i]));
+        aSetCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aSC" + colorWords[i]));
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
@@ -1003,44 +981,45 @@ void Player::setShortcutsActive()
         counterIterator.next().value()->setShortcutsActive();
     }
 
-    aViewSideboard->setShortcut(shortcuts.getSingleShortcut("Player/aViewSideboard"));
-    aViewLibrary->setShortcut(shortcuts.getSingleShortcut("Player/aViewLibrary"));
-    aViewHand->setShortcut(shortcuts.getSingleShortcut("Player/aViewHand"));
-    aViewTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewTopCards"));
-    aViewBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aViewBottomCards"));
-    aViewGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aViewGraveyard"));
-    aDrawCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCard"));
-    aDrawCards->setShortcut(shortcuts.getSingleShortcut("Player/aDrawCards"));
-    aUndoDraw->setShortcut(shortcuts.getSingleShortcut("Player/aUndoDraw"));
-    aMulligan->setShortcut(shortcuts.getSingleShortcut("Player/aMulligan"));
-    aShuffle->setShortcut(shortcuts.getSingleShortcut("Player/aShuffle"));
-    aShuffleTopCards->setShortcut(shortcuts.getSingleShortcut("Player/aShuffleTopCards"));
-    aShuffleBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aShuffleBottomCards"));
-    aUntapAll->setShortcut(shortcuts.getSingleShortcut("Player/aUntapAll"));
-    aRollDie->setShortcut(shortcuts.getSingleShortcut("Player/aRollDie"));
-    aCreateToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateToken"));
-    aCreateAnotherToken->setShortcut(shortcuts.getSingleShortcut("Player/aCreateAnotherToken"));
-    aAlwaysRevealTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysRevealTopCard"));
-    aAlwaysLookAtTopCard->setShortcut(shortcuts.getSingleShortcut("Player/aAlwaysLookAtTopCard"));
-    aMoveTopToPlay->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlay"));
-    aMoveTopToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopToPlayFaceDown"));
-    aMoveTopCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToGraveyard"));
-    aMoveTopCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToGraveyard"));
-    aMoveTopCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToExile"));
-    aMoveTopCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsToExile"));
-    aMoveTopCardsUntil->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardsUntil"));
-    aMoveTopCardToBottom->setShortcut(shortcuts.getSingleShortcut("Player/aMoveTopCardToBottom"));
-    aDrawBottomCard->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCard"));
-    aDrawBottomCards->setShortcut(shortcuts.getSingleShortcut("Player/aDrawBottomCards"));
-    aMoveBottomToPlay->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomToPlay"));
-    aMoveBottomToPlayFaceDown->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomToPlayFaceDown"));
-    aMoveBottomCardToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToGrave"));
-    aMoveBottomCardsToGraveyard->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardsToGrave"));
-    aMoveBottomCardToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToExile"));
-    aMoveBottomCardsToExile->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardsToExile"));
-    aMoveBottomCardToTop->setShortcut(shortcuts.getSingleShortcut("Player/aMoveBottomCardToTop"));
-    aPlayFacedown->setShortcut(shortcuts.getSingleShortcut("Player/aPlayFacedown"));
-    aPlay->setShortcut(shortcuts.getSingleShortcut("Player/aPlay"));
+    aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
+    aViewSideboard->setShortcuts(shortcuts.getShortcut("Player/aViewSideboard"));
+    aViewLibrary->setShortcuts(shortcuts.getShortcut("Player/aViewLibrary"));
+    aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
+    aViewTopCards->setShortcuts(shortcuts.getShortcut("Player/aViewTopCards"));
+    aViewBottomCards->setShortcuts(shortcuts.getShortcut("Player/aViewBottomCards"));
+    aViewGraveyard->setShortcuts(shortcuts.getShortcut("Player/aViewGraveyard"));
+    aDrawCard->setShortcuts(shortcuts.getShortcut("Player/aDrawCard"));
+    aDrawCards->setShortcuts(shortcuts.getShortcut("Player/aDrawCards"));
+    aUndoDraw->setShortcuts(shortcuts.getShortcut("Player/aUndoDraw"));
+    aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));
+    aShuffle->setShortcuts(shortcuts.getShortcut("Player/aShuffle"));
+    aShuffleTopCards->setShortcuts(shortcuts.getShortcut("Player/aShuffleTopCards"));
+    aShuffleBottomCards->setShortcuts(shortcuts.getShortcut("Player/aShuffleBottomCards"));
+    aUntapAll->setShortcuts(shortcuts.getShortcut("Player/aUntapAll"));
+    aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
+    aCreateToken->setShortcuts(shortcuts.getShortcut("Player/aCreateToken"));
+    aCreateAnotherToken->setShortcuts(shortcuts.getShortcut("Player/aCreateAnotherToken"));
+    aAlwaysRevealTopCard->setShortcuts(shortcuts.getShortcut("Player/aAlwaysRevealTopCard"));
+    aAlwaysLookAtTopCard->setShortcuts(shortcuts.getShortcut("Player/aAlwaysLookAtTopCard"));
+    aMoveTopToPlay->setShortcuts(shortcuts.getShortcut("Player/aMoveTopToPlay"));
+    aMoveTopToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveTopToPlayFaceDown"));
+    aMoveTopCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToGraveyard"));
+    aMoveTopCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToGraveyard"));
+    aMoveTopCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToExile"));
+    aMoveTopCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToExile"));
+    aMoveTopCardsUntil->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsUntil"));
+    aMoveTopCardToBottom->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToBottom"));
+    aDrawBottomCard->setShortcuts(shortcuts.getShortcut("Player/aDrawBottomCard"));
+    aDrawBottomCards->setShortcuts(shortcuts.getShortcut("Player/aDrawBottomCards"));
+    aMoveBottomToPlay->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomToPlay"));
+    aMoveBottomToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomToPlayFaceDown"));
+    aMoveBottomCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToGrave"));
+    aMoveBottomCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToGrave"));
+    aMoveBottomCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToExile"));
+    aMoveBottomCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToExile"));
+    aMoveBottomCardToTop->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToTop"));
+    aPlayFacedown->setShortcuts(shortcuts.getShortcut("Player/aPlayFacedown"));
+    aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
 
     // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
     // when there are more than 1 player.
@@ -1089,6 +1068,7 @@ void Player::setShortcutsInactive()
     aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
     aMoveBottomCardToExile->setShortcut(QKeySequence());
     aMoveBottomCardsToExile->setShortcut(QKeySequence());
+    aIncrementAllCardCounters->setShortcut(QKeySequence());
     aSortHand->setShortcut(QKeySequence());
 
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
@@ -3049,6 +3029,51 @@ void Player::clearCounters()
     counters.clear();
 }
 
+void Player::incrementAllCardCounters()
+{
+    QList<CardItem *> cardsToUpdate;
+
+    auto selectedItems = scene()->selectedItems();
+    if (!selectedItems.isEmpty()) {
+        // If cards are selected, only update those
+        for (const auto &item : selectedItems) {
+            auto *card = static_cast<CardItem *>(item);
+            cardsToUpdate.append(card);
+        }
+    } else {
+        // If no cards selected, update all cards on table
+        const CardList &tableCards = table->getCards();
+        cardsToUpdate = tableCards;
+    }
+
+    QList<const ::google::protobuf::Message *> commandList;
+
+    for (const auto *card : cardsToUpdate) {
+        const auto &cardCounters = card->getCounters();
+
+        QMapIterator<int, int> counterIterator(cardCounters);
+        while (counterIterator.hasNext()) {
+            counterIterator.next();
+            int counterId = counterIterator.key();
+            int currentValue = counterIterator.value();
+            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+                continue;
+            }
+
+            auto cmd = std::make_unique<Command_SetCardCounter>();
+            cmd->set_zone(card->getZone()->getName().toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_counter_id(counterId);
+            cmd->set_counter_value(currentValue + 1);
+            commandList.append(cmd.release());
+        }
+    }
+
+    if (!commandList.isEmpty()) {
+        sendGameCommand(prepareGameCommand(commandList));
+    }
+}
+
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
 {
     const QMap<int, Player *> &playerList = game->getPlayers();
@@ -4186,8 +4211,8 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
     if (createRelatedCards) {
         if (shortcutsActive) {
-            createRelatedCards->setShortcut(
-                SettingsCache::instance().shortcuts().getSingleShortcut("Player/aCreateRelatedTokens"));
+            createRelatedCards->setShortcuts(
+                SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
         connect(createRelatedCards, &QAction::triggered, this, &Player::actCreateAllRelatedCards);
         cardMenu->addAction(createRelatedCards);
