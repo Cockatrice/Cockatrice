@@ -15,12 +15,6 @@ class Tab : public QMainWindow
 signals:
     void userEvent(bool globalEvent = true);
     void tabTextChanged(Tab *tab, const QString &newTabText);
-    /**
-     * Emitted when the tab is closed (because Qt doesn't provide a built-in close signal)
-     * This signal is emitted from this class's overridden Tab::closeEvent method.
-     * Make sure any subclasses that override closeEvent still emit this signal from there.
-     */
-    void closed();
 
 protected:
     TabSupervisor *tabSupervisor;
@@ -31,7 +25,6 @@ protected:
 protected slots:
     void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(const QString &cardName);
-    void closeEvent(QCloseEvent *event) override;
 
 private:
     CardRef currentCard;
@@ -59,13 +52,16 @@ public:
     }
     virtual QString getTabText() const = 0;
     virtual void retranslateUi() = 0;
+
     /**
-     * Sends a request to close the tab.
-     * Signals for cleanup should be emitted from this method instead of the destructor.
+     * Nicely asks to close the tab.
+     * Override this method to do checks or ask for confirmation before closing the tab.
+     * If you need to force close the tab, just call close() instead.
      *
-     * @param forced whether this close request was initiated by the user or forced by the server.
+     * @return True if the tab is successfully closed.
      */
-    virtual void closeRequest(bool forced = false);
+    virtual bool closeRequest();
+
     virtual void tabActivated()
     {
     }

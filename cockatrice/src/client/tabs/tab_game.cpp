@@ -376,15 +376,19 @@ void TabGame::refreshShortcuts()
     }
 }
 
-void TabGame::closeRequest(bool forced)
+bool TabGame::closeRequest()
 {
-    if (!forced && !leaveGame()) {
-        return;
+    if (!leaveGame()) {
+        return false;
     }
 
-    emit gameClosing(this);
+    return close();
+}
 
-    close();
+void TabGame::closeEvent(QCloseEvent *event)
+{
+    emit gameClosing(this);
+    event->accept();
 }
 
 void TabGame::incrementGameTime()
@@ -1249,7 +1253,7 @@ void TabGame::createMenuItems()
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
     aLeaveGame = new QAction(this);
-    connect(aLeaveGame, &QAction::triggered, this, [this] { closeRequest(); });
+    connect(aLeaveGame, &QAction::triggered, this, &TabGame::closeRequest);
     aFocusChat = new QAction(this);
     connect(aFocusChat, &QAction::triggered, sayEdit, qOverload<>(&LineEditCompleter::setFocus));
     aCloseReplay = nullptr;
@@ -1299,7 +1303,7 @@ void TabGame::createReplayMenuItems()
     aFocusChat = nullptr;
     aLeaveGame = nullptr;
     aCloseReplay = new QAction(this);
-    connect(aCloseReplay, &QAction::triggered, this, [this] { closeRequest(); });
+    connect(aCloseReplay, &QAction::triggered, this, &TabGame::closeRequest);
 
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);

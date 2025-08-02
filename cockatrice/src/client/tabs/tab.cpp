@@ -43,16 +43,7 @@ void Tab::deleteCardInfoPopup(const QString &cardName)
     }
 }
 
-/**
- * Overrides the closeEvent in order to emit a close signal
- */
-void Tab::closeEvent(QCloseEvent *event)
+bool Tab::closeRequest()
 {
-    emit closed();
-    event->accept();
-}
-
-void Tab::closeRequest(bool /*forced*/)
-{
-    close();
+    return close();
 }
