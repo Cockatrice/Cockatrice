@@ -37,6 +37,8 @@ set(PROTO_FILES
     command_replay_list.proto
     command_replay_download.proto
     command_replay_modify_match.proto
+    command_replay_get_code.proto
+    command_replay_submit_code.proto
     command_reveal_cards.proto
     command_reverse_turn.proto
     command_roll_die.proto
@@ -130,6 +132,7 @@ set(PROTO_FILES
     response_password_salt.proto
     response_register.proto
     response_replay_download.proto
+    response_replay_get_code.proto
     response_replay_list.proto
     response_viewlog_history.proto
     response_warn_history.proto
