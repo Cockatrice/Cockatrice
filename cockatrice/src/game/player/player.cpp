@@ -851,6 +851,7 @@ void Player::retranslateUi()
             aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));
         }
 
+        aIncrementAllCardCounters->setText(tr("Increment all card counters"));
         aUntapAll->setText(tr("&Untap all permanents"));
         aRollDie->setText(tr("R&oll die..."));
         aCreateToken->setText(tr("&Create token..."));
@@ -918,7 +919,6 @@ void Player::retranslateUi()
         aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
     }
 
-    aIncrementAllCardCounters->setText(tr("Increment all card counters"));
     aMoveToTopLibrary->setText(tr("&Top of library in random order"));
     aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
     aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
