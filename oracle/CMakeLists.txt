@@ -49,11 +49,11 @@ if(UPDATE_TRANSLATIONS)
   set(oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/oracle_en@source.ts")
 else()
   file(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
-endif(UPDATE_TRANSLATIONS)
+endif()
 
 if(WIN32)
   set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
-endif(WIN32)
+endif()
 
 if(APPLE)
   set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
@@ -61,7 +61,7 @@ if(APPLE)
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
   set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
-endif(APPLE)
+endif()
 
 if(Qt6_FOUND)
   qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
@@ -72,12 +72,11 @@ endif()
 include_directories(../cockatrice/src)
 include_directories(../common)
 
-# Libz is required to support zipped files
+# Libz is required to support zip files
 find_package(ZLIB)
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
   add_definitions("-DHAS_ZLIB")
-
   set(oracle_SOURCES ${oracle_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
 else()
   message(STATUS "Oracle: zlib not found; ZIP support disabled")
@@ -88,7 +87,6 @@ find_package(LibLZMA)
 if(LIBLZMA_FOUND)
   include_directories(${LIBLZMA_INCLUDE_DIRS})
   add_definitions("-DHAS_LZMA")
-
   set(oracle_SOURCES ${oracle_SOURCES} src/lzma/decompress.cpp)
 else()
   message(STATUS "Oracle: LibLZMA not found; xz support disabled")
@@ -152,7 +150,7 @@ if(UNIX)
 
     install(TARGETS oracle BUNDLE DESTINATION ./)
   else()
-    # Assume linux
+    # Assume Linux
     install(TARGETS oracle RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
@@ -163,7 +161,7 @@ endif()
 
 if(NOT WIN32 AND NOT APPLE)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
-endif(NOT WIN32 AND NOT APPLE)
+endif()
 
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
@@ -206,17 +204,17 @@ Translations = Resources/translations\")
 endif()
 
 if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
-  install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
-    DESTINATION ./
-    FILES_MATCHING
-    PATTERN "*.dll"
-  )
+  # install(
+  #   DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+  #   DESTINATION ./
+  #   FILES_MATCHING
+  #   PATTERN "*.dll"
+  # )
 
   # Qt plugins: iconengines, platforms, styles, tls (Qt6)
   install(
@@ -247,16 +245,16 @@ Translations = Resources/translations\")
     COMPONENT Runtime
   )
 
-  install(
-    CODE "
-        file(GLOB_RECURSE QTPLUGINS
-            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
-        set(BU_CHMOD_BUNDLE_ITEMS ON)
-        include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
-        "
-    COMPONENT Runtime
-  )
+  # install(
+  #   CODE "
+  #       file(GLOB_RECURSE QTPLUGINS
+  #           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
+  #       set(BU_CHMOD_BUNDLE_ITEMS ON)
+  #       include(BundleUtilities)
+  #       fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
+  #       "
+  #   COMPONENT Runtime
+  # )
 endif()
 
 if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
@@ -288,4 +286,16 @@ endif()
 
 if(Qt6_FOUND)
   qt6_finalize_target(oracle)
+endif()
+
+if(WIN32)
+  install(CODE "
+      include(BundleUtilities)
+      set(BU_CHMOD_BUNDLE_ITEMS ON)
+      fixup_bundle(
+          \"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\"
+          \"\"
+          \"\${CMAKE_INSTALL_PREFIX}\"
+      )
+  ")
 endif()
