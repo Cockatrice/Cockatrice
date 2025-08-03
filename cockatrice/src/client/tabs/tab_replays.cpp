@@ -30,6 +30,29 @@
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)
 {
+    leftGroupBox = createLeftLayout();
+    rightGroupBox = createRightLayout();
+
+    // combine layouts
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(leftGroupBox);
+    hbox->addWidget(rightGroupBox);
+
+    retranslateUi();
+
+    QWidget *mainWidget = new QWidget(this);
+    mainWidget->setLayout(hbox);
+    setCentralWidget(mainWidget);
+
+    connect(client, &AbstractClient::replayAddedEventReceived, this, &TabReplays::replayAddedEventReceived);
+
+    connect(client, &AbstractClient::userInfoChanged, this, &TabReplays::handleConnected);
+    connect(client, &AbstractClient::statusChanged, this, &TabReplays::handleConnectionChanged);
+    setRemoteEnabled(currentUserInfo && currentUserInfo->user_level() & ServerInfo_User::IsRegistered);
+}
+
+QGroupBox *TabReplays::createLeftLayout()
+{
     localDirModel = new QFileSystemModel(this);
     localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
     localDirModel->sort(0, Qt::AscendingOrder);
@@ -52,46 +75,24 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     dummyToolBar->setSizePolicy(sizePolicy);
     dummyToolBar->setVisible(false);
 
-    leftToolBar = new QToolBar(this);
-    leftToolBar->setOrientation(Qt::Horizontal);
-    leftToolBar->setIconSize(QSize(32, 32));
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setOrientation(Qt::Horizontal);
+    toolBar->setIconSize(QSize(32, 32));
 
-    QToolBar *leftRightmostToolBar = new QToolBar(this);
-    leftRightmostToolBar->setOrientation(Qt::Horizontal);
-    leftRightmostToolBar->setIconSize(QSize(32, 32));
+    QToolBar *rightmostToolBar = new QToolBar(this);
+    rightmostToolBar->setOrientation(Qt::Horizontal);
+    rightmostToolBar->setIconSize(QSize(32, 32));
 
-    QGridLayout *leftToolBarLayout = new QGridLayout;
-    leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
-    leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
-    leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
+    QGridLayout *toolBarLayout = new QGridLayout;
+    toolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    toolBarLayout->addWidget(toolBar, 0, 1, Qt::AlignHCenter);
+    toolBarLayout->addWidget(rightmostToolBar, 0, 2, Qt::AlignRight);
 
-    QVBoxLayout *leftVbox = new QVBoxLayout;
-    leftVbox->addWidget(localDirView);
-    leftVbox->addLayout(leftToolBarLayout);
-    leftGroupBox = new QGroupBox;
-    leftGroupBox->setLayout(leftVbox);
-
-    // Right side layout
-    rightToolBar = new QToolBar;
-    rightToolBar->setOrientation(Qt::Horizontal);
-    rightToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *rightToolBarLayout = new QHBoxLayout;
-    rightToolBarLayout->addStretch();
-    rightToolBarLayout->addWidget(rightToolBar);
-    rightToolBarLayout->addStretch();
-
-    serverDirView = new RemoteReplayList_TreeWidget(client);
-
-    QVBoxLayout *rightVbox = new QVBoxLayout;
-    rightVbox->addWidget(serverDirView);
-    rightVbox->addLayout(rightToolBarLayout);
-    rightGroupBox = new QGroupBox;
-    rightGroupBox->setLayout(rightVbox);
-
-    // combine layouts
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(leftGroupBox);
-    hbox->addWidget(rightGroupBox);
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(localDirView);
+    vbox->addLayout(toolBarLayout);
+    QGroupBox *groupBox = new QGroupBox;
+    groupBox->setLayout(vbox);
 
     // Left side actions
     aOpenLocalReplay = new QAction(this);
@@ -112,6 +113,36 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     aOpenReplaysFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_DirOpenIcon));
     connect(aOpenReplaysFolder, &QAction::triggered, this, &TabReplays::actOpenReplaysFolder);
 
+    // Add actions to toolbars
+    toolBar->addAction(aOpenLocalReplay);
+    toolBar->addAction(aRenameLocal);
+    toolBar->addAction(aNewLocalFolder);
+    toolBar->addAction(aDeleteLocalReplay);
+
+    rightmostToolBar->addAction(aOpenReplaysFolder);
+
+    return groupBox;
+}
+
+QGroupBox *TabReplays::createRightLayout()
+{
+    serverDirView = new RemoteReplayList_TreeWidget(client);
+
+    // Right side layout
+    QToolBar *toolBar = new QToolBar;
+    toolBar->setOrientation(Qt::Horizontal);
+    toolBar->setIconSize(QSize(32, 32));
+    QHBoxLayout *toolBarLayout = new QHBoxLayout;
+    toolBarLayout->addStretch();
+    toolBarLayout->addWidget(toolBar);
+    toolBarLayout->addStretch();
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(serverDirView);
+    vbox->addLayout(toolBarLayout);
+    QGroupBox *groupBox = new QGroupBox;
+    groupBox->setLayout(vbox);
+
     // Right side actions
     aOpenRemoteReplay = new QAction(this);
     aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
@@ -128,29 +159,12 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
 
     // Add actions to toolbars
-    leftToolBar->addAction(aOpenLocalReplay);
-    leftToolBar->addAction(aRenameLocal);
-    leftToolBar->addAction(aNewLocalFolder);
-    leftToolBar->addAction(aDeleteLocalReplay);
+    toolBar->addAction(aOpenRemoteReplay);
+    toolBar->addAction(aDownload);
+    toolBar->addAction(aKeep);
+    toolBar->addAction(aDeleteRemoteReplay);
 
-    leftRightmostToolBar->addAction(aOpenReplaysFolder);
-
-    rightToolBar->addAction(aOpenRemoteReplay);
-    rightToolBar->addAction(aDownload);
-    rightToolBar->addAction(aKeep);
-    rightToolBar->addAction(aDeleteRemoteReplay);
-
-    retranslateUi();
-
-    QWidget *mainWidget = new QWidget(this);
-    mainWidget->setLayout(hbox);
-    setCentralWidget(mainWidget);
-
-    connect(client, &AbstractClient::replayAddedEventReceived, this, &TabReplays::replayAddedEventReceived);
-
-    connect(client, &AbstractClient::userInfoChanged, this, &TabReplays::handleConnected);
-    connect(client, &AbstractClient::statusChanged, this, &TabReplays::handleConnectionChanged);
-    setRemoteEnabled(currentUserInfo && currentUserInfo->user_level() & ServerInfo_User::IsRegistered);
+    return groupBox;
 }
 
 void TabReplays::retranslateUi()
