@@ -5,7 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
+# CMake 3.16 is required if using Qt6
 cmake_minimum_required(VERSION 3.10)
 
 # Early detect ccache
@@ -81,7 +81,7 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Omenpath")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
@@ -183,7 +183,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
     endif()
   endforeach()
 else()
-  # other: osx/llvm, bsd/llvm
+  # Other: osx/llvm, bsd/llvm
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
@@ -232,7 +232,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
+# Find OpenSSL
 if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
@@ -245,7 +245,7 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
+# Find VCredist
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
@@ -273,7 +273,7 @@ if(UNIX)
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
   else()
-    # linux
+    # Linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
@@ -284,7 +284,7 @@ if(UNIX)
       endif()
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
-      # stop directories from making package conflicts
+      # Stop directories from making package conflicts
       set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
           /usr/share/applications
           /usr/share/icons
@@ -314,10 +314,31 @@ elseif(WIN32)
     set(TRICE_IS_64_BIT 0)
   endif()
 
-  # Configure file with custom definitions for NSIS.
+  # Configure file with custom definitions for NSIS
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # include vcredist into the package; NSIS will take care of running it
+  # Include liblzma.dll into the package
+  # install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION ./)
+  # install(FILES "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll" DESTINATION "bin")
+
+  # set(LIBLZMA_DLL "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/liblzma.dll")
+  #
+  # if(EXISTS "${LIBLZMA_DLL}")
+  #   install(FILES "${LIBLZMA_DLL}" DESTINATION ./)
+  # else()
+  #   message(WARNING "liblzma.dll not found at ${LIBLZMA_DLL}, skipping DLL install.")
+  # endif()
+
+  # Make sure vcpkg's toolchain is in use and lzma is available as a target
+  # find_package(lzma CONFIG REQUIRED)
+  # This will install the DLL if present (vcpkg target will point to the correct location)
+  # install(TARGETS lzma
+  #     RUNTIME DESTINATION .
+  #     LIBRARY DESTINATION lib
+  #     ARCHIVE DESTINATION lib
+  # )
+
+  # Include vcredist into the package; NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
   endif()
@@ -352,6 +373,6 @@ if(TEST)
 endif()
 
 if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
+  # Qt 6.3+ requires project finalization to support translations
   qt6_finalize_project()
 endif()
