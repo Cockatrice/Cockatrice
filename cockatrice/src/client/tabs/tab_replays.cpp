@@ -6,11 +6,14 @@
 #include "../../settings/cache_settings.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_get_code.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
+#include "pb/command_replay_submit_code.pb.h"
 #include "pb/event_replay_added.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
+#include "pb/response_replay_get_code.pb.h"
 #include "tab_game.h"
 
 #include <QAction>
@@ -129,13 +132,26 @@ QGroupBox *TabReplays::createRightLayout()
     serverDirView = new RemoteReplayList_TreeWidget(client);
 
     // Right side layout
-    QToolBar *toolBar = new QToolBar;
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    QToolBar *toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Horizontal);
     toolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *toolBarLayout = new QHBoxLayout;
-    toolBarLayout->addStretch();
-    toolBarLayout->addWidget(toolBar);
-    toolBarLayout->addStretch();
+
+    QToolBar *rightmostToolBar = new QToolBar(this);
+    rightmostToolBar->setOrientation(Qt::Horizontal);
+    rightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *toolBarLayout = new QGridLayout;
+    toolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    toolBarLayout->addWidget(toolBar, 0, 1, Qt::AlignHCenter);
+    toolBarLayout->addWidget(rightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(serverDirView);
@@ -157,12 +173,22 @@ QGroupBox *TabReplays::createRightLayout()
     aDeleteRemoteReplay = new QAction(this);
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
+    aGetReplayCode = new QAction(this);
+    aGetReplayCode->setIcon(QPixmap("theme:icons/arrow_top_green"));
+    connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
+
+    aSubmitReplayCode = new QAction(this);
+    aSubmitReplayCode->setIcon(QPixmap("theme:icons/search"));
+    connect(aSubmitReplayCode, &QAction::triggered, this, &TabReplays::actSubmitReplayCode);
 
     // Add actions to toolbars
     toolBar->addAction(aOpenRemoteReplay);
     toolBar->addAction(aDownload);
     toolBar->addAction(aKeep);
     toolBar->addAction(aDeleteRemoteReplay);
+    toolBar->addAction(aGetReplayCode);
+
+    rightmostToolBar->addAction(aSubmitReplayCode);
 
     return groupBox;
 }
@@ -181,6 +207,9 @@ void TabReplays::retranslateUi()
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
     aDeleteRemoteReplay->setText(tr("Delete"));
+    aGetReplayCode->setText(tr("Get replay code"));
+
+    aSubmitReplayCode->setText(tr("Look up replay by code"));
 }
 
 void TabReplays::handleConnected(const ServerInfo_User &userInfo)
@@ -204,6 +233,8 @@ void TabReplays::setRemoteEnabled(bool enabled)
     aDownload->setEnabled(enabled);
     aKeep->setEnabled(enabled);
     aDeleteRemoteReplay->setEnabled(enabled);
+    aGetReplayCode->setEnabled(enabled);
+    aSubmitReplayCode->setEnabled(enabled);
 
     if (enabled) {
         serverDirView->refreshTree();
@@ -480,13 +511,68 @@ void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandCont
     serverDirView->removeMatchInfo(cmd.game_id());
 }
 
+void TabReplays::actGetReplayCode()
+{
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+    if (curRights.isEmpty()) {
+        return;
+    }
+
+    for (const auto curRight : curRights) {
+        Command_ReplayGetCode cmd;
+        cmd.set_game_id(curRight->game_id());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, &PendingCommand::finished, this, &TabReplays::getReplayCodeFinished);
+        client->sendCommand(pend);
+    }
+}
+
+void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
+{
+    if (r.response_code() != Response::RespOk)
+        return;
+
+    const Response_ReplayGetCode &resp = r.GetExtension(Response_ReplayGetCode::ext);
+    QString code = QString::fromStdString(resp.replay_code());
+    QMessageBox::information(this, tr("Success"), code);
+}
+
+void TabReplays::actSubmitReplayCode()
+{
+    bool ok;
+    QString code = QInputDialog::getText(this, tr("Add replay by code"), tr("Replay code"), QLineEdit::Normal, "", &ok);
+
+    if (!ok) {
+        return;
+    }
+
+    Command_ReplaySubmitCode cmd;
+    cmd.set_replay_code(code.toStdString());
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabReplays::submitReplayCodeFinished);
+    client->sendCommand(pend);
+}
+
+void TabReplays::submitReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
+{
+    if (r.response_code() == Response::RespOk) {
+        QMessageBox::information(this, tr("Success"), tr("Replay code found. Replay was added"));
+    } else if (r.response_code() == Response::RespNameNotFound) {
+        QMessageBox::warning(this, tr("Failed"), tr("Code not found"));
+    } else {
+        QMessageBox::warning(this, tr("Failed"), tr("Unexpected error"));
+    }
+}
+
 void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
 {
     if (event.has_match_info()) {
         // 99.9% of events will have match info (Normal Workflow)
         serverDirView->addMatchInfo(event.match_info());
     } else {
-        // When a Moderator force adds a replay, we need to refresh their view
+        // When a Moderator force adds a replay or a user submits a replay code, we need to refresh their view
         serverDirView->refreshTree();
     }
 }
