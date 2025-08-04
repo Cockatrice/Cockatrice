@@ -174,11 +174,11 @@ QGroupBox *TabReplays::createRightLayout()
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
     aGetReplayCode = new QAction(this);
-    aGetReplayCode->setIcon(QPixmap("theme:icons/arrow_top_green"));
+    aGetReplayCode->setIcon(QPixmap("theme:icons/share"));
     connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
 
     aSubmitReplayCode = new QAction(this);
-    aSubmitReplayCode->setIcon(QPixmap("theme:icons/search"));
+    aSubmitReplayCode->setIcon(QPixmap("theme:icons/earth"));
     connect(aSubmitReplayCode, &QAction::triggered, this, &TabReplays::actSubmitReplayCode);
 
     // Add actions to toolbars
