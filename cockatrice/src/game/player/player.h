@@ -326,6 +326,8 @@ private:
                            const QString &avalue,
                            bool allCards,
                            EventProcessingOptions options);
+    QMenu *createMoveMenu() const;
+    QMenu *createPtMenu() const;
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard,
@@ -484,9 +486,9 @@ public:
     {
         return arrows;
     }
-    void setCardMenu(QMenu *menu);
+    QMenu *updateCardMenu(const CardItem *card);
     QMenu *getCardMenu() const;
-    void updateCardMenu(const CardItem *card);
+    QMenu *createCardMenu(const CardItem *card);
     bool getActive() const
     {
         return active;

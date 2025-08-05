@@ -3897,19 +3897,13 @@ void Player::refreshShortcuts()
     }
 }
 
-void Player::updateCardMenu(const CardItem *card)
+QMenu *Player::createCardMenu(const CardItem *card)
 {
     // If bad card OR is a spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
     if (card == nullptr || (game->isSpectator() && !judge) || game->getActiveCard() != card) {
-        return;
+        return nullptr;
     }
-
-    QMenu *cardMenu = card->getCardMenu();
-    QMenu *ptMenu = card->getPTMenu();
-    QMenu *moveMenu = card->getMoveMenu();
-
-    cardMenu->clear();
 
     bool revealedCard = false;
     bool writeableCard = getLocalOrJudge();
@@ -3923,6 +3917,8 @@ void Player::updateCardMenu(const CardItem *card)
         }
     }
 
+    QMenu *cardMenu = new QMenu;
+
     if (revealedCard) {
         cardMenu->addAction(aHide);
         cardMenu->addAction(aClone);
@@ -3932,18 +3928,6 @@ void Player::updateCardMenu(const CardItem *card)
         addRelatedCardView(card, cardMenu);
     } else if (writeableCard) {
         bool canModifyCard = judge || card->getOwner() == this;
-
-        if (moveMenu->isEmpty() && canModifyCard) {
-            moveMenu->addAction(aMoveToTopLibrary);
-            moveMenu->addAction(aMoveToXfromTopOfLibrary);
-            moveMenu->addAction(aMoveToBottomLibrary);
-            moveMenu->addSeparator();
-            moveMenu->addAction(aMoveToHand);
-            moveMenu->addSeparator();
-            moveMenu->addAction(aMoveToGraveyard);
-            moveMenu->addSeparator();
-            moveMenu->addAction(aMoveToExile);
-        }
 
         if (card->getZone()) {
             if (card->getZone()->getName() == "table") {
@@ -3960,23 +3944,7 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addSeparator();
                     cardMenu->addAction(aSelectAll);
                     cardMenu->addAction(aSelectRow);
-                    return;
-                }
-
-                if (ptMenu->isEmpty()) {
-                    ptMenu->addAction(aIncP);
-                    ptMenu->addAction(aDecP);
-                    ptMenu->addAction(aFlowP);
-                    ptMenu->addSeparator();
-                    ptMenu->addAction(aIncT);
-                    ptMenu->addAction(aDecT);
-                    ptMenu->addAction(aFlowT);
-                    ptMenu->addSeparator();
-                    ptMenu->addAction(aIncPT);
-                    ptMenu->addAction(aDecPT);
-                    ptMenu->addSeparator();
-                    ptMenu->addAction(aSetPT);
-                    ptMenu->addAction(aResetPT);
+                    return cardMenu;
                 }
 
                 cardMenu->addAction(aTap);
@@ -3996,11 +3964,11 @@ void Player::updateCardMenu(const CardItem *card)
                 }
                 cardMenu->addAction(aDrawArrow);
                 cardMenu->addSeparator();
-                cardMenu->addMenu(ptMenu);
+                cardMenu->addMenu(createPtMenu());
                 cardMenu->addAction(aSetAnnotation);
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
-                cardMenu->addMenu(moveMenu);
+                cardMenu->addMenu(createMoveMenu());
                 cardMenu->addSeparator();
                 cardMenu->addAction(aSelectAll);
                 cardMenu->addAction(aSelectRow);
@@ -4024,7 +3992,7 @@ void Player::updateCardMenu(const CardItem *card)
                     cardMenu->addAction(aDrawArrow);
                     cardMenu->addSeparator();
                     cardMenu->addAction(aClone);
-                    cardMenu->addMenu(moveMenu);
+                    cardMenu->addMenu(createMoveMenu());
                     cardMenu->addSeparator();
                     cardMenu->addAction(aSelectAll);
                 } else {
@@ -4045,7 +4013,7 @@ void Player::updateCardMenu(const CardItem *card)
 
                     cardMenu->addSeparator();
                     cardMenu->addAction(aClone);
-                    cardMenu->addMenu(moveMenu);
+                    cardMenu->addMenu(createMoveMenu());
                     cardMenu->addSeparator();
                     cardMenu->addAction(aSelectAll);
                     cardMenu->addAction(aSelectColumn);
@@ -4075,7 +4043,7 @@ void Player::updateCardMenu(const CardItem *card)
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
-                cardMenu->addMenu(moveMenu);
+                cardMenu->addMenu(createMoveMenu());
 
                 // actions that are really wonky when done from deck or sideboard
                 if (card->getZone()->getName() == "hand") {
@@ -4096,7 +4064,7 @@ void Player::updateCardMenu(const CardItem *card)
                 }
             }
         } else {
-            cardMenu->addMenu(moveMenu);
+            cardMenu->addMenu(createMoveMenu());
         }
     } else {
         if (card->getZone() && card->getZone()->getName() != "hand") {
@@ -4110,6 +4078,42 @@ void Player::updateCardMenu(const CardItem *card)
             cardMenu->addAction(aSelectAll);
         }
     }
+
+    return cardMenu;
+}
+
+QMenu *Player::createMoveMenu() const
+{
+    QMenu *moveMenu = new QMenu("Move to");
+    moveMenu->addAction(aMoveToTopLibrary);
+    moveMenu->addAction(aMoveToXfromTopOfLibrary);
+    moveMenu->addAction(aMoveToBottomLibrary);
+    moveMenu->addSeparator();
+    moveMenu->addAction(aMoveToHand);
+    moveMenu->addSeparator();
+    moveMenu->addAction(aMoveToGraveyard);
+    moveMenu->addSeparator();
+    moveMenu->addAction(aMoveToExile);
+    return moveMenu;
+}
+
+QMenu *Player::createPtMenu() const
+{
+    QMenu *ptMenu = new QMenu("Power / toughness");
+    ptMenu->addAction(aIncP);
+    ptMenu->addAction(aDecP);
+    ptMenu->addAction(aFlowP);
+    ptMenu->addSeparator();
+    ptMenu->addAction(aIncT);
+    ptMenu->addAction(aDecT);
+    ptMenu->addAction(aFlowT);
+    ptMenu->addSeparator();
+    ptMenu->addAction(aIncPT);
+    ptMenu->addAction(aDecPT);
+    ptMenu->addSeparator();
+    ptMenu->addAction(aSetPT);
+    ptMenu->addAction(aResetPT);
+    return ptMenu;
 }
 
 void Player::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
@@ -4219,14 +4223,22 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     }
 }
 
-void Player::setCardMenu(QMenu *menu)
+/**
+ * Creates a card menu from the given card and sets it as the currently active card menu.
+ *
+ * @param card The card to create the menu for. Pass nullptr to disable the card menu.
+ * @return The new card menu
+ */
+QMenu *Player::updateCardMenu(const CardItem *card)
 {
-    if (aCardMenu != nullptr) {
-        aCardMenu->setEnabled(menu != nullptr);
-        if (menu) {
-            aCardMenu->setMenu(menu);
-        }
+    QMenu *menu = createCardMenu(card);
+
+    aCardMenu->setEnabled(menu != nullptr);
+    if (menu) {
+        aCardMenu->setMenu(menu);
     }
+
+    return menu;
 }
 
 QMenu *Player::getCardMenu() const

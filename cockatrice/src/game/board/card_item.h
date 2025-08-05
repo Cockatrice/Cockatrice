@@ -33,8 +33,6 @@ private:
     CardItem *attachedTo;
     QList<CardItem *> attachedCards;
 
-    QMenu *cardMenu, *ptMenu, *moveMenu;
-
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);
 public slots:
@@ -54,7 +52,7 @@ public:
                       const CardRef &cardRef = {},
                       int _cardid = -1,
                       CardZone *_zone = nullptr);
-    ~CardItem() override;
+
     void retranslateUi();
     CardZone *getZone() const
     {
@@ -134,19 +132,6 @@ public:
     }
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
-
-    QMenu *getCardMenu() const
-    {
-        return cardMenu;
-    }
-    QMenu *getPTMenu() const
-    {
-        return ptMenu;
-    }
-    QMenu *getMoveMenu() const
-    {
-        return moveMenu;
-    }
 
     bool animationEvent();
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
