@@ -411,11 +411,6 @@ void TabGame::adminLockChanged(bool lock)
     sayEdit->setVisible(v);
 }
 
-bool TabGame::isSpectator()
-{
-    return spectator;
-}
-
 void TabGame::actGameInfo()
 {
     DlgCreateGame dlg(gameInfo, roomGameTypes, this);
