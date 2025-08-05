@@ -118,6 +118,7 @@ private:
         *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QAction *aFocusChat;
     QList<QAction *> phaseActions;
+    QAction *aCardMenu;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
@@ -172,6 +173,7 @@ private slots:
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
     void updateCardMenu(AbstractCardItem *card);
+    void setCardMenu(QMenu *menu);
 
     void actGameInfo();
     void actConcede();

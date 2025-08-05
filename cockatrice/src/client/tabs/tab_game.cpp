@@ -261,6 +261,10 @@ void TabGame::retranslateUi()
         sayLabel->setText(tr("&Say:"));
     }
 
+    if (aCardMenu) {
+        aCardMenu->setText(tr("Selected cards"));
+    }
+
     viewMenu->setTitle(tr("&View"));
     cardInfoDockMenu->setTitle(tr("Card Info"));
     messageLayoutDockMenu->setTitle(tr("Messages"));
@@ -576,6 +580,7 @@ Player *TabGame::addPlayer(int playerId, const ServerInfo_User &info)
     scene->addPlayer(newPlayer);
 
     connect(newPlayer, &Player::newCardAdded, this, &TabGame::newCardAdded);
+    connect(newPlayer, &Player::cardMenuUpdated, this, &TabGame::setCardMenu);
     messageLog->connectToPlayer(newPlayer);
 
     if (local && !spectator) {
@@ -1232,6 +1237,18 @@ void TabGame::updateCardMenu(AbstractCardItem *card)
     }
 }
 
+/**
+ * @param menu The menu to set. Pass in nullptr to set the menu to empty.
+ */
+void TabGame::setCardMenu(QMenu *menu)
+{
+    if (menu) {
+        aCardMenu->setMenu(menu);
+    } else {
+        aCardMenu->setMenu(new QMenu);
+    }
+}
+
 void TabGame::createMenuItems()
 {
     aNextPhase = new QAction(this);
@@ -1285,6 +1302,11 @@ void TabGame::createMenuItems()
     gameMenu->addAction(aConcede);
     gameMenu->addAction(aFocusChat);
     gameMenu->addAction(aLeaveGame);
+
+    gameMenu->addSeparator();
+
+    aCardMenu = gameMenu->addMenu(new QMenu(this));
+
     addTabMenu(gameMenu);
 }
 

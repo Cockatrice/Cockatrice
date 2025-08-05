@@ -156,6 +156,7 @@ signals:
 
     void sizeChanged();
     void playerCountChanged();
+    void cardMenuUpdated(QMenu *cardMenu);
 public slots:
     void actUntapAll();
     void actRollDie();
@@ -271,7 +272,6 @@ private:
         *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile,
         *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard, *aDrawBottomCards;
 
-    QAction *aCardMenu;
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
@@ -487,7 +487,6 @@ public:
         return arrows;
     }
     QMenu *updateCardMenu(const CardItem *card);
-    QMenu *getCardMenu() const;
     QMenu *createCardMenu(const CardItem *card);
     bool getActive() const
     {

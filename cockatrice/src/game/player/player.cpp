@@ -449,11 +449,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         initSayMenu();
     }
 
-    aCardMenu = new QAction(this);
-    aCardMenu->setEnabled(false);
-    playerMenu->addSeparator();
-    playerMenu->addAction(aCardMenu);
-
     if (local || judge) {
 
         for (auto &playerList : playerLists) {
@@ -869,8 +864,6 @@ void Player::retranslateUi()
             allPlayersAction->setText(tr("&All players"));
         }
     }
-
-    aCardMenu->setText(tr("Selec&ted cards"));
 
     if (local) {
         sayMenu->setTitle(tr("S&ay"));
@@ -4233,21 +4226,11 @@ QMenu *Player::updateCardMenu(const CardItem *card)
 {
     QMenu *menu = createCardMenu(card);
 
-    aCardMenu->setEnabled(menu != nullptr);
     if (menu) {
-        aCardMenu->setMenu(menu);
+        emit cardMenuUpdated(menu);
     }
 
     return menu;
-}
-
-QMenu *Player::getCardMenu() const
-{
-    if (aCardMenu != nullptr) {
-        return aCardMenu->menu();
-    } else {
-        return nullptr;
-    }
 }
 
 QString Player::getName() const
