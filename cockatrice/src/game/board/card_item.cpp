@@ -466,8 +466,8 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if ((change == ItemSelectedHasChanged) && owner != nullptr) {
         if (value == true) {
-            owner->updateCardMenu(this);
             owner->getGame()->setActiveCard(this);
+            owner->updateCardMenu(this);
         }
     }
     return AbstractCardItem::itemChange(change, value);

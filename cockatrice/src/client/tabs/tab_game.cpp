@@ -1218,23 +1218,6 @@ Player *TabGame::getActiveLocalPlayer() const
 void TabGame::setActiveCard(CardItem *card)
 {
     activeCard = card;
-    updateCardMenu(card);
-}
-
-void TabGame::updateCardMenu(AbstractCardItem *card)
-{
-    if (card == nullptr) {
-        return;
-    }
-    Player *player;
-    if ((clients.size() > 1) || !players.contains(localPlayerId)) {
-        player = card->getOwner();
-    } else {
-        player = players.value(localPlayerId);
-    }
-    if (player != nullptr) {
-        player->updateCardMenu(static_cast<CardItem *>(card));
-    }
 }
 
 /**

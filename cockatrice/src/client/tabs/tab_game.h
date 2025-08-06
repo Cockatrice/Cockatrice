@@ -172,7 +172,6 @@ private slots:
     void incrementGameTime();
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
-    void updateCardMenu(AbstractCardItem *card);
     void setCardMenu(QMenu *menu);
 
     void actGameInfo();
