@@ -468,6 +468,9 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
         if (value == true) {
             owner->getGame()->setActiveCard(this);
             owner->updateCardMenu(this);
+        } else if (owner->scene()->selectedItems().isEmpty()) {
+            owner->getGame()->setActiveCard(nullptr);
+            owner->updateCardMenu(nullptr);
         }
     }
     return AbstractCardItem::itemChange(change, value);
