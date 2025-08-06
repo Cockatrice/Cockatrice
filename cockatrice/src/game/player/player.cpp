@@ -3892,9 +3892,7 @@ void Player::refreshShortcuts()
 
 QMenu *Player::createCardMenu(const CardItem *card)
 {
-    // If bad card OR is a spectator (as spectators don't need card menus), return
-    // only update the menu if the card is actually selected
-    if (card == nullptr || (game->isSpectator() && !judge) || game->getActiveCard() != card) {
+    if (card == nullptr) {
         return nullptr;
     }
 
@@ -4218,17 +4216,26 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
 
 /**
  * Creates a card menu from the given card and sets it as the currently active card menu.
+ * Will first check if the card should have a card menu, and no-ops if not.
  *
  * @param card The card to create the menu for. Pass nullptr to disable the card menu.
- * @return The new card menu
+ * @return The new card menu, or nullptr if failed.
  */
 QMenu *Player::updateCardMenu(const CardItem *card)
 {
-    QMenu *menu = createCardMenu(card);
-
-    if (menu) {
-        emit cardMenuUpdated(menu);
+    if (!card) {
+        emit cardMenuUpdated(nullptr);
+        return nullptr;
     }
+
+    // If is spectator (as spectators don't need card menus), return
+    // only update the menu if the card is actually selected
+    if ((game->isSpectator() && !judge) || game->getActiveCard() != card) {
+        return nullptr;
+    }
+
+    QMenu *menu = createCardMenu(card);
+    emit cardMenuUpdated(menu);
 
     return menu;
 }
