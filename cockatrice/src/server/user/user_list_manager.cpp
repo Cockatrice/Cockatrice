@@ -1,7 +1,7 @@
 #include "user_list_manager.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/sound_engine.h"
+#include "../abstract_client.h"
 #include "../pending_command.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_remove_from_list.pb.h"

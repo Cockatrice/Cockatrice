@@ -1,6 +1,5 @@
 #include "tab_deck_editor.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../dialogs/dlg_load_deck.h"
@@ -9,6 +8,7 @@
 #include "../../game/cards/card_database_model.h"
 #include "../../game/filters/filter_builder.h"
 #include "../../game/filters/filter_tree_model.h"
+#include "../../server/abstract_client.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
 #include "../menus/deck_editor/deck_editor_menu.h"

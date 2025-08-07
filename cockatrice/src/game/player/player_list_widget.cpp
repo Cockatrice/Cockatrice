@@ -1,10 +1,10 @@
 #include "player_list_widget.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/tabs/tab_account.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../client/ui/pixel_map_generator.h"
+#include "../../server/abstract_client.h"
 #include "../../server/user/user_context_menu.h"
 #include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"

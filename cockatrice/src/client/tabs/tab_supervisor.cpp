@@ -1,7 +1,7 @@
 #include "tab_supervisor.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../main.h"
+#include "../../server/abstract_client.h"
 #include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "../../settings/cache_settings.h"

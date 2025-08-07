@@ -1,7 +1,7 @@
 #ifndef REMOTECLIENT_H
 #define REMOTECLIENT_H
 
-#include "../../client/game_logic/abstract_client.h"
+#include "../abstract_client.h"
 #include "pb/commands.pb.h"
 
 #include <QLoggingCategory>

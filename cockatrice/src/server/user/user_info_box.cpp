@@ -1,11 +1,11 @@
 #include "user_info_box.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/get_text_with_max.h"
 #include "../../client/ui/pixel_map_generator.h"
 #include "../../dialogs/dlg_edit_avatar.h"
 #include "../../dialogs/dlg_edit_password.h"
 #include "../../dialogs/dlg_edit_user.h"
+#include "../abstract_client.h"
 #include "../pending_command.h"
 #include "passwordhasher.h"
 #include "pb/response_get_user_info.pb.h"

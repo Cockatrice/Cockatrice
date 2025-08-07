@@ -1,6 +1,5 @@
 #include "game_selector.h"
 
-#include "../client/game_logic/abstract_client.h"
 #include "../client/get_text_with_max.h"
 #include "../client/tabs/tab_account.h"
 #include "../client/tabs/tab_game.h"
@@ -8,6 +7,7 @@
 #include "../client/tabs/tab_supervisor.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
+#include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"
 #include "games_model.h"

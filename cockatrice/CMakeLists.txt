@@ -7,8 +7,6 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/client/game_logic/abstract_client.cpp
-    src/client/game_logic/key_signals.cpp
     src/client/get_text_with_max.cpp
     src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/network/client_update_checker.cpp
@@ -226,6 +224,7 @@ set(cockatrice_SOURCES
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
     src/main.cpp
+    src/server/abstract_client.cpp
     src/server/chat_view/chat_view.cpp
     src/server/handle_public_servers.cpp
     src/server/local_client.cpp
@@ -256,6 +255,7 @@ set(cockatrice_SOURCES
     src/settings/shortcut_treeview.cpp
     src/settings/shortcuts_settings.cpp
     src/utility/card_info_comparator.cpp
+    src/utility/key_signals.cpp
     src/utility/levenshtein.cpp
     src/utility/logger.cpp
     src/utility/sequence_edit.cpp
