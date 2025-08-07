@@ -1,10 +1,10 @@
 #include "user_context_menu.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/tabs/tab_account.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../client/tabs/tab_supervisor.h"
 #include "../../game/game_selector.h"
+#include "../abstract_client.h"
 #include "../chat_view/chat_view.h"
 #include "../pending_command.h"
 #include "pb/command_kick_from_game.pb.h"

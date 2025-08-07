@@ -2,11 +2,11 @@
 
 #include "../../deck/custom_line_edit.h"
 #include "../../main.h"
+#include "../../server/abstract_client.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_list_manager.h"
 #include "../../settings/cache_settings.h"
-#include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"

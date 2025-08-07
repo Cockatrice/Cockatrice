@@ -1,6 +1,6 @@
 #include "remote_decklist_tree_widget.h"
 
-#include "../../client/game_logic/abstract_client.h"
+#include "../abstract_client.h"
 #include "../pending_command.h"
 #include "pb/command_deck_list.pb.h"
 #include "pb/response_deck_list.pb.h"

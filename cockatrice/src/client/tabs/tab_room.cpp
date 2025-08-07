@@ -1,9 +1,9 @@
 #include "tab_room.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../dialogs/dlg_settings.h"
 #include "../../game/game_selector.h"
 #include "../../main.h"
+#include "../../server/abstract_client.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_list_manager.h"
