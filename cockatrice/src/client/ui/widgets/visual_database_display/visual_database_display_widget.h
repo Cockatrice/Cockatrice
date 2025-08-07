@@ -6,7 +6,7 @@
 #include "../../../../game/cards/card_database.h"
 #include "../../../../game/cards/card_database_model.h"
 #include "../../../../game/filters/filter_tree_model.h"
-#include "../../../game_logic/key_signals.h"
+#include "../../../../utility/key_signals.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
