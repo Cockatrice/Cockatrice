@@ -32,14 +32,18 @@ export const useRefreshGuard = ({
         return;
       }
 
-      // DO NOT call onBeforeUnload here! 
-      // This fires before user chooses "Stay" or "Leave"
-      // Calling disconnect here will log out the user even if they choose "Stay"
-
-      // DO NOT set React state during beforeunload - it causes state corruption
-      // Only show browser's native dialog for page refresh/navigation
+      // Show browser's native dialog first
       event.preventDefault();
       event.returnValue = ''; // Required for Chrome
+      
+      // Schedule custom modal to show after browser dialog is dismissed
+      // This only happens if user chooses "Stay" on the browser dialog
+      setTimeout(() => {
+        if (shouldGuard) {
+          setShowModal(true);
+        }
+      }, 100);
+      
       return ''; // Required for other browsers
     };
 

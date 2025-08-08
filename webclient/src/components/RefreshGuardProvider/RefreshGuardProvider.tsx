@@ -17,18 +17,20 @@ export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({ chil
     handleConfirmNavigation,
     handleCancelNavigation,
     navigationMessage,
+    showRefreshModal,
+    setShowRefreshModal,
+    handleConfirmRefresh,
+    handleCancelRefresh,
+    refreshMessage,
     isInActiveGame,
     shouldGuard
   } = useGameGuard();
 
-  // Only show custom modal for SPA navigation, not for browser refresh
-  // Browser refresh is handled by the browser's native beforeunload dialog
-  
   return (
     <>
       {children}
       
-      {/* Custom modal only for SPA navigation (React Router) */}
+      {/* Custom modal for SPA navigation (React Router) */}
       <RefreshGuardModal
         open={showNavigationModal}
         onClose={handleCancelNavigation}
@@ -37,6 +39,17 @@ export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({ chil
         title={isInActiveGame ? "Active Game Warning" : "Connection Warning"}
         confirmButtonText={isInActiveGame ? "Leave Game" : "Leave Anyway"}
         cancelButtonText="Stay"
+      />
+      
+      {/* Custom modal for browser refresh (after native dialog) */}
+      <RefreshGuardModal
+        open={showRefreshModal}
+        onClose={handleCancelRefresh}
+        onConfirm={handleConfirmRefresh}
+        message={refreshMessage}
+        title={isInActiveGame ? "Page Refresh Warning" : "Connection Warning"}
+        confirmButtonText="Refresh Anyway"
+        cancelButtonText="Stay on Page"
       />
     </>
   );

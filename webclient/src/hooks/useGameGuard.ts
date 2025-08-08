@@ -14,6 +14,13 @@ interface UseGameGuardReturn {
   handleCancelNavigation: () => void;
   navigationMessage: string;
   
+  // Refresh guard (browser refresh)
+  showRefreshModal: boolean;
+  setShowRefreshModal: (show: boolean) => void;
+  handleConfirmRefresh: () => void;
+  handleCancelRefresh: () => void;
+  refreshMessage: string;
+  
   // Guard state
   isInActiveGame: boolean;
   isConnected: boolean;
@@ -102,6 +109,18 @@ export const useGameGuard = (): UseGameGuardReturn => {
     },
     handleCancelNavigation: navigationGuard.handleCancelNavigation,
     navigationMessage: navigationGuard.guardMessage,
+    
+    // Refresh guard (browser refresh)
+    showRefreshModal: refreshGuard.showModal,
+    setShowRefreshModal: refreshGuard.setShowModal,
+    handleConfirmRefresh: async () => {
+      await handleGracefulDisconnect();
+      window.location.reload();
+    },
+    handleCancelRefresh: () => {
+      refreshGuard.setShowModal(false);
+    },
+    refreshMessage: refreshGuard.guardMessage,
     
     // State
     isInActiveGame,
