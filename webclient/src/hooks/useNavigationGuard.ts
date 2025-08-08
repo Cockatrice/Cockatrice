@@ -19,7 +19,7 @@ interface UseNavigationGuardReturn {
 /**
  * Hook to guard against navigation within the SPA when user has unsaved changes.
  * Works with React Router to block navigation and show confirmation dialog.
- * 
+ *
  * @param options Configuration for the navigation guard
  * @returns Modal state controls and navigation handlers
  */
@@ -30,11 +30,11 @@ export const useNavigationGuard = ({
 }: UseNavigationGuardOptions): UseNavigationGuardReturn => {
   const [showModal, setShowModal] = useState(false);
   const [pendingLocation, setPendingLocation] = useState<string | null>(null);
-  
+
   // Safely get React Router hooks - they might not be available
   let navigate: ReturnType<typeof useNavigate> | null = null;
   let location: ReturnType<typeof useLocation> | null = null;
-  
+
   try {
     navigate = useNavigate();
     location = useLocation();
@@ -64,9 +64,11 @@ export const useNavigationGuard = ({
     const handleLinkClick = (event: Event) => {
       const target = event.target as HTMLElement;
       const link = target.closest('a');
-      
-      if (!link) return;
-      
+
+      if (!link) {
+        return;
+      }
+
       const href = link.getAttribute('href');
       if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:')) {
         return; // Allow external links, anchors, and mailto links
@@ -75,11 +77,11 @@ export const useNavigationGuard = ({
       // Check if this is a React Router navigation
       if (href !== location.pathname) {
         event.preventDefault();
-        
+
         if (onBeforeNavigate) {
           onBeforeNavigate(href);
         }
-        
+
         setPendingLocation(href);
         setShowModal(true);
       }
@@ -89,15 +91,15 @@ export const useNavigationGuard = ({
       if (shouldGuard) {
         // Browser back/forward button pressed
         event.preventDefault();
-        
+
         const targetPath = window.location.pathname;
         if (onBeforeNavigate) {
           onBeforeNavigate(targetPath);
         }
-        
+
         setPendingLocation(targetPath);
         setShowModal(true);
-        
+
         // Restore current URL in history
         window.history.pushState(null, '', location.pathname);
       }

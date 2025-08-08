@@ -1,6 +1,6 @@
-import React from "react";
-import { useGameGuard } from "hooks";
-import { RefreshGuardModal } from "../RefreshGuardModal/RefreshGuardModal";
+import React from 'react';
+import { useGameGuard } from 'hooks';
+import { RefreshGuardModal } from '../RefreshGuardModal/RefreshGuardModal';
 
 interface RefreshGuardProviderProps {
   children: React.ReactNode;
@@ -34,8 +34,8 @@ export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({
         onClose={handleCancelNavigation}
         onConfirm={handleConfirmNavigation}
         message={navigationMessage}
-        title={isInActiveGame ? "Active Game Warning" : "Connection Warning"}
-        confirmButtonText={isInActiveGame ? "Leave Game" : "Leave Anyway"}
+        title={isInActiveGame ? 'Active Game Warning' : 'Connection Warning'}
+        confirmButtonText={isInActiveGame ? 'Leave Game' : 'Leave Anyway'}
         cancelButtonText="Stay"
       />
 
@@ -45,7 +45,7 @@ export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({
         onClose={handleCancelRefresh}
         onConfirm={handleConfirmRefresh}
         message={refreshMessage}
-        title={isInActiveGame ? "Page Refresh Warning" : "Connection Warning"}
+        title={isInActiveGame ? 'Page Refresh Warning' : 'Connection Warning'}
         confirmButtonText="Refresh Anyway"
         cancelButtonText="Stay on Page"
       />

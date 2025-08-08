@@ -15,7 +15,7 @@ interface UseRefreshGuardReturn {
 /**
  * Hook to guard against accidental page refresh or navigation away from the site.
  * Shows both browser's native beforeunload dialog and a custom modal for better UX.
- * 
+ *
  * @param options Configuration for the refresh guard
  * @returns Modal state controls and current guard message
  */
@@ -35,7 +35,7 @@ export const useRefreshGuard = ({
       // Show browser's native dialog first
       event.preventDefault();
       event.returnValue = ''; // Required for Chrome
-      
+
       // Schedule custom modal to show after browser dialog is dismissed
       // This only happens if user chooses "Stay" on the browser dialog
       setTimeout(() => {
@@ -43,7 +43,7 @@ export const useRefreshGuard = ({
           setShowModal(true);
         }
       }, 100);
-      
+
       return ''; // Required for other browsers
     };
 

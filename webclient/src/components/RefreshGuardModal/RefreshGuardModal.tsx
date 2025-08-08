@@ -50,22 +50,22 @@ export const RefreshGuardModal: React.FC<RefreshGuardModalProps> = ({
           {title}
         </Box>
       </DialogTitle>
-      
+
       <DialogContent>
         <Alert severity="warning" sx={{ mb: 2 }}>
           <Typography variant="body1" id="refresh-guard-description">
             {message}
           </Typography>
         </Alert>
-        
+
         <Typography variant="body2" color="textSecondary">
-          Your browser may also show a confirmation dialog. Both dialogs are asking the same thing - 
+          Your browser may also show a confirmation dialog. Both dialogs are asking the same thing -
           whether you want to leave the page and lose your current progress.
         </Typography>
       </DialogContent>
-      
+
       <DialogActions>
-        <Button 
+        <Button
           onClick={onClose}
           variant="contained"
           color="primary"
@@ -73,7 +73,7 @@ export const RefreshGuardModal: React.FC<RefreshGuardModalProps> = ({
         >
           {cancelButtonText}
         </Button>
-        <Button 
+        <Button
           onClick={onConfirm}
           variant="outlined"
           color="error"
