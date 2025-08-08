@@ -1,6 +1,6 @@
-import React from 'react';
-import { useGameGuard } from 'hooks';
-import { RefreshGuardModal } from '../RefreshGuardModal/RefreshGuardModal';
+import React from "react";
+import { useGameGuard } from "hooks";
+import { RefreshGuardModal } from "../RefreshGuardModal/RefreshGuardModal";
 
 interface RefreshGuardProviderProps {
   children: React.ReactNode;
@@ -8,28 +8,26 @@ interface RefreshGuardProviderProps {
 
 /**
  * Provider component that wraps the entire app to provide refresh and navigation guarding.
- * Should be placed high in the component tree, ideally in AppShell.
  */
-export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({ children }) => {
+export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({
+  children,
+}) => {
   const {
     showNavigationModal,
-    setShowNavigationModal,
     handleConfirmNavigation,
     handleCancelNavigation,
     navigationMessage,
     showRefreshModal,
-    setShowRefreshModal,
     handleConfirmRefresh,
     handleCancelRefresh,
     refreshMessage,
     isInActiveGame,
-    shouldGuard
   } = useGameGuard();
 
   return (
     <>
       {children}
-      
+
       {/* Custom modal for SPA navigation (React Router) */}
       <RefreshGuardModal
         open={showNavigationModal}
@@ -40,7 +38,7 @@ export const RefreshGuardProvider: React.FC<RefreshGuardProviderProps> = ({ chil
         confirmButtonText={isInActiveGame ? "Leave Game" : "Leave Anyway"}
         cancelButtonText="Stay"
       />
-      
+
       {/* Custom modal for browser refresh (after native dialog) */}
       <RefreshGuardModal
         open={showRefreshModal}

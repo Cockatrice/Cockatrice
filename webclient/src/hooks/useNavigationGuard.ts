@@ -61,9 +61,6 @@ export const useNavigationGuard = ({
       return; // Skip navigation guard if Router is not available
     }
 
-    // Note: React Router v6 doesn't have built-in navigation blocking like v5
-    // We'll implement a custom solution by intercepting link clicks and form submissions
-
     const handleLinkClick = (event: Event) => {
       const target = event.target as HTMLElement;
       const link = target.closest('a');
