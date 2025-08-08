@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 interface UseRefreshGuardOptions {
   shouldGuard: boolean;
   message?: string;
-  onUnload?: () => void; // Called only when page is actually unloading (not on beforeunload)
+  onUnload?: () => void;
 }
 
 interface UseRefreshGuardReturn {
@@ -22,7 +22,7 @@ interface UseRefreshGuardReturn {
 export const useRefreshGuard = ({
   shouldGuard,
   message = 'You have unsaved changes that will be lost.',
-  onUnload
+  onUnload,
 }: UseRefreshGuardOptions): UseRefreshGuardReturn => {
   const [showModal, setShowModal] = useState(false);
 
@@ -34,7 +34,7 @@ export const useRefreshGuard = ({
 
       // Show browser's native dialog first
       event.preventDefault();
-      event.returnValue = ''; // Required for Chrome
+      event.returnValue = '';
 
       // Schedule custom modal to show after browser dialog is dismissed
       // This only happens if user chooses "Stay" on the browser dialog
@@ -44,7 +44,7 @@ export const useRefreshGuard = ({
         }
       }, 100);
 
-      return ''; // Required for other browsers
+      return '';
     };
 
     const handleUnload = () => {
@@ -76,6 +76,6 @@ export const useRefreshGuard = ({
   return {
     showModal,
     setShowModal,
-    guardMessage: message
+    guardMessage: message,
   };
 };

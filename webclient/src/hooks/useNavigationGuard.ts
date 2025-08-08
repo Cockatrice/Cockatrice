@@ -26,7 +26,7 @@ interface UseNavigationGuardReturn {
 export const useNavigationGuard = ({
   shouldGuard,
   message = 'You have unsaved changes that will be lost.',
-  onBeforeNavigate
+  onBeforeNavigate,
 }: UseNavigationGuardOptions): UseNavigationGuardReturn => {
   const [showModal, setShowModal] = useState(false);
   const [pendingLocation, setPendingLocation] = useState<string | null>(null);
@@ -40,7 +40,10 @@ export const useNavigationGuard = ({
     location = useLocation();
   } catch (error) {
     // React Router hooks not available - navigation guard will be disabled
-    console.warn('React Router not available, navigation guard disabled:', error);
+    console.warn(
+      'React Router not available, navigation guard disabled:',
+      error
+    );
   }
 
   const handleConfirmNavigation = useCallback(() => {
@@ -58,7 +61,7 @@ export const useNavigationGuard = ({
 
   useEffect(() => {
     if (!shouldGuard || !location || !navigate) {
-      return; // Skip navigation guard if Router is not available
+      return;
     }
 
     const handleLinkClick = (event: Event) => {
@@ -70,8 +73,13 @@ export const useNavigationGuard = ({
       }
 
       const href = link.getAttribute('href');
-      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:')) {
-        return; // Allow external links, anchors, and mailto links
+      if (
+        !href ||
+        href.startsWith('#') ||
+        href.startsWith('http') ||
+        href.startsWith('mailto:')
+      ) {
+        return;
       }
 
       // Check if this is a React Router navigation
@@ -129,6 +137,6 @@ export const useNavigationGuard = ({
     pendingLocation,
     handleConfirmNavigation,
     handleCancelNavigation,
-    guardMessage: message
+    guardMessage: message,
   };
 };

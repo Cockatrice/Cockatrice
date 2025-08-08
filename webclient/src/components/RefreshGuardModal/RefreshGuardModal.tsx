@@ -42,7 +42,7 @@ export const RefreshGuardModal: React.FC<RefreshGuardModalProps> = ({
       aria-describedby="refresh-guard-description"
       maxWidth="sm"
       fullWidth
-      disableEscapeKeyDown // Prevent closing with Escape key
+      disableEscapeKeyDown
     >
       <DialogTitle id="refresh-guard-title">
         <Box display="flex" alignItems="center" gap={1}>
@@ -69,7 +69,7 @@ export const RefreshGuardModal: React.FC<RefreshGuardModalProps> = ({
           onClick={onClose}
           variant="contained"
           color="primary"
-          autoFocus // Focus the safe option by default
+          autoFocus
         >
           {cancelButtonText}
         </Button>
