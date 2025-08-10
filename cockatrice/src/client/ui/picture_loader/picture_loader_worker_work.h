@@ -33,7 +33,6 @@ public slots:
     void handleNetworkReply(QNetworkReply *reply);
 
 private:
-    QThread *pictureLoaderThread;
     bool picDownload;
 
     void startNextPicDownload();

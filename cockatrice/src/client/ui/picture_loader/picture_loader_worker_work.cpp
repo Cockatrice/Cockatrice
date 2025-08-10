@@ -28,16 +28,7 @@ PictureLoaderWorkerWork::PictureLoaderWorkerWork(const PictureLoaderWorker *work
     // Hook up signals to settings
     connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
-    pictureLoaderThread = new QThread;
-    moveToThread(pictureLoaderThread);
-
-    connect(pictureLoaderThread, &QThread::started, this, &PictureLoaderWorkerWork::startNextPicDownload);
-
-    // clean up threads once loading finishes
-    connect(this, &QObject::destroyed, pictureLoaderThread, &QThread::quit);
-    connect(pictureLoaderThread, &QThread::finished, pictureLoaderThread, &QObject::deleteLater);
-
-    pictureLoaderThread->start(QThread::LowPriority);
+    startNextPicDownload();
 }
 
 void PictureLoaderWorkerWork::startNextPicDownload()
