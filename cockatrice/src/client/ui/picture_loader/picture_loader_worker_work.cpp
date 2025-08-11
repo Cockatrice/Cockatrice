@@ -11,6 +11,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
+#include <QThreadPool>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};
@@ -67,6 +68,15 @@ void PictureLoaderWorkerWork::picDownloadFailed()
             << ", no more url combinations to try: BAILING OUT";
         concludeImageLoad(QImage());
     }
+}
+
+/**
+ * Processes the reply in another thread.
+ * @param reply The finished reply. Takes ownership of the object
+ */
+void PictureLoaderWorkerWork::acceptNetworkReply(QNetworkReply *reply)
+{
+    QThreadPool::globalInstance()->start([this, reply] { handleNetworkReply(reply); });
 }
 
 /**
