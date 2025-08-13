@@ -1004,7 +1004,6 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
                     i.value()->addOpponentDeckView(loader, eventPlayerId, player->getName());
                 }
             }
-            qInfo() << "lol, lmao even";
             break;
         }
         case GameEventContext::SET_SIDEBOARD_LOCK: {
