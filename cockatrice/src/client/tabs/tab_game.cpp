@@ -912,12 +912,14 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
             if (player->getLocal()) {
                 continue;
             }
-            DeckList loader;
-            loader.loadFromString_Native(QString::fromStdString(playerInfo.deck_list()));
-            QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
-            while (i.hasNext()) {
-                i.next();
-                i.value()->addOpponentDeckView(loader, playerId, player->getName());
+            if (gameInfo.share_decklists_on_load()) {
+                DeckList loader;
+                loader.loadFromString_Native(QString::fromStdString(playerInfo.deck_list()));
+                QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
+                while (i.hasNext()) {
+                    i.next();
+                    i.value()->addOpponentDeckView(loader, playerId, player->getName());
+                }
             }
         }
     }
