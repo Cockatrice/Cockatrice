@@ -995,7 +995,7 @@ void TabGame::eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &
             Context_DeckSelect deckSelect = context.GetExtension(Context_DeckSelect::ext);
             messageLog->logDeckSelect(player, QString::fromStdString(deckSelect.deck_hash()),
                                       deckSelect.sideboard_size());
-            if (deckSelect.has_deck_list() && eventPlayerId != localPlayerId) {
+            if (gameInfo.share_decklists_on_load() && deckSelect.has_deck_list() && eventPlayerId != localPlayerId) {
                 DeckList loader;
                 loader.loadFromString_Native(QString::fromStdString(deckSelect.deck_list()));
                 QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
