@@ -102,7 +102,7 @@ void DlgCreateGame::sharedCtor()
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
-    shareDecklistsOnLoadLabel = new QLabel(tr("Share decklists on load"));
+    shareDecklistsOnLoadLabel = new QLabel(tr("Open Decklists in Lobby"));
     shareDecklistsOnLoadCheckBox = new QCheckBox();
     shareDecklistsOnLoadLabel->setBuddy(shareDecklistsOnLoadCheckBox);
 
