@@ -12,6 +12,7 @@ TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     playerDeckView = new DeckViewContainer(playerId, parentGame);
     int playerTabIndex = addTab(playerDeckView, "Your Deck");
     tabBar()->setTabButton(playerTabIndex, QTabBar::RightSide, nullptr);
+    updateTabBarVisibility();
 }
 
 void TabbedDeckViewContainer::addOpponentDeckView(const DeckList &opponentDeck, int opponentId, QString opponentName)
@@ -26,6 +27,7 @@ void TabbedDeckViewContainer::addOpponentDeckView(const DeckList &opponentDeck, 
 
         opponentDeckViews.insert(opponentId, opponentDeckView);
     }
+    updateTabBarVisibility();
 }
 
 void TabbedDeckViewContainer::closeTab(int index)
@@ -49,4 +51,14 @@ void TabbedDeckViewContainer::closeTab(int index)
 
     removeTab(index);
     widgetToClose->deleteLater();
+    updateTabBarVisibility();
+}
+
+void TabbedDeckViewContainer::updateTabBarVisibility()
+{
+    if (tabBar()->count() <= 1) {
+        tabBar()->hide();
+    } else {
+        tabBar()->show();
+    }
 }

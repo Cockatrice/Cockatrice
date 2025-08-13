@@ -11,6 +11,7 @@ class TabbedDeckViewContainer : public QTabWidget
 public:
     explicit TabbedDeckViewContainer(int _playerId, TabGame *parent);
     void closeTab(int index);
+    void updateTabBarVisibility();
     void addOpponentDeckView(const DeckList &opponentDeck, int opponentId, QString opponentName);
     int playerId;
     TabGame *parentGame;
