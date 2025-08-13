@@ -513,21 +513,6 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
     userInterface->playerAddedToGame(gameId, room->getId(), newPlayer->getPlayerId());
 
     createGameJoinedEvent(newPlayer, rc, false);
-
-    Event_PlayerPropertiesChanged event;
-    GameEventStorage ges;
-
-    if (getShareDecklistsOnLoad()) {
-        for (const auto &player : players) {
-            Context_DeckSelect context;
-            if (player->getDeckList() != nullptr) {
-                context.set_deck_list(player->getDeckList()->writeToString_Native().toStdString());
-                ges.setGameEventContext(context);
-                ges.enqueueGameEvent(event, player->getPlayerId());
-                ges.sendToGame(this);
-            }
-        }
-    }
 }
 
 void Server_Game::removePlayer(Server_Player *player, Event_Leave::LeaveReason reason)
