@@ -1840,7 +1840,8 @@ void Player::actCreateToken()
 
     lastTokenInfo = dlg.getTokenInfo();
 
-    ExactCard correctedCard = CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name});
+    ExactCard correctedCard =
+        CardDatabaseManager::getInstance()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
         lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard.getInfo().getTableRow());
@@ -1863,6 +1864,7 @@ void Player::actCreateAnotherToken()
     Command_CreateToken cmd;
     cmd.set_zone("table");
     cmd.set_card_name(lastTokenInfo.name.toStdString());
+    cmd.set_card_provider_id(lastTokenInfo.providerId.toStdString());
     cmd.set_color(lastTokenInfo.color.toStdString());
     cmd.set_pt(lastTokenInfo.pt.toStdString());
     cmd.set_annotation(lastTokenInfo.annotation.toStdString());
@@ -1903,9 +1905,9 @@ void Player::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        ExactCard cardInfo =
-            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), sourceCard->getProviderId()});
-        setLastToken(cardInfo.getCardPtr());
+        ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(
+            cardRelation->getName(), sourceCard->getCard().getPrinting());
+        setLastToken(relatedCard.getCardPtr());
     }
 }
 
@@ -2067,13 +2069,18 @@ void Player::createCard(const CardItem *sourceCard,
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
 
+    ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardInfo->getName(),
+                                                                                   sourceCard->getCard().getPrinting());
+
     switch (attachType) {
         case CardRelation::DoesNotAttach:
             cmd.set_target_zone("table");
+            cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             break;
 
         case CardRelation::AttachTo:
             cmd.set_target_zone("table"); // We currently only support creating tokens on the table
+            cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
             break;
@@ -4166,8 +4173,8 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        ExactCard relatedCard =
-            CardDatabaseManager::getInstance()->getCard({cardRelation->getName(), exactCard.getPrinting().getUuid()});
+        ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardRelation->getName(),
+                                                                                       card->getCard().getPrinting());
         if (!relatedCard) {
             relatedCard = CardDatabaseManager::getInstance()->getCard({cardRelation->getName()});
         }
@@ -4307,7 +4314,9 @@ void Player::setLastToken(CardInfoPtr cardInfo)
                      .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
                      .pt = cardInfo->getPowTough(),
                      .annotation = SettingsCache::instance().getAnnotateTokens() ? cardInfo->getText() : "",
-                     .destroy = true};
+                     .destroy = true,
+                     .providerId =
+                         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
     lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getTableRow());
     aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(lastTokenInfo.name));

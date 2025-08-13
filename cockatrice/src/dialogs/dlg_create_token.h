@@ -25,6 +25,7 @@ struct TokenInfo
     QString annotation;
     bool destroy = true;
     bool faceDown = false;
+    QString providerId;
 };
 
 class DlgCreateToken : public QDialog

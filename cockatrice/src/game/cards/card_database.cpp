@@ -458,6 +458,12 @@ bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
     return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
 }
 
+ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
+{
+    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
+    return ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+}
+
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
     for (const CardInfoPtr &card : cards)
