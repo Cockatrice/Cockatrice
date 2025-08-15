@@ -23,13 +23,15 @@ private:
     AbstractClient *client;
     QTreeView *localDirView;
     QFileSystemModel *localDirModel;
-    QToolBar *leftToolBar, *rightToolBar;
     RemoteReplayList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
     QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenReplaysFolder;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
+
+    QGroupBox *createLeftLayout();
+    QGroupBox *createRightLayout();
 
     void setRemoteEnabled(bool enabled);
 
