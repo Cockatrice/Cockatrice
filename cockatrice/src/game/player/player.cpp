@@ -150,8 +150,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     stack = addZone(new StackZone(this, (int)table->boundingRect().height(), this));
 
-    hand = addZone(new HandZone(this,
-                                _local || _judge || (_parent->getSpectator() && _parent->getSpectatorsSeeEverything()),
+    hand = addZone(new HandZone(this, _local || _judge || (_parent->isSpectator() && _parent->isSpectatorsOmniscient()),
                                 (int)table->boundingRect().height(), this));
     connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
@@ -2782,7 +2781,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 
                 switch (zoneInfo.type()) {
                     case ServerInfo_Zone::PrivateZone:
-                        contentsKnown = local || judge || (game->getSpectator() && game->getSpectatorsSeeEverything());
+                        contentsKnown = local || judge || (game->isSpectator() && game->isSpectatorsOmniscient());
                         break;
 
                     case ServerInfo_Zone::PublicZone:

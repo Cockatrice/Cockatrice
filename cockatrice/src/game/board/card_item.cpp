@@ -259,7 +259,7 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (static_cast<TabGame *>(owner->parent())->isSpectator())
         return;
 
     Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
@@ -282,7 +282,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (static_cast<TabGame *>(owner->parent())->isSpectator())
         return;
 
     auto *arrow = new ArrowAttachItem(this);
