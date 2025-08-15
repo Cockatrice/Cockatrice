@@ -161,6 +161,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setHidePasswordProtectedGames(dlg.getHidePasswordProtectedGames());
     gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
     gameListProxyModel->setHideNotBuddyCreatedGames(dlg.getHideNotBuddyCreatedGames());
+    gameListProxyModel->setHideOpenDecklistGames(dlg.getHideOpenDecklistGames());
     gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
     gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
     gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());

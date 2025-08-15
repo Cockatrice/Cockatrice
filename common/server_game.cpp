@@ -21,6 +21,7 @@
 
 #include "decklist.h"
 #include "pb/context_connection_state_changed.pb.h"
+#include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"
 #include "pb/event_delete_arrow.pb.h"
 #include "pb/event_game_closed.pb.h"
@@ -62,15 +63,16 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          bool _spectatorsCanTalk,
                          bool _spectatorsSeeEverything,
                          int _startingLifeTotal,
+                         bool _shareDecklistsOnLoad,
                          Server_Room *_room)
     : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(_creatorInfo)),
       gameStarted(false), gameClosed(false), gameId(_gameId), password(_password), maxPlayers(_maxPlayers),
       gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies),
       onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
-      spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal), inactivityCounter(0),
-      startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false),
-      startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+      spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
+      shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
+      firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
 #else
@@ -800,6 +802,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_need_password(getSpectatorsNeedPassword());
         result.set_spectators_can_chat(spectatorsCanTalk);
         result.set_spectators_omniscient(spectatorsSeeEverything);
+        result.set_share_decklists_on_load(shareDecklistsOnLoad);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
     }

@@ -102,9 +102,15 @@ void DlgCreateGame::sharedCtor()
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
+    shareDecklistsOnLoadLabel = new QLabel(tr("Open decklists in lobby"));
+    shareDecklistsOnLoadCheckBox = new QCheckBox();
+    shareDecklistsOnLoadLabel->setBuddy(shareDecklistsOnLoadCheckBox);
+
     QGridLayout *gameSetupOptionsLayout = new QGridLayout;
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
+    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadLabel, 1, 0);
+    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 1);
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"));
     gameSetupOptionsGroupBox->setLayout(gameSetupOptionsLayout);
 
@@ -149,6 +155,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     spectatorsSeeEverythingCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanSeeEverything());
     createGameAsSpectatorCheckBox->setChecked(SettingsCache::instance().getCreateGameAsSpectator());
     startingLifeTotalEdit->setValue(SettingsCache::instance().getDefaultStartingLifeTotal());
+    shareDecklistsOnLoadCheckBox->setChecked(SettingsCache::instance().getShareDecklistsOnLoad());
 
     if (!rememberGameSettings->isChecked()) {
         actReset();
@@ -181,6 +188,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsSeeEverythingCheckBox->setEnabled(false);
     createGameAsSpectatorCheckBox->setEnabled(false);
     startingLifeTotalEdit->setEnabled(false);
+    shareDecklistsOnLoadCheckBox->setEnabled(false);
 
     descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
     maxPlayersEdit->setValue(gameInfo.max_players());
@@ -225,6 +233,7 @@ void DlgCreateGame::actReset()
     createGameAsSpectatorCheckBox->setChecked(false);
 
     startingLifeTotalEdit->setValue(20);
+    shareDecklistsOnLoadCheckBox->setChecked(false);
 
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
@@ -253,6 +262,7 @@ void DlgCreateGame::actOK()
     cmd.set_join_as_judge(QApplication::keyboardModifiers() & Qt::ShiftModifier);
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
     cmd.set_starting_life_total(startingLifeTotalEdit->value());
+    cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
 
     QString _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
@@ -276,6 +286,7 @@ void DlgCreateGame::actOK()
         SettingsCache::instance().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
         SettingsCache::instance().setCreateGameAsSpectator(createGameAsSpectatorCheckBox->isChecked());
         SettingsCache::instance().setDefaultStartingLifeTotal(startingLifeTotalEdit->value());
+        SettingsCache::instance().setShareDecklistsOnLoad(shareDecklistsOnLoadCheckBox->isChecked());
         SettingsCache::instance().setGameTypes(_gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);

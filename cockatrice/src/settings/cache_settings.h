@@ -302,6 +302,7 @@ private:
     bool spectatorsCanSeeEverything;
     bool createGameAsSpectator;
     int defaultStartingLifeTotal;
+    bool shareDecklistsOnLoad;
     int keepalive;
     int timeout;
     void translateLegacySettings();
@@ -805,6 +806,10 @@ public:
     {
         return defaultStartingLifeTotal;
     }
+    bool getShareDecklistsOnLoad() const
+    {
+        return shareDecklistsOnLoad;
+    }
     bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
@@ -1032,6 +1037,7 @@ public slots:
     void setSpectatorsCanSeeEverything(const bool _spectatorsCanSeeEverything);
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
+    void setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);

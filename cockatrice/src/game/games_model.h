@@ -81,6 +81,7 @@ private:
     bool hideGamesThatStarted;
     bool hidePasswordProtectedGames;
     bool hideNotBuddyCreatedGames;
+    bool hideOpenDecklistGames;
     QString gameNameFilter, creatorNameFilter;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
@@ -121,6 +122,11 @@ public:
         return hideNotBuddyCreatedGames;
     }
     void setHideNotBuddyCreatedGames(bool value);
+    bool getHideOpenDecklistGames() const
+    {
+        return hideOpenDecklistGames;
+    }
+    void setHideOpenDecklistGames(bool _hideOpenDecklistGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;

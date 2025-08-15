@@ -16,6 +16,7 @@ message ServerInfo_Game {
     optional bool spectators_need_password = 12;
     optional bool spectators_can_chat = 13;
     optional bool spectators_omniscient = 14;
+    optional bool share_decklists_on_load = 15;
     optional uint32 player_count = 30;
     optional uint32 spectators_count = 31;
     optional bool started = 50;
