@@ -31,13 +31,16 @@
 #include "pb/command_deck_upload.pb.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_get_code.pb.h"
 #include "pb/command_replay_list.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
+#include "pb/command_replay_submit_code.pb.h"
 #include "pb/commands.pb.h"
 #include "pb/event_add_to_list.pb.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_notify_user.pb.h"
 #include "pb/event_remove_from_list.pb.h"
+#include "pb/event_replay_added.pb.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/event_server_message.pb.h"
 #include "pb/event_user_message.pb.h"
@@ -50,6 +53,7 @@
 #include "pb/response_password_salt.pb.h"
 #include "pb/response_register.pb.h"
 #include "pb/response_replay_download.pb.h"
+#include "pb/response_replay_get_code.pb.h"
 #include "pb/response_replay_list.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "pb/response_warn_history.pb.h"
@@ -733,6 +737,120 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
     if (!sqlInterface->execSqlQuery(query))
         return Response::RespInternalError;
     return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
+}
+
+/**
+ * Generates a hash for the given replay folder, used for auth when replay sharing
+ * This is a separate function in case we change the hash implementation in the future
+ *
+ * @param gameId The replay match to hash
+ * @return The hash as a QString. Returns an empty string if failed
+ */
+QString AbstractServerSocketInterface::createHashForReplay(int gameId)
+{
+    QSqlQuery *query = sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game");
+    query->bindValue(":id_game", gameId);
+
+    if (!sqlInterface->execSqlQuery(query))
+        return "";
+
+    QByteArray replaysBytes;
+    while (query->next()) {
+        QByteArray replay = query->value(0).toByteArray();
+        replay.truncate(127);
+        replaysBytes.append(replay);
+    }
+
+    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toHex();
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Command_ReplayGetCode &cmd,
+                                                                       ResponseContainer &rc)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    // Check that user has access to replay match
+    {
+        QSqlQuery *query =
+            sqlInterface->prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on "
+                                       "a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
+        query->bindValue(":id_replay", cmd.game_id());
+        query->bindValue(":id_player", userInfo->id());
+        if (!sqlInterface->execSqlQuery(query))
+            return Response::RespInternalError;
+        if (!query->next())
+            return Response::RespAccessDenied;
+    }
+
+    QString hash = createHashForReplay(cmd.game_id());
+    if (hash.isEmpty()) {
+        return Response::RespInternalError;
+    }
+
+    // code is of the form <game-id>-<hash>
+    QString code = QString(QString::number(cmd.game_id()) + "-" + hash);
+
+    Response_ReplayGetCode *re = new Response_ReplayGetCode;
+    re->set_replay_code(code.toStdString());
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd,
+                                                                          ResponseContainer & /*rc*/)
+{
+    // code is of the form <game-id>-<hash of replay data>
+    QString code = QString::fromStdString(cmd.replay_code());
+    QStringList split = code.split("-");
+    if (split.size() != 2) {
+        // always return the same error response if code is incorrect, to not leak info to user
+        return Response::RespNameNotFound;
+    }
+    QString gameId = split[0];
+    QString hash = split[1];
+
+    // Determine if the replay actually exists already
+    auto *replayExistsQuery =
+        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
+    replayExistsQuery->bindValue(":idgame", gameId);
+    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!replayExistsQuery->next()) {
+        return Response::RespNameNotFound;
+    }
+
+    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
+    if (!replayExists) {
+        return Response::RespNameNotFound;
+    }
+
+    // Check if hash is correct
+    if (hash != createHashForReplay(gameId.toInt())) {
+        return Response::RespNameNotFound;
+    }
+
+    // Grant the User access to the replay
+    auto *grantReplayAccessQuery =
+        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                                   "values(:idgame, :idplayer, :replayname, 0)");
+    grantReplayAccessQuery->bindValue(":idgame", gameId);
+    grantReplayAccessQuery->bindValue(":idplayer", userInfo->id());
+    grantReplayAccessQuery->bindValue(":replayname", "Shared Replay");
+
+    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+        return Response::RespInternalError;
+    }
+
+    // update user's view
+    Event_ReplayAdded event;
+    SessionEvent *se = prepareSessionEvent(event);
+    sendProtocolItem(*se);
+    delete se;
+
+    return Response::RespOk;
 }
 
 // MODERATOR FUNCTIONS.

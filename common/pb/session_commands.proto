@@ -31,6 +31,8 @@ message SessionCommand {
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
         REPLAY_DELETE_MATCH = 1103;
+        REPLAY_GET_CODE = 1104;
+        REPLAY_SUBMIT_CODE = 1105;
     }
     extensions 100 to max;
 }
