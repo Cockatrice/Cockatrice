@@ -140,16 +140,22 @@ void CardAmountWidget::updateCardCount()
  */
 void CardAmountWidget::addPrinting(const QString &zone)
 {
+    // Add the card and expand the list UI
     auto newCardIndex = deckModel->addCard(rootCard, zone);
     recursiveExpand(newCardIndex);
+
+    // Check if a card without a providerId already exists in the deckModel and replace it, if so.
     QModelIndex find_card = deckModel->findCard(rootCard.getName(), zone);
-    if (find_card.isValid() && find_card != newCardIndex) {
+    QString foundProviderId = deckModel->data(find_card.sibling(find_card.row(), 4), Qt::DisplayRole).toString();
+    if (find_card.isValid() && find_card != newCardIndex && foundProviderId == "") {
         auto amount = deckModel->data(find_card, Qt::DisplayRole);
         for (int i = 0; i < amount.toInt() - 1; i++) {
             deckModel->addCard(rootCard, zone);
         }
         deckModel->removeRow(find_card.row(), find_card.parent());
     }
+
+    // Set Index and Focus as if the user had just clicked the new card and modify the deckEditor saveState
     newCardIndex = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
                                        rootCard.getPrinting().getProperty("num"));
     deckView->setCurrentIndex(newCardIndex);

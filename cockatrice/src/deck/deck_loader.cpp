@@ -397,6 +397,7 @@ void DeckLoader::clearSetNamesAndNumbers()
         // Set the providerId on the card
         card->setCardSetShortName(nullptr);
         card->setCardCollectorNumber(nullptr);
+        card->setCardProviderId(nullptr);
     };
 
     forEachCard(clearSetNameAndNumber);
