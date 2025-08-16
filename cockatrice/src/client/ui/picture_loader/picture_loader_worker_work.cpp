@@ -71,15 +71,6 @@ void PictureLoaderWorkerWork::picDownloadFailed()
 }
 
 /**
- * Processes the reply in another thread.
- * @param reply The finished reply. Takes ownership of the object
- */
-void PictureLoaderWorkerWork::acceptNetworkReply(QNetworkReply *reply)
-{
-    QThreadPool::globalInstance()->start([this, reply] { handleNetworkReply(reply); });
-}
-
-/**
  *
  * @param reply The reply. Takes ownership of the object
  */

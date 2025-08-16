@@ -30,14 +30,13 @@ public:
     PictureToLoad cardToDownload;
 
 public slots:
-    void acceptNetworkReply(QNetworkReply *reply);
+    void handleNetworkReply(QNetworkReply *reply);
 
 private:
     bool picDownload;
 
     void startNextPicDownload();
     void picDownloadFailed();
-    void handleNetworkReply(QNetworkReply *reply);
     void handleFailedReply(const QNetworkReply *reply);
     void handleSuccessfulReply(QNetworkReply *reply);
     QImage tryLoadImageFromReply(QNetworkReply *reply);
