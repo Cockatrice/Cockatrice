@@ -1267,6 +1267,10 @@ void TabGame::setActiveCard(CardItem *card)
  */
 void TabGame::setCardMenu(QMenu *menu)
 {
+    if (!aCardMenu) {
+        return;
+    }
+
     if (menu) {
         aCardMenu->setMenu(menu);
     } else {
@@ -1355,6 +1359,9 @@ void TabGame::createReplayMenuItems()
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);
     gameMenu->addAction(aCloseReplay);
+
+    aCardMenu = nullptr;
+
     addTabMenu(gameMenu);
 }
 
