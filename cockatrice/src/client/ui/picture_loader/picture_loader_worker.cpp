@@ -94,7 +94,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url, PictureLoaderWo
     QNetworkReply *reply = networkManager->get(req);
 
     // Connect reply handling
-    connect(reply, &QNetworkReply::finished, worker, [reply, worker] { worker->acceptNetworkReply(reply); });
+    connect(reply, &QNetworkReply::finished, worker, [reply, worker] { worker->handleNetworkReply(reply); });
 
     return reply;
 }
