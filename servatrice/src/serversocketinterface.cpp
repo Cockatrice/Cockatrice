@@ -817,9 +817,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     QString gameId = split[0];
     QString hash = split[1];
 
-    // Determine if the replay actually exists
+    // Determine if the replay actually exists (and grab the replay name while at it)
     auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :id_game");
+        sqlInterface->prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
     replayExistsQuery->bindValue(":id_game", gameId);
     if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
         return Response::RespInternalError;
@@ -828,10 +828,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
         return Response::RespNameNotFound;
     }
 
-    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
-    if (!replayExists) {
-        return Response::RespNameNotFound;
-    }
+    const auto &replayName = replayExistsQuery->value(0).toString();
 
     // Determine if user already has access to replay
     auto *alreadyAccessQuery = sqlInterface->prepareQuery(
@@ -856,7 +853,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
                                    "values(:idgame, :idplayer, :replayname, 0)");
     grantReplayAccessQuery->bindValue(":idgame", gameId);
     grantReplayAccessQuery->bindValue(":idplayer", userInfo->id());
-    grantReplayAccessQuery->bindValue(":replayname", "Shared Replay");
+    grantReplayAccessQuery->bindValue(":replayname", replayName);
 
     if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
         return Response::RespInternalError;
