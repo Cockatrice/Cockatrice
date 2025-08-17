@@ -817,10 +817,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     QString gameId = split[0];
     QString hash = split[1];
 
-    // Determine if the replay actually exists already
+    // Determine if the replay actually exists
     auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
-    replayExistsQuery->bindValue(":idgame", gameId);
+        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :id_game");
+    replayExistsQuery->bindValue(":id_game", gameId);
     if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
         return Response::RespInternalError;
     }
@@ -831,6 +831,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
     if (!replayExists) {
         return Response::RespNameNotFound;
+    }
+
+    // Determine if user already has access to replay
+    auto *alreadyAccessQuery = sqlInterface->prepareQuery(
+        "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+    alreadyAccessQuery->bindValue(":id_game", gameId);
+    alreadyAccessQuery->bindValue(":id_player", userInfo->id());
+    if (!sqlInterface->execSqlQuery(alreadyAccessQuery)) {
+        return Response::RespInternalError;
+    }
+    if (alreadyAccessQuery->next()) {
+        return Response::RespOk;
     }
 
     // Check if hash is correct
