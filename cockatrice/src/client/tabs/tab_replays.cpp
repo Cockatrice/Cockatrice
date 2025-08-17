@@ -530,8 +530,10 @@ void TabReplays::actGetReplayCode()
 
 void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
+        QMessageBox::warning(this, tr("Failed"), tr("Could not get replay code."));
         return;
+    }
 
     const Response_ReplayGetCode &resp = r.GetExtension(Response_ReplayGetCode::ext);
     QString code = QString::fromStdString(resp.replay_code());
