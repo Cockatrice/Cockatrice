@@ -530,6 +530,11 @@ void TabReplays::actGetReplayCode()
 
 void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
+    if (r.response_code() == Response::RespFunctionNotAllowed) {
+        QMessageBox::warning(this, tr("Failed"), tr("This server does not support replay sharing."));
+        return;
+    }
+
     if (r.response_code() != Response::RespOk) {
         QMessageBox::warning(this, tr("Failed"), tr("Could not get replay code."));
         return;
@@ -559,12 +564,19 @@ void TabReplays::actSubmitReplayCode()
 
 void TabReplays::submitReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
-    if (r.response_code() == Response::RespOk) {
-        QMessageBox::information(this, tr("Success"), tr("Replay code found. Replay was added"));
-    } else if (r.response_code() == Response::RespNameNotFound) {
-        QMessageBox::warning(this, tr("Failed"), tr("Code not found"));
-    } else {
-        QMessageBox::warning(this, tr("Failed"), tr("Unexpected error"));
+    switch (r.response_code()) {
+        case Response::RespOk:
+            QMessageBox::information(this, tr("Success"), tr("Replay code found. Replay was added."));
+            break;
+        case Response_ResponseCode_RespNameNotFound:
+            QMessageBox::warning(this, tr("Failed"), tr("Code not found."));
+            break;
+        case Response::RespFunctionNotAllowed:
+            QMessageBox::warning(this, tr("Failed"), tr("This server does not support replay sharing."));
+            break;
+        default:
+            QMessageBox::warning(this, tr("Failed"), tr("Unexpected error"));
+            break;
     }
 }
 
