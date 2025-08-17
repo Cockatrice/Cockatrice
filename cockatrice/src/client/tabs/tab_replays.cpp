@@ -18,6 +18,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QClipboard>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
@@ -542,7 +543,15 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
 
     const Response_ReplayGetCode &resp = r.GetExtension(Response_ReplayGetCode::ext);
     QString code = QString::fromStdString(resp.replay_code());
-    QMessageBox::information(this, tr("Success"), code);
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Got replay code."));
+    msgBox.setInformativeText(code);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    QPushButton *copyToClipboardButton = msgBox.addButton(tr("Copy to clipboard"), QMessageBox::ActionRole);
+    connect(copyToClipboardButton, &QPushButton::clicked, this, [code] { QApplication::clipboard()->setText(code); });
+    msgBox.setDefaultButton(copyToClipboardButton);
+    msgBox.exec();
 }
 
 void TabReplays::actSubmitReplayCode()
@@ -565,10 +574,14 @@ void TabReplays::actSubmitReplayCode()
 void TabReplays::submitReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
     switch (r.response_code()) {
-        case Response::RespOk:
-            QMessageBox::information(this, tr("Success"), tr("Replay code found. Replay was added."));
+        case Response::RespOk: {
+            QMessageBox msgBox;
+            msgBox.setText(tr("Replay code found."));
+            msgBox.setInformativeText(tr("Replay was added, or you already had access to it."));
+            msgBox.exec();
             break;
-        case Response_ResponseCode_RespNameNotFound:
+        }
+        case Response::RespNameNotFound:
             QMessageBox::warning(this, tr("Failed"), tr("Code not found."));
             break;
         case Response::RespFunctionNotAllowed:
