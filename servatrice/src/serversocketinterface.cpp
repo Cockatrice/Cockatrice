@@ -744,15 +744,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
 }
 
 /**
- * Generates a hash for the given replay folder, used for auth when replay sharing
- * This is a separate function in case we change the hash implementation in the future
+ * Generates a hash for the given replay folder, used for auth when replay sharing.
+ * This is a separate function in case we change the hash implementation in the future.
+ *
+ * Currently, we append together the first 128 bytes of the first 3 replays in the game, and hash that.
  *
  * @param gameId The replay match to hash
  * @return The hash as a QString. Returns an empty string if failed
  */
 QString AbstractServerSocketInterface::createHashForReplay(int gameId)
 {
-    QSqlQuery *query = sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game");
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
     query->bindValue(":id_game", gameId);
 
     if (!sqlInterface->execSqlQuery(query))
@@ -761,11 +764,11 @@ QString AbstractServerSocketInterface::createHashForReplay(int gameId)
     QByteArray replaysBytes;
     while (query->next()) {
         QByteArray replay = query->value(0).toByteArray();
-        replay.truncate(127);
+        replay.truncate(128);
         replaysBytes.append(replay);
     }
 
-    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toHex();
+    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Command_ReplayGetCode &cmd,
@@ -804,7 +807,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd,
                                                                           ResponseContainer & /*rc*/)
 {
-    // code is of the form <game-id>-<hash of replay data>
+    // code is of the form <game-id>-<hash>
     QString code = QString::fromStdString(cmd.replay_code());
     QStringList split = code.split("-");
     if (split.size() != 2) {
