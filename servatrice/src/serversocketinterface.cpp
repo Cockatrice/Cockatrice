@@ -776,10 +776,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Com
 
     // Check that user has access to replay match
     {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on "
-                                       "a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
-        query->bindValue(":id_replay", cmd.game_id());
+        QSqlQuery *query = sqlInterface->prepareQuery(
+            "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+        query->bindValue(":id_game", cmd.game_id());
         query->bindValue(":id_player", userInfo->id());
         if (!sqlInterface->execSqlQuery(query))
             return Response::RespInternalError;
