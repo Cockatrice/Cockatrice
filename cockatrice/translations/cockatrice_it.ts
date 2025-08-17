@@ -249,12 +249,12 @@ Controlla se la cartella è valida e prova ancora.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="691"/>
         <source>Table grid layout</source>
-        <translation>Disposizione della griglia tabellare</translation>
+        <translation>Disposizione delle aree di gioco</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="692"/>
         <source>Invert vertical coordinate</source>
-        <translation>Inverti le coordinate verticali</translation>
+        <translation>Inverti disposizione verticale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="693"/>
@@ -1876,7 +1876,7 @@ Vuoi convertire il mazzo al formato .cod?</translation>
     <message>
         <location filename="src/dialogs/dlg_create_token.cpp" line="63"/>
         <source>&amp;Destroy token when it leaves the table</source>
-        <translation>&amp;Distruggi la pedina quando lascia il tavolo</translation>
+        <translation>&amp;Elimina la pedina quando lascia il campo</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_token.cpp" line="66"/>
@@ -3209,7 +3209,7 @@ Dovrai scaricare la nuova versione manualmente.</translation>
     <message>
         <location filename="src/game/filters/filter_builder.cpp" line="28"/>
         <source>Type your filter here</source>
-        <translation>Scrivi qui il tuo filtro</translation>
+        <translation>Scrivi il filtro qui</translation>
     </message>
 </context>
 <context>
@@ -3598,7 +3598,7 @@ Dovrai scaricare la nuova versione manualmente.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="399"/>
         <source>Last update check on %1 (%2 days ago)</source>
-        <translation>Ultimo controllo il %1 (%2 giorni fa)</translation>
+        <translation>Ultimo controllo %1 (%2 giorni fa)</translation>
     </message>
 </context>
 <context>
@@ -4196,7 +4196,7 @@ La tua versione è la %1, la versione online è la %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="697"/>
         <source>Check for Card Updates (Automatic)</source>
-        <translation>Controlla aggiornamenti carte (automatico)</translation>
+        <translation>Controlla aggiornamenti carte in background</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="698"/>
