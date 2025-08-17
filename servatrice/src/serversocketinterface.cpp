@@ -183,6 +183,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdReplayModifyMatch(cmd.GetExtension(Command_ReplayModifyMatch::ext), rc);
         case SessionCommand::REPLAY_DELETE_MATCH:
             return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
+        case SessionCommand::REPLAY_GET_CODE:
+            return cmdReplayGetCode(cmd.GetExtension(Command_ReplayGetCode::ext), rc);
+        case SessionCommand::REPLAY_SUBMIT_CODE:
+            return cmdReplaySubmitCode(cmd.GetExtension(Command_ReplaySubmitCode::ext), rc);
         case SessionCommand::REGISTER:
             return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc);
             break;
