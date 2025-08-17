@@ -851,42 +851,7 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
 {
     const int playerListSize = event.player_list_size();
 
-    // Always process the local player first so we have an established deckViewcontainer
-
-    for (int i = 0; i < playerListSize; ++i) {
-        const ServerInfo_Player &playerInfo = event.player_list(i);
-        const ServerInfo_PlayerProperties &prop = playerInfo.properties();
-        const int playerId = prop.player_id();
-        QString playerName = "@" + QString::fromStdString(prop.user_info().name());
-        if (sayEdit && !autocompleteUserList.contains(playerName)) {
-            autocompleteUserList << playerName;
-            sayEdit->setCompletionList(autocompleteUserList);
-        }
-        if (!prop.spectator()) {
-            Player *player = players.value(playerId, 0);
-            if (!player) {
-                if (clients.size() > 1 || playerId == localPlayerId) {
-                    player = addPlayer(playerId, prop.user_info());
-                    playerListWidget->addPlayer(prop);
-                    player->processPlayerInfo(playerInfo);
-                    if (player->getLocal()) {
-                        TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
-                        if (playerInfo.has_deck_list()) {
-                            DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-                            PictureLoader::cacheCardPixmaps(
-                                CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
-                            deckViewContainer->playerDeckView->setDeck(newDeck);
-                            player->setDeck(newDeck);
-                        }
-                        deckViewContainer->playerDeckView->setReadyStart(prop.ready_start());
-                        deckViewContainer->playerDeckView->setSideboardLocked(prop.sideboard_locked());
-                    }
-                }
-            }
-        }
-    }
-
-    // then process every non-local player.
+    QVector<QPair<int, QPair<QString, QString>>> opponentDecksToDisplay;
 
     for (int i = 0; i < playerListSize; ++i) {
         const ServerInfo_Player &playerInfo = event.player_list(i);
@@ -909,16 +874,24 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
                 playerListWidget->addPlayer(prop);
             }
             player->processPlayerInfo(playerInfo);
-            if (player->getLocal() || !gameInfo.share_decklists_on_load()) {
-                continue;
-            }
+            if (player->getLocal()) {
+                TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
+                if (playerInfo.has_deck_list()) {
+                    DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
+                    PictureLoader::cacheCardPixmaps(
+                        CardDatabaseManager::getInstance()->getCards(newDeck.getCardRefList()));
+                    deckViewContainer->playerDeckView->setDeck(newDeck);
+                    player->setDeck(newDeck);
+                }
+                deckViewContainer->playerDeckView->setReadyStart(prop.ready_start());
+                deckViewContainer->playerDeckView->setSideboardLocked(prop.sideboard_locked());
+            } else {
+                if (!gameInfo.share_decklists_on_load()) {
+                    continue;
+                }
 
-            DeckList loader;
-            loader.loadFromString_Native(QString::fromStdString(playerInfo.deck_list()));
-            QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
-            while (i.hasNext()) {
-                i.next();
-                i.value()->addOpponentDeckView(loader, playerId, player->getName());
+                opponentDecksToDisplay.append(
+                    qMakePair(playerId, qMakePair(playerName, QString::fromStdString(playerInfo.deck_list()))));
             }
         }
     }
@@ -930,6 +903,21 @@ void TabGame::eventGameStateChanged(const Event_GameStateChanged &event,
             if (!player)
                 continue;
             player->processCardAttachment(playerInfo);
+        }
+    }
+
+    for (const auto &entry : opponentDecksToDisplay) {
+        int playerId = entry.first;
+        QString playerName = entry.second.first;
+        QString deckList = entry.second.second;
+
+        DeckList loader;
+        loader.loadFromString_Native(deckList);
+
+        QMapIterator<int, TabbedDeckViewContainer *> it(deckViewContainers);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->addOpponentDeckView(loader, playerId, playerName);
         }
     }
 
