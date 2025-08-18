@@ -747,7 +747,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
  * Generates a hash for the given replay folder, used for auth when replay sharing.
  * This is a separate function in case we change the hash implementation in the future.
  *
- * Currently, we append together the first 128 bytes of the first 3 replays in the game, and hash that.
+ * Currently, we append together the first 128 bytes of the first 3 replays in the game.
+ * Then we md5 hash it and base64 encode it.
  *
  * @param gameId The replay match to hash
  * @return The hash as a QString. Returns an empty string if failed
@@ -768,7 +769,7 @@ QString AbstractServerSocketInterface::createHashForReplay(int gameId)
         replaysBytes.append(replay);
     }
 
-    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5);
+    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toBase64();
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Command_ReplayGetCode &cmd,
