@@ -189,31 +189,23 @@ static void setupParserRules()
     };
 
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        // Extract common matching logic with strict matching option
-        auto createMatcher = [](const QString &target, bool strictMatch = true) -> StringMatcher {
-            return [target, strictMatch](const QString &s) -> bool {
-                if (!strictMatch && s.contains(target, Qt::CaseInsensitive)) {
-                    return true;
-                }
-
-                // For strict mode, try both exact word matching and substring matching
-                if (s.split(" ").contains(target, Qt::CaseInsensitive)) {
-                    return true;
-                }
-
-                // Also check if the target appears as a substring (for multi-word terms)
-                return s.contains(target, Qt::CaseInsensitive);
-            };
+        // Helper function for word boundary matching
+        auto createWordBoundaryMatcher = [](const QString &target) {
+            QString pattern = QString("\\b%1\\b").arg(QRegularExpression::escape(target));
+            QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
+            return [regex](const QString &s) { return regex.match(s).hasMatch(); };
         };
 
         if (sv.choice() == 0) {
             const auto target = std::any_cast<QString>(sv[0]);
-            return createMatcher(target, true); // Use strict matching
+            return createWordBoundaryMatcher(target);
         }
 
         const auto target = std::any_cast<QStringList>(sv[0]);
-        return [=](const QString &s) -> bool {
-            auto containsString = [&](const QString &str) { return createMatcher(str, true)(s); };
+        return [=](const QString &s) {
+            auto containsString = [&s, &createWordBoundaryMatcher](const QString &str) {
+                return createWordBoundaryMatcher(str)(s);
+            };
             return std::any_of(target.begin(), target.end(), containsString);
         };
     };
