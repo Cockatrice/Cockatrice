@@ -156,6 +156,7 @@ signals:
 
     void sizeChanged();
     void playerCountChanged();
+    void cardMenuUpdated(QMenu *cardMenu);
 public slots:
     void actUntapAll();
     void actRollDie();
@@ -239,7 +240,7 @@ private slots:
     void actSetAnnotation();
     void actReveal(QAction *action);
     void refreshShortcuts();
-
+    void actSortHand();
     void initSayMenu();
 
 public:
@@ -271,12 +272,11 @@ private:
         *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile,
         *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard, *aDrawBottomCards;
 
-    QAction *aCardMenu;
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
     QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
         *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn;
+        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aSortHand, *aIncrementAllCardCounters;
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
@@ -326,6 +326,8 @@ private:
                            const QString &avalue,
                            bool allCards,
                            EventProcessingOptions options);
+    QMenu *createMoveMenu() const;
+    QMenu *createPtMenu() const;
     void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
     void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
     void createCard(const CardItem *sourceCard,
@@ -420,6 +422,7 @@ public:
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
+    void incrementAllCardCounters();
 
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
@@ -483,9 +486,8 @@ public:
     {
         return arrows;
     }
-    void setCardMenu(QMenu *menu);
-    QMenu *getCardMenu() const;
-    void updateCardMenu(const CardItem *card);
+    QMenu *updateCardMenu(const CardItem *card);
+    QMenu *createCardMenu(const CardItem *card);
     bool getActive() const
     {
         return active;

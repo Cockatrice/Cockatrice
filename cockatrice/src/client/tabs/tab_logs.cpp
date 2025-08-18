@@ -2,8 +2,8 @@
 
 #include "../../deck/custom_line_edit.h"
 #include "../../dialogs/dlg_manage_sets.h"
+#include "../../server/abstract_client.h"
 #include "../../server/pending_command.h"
-#include "../game_logic/abstract_client.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
 #include "trice_limits.h"

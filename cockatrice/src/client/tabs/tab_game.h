@@ -13,6 +13,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 
+class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
@@ -105,7 +106,7 @@ private:
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
-    QMap<int, DeckViewContainer *> deckViewContainers;
+    QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
@@ -118,6 +119,7 @@ private:
         *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QAction *aFocusChat;
     QList<QAction *> phaseActions;
+    QAction *aCardMenu;
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
@@ -171,7 +173,7 @@ private slots:
     void incrementGameTime();
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
-    void updateCardMenu(AbstractCardItem *card);
+    void setCardMenu(QMenu *menu);
 
     void actGameInfo();
     void actConcede();
@@ -202,6 +204,9 @@ private slots:
     void dockFloatingTriggered();
     void dockTopLevelChanged(bool topLevel);
 
+protected slots:
+    void closeEvent(QCloseEvent *event) override;
+
 public:
     TabGame(TabSupervisor *_tabSupervisor,
             QList<AbstractClient *> &_clients,
@@ -212,7 +217,7 @@ public:
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
-    void closeRequest(bool forced = false) override;
+    bool closeRequest() override;
     const QMap<int, Player *> &getPlayers() const
     {
         return players;
@@ -231,15 +236,14 @@ public:
         return gameInfo.game_id();
     }
     QString getTabText() const override;
-    bool getSpectator() const
+    bool isSpectator() const
     {
         return spectator;
     }
-    bool getSpectatorsSeeEverything() const
+    bool isSpectatorsOmniscient() const
     {
         return gameInfo.spectators_omniscient();
     }
-    bool isSpectator();
     Player *getActiveLocalPlayer() const;
     AbstractClient *getClientForPlayer(int playerId) const;
 

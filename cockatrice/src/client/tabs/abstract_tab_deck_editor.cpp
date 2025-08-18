@@ -1,6 +1,5 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
 #include "../../deck/deck_stats_interface.h"
@@ -9,6 +8,7 @@
 #include "../../dialogs/dlg_load_deck_from_website.h"
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/cards/card_database_model.h"
+#include "../../server/abstract_client.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
 #include "../ui/picture_loader/picture_loader.h"
@@ -549,6 +549,12 @@ void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
     databaseDisplayDockWidget->setFilterTree(filterTree);
 }
 
+void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
+{
+    emit deckEditorClosing(this);
+    event->accept();
+}
+
 // Method uses to sync docks state with menu items state
 bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
@@ -592,12 +598,11 @@ bool AbstractTabDeckEditor::confirmClose()
     return true;
 }
 
-void AbstractTabDeckEditor::closeRequest(bool forced)
+bool AbstractTabDeckEditor::closeRequest()
 {
-    if (!forced && !confirmClose()) {
-        return;
+    if (!confirmClose()) {
+        return false;
     }
 
-    emit deckEditorClosing(this);
-    close();
+    return close();
 }

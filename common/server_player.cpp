@@ -836,6 +836,9 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
     Context_DeckSelect context;
     context.set_deck_hash(deck->getDeckHash().toStdString());
     context.set_sideboard_size(deck->getSideboardSize());
+    if (game->getShareDecklistsOnLoad()) {
+        context.set_deck_list(deck->writeToString_Native().toStdString());
+    }
     ges.setGameEventContext(context);
 
     auto *re = new Response_DeckDownload;

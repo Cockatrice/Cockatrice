@@ -1,8 +1,8 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
+#include "../../server/abstract_client.h"
 #include "../../server/remote/remote_decklist_tree_widget.h"
-#include "../game_logic/abstract_client.h"
 #include "tab.h"
 
 class ServerInfo_User;

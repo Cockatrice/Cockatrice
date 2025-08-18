@@ -82,6 +82,7 @@ public:
     getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
     QString getPreferredPrintingProviderId(const QString &cardName) const;
     bool isPreferredPrinting(const CardRef &cardRef) const;
+    ExactCard getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const;
 
     [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
 

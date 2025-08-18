@@ -153,6 +153,8 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                         result.append(tr("buddies only"));
                     if (gameentry.only_registered())
                         result.append(tr("reg. users only"));
+                    if (gameentry.share_decklists_on_load())
+                        result.append(tr("open decklists"));
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {
@@ -320,6 +322,12 @@ void GamesProxyModel::setHideNotBuddyCreatedGames(bool value)
     invalidateFilter();
 }
 
+void GamesProxyModel::setHideOpenDecklistGames(bool _hideOpenDecklistGames)
+{
+    hideOpenDecklistGames = _hideOpenDecklistGames;
+    invalidateFilter();
+}
+
 void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
 {
     gameNameFilter = _gameNameFilter;
@@ -398,6 +406,7 @@ void GamesProxyModel::resetFilterParameters()
     hideBuddiesOnlyGames = false;
     hideIgnoredUserGames = false;
     hideNotBuddyCreatedGames = false;
+    hideOpenDecklistGames = false;
     gameNameFilter = QString();
     creatorNameFilter = QString();
     gameTypeFilter.clear();
@@ -415,7 +424,7 @@ void GamesProxyModel::resetFilterParameters()
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
 {
     return !hideFullGames && !hideGamesThatStarted && !hidePasswordProtectedGames && !hideBuddiesOnlyGames &&
-           !hideIgnoredUserGames && !hideNotBuddyCreatedGames && gameNameFilter.isEmpty() &&
+           !hideOpenDecklistGames && !hideIgnoredUserGames && !hideNotBuddyCreatedGames && gameNameFilter.isEmpty() &&
            creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
            maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAge == DEFAULT_MAX_GAME_AGE &&
            !showOnlyIfSpectatorsCanWatch && !showSpectatorPasswordProtected && !showOnlyIfSpectatorsCanChat &&
@@ -431,6 +440,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
     hideBuddiesOnlyGames = gameFilters.isHideBuddiesOnlyGames();
     hideNotBuddyCreatedGames = gameFilters.isHideNotBuddyCreatedGames();
+    hideOpenDecklistGames = gameFilters.isHideOpenDecklistGames();
     gameNameFilter = gameFilters.getGameNameFilter();
     creatorNameFilter = gameFilters.getCreatorNameFilter();
     maxPlayersFilterMin = gameFilters.getMinPlayers();
@@ -461,6 +471,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setHidePasswordProtectedGames(hidePasswordProtectedGames);
     gameFilters.setHideIgnoredUserGames(hideIgnoredUserGames);
     gameFilters.setHideNotBuddyCreatedGames(hideNotBuddyCreatedGames);
+    gameFilters.setHideOpenDecklistGames(hideOpenDecklistGames);
     gameFilters.setGameNameFilter(gameNameFilter);
     gameFilters.setCreatorNameFilter(creatorNameFilter);
 
@@ -502,6 +513,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
     if (hideBuddiesOnlyGames && game.only_buddies()) {
+        return false;
+    }
+    if (hideOpenDecklistGames && game.share_decklists_on_load()) {
         return false;
     }
     if (hideIgnoredUserGames && userListProxy->isUserIgnored(QString::fromStdString(game.creator_info().name()))) {

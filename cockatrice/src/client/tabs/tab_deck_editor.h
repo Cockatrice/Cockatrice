@@ -2,7 +2,7 @@
 #define WINDOW_DECKEDITOR_H
 
 #include "../../game/cards/card_info.h"
-#include "../game_logic/key_signals.h"
+#include "../../utility/key_signals.h"
 #include "../ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "abstract_tab_deck_editor.h"
 

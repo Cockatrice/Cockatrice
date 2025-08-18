@@ -1,9 +1,9 @@
 #include "tab_room.h"
 
-#include "../../client/game_logic/abstract_client.h"
 #include "../../dialogs/dlg_settings.h"
 #include "../../game/game_selector.h"
 #include "../../main.h"
+#include "../../server/abstract_client.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_list_manager.h"
@@ -103,7 +103,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     hbox->addWidget(userList, 1);
 
     aLeaveRoom = new QAction(this);
-    connect(aLeaveRoom, &QAction::triggered, this, [this] { closeRequest(); });
+    connect(aLeaveRoom, &QAction::triggered, this, &TabRoom::closeRequest);
 
     roomMenu = new QMenu(this);
     roomMenu->addAction(aLeaveRoom);
@@ -173,11 +173,11 @@ void TabRoom::actShowPopup(const QString &message)
     }
 }
 
-void TabRoom::closeRequest(bool /*forced*/)
+void TabRoom::closeEvent(QCloseEvent *event)
 {
     sendRoomCommand(prepareRoomCommand(Command_LeaveRoom()));
     emit roomClosing(this);
-    close();
+    event->accept();
 }
 
 void TabRoom::tabActivated()

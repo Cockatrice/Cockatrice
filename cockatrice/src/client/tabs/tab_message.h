@@ -37,6 +37,9 @@ private slots:
     void addMentionTag(QString mentionTag);
     void messageClicked();
 
+protected slots:
+    void closeEvent(QCloseEvent *event) override;
+
 public:
     TabMessage(TabSupervisor *_tabSupervisor,
                AbstractClient *_client,
@@ -44,7 +47,6 @@ public:
                const ServerInfo_User &_otherUserInfo);
     ~TabMessage() override;
     void retranslateUi() override;
-    void closeRequest(bool forced = false) override;
     void tabActivated() override;
     QString getUserName() const;
     QString getTabText() const override;

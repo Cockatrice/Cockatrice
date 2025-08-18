@@ -88,13 +88,15 @@ private slots:
     void processRemoveMessagesEvent(const Event_RemoveMessages &event);
     void refreshShortcuts();
 
+protected slots:
+    void closeEvent(QCloseEvent *event) override;
+
 public:
     TabRoom(TabSupervisor *_tabSupervisor,
             AbstractClient *_client,
             ServerInfo_User *_ownUser,
             const ServerInfo_Room &info);
     void retranslateUi() override;
-    void closeRequest(bool forced = false) override;
     void tabActivated() override;
     void processRoomEvent(const RoomEvent &event);
     int getRoomId() const

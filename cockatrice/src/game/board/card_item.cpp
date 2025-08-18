@@ -24,30 +24,17 @@ CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef
 {
     owner->addCard(this);
 
-    cardMenu = new QMenu;
-    ptMenu = new QMenu;
-    moveMenu = new QMenu;
-
     connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
         if (counters.contains(counterId))
             update();
     });
-
-    retranslateUi();
-}
-
-CardItem::~CardItem()
-{
-    delete cardMenu;
-    delete ptMenu;
-    delete moveMenu;
 }
 
 void CardItem::prepareDelete()
 {
     if (owner != nullptr) {
-        if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(nullptr);
+        if (owner->getGame()->getActiveCard() == this) {
+            owner->updateCardMenu(nullptr);
             owner->getGame()->setActiveCard(nullptr);
         }
         owner = nullptr;
@@ -79,8 +66,6 @@ void CardItem::setZone(CardZone *_zone)
 
 void CardItem::retranslateUi()
 {
-    moveMenu->setTitle(tr("&Move to"));
-    ptMenu->setTitle(tr("&Power / toughness"));
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -274,7 +259,7 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (static_cast<TabGame *>(owner->parent())->isSpectator())
         return;
 
     Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
@@ -297,7 +282,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (static_cast<TabGame *>(owner->parent())->isSpectator())
         return;
 
     auto *arrow = new ArrowAttachItem(this);
@@ -422,9 +407,13 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        if (cardMenu != nullptr && !cardMenu->isEmpty() && owner != nullptr) {
-            cardMenu->popup(event->screenPos());
-            return;
+
+        if (owner != nullptr) {
+            owner->getGame()->setActiveCard(this);
+            if (QMenu *cardMenu = owner->updateCardMenu(this)) {
+                cardMenu->popup(event->screenPos());
+                return;
+            }
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
                (!SettingsCache::instance().getDoubleClickToPlay())) {
@@ -477,11 +466,11 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if ((change == ItemSelectedHasChanged) && owner != nullptr) {
         if (value == true) {
-            owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
-        } else if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(nullptr);
+            owner->updateCardMenu(this);
+        } else if (owner->scene()->selectedItems().isEmpty()) {
             owner->getGame()->setActiveCard(nullptr);
+            owner->updateCardMenu(nullptr);
         }
     }
     return AbstractCardItem::itemChange(change, value);

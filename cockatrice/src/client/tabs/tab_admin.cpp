@@ -1,7 +1,7 @@
 #include "tab_admin.h"
 
+#include "../../server/abstract_client.h"
 #include "../../server/pending_command.h"
-#include "../game_logic/abstract_client.h"
 #include "pb/admin_commands.pb.h"
 #include "pb/event_replay_added.pb.h"
 #include "pb/moderator_commands.pb.h"

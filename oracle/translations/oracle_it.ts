@@ -369,7 +369,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid: </source>
-        <translation type="unfinished"/>
+        <translation>L&apos;indirizzo fornito non è valido:</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>
@@ -551,7 +551,7 @@ e pedine che verranno usate da Cockatrice.</translation>
     <message>
         <location filename="src/main.cpp" line="63"/>
         <source>Run in no-confirm background mode</source>
-        <translation type="unfinished"/>
+        <translation>Esegui in background senza conferma</translation>
     </message>
 </context>
 </TS>

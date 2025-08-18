@@ -25,12 +25,12 @@
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="24"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Rafraîchir</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="32"/>
         <source>Parse Set Name and Number (if available)</source>
-        <translation type="unfinished"/>
+        <translation>Analyser le nom et le numéro de l&apos;extension (si disponibles)</translation>
     </message>
 </context>
 <context>
@@ -38,18 +38,19 @@
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="244"/>
         <source>Open in new tab</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir dans un nouvel onglet</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="273"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous sûr ?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="274"/>
         <source>The decklist has been modified.
 Do you want to save the changes?</source>
-        <translation type="unfinished"/>
+        <translation>La liste de deck a été modifiée.
+Voulez-vous enregistrer les modifications ?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="327"/>
@@ -60,44 +61,45 @@ Do you want to save the changes?</source>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="479"/>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="491"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="327"/>
         <source>Could not open deck at %1</source>
-        <translation type="unfinished"/>
+        <translation>N&apos;a pas pu ouvrir le deck à %1</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="338"/>
         <source>Could not save remote deck</source>
-        <translation type="unfinished"/>
+        <translation>N&apos;a pas pu sauvegarder le deck distant</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="359"/>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="381"/>
         <source>The deck could not be saved.
 Please check that the directory is writable and try again.</source>
-        <translation type="unfinished"/>
+        <translation>Le deck n&apos;a pas pu être enregistré.
+Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="365"/>
         <source>Save deck</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder le deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="394"/>
         <source>The deck could not be saved.</source>
-        <translation type="unfinished"/>
+        <translation>Le deck n&apos;a pas pu être enregistré.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="479"/>
         <source>There are no cards in your deck to be exported</source>
-        <translation type="unfinished"/>
+        <translation>Il n&apos;y a pas de cartes dans le deck à exporter</translation>
     </message>
     <message>
         <location filename="src/client/tabs/abstract_tab_deck_editor.cpp" line="491"/>
         <source>No deck was selected to be exported.</source>
-        <translation type="unfinished"/>
+        <translation>Aucun deck n&apos;a été sélectionné pour être exporté.</translation>
     </message>
 </context>
 <context>
@@ -105,12 +107,12 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="293"/>
         <source>Update Notes</source>
-        <translation type="unfinished"/>
+        <translation>Notes de mises à jour</translation>
     </message>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="306"/>
         <source>Admin Notes for %1</source>
-        <translation type="unfinished"/>
+        <translation>Notes d&apos;administrateur pour %1</translation>
     </message>
 </context>
 <context>
@@ -118,12 +120,12 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/all_zones_card_amount_widget.cpp" line="37"/>
         <source>Mainboard</source>
-        <translation type="unfinished"/>
+        <translation>Deck principal</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/all_zones_card_amount_widget.cpp" line="40"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Réserve</translation>
     </message>
 </context>
 <context>
@@ -161,7 +163,7 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="661"/>
         <source>Show keyboard shortcuts in right-click menus</source>
-        <translation type="unfinished"/>
+        <translation>Montrer les raccourcis clavier dans les menus clic-droit</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="663"/>
@@ -176,17 +178,17 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="665"/>
         <source>Auto-Rotate cards with sideways layout</source>
-        <translation type="unfinished"/>
+        <translation>Rotation automatique des cartes avec disposition horizontale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="667"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client restart]</source>
-        <translation type="unfinished"/>
+        <translation>Remplacer toutes les illustrations de cartes par les préférences personnelles (comportement avant modification du ProviderID) [Nécessite le redémarrage du client]</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="670"/>
         <source>Bump sets that the deck contains cards from to the top in the printing selector</source>
-        <translation type="unfinished"/>
+        <translation>Mettre en avant que ce deck contient des cartes depuis le sommet, dans le sélecteur d&apos;impression</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="671"/>
@@ -196,38 +198,38 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="672"/>
         <source>Use rounded card corners</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser des bords de cartes arrondis</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="674"/>
         <source>Minimum overlap percentage of cards on the stack and in vertical hand</source>
-        <translation type="unfinished"/>
+        <translation>Pourcentage minimum de chevauchement des cartes dans la pile et dans la main verticale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="675"/>
         <source>Maximum initial height for card view window:</source>
-        <translation type="unfinished"/>
+        <translation>Hauteur initiale maximale pour la fenêtre d&apos;affichage des cartes :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="676"/>
         <location filename="src/dialogs/dlg_settings.cpp" line="678"/>
         <source> rows</source>
-        <translation type="unfinished"/>
+        <translation>lignes</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="677"/>
         <source>Maximum expanded height for card view window:</source>
-        <translation type="unfinished"/>
+        <translation>Hauteur étendue maximale pour la fenêtre d&apos;affichage des cartes :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="680"/>
         <source>Card counters</source>
-        <translation type="unfinished"/>
+        <translation>Marqueurs sur la carte</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="684"/>
         <source>Counter %1</source>
-        <translation type="unfinished"/>
+        <translation>Marqueur %1</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="687"/>
@@ -523,12 +525,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="86"/>
         <source>Main Type</source>
-        <translation type="unfinished"/>
+        <translation>Type principal</translation>
     </message>
     <message>
         <location filename="src/game/filters/filter_card.cpp" line="88"/>
         <source>Sub Type</source>
-        <translation type="unfinished"/>
+        <translation>Sous-type</translation>
     </message>
 </context>
 <context>
@@ -546,12 +548,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="72"/>
         <source>Both</source>
-        <translation type="unfinished"/>
+        <translation>Les deux</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_frame_widget.cpp" line="75"/>
         <source>View transformation</source>
-        <translation type="unfinished"/>
+        <translation>Voir la transformation</translation>
     </message>
 </context>
 <context>
@@ -559,22 +561,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="372"/>
         <source>View related cards</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes associées</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="416"/>
         <source>Add card to deck</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter la carte au deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="429"/>
         <source>Mainboard</source>
-        <translation type="unfinished"/>
+        <translation>Deck principal</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_picture_widget.cpp" line="435"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Réserve</translation>
     </message>
 </context>
 <context>
@@ -587,12 +589,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_text_widget.cpp" line="52"/>
         <source>Related cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartes associées :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/cards/card_info_text_widget.cpp" line="69"/>
         <source>Unknown card:</source>
-        <translation type="unfinished"/>
+        <translation>Carte inconnue :</translation>
     </message>
 </context>
 <context>
@@ -742,13 +744,13 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
         <location filename="src/game/zones/card_zone.cpp" line="96"/>
         <source>their custom zone &apos;%1&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>leur zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="src/game/zones/card_zone.cpp" line="97"/>
         <source>%1&apos;s custom zone &apos;%2&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>La zone personnalisée &apos;%2&apos; de %1</translation>
     </message>
 </context>
 <context>
@@ -756,7 +758,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/cards/card_database_parser/cockatrice_xml_3.cpp" line="69"/>
         <source>Parse error at line %1 col %2:</source>
-        <translation type="unfinished"/>
+        <translation>Erreur de lecture à la ligne %1 (colonne %2)</translation>
     </message>
 </context>
 <context>
@@ -764,7 +766,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/cards/card_database_parser/cockatrice_xml_4.cpp" line="71"/>
         <source>Parse error at line %1 col %2:</source>
-        <translation type="unfinished"/>
+        <translation>Erreur de lecture à la ligne %1 (colonne %2)</translation>
     </message>
 </context>
 <context>
@@ -772,7 +774,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp" line="44"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Infos de la carte</translation>
     </message>
 </context>
 <context>
@@ -780,47 +782,47 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="36"/>
         <source>Search by card name (or search expressions)</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="194"/>
         <source>Add to Deck</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter au deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="195"/>
         <source>Add to Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la réserve</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="196"/>
         <source>Select Printing</source>
-        <translation type="unfinished"/>
+        <translation>Choisir l&apos;impression</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="198"/>
         <source>Show on EDHREC (Commander)</source>
-        <translation type="unfinished"/>
+        <translation>Afficher sur EDHREC (Commandant)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="202"/>
         <source>Show on EDHREC (Card)</source>
-        <translation type="unfinished"/>
+        <translation>Afficher sur EDHREC (carte)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="211"/>
         <source>Show Related cards</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les cartes associées</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="247"/>
         <source>Add card to &amp;maindeck</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter la carte au &amp;deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="248"/>
         <source>Add card to &amp;sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter carte à la ré&amp;serve</translation>
     </message>
 </context>
 <context>
@@ -828,87 +830,87 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="93"/>
         <source>Banner Card</source>
-        <translation type="unfinished"/>
+        <translation>Carte bannière</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="110"/>
         <source>Main Type</source>
-        <translation type="unfinished"/>
+        <translation>Type principal</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="111"/>
         <source>Mana Cost</source>
-        <translation type="unfinished"/>
+        <translation>Coût de mana</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="112"/>
         <source>Colors</source>
-        <translation type="unfinished"/>
+        <translation>Couleurs</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="572"/>
         <source>Select Printing</source>
-        <translation type="unfinished"/>
+        <translation>Choisir l&apos;impression</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="589"/>
         <source>Deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="591"/>
         <source>Deck &amp;name:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nom du deck :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="592"/>
         <source>Banner Card/Tags Visibility Settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres de visibilité de la carte bannière et des étiquettes</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="593"/>
         <source>Show banner card selection menu</source>
-        <translation type="unfinished"/>
+        <translation>Montrer le menu de sélection de carte bannière</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="594"/>
         <source>Show tags selection menu</source>
-        <translation type="unfinished"/>
+        <translation>Montrer le menu de sélection d&apos;étiquettes</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="595"/>
         <source>&amp;Comments:</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Commentaires :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="596"/>
         <source>Group by:</source>
-        <translation type="unfinished"/>
+        <translation>Grouper par :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="597"/>
         <source>Hash:</source>
-        <translation type="unfinished"/>
+        <translation>Empreinte :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="599"/>
         <source>&amp;Increment number</source>
-        <translation type="unfinished"/>
+        <translation>Augmenter quant&amp;ité</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="600"/>
         <source>&amp;Decrement number</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Diminuer quantité</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="601"/>
         <source>&amp;Remove row</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Retirer la ligne</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="602"/>
         <source>Swap card to/from sideboard</source>
-        <translation type="unfinished"/>
+        <translation>Échanger la carte vers/depuis la réserve</translation>
     </message>
 </context>
 <context>
@@ -916,17 +918,17 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="139"/>
         <source>Filters</source>
-        <translation type="unfinished"/>
+        <translation>Filtres</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="141"/>
         <source>&amp;Clear all filters</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Effacer tous les filtres</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp" line="142"/>
         <source>Delete selected</source>
-        <translation type="unfinished"/>
+        <translation>Enlever la sélection</translation>
     </message>
 </context>
 <context>
@@ -934,109 +936,109 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="147"/>
         <source>&amp;Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Éditeur de deck</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="148"/>
         <source>&amp;New deck</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Nouveau deck</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="149"/>
         <source>&amp;Load deck...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Charger un deck...</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="150"/>
         <source>Load recent deck...</source>
-        <translation type="unfinished"/>
+        <translation>Charger un deck récent...</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="151"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="152"/>
         <source>&amp;Save deck</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sauvegarder le deck</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="153"/>
         <source>Save deck &amp;as...</source>
-        <translation type="unfinished"/>
+        <translation>S&amp;auvegarder le deck sous...</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="155"/>
         <source>Load deck from cl&amp;ipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Charger un deck depuis le presse-pap&amp;ier...</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="157"/>
         <source>Edit deck in clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Éditer le deck dans le presse-papier</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="158"/>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="162"/>
         <source>Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Avec annotations</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="159"/>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="164"/>
         <source>Not Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Sans annotation</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="161"/>
         <source>Save deck to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck dans le presse-papier</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="163"/>
         <source>Annotated (No set info)</source>
-        <translation type="unfinished"/>
+        <translation>Annoté (pas d&apos;info sur l&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="165"/>
         <source>Not Annotated (No set info)</source>
-        <translation type="unfinished"/>
+        <translation>Pas annoté (pas d&apos;info sur l&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="167"/>
         <source>&amp;Print deck...</source>
-        <translation type="unfinished"/>
+        <translation>Im&amp;primer le deck...</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="169"/>
         <source>&amp;Send deck to online service</source>
-        <translation type="unfinished"/>
+        <translation>Envoyer le deck au service en &amp;ligne</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="170"/>
         <source>Create decklist (decklist.org)</source>
-        <translation type="unfinished"/>
+        <translation>Créer une liste de deck (decklist.org)</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="171"/>
         <source>Create decklist (decklist.xyz)</source>
-        <translation type="unfinished"/>
+        <translation>Créer une liste de deck (decklist.xyz)</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="172"/>
         <source>Analyze deck (deckstats.net)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Analyser le deck sur deckstats.net</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="173"/>
         <source>Analyze deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analyser le deck (tappedout.net)</translation>
     </message>
     <message>
         <location filename="src/client/menus/deck_editor/deck_editor_menu.cpp" line="175"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Fermer</translation>
     </message>
 </context>
 <context>
@@ -1044,7 +1046,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp" line="40"/>
         <source>Printing Selector</source>
-        <translation type="unfinished"/>
+        <translation>Sélection d&apos;impression</translation>
     </message>
 </context>
 <context>
@@ -1101,22 +1103,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1217"/>
         <source>Network Cache Size:</source>
-        <translation type="unfinished"/>
+        <translation>Taille du cache du réseau :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1219"/>
         <source>Redirect Cache TTL:</source>
-        <translation type="unfinished"/>
+        <translation>Rediriger le TTL du cache :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1220"/>
         <source>How long cached redirects for urls are valid for.</source>
-        <translation type="unfinished"/>
+        <translation>Combien de temps les redirections mises en cache pour les URL sont-elles valides.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1221"/>
         <source>Picture Cache Size:</source>
-        <translation type="unfinished"/>
+        <translation>Taille du cache des images :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1224"/>
@@ -1219,12 +1221,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="199"/>
         <source>Count</source>
-        <translation type="unfinished"/>
+        <translation>Compter</translation>
     </message>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="203"/>
         <source>Set</source>
-        <translation type="unfinished"/>
+        <translation>Édition</translation>
     </message>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="205"/>
@@ -1234,7 +1236,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="207"/>
         <source>Provider ID</source>
-        <translation type="unfinished"/>
+        <translation>Provider ID</translation>
     </message>
     <message>
         <location filename="src/deck/deck_list_model.cpp" line="201"/>
@@ -1247,12 +1249,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/deck/deck_loader.cpp" line="22"/>
         <source>Common deck formats (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Formats de decks courants (%1)</translation>
     </message>
     <message>
         <location filename="src/deck/deck_loader.cpp" line="22"/>
         <source>All files (*.*)</source>
-        <translation type="unfinished"/>
+        <translation>Tous les fichiers (*.*)</translation>
     </message>
 </context>
 <context>
@@ -1260,17 +1262,17 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp" line="49"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp" line="49"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp" line="50"/>
         <source>Color identity filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Mode de filtre par identité de couleur (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
 </context>
 <context>
@@ -1278,7 +1280,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp" line="58"/>
         <source>Edit tags ...</source>
-        <translation type="unfinished"/>
+        <translation>Éditer les étiquettes...</translation>
     </message>
 </context>
 <context>
@@ -1286,62 +1288,62 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="102"/>
         <source>Deck Tags Manager</source>
-        <translation type="unfinished"/>
+        <translation>Gestionnaire d&apos;étiquettes de decks</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="103"/>
         <source>Manage your deck tags. Check or uncheck tags as needed, or add new ones:</source>
-        <translation type="unfinished"/>
+        <translation>Gérer vos étiquettes de decks. Ajouter ou retirer les étiquettes comme nécessaire, ou en créer de nouveaux :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="104"/>
         <source>Add a new tag (e.g., Aggro️)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter une nouvelle étiquette (e.g., Elfes)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="105"/>
         <source>Add Tag</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter Étiquette</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="106"/>
         <source>Filter tags...</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer les étiquettes...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="107"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="108"/>
         <source>Edit default tags</source>
-        <translation type="unfinished"/>
+        <translation>Éditer les étiquettes par défaut</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="109"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="142"/>
         <source>Invalid Input</source>
-        <translation type="unfinished"/>
+        <translation>Entrée invalide</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="142"/>
         <source>Tag name cannot be empty!</source>
-        <translation type="unfinished"/>
+        <translation>Le nom de l&apos;étiquette ne peut pas être vide !</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="151"/>
         <source>Duplicate Tag</source>
-        <translation type="unfinished"/>
+        <translation>Étiquette dupliquée</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="151"/>
         <source>This tag already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Cette étiquette existe déjà.</translation>
     </message>
 </context>
 <context>
@@ -1349,94 +1351,94 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="57"/>
         <source>Banner Card</source>
-        <translation type="unfinished"/>
+        <translation>Carte bannière</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="321"/>
         <source>Open in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir dans l&apos;éditeur de deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="324"/>
         <source>Edit Tags</source>
-        <translation type="unfinished"/>
+        <translation>Éditer les étiquettes</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="331"/>
         <source>Rename Deck</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="333"/>
         <source>Save Deck to Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck dans le presse-papier</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="335"/>
         <source>Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Avec annotations</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="337"/>
         <source>Annotated (No set info)</source>
-        <translation type="unfinished"/>
+        <translation>Avec annotations (pas d&apos;info sur l&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="339"/>
         <source>Not Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Sans annotation</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="341"/>
         <source>Not Annotated (No set info)</source>
-        <translation type="unfinished"/>
+        <translation>Sans annotation (pas d&apos;info sur l&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="346"/>
         <source>Rename File</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le fichier</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="348"/>
         <source>Delete File</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer le fichier</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="363"/>
         <source>Set Banner Card</source>
-        <translation type="unfinished"/>
+        <translation>Choisir la carte bannière</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="381"/>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="401"/>
         <source>New name:</source>
-        <translation type="unfinished"/>
+        <translation>Nouveau nom :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="414"/>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="436"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="414"/>
         <source>Rename failed</source>
-        <translation type="unfinished"/>
+        <translation>Renommage échoué</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="428"/>
         <source>Delete file</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer le fichier</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="428"/>
         <source>Are you sure you want to delete the selected file?</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous certain de vouloir supprimer le fichier sélectionné ?</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp" line="436"/>
         <source>Delete failed</source>
-        <translation type="unfinished"/>
+        <translation>Suppression échouée</translation>
     </message>
 </context>
 <context>
@@ -1468,13 +1470,13 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="125"/>
         <source>Load from clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Charger depuis le presse-papier...</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="126"/>
         <source>Unload deck</source>
         <oldsource>Unload deck...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Annuler le chargement du deck</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="127"/>
@@ -1484,7 +1486,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="128"/>
         <source>Force start</source>
-        <translation type="unfinished"/>
+        <translation>Forcer le démarrage</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="194"/>
@@ -1510,18 +1512,19 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="277"/>
         <source>Deck is greater than maximum file size.</source>
-        <translation type="unfinished"/>
+        <translation>Le deck est plus grand que la taille maximum de fichier.</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="329"/>
         <source>Are you sure you want to force start?
 This will kick all non-ready players from the game.</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous sûr de vouloir forcer le démarrage ?
+Cela va éjecter de la partie tous les joueurs non prêts à démarrer.</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="331"/>
         <source>Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice</translation>
     </message>
 </context>
 <context>
@@ -1529,19 +1532,21 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_convert_deck_to_cod_format.cpp" line="30"/>
         <source>Deck Format Conversion</source>
-        <translation type="unfinished"/>
+        <translation>Conversion de format de deck</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_convert_deck_to_cod_format.cpp" line="32"/>
         <source>You tried to add a tag to a .txt format deck.
  Tags can only be added to .cod format decks.
  Do you want to convert the deck to the .cod format?</source>
-        <translation type="unfinished"/>
+        <translation>Vous avez essayé d&apos;ajouter une étiquette à un deck au format .txt.
+Les étiquettes ne peuvent être ajoutées qu&apos;aux decks au format .cod.
+Voulez-vous convertir le deck au format .cod ?</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_convert_deck_to_cod_format.cpp" line="34"/>
         <source>Remember and automatically apply choice in the future</source>
-        <translation type="unfinished"/>
+        <translation>Mémoriser et appliquer automatiquement le choix à l&apos;avenir</translation>
     </message>
 </context>
 <context>
@@ -1559,7 +1564,7 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_connect.cpp" line="26"/>
         <source>Delete the currently selected saved server</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer le serveur enregistré actuellement sélectionné</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_connect.cpp" line="34"/>
@@ -1630,7 +1635,7 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_connect.cpp" line="108"/>
         <source>Forgot password?</source>
-        <translation type="unfinished"/>
+        <translation>Mot de passe oublié ?</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_connect.cpp" line="111"/>
@@ -1773,12 +1778,12 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="98"/>
         <source>Starting life total:</source>
-        <translation type="unfinished"/>
+        <translation>Total initial de point de vie</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="108"/>
         <source>Game setup options</source>
-        <translation type="unfinished"/>
+        <translation>Options de configuration de la partie</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_game.cpp" line="158"/>
@@ -1876,7 +1881,7 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_create_token.cpp" line="66"/>
         <source>Create face-down (Only hides name)</source>
-        <translation type="unfinished"/>
+        <translation>Créer face-cachée (cache seulement le nom)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_create_token.cpp" line="81"/>
@@ -1909,53 +1914,53 @@ This will kick all non-ready players from the game.</source>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="46"/>
         <source>Edit Tags</source>
-        <translation type="unfinished"/>
+        <translation>Éditer les étiquettes</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="47"/>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="48"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Confirmer</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="49"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="50"/>
         <source>Enter a tag and press Enter</source>
-        <translation type="unfinished"/>
+        <translation>Entrer une étiquette et valider avec Entrée</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="70"/>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="118"/>
         <source>✖</source>
-        <translation type="unfinished"/>
+        <translation>✖</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="90"/>
         <source>Invalid Input</source>
-        <translation type="unfinished"/>
+        <translation>Entrée invalide</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="90"/>
         <source>Tag name cannot be empty!</source>
-        <translation type="unfinished"/>
+        <translation>Le nom de l&apos;étiquette ne peut pas être vide !</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="101"/>
         <source>Duplicate Tag</source>
-        <translation type="unfinished"/>
+        <translation>Étiquette dupliquée</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_default_tags_editor.cpp" line="101"/>
         <source>This tag already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Cette étiquette existe déjà.</translation>
     </message>
 </context>
 <context>
@@ -2004,17 +2009,17 @@ Pour enlever votre avatar actuel, confirmez sans choisir une nouvelle image.</tr
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="144"/>
         <source>Edit deck in clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Éditer le deck dans le presse-papier</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="176"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_load_deck_from_clipboard.cpp" line="176"/>
         <source>Invalid deck list.</source>
-        <translation type="unfinished"/>
+        <translation>Liste de deck invalide.</translation>
     </message>
 </context>
 <context>
@@ -2215,32 +2220,32 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="25"/>
         <source>Hide &apos;buddies only&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas afficher les parties « amis uniquement »</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="28"/>
         <source>Hide full games</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties pleines</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="31"/>
         <source>Hide games that have started</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties qui ont commencées</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="34"/>
         <source>Hide password protected games</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties protégées par un mot de passe</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="37"/>
         <source>Hide &apos;ignored user&apos; games</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties des utilisateurs ignorés</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="40"/>
         <source>Hide games not created by buddy</source>
-        <translation type="unfinished"/>
+        <translation>Cacher les parties non créées par des amis.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_filter_games.cpp" line="48"/>
@@ -2501,7 +2506,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="src/dialogs/dlg_load_deck.cpp" line="6"/>
         <source>Load Deck</source>
-        <translation type="unfinished"/>
+        <translation>Charger un deck</translation>
     </message>
 </context>
 <context>
@@ -2535,37 +2540,37 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="19"/>
         <source>Card name (or search expressions):</source>
-        <translation type="unfinished"/>
+        <translation>Nom de la carte (ou expression de recherche) :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="28"/>
         <source>Number of hits:</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de cartes trouvées :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="38"/>
         <source>Auto play hits</source>
-        <translation type="unfinished"/>
+        <translation>Jouer les cartes trouvées automatiquement</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="53"/>
         <source>Put top cards on stack until...</source>
-        <translation type="unfinished"/>
+        <translation>Placer la carte du dessus sur la pile jusqu&apos;à...</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="84"/>
         <source>No cards matching the search expression exists in the card database. Proceed anyways?</source>
-        <translation type="unfinished"/>
+        <translation>Aucune carte ne correspondant à l&apos;expression recherchée n&apos;existe dans la base de données de cartes. Continuer malgré tout ?</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="86"/>
         <source>Cockatrice</source>
-        <translation type="unfinished"/>
+        <translation>Cockatrice</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_move_top_cards_until.cpp" line="98"/>
         <source>Invalid filter</source>
-        <translation type="unfinished"/>
+        <translation>Filtre invalide</translation>
     </message>
 </context>
 <context>
@@ -2683,27 +2688,27 @@ Your email will be used to verify your account.</source>
     <message>
         <location filename="src/dialogs/dlg_select_set_for_cards.cpp" line="137"/>
         <source>Unmodified Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartes non modifiées :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_select_set_for_cards.cpp" line="138"/>
         <source>Modified Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartes modifiées :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_select_set_for_cards.cpp" line="139"/>
         <source>Check Sets to enable them. Drag-and-Drop to reorder them and change their priority. Cards will use the printing of the highest priority enabled set.</source>
-        <translation type="unfinished"/>
+        <translation>Cliquer sur des Extensions pour les activer. Glisser-et-déposer pour les réarranger et changer leur priorité. Les cartes utiliseront la version de l&apos;extension activée ayant la plus haut priorité.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_select_set_for_cards.cpp" line="141"/>
         <source>Clear all set information</source>
-        <translation type="unfinished"/>
+        <translation>Nettoyer toutes les informations sur les extensions</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_select_set_for_cards.cpp" line="142"/>
         <source>Set all to preferred</source>
-        <translation type="unfinished"/>
+        <translation>Tout régler selon vos préférences</translation>
     </message>
 </context>
 <context>
@@ -2854,39 +2859,41 @@ Voulez-vous changer l&apos;emplacement de votre base de données ?</translation>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="9"/>
         <source>Card Update Check</source>
-        <translation type="unfinished"/>
+        <translation>Vérification de la mise à jour des cartes</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="17"/>
         <source>It has been more than %2 days since you last checked your card database for updates.
 Choose how you would like to run the card database updater.
 You can always change this behavior in the &apos;General&apos; settings tab.</source>
-        <translation type="unfinished"/>
+        <translation>Cela fait plus de %2 jour(s) que vous n&apos;avez pas vérifié les mises à jour de votre base de données de cartes.
+Choisissez comment vous souhaitez exécuter le programme de mise à jour de la base de données de cartes.
+Vous pouvez toujours modifier ce comportement dans l&apos;onglet « Général » des paramètres.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="25"/>
         <source>Run in foreground</source>
-        <translation type="unfinished"/>
+        <translation>S&apos;exécuter en tâche principale</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="26"/>
         <source>Run in background</source>
-        <translation type="unfinished"/>
+        <translation>S&apos;exécuter en tâche de fond</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="27"/>
         <source>Run in background and always from now on</source>
-        <translation type="unfinished"/>
+        <translation>S&apos;exécuter en tâche de fond, et toujours le faire à partir de maintenant</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="28"/>
         <source>Don&apos;t prompt again and don&apos;t run</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas demander à nouveau et ne pas exécuter</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_startup_card_check.cpp" line="29"/>
         <source>Don&apos;t run this time</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas exécuter cette fois</translation>
     </message>
 </context>
 <context>
@@ -2953,7 +2960,7 @@ Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre 
         <location filename="src/dialogs/dlg_update.cpp" line="92"/>
         <source>Downloading update: %1</source>
         <oldsource>Downloading update...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Téléchargement de la mise à jour : %1</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="109"/>
@@ -3031,13 +3038,14 @@ Veuillez s&apos;il vous plaît visiter la page de téléchargement, pour mettre 
 You may have to manually download the new version.</source>
         <oldsource>Unfortunately there are no download packages available for your operating system. 
 You may have to build from source yourself.</oldsource>
-        <translation type="unfinished"/>
+        <translation>Malheureusement, la mise à jour automatique n&apos;a pas pu trouver un téléchargement compatible.
+Vous allez peut-être devoir télécharger manuellement la nouvelle version.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="171"/>
         <source>Please check the &lt;a href=&quot;%1&quot;&gt;releases page&lt;/a&gt; on our Github and download the build for your system.</source>
         <oldsource>Please check the download page manually and visit the wiki for instructions on compiling.</oldsource>
-        <translation type="unfinished"/>
+        <translation>Veuillez vérifier la &lt;a href=&quot;%1&quot;&gt;page &quot;releases&quot;&lt;/a&gt; sur notre Github et télécharger le programme pour votre système.</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_update.cpp" line="208"/>
@@ -3087,7 +3095,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_view_log.cpp" line="31"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Charger vers le presse-papier</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_view_log.cpp" line="43"/>
@@ -3100,12 +3108,12 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp" line="37"/>
         <source>In %1 decks</source>
-        <translation type="unfinished"/>
+        <translation>Dans %1 deck(s)</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp" line="38"/>
         <source>%1% of %2 decks</source>
-        <translation type="unfinished"/>
+        <translation>%1% de %2 deck(s)</translation>
     </message>
 </context>
 <context>
@@ -3113,47 +3121,47 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="57"/>
         <source>Card Hoarder</source>
-        <translation type="unfinished"/>
+        <translation>Card Hoarder</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="58"/>
         <source>Card Kingdom</source>
-        <translation type="unfinished"/>
+        <translation>Card Kingdom</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="59"/>
         <source>Card Market</source>
-        <translation type="unfinished"/>
+        <translation>Card Market</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="60"/>
         <source>Face 2-Face</source>
-        <translation type="unfinished"/>
+        <translation>Face 2-Face</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="61"/>
         <source>Mana Pool</source>
-        <translation type="unfinished"/>
+        <translation>Mana Pool</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="62"/>
         <source>MTG Stocks</source>
-        <translation type="unfinished"/>
+        <translation>MTG Stocks</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="63"/>
         <source>Scg</source>
-        <translation type="unfinished"/>
+        <translation>Scg</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="64"/>
         <source>Tcgl</source>
-        <translation type="unfinished"/>
+        <translation>Tcgl</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="65"/>
         <source>Tcgplayer</source>
-        <translation type="unfinished"/>
+        <translation>Tcgplayer</translation>
     </message>
 </context>
 <context>
@@ -3161,7 +3169,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp" line="27"/>
         <source>%1% Synergy</source>
-        <translation type="unfinished"/>
+        <translation>%1% synergie</translation>
     </message>
 </context>
 <context>
@@ -3169,22 +3177,22 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="81"/>
         <source>Combos</source>
-        <translation type="unfinished"/>
+        <translation>Combos</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="82"/>
         <source>Average Deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck moyen</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="83"/>
         <source>Game Changers</source>
-        <translation type="unfinished"/>
+        <translation>Game Changers</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="84"/>
         <source>Budget</source>
-        <translation type="unfinished"/>
+        <translation>Budget</translation>
     </message>
 </context>
 <context>
@@ -3192,7 +3200,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp" line="59"/>
         <source>Salt: </source>
-        <translation type="unfinished"/>
+        <translation>Sel :</translation>
     </message>
 </context>
 <context>
@@ -3208,22 +3216,22 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="67"/>
         <source>Confirm Delete</source>
-        <translation type="unfinished"/>
+        <translation>Confirmer la suppression</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="67"/>
         <source>Are you sure you want to delete the filter &apos;%1&apos;?</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous sûr de vouloir supprimer le filtre &apos;%1&apos; ?</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="77"/>
         <source>Delete Failed</source>
-        <translation type="unfinished"/>
+        <translation>Suppression échouée</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="77"/>
         <source>Failed to delete filter &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Échec de la suppression du filtre &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -3284,17 +3292,17 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/game/game_selector.cpp" line="264"/>
         <source>Join Game</source>
-        <translation type="unfinished"/>
+        <translation>Rejoindre la partie</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="267"/>
         <source>Spectate Game</source>
-        <translation type="unfinished"/>
+        <translation>Rejoindre la partie comme spectateur</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="270"/>
         <source>Game Information</source>
-        <translation type="unfinished"/>
+        <translation>Informations sur la partie</translation>
     </message>
     <message>
         <location filename="src/game/game_selector.cpp" line="304"/>
@@ -3494,7 +3502,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="370"/>
         <source>How to help with translations</source>
-        <translation type="unfinished"/>
+        <translation>Comment aider avec les traductions</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="371"/>
@@ -3504,7 +3512,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="372"/>
         <source>Filters directory:</source>
-        <translation type="unfinished"/>
+        <translation>Répertoire des filtres :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="373"/>
@@ -3539,37 +3547,37 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="379"/>
         <source>Check for client updates on startup</source>
-        <translation type="unfinished"/>
+        <translation>Vérifier les mises à jour du client au démarrage</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="380"/>
         <source>Check for card database updates on startup</source>
-        <translation type="unfinished"/>
+        <translation>Vérifier les mises à jour de la base de données des cartes au démarrage...</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="381"/>
         <source>Don&apos;t check</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas vérifier</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="383"/>
         <source>Prompt for update</source>
-        <translation type="unfinished"/>
+        <translation>Confirmer les mises à jour</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="385"/>
         <source>Always update in the background</source>
-        <translation type="unfinished"/>
+        <translation>Toujours mettre à jour en tâche de fond</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="386"/>
         <source>Check for card database updates every</source>
-        <translation type="unfinished"/>
+        <translation>Vérifier les mises à jour de la base de données des cartes tous les</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="387"/>
         <source> days</source>
-        <translation type="unfinished"/>
+        <translation>jour(s)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="388"/>
@@ -3589,7 +3597,7 @@ You may have to build from source yourself.</oldsource>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="399"/>
         <source>Last update check on %1 (%2 days ago)</source>
-        <translation type="unfinished"/>
+        <translation>Dernière vérification de mise à jour le %1 (il y a %2 jours)</translation>
     </message>
 </context>
 <context>
@@ -4006,7 +4014,7 @@ Cela veut généralement dire que votre client n&apos;est plus à jour, et que l
     <message>
         <location filename="src/client/ui/window_main.cpp" line="582"/>
         <source>The connection to the server has been lost.</source>
-        <translation type="unfinished"/>
+        <translation>La connexion au serveur a été perdue.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="586"/>
@@ -4152,12 +4160,12 @@ La version locale est %1, la nouvelle version est %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="688"/>
         <source>Reload card database</source>
-        <translation type="unfinished"/>
+        <translation>Recharger la base de cartes</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="690"/>
         <source>Tabs</source>
-        <translation type="unfinished"/>
+        <translation>Onglets</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="692"/>
@@ -4187,12 +4195,12 @@ La version locale est %1, la nouvelle version est %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="697"/>
         <source>Check for Card Updates (Automatic)</source>
-        <translation type="unfinished"/>
+        <translation>Vérifier les mises à jour des cartes (automatiquement)</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="698"/>
         <source>Show Status Bar</source>
-        <translation type="unfinished"/>
+        <translation>Montrer la barre de statut</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="699"/>
@@ -4202,7 +4210,7 @@ La version locale est %1, la nouvelle version est %2.</translation>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="700"/>
         <source>Open Settings Folder</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir le dossier des paramètres</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="702"/>
@@ -4320,43 +4328,44 @@ Pour plus d&apos;informations sur la modification de l&apos;ordre des éditions,
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1268"/>
         <source>Card database update running.</source>
-        <translation type="unfinished"/>
+        <translation>Une mise à jour de la base de données de cartes est en cours.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1286"/>
         <source>Failed to start. The file might be missing, or permissions might be incorrect.</source>
-        <translation type="unfinished"/>
+        <translation>Échec au démarrage. Le fichier peut être manquant, ou les permissions sont incorrectes.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1289"/>
         <source>The process crashed some time after starting successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Le processus a échoué quelque temps après avoir démarré avec succès.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1293"/>
         <source>Timed out. The process took too long to respond. The last waitFor...() function timed out.</source>
-        <translation type="unfinished"/>
+        <translation>Temps limite dépassé. Le processus a pris trop longtemps pour répondre. La dernière fonction waitFor...() a terminé.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1296"/>
         <source>An error occurred when attempting to write to the process. For example, the process may not be running, or it may have closed its input channel.</source>
-        <translation type="unfinished"/>
+        <translation>Une erreur a eu lieu en essayant d&apos;écrire vers le processus. Par exemple, le processus pourrait ne pas tourner, ou il pourrait avoir son canal d&apos;entrée fermé.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1300"/>
         <source>An error occurred when attempting to read from the process. For example, the process may not be running.</source>
-        <translation type="unfinished"/>
+        <translation>Une erreur a eu lieu en essayant d&apos;écrire vers le processus. Par exemple, le processus pourrait ne pas tourner, ou il pourrait avoir son canal de sortie inactif.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1305"/>
         <source>Unknown error occurred.</source>
-        <translation type="unfinished"/>
+        <translation>Une erreur inconnue est arrivée.</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1310"/>
         <source>The card database updater exited with an error:
 %1</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;outil de mise à jour de la base de données de cartes s&apos;est arrêté avec l&apos;erreur :
+%1</translation>
     </message>
     <message>
         <location filename="src/client/ui/window_main.cpp" line="1365"/>
@@ -4429,7 +4438,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="src/client/ui/widgets/deck_analytics/mana_base_widget.cpp" line="19"/>
         <location filename="src/client/ui/widgets/deck_analytics/mana_base_widget.cpp" line="34"/>
         <source>Mana Base</source>
-        <translation type="unfinished"/>
+        <translation>Base de mana</translation>
     </message>
 </context>
 <context>
@@ -4438,7 +4447,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp" line="19"/>
         <location filename="src/client/ui/widgets/deck_analytics/mana_curve_widget.cpp" line="34"/>
         <source>Mana Curve</source>
-        <translation type="unfinished"/>
+        <translation>Courbe de mana</translation>
     </message>
 </context>
 <context>
@@ -4447,7 +4456,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp" line="22"/>
         <location filename="src/client/ui/widgets/deck_analytics/mana_devotion_widget.cpp" line="36"/>
         <source>Mana Devotion</source>
-        <translation type="unfinished"/>
+        <translation>Dévotion au mana</translation>
     </message>
 </context>
 <context>
@@ -4535,7 +4544,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="91"/>
         <source> from custom zone &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation> depuis la zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="117"/>
@@ -4625,7 +4634,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="223"/>
         <source>%1 creates a face down token.</source>
-        <translation type="unfinished"/>
+        <translation>%1 crée un jeton face-cachée.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="225"/>
@@ -4715,7 +4724,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="329"/>
         <source>%1 moves %2%3 to custom zone &apos;%4&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>%1 déplace %2%3 vers la zone personnalisée &apos;%4&apos;.</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="348"/>
@@ -4737,17 +4746,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <source>%1 is looking at the %4 %3 card(s) %2.</source>
         <oldsource>%1 is looking at the top %3 card(s) %2.</oldsource>
         <comment>top card for singular, top %3 cards for plural</comment>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1 regarde la %4 %3 carte %2.</numerusform><numerusform>%1 regarde les %4 %3 cartes %2.</numerusform><numerusform>%1 regarde la / les %4 %3 carte(s) %2.</numerusform></translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="369"/>
         <source>bottom</source>
-        <translation type="unfinished"/>
+        <translation>dessous</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="369"/>
         <source>top</source>
-        <translation type="unfinished"/>
+        <translation>dessus</translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="377"/>
@@ -4934,12 +4943,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message numerus="yes">
         <location filename="src/server/message_log_widget.cpp" line="618"/>
         <source>%1 places %2 &quot;%3&quot; counter(s) on %4 (now %5).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1 place %2 &quot;%3&quot; compteur sur %4 (désormais %5).</numerusform><numerusform>%1 place %2 &quot;%3&quot; compteurs sur %4 (désormais %5).</numerusform><numerusform>%1 place %2 &quot;%3&quot; compteur(s) sur %4 (désormais %5).</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="src/server/message_log_widget.cpp" line="620"/>
         <source>%1 removes %2 &quot;%3&quot; counter(s) from %4 (now %5).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation><numerusform>%1 retire %2 &quot;%3&quot; compteur sur %4 (désormais %5).</numerusform><numerusform>%1 retire %2 &quot;%3&quot; compteurs sur %4 (désormais %5).</numerusform><numerusform>%1 retire %2 &quot;%3&quot; compteur(s) sur %4 (désormais %5).</numerusform></translation>
     </message>
     <message>
         <location filename="src/server/message_log_widget.cpp" line="638"/>
@@ -5206,17 +5215,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp" line="24"/>
         <source>Cards to overlap:</source>
-        <translation type="unfinished"/>
+        <translation>Cartes à superposer :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp" line="26"/>
         <source>Overlap percentage:</source>
-        <translation type="unfinished"/>
+        <translation>Pourcentage de superposition :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/general/layout_containers/overlap_control_widget.cpp" line="28"/>
         <source>Overlap direction:</source>
-        <translation type="unfinished"/>
+        <translation>Direction de superposition :</translation>
     </message>
 </context>
 <context>
@@ -5523,7 +5532,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="795"/>
         <source>View bottom cards of library...</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du dessous de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="797"/>
@@ -5533,23 +5542,23 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="810"/>
         <source>Shuffle</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="819"/>
         <source>Put top cards on stack &amp;until...</source>
         <oldsource>Take top cards &amp;until...</oldsource>
-        <translation type="unfinished"/>
+        <translation>Placer les cartes du dessus sur la pile j&amp;usqu&apos;à...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="820"/>
         <source>Shuffle top cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessus...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="831"/>
         <source>Shuffle bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessous...</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="834"/>
@@ -5584,13 +5593,13 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="840"/>
         <source>C&amp;ustom Zones</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Zones personnalisés</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="843"/>
         <location filename="src/game/player/player.cpp" line="2806"/>
         <source>View custom zone &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Voir la zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="846"/>
@@ -5620,7 +5629,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="852"/>
         <source>Ca&amp;rd counters</source>
-        <translation type="unfinished"/>
+        <translation>Ma&amp;rqueurs sur la carte</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="860"/>
@@ -5641,12 +5650,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="871"/>
         <source>S&amp;elect Row</source>
-        <translation type="unfinished"/>
+        <translation>Sél&amp;ectionne une ligne</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="872"/>
         <source>S&amp;elect Column</source>
-        <translation type="unfinished"/>
+        <translation>Sél&amp;ectionne une colonne</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="874"/>
@@ -5778,7 +5787,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="913"/>
         <source>&amp;Top of library in random order</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque dans un ordre aléatoire</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="914"/>
@@ -5798,17 +5807,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player.cpp" line="1175"/>
         <source>View bottom cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1248"/>
         <source>Shuffle top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="1276"/>
         <source>Shuffle bottom cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player.cpp" line="3188"/>
@@ -6013,12 +6022,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="109"/>
         <source>Display Navigation Buttons</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les boutons de navigation</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector.cpp" line="113"/>
         <source>&lt;b&gt;Warning:&lt;/b&gt; You appear to be using custom card art, which has known bugs when also using the printing selector in this version of Cockatrice.</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Attention :&lt;/b&gt; Vous semblez utiliser des illustrations de cartes personnalisées, qui présentent des bugs connus lorsque vous utilisez également le sélecteur d&apos;impression dans cette version de Cockatrice.</translation>
     </message>
 </context>
 <context>
@@ -6026,22 +6035,22 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="170"/>
         <source>Preference</source>
-        <translation type="unfinished"/>
+        <translation>Préférence</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="178"/>
         <source>Pin Printing</source>
-        <translation type="unfinished"/>
+        <translation>Épingler Imprimer</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="184"/>
         <source>Unpin Printing</source>
-        <translation type="unfinished"/>
+        <translation>Désépingler Imprimer</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_overlay_widget.cpp" line="192"/>
         <source>Show Related cards</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les cartes associées</translation>
     </message>
 </context>
 <context>
@@ -6049,7 +6058,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_search_widget.cpp" line="18"/>
         <source>Search by set name or set code</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par nom d&apos;extension ou code d&apos;extension</translation>
     </message>
 </context>
 <context>
@@ -6057,17 +6066,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="19"/>
         <source>Previous Card in Deck</source>
-        <translation type="unfinished"/>
+        <translation>Carte précédente dans le deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="24"/>
         <source>Bulk Selection</source>
-        <translation type="unfinished"/>
+        <translation>Sélection groupée</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/printing_selector/printing_selector_card_selection_widget.cpp" line="27"/>
         <source>Next Card in Deck</source>
-        <translation type="unfinished"/>
+        <translation>Carte suivante dans le deck</translation>
     </message>
 </context>
 <context>
@@ -6172,12 +6181,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp" line="88"/>
         <source>Overwrite Existing File?</source>
-        <translation type="unfinished"/>
+        <translation>Écraser le fichier existant ?</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp" line="89"/>
         <source>A .cod version of this deck already exists. Overwrite it?</source>
-        <translation type="unfinished"/>
+        <translation>Une version en fichier .cod existe déjà pour ce deck. L&apos;écraser ?</translation>
     </message>
 </context>
 <context>
@@ -6367,7 +6376,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/utility/sequence_edit.cpp" line="44"/>
         <source>Choose an action from the table</source>
-        <translation type="unfinished"/>
+        <translation>Choisir une action de la table</translation>
     </message>
     <message>
         <location filename="src/utility/sequence_edit.cpp" line="51"/>
@@ -6382,7 +6391,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/utility/sequence_edit.cpp" line="183"/>
         <source>Shortcut already in use by:</source>
-        <translation type="unfinished"/>
+        <translation>Raccourci déjà utilisé par :</translation>
     </message>
     <message>
         <location filename="src/utility/sequence_edit.cpp" line="217"/>
@@ -6469,12 +6478,12 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1665"/>
         <source>Clear all shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Effacer tous les raccourcis</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="1666"/>
         <source>Search by shortcut name</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par nom de raccourci</translation>
     </message>
 </context>
 <context>
@@ -6606,7 +6615,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="104"/>
         <source>Default</source>
-        <translation type="unfinished"/>
+        <translation>Défaut</translation>
     </message>
     <message>
         <location filename="src/client/network/release_channel.cpp" line="120"/>
@@ -6634,17 +6643,17 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/tab_account.cpp" line="57"/>
         <source>Add to Buddy List</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la liste d&apos;amis</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_account.cpp" line="67"/>
         <source>Add to Ignore List</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la liste noire</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_account.h" line="53"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Compte</translation>
     </message>
 </context>
 <context>
@@ -6677,27 +6686,27 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="135"/>
         <source>Server moderator functions</source>
-        <translation type="unfinished"/>
+        <translation>Fonctions de modérateur du serveur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="137"/>
         <source>Replay ID</source>
-        <translation type="unfinished"/>
+        <translation>Replay ID</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="138"/>
         <source>Grant Replay Access</source>
-        <translation type="unfinished"/>
+        <translation>Accorder l&apos;accès au Replay</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="140"/>
         <source>Username to Activate</source>
-        <translation type="unfinished"/>
+        <translation>Nom d&apos;utilisateur à activer</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="141"/>
         <source>Force Activate User</source>
-        <translation type="unfinished"/>
+        <translation>Forcer l&apos;activation d&apos;un utilisateur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="143"/>
@@ -6713,12 +6722,12 @@ Please check your shortcut settings!</source>
         <location filename="src/client/tabs/tab_admin.cpp" line="209"/>
         <location filename="src/client/tabs/tab_admin.cpp" line="224"/>
         <source>Success</source>
-        <translation type="unfinished"/>
+        <translation>Succès</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="209"/>
         <source>Replay access granted</source>
-        <translation type="unfinished"/>
+        <translation>Accès au Replay accordé</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="212"/>
@@ -6727,37 +6736,37 @@ Please check your shortcut settings!</source>
         <location filename="src/client/tabs/tab_admin.cpp" line="230"/>
         <location filename="src/client/tabs/tab_admin.cpp" line="233"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="212"/>
         <source>Unable to grant replay access. Replay ID invalid</source>
-        <translation type="unfinished"/>
+        <translation>Incapable d&apos;accorder l&apos;accès au Replay. Le Replay ID est invalide.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="215"/>
         <source>Unable to grant replay access. Internal error</source>
-        <translation type="unfinished"/>
+        <translation>Incapable d&apos;accorder l&apos;accès au Replay. Erreur interne.</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="224"/>
         <source>User successfully activated</source>
-        <translation type="unfinished"/>
+        <translation>Utilisateur activé avec succès</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="227"/>
         <source>Unable to activate user. Username invalid</source>
-        <translation type="unfinished"/>
+        <translation>Incapable d&apos;activer l&apos;utilisateur. Nom d&apos;utilisateur invalide</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="230"/>
         <source>Unable to activate user. User already active</source>
-        <translation type="unfinished"/>
+        <translation>Incapable d&apos;activer l&apos;utilisateur. Utilisateur déjà actif</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_admin.cpp" line="233"/>
         <source>Unable to activate user. Internal error</source>
-        <translation type="unfinished"/>
+        <translation>Incapable d&apos;activer l&apos;utilisateur. Erreur interne</translation>
     </message>
 </context>
 <context>
@@ -6819,45 +6828,45 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="150"/>
         <source>Visual Deck: %1</source>
-        <translation type="unfinished"/>
+        <translation>Deck visuel : %1</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="316"/>
         <source>&amp;Visual Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Éditeur de deck visuel</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="318"/>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="323"/>
         <source>Card Info</source>
-        <translation type="unfinished"/>
+        <translation>Infos de la carte</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="319"/>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="324"/>
         <source>Deck</source>
-        <translation type="unfinished"/>
+        <translation>Deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="320"/>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="326"/>
         <source>Filters</source>
-        <translation type="unfinished"/>
+        <translation>Filtres</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="322"/>
         <source>&amp;View</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="325"/>
         <source>Deck Analytics</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="327"/>
         <source>Printing</source>
-        <translation type="unfinished"/>
+        <translation>Imprimer</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="329"/>
@@ -6866,7 +6875,7 @@ Please check your shortcut settings!</source>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="338"/>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="341"/>
         <source>Visible</source>
-        <translation type="unfinished"/>
+        <translation>Visible</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="330"/>
@@ -6875,12 +6884,12 @@ Please check your shortcut settings!</source>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="339"/>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="342"/>
         <source>Floating</source>
-        <translation type="unfinished"/>
+        <translation>Flottant</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual.cpp" line="344"/>
         <source>Reset layout</source>
-        <translation type="unfinished"/>
+        <translation>Réinitialiser l&apos;interface</translation>
     </message>
 </context>
 <context>
@@ -6888,22 +6897,22 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="43"/>
         <source>Visual Deck View</source>
-        <translation type="unfinished"/>
+        <translation>Vue de deck visuel</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="44"/>
         <source>Visual Database Display</source>
-        <translation type="unfinished"/>
+        <translation>Affichage visuel de la base de données</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="45"/>
         <source>Deck Analytics</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp" line="46"/>
         <source>Sample Hand</source>
-        <translation type="unfinished"/>
+        <translation>Exemple de main</translation>
     </message>
 </context>
 <context>
@@ -6927,7 +6936,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="171"/>
         <source>Rename deck or folder</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le deck ou le dossier</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="172"/>
@@ -6956,22 +6965,22 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="179"/>
         <source>Open decks folder</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir le dossier des decks</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="260"/>
         <source>Rename local folder</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le dossier local</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="260"/>
         <source>Rename local file</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le fichier local</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="263"/>
         <source>New name:</source>
-        <translation type="unfinished"/>
+        <translation>Nouveau nom :</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="278"/>
@@ -6984,7 +6993,7 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="278"/>
         <source>Rename failed</source>
-        <translation type="unfinished"/>
+        <translation>Renommage échoué</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="313"/>
@@ -7022,17 +7031,17 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="388"/>
         <source>Are you sure you want to delete the selected files?</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous certain de vouloir supprimer les fichiers sélectionnés ?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="544"/>
         <source>Delete remote decks</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer les decks dinstants</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="544"/>
         <source>Are you sure you want to delete the selected decks?</source>
-        <translation type="unfinished"/>
+        <translation>Êtes-vous certain de vouloir supprimer les decks sélectionnés ?</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.cpp" line="373"/>
@@ -7043,7 +7052,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/tab_deck_storage.h" line="79"/>
         <source>Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage de deck</translation>
     </message>
 </context>
 <context>
@@ -7051,17 +7060,17 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/visual_deck_storage/tab_deck_storage_visual.h" line="27"/>
         <source>Visual Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage visuel de deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp" line="32"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/visual_deck_storage/tab_deck_storage_visual.cpp" line="32"/>
         <source>Could not open deck at %1</source>
-        <translation type="unfinished"/>
+        <translation>N&apos;a pas pu ouvrir le deck à %1</translation>
     </message>
 </context>
 <context>
@@ -7069,7 +7078,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec.h" line="21"/>
         <source>EDHREC: </source>
-        <translation type="unfinished"/>
+        <translation>EDHREC :</translation>
     </message>
 </context>
 <context>
@@ -7077,32 +7086,32 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.cpp" line="130"/>
         <source>&amp;Cards</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cartes</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.cpp" line="131"/>
         <source>Top Commanders</source>
-        <translation type="unfinished"/>
+        <translation>Commandants populaires</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.cpp" line="132"/>
         <source>Tags</source>
-        <translation type="unfinished"/>
+        <translation>Étiquettes</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.cpp" line="133"/>
         <source>Search for a card ...</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher une carte ...</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.cpp" line="134"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher</translation>
     </message>
     <message>
         <location filename="src/client/tabs/api/edhrec/tab_edhrec_main.h" line="27"/>
         <source>EDHREC: </source>
-        <translation type="unfinished"/>
+        <translation>EDHREC :</translation>
     </message>
 </context>
 <context>
@@ -7197,7 +7206,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="251"/>
         <source>Un&amp;concede</source>
-        <translation type="unfinished"/>
+        <translation>Annuler la &amp;concession</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="253"/>
@@ -7539,7 +7548,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="162"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Renommer</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="163"/>
@@ -7556,7 +7565,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="165"/>
         <source>Open replays folder</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir le dossier des Replays</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="167"/>
@@ -7571,12 +7580,12 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="236"/>
         <source>Rename local folder</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le dossier local</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="236"/>
         <source>Rename local file</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le fichier local</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="239"/>
@@ -7586,12 +7595,12 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="254"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="254"/>
         <source>Rename failed</source>
-        <translation type="unfinished"/>
+        <translation>Renommage échoué</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_replays.cpp" line="272"/>
@@ -7621,7 +7630,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_replays.h" line="72"/>
         <source>Game Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replays de parties</translation>
     </message>
 </context>
 <context>
@@ -7713,57 +7722,57 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="191"/>
         <source>Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Éditeur de deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="192"/>
         <source>Visual Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Éditeur de deck visuel</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="193"/>
         <source>EDHRec</source>
-        <translation type="unfinished"/>
+        <translation>EDHrec</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="194"/>
         <source>&amp;Visual Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage &amp;visuel de decks</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="195"/>
         <source>Visual Database Display</source>
-        <translation type="unfinished"/>
+        <translation>Affichage visuel de la base de données</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="196"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Serveur</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="197"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Compte</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="198"/>
         <source>Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage de deck</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="199"/>
         <source>Game Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replays de parties</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="200"/>
         <source>Administration</source>
-        <translation type="unfinished"/>
+        <translation>Administration</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="201"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>Journaux</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_supervisor.cpp" line="258"/>
@@ -7846,7 +7855,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/tabs/tab_visual_database_display.h" line="22"/>
         <source>Visual Database Display</source>
-        <translation type="unfinished"/>
+        <translation>Affichage visuel de la base de données</translation>
     </message>
 </context>
 <context>
@@ -8016,7 +8025,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="77"/>
         <source>View admin notes</source>
-        <translation type="unfinished"/>
+        <translation>Voir les notes d&apos;administrateur</translation>
     </message>
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="107"/>
@@ -8070,7 +8079,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="234"/>
         <source>Failed to get admin notes.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de récupérer les notes d&apos;administrateur.</translation>
     </message>
     <message>
         <location filename="src/server/user/user_context_menu.cpp" line="251"/>
@@ -8305,7 +8314,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="875"/>
         <source>&amp;Clicking plays all selected cards (instead of just the clicked card)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cliquer joue toutes les cartes sélectionnées (à la place de seulement la carte cliquée)</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="876"/>
@@ -8315,12 +8324,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="877"/>
         <source>Close card view window when last card is removed</source>
-        <translation type="unfinished"/>
+        <translation>Fermer la fenêtre d&apos;affichage des cartes lorsque la dernière carte est supprimée</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="878"/>
         <source>Auto focus search bar when card view window is opened</source>
-        <translation type="unfinished"/>
+        <translation>Focalise automatiquement la barre de recherche lorsque la fenêtre d&apos;affichage des cartes est ouverte</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="879"/>
@@ -8365,67 +8374,67 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="887"/>
         <source>Deck editor/storage settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres d&apos;éditeur et de stockage de deck</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="888"/>
         <source>Open deck in new tab by default</source>
-        <translation type="unfinished"/>
+        <translation>Ouvre le deck dans un nouvel onglet par défaut</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="889"/>
         <source>Use visual deck storage in game lobby</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser le stockage visuel de decks dans le lobby des parties</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="890"/>
         <source>Use selection animation for Visual Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Utilisez l&apos;animation de sélection pour le stockage visuel des deck</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="892"/>
         <source>When adding a tag in the visual deck storage to a .txt deck:</source>
-        <translation type="unfinished"/>
+        <translation>Lorsque vous ajoutez une étiquette dans le stockage visuel du deck à un deck stocké comme un fichier .txt :</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="894"/>
         <source>do nothing</source>
-        <translation type="unfinished"/>
+        <translation>ne rien faire</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="896"/>
         <source>ask to convert to .cod</source>
-        <translation type="unfinished"/>
+        <translation>demander à convertir en fichier .cod</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="898"/>
         <source>always convert to .cod</source>
-        <translation type="unfinished"/>
+        <translation>toujours convertir en fichier .cod</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="899"/>
         <source>Default deck editor type</source>
-        <translation type="unfinished"/>
+        <translation>Type d&apos;éditeur de deck par défaut</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="900"/>
         <source>Classic Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Éditeur de deck classique</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="901"/>
         <source>Visual Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Éditeur de deck visuel</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="902"/>
         <source>Replay settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres du replay</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_settings.cpp" line="903"/>
         <source>Buffer time for backwards skip via shortcut:</source>
-        <translation type="unfinished"/>
+        <translation>Temps de tampon pour les sauts en arrière via un raccourci :</translation>
     </message>
 </context>
 <context>
@@ -8433,22 +8442,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="452"/>
         <source>Users connected to server: %1</source>
-        <translation type="unfinished"/>
+        <translation>Joueurs connectés au serveur : %1</translation>
     </message>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="455"/>
         <source>Users in this room: %1</source>
-        <translation type="unfinished"/>
+        <translation>Joueurs dans ce salon : %1</translation>
     </message>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="458"/>
         <source>Buddies online: %1 / %2</source>
-        <translation type="unfinished"/>
+        <translation>Amis connectés : %1 / %2</translation>
     </message>
     <message>
         <location filename="src/server/user/user_list_widget.cpp" line="461"/>
         <source>Ignored users online: %1 / %2</source>
-        <translation type="unfinished"/>
+        <translation>Joueurs sur liste noire connectés : %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -8456,22 +8465,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="52"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="55"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="58"/>
         <source>Mode: Include/Exclude</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure / exclure</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="62"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
 </context>
 <context>
@@ -8479,17 +8488,17 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="41"/>
         <source>Save Filter</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder le filtre</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="42"/>
         <source>Save all currently applied filters to a file</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder tous les filtres actuellement appliqués dans un fichier</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="43"/>
         <source>Enter filename...</source>
-        <translation type="unfinished"/>
+        <translation>Entrer le nom du fichier...</translation>
     </message>
 </context>
 <context>
@@ -8497,22 +8506,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="56"/>
         <source>Do not display card main-types with less than this amount of cards in the database</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas afficher les types principaux de cartes dont le nombre est inférieur à ce montant dans la base de données</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="57"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="165"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="165"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
 </context>
 <context>
@@ -8520,27 +8529,27 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="54"/>
         <source>Filter by name...</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par nom...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="55"/>
         <source>Load from Deck</source>
-        <translation type="unfinished"/>
+        <translation>Charger depuis un deck</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="56"/>
         <source>Apply all card names in currently loaded deck as exact match name filters</source>
-        <translation type="unfinished"/>
+        <translation>Appliquer tous les noms de cartes du deck actuellement chargé comme filtres de nom exacts</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="57"/>
         <source>Load from Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Charger depuis le presse-papier...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="58"/>
         <source>Apply all card names in clipboard as exact match name filters</source>
-        <translation type="unfinished"/>
+        <translation>Appliquer tous les noms de cartes du presse-papier comme filtres de nom exacts</translation>
     </message>
 </context>
 <context>
@@ -8548,7 +8557,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="41"/>
         <source>Filter to most recent sets</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par extensions récentes</translation>
     </message>
 </context>
 <context>
@@ -8556,19 +8565,19 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="63"/>
         <source>Search sets...</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher les extensions...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="85"/>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="254"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="85"/>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp" line="254"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
 </context>
 <context>
@@ -8576,27 +8585,27 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="34"/>
         <source>Search subtypes...</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par sous-types...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="60"/>
         <source>Do not display card sub-types with less than this amount of cards in the database</source>
-        <translation type="unfinished"/>
+        <translation>Ne pas afficher les sous-types de cartes dont le nombre est inférieur à ce montant dans la base de données</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="61"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Mode de filtre (conjonctions AND/OR/NOT de filtres)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="172"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Mode : correspondance exacte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="172"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Mode : inclure</translation>
     </message>
 </context>
 <context>
@@ -8604,32 +8613,32 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="53"/>
         <source>Search by card name (or search expressions)</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="167"/>
         <source>Clear all filters</source>
-        <translation type="unfinished"/>
+        <translation>Effacer tous les filtres</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="169"/>
         <source>Save and load filters</source>
-        <translation type="unfinished"/>
+        <translation>Sauvegarder et charger des filtres</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="170"/>
         <source>Filter by exact card name</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par nom exact de carte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="171"/>
         <source>Filter by card sub-type</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par sous-type de carte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_database_display/visual_database_display_widget.cpp" line="172"/>
         <source>Filter by set</source>
-        <translation type="unfinished"/>
+        <translation>Filtrer par extension</translation>
     </message>
 </context>
 <context>
@@ -8637,12 +8646,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp" line="53"/>
         <source>Draw a new sample hand</source>
-        <translation type="unfinished"/>
+        <translation>Piocher un nouvel exemple de main</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp" line="54"/>
         <source>Sample hand size</source>
-        <translation type="unfinished"/>
+        <translation>Taille de l&apos;exemple de main</translation>
     </message>
 </context>
 <context>
@@ -8650,38 +8659,38 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="192"/>
         <source>Click and drag to change the sort order within the groups</source>
-        <translation type="unfinished"/>
+        <translation>Cliquer et glisser pour changer l&apos;ordre dans les groupes</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="193"/>
         <source>Quick search and add card</source>
-        <translation type="unfinished"/>
+        <translation>Recherche et ajout rapide d&apos;une carte</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="194"/>
         <source>Search for closest match in the database (with auto-suggestions) and add preferred printing to the deck on pressing enter</source>
-        <translation type="unfinished"/>
+        <translation>Recherchez la correspondance la plus proche dans la base de données (avec suggestions automatiques) et ajoutez l&apos;impression souhaitée au deck en appuyant sur Entrée</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="196"/>
         <source>Configure how cards are sorted within their groups</source>
-        <translation type="unfinished"/>
+        <translation>Configurez le mode de tri des cartes dans leurs groupes.</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="197"/>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="304"/>
         <source>Overlap Layout</source>
-        <translation type="unfinished"/>
+        <translation>Interface de superposition</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="199"/>
         <source>Change how cards are displayed within zones (i.e. overlapped or fully visible.)</source>
-        <translation type="unfinished"/>
+        <translation>Modifier l&apos;affichage des cartes dans les zones (i.e. superposées ou entièrement visibles).</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="301"/>
         <source>Flat Layout</source>
-        <translation type="unfinished"/>
+        <translation>Interface plate</translation>
     </message>
 </context>
 <context>
@@ -8689,7 +8698,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp" line="44"/>
         <source>Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage de deck</translation>
     </message>
 </context>
 <context>
@@ -8697,47 +8706,47 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="120"/>
         <source>Show Folders</source>
-        <translation type="unfinished"/>
+        <translation>Montrer les dossiers</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="121"/>
         <source>Show Tag Filter</source>
-        <translation type="unfinished"/>
+        <translation>Montrer le filtre à étiquette</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="122"/>
         <source>Show Tags On Deck Previews</source>
-        <translation type="unfinished"/>
+        <translation>Montrer les étiquettes sur les aperçus de decks</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="123"/>
         <source>Show Banner Card Selection Option</source>
-        <translation type="unfinished"/>
+        <translation>Montrer l&apos;option de sélection de carte bannière</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="124"/>
         <source>Draw unused Color Identities</source>
-        <translation type="unfinished"/>
+        <translation>Affiche les identités de couleurs non utilisées</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="125"/>
         <source>Unused Color Identities Opacity</source>
-        <translation type="unfinished"/>
+        <translation>Opacité des identités de couleur inutilisées</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="128"/>
         <source>Deck tooltip:</source>
-        <translation type="unfinished"/>
+        <translation>Aide contextuelle du deck :</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="129"/>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Aucun(e)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="130"/>
         <source>Filepath</source>
-        <translation type="unfinished"/>
+        <translation>Chemin de fichier</translation>
     </message>
 </context>
 <context>
@@ -8745,7 +8754,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp" line="25"/>
         <source>Search by filename (or search expression)</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par chemin de fichier (ou expressions de recherche)</translation>
     </message>
 </context>
 <context>
@@ -8753,22 +8762,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="47"/>
         <source>Sort Alphabetically (Deck Name)</source>
-        <translation type="unfinished"/>
+        <translation>Trier par ordre alphabétique (nom de deck)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="48"/>
         <source>Sort Alphabetically (Filename)</source>
-        <translation type="unfinished"/>
+        <translation>Trier par ordre alphabétique (nom de fichier)</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="49"/>
         <source>Sort by Last Modified</source>
-        <translation type="unfinished"/>
+        <translation>Trier par date de dernière modification</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp" line="50"/>
         <source>Sort by Last Loaded</source>
-        <translation type="unfinished"/>
+        <translation>Trier par date de dernier chargement</translation>
     </message>
 </context>
 <context>
@@ -8776,17 +8785,17 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="119"/>
         <source>Loading database ...</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de la base de données ...</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="121"/>
         <source>Refresh loaded files</source>
-        <translation type="unfinished"/>
+        <translation>Recharger les fichiers chargés</translation>
     </message>
     <message>
         <location filename="src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp" line="122"/>
         <source>Visual Deck Storage Settings</source>
-        <translation type="unfinished"/>
+        <translation>Paramètres du stockage visuel des decks</translation>
     </message>
 </context>
 <context>
@@ -8919,7 +8928,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/dialogs/dlg_manage_sets.cpp" line="163"/>
         <source>Include cards rebalanced for Alchemy [requires restart]</source>
-        <translation type="unfinished"/>
+        <translation>Inclure les cartes rééquilibrées pour Alchemy [nécessite un redémarrage]</translation>
     </message>
     <message>
         <location filename="src/dialogs/dlg_manage_sets.cpp" line="133"/>
@@ -8972,12 +8981,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="52"/>
         <source>Search by card name (or search expressions)</source>
-        <translation type="unfinished"/>
+        <translation>Rechercher par nom de carte (ou expression de recherche)</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="219"/>
         <source>Ungrouped</source>
-        <translation type="unfinished"/>
+        <translation>Non groupé</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="220"/>
@@ -8997,7 +9006,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="229"/>
         <source>Unsorted</source>
-        <translation type="unfinished"/>
+        <translation>Non trié</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="230"/>
@@ -9022,12 +9031,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="234"/>
         <source>Sort by P/T</source>
-        <translation type="unfinished"/>
+        <translation>Trier par F/E</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="235"/>
         <source>Sort by Set</source>
-        <translation type="unfinished"/>
+        <translation>Trier par extension</translation>
     </message>
     <message>
         <location filename="src/game/zones/view_zone_widget.cpp" line="239"/>
@@ -9153,12 +9162,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <location filename="src/settings/shortcuts_settings.h" line="75"/>
         <location filename="src/settings/shortcuts_settings.h" line="709"/>
         <source>Replays</source>
-        <translation type="unfinished"/>
+        <translation>Replays</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="77"/>
         <source>Tabs</source>
-        <translation type="unfinished"/>
+        <translation>Onglets</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="150"/>
@@ -9209,12 +9218,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <location filename="src/settings/shortcuts_settings.h" line="179"/>
         <source>Analyze Deck (deckstats.net)</source>
         <oldsource>Analyze Deck</oldsource>
-        <translation type="unfinished"/>
+        <translation>Analyser le deck (deckstats.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="183"/>
         <source>Analyze Deck (tappedout.net)</source>
-        <translation type="unfinished"/>
+        <translation>Analyser le deck (tappedout.net)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="186"/>
@@ -9249,12 +9258,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="204"/>
         <source>Export Deck (decklist.org)</source>
-        <translation type="unfinished"/>
+        <translation>Exporter le deck (decklist.org)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="208"/>
         <source>Export Deck (decklist.xyz)</source>
-        <translation type="unfinished"/>
+        <translation>Exporter le deck (decklist.xyz)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="211"/>
@@ -9275,12 +9284,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="222"/>
         <source>Edit Deck in Clipboard, Annotated</source>
-        <translation type="unfinished"/>
+        <translation>Éditer le deck dans le presse-papier, avec annotations</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="226"/>
         <source>Edit Deck in Clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Éditer le deck dans le presse-papier</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="229"/>
@@ -9326,7 +9335,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="256"/>
         <source>Save Deck to Clipboard, Annotated (No Set Info)</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck, avec annotations (sans information d&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="260"/>
@@ -9336,7 +9345,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="264"/>
         <source>Save Deck to Clipboard (No Set Info)</source>
-        <translation type="unfinished"/>
+        <translation>Copier le deck (sans information d&apos;extension)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="267"/>
@@ -9396,107 +9405,107 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="176"/>
         <source>Show Status Bar</source>
-        <translation type="unfinished"/>
+        <translation>Montrer la barre de statut</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="277"/>
         <source>Unload Deck</source>
-        <translation type="unfinished"/>
+        <translation>Annuler le chargement du deck</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="287"/>
         <source>Force Start</source>
-        <translation type="unfinished"/>
+        <translation>Forcer le démarrage</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="290"/>
         <source>Add Card Counter (F)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (F)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="293"/>
         <source>Remove Card Counter (F)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (F)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="296"/>
         <source>Set Card Counters (F)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (F)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="299"/>
         <source>Add Card Counter (E)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (E)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="302"/>
         <source>Remove Card Counter (E)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (E)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="305"/>
         <source>Set Card Counters (E)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (E)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="308"/>
         <source>Add Card Counter(D)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (D)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="311"/>
         <source>Remove Card Counter (D)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (D)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="314"/>
         <source>Set Card Counters (D)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (D)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="317"/>
         <source>Add Card Counter (C)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (C)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="320"/>
         <source>Remove Card Counter (C)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (C)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="323"/>
         <source>Set Card Counters (C)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (C)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="326"/>
         <source>Add Card Counter (B)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (B)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="329"/>
         <source>Remove Card Counter (B)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (B)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="332"/>
         <source>Set Card Counters (B)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (B)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="335"/>
         <source>Add Card Counter (A)</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un marqueur de carte (A)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="338"/>
         <source>Remove Card Counter (A)</source>
-        <translation type="unfinished"/>
+        <translation>Retirer un marqueur de carte (A)</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="341"/>
         <source>Set Card Counters (A)...</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de marqueurs de carte (A)...</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="347"/>
@@ -9706,7 +9715,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="482"/>
         <source>Hide Card in Reveal Window</source>
-        <translation type="unfinished"/>
+        <translation>Cache la carte dans la fenêtre Révéler</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="485"/>
@@ -9776,17 +9785,17 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="524"/>
         <source>Select All Cards in Zone</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionne toutes les cartes dans la zone</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="527"/>
         <source>Select All Cards in Row</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionne toutes les cartes dans la ligne</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="530"/>
         <source>Select All Cards in Column</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionne toutes les cartes dans la colonne</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="533"/>
@@ -9852,7 +9861,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="567"/>
         <source>Bottom Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="570"/>
@@ -9880,7 +9889,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="590"/>
         <source>Stack Until Found</source>
-        <translation type="unfinished"/>
+        <translation>Empiler jusqu&apos;à ce que trouvé</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="615"/>
@@ -9925,12 +9934,12 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="638"/>
         <source>Shuffle Top Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="641"/>
         <source>Shuffle Bottom Cards of Library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="644"/>
@@ -9995,22 +10004,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="683"/>
         <source>Skip Forward</source>
-        <translation type="unfinished"/>
+        <translation>Avance en avant</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="686"/>
         <source>Skip Backward</source>
-        <translation type="unfinished"/>
+        <translation>Avant en arrière</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="689"/>
         <source>Skip Forward by a lot</source>
-        <translation type="unfinished"/>
+        <translation>Avance beaucoup en avant</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="692"/>
         <source>Skip Backward by a lot</source>
-        <translation type="unfinished"/>
+        <translation>Avance beaucoup en arrière</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="695"/>
@@ -10020,37 +10029,37 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="698"/>
         <source>Toggle Fast Forward</source>
-        <translation type="unfinished"/>
+        <translation>Activer l&apos;avance rapide</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="703"/>
         <source>Visual Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage visuel de deck</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="707"/>
         <source>Deck Storage</source>
-        <translation type="unfinished"/>
+        <translation>Stockage de deck</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="711"/>
         <source>Server</source>
-        <translation type="unfinished"/>
+        <translation>Serveur</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="713"/>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Compte</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="714"/>
         <source>Administration</source>
-        <translation type="unfinished"/>
+        <translation>Administration</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="718"/>
         <source>Logs</source>
-        <translation type="unfinished"/>
+        <translation>Journaux</translation>
     </message>
 </context>
 </TS>

@@ -1,7 +1,7 @@
 #ifndef LOCALCLIENT_H
 #define LOCALCLIENT_H
 
-#include "../client/game_logic/abstract_client.h"
+#include "abstract_client.h"
 
 #include <QLoggingCategory>
 

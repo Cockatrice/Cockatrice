@@ -2,11 +2,11 @@
 
 #include "../../deck/custom_line_edit.h"
 #include "../../main.h"
+#include "../../server/abstract_client.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../../server/pending_command.h"
 #include "../../server/user/user_list_manager.h"
 #include "../../settings/cache_settings.h"
-#include "../game_logic/abstract_client.h"
 #include "../sound_engine.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"
@@ -39,7 +39,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     vbox->addWidget(sayEdit);
 
     aLeave = new QAction(this);
-    connect(aLeave, &QAction::triggered, this, [this] { closeRequest(); });
+    connect(aLeave, &QAction::triggered, this, &TabMessage::closeRequest);
 
     messageMenu = new QMenu(this);
     messageMenu->addAction(aLeave);
@@ -86,10 +86,10 @@ QString TabMessage::getTabText() const
     return tr("%1 - Private chat").arg(QString::fromStdString(otherUserInfo->name()));
 }
 
-void TabMessage::closeRequest(bool /*forced*/)
+void TabMessage::closeEvent(QCloseEvent *event)
 {
     emit talkClosing(this);
-    close();
+    event->accept();
 }
 
 void TabMessage::sendMessage()

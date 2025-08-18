@@ -1,7 +1,7 @@
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 
-#include "../game_logic/abstract_client.h"
+#include "../../server/abstract_client.h"
 #include "tab.h"
 
 class ServerInfo_User;
@@ -23,13 +23,15 @@ private:
     AbstractClient *client;
     QTreeView *localDirView;
     QFileSystemModel *localDirModel;
-    QToolBar *leftToolBar, *rightToolBar;
     RemoteReplayList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
 
     QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenReplaysFolder;
     QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
+
+    QGroupBox *createLeftLayout();
+    QGroupBox *createRightLayout();
 
     void setRemoteEnabled(bool enabled);
 
