@@ -532,12 +532,17 @@ void TabReplays::actGetReplayCode()
 void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
 {
     if (r.response_code() == Response::RespFunctionNotAllowed) {
-        QMessageBox::warning(this, tr("Failed"), tr("This server does not support replay sharing."));
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText(tr("Failed to get code"));
+        msgBox.setInformativeText(
+            tr("Either this server does not support replay sharing, or does not permit replay sharing for you."));
+        msgBox.exec();
         return;
     }
 
     if (r.response_code() != Response::RespOk) {
-        QMessageBox::warning(this, tr("Failed"), tr("Could not get replay code."));
+        QMessageBox::warning(this, tr("Failed"), tr("Could not get replay code"));
         return;
     }
 
@@ -545,7 +550,7 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
     QString code = QString::fromStdString(resp.replay_code());
 
     QMessageBox msgBox;
-    msgBox.setText(tr("Got replay code."));
+    msgBox.setText(tr("Got replay code"));
     msgBox.setInformativeText(code);
     msgBox.setStandardButtons(QMessageBox::Ok);
     QPushButton *copyToClipboardButton = msgBox.addButton(tr("Copy to clipboard"), QMessageBox::ActionRole);
@@ -557,7 +562,8 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
 void TabReplays::actSubmitReplayCode()
 {
     bool ok;
-    QString code = QInputDialog::getText(this, tr("Add replay by code"), tr("Replay code"), QLineEdit::Normal, "", &ok);
+    QString code =
+        QInputDialog::getText(this, tr("Look up replay by code"), tr("Replay code"), QLineEdit::Normal, "", &ok);
 
     if (!ok) {
         return;
@@ -576,17 +582,24 @@ void TabReplays::submitReplayCodeFinished(const Response &r, const CommandContai
     switch (r.response_code()) {
         case Response::RespOk: {
             QMessageBox msgBox;
-            msgBox.setText(tr("Replay code found."));
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText(tr("Replay code found"));
             msgBox.setInformativeText(tr("Replay was added, or you already had access to it."));
             msgBox.exec();
             break;
         }
         case Response::RespNameNotFound:
-            QMessageBox::warning(this, tr("Failed"), tr("Code not found."));
+            QMessageBox::warning(this, tr("Failed"), tr("Replay code not found"));
             break;
-        case Response::RespFunctionNotAllowed:
-            QMessageBox::warning(this, tr("Failed"), tr("This server does not support replay sharing."));
+        case Response::RespFunctionNotAllowed: {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.setText(tr("Failed to submit code"));
+            msgBox.setInformativeText(
+                tr("Either this server does not support replay sharing, or does not permit replay sharing for you."));
+            msgBox.exec();
             break;
+        }
         default:
             QMessageBox::warning(this, tr("Failed"), tr("Unexpected error"));
             break;
