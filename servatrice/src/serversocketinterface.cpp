@@ -748,7 +748,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
  * This is a separate function in case we change the hash implementation in the future.
  *
  * Currently, we append together the first 128 bytes of the first 3 replays in the game.
- * Then we md5 hash it and base64 encode it.
+ * Then we md5 hash it, base64 encode it, and truncate the result to 10 characters.
  *
  * @param gameId The replay match to hash
  * @return The hash as a QString. Returns an empty string if failed
@@ -769,7 +769,10 @@ QString AbstractServerSocketInterface::createHashForReplay(int gameId)
         replaysBytes.append(replay);
     }
 
-    return QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toBase64();
+    auto hash =
+        QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toBase64(QByteArray::OmitTrailingEquals);
+    hash.truncate(10);
+    return hash;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Command_ReplayGetCode &cmd,
