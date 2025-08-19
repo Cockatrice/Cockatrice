@@ -201,9 +201,8 @@ static void setupParserRules()
 
             // Check cache first with thread safety
             QMutexLocker locker(&regexCacheMutex);
-            auto it = regexCache.find(pattern);
-            if (it != regexCache.end()) {
-                QRegularExpression cachedRegex = it.value();
+            if (regexCache.contains(pattern)) {
+                QRegularExpression cachedRegex = regexCache.value(pattern);
                 locker.unlock();
                 return [cachedRegex](const QString &s) { return cachedRegex.match(s).hasMatch(); };
             }
