@@ -4,15 +4,9 @@
 
 #include <QByteArray>
 #include <QDebug>
-#include <QHash>
-#include <QMutex>
 #include <QRegularExpression>
 #include <QString>
 #include <functional>
-
-// Static cache for compiled regexes to avoid recompilation
-static QHash<QString, QRegularExpression> regexCache;
-static QMutex regexCacheMutex;
 
 static peg::parser search(R"(
 Start <- QueryPartList
@@ -195,24 +189,10 @@ static void setupParserRules()
     };
 
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        // Helper function for word boundary matching with caching
-        auto createWordBoundaryMatcher = [](const QString &target) -> std::function<bool(const QString &)> {
+        // Helper function for word boundary matching
+        auto createWordBoundaryMatcher = [](const QString &target) {
             QString pattern = QString("\\b%1\\b").arg(QRegularExpression::escape(target));
-
-            // Check cache first with thread safety
-            QMutexLocker locker(&regexCacheMutex);
-            auto it = regexCache.find(pattern);
-            if (it != regexCache.end()) {
-                QRegularExpression cachedRegex = it.value();
-                locker.unlock();
-                return [cachedRegex](const QString &s) { return cachedRegex.match(s).hasMatch(); };
-            }
-
-            // Compile new regex and add to cache
             QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
-            regexCache.insert(pattern, regex);
-            locker.unlock();
-
             return [regex](const QString &s) { return regex.match(s).hasMatch(); };
         };
 
