@@ -179,7 +179,7 @@ QGroupBox *TabReplays::createRightLayout()
     connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
 
     aSubmitReplayCode = new QAction(this);
-    aSubmitReplayCode->setIcon(QPixmap("theme:icons/earth"));
+    aSubmitReplayCode->setIcon(QPixmap("theme:icons/search"));
     connect(aSubmitReplayCode, &QAction::triggered, this, &TabReplays::actSubmitReplayCode);
 
     // Add actions to toolbars
