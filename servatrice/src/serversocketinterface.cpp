@@ -834,6 +834,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
 
     const auto &replayName = replayExistsQuery->value(0).toString();
 
+    // Check if hash is correct
+    if (hash != createHashForReplay(gameId.toInt())) {
+        return Response::RespNameNotFound;
+    }
+
     // Determine if user already has access to replay
     auto *alreadyAccessQuery = sqlInterface->prepareQuery(
         "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
@@ -844,11 +849,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     }
     if (alreadyAccessQuery->next()) {
         return Response::RespOk;
-    }
-
-    // Check if hash is correct
-    if (hash != createHashForReplay(gameId.toInt())) {
-        return Response::RespNameNotFound;
     }
 
     // Grant the User access to the replay
