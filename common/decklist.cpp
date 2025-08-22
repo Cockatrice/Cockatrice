@@ -93,8 +93,7 @@ int AbstractDecklistNode::depth() const
 }
 
 InnerDecklistNode::InnerDecklistNode(InnerDecklistNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistNode(_parent), name(other->getName()), cardSetShortName(other->getCardSetShortName()),
-      cardCollectorNumber(other->getCardCollectorNumber()), cardProviderId(other->getCardProviderId())
+    : AbstractDecklistNode(_parent), name(other->getName())
 {
     for (int i = 0; i < other->size(); ++i) {
         auto *inner = dynamic_cast<InnerDecklistNode *>(other->at(i));
