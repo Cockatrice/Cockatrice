@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar class="toolbar">
         <CockatriceAvatar square />
         <q-toolbar-title> Webatrice </q-toolbar-title>
         <q-btn flat dense round icon="people" aria-label="Menu" @click="toggleDrawer" />
@@ -21,6 +21,13 @@
     </q-page-container>
   </q-layout>
 </template>
+
+<style scoped>
+  .toolbar{
+    min-height: 0;
+    height: 5vh;
+  }
+</style>
 
 <script setup lang="ts">
 import { ref } from 'vue';

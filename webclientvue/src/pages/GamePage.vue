@@ -91,13 +91,13 @@
             <!-- relative container to make sure absolute draw area stays in bounds -->
             <div class="draw-area" ref="drawArea" style="height: 20%; width: 100%">
               <p
+                class="absolute"
                 style="
                   font-size: 36px;
                   color: white;
                   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
                   font-weight: bold;
                 "
-                class="absolute"
               >
                 DRAW AREA
               </p>
@@ -318,11 +318,10 @@ const addCard = () => {
   emitCardsToServer(); // <-- sync to server
 };
 
-/**
- * Clear the board by removing all cards.
- */
+//Clear the board by removing all cards and resetting cardId
 const clearBoard = () => {
   cards.value = [];
+  cardId.value = 1;
 };
 
 /**
@@ -346,7 +345,6 @@ const startDrag = (card: Card, e: MouseEvent) => {
 
   // Get all cards at the same position (stack)
   const stack = cards.value.filter((c) => c.x === card.x && c.y === card.y);
-
   // topCard is the last card in the stack (topmost visually)
   const topCard = stack[stack.length - 1];
 
@@ -384,8 +382,8 @@ const dragMove = (e: MouseEvent) => {
   newY = Math.round(newY / CARD_HEIGHT) * CARD_HEIGHT;
 
   // Clamp newX and newY so cards do not go out of play area
-  newX = Math.max(0, Math.min(newX, rect.width - CARD_WIDTH));
-  newY = Math.max(0, Math.min(newY, rect.height - CARD_HEIGHT));
+  newX = Math.max(0, Math.min(newX, (Math.round(rect.width/CARD_WIDTH)*CARD_WIDTH) - CARD_WIDTH));
+  newY = Math.max(0, Math.min(newY, (Math.round(rect.height/CARD_HEIGHT)*CARD_HEIGHT) - CARD_HEIGHT));
 
   // Calculate how far the cards moved (delta)
   const dx = newX - dragging.value.x;
@@ -406,11 +404,19 @@ const dragMove = (e: MouseEvent) => {
  * - Removes dragged cards from the current array.
  * - Inserts dragged cards back either at the position of the stack at new location,
  *   or at the end if no stack exists there.
+ * - Unstacks and untaps cards cards in the draw area and auto shifts cards to fill gaps
  * - Clears dragging state and removes event listeners.
  */
 const stopDrag = () => {
-  if (!dragging.value) return;
+  if (!dragging.value || !drawArea.value || !playArea.value) return;
   const draggedCards = draggedStack.value;
+  const drawAreaRect = drawArea.value.getBoundingClientRect();
+  const playAreaRect = playArea.value.getBoundingClientRect();
+
+  // Calculate drawArea's top-left relative to playArea
+  const drawAreaTopRel = Math.round((drawAreaRect.top - playAreaRect.top) / CARD_HEIGHT) * CARD_HEIGHT;
+  const drawAreaLeftRel = Math.round((drawAreaRect.left - playAreaRect.left) / CARD_WIDTH) * CARD_WIDTH;
+
 
   // Remove dragged cards from original cards array
   for (const card of draggedCards) {
@@ -433,6 +439,23 @@ const stopDrag = () => {
     cards.value.splice(insertIndex, 0, ...draggedCards);
   }
 
+  // Find which cards already exist horizontally in the drawArea
+  const cardsInDrawArea = cards.value.filter(
+    (card) =>
+      card.y === drawAreaTopRel && // same y line (same row)
+      card.x >= drawAreaLeftRel &&
+      card.x < drawAreaLeftRel + drawAreaRect.width,
+  );
+
+  // Sort the cards in the draw Area from left to right
+  cardsInDrawArea.sort((a,b)=>a.x-b.x);
+
+  //Update the cards to be unstacked seperately in hand and untapped
+  cardsInDrawArea.forEach((card, index)=>{
+    card.x = drawAreaLeftRel + (index)*CARD_WIDTH
+    card.tapped = false;
+  });
+
   // Reset drag state
   dragging.value = null;
   draggedStack.value = [];
@@ -447,11 +470,24 @@ const stopDrag = () => {
 
 /**
  * Toggles the tapped (rotated) state for all cards in the same stack.
+ * - Won't work if the card is in the draw area
  * - When a card is double-clicked, find all cards stacked with it.
  * - If the card is tapped, untap all cards in stack.
  * - Otherwise, tap all cards in stack.
  */
 const toggleTap = (card: Card) => {
+  if(drawArea.value && playArea.value){
+    const drawAreaRect = drawArea.value.getBoundingClientRect();
+    const playAreaRect = playArea.value.getBoundingClientRect();
+
+    // Calculate drawArea's top relative to playArea
+    const drawAreaTopRel =
+      Math.round((drawAreaRect.top - playAreaRect.top) / CARD_HEIGHT) * CARD_HEIGHT;
+
+    // Check if this cards exists in the drawArea and prevent toggling if so
+    if(card.y >= drawAreaTopRel) return;
+  }
+
   // Find all cards at same position
   const sameStack = cards.value.filter((c) => c.x === card.x && c.y === card.y);
 
@@ -523,7 +559,7 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
 .game {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 95vh;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
 }
 
@@ -611,7 +647,7 @@ const cardStyle = (card: Card, index: number): CSSProperties => ({
 .draw-area {
   margin-top: auto;
   background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f4e79 100%);
-  border-radius: 12px 12px 0 0;
+  border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
   height: 20%;
