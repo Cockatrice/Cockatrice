@@ -7227,7 +7227,7 @@ Please enter a name:</source>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="263"/>
         <source>&amp;Focus Chat</source>
-        <translation>Focus sulla Chat</translation>
+        <translation>Vai alla &amp;chat</translation>
     </message>
     <message>
         <location filename="src/client/tabs/tab_game.cpp" line="266"/>
@@ -9990,7 +9990,7 @@ Se pregato di evitare di continuare questa attività o potrebbero venire presi u
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="671"/>
         <source>Focus Chat</source>
-        <translation>Focalizza Chat</translation>
+        <translation>Vai alla chat</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="674"/>
