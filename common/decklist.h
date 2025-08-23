@@ -84,10 +84,6 @@ public:
 class InnerDecklistNode : public AbstractDecklistNode, public QList<AbstractDecklistNode *>
 {
     QString name;
-    QString cardSetShortName;
-    QString cardCollectorNumber;
-    QString cardProviderId;
-    class compareFunctor;
 
 public:
     explicit InnerDecklistNode(QString _name = QString(), InnerDecklistNode *_parent = nullptr, int position = -1)
@@ -109,27 +105,15 @@ public:
     [[nodiscard]] virtual QString getVisibleName() const;
     [[nodiscard]] QString getCardProviderId() const override
     {
-        return cardProviderId;
-    }
-    void setCardProviderId(const QString &_cardProviderId)
-    {
-        cardProviderId = _cardProviderId;
+        return "";
     }
     [[nodiscard]] QString getCardSetShortName() const override
     {
-        return cardSetShortName;
-    }
-    void setCardSetShortName(const QString &_cardSetShortName)
-    {
-        cardSetShortName = _cardSetShortName;
+        return "";
     }
     [[nodiscard]] QString getCardCollectorNumber() const override
     {
-        return cardCollectorNumber;
-    }
-    void setCardCollectorNumber(const QString &_cardCollectorNumber)
-    {
-        cardCollectorNumber = _cardCollectorNumber;
+        return "";
     }
     [[nodiscard]] bool isDeckHeader() const override
     {
