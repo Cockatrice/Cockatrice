@@ -460,8 +460,21 @@ bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
 
 ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
 {
+    // The source card does not have a printing defined, which means we can't get a card from the same set.
+    if (otherPrinting == PrintingInfo()) {
+        return getCard({cardName});
+    }
+
+    // The source card does have a printing defined, which means we can attempt to get a card from the same set.
     PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
-    return ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+    ExactCard relatedCard = ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+
+    // We didn't find a card from the same set, just try to find any card with the same name.
+    if (!relatedCard) {
+        return getCard({cardName});
+    }
+
+    return relatedCard;
 }
 
 void CardDatabase::refreshCachedReverseRelatedCards()
