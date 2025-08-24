@@ -105,6 +105,11 @@ jobs:
           - distro: Debian
             version: 12
             package: DEB
+            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Debian
+            version: 13
+            package: DEB
 
           - distro: Fedora
             version: 41
