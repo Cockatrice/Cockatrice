@@ -187,15 +187,25 @@ static void setupParserRules()
 
         return QString::fromStdString(std::string(sv.sv())).toLower();
     };
+
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
+        // Helper function for word boundary matching
+        auto createWordBoundaryMatcher = [](const QString &target) {
+            QString pattern = QString("\\b%1\\b").arg(QRegularExpression::escape(target));
+            QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
+            return [regex](const QString &s) { return regex.match(s).hasMatch(); };
+        };
+
         if (sv.choice() == 0) {
             const auto target = std::any_cast<QString>(sv[0]);
-            return [=](const QString &s) { return s.split(" ").contains(target, Qt::CaseInsensitive); };
+            return createWordBoundaryMatcher(target);
         }
 
         const auto target = std::any_cast<QStringList>(sv[0]);
         return [=](const QString &s) {
-            auto containsString = [&s](const QString &str) { return s.split(" ").contains(str, Qt::CaseInsensitive); };
+            auto containsString = [&s, &createWordBoundaryMatcher](const QString &str) {
+                return createWordBoundaryMatcher(str)(s);
+            };
             return std::any_of(target.begin(), target.end(), containsString);
         };
     };
