@@ -421,8 +421,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4

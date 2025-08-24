@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "$docs": "https://learn.microsoft.com/en-us/vcpkg/reference/vcpkg-json",
   "dependencies": [
     "gtest",
     "liblzma",
@@ -7,5 +8,6 @@
     "protobuf",
     "pthreads",
     "zlib"
-  ]
+  ],
+  "builtin-baseline": "c63619856b89f0af4d77ba2049396039e4985418"
 }
