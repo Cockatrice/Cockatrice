@@ -20,6 +20,7 @@ Available pre-compiled binaries for installation:
   <b>Linux</b>
    • <kbd>Ubuntu 24.04 LTS</kbd> <sub><i>Noble Numbat</i></sub>
    • <kbd>Ubuntu 22.04 LTS</kbd> <sub><i>Jammy Jellyfish</i></sub>
+   • <kbd>Debian 13</kbd> <sub><i>Trixie</i></sub>
    • <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
    • <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
    • <kbd>Fedora 42</kbd>
