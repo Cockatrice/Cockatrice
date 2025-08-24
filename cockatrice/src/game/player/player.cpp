@@ -1899,6 +1899,11 @@ void Player::actCreateRelatedCard()
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
         ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(
             cardRelation->getName(), sourceCard->getCard().getPrinting());
+
+        if (!relatedCard) {
+            return;
+        }
+
         setLastToken(relatedCard.getCardPtr());
     }
 }
@@ -2063,6 +2068,10 @@ void Player::createCard(const CardItem *sourceCard,
 
     ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardInfo->getName(),
                                                                                    sourceCard->getCard().getPrinting());
+
+    if (!relatedCard) {
+        return;
+    }
 
     switch (attachType) {
         case CardRelation::DoesNotAttach:
@@ -4169,9 +4178,7 @@ void Player::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
     for (const CardRelation *cardRelation : relatedCards) {
         ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardRelation->getName(),
                                                                                        card->getCard().getPrinting());
-        if (!relatedCard) {
-            relatedCard = CardDatabaseManager::getInstance()->getCard({cardRelation->getName()});
-        }
+
         if (!relatedCard) {
             continue;
         }
