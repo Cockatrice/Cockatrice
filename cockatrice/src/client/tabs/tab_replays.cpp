@@ -208,9 +208,9 @@ void TabReplays::retranslateUi()
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
     aDeleteRemoteReplay->setText(tr("Delete"));
-    aGetReplayCode->setText(tr("Get replay code"));
+    aGetReplayCode->setText(tr("Get replay share code"));
 
-    aSubmitReplayCode->setText(tr("Look up replay by code"));
+    aSubmitReplayCode->setText(tr("Look up replay by share code"));
 }
 
 void TabReplays::handleConnected(const ServerInfo_User &userInfo)
@@ -550,8 +550,9 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
     QString code = QString::fromStdString(resp.replay_code());
 
     QMessageBox msgBox;
-    msgBox.setText(tr("Got replay code"));
-    msgBox.setInformativeText(code);
+    msgBox.setText(tr("Replay Share Code"));
+    msgBox.setInformativeText(
+        tr("Others can use this code to add the replay to their list of remote replays:\n%1").arg(code));
     msgBox.setStandardButtons(QMessageBox::Ok);
     QPushButton *copyToClipboardButton = msgBox.addButton(tr("Copy to clipboard"), QMessageBox::ActionRole);
     connect(copyToClipboardButton, &QPushButton::clicked, this, [code] { QApplication::clipboard()->setText(code); });
@@ -562,8 +563,8 @@ void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer
 void TabReplays::actSubmitReplayCode()
 {
     bool ok;
-    QString code =
-        QInputDialog::getText(this, tr("Look up replay by code"), tr("Replay code"), QLineEdit::Normal, "", &ok);
+    QString code = QInputDialog::getText(this, tr("Look up replay by share code"), tr("Replay share code"),
+                                         QLineEdit::Normal, "", &ok);
 
     if (!ok) {
         return;
