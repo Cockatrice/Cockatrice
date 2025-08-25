@@ -6,15 +6,19 @@
 #include "../../settings/cache_settings.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
+#include "pb/command_replay_get_code.pb.h"
 #include "pb/command_replay_modify_match.pb.h"
+#include "pb/command_replay_submit_code.pb.h"
 #include "pb/event_replay_added.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
+#include "pb/response_replay_get_code.pb.h"
 #include "tab_game.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QClipboard>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
@@ -129,13 +133,26 @@ QGroupBox *TabReplays::createRightLayout()
     serverDirView = new RemoteReplayList_TreeWidget(client);
 
     // Right side layout
-    QToolBar *toolBar = new QToolBar;
+    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    QToolBar *dummyToolBar = new QToolBar(this);
+    QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    dummyToolBar->setSizePolicy(sizePolicy);
+    dummyToolBar->setVisible(false);
+
+    QToolBar *toolBar = new QToolBar(this);
     toolBar->setOrientation(Qt::Horizontal);
     toolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *toolBarLayout = new QHBoxLayout;
-    toolBarLayout->addStretch();
-    toolBarLayout->addWidget(toolBar);
-    toolBarLayout->addStretch();
+
+    QToolBar *rightmostToolBar = new QToolBar(this);
+    rightmostToolBar->setOrientation(Qt::Horizontal);
+    rightmostToolBar->setIconSize(QSize(32, 32));
+
+    QGridLayout *toolBarLayout = new QGridLayout;
+    toolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
+    toolBarLayout->addWidget(toolBar, 0, 1, Qt::AlignHCenter);
+    toolBarLayout->addWidget(rightmostToolBar, 0, 2, Qt::AlignRight);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(serverDirView);
@@ -157,12 +174,22 @@ QGroupBox *TabReplays::createRightLayout()
     aDeleteRemoteReplay = new QAction(this);
     aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
+    aGetReplayCode = new QAction(this);
+    aGetReplayCode->setIcon(QPixmap("theme:icons/share"));
+    connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
+
+    aSubmitReplayCode = new QAction(this);
+    aSubmitReplayCode->setIcon(QPixmap("theme:icons/search"));
+    connect(aSubmitReplayCode, &QAction::triggered, this, &TabReplays::actSubmitReplayCode);
 
     // Add actions to toolbars
     toolBar->addAction(aOpenRemoteReplay);
     toolBar->addAction(aDownload);
     toolBar->addAction(aKeep);
     toolBar->addAction(aDeleteRemoteReplay);
+    toolBar->addAction(aGetReplayCode);
+
+    rightmostToolBar->addAction(aSubmitReplayCode);
 
     return groupBox;
 }
@@ -181,6 +208,9 @@ void TabReplays::retranslateUi()
     aDownload->setText(tr("Download replay"));
     aKeep->setText(tr("Toggle expiration lock"));
     aDeleteRemoteReplay->setText(tr("Delete"));
+    aGetReplayCode->setText(tr("Get replay share code"));
+
+    aSubmitReplayCode->setText(tr("Look up replay by share code"));
 }
 
 void TabReplays::handleConnected(const ServerInfo_User &userInfo)
@@ -204,6 +234,8 @@ void TabReplays::setRemoteEnabled(bool enabled)
     aDownload->setEnabled(enabled);
     aKeep->setEnabled(enabled);
     aDeleteRemoteReplay->setEnabled(enabled);
+    aGetReplayCode->setEnabled(enabled);
+    aSubmitReplayCode->setEnabled(enabled);
 
     if (enabled) {
         serverDirView->refreshTree();
@@ -480,13 +512,108 @@ void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandCont
     serverDirView->removeMatchInfo(cmd.game_id());
 }
 
+void TabReplays::actGetReplayCode()
+{
+    const auto curRights = serverDirView->getSelectedReplayMatches();
+    if (curRights.isEmpty()) {
+        return;
+    }
+
+    for (const auto curRight : curRights) {
+        Command_ReplayGetCode cmd;
+        cmd.set_game_id(curRight->game_id());
+
+        PendingCommand *pend = client->prepareSessionCommand(cmd);
+        connect(pend, &PendingCommand::finished, this, &TabReplays::getReplayCodeFinished);
+        client->sendCommand(pend);
+    }
+}
+
+void TabReplays::getReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
+{
+    if (r.response_code() == Response::RespFunctionNotAllowed) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText(tr("Failed to get code"));
+        msgBox.setInformativeText(
+            tr("Either this server does not support replay sharing, or does not permit replay sharing for you."));
+        msgBox.exec();
+        return;
+    }
+
+    if (r.response_code() != Response::RespOk) {
+        QMessageBox::warning(this, tr("Failed"), tr("Could not get replay code"));
+        return;
+    }
+
+    const Response_ReplayGetCode &resp = r.GetExtension(Response_ReplayGetCode::ext);
+    QString code = QString::fromStdString(resp.replay_code());
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Replay Share Code"));
+    msgBox.setInformativeText(
+        tr("Others can use this code to add the replay to their list of remote replays:\n%1").arg(code));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    QPushButton *copyToClipboardButton = msgBox.addButton(tr("Copy to clipboard"), QMessageBox::ActionRole);
+    connect(copyToClipboardButton, &QPushButton::clicked, this, [code] { QApplication::clipboard()->setText(code); });
+    msgBox.setDefaultButton(copyToClipboardButton);
+    msgBox.exec();
+}
+
+void TabReplays::actSubmitReplayCode()
+{
+    bool ok;
+    QString code = QInputDialog::getText(this, tr("Look up replay by share code"), tr("Replay share code"),
+                                         QLineEdit::Normal, "", &ok);
+
+    if (!ok) {
+        return;
+    }
+
+    Command_ReplaySubmitCode cmd;
+    cmd.set_replay_code(code.toStdString());
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &TabReplays::submitReplayCodeFinished);
+    client->sendCommand(pend);
+}
+
+void TabReplays::submitReplayCodeFinished(const Response &r, const CommandContainer & /*commandContainer*/)
+{
+    switch (r.response_code()) {
+        case Response::RespOk: {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText(tr("Replay code found"));
+            msgBox.setInformativeText(tr("Replay was added, or you already had access to it."));
+            msgBox.exec();
+            break;
+        }
+        case Response::RespNameNotFound:
+            QMessageBox::warning(this, tr("Failed"), tr("Replay code not found"));
+            break;
+        case Response::RespFunctionNotAllowed: {
+            QMessageBox msgBox;
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.setText(tr("Failed to submit code"));
+            msgBox.setInformativeText(
+                tr("Either this server does not support replay sharing, or does not permit replay sharing for you."));
+            msgBox.exec();
+            break;
+        }
+        default:
+            QMessageBox::warning(this, tr("Failed"), tr("Unexpected error"));
+            break;
+    }
+}
+
 void TabReplays::replayAddedEventReceived(const Event_ReplayAdded &event)
 {
     if (event.has_match_info()) {
         // 99.9% of events will have match info (Normal Workflow)
         serverDirView->addMatchInfo(event.match_info());
     } else {
-        // When a Moderator force adds a replay, we need to refresh their view
+        // When a Moderator force adds a replay or a user submits a replay code, we need to refresh their view
         serverDirView->refreshTree();
     }
 }

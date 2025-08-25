@@ -28,7 +28,8 @@ private:
 
     QAction *aOpenLocalReplay, *aRenameLocal, *aNewLocalFolder, *aDeleteLocalReplay;
     QAction *aOpenReplaysFolder;
-    QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay;
+    QAction *aOpenRemoteReplay, *aDownload, *aKeep, *aDeleteRemoteReplay, *aGetReplayCode;
+    QAction *aSubmitReplayCode;
 
     QGroupBox *createLeftLayout();
     QGroupBox *createRightLayout();
@@ -61,6 +62,12 @@ private slots:
 
     void actDeleteRemoteReplay();
     void deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer);
+
+    void actGetReplayCode();
+    void getReplayCodeFinished(const Response &r, const CommandContainer &commandContainer);
+
+    void actSubmitReplayCode();
+    void submitReplayCodeFinished(const Response &r, const CommandContainer &commandContainer);
 
     void replayAddedEventReceived(const Event_ReplayAdded &event);
 signals:

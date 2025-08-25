@@ -65,6 +65,7 @@ message Response {
         GET_ADMIN_NOTES = 1018;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
+        REPLAY_GET_CODE = 1102;
     }
     required uint64 cmd_id = 1;
     optional ResponseCode response_code = 2;

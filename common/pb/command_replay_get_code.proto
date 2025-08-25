@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_ReplayGetCode {
+    extend SessionCommand {
+        optional Command_ReplayGetCode ext = 1104;
+    }
+    optional sint32 game_id = 1 [default = -1];
+}
