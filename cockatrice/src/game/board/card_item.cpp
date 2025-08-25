@@ -259,10 +259,10 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (static_cast<TabGame *>(owner->parent())->isSpectator())
+    if (static_cast<TabGame *>(owner->parent())->getGameState()->isSpectator())
         return;
 
-    Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
+    Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getGameState()->getActiveLocalPlayer();
     ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
     scene()->addItem(arrow);
     arrow->grabMouse();
@@ -282,7 +282,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (static_cast<TabGame *>(owner->parent())->isSpectator())
+    if (static_cast<TabGame *>(owner->parent())->getGameState()->isSpectator())
         return;
 
     auto *arrow = new ArrowAttachItem(this);

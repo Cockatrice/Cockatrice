@@ -367,7 +367,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
         menu->addAction(aRemoveMessages);
     }
-    if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
+    if (game && (game->getGameState()->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
         menu->addAction(aKick);
     }
@@ -463,7 +463,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         Command_KickFromGame cmd;
         cmd.set_player_id(playerId);
 
-        game->sendGameCommand(cmd);
+        game->getGameEventHandler()->sendGameCommand(cmd);
     } else if (actionClicked == aBan) {
         Command_GetUserInfo cmd;
         cmd.set_user_name(userName.toStdString());

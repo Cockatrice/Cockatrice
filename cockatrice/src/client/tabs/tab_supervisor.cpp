@@ -707,7 +707,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    gameTabs.remove(tab->getGameId());
+    gameTabs.remove(tab->getGameState()->getGameId());
     removeTab(indexOf(tab));
 
     if (!localClients.isEmpty())
@@ -916,7 +916,7 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 {
     TabGame *tab = gameTabs.value(cont.game_id());
     if (tab)
-        tab->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()), {});
+        tab->getGameEventHandler()->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()), {});
     else
         qCInfo(TabSupervisorLog) << "gameEvent: invalid gameId" << cont.game_id();
 }
