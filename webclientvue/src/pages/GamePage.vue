@@ -172,7 +172,9 @@ interface ContextMenuState {
   item?: unknown; // Replace `unknown` with your actual item type
 }
 
-// Constants defining card size in pixels
+/* Constants defining card size in pixels. The grid is formed in the dragMove function using these constraints so that the xy coordinates
+of your mouse are rounded to the nearest multiple of the card width and height relative to the playArea (not viewport). Ex: a mouse location
+that is 190px and 130px from the top-left of the playArea will be rounded and place a card to 180px and 90px from the top-left.*/
 const CARD_WIDTH = 60;
 const CARD_HEIGHT = 90;
 
@@ -227,6 +229,7 @@ const emitCardsToServer = () => {
   });
 };
 
+// Context Menu has not been implemented yet, don't worry about it for now
 const contextMenu = reactive<ContextMenuState>({
   visible: false,
   x: 0,
@@ -273,27 +276,25 @@ const cancelPeekTimer = (card: Card) => {
 // The array of cards being dragged together (stack)
 const draggedStack = ref<Card[]>([]);
 
-/**
- * Add a new card at a random but grid-aligned position.
- * The math:
- * - Random x between 100 and 300 px (100 + random*200)
- * - Divided by CARD_WIDTH (60) to snap to grid, rounded
- * - Multiplied back by CARD_WIDTH for exact grid alignment
- * Similar for y, but with CARD_HEIGHT (90).
- */
+// Adds a card after the rightmost card in the player's drawArea
 const addCard = () => {
+  /* The drawArea and playArea can be null because they were declared as a union variable with type <HTMLElement | null>.
+  Thus TypeScript requires that you include a guard to prevent errors*/
   if (!drawArea.value || !playArea.value) return;
 
+  // getBoundingClientRect() returns an object containing playArea’s top, left, right, and bottom coords (measured relative to the viewport)
   const drawAreaRect = drawArea.value.getBoundingClientRect();
   const playAreaRect = playArea.value.getBoundingClientRect();
 
-  // Calculate drawArea's top-left relative to playArea
+  /* Getting the drawArea's top-left relative to playArea (instead of viewport) by subtraction, then rounding to the nearest grid value
+  (Should be an extremely minor difference, maybe less than 2px)*/
   const drawAreaLeftRel =
     Math.round((drawAreaRect.left - playAreaRect.left) / CARD_WIDTH) * CARD_WIDTH;
   const drawAreaTopRel =
     Math.round((drawAreaRect.top - playAreaRect.top) / CARD_HEIGHT) * CARD_HEIGHT;
 
-  // Find how many cards already exist horizontally in the drawArea
+  /* Finds the specific cards that exist in the player's drawArea by checking if they’re in the same row as the draw area and if they’re
+  within the left and right bounds of the drawArea*/
   const cardsInDrawArea = cards.value.filter(
     (card) =>
       card.y === drawAreaTopRel && // same y line (same row)
@@ -301,10 +302,12 @@ const addCard = () => {
       card.x < drawAreaLeftRel + drawAreaRect.width,
   );
 
-  // Position new card horizontally next to existing cards in drawArea
+  /* Finds the next x grid value right after the rightmost card. Done by calculating how many cards exist in the drawArea and multiplying it
+  by card width.*/
   const newX = drawAreaLeftRel + cardsInDrawArea.length * CARD_WIDTH;
   const newY = drawAreaTopRel;
 
+  // Temporary logic that adds a fake card with an incrementing number ID: (Card 1, Card 2, Card 3...)
   cards.value.push({
     id: cardId.value,
     name: 'Card ' + cardId.value,
@@ -312,68 +315,50 @@ const addCard = () => {
     y: newY,
     tapped: false,
   });
-
   cardId.value++;
 
   emitCardsToServer(); // <-- sync to server
 };
 
-//Clear the board by removing all cards and resetting cardId
+// Clear the board by removing all cards and resetting cardId
 const clearBoard = () => {
   cards.value = [];
   cardId.value = 1;
 };
 
-/**
- * Called when user starts dragging a card.
- * - Prevents multiple drag initiations.
- * - Calculates offset between mouse and card position (for smooth drag).
- * - Finds all cards stacked at the same (x, y) to drag the entire stack.
- * - Checks if the dragged card is topmost in that stack.
- *   - If yes, drag whole stack.
- *   - Otherwise, drag only the selected card.
- * - Adds mousemove and mouseup event listeners for dragging.
- */
+// Called when user starts dragging a card. Tracks dragged card/stack and offset between mouse and card/stack
 const startDrag = (card: Card, e: MouseEvent) => {
+  // Checks if a drag is already in play to prevent multiple drag initiations.
   if (dragging.value) return;
 
+  /* In short, this works as a boolean in other drag functions. If this value is null, we aren't dragging and the functions return early*/
   dragging.value = card;
+
+  // Later when we add multi-select we will add functionality to allow dragging multiple cards. For now we drag a single card
+  draggedStack.value = [card];
+
+  /* Stores offset between mouse and card position so that the card doesn’t end up wildly far away when dragged. We need to fix the offset
+  because our mouse position is relative to the viewport, whereas the card position is relative to the  playArea. */
   offset.value = {
     x: e.clientX - card.x,
     y: e.clientY - card.y,
   };
 
-  // Get all cards at the same position (stack)
-  const stack = cards.value.filter((c) => c.x === card.x && c.y === card.y);
-  // topCard is the last card in the stack (topmost visually)
-  const topCard = stack[stack.length - 1];
-
-  if (card.id === topCard?.id) {
-    // Drag entire stack if card is top card
-    draggedStack.value = stack;
-  } else {
-    // Drag only the single card otherwise
-    draggedStack.value = [card];
-  }
-
+  /* Event listeners are added to the window so that drag events don’t suddenly stop firing when your mouse moves off the card
+  in case you move your mouse into a zone the card can't follow it in.*/
   window.addEventListener('mousemove', dragMove);
   window.addEventListener('mouseup', stopDrag);
 };
 
-/**
- * Handles the mousemove event during dragging.
- * - Calculates new position relative to play area boundaries.
- * - Snaps the position to the grid by rounding to nearest CARD_WIDTH/HEIGHT multiple.
- * - Ensures cards stay inside play area.
- * - Moves all cards in draggedStack by the calculated delta.
- */
+// Handles the mousemove event during dragging. Moves card/stack to where mouse is and snaps to nearest grid location
 const dragMove = (e: MouseEvent) => {
+  // check if a drag is occurring and if the playArea exists. Return early if not.
   if (!dragging.value || !playArea.value) return;
 
-  // Get play area bounding rectangle for constraints
+  // Get an object containing playArea’s top, left, right, and bottom coords (measured relative to the viewport)
   const rect = playArea.value.getBoundingClientRect();
 
-  // Calculate new X and Y by subtracting the offset
+  // Calculate new X and Y by subtracting the offset to keep mouse and card coordinates the same
   let newX = e.clientX - offset.value.x;
   let newY = e.clientY - offset.value.y;
 
@@ -399,24 +384,24 @@ const dragMove = (e: MouseEvent) => {
   emitCardsToServer();
 };
 
-/**
- * Called when dragging stops (mouse up).
- * - Removes dragged cards from the current array.
- * - Inserts dragged cards back either at the position of the stack at new location,
- *   or at the end if no stack exists there.
+/* Called when dragging stops (mouse up).
+ * - Modify cards array so that the dropped cards/card (if in a stack) are placed consecutively in bottom to top order
  * - Unstacks and untaps cards cards in the draw area and auto shifts cards to fill gaps
- * - Clears dragging state and removes event listeners.
- */
+ * - Clears dragging state and removes event listeners. */
 const stopDrag = () => {
+  //return early if no card is being dragged or if drawArea and playArea don't exist. Needed to bypass TypeScript warning
   if (!dragging.value || !drawArea.value || !playArea.value) return;
+
+  //tracks which card(s) are being dragged
   const draggedCards = draggedStack.value;
+
+  // getBoundingClientRect() returns an object containing playArea’s top, left, right, and bottom coords (measured relative to the viewport)
   const drawAreaRect = drawArea.value.getBoundingClientRect();
   const playAreaRect = playArea.value.getBoundingClientRect();
 
-  // Calculate drawArea's top-left relative to playArea
+  // Getting the drawArea's top-left relative to playArea (instead of viewport) by subtraction, then rounding to the nearest grid value
   const drawAreaTopRel = Math.round((drawAreaRect.top - playAreaRect.top) / CARD_HEIGHT) * CARD_HEIGHT;
   const drawAreaLeftRel = Math.round((drawAreaRect.left - playAreaRect.left) / CARD_WIDTH) * CARD_WIDTH;
-
 
   // Remove dragged cards from original cards array
   for (const card of draggedCards) {
@@ -431,15 +416,15 @@ const stopDrag = () => {
     (c) => c.x === dragging.value!.x && c.y === dragging.value!.y,
   );
 
+  // If no stack exists, add dragged cards at the end of the cards array (just re-tracking them, no other purpose)
   if (insertIndex === -1) {
-    // If no stack exists, add dragged cards at the end
     cards.value.push(...draggedCards);
   } else {
-    // Insert dragged cards before the existing stack to keep them visually below
+    // Insert dragged cards before the existing stack to keep them visually below (this allows us to keep cards in bottom to top order)
     cards.value.splice(insertIndex, 0, ...draggedCards);
   }
 
-  // Find which cards already exist horizontally in the drawArea
+  // Find which cards exist in the drawArea (returned cards will not necessarily be in left to right order like we see visually)
   const cardsInDrawArea = cards.value.filter(
     (card) =>
       card.y === drawAreaTopRel && // same y line (same row)
@@ -447,10 +432,11 @@ const stopDrag = () => {
       card.x < drawAreaLeftRel + drawAreaRect.width,
   );
 
-  // Sort the cards in the draw Area from left to right
+  // Sort the cards in the draw Area so that this array stores them in left to right, just like we see visually
   cardsInDrawArea.sort((a,b)=>a.x-b.x);
 
-  //Update the cards to be unstacked seperately in hand and untapped
+  /* Update all the cards in hand to each be a CARD_WIDTH's length away from the previous card. This is done so that
+  a stack of cards added to the hand won't be on top of each other. Each card is also forcibly untapped */
   cardsInDrawArea.forEach((card, index)=>{
     card.x = drawAreaLeftRel + (index)*CARD_WIDTH
     card.tapped = false;
@@ -468,23 +454,22 @@ const stopDrag = () => {
   emitCardsToServer();
 };
 
-/**
- * Toggles the tapped (rotated) state for all cards in the same stack.
- * - Won't work if the card is in the draw area
- * - When a card is double-clicked, find all cards stacked with it.
- * - If the card is tapped, untap all cards in stack.
- * - Otherwise, tap all cards in stack.
- */
+// Toggles the tapped (rotated) state for all selected cards. Won't work if the card is in the draw area
 const toggleTap = (card: Card) => {
+
+  /* Check if the card exists in the drawArea. The drawArea and playArea can be null because they were declared as a union variable with
+  type <HTMLElement | null>. Thus TypeScript requires that you include a guard to prevent errors*/
   if(drawArea.value && playArea.value){
+
+    // getBoundingClientRect() returns an object containing playArea’s top, left, right, and bottom coords (measured relative to the viewport)
     const drawAreaRect = drawArea.value.getBoundingClientRect();
     const playAreaRect = playArea.value.getBoundingClientRect();
 
-    // Calculate drawArea's top relative to playArea
+    // Getting the drawArea's top-left relative to playArea (instead of viewport) by subtraction, then rounding to the nearest grid value
     const drawAreaTopRel =
       Math.round((drawAreaRect.top - playAreaRect.top) / CARD_HEIGHT) * CARD_HEIGHT;
 
-    // Check if this cards exists in the drawArea and prevent toggling if so
+    // Check if this cards exists in the drawArea and prevent toggling by returning early if so
     if(card.y >= drawAreaTopRel) return;
   }
 
@@ -503,10 +488,7 @@ const toggleTap = (card: Card) => {
   emitCardsToServer();
 };
 
-/**
- * Groups cards into stacks by their (x,y) position.
- * Returns an array of stacks, each stack is an array of cards.
- */
+//Groups cards into stacks by their (x,y) position. Returns an array of stacks, each stack is an array of cards.
 const cardStacks = computed(() => {
   const groups: Record<string, Card[]> = {};
   for (const card of cards.value) {
@@ -519,7 +501,7 @@ const cardStacks = computed(() => {
   return Object.values(groups);
 });
 
-// need to create stacking logic for everyCard, so that it can be displayed in the red areas
+// Need to create stacking logic for everyCard, so that it can be displayed in the red areas
 // This will be used to display cards in the opponent's areas
 const cardStacksOpponent = computed(() => {
   const groups: Record<string, Card[]> = {};
