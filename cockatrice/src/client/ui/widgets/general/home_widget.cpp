@@ -52,11 +52,11 @@ void HomeWidget::startCardShuffleTimer()
 
 void HomeWidget::updateRandomCard()
 {
-    CardInfoPtr newCard = CardDatabaseManager::getInstance()->getRandomCard();
+    ExactCard newCard = CardDatabaseManager::getInstance()->getRandomCard();
     if (!newCard)
         return;
 
-    connect(newCard.data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
+    connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSource->setCard(newCard);
 }
 

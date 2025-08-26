@@ -1,7 +1,7 @@
 #ifndef TAB_HOME_H
 #define TAB_HOME_H
 
-#include "../game_logic/abstract_client.h"
+#include "../../server/abstract_client.h"
 #include "../ui/widgets/general/home_widget.h"
 #include "tab.h"
 

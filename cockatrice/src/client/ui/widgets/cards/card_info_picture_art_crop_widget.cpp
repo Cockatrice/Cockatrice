@@ -12,8 +12,8 @@ QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &target
 {
     // Load the full-resolution card image, not a pre-scaled one
     QPixmap fullResPixmap;
-    if (getInfo()) {
-        PictureLoader::getPixmap(fullResPixmap, getInfo(), QSize(745, 1040)); // or a high default size
+    if (getCard()) {
+        PictureLoader::getPixmap(fullResPixmap, getCard(), QSize(745, 1040)); // or a high default size
     } else {
         PictureLoader::getCardBackPixmap(fullResPixmap, QSize(745, 1040));
     }

@@ -53,7 +53,6 @@ protected:
     QVector<ICardDatabaseParser *> availableParsers;
 
 private:
-    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 
@@ -100,6 +99,7 @@ public:
         return cards;
     }
     SetList getSetList() const;
+    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     LoadStatus loadFromFile(const QString &fileName);
     bool saveCustomTokensToFile();
     QStringList getAllMainCardTypes() const;
