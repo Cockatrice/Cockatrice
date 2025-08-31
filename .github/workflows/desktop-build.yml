@@ -56,7 +56,7 @@ jobs:
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -143,7 +143,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
@@ -270,7 +270,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies using Homebrew
         shell: bash
@@ -420,7 +420,7 @@ jobs:
           msbuild-architecture: x64
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
