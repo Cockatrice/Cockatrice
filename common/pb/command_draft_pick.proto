@@ -1,0 +1,13 @@
+syntax = "proto2";
+import "game_commands.proto";
+message CardsToPick {
+    repeated sint32 card_ids = 1;
+}
+
+message Command_DraftPick {
+    extend GameCommand {
+        optional Command_DraftPick ext = 1036;
+    }
+    optional CardsToPick picked_cards = 1;
+    optional CardsToPick burned_cards = 2;
+}
