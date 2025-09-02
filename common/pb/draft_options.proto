@@ -1,0 +1,19 @@
+syntax = "proto2";
+import "command_deck_select.proto"
+enum Draft_Type {
+    Booster_Draft = 1;
+    Sealed = 2;
+}
+
+message Draft_Options {
+    optional Draft_Type type = 1;
+    optional string draft_list = 2;
+    optional sint32 draft_list_id = 3 [default = -1];
+    optional string allowed_lands = 4;
+    optional uint32 cards_per_pack = 5;
+    optional uint32 packs_per_player = 6;
+    optional uint32 minimum_deck_size = 7;
+    optional uint32 picks_per_round = 8;
+    optional uint32 burns_per_round = 9;
+    optional uint32 round_timer = 10
+}

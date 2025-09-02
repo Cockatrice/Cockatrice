@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "game_event.proto";
+import "serverinfo_card.proto";
+
+message Event_DraftPack {
+    extend GameEvent {
+        optional Event_DraftPack ext = 2022;
+    }
+    optional uint32 round = 1;
+    repeated ServerInfo_Card cards = 2;
+}

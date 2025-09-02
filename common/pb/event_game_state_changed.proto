@@ -1,6 +1,7 @@
 syntax = "proto2";
 import "game_event.proto";
 import "serverinfo_player.proto";
+import "draft_options.proto";
 
 message Event_GameStateChanged {
     extend GameEvent {
@@ -11,4 +12,5 @@ message Event_GameStateChanged {
     optional sint32 active_player_id = 3;
     optional sint32 active_phase = 4;
     optional uint32 seconds_elapsed = 5;
+    optional Draft_Options options = 6;
 }

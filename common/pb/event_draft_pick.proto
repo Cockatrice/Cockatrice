@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "game_event.proto";
+
+message Event_DraftPick {
+    extend GameEvent {
+        optional Event_DraftPick ext = 2023;
+    }
+    optional uint32 round = 1;
+    repeated sint32 picked_card_ids = 2;
+    repeated sint32 burned_card_ids = 3;
+}
