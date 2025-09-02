@@ -21,6 +21,8 @@ set(PROTO_FILES
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
+    command_draft_options_select.proto
+    command_draft_pick_select.proto
     command_draw_cards.proto
     command_dump_zone.proto
     command_flip_card.proto
@@ -60,6 +62,7 @@ set(PROTO_FILES
     context_ready_start.proto
     context_set_sideboard_lock.proto
     context_undo_draw.proto
+    draft_options.proto
     event_add_to_list.proto
     event_attach_card.proto
     event_change_zone_properties.proto
@@ -70,6 +73,8 @@ set(PROTO_FILES
     event_del_counter.proto
     event_delete_arrow.proto
     event_destroy_card.proto
+    event_draft_pack.proto
+    event_draft_pick_select.proto
     event_draw_cards.proto
     event_dump_zone.proto
     event_flip_card.proto
@@ -124,6 +129,8 @@ set(PROTO_FILES
     response_deck_download.proto
     response_deck_list.proto
     response_deck_upload.proto
+    response_draft_deck_invalid.proto
+    response_draft_pick_selection_invalid.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
     response_get_admin_notes.proto

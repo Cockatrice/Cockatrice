@@ -45,4 +45,7 @@ message Event_MoveCard {
     // The provider id of the card in case it was not known yet.
     // Extends the name to supply a specific printing of that type of card.
     optional string new_card_provider_id = 12;
+
+    // During a draft this is the index of the pick selection
+    optional sint32 draft_selection_index = 13 [default = -1];
 }

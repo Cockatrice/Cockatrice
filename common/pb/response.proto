@@ -68,6 +68,8 @@ message Response {
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_GET_CODE = 1102;
+        DRAFT_PICK_SELECTION_INVALID = 1200;
+        DRAFT_DECK_INVALID = 1201;
     }
     required uint64 cmd_id = 1;
     optional ResponseCode response_code = 2;

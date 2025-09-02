@@ -53,4 +53,10 @@ message ServerInfo_Card {
 
     // unique id of this kind of card, extends the name to specify a specific printing of a card
     optional string provider_id = 17;
+
+    // index of the selection this card was picked in
+    optional sint32 draft_pick_selection_index = 64 [default = -1];
+
+    // user that picked this card
+    optional sint32 draft_pick_by_user_id = 65 [default = -1];
 }

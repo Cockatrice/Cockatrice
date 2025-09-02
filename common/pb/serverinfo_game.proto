@@ -48,6 +48,9 @@ message ServerInfo_Game {
     // decklists are sent to all players when loaded
     optional bool share_decklists_on_load = 15;
 
+    // the game is a draft game
+    optional bool is_draft = 16;
+
     // the current player count
     optional uint32 player_count = 30;
 
@@ -60,6 +63,6 @@ message ServerInfo_Game {
     // time that the game started at
     optional uint32 start_time = 51;
 
-    // whether the game is closed. Closed games are finished and can't be interacted with
+    // Whether the game is closed. Closed games are finished and can't be interacted with
     optional bool closed = 52;
 }

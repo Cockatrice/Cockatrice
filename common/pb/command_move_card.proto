@@ -50,4 +50,7 @@ message Command_MoveCard {
 
     // Inverts the x coordinate to apply from the end of the target zone instead of the start
     optional bool is_reversed = 8 [default = false];
+
+    // During a draft this is the index of the pick selection
+    optional sint32 draft_selection_index = 9 [default = -1];
 }

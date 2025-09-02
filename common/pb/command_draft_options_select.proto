@@ -1,0 +1,11 @@
+syntax = "proto2";
+import "game_commands.proto";
+import "draft_options.proto";
+
+// Sends the options to use to draft before the draft starts.
+message Command_DraftOptionsSelect {
+    extend GameCommand {
+        optional Command_DraftOptionsSelect ext = 1035;
+    }
+    optional Draft_Options options = 1;
+}

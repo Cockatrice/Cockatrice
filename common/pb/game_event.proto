@@ -33,6 +33,8 @@ message GameEvent {
         // STOP_DUMP_ZONE = 2019; // obsolete
         CHANGE_ZONE_PROPERTIES = 2020;
         REVERSE_TURN = 2021;
+        DRAFT_PACK = 2022;
+        DRAFT_PICK_SELECT = 2023;
     }
     optional sint32 player_id = 1 [default = -1];
     extensions 100 to max;
