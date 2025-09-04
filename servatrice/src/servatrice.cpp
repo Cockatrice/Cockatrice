@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "servatrice.h"
 
-#include "../../common/deck_list/decklist.h"
+#include "../../common/deck_list/deck_list.h"
 #include "email_parser.h"
 #include "featureset.h"
 #include "isl_interface.h"
