@@ -25,10 +25,7 @@ protected:
     QVBoxLayout *searchAndDatabaseFrame;
     QHBoxLayout *searchLayout;
     QDockWidget *searchAndDatabaseDock;
-    QDockWidget *deckAnalyticsDock;
     QWidget *centralWidget;
-    QMenu *deckAnalyticsMenu;
-    QAction *aDeckAnalyticsDockVisible, *aDeckAnalyticsDockFloating;
 
 public:
     explicit TabDeckEditorVisual(TabSupervisor *_tabSupervisor);
