@@ -1,7 +1,7 @@
 #ifndef CLIPBOARD_TESTING_H
 #define CLIPBOARD_TESTING_H
 
-#include "../../common/deck_list/decklist.h"
+#include "../../common/deck_list/deck_list.h"
 
 #include "gtest/gtest.h"
 
