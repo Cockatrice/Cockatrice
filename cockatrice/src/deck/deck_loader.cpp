@@ -1,9 +1,9 @@
 #include "deck_loader.h"
 
+#include "../../../common/deck_list/deck_list.h"
 #include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
-#include "decklist.h"
 
 #include <QApplication>
 #include <QClipboard>

@@ -1,9 +1,9 @@
 #include "deck_view.h"
 
+#include "../../../../common/deck_list/deck_list.h"
 #include "../../client/ui/theme_manager.h"
 #include "../../game/cards/card_info.h"
 #include "../../settings/cache_settings.h"
-#include "decklist.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>

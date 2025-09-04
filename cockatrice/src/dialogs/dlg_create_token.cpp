@@ -1,11 +1,11 @@
 #include "dlg_create_token.h"
 
+#include "../../../common/deck_list/deck_list.h"
 #include "../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../game/cards/card_database_manager.h"
 #include "../game/cards/card_database_model.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
-#include "decklist.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

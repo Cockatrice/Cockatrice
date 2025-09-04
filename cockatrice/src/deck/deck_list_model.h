@@ -1,8 +1,8 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
+#include "../../../common/deck_list/deck_list.h"
 #include "../game/cards/exact_card.h"
-#include "decklist.h"
 
 #include <QAbstractItemModel>
 #include <QList>

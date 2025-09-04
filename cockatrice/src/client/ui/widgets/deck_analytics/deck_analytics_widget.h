@@ -7,11 +7,11 @@
 #include "mana_curve_widget.h"
 #include "mana_devotion_widget.h"
 
+#include <../../../../../common/deck_list/deck_list.h>
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <decklist.h>
 
 class DeckAnalyticsWidget : public QWidget
 {

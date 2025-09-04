@@ -1,7 +1,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
-#include "card_ref.h"
+#include "../card_ref.h"
 
 #include <QMap>
 #include <QVector>

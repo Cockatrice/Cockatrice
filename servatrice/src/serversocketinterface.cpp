@@ -20,7 +20,7 @@
 
 #include "serversocketinterface.h"
 
-#include "decklist.h"
+#include "../../common/deck_list/deck_list.h"
 #include "email_parser.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"

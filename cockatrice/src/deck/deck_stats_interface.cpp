@@ -1,6 +1,6 @@
 #include "deck_stats_interface.h"
 
-#include "decklist.h"
+#include "../../../common/deck_list/deck_list.h"
 
 #include <QDesktopServices>
 #include <QMessageBox>

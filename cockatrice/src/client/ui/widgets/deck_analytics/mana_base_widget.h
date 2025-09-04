@@ -4,9 +4,9 @@
 #include "../../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 
+#include <../../../../../common/deck_list/deck_list.h>
 #include <QHBoxLayout>
 #include <QWidget>
-#include <decklist.h>
 #include <utility>
 
 class ManaBaseWidget : public QWidget

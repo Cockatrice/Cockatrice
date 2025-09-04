@@ -6,9 +6,9 @@
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
 
+#include <../../../../../common/deck_list/deck_list.h>
 #include <QHash>
 #include <QRegularExpression>
-#include <decklist.h>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)
