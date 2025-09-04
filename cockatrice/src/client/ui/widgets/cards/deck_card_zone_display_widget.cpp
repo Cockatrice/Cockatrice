@@ -64,7 +64,7 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
             subBannerOpacity, cardSizeWidget);
         connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                 SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(displayWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(displayWidget, SIGNAL(cardHovered(ExactCard)), this, SLOT(onHover(ExactCard)));
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
         cardGroupLayout->addWidget(displayWidget);
@@ -75,7 +75,7 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
                                            activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
         connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
                 SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(displayWidget, SIGNAL(cardHovered(CardInfoPtr)), this, SLOT(onHover(CardInfoPtr)));
+        connect(displayWidget, SIGNAL(cardHovered(ExactCard)), this, SLOT(onHover(ExactCard)));
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
         cardGroupLayout->addWidget(displayWidget);
