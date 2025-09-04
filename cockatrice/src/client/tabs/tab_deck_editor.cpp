@@ -198,9 +198,6 @@ void TabDeckEditor::loadLayout()
     printingSelectorDockWidget->setMinimumSize(layouts.getDeckEditorPrintingSelectorSize());
     printingSelectorDockWidget->setMaximumSize(layouts.getDeckEditorPrintingSelectorSize());
 
-    databaseDisplayDockWidget->setMinimumSize(100, 100);
-    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
-
     QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
 }
 
@@ -253,9 +250,6 @@ void TabDeckEditor::freeDocksSize()
 
     printingSelectorDockWidget->setMinimumSize(100, 100);
     printingSelectorDockWidget->setMaximumSize(5000, 5000);
-
-    databaseDisplayDockWidget->setMinimumSize(100, 100);
-    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
 }
 
 void TabDeckEditor::dockVisibleTriggered()
