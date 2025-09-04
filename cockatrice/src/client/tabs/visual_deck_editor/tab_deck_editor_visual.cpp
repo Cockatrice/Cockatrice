@@ -270,8 +270,8 @@ void TabDeckEditorVisual::restartLayout()
 {
     deckDockWidget->setVisible(true);
     cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(true);
-    printingSelectorDockWidget->setVisible(false);
+    filterDockWidget->setVisible(false);
+    printingSelectorDockWidget->setVisible(true);
 
     deckDockWidget->setFloating(false);
     cardInfoDockWidget->setFloating(false);
@@ -280,22 +280,21 @@ void TabDeckEditorVisual::restartLayout()
 
     aCardInfoDockVisible->setChecked(true);
     aDeckDockVisible->setChecked(true);
-    aFilterDockVisible->setChecked(true);
-    aPrintingSelectorDockVisible->setChecked(false);
+    aFilterDockVisible->setChecked(false);
+    aPrintingSelectorDockVisible->setChecked(true);
 
     aCardInfoDockFloating->setChecked(false);
     aDeckDockFloating->setChecked(false);
     aFilterDockFloating->setChecked(false);
     aPrintingSelectorDockFloating->setChecked(false);
 
-    setCentralWidget(searchAndDatabaseDock);
+    setCentralWidget(centralWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), deckDockWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), cardInfoDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), filterDockWidget);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), printingSelectorDockWidget);
 
+    splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Vertical);
     splitDockWidget(cardInfoDockWidget, deckDockWidget, Qt::Horizontal);
-    splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Vertical);
 
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
