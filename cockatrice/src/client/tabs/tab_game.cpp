@@ -50,11 +50,18 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 {
     // THIS CTOR IS USED ON REPLAY
 
+    gameMetaInfo = new GameMetaInfo();
     gameState = new GameState(0, -1, -1, _tabSupervisor->getIsLocalGame(), QList<AbstractClient *>(), true, false,
                               false, false, -1, false);
     connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
     connect(gameState, &GameState::spectatorAdded, this, &TabGame::addSpectator);
     connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
+
+    gameEventHandler = new GameEventHandler(this);
+    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
+    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
+    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
+    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -62,12 +69,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
     createReplayDock(_replay);
-
-    gameEventHandler = new GameEventHandler(this, messageLog);
-    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
-    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
-    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
-    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
@@ -85,7 +86,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);
     refreshShortcuts();
-    messageLog->logReplayStarted(gameState->getGameId());
+    messageLog->logReplayStarted(gameMetaInfo->gameId());
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
@@ -97,15 +98,24 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager()), activeCard(nullptr)
 {
 
+    gameMetaInfo = new GameMetaInfo();
+    gameMetaInfo->setFromProto(event.game_info());
+    gameMetaInfo->setRoomGameTypes(_roomGameTypes);
     gameState = new GameState(0, event.host_id(), event.player_id(), _tabSupervisor->getIsLocalGame(), _clients,
                               event.spectator(), event.judge(), false, event.resuming(), -1, false);
-    gameState->setGameInfo(event.game_info());
-    gameState->setRoomGameTypes(_roomGameTypes);
+
     // THIS CTOR IS USED ON GAMES
-    gameState->setStarted(false);
+    gameMetaInfo->setStarted(false);
     connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
     connect(gameState, &GameState::spectatorAdded, this, &TabGame::addSpectator);
 
+    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
+
+    gameEventHandler = new GameEventHandler(this);
+    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
+    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
+    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
+    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
 
     createCardInfoDock();
     createPlayerListDock();
@@ -113,14 +123,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createPlayAreaWidget();
     createDeckViewContainerWidget();
     createReplayDock(nullptr);
-
-    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
-
-    gameEventHandler = new GameEventHandler(this, messageLog);
-    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
-    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
-    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
-    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
@@ -141,16 +143,16 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     refreshShortcuts();
 
     // append game to rooms game list for others to see
-    for (int i = gameState->getGameTypesSize() - 1; i >= 0; i--)
-        gameTypes.append(gameState->findRoomGameType(i));
+    for (int i = gameMetaInfo->gameTypesSize() - 1; i >= 0; i--)
+        gameTypes.append(gameMetaInfo->findRoomGameType(i));
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
 
 void TabGame::loadReplay(GameReplay *replay)
 {
-    gameState->setGameInfo(replay->game_info());
-    gameState->setSpectatorsOmniscient(true);
+    gameMetaInfo->setFromProto(replay->game_info());
+    gameMetaInfo->setSpectatorsOmniscient(true);
 }
 
 void TabGame::addMentionTag(const QString &value)
@@ -189,8 +191,8 @@ TabGame::~TabGame()
 void TabGame::updatePlayerListDockTitle()
 {
     QString tabText =
-        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameState->getGameId());
-    QString userCountInfo = QString(" %1/%2").arg(gameState->getPlayerCount()).arg(gameState->getMaxPlayerCount());
+        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameMetaInfo->gameId());
+    QString userCountInfo = QString(" %1/%2").arg(gameState->getPlayerCount()).arg(gameMetaInfo->maxPlayers());
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
                                    (playerListDock->isWindow() ? tabText : QString()));
 }
@@ -198,7 +200,7 @@ void TabGame::updatePlayerListDockTitle()
 void TabGame::retranslateUi()
 {
     QString tabText =
-        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameState->getGameId());
+        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameMetaInfo->gameId());
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -397,14 +399,14 @@ void TabGame::updateTimeElapsedLabel(const QString newTime)
 
 void TabGame::adminLockChanged(bool lock)
 {
-    bool v = !(gameState->isSpectator() && !gameState->canSpectatorsChat() && lock);
+    bool v = !(gameState->isSpectator() && !gameMetaInfo->spectatorsCanChat() && lock);
     sayLabel->setVisible(v);
     sayEdit->setVisible(v);
 }
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(gameState->getGameInfo(), gameState->getRoomGameTypes(), this);
+    DlgCreateGame dlg(gameMetaInfo->proto(), gameMetaInfo->getRoomGameTypes(), this);
     dlg.exec();
 }
 
@@ -561,7 +563,7 @@ void TabGame::actCompleterChanged()
 void TabGame::notifyPlayerJoin(QString playerName)
 {
     if (trayIcon) {
-        QString gameId(QString::number(gameState->getGameId()));
+        QString gameId(QString::number(gameMetaInfo->gameId()));
         trayIcon->showMessage(tr("A player has joined game #%1").arg(gameId),
                               tr("%1 has joined the game").arg(playerName));
     }
@@ -746,7 +748,7 @@ void TabGame::startGame(bool _resuming)
     }
 
     playerListWidget->setGameStarted(true, gameState->isResuming());
-    gameState->setStarted(true);
+    gameMetaInfo->setStarted(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
 }
 
@@ -836,8 +838,8 @@ QString TabGame::getTabText() const
             gameTypeInfo.append("...");
     }
 
-    QString gameDesc(gameState->getGameDescription());
-    QString gameId(QString::number(gameState->getGameId()));
+    QString gameDesc(gameMetaInfo->description());
+    QString gameId(QString::number(gameMetaInfo->gameId()));
 
     QString tabText;
     if (replayManager->replay)
@@ -1282,7 +1284,7 @@ void TabGame::createMessageDock(bool bReplay)
              * (c) the spectator is a judge
              */
             bool isModOrJudge = !tabSupervisor->getAdminLocked() || gameState->isJudge();
-            if (!isModOrJudge && !gameState->canSpectatorsChat()) {
+            if (!isModOrJudge && !gameMetaInfo->spectatorsCanChat()) {
                 sayLabel->hide();
                 sayEdit->hide();
             }

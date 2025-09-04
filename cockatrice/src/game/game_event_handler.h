@@ -39,10 +39,9 @@ class GameEventHandler : public QObject
 private:
     TabGame *game;
     GameState *gameState;
-    MessageLogWidget *messageLog;
 
 public:
-    GameEventHandler(TabGame *game, MessageLogWidget *messageLog);
+    GameEventHandler(TabGame *game);
 
     void handleNextTurn();
     void handleReverseTurn();
@@ -95,6 +94,28 @@ signals:
     void gameClosed();
     void playerLeft(Player *leavingPlayer);
     void playerKicked();
+    void gameFlooded();
+    void containerProcessingStarted(GameEventContext context);
+    void setContextJudgeName();
+    void containerProcessingDone();
+    void logSpectatorSay(ServerInfo_User userInfo, QString message);
+    void logSpectatorLeave(QString name, QString reason);
+    void logGameStart();
+    void logReadyStart();
+    void logNotReadyStart();
+    void playerConceded();
+    void playerUnconceded();
+    void logDeckSelect();
+    void logSideboardLockSet();
+    void logConnectionStateChanged();
+    void logJoinSpectator();
+    void logJoinPlayer(Player *player);
+    void logLeave(Player *player, QString reason);
+    void logKicked();
+    void logTurnReversed(Player *player, bool reversed);
+    void logGameClosed();
+    void logActivePlayer();
+    void logActivePhaseChanged();
 };
 
 #endif // COCKATRICE_GAME_EVENT_HANDLER_H

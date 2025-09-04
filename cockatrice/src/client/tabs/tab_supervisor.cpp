@@ -707,7 +707,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
     if (tab == currentWidget())
         emit setMenu();
 
-    gameTabs.remove(tab->getGameState()->getGameId());
+    gameTabs.remove(tab->getGameMetaInfo()->gameId());
     removeTab(indexOf(tab));
 
     if (!localClients.isEmpty())

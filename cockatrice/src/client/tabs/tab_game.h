@@ -3,6 +3,7 @@
 
 #include "../../client/tearoff_menu.h"
 #include "../../game/game_event_handler.h"
+#include "../../game/game_meta_info.h"
 #include "../../game/game_state.h"
 #include "../../game/player/player.h"
 #include "../replay_manager.h"
@@ -51,6 +52,7 @@ class TabGame : public Tab
 {
     Q_OBJECT
 private:
+    GameMetaInfo *gameMetaInfo;
     GameState *gameState;
     GameEventHandler *gameEventHandler;
     const UserListProxy *userListProxy;
@@ -177,6 +179,11 @@ public:
     void retranslateUi() override;
     void updatePlayerListDockTitle();
     bool closeRequest() override;
+
+    GameMetaInfo *getGameMetaInfo()
+    {
+        return gameMetaInfo;
+    }
 
     GameState *getGameState() const
     {

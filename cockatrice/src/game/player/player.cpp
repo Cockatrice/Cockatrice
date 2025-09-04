@@ -153,7 +153,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     hand = addZone(
         new HandZone(this,
                      _local || _judge ||
-                         (_parent->getGameState()->isSpectator() && _parent->getGameState()->isSpectatorsOmniscient()),
+                         (_parent->getGameState()->isSpectator() && _parent->getGameMetaInfo()->spectatorsOmniscient()),
                      (int)table->boundingRect().height(), this));
     connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
@@ -2787,7 +2787,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
                     case ServerInfo_Zone::PrivateZone:
                         contentsKnown =
                             local || judge ||
-                            (game->getGameState()->isSpectator() && game->getGameState()->isSpectatorsOmniscient());
+                            (game->getGameState()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
                         break;
 
                     case ServerInfo_Zone::PublicZone:

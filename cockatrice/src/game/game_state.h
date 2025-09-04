@@ -5,7 +5,6 @@
 #include "../server/abstract_client.h"
 #include "pb/serverinfo_game.pb.h"
 #include "pb/serverinfo_playerproperties.pb.h"
-#include "player/player.h"
 
 #include <QObject>
 
@@ -37,11 +36,6 @@ public:
     int getPlayerCount() const
     {
         return players.size();
-    }
-
-    int getMaxPlayerCount() const
-    {
-        return gameInfo.max_players();
     }
 
     const QMap<int, ServerInfo_User> &getSpectators() const
@@ -159,44 +153,14 @@ public:
         return isLocalGame;
     }
 
-    int getGameId() const
-    {
-        return gameInfo.game_id();
-    }
-
-    QString getGameDescription() const
-    {
-        return gameInfo.description().c_str();
-    }
-
     bool isSpectator() const
     {
         return spectator;
     }
 
-    bool isSpectatorsOmniscient() const
-    {
-        return gameInfo.spectators_omniscient();
-    }
-
-    bool canSpectatorsChat() const
-    {
-        return gameInfo.spectators_can_chat();
-    }
-
     bool isResuming() const
     {
         return resuming;
-    }
-
-    void setStarted(bool _started)
-    {
-        gameInfo.set_started(_started);
-        if (_started) {
-            emit gameStarted(resuming);
-        } else {
-            emit gameStopped();
-        }
     }
 
     void setResuming(bool _resuming)
@@ -237,41 +201,6 @@ public:
 
     void startGameTimer();
 
-    ServerInfo_Game getGameInfo() const
-    {
-        return gameInfo;
-    }
-
-    void setGameInfo(ServerInfo_Game _gameInfo)
-    {
-        gameInfo.CopyFrom(_gameInfo);
-    }
-
-    QMap<int, QString> getRoomGameTypes() const
-    {
-        return roomGameTypes;
-    }
-
-    void setRoomGameTypes(QMap<int, QString> _roomGameTypes)
-    {
-        roomGameTypes = _roomGameTypes;
-    }
-
-    int getGameTypesSize() const
-    {
-        return gameInfo.game_types_size();
-    }
-
-    QString findRoomGameType(int index)
-    {
-        return roomGameTypes.find(gameInfo.game_types(index)).value();
-    }
-
-    void setSpectatorsOmniscient(bool spectatorsOmniscient)
-    {
-        gameInfo.set_spectators_omniscient(spectatorsOmniscient);
-    }
-
     void setGameStateKnown(bool known)
     {
         gameStateKnown = known;
@@ -293,8 +222,6 @@ public slots:
 private:
     QTimer *gameTimer;
     int secondsElapsed;
-    ServerInfo_Game gameInfo;
-    QMap<int, QString> roomGameTypes;
     int hostId;
     int localPlayerId;
     const bool isLocalGame;
