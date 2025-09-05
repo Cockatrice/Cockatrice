@@ -256,6 +256,7 @@ set(cockatrice_SOURCES
     src/settings/shortcut_treeview.cpp
     src/settings/shortcuts_settings.cpp
     src/utility/card_info_comparator.cpp
+    src/utility/deck_list_sort_filter_proxy_model.h
     src/utility/key_signals.cpp
     src/utility/levenshtein.cpp
     src/utility/logger.cpp

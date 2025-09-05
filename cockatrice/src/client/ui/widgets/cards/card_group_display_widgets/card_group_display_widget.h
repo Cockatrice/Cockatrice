@@ -25,6 +25,7 @@ public:
                            QStringList activeSortCriteria,
                            int bannerOpacity,
                            CardSizeWidget *cardSizeWidget);
+    void clearAllDisplayWidgets();
 
     DeckListModel *deckListModel;
     QPersistentModelIndex trackedIndex;
@@ -38,10 +39,11 @@ public:
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(const ExactCard &card);
-    virtual QWidget *constructWidgetForIndex(int rowIndex);
+    virtual QWidget *constructWidgetForIndex(QPersistentModelIndex index);
     virtual void updateCardDisplays();
     virtual void onCardAddition(const QModelIndex &parent, int first, int last);
     virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
     void resizeEvent(QResizeEvent *event) override;
 
 signals:

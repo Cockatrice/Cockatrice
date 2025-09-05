@@ -62,22 +62,26 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, index, zoneName, categoryName, activeGroupCriteria, activeSortCriteria,
             subBannerOpacity, cardSizeWidget);
-        connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(displayWidget, SIGNAL(cardHovered(ExactCard)), this, SLOT(onHover(ExactCard)));
+        connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardClicked, this,
+                &DeckCardZoneDisplayWidget::onClick);
+        connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardHovered, this,
+                &DeckCardZoneDisplayWidget::onHover);
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
+        connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, displayWidget,
+                &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
         cardGroupLayout->addWidget(displayWidget);
         indexToWidgetMap.insert(index, displayWidget);
     } else if (displayType == DisplayType::Flat) {
         auto *displayWidget =
             new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, index, zoneName, categoryName,
                                            activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
-        connect(displayWidget, SIGNAL(cardClicked(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)), this,
-                SLOT(onClick(QMouseEvent *, CardInfoPictureWithTextOverlayWidget *)));
-        connect(displayWidget, SIGNAL(cardHovered(ExactCard)), this, SLOT(onHover(ExactCard)));
+        connect(displayWidget, &FlatCardGroupDisplayWidget::cardClicked, this, &DeckCardZoneDisplayWidget::onClick);
+        connect(displayWidget, &FlatCardGroupDisplayWidget::cardHovered, this, &DeckCardZoneDisplayWidget::onHover);
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
+        connect(this, &DeckCardZoneDisplayWidget::activeSortCriteriaChanged, displayWidget,
+                &CardGroupDisplayWidget::onActiveSortCriteriaChanged);
         cardGroupLayout->addWidget(displayWidget);
         indexToWidgetMap.insert(index, displayWidget);
     }
@@ -85,9 +89,25 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
 
 void DeckCardZoneDisplayWidget::displayCards()
 {
-    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
-        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
-        constructAppropriateWidget(index);
+    QSortFilterProxyModel proxy;
+    proxy.setSourceModel(deckListModel);
+    proxy.setSortRole(Qt::EditRole);
+    proxy.sort(1, Qt::AscendingOrder);
+
+    // 1. trackedIndex is a source index → map it to proxy space
+    QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
+
+    // 2. iterate children under the proxy parent
+    for (int i = 0; i < proxy.rowCount(proxyParent); ++i) {
+        QModelIndex proxyIndex = proxy.index(i, 0, proxyParent);
+
+        // 3. map back to source
+        QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
+
+        // 4. persist the source index
+        QPersistentModelIndex persistent(sourceIndex);
+
+        constructAppropriateWidget(persistent);
     }
 }
 
