@@ -3,8 +3,8 @@
 
 #include "../game/cards/exact_card.h"
 #include "abstract_deck_list_card_node.h"
-#include "deck_list_card_node.h"
 #include "deck_list.h"
+#include "deck_list_card_node.h"
 
 #include <QAbstractItemModel>
 #include <QList>
@@ -19,9 +19,9 @@ class QTextCursor;
  */
 enum DeckListModelGroupCriteria
 {
-    MAIN_TYPE,   /**< Group cards by their main type (e.g., creature, instant). */
-    MANA_COST,   /**< Group cards by their mana cost. */
-    COLOR        /**< Group cards by their color identity. */
+    MAIN_TYPE, /**< Group cards by their main type (e.g., creature, instant). */
+    MANA_COST, /**< Group cards by their mana cost. */
+    COLOR      /**< Group cards by their color identity. */
 };
 
 /**
@@ -236,10 +236,10 @@ public:
     void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
 
 private:
-    DeckLoader *deckList; /**< Pointer to the deck loader providing the underlying data. */
+    DeckLoader *deckList;    /**< Pointer to the deck loader providing the underlying data. */
     InnerDecklistNode *root; /**< Root node of the model tree. */
     DeckListModelGroupCriteria activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
-    int lastKnownColumn; /**< Last column used for sorting. */
+    int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
@@ -253,8 +253,7 @@ private:
 
     void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
-    template <typename T>
-    T getNode(const QModelIndex &index) const
+    template <typename T> T getNode(const QModelIndex &index) const
     {
         if (!index.isValid())
             return dynamic_cast<T>(root);

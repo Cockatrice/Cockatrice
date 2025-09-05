@@ -34,8 +34,6 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-
-
 bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
 {
     while (!xml->atEnd()) {
