@@ -213,7 +213,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
@@ -380,7 +380,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
@@ -485,7 +485,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
