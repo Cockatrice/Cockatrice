@@ -31,6 +31,7 @@ class VisualDeckEditorWidget : public QWidget
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
     void retranslateUi();
+    void clearAllDisplayWidgets();
     void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
@@ -60,6 +61,7 @@ protected slots:
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void actChangeActiveGroupCriteria();
     void actChangeActiveSortCriteria();
+    void decklistModelReset();
 
 private:
     DeckListModel *deckListModel;

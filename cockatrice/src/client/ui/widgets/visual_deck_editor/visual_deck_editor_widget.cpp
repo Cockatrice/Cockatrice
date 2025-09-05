@@ -179,6 +179,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(cardSizeWidget);
 
+    connect(deckListModel, &DeckListModel::modelReset, this, &VisualDeckEditorWidget::decklistModelReset);
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &VisualDeckEditorWidget::onCardAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &VisualDeckEditorWidget::onCardRemoval);
@@ -197,6 +198,16 @@ void VisualDeckEditorWidget::retranslateUi()
     displayTypeButton->setText(tr("Overlap Layout"));
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
+}
+
+void VisualDeckEditorWidget::clearAllDisplayWidgets()
+{
+    for (auto idx : indexToWidgetMap.keys()) {
+        auto displayWidget = indexToWidgetMap.value(idx);
+        zoneContainerLayout->removeWidget(displayWidget);
+        indexToWidgetMap.remove(idx);
+        delete displayWidget;
+    }
 }
 
 void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
@@ -330,6 +341,12 @@ void VisualDeckEditorWidget::actChangeActiveSortCriteria()
     activeSortCriteria = selectedCriteria;
 
     emit activeSortCriteriaChanged(selectedCriteria);
+}
+
+void VisualDeckEditorWidget::decklistModelReset()
+{
+    clearAllDisplayWidgets();
+    constructZoneWidgetsFromDeckListModel();
 }
 
 void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight)
