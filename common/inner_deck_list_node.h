@@ -94,10 +94,16 @@ public:
     void setSortMethod(DeckSortMethod method) override;
 
     /// @return The internal name of this node.
-    [[nodiscard]] QString getName() const override { return name; }
+    [[nodiscard]] QString getName() const override
+    {
+        return name;
+    }
 
     /// @param _name Set the internal name of this node.
-    void setName(const QString &_name) { name = _name; }
+    void setName(const QString &_name)
+    {
+        name = _name;
+    }
 
     /**
      * @brief Translate an internal name into a user-visible name.
@@ -117,16 +123,28 @@ public:
     [[nodiscard]] virtual QString getVisibleName() const;
 
     /// @return Always empty for container nodes.
-    [[nodiscard]] QString getCardProviderId() const override { return ""; }
+    [[nodiscard]] QString getCardProviderId() const override
+    {
+        return "";
+    }
 
     /// @return Always empty for container nodes.
-    [[nodiscard]] QString getCardSetShortName() const override { return ""; }
+    [[nodiscard]] QString getCardSetShortName() const override
+    {
+        return "";
+    }
 
     /// @return Always empty for container nodes.
-    [[nodiscard]] QString getCardCollectorNumber() const override { return ""; }
+    [[nodiscard]] QString getCardCollectorNumber() const override
+    {
+        return "";
+    }
 
     /// @return Always true; InnerDecklistNode represents deck structure.
-    [[nodiscard]] bool isDeckHeader() const override { return true; }
+    [[nodiscard]] bool isDeckHeader() const override
+    {
+        return true;
+    }
 
     /**
      * @brief Delete all children of this node, recursively.

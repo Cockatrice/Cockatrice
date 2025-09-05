@@ -95,7 +95,10 @@ public:
      *
      * @return 0
      */
-    int height() const override { return 0; }
+    int height() const override
+    {
+        return 0;
+    }
 
     /**
      * @brief Compare this card node against another for sorting.

@@ -44,11 +44,11 @@
  */
 class DecklistCardNode : public AbstractDecklistCardNode
 {
-    QString name;              ///< Display name of the card.
-    int number;                ///< Quantity of this card in the deck.
-    QString cardSetShortName;  ///< Short set code (e.g., "NEO").
-    QString cardSetNumber;     ///< Collector number within the set.
-    QString cardProviderId;    ///< External provider identifier (e.g., UUID).
+    QString name;             ///< Display name of the card.
+    int number;               ///< Quantity of this card in the deck.
+    QString cardSetShortName; ///< Short set code (e.g., "NEO").
+    QString cardSetNumber;    ///< Collector number within the set.
+    QString cardProviderId;   ///< External provider identifier (e.g., UUID).
 
 public:
     /**
@@ -89,37 +89,70 @@ public:
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 
     /// @return The quantity of this card.
-    int getNumber() const override { return number; }
+    int getNumber() const override
+    {
+        return number;
+    }
 
     /// @param _number Set the quantity of this card.
-    void setNumber(int _number) override { number = _number; }
+    void setNumber(int _number) override
+    {
+        number = _number;
+    }
 
     /// @return The display name of this card.
-    QString getName() const override { return name; }
+    QString getName() const override
+    {
+        return name;
+    }
 
     /// @param _name Set the display name of this card.
-    void setName(const QString &_name) override { name = _name; }
+    void setName(const QString &_name) override
+    {
+        name = _name;
+    }
 
     /// @return The provider identifier for this card.
-    QString getCardProviderId() const override { return cardProviderId; }
+    QString getCardProviderId() const override
+    {
+        return cardProviderId;
+    }
 
     /// @param _providerId Set the provider identifier for this card.
-    void setCardProviderId(const QString &_providerId) override { cardProviderId = _providerId; }
+    void setCardProviderId(const QString &_providerId) override
+    {
+        cardProviderId = _providerId;
+    }
 
     /// @return The short set code (e.g., "NEO").
-    QString getCardSetShortName() const override { return cardSetShortName; }
+    QString getCardSetShortName() const override
+    {
+        return cardSetShortName;
+    }
 
     /// @param _cardSetShortName Set the short set code.
-    void setCardSetShortName(const QString &_cardSetShortName) override { cardSetShortName = _cardSetShortName; }
+    void setCardSetShortName(const QString &_cardSetShortName) override
+    {
+        cardSetShortName = _cardSetShortName;
+    }
 
     /// @return The collector number of this card within its set.
-    QString getCardCollectorNumber() const override { return cardSetNumber; }
+    QString getCardCollectorNumber() const override
+    {
+        return cardSetNumber;
+    }
 
     /// @param _cardSetNumber Set the collector number.
-    void setCardCollectorNumber(const QString &_cardSetNumber) override { cardSetNumber = _cardSetNumber; }
+    void setCardCollectorNumber(const QString &_cardSetNumber) override
+    {
+        cardSetNumber = _cardSetNumber;
+    }
 
     /// @return Always false; card nodes are not deck headers.
-    [[nodiscard]] bool isDeckHeader() const override { return false; }
+    [[nodiscard]] bool isDeckHeader() const override
+    {
+        return false;
+    }
 
     /**
      * @brief Convert this node to a CardRef.
@@ -127,7 +160,10 @@ public:
      * @return A CardRef with the card’s name and provider ID, suitable
      *         for database lookups or comparison with other card sources.
      */
-    CardRef toCardRef() const { return {name, cardProviderId}; }
+    CardRef toCardRef() const
+    {
+        return {name, cardProviderId};
+    }
 };
 
 #endif // COCKATRICE_DECK_LIST_CARD_NODE_H

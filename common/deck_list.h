@@ -45,8 +45,8 @@ class InnerDecklistNode;
 class SideboardPlan
 {
 private:
-    QString name;                     ///< Human-readable name of this plan.
-    QList<MoveCard_ToZone> moveList;  ///< List of move instructions for this plan.
+    QString name;                    ///< Human-readable name of this plan.
+    QList<MoveCard_ToZone> moveList; ///< List of move instructions for this plan.
 
 public:
     /**
@@ -71,10 +71,16 @@ public:
     void write(QXmlStreamWriter *xml);
 
     /// @return The plan name.
-    QString getName() const { return name; }
+    QString getName() const
+    {
+        return name;
+    }
 
     /// @return Const reference to the move list.
-    const QList<MoveCard_ToZone> &getMoveList() const { return moveList; }
+    const QList<MoveCard_ToZone> &getMoveList() const
+    {
+        return moveList;
+    }
 
     /// @brief Replace the move list with a new one.
     void setMoveList(const QList<MoveCard_ToZone> &_moveList);
@@ -119,13 +125,13 @@ class DeckList : public QObject
 {
     Q_OBJECT
 private:
-    QString name;                          ///< User-defined deck name.
-    QString comments;                      ///< Free-form comments or notes.
-    CardRef bannerCard;                    ///< Optional representative card for the deck.
-    QString lastLoadedTimestamp;           ///< Timestamp string of last load.
-    QStringList tags;                      ///< User-defined tags for deck classification.
+    QString name;                                  ///< User-defined deck name.
+    QString comments;                              ///< Free-form comments or notes.
+    CardRef bannerCard;                            ///< Optional representative card for the deck.
+    QString lastLoadedTimestamp;                   ///< Timestamp string of last load.
+    QStringList tags;                              ///< User-defined tags for deck classification.
     QMap<QString, SideboardPlan *> sideboardPlans; ///< Named sideboard plans.
-    InnerDecklistNode *root;               ///< Root of the deck tree (zones + cards).
+    InnerDecklistNode *root;                       ///< Root of the deck tree (zones + cards).
 
     /**
      * @brief Cached deck hash, recalculated lazily.
@@ -171,8 +177,14 @@ signals:
 public slots:
     /// @name Metadata setters
     ///@{
-    void setName(const QString &_name = QString()) { name = _name; }
-    void setComments(const QString &_comments = QString()) { comments = _comments; }
+    void setName(const QString &_name = QString())
+    {
+        name = _name;
+    }
+    void setComments(const QString &_comments = QString())
+    {
+        comments = _comments;
+    }
     void setTags(const QStringList &_tags = QStringList())
     {
         tags = _tags;
@@ -188,7 +200,10 @@ public slots:
         tags.clear();
         emit deckTagsChanged();
     }
-    void setBannerCard(const CardRef &_bannerCard = {}) { bannerCard = _bannerCard; }
+    void setBannerCard(const CardRef &_bannerCard = {})
+    {
+        bannerCard = _bannerCard;
+    }
     void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
     {
         lastLoadedTimestamp = _lastLoadedTimestamp;
@@ -206,18 +221,36 @@ public:
 
     /// @name Metadata getters
     ///@{
-    QString getName() const { return name; }
-    QString getComments() const { return comments; }
-    QStringList getTags() const { return tags; }
-    CardRef getBannerCard() const { return bannerCard; }
-    QString getLastLoadedTimestamp() const { return lastLoadedTimestamp; }
+    QString getName() const
+    {
+        return name;
+    }
+    QString getComments() const
+    {
+        return comments;
+    }
+    QStringList getTags() const
+    {
+        return tags;
+    }
+    CardRef getBannerCard() const
+    {
+        return bannerCard;
+    }
+    QString getLastLoadedTimestamp() const
+    {
+        return lastLoadedTimestamp;
+    }
     ///@}
 
     /// @name Sideboard plans
     ///@{
     QList<MoveCard_ToZone> getCurrentSideboardPlan();
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
-    const QMap<QString, SideboardPlan *> &getSideboardPlans() const { return sideboardPlans; }
+    const QMap<QString, SideboardPlan *> &getSideboardPlans() const
+    {
+        return sideboardPlans;
+    }
     ///@}
 
     /// @name Serialization (XML)
@@ -250,7 +283,10 @@ public:
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
     int getSideboardSize() const;
-    InnerDecklistNode *getRoot() const { return root; }
+    InnerDecklistNode *getRoot() const
+    {
+        return root;
+    }
     DecklistCardNode *addCard(const QString &cardName,
                               const QString &zoneName,
                               int position,

@@ -136,7 +136,10 @@ public:
     [[nodiscard]] virtual bool isDeckHeader() const = 0;
 
     /// @return The parent node, or nullptr if this is the root.
-    InnerDecklistNode *getParent() const { return parent; }
+    InnerDecklistNode *getParent() const
+    {
+        return parent;
+    }
 
     /**
      * @brief Compute the depth of this node in the tree.
