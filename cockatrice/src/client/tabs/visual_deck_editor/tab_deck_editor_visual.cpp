@@ -95,7 +95,6 @@ void TabDeckEditorVisual::createMenus()
 
     cardInfoDockMenu = viewMenu->addMenu(QString());
     deckDockMenu = viewMenu->addMenu(QString());
-    deckAnalyticsMenu = viewMenu->addMenu(QString());
     filterDockMenu = viewMenu->addMenu(QString());
     printingSelectorDockMenu = viewMenu->addMenu(QString());
 
@@ -112,13 +111,6 @@ void TabDeckEditorVisual::createMenus()
     aDeckDockFloating = deckDockMenu->addAction(QString());
     aDeckDockFloating->setCheckable(true);
     connect(aDeckDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
-
-    aDeckAnalyticsDockVisible = deckAnalyticsMenu->addAction(QString());
-    aDeckAnalyticsDockVisible->setCheckable(true);
-    connect(aDeckAnalyticsDockVisible, SIGNAL(triggered()), this, SLOT(dockVisibleTriggered()));
-    aDeckAnalyticsDockFloating = deckAnalyticsMenu->addAction(QString());
-    aDeckAnalyticsDockFloating->setCheckable(true);
-    connect(aDeckAnalyticsDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
 
     aFilterDockVisible = filterDockMenu->addAction(QString());
     aFilterDockVisible->setCheckable(true);
@@ -212,41 +204,6 @@ void TabDeckEditorVisual::showPrintingSelector()
     printingSelectorDockWidget->setVisible(true);
 }
 
-void TabDeckEditorVisual::restartLayout()
-{
-    deckDockWidget->setVisible(true);
-    cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(true);
-
-    deckDockWidget->setFloating(false);
-    cardInfoDockWidget->setFloating(false);
-    filterDockWidget->setFloating(false);
-
-    aCardInfoDockVisible->setChecked(true);
-    aDeckDockVisible->setChecked(true);
-    aFilterDockVisible->setChecked(true);
-
-    aCardInfoDockFloating->setChecked(false);
-    aDeckDockFloating->setChecked(false);
-    aFilterDockFloating->setChecked(false);
-
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), deckDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), cardInfoDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(1), deckAnalyticsDock);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), filterDockWidget);
-
-    splitDockWidget(cardInfoDockWidget, deckDockWidget, Qt::Horizontal);
-    splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Vertical);
-    splitDockWidget(searchAndDatabaseDock, deckAnalyticsDock, Qt::Vertical);
-
-    deckDockWidget->setMinimumWidth(360);
-    deckDockWidget->setMaximumWidth(360);
-
-    cardInfoDockWidget->setMinimumSize(250, 360);
-    cardInfoDockWidget->setMaximumSize(250, 360);
-    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
-}
-
 void TabDeckEditorVisual::freeDocksSize()
 {
     deckDockWidget->setMinimumSize(100, 100);
@@ -258,8 +215,8 @@ void TabDeckEditorVisual::freeDocksSize()
     filterDockWidget->setMinimumSize(100, 100);
     filterDockWidget->setMaximumSize(5000, 5000);
 
-    databaseDisplayDockWidget->setMinimumSize(100, 100);
-    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
+    printingSelectorDockWidget->setMinimumSize(100, 100);
+    printingSelectorDockWidget->setMaximumSize(5000, 5000);
 }
 
 void TabDeckEditorVisual::refreshShortcuts()
@@ -306,10 +263,40 @@ void TabDeckEditorVisual::loadLayout()
     printingSelectorDockWidget->setMinimumSize(layouts.getDeckEditorPrintingSelectorSize());
     printingSelectorDockWidget->setMaximumSize(layouts.getDeckEditorPrintingSelectorSize());
 
-    databaseDisplayDockWidget->setMinimumSize(100, 100);
-    databaseDisplayDockWidget->setMaximumSize(1400, 5000);
-
     QTimer::singleShot(100, this, &TabDeckEditorVisual::freeDocksSize);
+}
+
+void TabDeckEditorVisual::restartLayout()
+{
+    deckDockWidget->setVisible(true);
+    cardInfoDockWidget->setVisible(true);
+    filterDockWidget->setVisible(false);
+    printingSelectorDockWidget->setVisible(true);
+
+    deckDockWidget->setFloating(false);
+    cardInfoDockWidget->setFloating(false);
+    filterDockWidget->setFloating(false);
+    printingSelectorDockWidget->setFloating(false);
+
+    aCardInfoDockVisible->setChecked(true);
+    aDeckDockVisible->setChecked(true);
+    aFilterDockVisible->setChecked(false);
+    aPrintingSelectorDockVisible->setChecked(true);
+
+    aCardInfoDockFloating->setChecked(false);
+    aDeckDockFloating->setChecked(false);
+    aFilterDockFloating->setChecked(false);
+    aPrintingSelectorDockFloating->setChecked(false);
+
+    setCentralWidget(centralWidget);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), deckDockWidget);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), cardInfoDockWidget);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), printingSelectorDockWidget);
+
+    splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Vertical);
+    splitDockWidget(cardInfoDockWidget, deckDockWidget, Qt::Horizontal);
+
+    QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
 void TabDeckEditorVisual::retranslateUi()
@@ -323,7 +310,6 @@ void TabDeckEditorVisual::retranslateUi()
     viewMenu->setTitle(tr("&View"));
     cardInfoDockMenu->setTitle(tr("Card Info"));
     deckDockMenu->setTitle(tr("Deck"));
-    deckAnalyticsMenu->setTitle(tr("Deck Analytics"));
     filterDockMenu->setTitle(tr("Filters"));
     printingSelectorDockMenu->setTitle(tr("Printing"));
 
@@ -332,9 +318,6 @@ void TabDeckEditorVisual::retranslateUi()
 
     aDeckDockVisible->setText(tr("Visible"));
     aDeckDockFloating->setText(tr("Floating"));
-
-    aDeckAnalyticsDockVisible->setText(tr("Visible"));
-    aDeckAnalyticsDockFloating->setText(tr("Floating"));
 
     aFilterDockVisible->setText(tr("Visible"));
     aFilterDockFloating->setText(tr("Floating"));
@@ -355,9 +338,6 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
         } else if (o == deckDockWidget) {
             aDeckDockVisible->setChecked(false);
             aDeckDockFloating->setEnabled(false);
-        } else if (o == deckAnalyticsDock) {
-            aDeckAnalyticsDockVisible->setChecked(false);
-            aDeckAnalyticsDockFloating->setEnabled(false);
         } else if (o == filterDockWidget) {
             aFilterDockVisible->setChecked(false);
             aFilterDockFloating->setEnabled(false);
@@ -393,12 +373,6 @@ void TabDeckEditorVisual::dockVisibleTriggered()
         return;
     }
 
-    if (o == aDeckAnalyticsDockVisible) {
-        deckAnalyticsDock->setHidden(!aDeckAnalyticsDockVisible->isChecked());
-        aDeckAnalyticsDockFloating->setEnabled(aDeckAnalyticsDockVisible->isChecked());
-        return;
-    }
-
     if (o == aFilterDockVisible) {
         filterDockWidget->setHidden(!aFilterDockVisible->isChecked());
         aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
@@ -422,11 +396,6 @@ void TabDeckEditorVisual::dockFloatingTriggered()
 
     if (o == aDeckDockFloating) {
         deckDockWidget->setFloating(aDeckDockFloating->isChecked());
-        return;
-    }
-
-    if (o == aDeckAnalyticsDockFloating) {
-        deckAnalyticsDock->setFloating(aDeckAnalyticsDockFloating->isChecked());
         return;
     }
 
@@ -456,11 +425,6 @@ void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
 
     if (o == filterDockWidget) {
         aFilterDockFloating->setChecked(topLevel);
-        return;
-    }
-
-    if (o == deckAnalyticsDock) {
-        aDeckAnalyticsDockFloating->setChecked(topLevel);
         return;
     }
 
