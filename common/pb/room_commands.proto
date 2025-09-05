@@ -40,6 +40,7 @@ message Command_CreateGame {
     optional bool join_as_spectator = 12;
     optional uint32 starting_life_total = 13;
     optional bool share_decklists_on_load = 14;
+    optional bool is_draft = 15;
 }
 
 message Command_JoinGame {
