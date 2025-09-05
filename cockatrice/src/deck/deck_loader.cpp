@@ -3,7 +3,8 @@
 #include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
 #include "../main.h"
-#include "decklist.h"
+#include "deck_list_card_node.h"
+#include "deck_list.h"
 
 #include <QApplication>
 #include <QClipboard>

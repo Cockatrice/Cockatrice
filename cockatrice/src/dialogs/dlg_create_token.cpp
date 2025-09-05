@@ -5,7 +5,7 @@
 #include "../game/cards/card_database_model.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
-#include "decklist.h"
+#include "deck_list.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

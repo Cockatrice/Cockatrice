@@ -1,6 +1,7 @@
 #include "tapped_out_interface.h"
 
-#include "decklist.h"
+#include "deck_list_card_node.h"
+#include "deck_list.h"
 
 #include <QDesktopServices>
 #include <QMessageBox>

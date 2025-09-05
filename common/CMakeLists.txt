@@ -5,11 +5,15 @@
 add_subdirectory(pb)
 
 set(common_SOURCES
+    abstract_deck_list_card_node.cpp
+    abstract_deck_list_node.cpp
     debug_pb_message.cpp
-    decklist.cpp
+    deck_list_card_node.cpp
+    deck_list.cpp
     expression.cpp
     featureset.cpp
     get_pb_extension.cpp
+    inner_deck_list_node.cpp
     passwordhasher.cpp
     rng_abstract.cpp
     rng_sfmt.cpp

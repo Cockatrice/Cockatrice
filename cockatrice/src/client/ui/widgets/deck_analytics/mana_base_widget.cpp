@@ -8,7 +8,7 @@
 
 #include <QHash>
 #include <QRegularExpression>
-#include <decklist.h>
+#include <deck_list.h>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)

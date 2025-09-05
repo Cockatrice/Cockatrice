@@ -3,7 +3,8 @@
 #include "../../client/ui/theme_manager.h"
 #include "../../game/cards/card_info.h"
 #include "../../settings/cache_settings.h"
-#include "decklist.h"
+#include "deck_list_card_node.h"
+#include "deck_list.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
