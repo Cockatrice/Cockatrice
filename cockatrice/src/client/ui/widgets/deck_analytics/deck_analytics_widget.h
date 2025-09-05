@@ -11,7 +11,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <decklist.h>
+#include <deck_list.h>
 
 class DeckAnalyticsWidget : public QWidget
 {

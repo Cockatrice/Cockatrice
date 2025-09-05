@@ -6,7 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QWidget>
-#include <decklist.h>
+#include <deck_list.h>
 #include <utility>
 
 class ManaBaseWidget : public QWidget

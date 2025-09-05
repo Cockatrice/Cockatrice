@@ -1,5 +1,7 @@
 #include "clipboard_testing.h"
 
+#include "../../common/deck_list_card_node.h"
+
 #include <QTextStream>
 
 void testEmpty(const QString &clipboard)

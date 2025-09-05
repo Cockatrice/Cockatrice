@@ -1,7 +1,7 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
-#include "decklist.h"
+#include "deck_list.h"
 
 #include <QLoggingCategory>
 

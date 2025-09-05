@@ -7,7 +7,7 @@
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
 
-#include <decklist.h>
+#include <deck_list.h>
 #include <unordered_map>
 
 ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)

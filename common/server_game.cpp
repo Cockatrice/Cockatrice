@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "server_game.h"
 
-#include "decklist.h"
+#include "deck_list.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"

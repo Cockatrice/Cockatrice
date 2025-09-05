@@ -2,7 +2,7 @@
 #define TAPPEDOUT_INTERFACE_H
 
 #include "../game/cards/card_database.h"
-#include "decklist.h"
+#include "deck_list.h"
 
 #include <QLoggingCategory>
 #include <QObject>
