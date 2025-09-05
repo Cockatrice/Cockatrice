@@ -9900,7 +9900,7 @@ Please refrain from engaging in this activity or further actions may be taken ag
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="647"/>
         <source>Draw a Card</source>
-        <translation type="unfinished"/>
+        <translation>Dra ett kort</translation>
     </message>
     <message>
         <location filename="src/settings/shortcuts_settings.h" line="650"/>
