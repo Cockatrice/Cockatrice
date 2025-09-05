@@ -157,9 +157,9 @@ public:
     };
 
     /**
-     * @brief Returns the grouping category for a card based on the current criteria.
+     * @brief Returns the value of the grouping category for a card based on the current criteria.
      * @param info Pointer to card information.
-     * @return String representing the group (e.g., color, mana cost).
+     * @return String representing the value of the current grouping criteria for the card.
      */
     QString getGroupCriteriaForCard(CardInfoPtr info) const;
 
