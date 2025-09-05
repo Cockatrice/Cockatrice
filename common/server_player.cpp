@@ -1,8 +1,8 @@
 #include "server_player.h"
 
 #include "color.h"
-#include "deck_list_card_node.h"
 #include "deck_list.h"
+#include "deck_list_card_node.h"
 #include "get_pb_extension.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_change_zone_properties.pb.h"
