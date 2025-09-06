@@ -46,59 +46,6 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &FlatCardGroupDisplayWidget::onCardRemoval);
 }
 
-void FlatCardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
-{
-    if (!trackedIndex.isValid()) {
-        emit cleanupRequested(this);
-        return;
-    }
-    if (parent == trackedIndex) {
-        for (int i = first; i <= last; i++) {
-            insertIntoLayout(constructWidgetForIndex(i), i);
-        }
-    }
-}
-
-void FlatCardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
-{
-    Q_UNUSED(first);
-    Q_UNUSED(last);
-    if (parent == trackedIndex) {
-        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-            if (!idx.isValid()) {
-                removeFromLayout(indexToWidgetMap.value(idx));
-                indexToWidgetMap.value(idx)->deleteLater();
-                indexToWidgetMap.remove(idx);
-            }
-        }
-        if (!trackedIndex.isValid()) {
-            emit cleanupRequested(this);
-        }
-    }
-}
-
-QWidget *FlatCardGroupDisplayWidget::constructWidgetForIndex(int row)
-{
-    QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(row, 0, trackedIndex));
-
-    if (indexToWidgetMap.contains(index)) {
-        return indexToWidgetMap[index];
-    }
-    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
-
-    auto widget = new CardInfoPictureWithTextOverlayWidget(flowWidget, true);
-    widget->setScaleFactor(cardSizeWidget->getSlider()->value());
-    widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, cardProviderId}));
-
-    connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &FlatCardGroupDisplayWidget::onClick);
-    connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &FlatCardGroupDisplayWidget::onHover);
-    connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
-
-    indexToWidgetMap.insert(index, widget);
-    return widget;
-}
-
 void FlatCardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

@@ -3,6 +3,7 @@
 #include "../../../../../deck/deck_list_model.h"
 #include "../../../../../game/cards/card_database_manager.h"
 #include "../../../../../utility/card_info_comparator.h"
+#include "../../../../../utility/deck_list_sort_filter_proxy_model.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>
@@ -34,10 +35,18 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
-QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
+void CardGroupDisplayWidget::clearAllDisplayWidgets()
 {
-    QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(rowIndex, 0, trackedIndex));
+    for (auto idx : indexToWidgetMap.keys()) {
+        auto displayWidget = indexToWidgetMap.value(idx);
+        removeFromLayout(displayWidget);
+        indexToWidgetMap.remove(idx);
+        delete displayWidget;
+    }
+}
 
+QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex index)
+{
     if (indexToWidgetMap.contains(index)) {
         return indexToWidgetMap[index];
     }
@@ -58,8 +67,28 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(int rowIndex)
 
 void CardGroupDisplayWidget::updateCardDisplays()
 {
-    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
-        addToLayout(constructWidgetForIndex(i));
+    DeckListSortFilterProxyModel proxy;
+    proxy.setSourceModel(deckListModel);
+    proxy.setSortCriteria(activeSortCriteria);
+
+    // This doesn't really matter since overwrite the whole lessThan function to just compare dynamically anyway.
+    proxy.setSortRole(Qt::EditRole);
+    proxy.sort(1, Qt::AscendingOrder);
+
+    // 1. trackedIndex is a source index → map it to proxy space
+    QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
+
+    // 2. iterate children under the proxy parent
+    for (int i = 0; i < proxy.rowCount(proxyParent); ++i) {
+        QModelIndex proxyIndex = proxy.index(i, 0, proxyParent);
+
+        // 3. map back to source
+        QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
+
+        // 4. persist the source index
+        QPersistentModelIndex persistent(sourceIndex);
+
+        addToLayout(constructWidgetForIndex(persistent));
     }
 }
 
@@ -69,9 +98,15 @@ void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first
         emit cleanupRequested(this);
         return;
     }
+
     if (parent == trackedIndex) {
-        for (int i = first; i <= last; i++) {
-            insertIntoLayout(constructWidgetForIndex(i), i);
+        for (int row = first; row <= last; ++row) {
+            QModelIndex child = deckListModel->index(row, 0, parent);
+
+            // Persist the index
+            QPersistentModelIndex persistent(child);
+
+            insertIntoLayout(constructWidgetForIndex(persistent), row);
         }
     }
 }
@@ -88,10 +123,19 @@ void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first,
                 indexToWidgetMap.remove(idx);
             }
         }
+
         if (!trackedIndex.isValid()) {
             emit cleanupRequested(this);
         }
     }
+}
+
+void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
+{
+    activeSortCriteria = std::move(_activeSortCriteria);
+
+    clearAllDisplayWidgets();
+    updateCardDisplays();
 }
 
 void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)

@@ -270,16 +270,25 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
 
 void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 {
-    for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); i++) {
-        QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
+    QSortFilterProxyModel proxy;
+    proxy.setSourceModel(deckListModel);
+    proxy.setSortRole(Qt::EditRole);
+    proxy.sort(1, Qt::AscendingOrder);
 
-        if (indexToWidgetMap.contains(index)) {
+    for (int i = 0; i < proxy.rowCount(); ++i) {
+        QModelIndex proxyIndex = proxy.index(i, 0);
+        QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
+
+        // Make a persistent index from the *source* model
+        QPersistentModelIndex persistent(sourceIndex);
+
+        if (indexToWidgetMap.contains(persistent)) {
             continue;
         }
 
         DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-            zoneContainer, deckListModel, index,
-            deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
+            zoneContainer, deckListModel, persistent,
+            deckListModel->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
             activeSortCriteria, currentDisplayType, 20, 10, cardSizeWidget);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
         connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
@@ -293,7 +302,7 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
                 &DeckCardZoneDisplayWidget::refreshDisplayType);
         zoneContainerLayout->addWidget(zoneDisplayWidget);
 
-        indexToWidgetMap.insert(index, zoneDisplayWidget);
+        indexToWidgetMap.insert(persistent, zoneDisplayWidget);
     }
 }
 

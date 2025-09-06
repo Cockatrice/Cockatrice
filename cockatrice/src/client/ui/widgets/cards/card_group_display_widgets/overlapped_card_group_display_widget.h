@@ -20,8 +20,6 @@ public:
                                      CardSizeWidget *cardSizeWidget);
 
 public slots:
-    void onCardAddition(const QModelIndex &parent, int first, int last) override;
-    void onCardRemoval(const QModelIndex &parent, int first, int last) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
