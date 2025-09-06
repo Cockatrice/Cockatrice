@@ -42,6 +42,7 @@ public:
 
     void adjustCardsPerPage();
     void populateCards();
+    void loadPage(int start, int end);
     void loadNextPage();
     void loadCurrentPage();
     void sortCardList(const QStringList &properties, Qt::SortOrder order) const;

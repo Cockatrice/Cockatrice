@@ -200,52 +200,6 @@ void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
 }
 
-void VisualDatabaseDisplayWidget::populateCards()
-{
-    int rowCount = databaseDisplayModel->rowCount();
-    cards->clear();
-
-    // Calculate the start and end indices for the current page
-    int start = currentPage * cardsPerPage;
-    int end = qMin(start + cardsPerPage, rowCount);
-
-    qCDebug(VisualDatabaseDisplayLog) << "Fetching from " << start << " to " << end << " cards";
-    // Load more cards if we are at the end of the current list and can fetch more
-    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
-        qCDebug(VisualDatabaseDisplayLog) << "We gotta load more";
-        databaseDisplayModel->fetchMore(QModelIndex());
-    }
-
-    QList<const CardFilter *> setFilters = filterModel->getFiltersOfType(CardFilter::AttrSet);
-    const CardFilter *setFilter = nullptr;
-    if (setFilters.length() == 1) {
-        setFilter = setFilters.at(0);
-    }
-
-    for (int row = start; row < end; ++row) {
-        qCDebug(VisualDatabaseDisplayLog) << "Adding " << row;
-        QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
-        QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
-        qCDebug(VisualDatabaseDisplayLog) << name.toString();
-
-        if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(name.toString())) {
-            if (setFilter) {
-                SetToPrintingsMap setMap = info->getSets();
-                if (setMap.contains(setFilter->term())) {
-                    for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(ExactCard(info, printing));
-                    }
-                }
-            } else {
-                addCard(CardDatabaseManager::getInstance()->getPreferredCard(info));
-            }
-        } else {
-            qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
-        }
-    }
-    currentPage++;
-}
-
 void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 {
     databaseDisplayModel->setStringFilter(search);
@@ -270,6 +224,38 @@ void VisualDatabaseDisplayWidget::searchModelChanged()
     qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
 }
 
+void VisualDatabaseDisplayWidget::loadCurrentPage()
+{
+    // Ensure only the initial page is loaded
+    if (currentPage == 0) {
+        // Only load the first page initially
+        qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
+        populateCards();
+    } else {
+        // If not the first page, just load the next page and append to the flow widget
+        loadNextPage();
+    }
+}
+
+void VisualDatabaseDisplayWidget::populateCards()
+{
+    int rowCount = databaseDisplayModel->rowCount();
+    cards->clear();
+
+    // Calculate the start and end indices for the current page
+    int start = currentPage * cardsPerPage;
+    int end = qMin(start + cardsPerPage, rowCount);
+
+    qCDebug(VisualDatabaseDisplayLog) << "Fetching from " << start << " to " << end << " cards";
+    // Load more cards if we are at the end of the current list and can fetch more
+    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
+        qCDebug(VisualDatabaseDisplayLog) << "We gotta load more";
+        databaseDisplayModel->fetchMore(QModelIndex());
+    }
+
+    loadPage(start, end);
+}
+
 void VisualDatabaseDisplayWidget::loadNextPage()
 {
     // Calculate the start and end indices for the next page
@@ -283,47 +269,36 @@ void VisualDatabaseDisplayWidget::loadNextPage()
     }
 
     // Load the next page of cards and add them to the flow widget
+    loadPage(start, end);
+}
 
+void VisualDatabaseDisplayWidget::loadPage(int start, int end)
+{
     QList<const CardFilter *> setFilters = filterModel->getFiltersOfType(CardFilter::AttrSet);
-    const CardFilter *setFilter = nullptr;
-    if (setFilters.length() == 1) {
-        setFilter = setFilters.at(0);
-    }
-
     for (int row = start; row < end; ++row) {
+        qCDebug(VisualDatabaseDisplayLog) << "Adding " << row;
         QModelIndex index = databaseDisplayModel->index(row, CardDatabaseModel::NameColumn);
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
+        qCDebug(VisualDatabaseDisplayLog) << name.toString();
+
         if (CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(name.toString())) {
-            if (setFilter) {
+            if (!setFilters.empty()) {
                 SetToPrintingsMap setMap = info->getSets();
-                if (setMap.contains(setFilter->term())) {
-                    for (PrintingInfo printing : setMap[setFilter->term()]) {
-                        addCard(ExactCard(info, printing));
+                for (const CardFilter *setFilter : setFilters) {
+                    if (setMap.contains(setFilter->term())) {
+                        for (PrintingInfo printing : setMap[setFilter->term()]) {
+                            addCard(ExactCard(info, printing));
+                        }
                     }
                 }
             } else {
                 addCard(CardDatabaseManager::getInstance()->getPreferredCard(info));
             }
         } else {
-            qCDebug(VisualDatabaseDisplayLog) << "Card " << name.toString() << " not found in database!";
+            qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";
         }
     }
-
-    // Update the current page
     currentPage++;
-}
-
-void VisualDatabaseDisplayWidget::loadCurrentPage()
-{
-    // Ensure only the initial page is loaded
-    if (currentPage == 0) {
-        // Only load the first page initially
-        qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
-        populateCards();
-    } else {
-        // If not the first page, just load the next page and append to the flow widget
-        loadNextPage();
-    }
 }
 
 void VisualDatabaseDisplayWidget::modelDirty() const
