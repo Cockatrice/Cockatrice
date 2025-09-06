@@ -282,12 +282,6 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
         // Make a persistent index from the *source* model
         QPersistentModelIndex persistent(sourceIndex);
 
-        if (indexToWidgetMap.contains(persistent))
-            continue;
-
-        // for (int i = 0; i < deckListModel->rowCount(deckListModel->parent(QModelIndex())); i++) {
-        //    QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
-
         if (indexToWidgetMap.contains(persistent)) {
             continue;
         }

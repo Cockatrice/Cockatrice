@@ -41,7 +41,7 @@ protected:
         CardInfoPtr lInfo = CardDatabaseManager::getInstance()->guessCard({lNode->getName()}).getCardPtr();
         CardInfoPtr rInfo = CardDatabaseManager::getInstance()->guessCard({rNode->getName()}).getCardPtr();
 
-        // Example: multiple tie-break criteria (cmc > rarity > name)
+        // Example: multiple tie-break criteria (colors > cmc > name)
         for (const QString &crit : sortCriteria) {
             if (crit == "name") {
                 QString ln = lNode->getName();
@@ -74,26 +74,6 @@ protected:
 
 private:
     QStringList sortCriteria;
-
-    QVariant fetchCardProperty(const QAbstractItemModel *src, const QModelIndex &idx, const QString &criterion) const
-    {
-        // Map criterion strings to roles or columns in your model
-        if (criterion == "Name")
-            return src->data(idx.sibling(idx.row(), 1), Qt::DisplayRole);
-        else if (criterion == "CMC")
-            return src->data(idx, Qt::UserRole + 2); // e.g. custom role
-        else if (criterion == "Type")
-            return src->data(idx, Qt::UserRole + 3);
-        // etc…
-        return {};
-    }
-
-    static int compareVariants(const QVariant &a, const QVariant &b)
-    {
-        if (a.userType() == QMetaType::Int && b.userType() == QMetaType::Int)
-            return a.toInt() - b.toInt();
-        return QString::localeAwareCompare(a.toString(), b.toString());
-    }
 };
 
 #endif // COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
