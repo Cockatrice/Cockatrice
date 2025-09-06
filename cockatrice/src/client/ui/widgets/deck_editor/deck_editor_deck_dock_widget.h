@@ -88,6 +88,7 @@ private slots:
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
+    void syncBannerCardComboBoxSelectionWithDeck();
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H
