@@ -126,11 +126,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
 
-    filterContainerLayout->addWidget(mainTypeFilterWidget);
     filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
     filterContainerLayout->addWidget(quickFilterNameWidget);
     filterContainerLayout->addWidget(quickFilterSubTypeWidget);
     filterContainerLayout->addWidget(quickFilterSetWidget);
+    filterContainerLayout->addWidget(mainTypeFilterWidget);
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);
