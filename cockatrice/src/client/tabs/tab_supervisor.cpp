@@ -651,9 +651,9 @@ void TabSupervisor::openTabLog()
     myAddTab(tabLog, aTabLog);
     connect(tabLog, &QObject::destroyed, this, [this] {
         tabLog = nullptr;
-        aTabAdmin->setChecked(false);
+        aTabLog->setChecked(false);
     });
-    aTabAdmin->setChecked(true);
+    aTabLog->setChecked(true);
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
