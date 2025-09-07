@@ -161,9 +161,8 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     updateBoundingRect();
 
     if (local || judge) {
-        // TODO
-        // connect(_parent, &TabGame::playerAdded, this, &Player::addPlayer);
-        // connect(_parent, &TabGame::playerRemoved, this, &Player::removePlayer);
+        connect(_parent->getGameState(), &GameState::playerAdded, this, &Player::addPlayer);
+        connect(_parent->getGameState(), &GameState::playerRemoved, this, &Player::removePlayer);
     }
 
     if (local || judge) {
@@ -4042,8 +4041,8 @@ QMenu *Player::createCardMenu(const CardItem *card)
 
                 QMenu *revealMenu = cardMenu->addMenu(tr("Re&veal to..."));
                 initContextualPlayersMenu(revealMenu);
-                // TODO
-                // connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
+
+                connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
 
                 cardMenu->addSeparator();
                 cardMenu->addAction(aClone);
