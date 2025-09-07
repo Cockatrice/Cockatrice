@@ -120,6 +120,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     createCardInfoDock();
     createPlayerListDock();
+    connectPlayerListToGameEventHandler();
     createMessageDock();
     connectMessageLogToGameEventHandler();
     createPlayAreaWidget();
@@ -187,6 +188,16 @@ void TabGame::connectMessageLogToGameEventHandler()
     connect(gameEventHandler, &GameEventHandler::logTurnReversed, messageLog, &MessageLogWidget::logReverseTurn);
 
     connect(gameEventHandler, &GameEventHandler::logGameClosed, messageLog, &MessageLogWidget::logGameClosed);
+}
+
+void TabGame::connectPlayerListToGameEventHandler()
+{
+    connect(gameState, &GameState::playerAdded, playerListWidget, &PlayerListWidget::addPlayer);
+    connect(gameEventHandler, &GameEventHandler::playerLeft, playerListWidget, &PlayerListWidget::removePlayer);
+    connect(gameEventHandler, &GameEventHandler::spectatorJoined, playerListWidget, &PlayerListWidget::addSpectator);
+    connect(gameEventHandler, &GameEventHandler::spectatorLeft, playerListWidget, &PlayerListWidget::removePlayer);
+    connect(gameEventHandler, &GameEventHandler::playerPropertiesChanged, playerListWidget,
+            &PlayerListWidget::updatePlayerProperties);
 }
 
 void TabGame::loadReplay(GameReplay *replay)
@@ -526,7 +537,7 @@ void TabGame::removePlayerFromAutoCompleteList(QString playerName)
 
 void TabGame::addSpectator(ServerInfo_PlayerProperties prop)
 {
-    playerListWidget->addPlayer(prop);
+    playerListWidget->addSpectator(prop);
 }
 
 void TabGame::removeSpectator(int spectatorId, ServerInfo_User spectator)
@@ -534,8 +545,6 @@ void TabGame::removeSpectator(int spectatorId, ServerInfo_User spectator)
     Q_UNUSED(spectator);
     QString playerName = "@" + gameState->getSpectatorName(spectatorId);
     removePlayerFromAutoCompleteList(playerName);
-
-    playerListWidget->removePlayer(spectatorId);
 }
 
 void TabGame::actPhaseAction()
@@ -623,7 +632,7 @@ void TabGame::processPlayerLeave(Player *leavingPlayer)
 {
     QString playerName = "@" + leavingPlayer->getName();
     removePlayerFromAutoCompleteList(playerName);
-    playerListWidget->removePlayer(leavingPlayer->getId());
+
     scene->removePlayer(leavingPlayer);
 }
 
@@ -631,9 +640,6 @@ Player *TabGame::addPlayer(Player *newPlayer)
 {
     QString newPlayerName = "@" + newPlayer->getName();
     addPlayerToAutoCompleteList(newPlayerName);
-
-    // TODO
-    // playerListWidget->addPlayer(newPlayer);
 
     scene->addPlayer(newPlayer);
 

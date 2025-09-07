@@ -92,8 +92,12 @@ signals:
     void localPlayerReadyStateChanged(int playerId, bool ready);
     void gameStopped();
     void gameClosed();
-    void playerLeft(Player *leavingPlayer);
+    void playerPropertiesChanged(const ServerInfo_PlayerProperties &prop, int playerId);
+    void playerJoined(const ServerInfo_PlayerProperties &playerInfo);
+    void playerLeft(int leavingPlayerId);
     void playerKicked();
+    void spectatorJoined(const ServerInfo_PlayerProperties &spectatorInfo);
+    void spectatorLeft(int leavingSpectatorId);
     void gameFlooded();
     void containerProcessingStarted(GameEventContext context);
     void setContextJudgeName(QString judgeName);

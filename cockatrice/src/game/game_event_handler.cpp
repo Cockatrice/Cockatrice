@@ -237,6 +237,8 @@ void GameEventHandler::eventSpectatorLeave(const Event_Leave &event,
 {
     emit logSpectatorLeave(gameState->getSpectatorName(eventPlayerId), getLeaveReason(event.reason()));
 
+    emit spectatorLeft(eventPlayerId);
+
     gameState->removeSpectator(eventPlayerId);
 
     game->emitUserEvent();
@@ -322,7 +324,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     if (!player)
         return;
     const ServerInfo_PlayerProperties &prop = event.player_properties();
-    // playerListWidget->updatePlayerProperties(prop, eventPlayerId);
+    emit playerPropertiesChanged(prop, eventPlayerId);
 
     const auto contextType = static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {
@@ -395,11 +397,13 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
     if (playerInfo.spectator()) {
         gameState->addSpectator(playerId, playerInfo);
         emit logJoinSpectator(playerName);
+        emit spectatorJoined(playerInfo);
     } else {
         Player *newPlayer = gameState->addPlayer(playerId, playerInfo.user_info(), game);
         emit logJoinPlayer(newPlayer);
+        emit playerJoined(playerInfo);
     }
-    // playerListWidget->addPlayer(playerInfo);
+
     game->emitUserEvent();
 }
 
@@ -427,7 +431,7 @@ void GameEventHandler::eventLeave(const Event_Leave &event, int eventPlayerId, c
     if (!player)
         return;
 
-    emit playerLeft(player);
+    emit playerLeft(eventPlayerId);
 
     emit logLeave(player, getLeaveReason(event.reason()));
 
