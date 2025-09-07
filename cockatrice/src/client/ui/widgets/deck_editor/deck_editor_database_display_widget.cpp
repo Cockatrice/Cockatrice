@@ -142,8 +142,7 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
-        emit cardChanged(card);
+        emit cardChanged(getCardOrPinnedPrinting(cardName));
     }
 }
 
@@ -176,7 +175,21 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return CardDatabaseManager::getInstance()->getCard({cardName});
+    return getCardOrPinnedPrinting(cardName);
+}
+
+ExactCard DeckEditorDatabaseDisplayWidget::getCardOrPinnedPrinting(QString cardName) const
+{
+    const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
+
+    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
+
+    if (cardProviderId != "") {
+        return ExactCard(card.getCardPtr(),
+                         CardDatabaseManager::getInstance()->getSpecificPrinting({cardName, cardProviderId}));
+    }
+
+    return card;
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
