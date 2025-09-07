@@ -79,8 +79,21 @@ void UserContextMenu::retranslateUi()
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
 {
-    const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
     const Command_GetGamesOfUser &cmd = commandContainer.session_command(0).GetExtension(Command_GetGamesOfUser::ext);
+    if (resp.response_code() == Response::RespNameNotFound) {
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Error"), tr("This user does not exist."));
+        return;
+    } else if (resp.response_code() == Response::RespInIgnoreList) {
+        QMessageBox::critical(
+            static_cast<QWidget *>(parent()), tr("Error"),
+            tr("You are being ignored by %1 and can't see their games.").arg(QString::fromStdString(cmd.user_name())));
+        return;
+    } else if (resp.response_code() != Response::RespOk) {
+        QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Error"),
+                              tr("Could not get %1's games.").arg(QString::fromStdString(cmd.user_name())));
+        return;
+    }
+    const Response_GetGamesOfUser &response = resp.GetExtension(Response_GetGamesOfUser::ext);
 
     QMap<int, GameTypeMap> gameTypeMap;
     QMap<int, QString> roomMap;
