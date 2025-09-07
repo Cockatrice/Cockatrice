@@ -101,7 +101,6 @@ private:
     void closeGame();
     bool leaveGame();
 
-
     Player *setActivePlayer(int id);
     void setActivePhase(int phase);
     void createMenuItems();

@@ -627,7 +627,7 @@ void TabGame::processPlayerLeave(Player *leavingPlayer)
     scene->removePlayer(leavingPlayer);
 }
 
-Player *TabGame::addPlayer(Player* newPlayer)
+Player *TabGame::addPlayer(Player *newPlayer)
 {
     QString newPlayerName = "@" + newPlayer->getName();
     addPlayerToAutoCompleteList(newPlayerName);
