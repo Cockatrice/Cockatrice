@@ -805,8 +805,7 @@ void MessageLogWidget::connectToPlayer(Player *player)
     connect(player, &Player::logAttachCard, this, &MessageLogWidget::logAttachCard);
     connect(player, &Player::logUnattachCard, this, &MessageLogWidget::logUnattachCard);
     connect(player, &Player::logDumpZone, this, &MessageLogWidget::logDumpZone);
-    // TODO: Reconnect this
-    // connect(player, &Player::AlogDrawCards, this, &MessageLogWidget::logDrawCards);
+    connect(player, &Player::logDrawCards, this, &MessageLogWidget::logDrawCards);
     connect(player, &Player::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
     connect(player, &Player::logRevealCards, this, &MessageLogWidget::logRevealCards);
     connect(player, &Player::logAlwaysRevealTopCard, this, &MessageLogWidget::logAlwaysRevealTopCard);

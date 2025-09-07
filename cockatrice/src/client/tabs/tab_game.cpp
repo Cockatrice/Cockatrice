@@ -53,8 +53,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameMetaInfo = new GameMetaInfo();
     gameState = new GameState(0, -1, -1, _tabSupervisor->getIsLocalGame(), QList<AbstractClient *>(), true, false,
                               false, false, -1, false);
-    connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
-    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
+    connectToGameState();
 
     gameEventHandler = new GameEventHandler(this);
     connectToGameEventHandler();
@@ -101,13 +100,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     gameMetaInfo->setRoomGameTypes(_roomGameTypes);
     gameState = new GameState(0, event.host_id(), event.player_id(), _tabSupervisor->getIsLocalGame(), _clients,
                               event.spectator(), event.judge(), false, event.resuming(), -1, false);
+    connectToGameState();
 
     // THIS CTOR IS USED ON GAMES
     gameMetaInfo->setStarted(false);
-    connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
 
     connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
-    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
 
     gameEventHandler = new GameEventHandler(this);
     connectToGameEventHandler();
@@ -144,6 +142,14 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
         gameTypes.append(gameMetaInfo->findRoomGameType(i));
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
+}
+
+void TabGame::connectToGameState()
+{
+    connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
+    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
+    connect(gameState, &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
+    connect(gameState, &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
 }
 
 void TabGame::connectToGameEventHandler()
@@ -230,7 +236,7 @@ void TabGame::resetChatAndPhase()
     messageLog->clearChat();
 
     // reset phase markers
-    setActivePhase(-1);
+    gameState->setCurrentPhase(-1);
 }
 
 void TabGame::emitUserEvent()
@@ -826,7 +832,7 @@ Player *TabGame::setActivePlayer(int id)
     Player *player = gameState->getPlayer(id);
     if (!player)
         return nullptr;
-    gameState->setActivePlayer(id);
+
     playerListWidget->setActivePlayer(id);
     QMapIterator<int, Player *> i(gameState->getPlayers());
     while (i.hasNext()) {
@@ -848,10 +854,7 @@ Player *TabGame::setActivePlayer(int id)
 
 void TabGame::setActivePhase(int phase)
 {
-    if (gameState->getCurrentPhase() != phase) {
-        gameState->setCurrentPhase(phase);
-        phasesToolbar->setActivePhase(phase);
-    }
+    phasesToolbar->setActivePhase(phase);
 }
 
 void TabGame::newCardAdded(AbstractCardItem *card)

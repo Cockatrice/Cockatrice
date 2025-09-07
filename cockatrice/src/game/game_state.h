@@ -146,6 +146,7 @@ public:
     void setActivePlayer(int activePlayerId)
     {
         activePlayer = activePlayerId;
+        emit activePlayerChanged(activePlayer);
     }
 
     bool getIsLocalGame() const
@@ -181,6 +182,7 @@ public:
     void setCurrentPhase(int phase)
     {
         currentPhase = phase;
+        emit activePhaseChanged(phase);
     }
 
     bool isMainPlayerConceded() const
@@ -224,6 +226,8 @@ signals:
     void spectatorRemoved(int spectatorId, ServerInfo_User spectator);
     void gameStarted(bool resuming);
     void gameStopped();
+    void activePhaseChanged(int activePhase);
+    void activePlayerChanged(int playerId);
 
 public slots:
     void incrementGameTime();

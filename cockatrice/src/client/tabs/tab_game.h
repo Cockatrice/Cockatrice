@@ -172,6 +172,7 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void connectToGameState();
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
