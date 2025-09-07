@@ -602,6 +602,17 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
 
+    // Do not show games to someone on the ignore list of that user, except for mods
+    QString target_user = nameFromStdString(cmd.user_name());
+    Server_AbstractUserInterface *userInterface = server->findUser(target_user);
+    if (!userInterface) {
+        return Response::RespNameNotFound;
+    }
+    if (!(userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin)) &&
+        databaseInterface->isInIgnoreList(target_user, QString::fromStdString(userInfo->name()))) {
+        return Response::RespInIgnoreList;
+    }
+
     // We don't need to check whether the user is logged in; persistent games should also work.
     // The client needs to deal with an empty result list.
 
