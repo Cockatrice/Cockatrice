@@ -264,6 +264,7 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
             Player *player = gameState->getPlayers().value(playerId, 0);
             if (!player) {
                 player = gameState->addPlayer(playerId, prop.user_info(), game);
+                emit playerJoined(prop);
             }
             player->processPlayerInfo(playerInfo);
             if (player->getLocal()) {

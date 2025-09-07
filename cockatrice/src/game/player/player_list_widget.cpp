@@ -97,24 +97,11 @@ void PlayerListWidget::retranslateUi()
 {
 }
 
-void PlayerListWidget::addPlayer(const Player *player)
+void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 {
-
     QTreeWidgetItem *newPlayer = new PlayerListTWI;
-    players.insert(player->getId(), newPlayer);
-    // updatePlayerProperties(player->getUserInfo());
-    addTopLevelItem(newPlayer);
-    sortItems(1, Qt::AscendingOrder);
-    resizeColumnToContents(4);
-    resizeColumnToContents(5);
-}
-
-void PlayerListWidget::addSpectator(const ServerInfo_PlayerProperties &spectator)
-{
-
-    QTreeWidgetItem *newPlayer = new PlayerListTWI;
-    players.insert(spectator.player_id(), newPlayer);
-    updatePlayerProperties(spectator);
+    players.insert(player.player_id(), newPlayer);
+    updatePlayerProperties(player);
     addTopLevelItem(newPlayer);
     sortItems(1, Qt::AscendingOrder);
     resizeColumnToContents(4);

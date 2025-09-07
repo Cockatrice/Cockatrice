@@ -172,6 +172,7 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
     void loadReplay(GameReplay *replay);
@@ -214,7 +215,6 @@ public slots:
     void updateTimeElapsedLabel(QString newTime);
     void addPlayerToAutoCompleteList(QString playerName);
     void removePlayerFromAutoCompleteList(QString playerName);
-    void addSpectator(ServerInfo_PlayerProperties prop);
     void removeSpectator(int spectatorId, ServerInfo_User spectator);
     void processLocalPlayerSideboardLocked(int playerId, bool sideboardLocked);
     void processLocalPlayerReadyStateChanged(int playerId, bool ready);

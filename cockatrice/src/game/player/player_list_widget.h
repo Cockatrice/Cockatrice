@@ -54,8 +54,7 @@ public:
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
 
 public slots:
-    void addPlayer(const Player *player);
-    void addSpectator(const ServerInfo_PlayerProperties &spectator);
+    void addPlayer(const ServerInfo_PlayerProperties &player);
     void removePlayer(int playerId);
     void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
 };

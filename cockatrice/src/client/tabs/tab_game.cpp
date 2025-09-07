@@ -54,18 +54,16 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     gameState = new GameState(0, -1, -1, _tabSupervisor->getIsLocalGame(), QList<AbstractClient *>(), true, false,
                               false, false, -1, false);
     connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
-    connect(gameState, &GameState::spectatorAdded, this, &TabGame::addSpectator);
     connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
 
     gameEventHandler = new GameEventHandler(this);
-    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
-    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
-    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
-    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
+    connectToGameEventHandler();
 
     createCardInfoDock(true);
     createPlayerListDock(true);
+    connectPlayerListToGameEventHandler();
     createMessageDock(true);
+    connectMessageLogToGameEventHandler();
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
     createReplayDock(_replay);
@@ -107,16 +105,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     // THIS CTOR IS USED ON GAMES
     gameMetaInfo->setStarted(false);
     connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
-    connect(gameState, &GameState::spectatorAdded, this, &TabGame::addSpectator);
 
     connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
     connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
 
     gameEventHandler = new GameEventHandler(this);
-    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
-    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
-    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
-    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
+    connectToGameEventHandler();
 
     createCardInfoDock();
     createPlayerListDock();
@@ -150,6 +144,18 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
         gameTypes.append(gameMetaInfo->findRoomGameType(i));
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
+}
+
+void TabGame::connectToGameEventHandler()
+{
+    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
+    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
+    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
+    connect(gameEventHandler, &GameEventHandler::localPlayerReadyStateChanged, this,
+            &TabGame::processLocalPlayerReadyStateChanged);
+    connect(gameEventHandler, &GameEventHandler::localPlayerSideboardLocked, this,
+            &TabGame::processLocalPlayerSideboardLocked);
+    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
 }
 
 void TabGame::connectMessageLogToGameEventHandler()
@@ -192,9 +198,9 @@ void TabGame::connectMessageLogToGameEventHandler()
 
 void TabGame::connectPlayerListToGameEventHandler()
 {
-    connect(gameState, &GameState::playerAdded, playerListWidget, &PlayerListWidget::addPlayer);
+    connect(gameEventHandler, &GameEventHandler::playerJoined, playerListWidget, &PlayerListWidget::addPlayer);
     connect(gameEventHandler, &GameEventHandler::playerLeft, playerListWidget, &PlayerListWidget::removePlayer);
-    connect(gameEventHandler, &GameEventHandler::spectatorJoined, playerListWidget, &PlayerListWidget::addSpectator);
+    connect(gameEventHandler, &GameEventHandler::spectatorJoined, playerListWidget, &PlayerListWidget::addPlayer);
     connect(gameEventHandler, &GameEventHandler::spectatorLeft, playerListWidget, &PlayerListWidget::removePlayer);
     connect(gameEventHandler, &GameEventHandler::playerPropertiesChanged, playerListWidget,
             &PlayerListWidget::updatePlayerProperties);
@@ -533,11 +539,6 @@ void TabGame::removePlayerFromAutoCompleteList(QString playerName)
     if (sayEdit && autocompleteUserList.removeOne(playerName)) {
         sayEdit->setCompletionList(autocompleteUserList);
     }
-}
-
-void TabGame::addSpectator(ServerInfo_PlayerProperties prop)
-{
-    playerListWidget->addSpectator(prop);
 }
 
 void TabGame::removeSpectator(int spectatorId, ServerInfo_User spectator)
