@@ -96,26 +96,26 @@ signals:
     void playerKicked();
     void gameFlooded();
     void containerProcessingStarted(GameEventContext context);
-    void setContextJudgeName();
+    void setContextJudgeName(QString judgeName);
     void containerProcessingDone();
     void logSpectatorSay(ServerInfo_User userInfo, QString message);
     void logSpectatorLeave(QString name, QString reason);
     void logGameStart();
-    void logReadyStart();
-    void logNotReadyStart();
-    void playerConceded();
-    void playerUnconceded();
-    void logDeckSelect();
-    void logSideboardLockSet();
-    void logConnectionStateChanged();
-    void logJoinSpectator();
+    void logReadyStart(Player *player);
+    void logNotReadyStart(Player *player);
+    void playerConceded(Player *player);
+    void playerUnconceded(Player *player);
+    void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
+    void logSideboardLockSet(Player *player, bool sideboardLocked);
+    void logConnectionStateChanged(Player *player, bool connected);
+    void logJoinSpectator(QString spectatorName);
     void logJoinPlayer(Player *player);
     void logLeave(Player *player, QString reason);
     void logKicked();
     void logTurnReversed(Player *player, bool reversed);
     void logGameClosed();
-    void logActivePlayer();
-    void logActivePhaseChanged();
+    void logActivePlayer(Player *activePlayer);
+    void logActivePhaseChanged(int activePhase);
 };
 
 #endif // COCKATRICE_GAME_EVENT_HANDLER_H

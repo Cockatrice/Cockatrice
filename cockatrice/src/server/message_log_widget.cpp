@@ -391,6 +391,11 @@ void MessageLogWidget::logGameStart()
     appendHtmlServerMessage(tr("The game has started."));
 }
 
+void MessageLogWidget::logGameFlooded()
+{
+    appendMessage(tr("You are flooding the game. Please wait a couple of seconds."));
+}
+
 void MessageLogWidget::logJoin(Player *player)
 {
     soundEngine->playSound("player_join");

@@ -173,6 +173,7 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void connectMessageLogToGameEventHandler();
     void loadReplay(GameReplay *replay);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;

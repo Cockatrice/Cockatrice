@@ -57,7 +57,6 @@ void GameEventHandler::commandFinished(const Response &response)
 {
     if (response.response_code() == Response::RespChatFlood)
         emit gameFlooded();
-    // messageLog->appendMessage(tr("You are flooding the game. Please wait a couple of seconds."));
 }
 
 PendingCommand *GameEventHandler::prepareGameCommand(const ::google::protobuf::Message &cmd)
@@ -87,7 +86,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
 {
     const GameEventContext &context = cont.context();
     emit containerProcessingStarted(context);
-    // messageLog->containerProcessingStarted(context);
+
     const int eventListSize = cont.event_list_size();
     for (int i = 0; i < eventListSize; ++i) {
         const GameEvent &event = cont.event_list(i);
@@ -98,11 +97,9 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
             auto id = cont.forced_by_judge();
             Player *judgep = gameState->getPlayers().value(id, nullptr);
             if (judgep) {
-                emit setContextJudgeName();
-                // messageLog->setContextJudgeName(judgep->getName());
+                emit setContextJudgeName(judgep->getName());
             } else if (gameState->getSpectators().contains(id)) {
-                emit setContextJudgeName();
-                // messageLog->setContextJudgeName(QString::fromStdString(gameState->getSpectators().value(id).name()));
+                emit setContextJudgeName(QString::fromStdString(gameState->getSpectators().value(id).name()));
             }
         }
 
@@ -178,7 +175,6 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
         }
     }
     emit containerProcessingDone();
-    // messageLog->containerProcessingDone();
 }
 
 void GameEventHandler::handleNextTurn()
@@ -233,7 +229,6 @@ void GameEventHandler::eventSpectatorSay(const Event_GameSay &event,
 {
     const ServerInfo_User &userInfo = gameState->getSpectators().value(eventPlayerId);
     emit logSpectatorSay(userInfo, QString::fromStdString(event.message()));
-    // messageLog->logSpectatorSay(userInfo, QString::fromStdString(event.message()));
 }
 
 void GameEventHandler::eventSpectatorLeave(const Event_Leave &event,
@@ -293,7 +288,6 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
         game->getGameMetaInfo()->setStarted(event.game_started());
         if (gameState->isGameStateKnown())
             emit logGameStart();
-        // messageLog->logGameStart();
         gameState->setActivePlayer(event.active_player_id());
         gameState->setCurrentPhase(event.active_phase());
     } else if (!event.game_started() && game->getGameMetaInfo()->started()) {
@@ -337,18 +331,14 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             if (player->getLocal())
                 emit localPlayerReadyStateChanged(player->getId(), ready);
             if (ready) {
-                emit logReadyStart();
-                // messageLog->logReadyStart(player);
+                emit logReadyStart(player);
             } else {
-                emit logNotReadyStart();
-                // emit logNotReadyStart(player);
-                // messageLog->logNotReadyStart(player);
+                emit logNotReadyStart(player);
             }
             break;
         }
         case GameEventContext::CONCEDE: {
-            emit playerConceded();
-            // messageLog->logConcede(player);
+            emit playerConceded(player);
             player->setConceded(true);
 
             QMapIterator<int, Player *> playerIterator(gameState->getPlayers());
@@ -358,8 +348,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             break;
         }
         case GameEventContext::UNCONCEDE: {
-            emit playerUnconceded();
-            // messageLog->logUnconcede(player);
+            emit playerUnconceded(player);
             player->setConceded(false);
 
             QMapIterator<int, Player *> playerIterator(gameState->getPlayers());
@@ -370,9 +359,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
         }
         case GameEventContext::DECK_SELECT: {
             Context_DeckSelect deckSelect = context.GetExtension(Context_DeckSelect::ext);
-            emit logDeckSelect();
-            /*messageLog->logDeckSelect(player, QString::fromStdString(deckSelect.deck_hash()),
-                                      deckSelect.sideboard_size());*/
+            emit logDeckSelect(player, QString::fromStdString(deckSelect.deck_hash()), deckSelect.sideboard_size());
             if (game->getGameMetaInfo()->proto().share_decklists_on_load() && deckSelect.has_deck_list() &&
                 eventPlayerId != gameState->getLocalPlayerId()) {
                 emit remotePlayerDeckSelected(QString::fromStdString(deckSelect.deck_list()), eventPlayerId,
@@ -384,13 +371,11 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             if (player->getLocal()) {
                 emit localPlayerSideboardLocked(player->getId(), prop.sideboard_locked());
             }
-            emit logSideboardLockSet();
-            // messageLog->logSetSideboardLock(player, prop.sideboard_locked());
+            emit logSideboardLockSet(player, prop.sideboard_locked());
             break;
         }
         case GameEventContext::CONNECTION_STATE_CHANGED: {
-            // messageLog->logConnectionStateChanged(player, prop.ping_seconds() != -1);
-            emit logConnectionStateChanged();
+            emit logConnectionStateChanged(player, prop.ping_seconds() != -1);
             break;
         }
         default:;
@@ -409,8 +394,7 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
 
     if (playerInfo.spectator()) {
         gameState->addSpectator(playerId, playerInfo);
-        // messageLog->logJoinSpectator(playerName);
-        emit logJoinSpectator();
+        emit logJoinSpectator(playerName);
     } else {
         Player *newPlayer = gameState->addPlayer(playerId, playerInfo.user_info(), game);
         emit logJoinPlayer(newPlayer);
@@ -468,8 +452,6 @@ void GameEventHandler::eventKicked(const Event_Kicked & /*event*/,
 
     emit logKicked();
 
-    // messageLog->logKicked();
-
     emit playerKicked();
 
     game->emitUserEvent();
@@ -501,7 +483,6 @@ void GameEventHandler::eventGameClosed(const Event_GameClosed & /*event*/,
     gameState->setGameClosed(true);
     emit gameClosed();
     emit logGameClosed();
-    // messageLog->logGameClosed();
     game->emitUserEvent();
 }
 
@@ -513,8 +494,7 @@ void GameEventHandler::eventSetActivePlayer(const Event_SetActivePlayer &event,
     Player *player = gameState->getPlayer(event.active_player_id());
     if (!player)
         return;
-    emit logActivePlayer();
-    // messageLog->logSetActivePlayer(player);
+    emit logActivePlayer(player);
     game->emitUserEvent();
 }
 
@@ -524,9 +504,8 @@ void GameEventHandler::eventSetActivePhase(const Event_SetActivePhase &event,
 {
     const int phase = event.phase();
     if (gameState->getCurrentPhase() != phase) {
-        emit logActivePhaseChanged();
+        emit logActivePhaseChanged(phase);
     }
-    // messageLog->logSetActivePhase(phase);
     gameState->setCurrentPhase(phase);
     game->emitUserEvent();
 }

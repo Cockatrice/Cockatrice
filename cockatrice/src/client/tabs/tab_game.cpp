@@ -121,6 +121,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createCardInfoDock();
     createPlayerListDock();
     createMessageDock();
+    connectMessageLogToGameEventHandler();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
     createReplayDock(nullptr);
@@ -148,6 +149,44 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
         gameTypes.append(gameMetaInfo->findRoomGameType(i));
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
+}
+
+void TabGame::connectMessageLogToGameEventHandler()
+{
+    // connect(gameEventHandler, &GameEventHandler:: , messageLog, &MessageLogWidget::);
+    connect(gameEventHandler, &GameEventHandler::gameFlooded, messageLog, &MessageLogWidget::logGameFlooded);
+    connect(gameEventHandler, &GameEventHandler::containerProcessingStarted, messageLog,
+            &MessageLogWidget::containerProcessingStarted);
+    connect(gameEventHandler, &GameEventHandler::containerProcessingDone, messageLog,
+            &MessageLogWidget::containerProcessingDone);
+    connect(gameEventHandler, &GameEventHandler::setContextJudgeName, messageLog,
+            &MessageLogWidget::setContextJudgeName);
+    connect(gameEventHandler, &GameEventHandler::logSpectatorSay, messageLog, &MessageLogWidget::logSpectatorSay);
+
+    connect(gameEventHandler, &GameEventHandler::logJoinPlayer, messageLog, &MessageLogWidget::logJoin);
+    connect(gameEventHandler, &GameEventHandler::logJoinSpectator, messageLog, &MessageLogWidget::logJoinSpectator);
+    connect(gameEventHandler, &GameEventHandler::logLeave, messageLog, &MessageLogWidget::logLeave);
+    connect(gameEventHandler, &GameEventHandler::logKicked, messageLog, &MessageLogWidget::logKicked);
+    connect(gameEventHandler, &GameEventHandler::logConnectionStateChanged, messageLog,
+            &MessageLogWidget::logConnectionStateChanged);
+
+    connect(gameEventHandler, &GameEventHandler::logDeckSelect, messageLog, &MessageLogWidget::logDeckSelect);
+    connect(gameEventHandler, &GameEventHandler::logSideboardLockSet, messageLog,
+            &MessageLogWidget::logSetSideboardLock);
+    connect(gameEventHandler, &GameEventHandler::logReadyStart, messageLog, &MessageLogWidget::logReadyStart);
+    connect(gameEventHandler, &GameEventHandler::logNotReadyStart, messageLog, &MessageLogWidget::logNotReadyStart);
+    connect(gameEventHandler, &GameEventHandler::logGameStart, messageLog, &MessageLogWidget::logGameStart);
+
+    connect(gameEventHandler, &GameEventHandler::playerConceded, messageLog, &MessageLogWidget::logConcede);
+    connect(gameEventHandler, &GameEventHandler::playerUnconceded, messageLog, &MessageLogWidget::logUnconcede);
+
+    connect(gameEventHandler, &GameEventHandler::logActivePlayer, messageLog, &MessageLogWidget::logSetActivePlayer);
+    connect(gameEventHandler, &GameEventHandler::logActivePhaseChanged, messageLog,
+            &MessageLogWidget::logSetActivePhase);
+
+    connect(gameEventHandler, &GameEventHandler::logTurnReversed, messageLog, &MessageLogWidget::logReverseTurn);
+
+    connect(gameEventHandler, &GameEventHandler::logGameClosed, messageLog, &MessageLogWidget::logGameClosed);
 }
 
 void TabGame::loadReplay(GameReplay *replay)

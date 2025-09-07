@@ -49,6 +49,7 @@ public slots:
     void logFlipCard(Player *player, QString cardName, bool faceDown);
     void logGameClosed();
     void logGameStart();
+    void logGameFlooded();
     void logJoin(Player *player);
     void logJoinSpectator(QString name);
     void logKicked();
