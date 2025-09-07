@@ -109,6 +109,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
     connect(gameState, &GameState::spectatorAdded, this, &TabGame::addSpectator);
 
+    connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
     connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
 
     gameEventHandler = new GameEventHandler(this);

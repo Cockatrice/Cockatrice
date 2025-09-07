@@ -124,34 +124,44 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
 
             switch (eventType) {
                 case GameEvent::GAME_STATE_CHANGED:
+                    qInfo() << "Game state changed event";
                     eventGameStateChanged(event.GetExtension(Event_GameStateChanged::ext), playerId, context);
                     break;
                 case GameEvent::PLAYER_PROPERTIES_CHANGED:
+                    qInfo() << "player prop event";
                     eventPlayerPropertiesChanged(event.GetExtension(Event_PlayerPropertiesChanged::ext), playerId,
                                                  context);
                     break;
                 case GameEvent::JOIN:
+                    qInfo() << "join event";
                     eventJoin(event.GetExtension(Event_Join::ext), playerId, context);
                     break;
                 case GameEvent::LEAVE:
+                    qInfo() << "leave event";
                     eventLeave(event.GetExtension(Event_Leave::ext), playerId, context);
                     break;
                 case GameEvent::KICKED:
+                    qInfo() << "kicked event";
                     eventKicked(event.GetExtension(Event_Kicked::ext), playerId, context);
                     break;
                 case GameEvent::GAME_HOST_CHANGED:
+                    qInfo() << "host changed event";
                     eventGameHostChanged(event.GetExtension(Event_GameHostChanged::ext), playerId, context);
                     break;
                 case GameEvent::GAME_CLOSED:
+                    qInfo() << "game closed event";
                     eventGameClosed(event.GetExtension(Event_GameClosed::ext), playerId, context);
                     break;
                 case GameEvent::SET_ACTIVE_PLAYER:
+                    qInfo() << "set active player event";
                     eventSetActivePlayer(event.GetExtension(Event_SetActivePlayer::ext), playerId, context);
                     break;
                 case GameEvent::SET_ACTIVE_PHASE:
+                    qInfo() << "set active phase";
                     eventSetActivePhase(event.GetExtension(Event_SetActivePhase::ext), playerId, context);
                     break;
                 case GameEvent::REVERSE_TURN:
+                    qInfo() << "reverse turn event";
                     eventReverseTurn(event.GetExtension(Event_ReverseTurn::ext), playerId, context);
                     break;
 
