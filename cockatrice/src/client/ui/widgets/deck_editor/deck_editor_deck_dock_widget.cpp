@@ -346,6 +346,20 @@ void DeckEditorDeckDockWidget::updateShowTagsWidget(const bool visible)
     deckTagsDisplayWidget->setHidden(!visible);
 }
 
+void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
+{
+    if (deckModel->getDeckList()->getBannerCard().name == "") {
+        if (bannerCardComboBox->findText("-") != -1) {
+            bannerCardComboBox->setCurrentIndex(bannerCardComboBox->findText("-"));
+        } else {
+            bannerCardComboBox->insertItem(0, "-");
+            bannerCardComboBox->setCurrentIndex(0);
+        }
+    } else {
+        bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard().name);
+    }
+}
+
 /**
  * Sets the currently active deck for this tab
  * @param _deck The deck. Takes ownership of the object
@@ -356,7 +370,8 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
-    bannerCardComboBox->setCurrentText(deckModel->getDeckList()->getBannerCard().name);
+
+    syncBannerCardComboBoxSelectionWithDeck();
     updateBannerCardComboBox();
     updateHash();
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
