@@ -22,7 +22,7 @@ set(PROTO_FILES
     command_del_counter.proto
     command_delete_arrow.proto
     command_draft_options_select.proto
-    command_draft_pick_submission.proto
+    command_draft_pick_submit.proto
     command_draw_cards.proto
     command_dump_zone.proto
     command_flip_card.proto

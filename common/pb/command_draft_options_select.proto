@@ -4,7 +4,7 @@ import "draft_options.proto";
 
 message Command_DraftOptionsSelect {
     extend GameCommand {
-        optional Command_DraftOptionsSelect ext = 1029;
+        optional Command_DraftOptionsSelect ext = 1035;
     }
     optional Draft_Options options = 1;
 }

@@ -1,5 +1,5 @@
 syntax = "proto2";
-import "command_deck_select.proto"
+import "command_deck_select.proto";
 enum Draft_Type {
     Booster_Draft = 1;
     Sealed = 2;
