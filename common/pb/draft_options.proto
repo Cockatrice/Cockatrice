@@ -10,10 +10,15 @@ message Draft_Options {
     optional string draft_list = 2;
     optional sint32 draft_list_id = 3 [default = -1];
     optional string allowed_lands = 4;
-    optional uint32 cards_per_pack = 5;
-    optional uint32 packs_per_player = 6;
-    optional uint32 minimum_deck_size = 7;
-    optional uint32 picks_per_round = 8;
-    optional uint32 burns_per_round = 9;
-    optional uint32 round_timer = 10
+    optional sint32 cards_per_pack = 5;
+    optional sint32 packs_per_player = 6;
+    optional sint32 minimum_deck_size = 7;
+    optional sint32 picks_per_round = 8;
+    optional sint32 burns_per_round = 9;
+    optional sint32 round_timer = 10;
+    optional sint32 asynchronous_cards = 11;
+    optional sint32 asynchronous_packs = 12;
+    optional bool enable_table = 32;
+    optional bool enable_overpicking = 33;
+    optional bool enable_returning = 34;
 }
