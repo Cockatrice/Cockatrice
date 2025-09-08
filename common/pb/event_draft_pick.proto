@@ -5,9 +5,9 @@ message Event_DraftPick {
     extend GameEvent {
         optional Event_DraftPick ext = 2023;
     }
-    optional sint32 round = 1;
+    optional sint32 round = 1 [default = -1];
     optional sint32 picked_cards = 2;
     optional sint32 burned_cards = 3;
-    optional sint32 remaining_cards = 4;
-    optional sint32 passed_to_user_id = 5;
+    optional sint32 remaining_cards = 4 [default = -1];
+    optional sint32 passed_to_user_id = 5 [default = -1];
 }
