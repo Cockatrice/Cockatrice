@@ -4,6 +4,7 @@
 #include "../../../../settings/cache_settings.h"
 
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
