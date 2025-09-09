@@ -76,6 +76,7 @@ private:
     QComboBox *activeGroupCriteriaComboBox;
     QLabel *formatLabel;
     QComboBox *formatComboBox;
+    QPushButton *legalityCheckerButton;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 

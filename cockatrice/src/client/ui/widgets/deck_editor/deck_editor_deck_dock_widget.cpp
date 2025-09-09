@@ -126,7 +126,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     formatComboBox->addItem("Loading Database...");
     formatComboBox->setEnabled(false); // Disable until loaded
 
-    auto legalityCheckerButton = new QPushButton(this);
+    legalityCheckerButton = new QPushButton(this);
 
     connect(legalityCheckerButton, &QPushButton::clicked, this, &DeckEditorDeckDockWidget::checkDeckFormatLegality);
 
@@ -287,7 +287,7 @@ void DeckEditorDeckDockWidget::checkDeckFormatLegality()
             for (const QString &prop : card.getCardPtr()->getProperties()) {
                 if (prop.startsWith("format-")) {
                     hasFormatProperty = true;
-                    if (prop == formatProperty && card.getCardPtr()->getProperty(formatProperty) == "legal9") {
+                    if (prop == formatProperty && card.getCardPtr()->getProperty(formatProperty) == "legal") {
                         isLegal = true;
                         break;
                     }
@@ -728,6 +728,8 @@ void DeckEditorDeckDockWidget::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
     formatLabel->setText(tr("Format:"));
+    legalityCheckerButton->setText(tr("Check card legality"));
+
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));
