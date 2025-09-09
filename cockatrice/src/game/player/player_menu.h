@@ -17,6 +17,8 @@ signals:
 public slots:
     QMenu *createPtMenu() const;
     QMenu *createMoveMenu() const;
+    void enableOpenInDeckEditorAction() const;
+    void populatePredefinedTokensMenu();
 
 private slots:
     void addPlayer(Player *playerToAdd);
@@ -45,6 +47,11 @@ public:
     {
         aCreateAnotherToken->setText(text);
         aCreateAnotherToken->setEnabled(true);
+    }
+
+    QStringList getPredefinedTokens() const
+    {
+        return predefinedTokens;
     }
 
     [[nodiscard]] bool isAlwaysRevealTopCardChecked()
@@ -103,6 +110,7 @@ private:
         *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aSortHand, *aIncrementAllCardCounters;
 
     bool shortcutsActive;
+    QStringList predefinedTokens;
 
     QMenu *createCardMenu(const CardItem *card);
 

@@ -60,6 +60,7 @@ class Player : public QObject
 
 signals:
     void openDeckEditor(const DeckLoader *deck);
+    void deckChanged();
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();
     void activeChanged(bool _active);
@@ -119,6 +120,13 @@ public:
     [[nodiscard]] PlayerMenu *getPlayerMenu() const
     {
         return playerMenu;
+    }
+
+    void setDeck(const DeckLoader &_deck);
+
+    [[nodiscard]] DeckLoader *getDeck() const
+    {
+        return deck;
     }
 
     template <typename T> T *addZone(T *zone)
@@ -210,6 +218,8 @@ private:
     PlayerGraphicsItem *graphicsItem;
 
     bool active;
+
+    DeckLoader *deck;
 
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, AbstractCounter *> counters;

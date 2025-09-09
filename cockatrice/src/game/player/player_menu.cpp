@@ -919,6 +919,35 @@ void PlayerMenu::addViewCustomZoneActionToCustomZoneMenu(QString zoneName)
     }
 }
 
+void PlayerMenu::populatePredefinedTokensMenu()
+{
+    DeckLoader *_deck = player->getDeck();
+    createPredefinedTokenMenu->clear();
+    createPredefinedTokenMenu->setEnabled(false);
+    predefinedTokens.clear();
+    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(_deck->getRoot()->findChild(DECK_ZONE_TOKENS));
+
+    if (tokenZone) {
+        if (!tokenZone->empty())
+            createPredefinedTokenMenu->setEnabled(true);
+
+        for (int i = 0; i < tokenZone->size(); ++i) {
+            const QString tokenName = tokenZone->at(i)->getName();
+            predefinedTokens.append(tokenName);
+            QAction *a = createPredefinedTokenMenu->addAction(tokenName);
+            if (i < 10) {
+                a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
+            }
+            connect(a, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actCreatePredefinedToken);
+        }
+    }
+}
+
+void PlayerMenu::enableOpenInDeckEditorAction() const
+{
+    aOpenDeckInDeckEditor->setEnabled(true);
+}
+
 void PlayerMenu::resetTopCardMenuActions()
 {
     aAlwaysRevealTopCard->setChecked(false);

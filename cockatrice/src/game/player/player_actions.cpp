@@ -834,7 +834,7 @@ void PlayerActions::actRollDie()
 
 void PlayerActions::actCreateToken()
 {
-    DlgCreateToken dlg(player->getPlayerInfo()->getPredefinedTokens(), player->getGame());
+    DlgCreateToken dlg(player->getPlayerMenu()->getPredefinedTokens(), player->getGame());
     if (!dlg.exec()) {
         return;
     }

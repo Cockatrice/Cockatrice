@@ -25,17 +25,12 @@ public:
     bool conceded;
     int zoneId;
 
-    DeckLoader *deck;
-    QStringList predefinedTokens;
-
     int getZoneId() const
     {
         return zoneId;
     }
 
     void setZoneId(int _zoneId);
-
-    void setDeck(const DeckLoader &_deck);
 
     void setConceded(bool _conceded);
     bool getConceded() const
@@ -78,11 +73,6 @@ public:
     QString getName() const
     {
         return QString::fromStdString(userInfo->name());
-    }
-
-    QStringList getPredefinedTokens() const
-    {
-        return predefinedTokens;
     }
 };
 

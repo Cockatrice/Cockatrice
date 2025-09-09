@@ -32,7 +32,7 @@
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      dialogSemaphore(false)
+      deck(nullptr), dialogSemaphore(false)
 {
     initializeZones();
 
@@ -40,6 +40,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     playerMenu = new PlayerMenu(this);
 
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
+
+    connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::enableOpenInDeckEditorAction);
+    connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::populatePredefinedTokensMenu);
 }
 
 void Player::initializeZones()
@@ -238,6 +241,13 @@ void Player::deleteCard(CardItem *card)
     } else {
         card->deleteLater();
     }
+}
+
+void Player::setDeck(const DeckLoader &_deck)
+{
+    deck = new DeckLoader(_deck);
+
+    emit deckChanged();
 }
 
 AbstractCounter *Player::addCounter(const ServerInfo_Counter &counter)
