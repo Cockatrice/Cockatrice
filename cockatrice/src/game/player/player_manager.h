@@ -62,8 +62,6 @@ public:
     Player *addPlayer(int playerId, const ServerInfo_User &info, TabGame *game)
     {
         auto *newPlayer = new Player(info, playerId, isLocalPlayer(playerId), isJudge(), game);
-        // TODO
-        // connect(newPlayer, &Player::openDeckEditor, game, &TabGame::openDeckEditor);
         players.insert(playerId, newPlayer);
         emit playerAdded(newPlayer);
         emit playerCountChanged();
