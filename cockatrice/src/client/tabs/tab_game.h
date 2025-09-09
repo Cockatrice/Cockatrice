@@ -2,11 +2,9 @@
 #define TAB_GAME_H
 
 #include "../../client/tearoff_menu.h"
-#include "../../game/game_event_handler.h"
-#include "../../game/game_meta_info.h"
-#include "../../game/game_state.h"
+#include "../../game/game.h"
 #include "../../game/player/player.h"
-#include "../../game/player/player_manager.h"
+#include "../../server/message_log_widget.h"
 #include "../replay_manager.h"
 #include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
@@ -53,12 +51,8 @@ class TabGame : public Tab
 {
     Q_OBJECT
 private:
-    GameMetaInfo *gameMetaInfo;
-    GameState *gameState;
-    GameEventHandler *gameEventHandler;
-    PlayerManager *playerManager;
+    Game *game;
     const UserListProxy *userListProxy;
-    CardItem *activeCard;
     ReplayManager *replayManager;
     QStringList gameTypes;
     QCompleter *completer;
@@ -116,16 +110,12 @@ private:
     void createReplayDock(GameReplay *replay);
 signals:
     void gameClosing(TabGame *tab);
-    void playerAdded(Player *player);
-    void playerRemoved(Player *player);
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
     void openMessageDialog(const QString &userName, bool focus);
     void openDeckEditor(const DeckLoader *deck);
     void notIdle();
 
-    void playerConceded();
-    void playerUnconceded();
     void phaseChanged(int phase);
     void gameLeft();
     void chatMessageSent(QString chatMessage);
@@ -178,46 +168,19 @@ public:
     void connectToPlayerManager();
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
+    void connectMessageLogToPlayerHandler();
     void connectPlayerListToGameEventHandler();
-    void loadReplay(GameReplay *replay);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
     bool closeRequest() override;
 
-    GameMetaInfo *getGameMetaInfo()
-    {
-        return gameMetaInfo;
-    }
-
-    GameState *getGameState() const
-    {
-        return gameState;
-    }
-
-    GameEventHandler *getGameEventHandler() const
-    {
-        return gameEventHandler;
-    }
-
-    PlayerManager *getPlayerManager() const
-    {
-        return playerManager;
-    }
-
-    bool isHost() const;
-
-    CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
-
     QString getTabText() const override;
 
-    AbstractClient *getClientForPlayer(int playerId) const;
-
-    void setActiveCard(CardItem *card);
-    CardItem *getActiveCard() const
+    Game *getGame() const
     {
-        return activeCard;
+        return game;
     }
 
 public slots:

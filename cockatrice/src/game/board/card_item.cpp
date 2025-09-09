@@ -260,13 +260,15 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (static_cast<TabGame *>(owner->parent())->getPlayerManager()->isSpectator())
+    if (static_cast<TabGame *>(owner->parent())->getGame()->getPlayerManager()->isSpectator())
         return;
 
     Player *arrowOwner =
         static_cast<TabGame *>(owner->parent())
-            ->getPlayerManager()
-            ->getActiveLocalPlayer(static_cast<TabGame *>(owner->parent())->getGameState()->getActivePlayer());
+                             ->getGame()
+                             ->getPlayerManager()
+                             ->getActiveLocalPlayer(
+                                 static_cast<TabGame *>(owner->parent())->getGame()->getGameState()->getActivePlayer());
     ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
     scene()->addItem(arrow);
     arrow->grabMouse();
@@ -286,7 +288,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (static_cast<TabGame *>(owner->parent())->getPlayerManager()->isSpectator())
+    if (static_cast<TabGame *>(owner->parent())->getGame()->getPlayerManager()->isSpectator())
         return;
 
     auto *arrow = new ArrowAttachItem(this);
@@ -474,6 +476,7 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
             owner->getGame()->setActiveCard(this);
             owner->getPlayerMenu()->updateCardMenu(this);
         } else if (owner->getGameScene()->selectedItems().isEmpty()) {
+
             owner->getGame()->setActiveCard(nullptr);
             owner->getPlayerMenu()->updateCardMenu(nullptr);
         }

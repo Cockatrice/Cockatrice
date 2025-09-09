@@ -29,10 +29,10 @@
 #include <QPainter>
 #include <QtConcurrent>
 
-Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
+Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      deck(nullptr), dialogSemaphore(false)
+      conceded(false), deck(nullptr), dialogSemaphore(false)
 {
     initializeZones();
 
@@ -44,7 +44,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::enableOpenInDeckEditorAction);
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::populatePredefinedTokensMenu);
 
-    connect(this, &Player::openDeckEditor, game, &TabGame::openDeckEditor);
+    // connect(this, &Player::openDeckEditor, game, &TabGame::openDeckEditor);
 }
 
 void Player::initializeZones()
@@ -55,7 +55,6 @@ void Player::initializeZones()
     addZone(new PileZoneLogic(this, "sb", false, false, false, this));
     addZone(new TableZoneLogic(this, "table", true, false, true, this));
     addZone(new StackZoneLogic(this, "stack", true, false, true, this));
-    // TODO: Contentsknown is probably not true for other players
     addZone(new HandZoneLogic(this, "hand", false, false, true, this));
 }
 
@@ -95,6 +94,19 @@ void Player::clear()
     }
 
     clearCounters();
+}
+
+void Player::setConceded(bool _conceded)
+{
+    if (conceded != _conceded) {
+        conceded = _conceded;
+
+        getGraphicsItem()->setVisible(!conceded);
+        if (conceded) {
+            clear();
+        }
+        emit concededChanged(getPlayerInfo()->getId(), conceded);
+    }
 }
 
 void Player::processPlayerInfo(const ServerInfo_Player &info)
@@ -160,8 +172,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 
             // Non-builtin zones are hidden by default and can't be interacted
             // with, except through menus.
-            // TODO: worry about this (later)
-            // zone->setVisible(false);
+            emit zone->setGraphicsVisibility(false);
 
             emit addViewCustomZoneActionToCustomZoneMenu(zoneName);
 
@@ -193,7 +204,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
         addCounter(info.counter_list(i));
     }
 
-    playerInfo->setConceded(info.properties().conceded());
+    setConceded(info.properties().conceded());
 }
 
 void Player::processCardAttachment(const ServerInfo_Player &info)
@@ -268,7 +279,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     if (name == "life") {
         ctr = getGraphicsItem()->getPlayerTarget()->addCounter(counterId, name, value);
     } else {
-        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, graphicsItem, game);
+        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, graphicsItem);
     }
     counters.insert(counterId, ctr);
 
@@ -387,8 +398,8 @@ ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targe
 {
     auto *arrow = new ArrowItem(this, arrowId, startCard, targetItem, color);
     arrows.insert(arrowId, arrow);
-    // TODO: consider this in the graphics item
-    // scene()->addItem(arrow);
+
+    getGameScene()->addItem(arrow);
     return arrow;
 }
 
@@ -467,5 +478,5 @@ void Player::setGameStarted()
     if (playerInfo->local) {
         emit resetTopCardMenuActions();
     }
-    playerInfo->setConceded(false);
+    setConceded(false);
 }

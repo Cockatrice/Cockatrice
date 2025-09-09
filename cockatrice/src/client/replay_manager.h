@@ -2,6 +2,7 @@
 #define REPLAY_MANAGER_H
 #include "network/replay_timeline_widget.h"
 #include "pb/game_replay.pb.h"
+#include "tabs/tab_game.h"
 
 #include <QWidget>
 

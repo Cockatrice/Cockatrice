@@ -16,7 +16,8 @@ class GameState : public QObject
     Q_OBJECT
 
 public:
-    explicit GameState(int secondsElapsed,
+    explicit GameState(Game *_game,
+                       int secondsElapsed,
                        int hostId,
                        bool isLocalGame,
                        QList<AbstractClient *> clients,
@@ -24,36 +25,6 @@ public:
                        bool resuming,
                        int currentPhase,
                        bool gameClosed);
-
-    const QMap<int, ServerInfo_User> &getSpectators() const
-    {
-        return spectators;
-    }
-
-    ServerInfo_User getSpectator(int playerId) const
-    {
-        return spectators.value(playerId);
-    }
-
-    QString getSpectatorName(int spectatorId) const
-    {
-        return QString::fromStdString(spectators.value(spectatorId).name());
-    }
-
-    void addSpectator(int spectatorId, const ServerInfo_PlayerProperties &prop)
-    {
-        if (!spectators.contains(spectatorId)) {
-            spectators.insert(spectatorId, prop.user_info());
-            emit spectatorAdded(prop);
-        }
-    }
-
-    void removeSpectator(int spectatorId)
-    {
-        ServerInfo_User spectatorInfo = spectators.value(spectatorId);
-        spectators.remove(spectatorId);
-        emit spectatorRemoved(spectatorId, spectatorInfo);
-    }
 
     void setHostId(int _hostId)
     {
@@ -151,10 +122,6 @@ public:
 
 signals:
     void updateTimeElapsedLabel(QString newTime);
-    void playerAdded(Player *player);
-    void playerRemoved(Player *player);
-    void spectatorAdded(ServerInfo_PlayerProperties spectator);
-    void spectatorRemoved(int spectatorId, ServerInfo_User spectator);
     void gameStarted(bool resuming);
     void gameStopped();
     void activePhaseChanged(int activePhase);
@@ -165,12 +132,12 @@ public slots:
     void setGameTime(int _secondsElapsed);
 
 private:
+    Game *game;
     QTimer *gameTimer;
     int secondsElapsed;
     QMap<int, QString> roomGameTypes;
     int hostId;
     const bool isLocalGame;
-    QMap<int, ServerInfo_User> spectators;
     QList<AbstractClient *> clients;
     bool gameStateKnown;
     bool resuming;

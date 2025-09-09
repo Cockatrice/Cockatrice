@@ -6,6 +6,7 @@
 #include "../board/abstract_graphics_item.h"
 #include "../cards/card_info.h"
 #include "../filters/filter_string.h"
+#include "../game.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "player_actions.h"
@@ -63,7 +64,8 @@ signals:
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();
-    void activeChanged(bool _active);
+    void activeChanged(bool active);
+    void concededChanged(int playerId, bool conceded);
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
@@ -72,7 +74,7 @@ public slots:
     void setActive(bool _active);
 
 public:
-    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent);
+    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent);
     ~Player() override;
     void retranslateUi();
 
@@ -93,7 +95,7 @@ public:
         return active;
     }
 
-    TabGame *getGame() const
+    Game *getGame() const
     {
         return game;
     }
@@ -202,6 +204,12 @@ public:
         return arrows;
     }
 
+    void setConceded(bool _conceded);
+    bool getConceded() const
+    {
+        return conceded;
+    }
+
     void setGameStarted();
 
     void setDialogSemaphore(const bool _active)
@@ -210,7 +218,7 @@ public:
     }
 
 private:
-    TabGame *game;
+    Game *game;
     PlayerInfo *playerInfo;
     PlayerEventHandler *playerEventHandler;
     PlayerActions *playerActions;
@@ -218,6 +226,7 @@ private:
     PlayerGraphicsItem *graphicsItem;
 
     bool active;
+    bool conceded;
 
     DeckLoader *deck;
 
@@ -237,7 +246,7 @@ class AnnotationDialog : public QInputDialog
     void keyPressEvent(QKeyEvent *e) override;
 
 public:
-    explicit AnnotationDialog(QWidget *parent) : QInputDialog(parent)
+    explicit AnnotationDialog(QWidget *parent = nullptr) : QInputDialog(parent)
     {
     }
 };

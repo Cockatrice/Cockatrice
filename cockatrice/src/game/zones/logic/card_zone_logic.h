@@ -25,6 +25,7 @@ signals:
     void cardCountChanged();
     void reorganizeCards();
     void updateGraphics();
+    void setGraphicsVisibility(bool visible);
     void retranslateUi();
 
 public:

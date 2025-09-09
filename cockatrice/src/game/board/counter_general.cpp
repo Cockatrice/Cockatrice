@@ -12,10 +12,8 @@ GeneralCounter::GeneralCounter(Player *_player,
                                int _radius,
                                int _value,
                                bool useNameForShortcut,
-                               QGraphicsItem *parent,
-                               QWidget *game)
-    : AbstractCounter(_player, _id, _name, true, _value, useNameForShortcut, parent, game), color(_color),
-      radius(_radius)
+                               QGraphicsItem *parent)
+    : AbstractCounter(_player, _id, _name, true, _value, useNameForShortcut, parent), color(_color), radius(_radius)
 {
     setCacheMode(DeviceCoordinateCache);
 }

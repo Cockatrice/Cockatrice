@@ -1,5 +1,7 @@
 #include "replay_timeline_widget.h"
 
+#include "../../settings/cache_settings.h"
+
 #include <QPainter>
 #include <QPainterPath>
 #include <QPalette>

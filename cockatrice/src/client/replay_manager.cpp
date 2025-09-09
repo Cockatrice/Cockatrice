@@ -11,7 +11,7 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
       aReplaySkipBackwardBig(nullptr)
 {
     if (replay) {
-        game->loadReplay(replay);
+        game->getGame()->loadReplay(replay);
 
         // Create list: event number -> time [ms]
         // Distribute simultaneous events evenly across 1 second.
@@ -95,8 +95,8 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
 
 void ReplayManager::replayNextEvent(EventProcessingOptions options)
 {
-    game->getGameEventHandler()->processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()),
-                                                           nullptr, options);
+    game->getGame()->getGameEventHandler()->processGameEventContainer(
+        replay->event_list(timelineWidget->getCurrentEvent()), nullptr, options);
 }
 
 void ReplayManager::replayFinished()

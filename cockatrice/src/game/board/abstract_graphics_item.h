@@ -6,15 +6,15 @@
 /**
  * Parent class of all objects that appear in a game.
  */
-class AbstractGraphicsItem : public QObject, public QGraphicsItem
+class AbstractGraphicsItem : public QGraphicsObject
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
+
 protected:
     void paintNumberEllipse(int number, int radius, const QColor &color, int position, int count, QPainter *painter);
 
 public:
-    explicit AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QGraphicsItem(parent)
+    explicit AbstractGraphicsItem(QGraphicsItem *parent = nullptr) : QGraphicsObject(parent)
     {
     }
 };

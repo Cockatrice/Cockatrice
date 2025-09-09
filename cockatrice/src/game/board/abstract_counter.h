@@ -34,7 +34,6 @@ private:
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
     bool shortcutActive;
-    QWidget *game;
 
 private slots:
     void refreshShortcuts();
@@ -48,8 +47,7 @@ public:
                     bool _shownInCounterArea,
                     int _value,
                     bool _useNameForShortcut = false,
-                    QGraphicsItem *parent = nullptr,
-                    QWidget *game = nullptr);
+                    QGraphicsItem *parent = nullptr);
     ~AbstractCounter() override;
 
     void retranslateUi();

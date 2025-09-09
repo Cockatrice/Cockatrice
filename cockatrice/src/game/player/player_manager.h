@@ -1,21 +1,26 @@
 #ifndef COCKATRICE_PLAYER_MANAGER_H
 #define COCKATRICE_PLAYER_MANAGER_H
 
-#include "player.h"
+#include "pb/serverinfo_playerproperties.pb.h"
 
+#include <QMap>
 #include <QObject>
 
+class Game;
+class Player;
 class PlayerManager : public QObject
 {
     Q_OBJECT
 
 public:
-    PlayerManager(QObject *parent, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
+    PlayerManager(Game *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
 
+    Game *game;
     QMap<int, Player *> players;
     int localPlayerId;
     bool localPlayerIsJudge;
     bool localPlayerIsSpectator;
+    QMap<int, ServerInfo_User> spectators;
 
     bool isSpectator() const
     {
@@ -42,66 +47,68 @@ public:
         return players.size();
     }
 
-    Player *getActiveLocalPlayer(int activePlayer) const
-    {
-        Player *active = players.value(activePlayer, 0);
-        if (active)
-            if (active->getPlayerInfo()->getLocal())
-                return active;
+    Player *getActiveLocalPlayer(int activePlayer) const;
 
-        QMapIterator<int, Player *> playerIterator(players);
-        while (playerIterator.hasNext()) {
-            Player *temp = playerIterator.next().value();
-            if (temp->getPlayerInfo()->getLocal())
-                return temp;
-        }
+    Player *addPlayer(int playerId, const ServerInfo_User &info);
 
-        return nullptr;
-    }
+    void removePlayer(int playerId);
 
-    Player *addPlayer(int playerId, const ServerInfo_User &info, TabGame *game)
-    {
-        auto *newPlayer = new Player(info, playerId, isLocalPlayer(playerId), isJudge(), game);
-        players.insert(playerId, newPlayer);
-        emit playerAdded(newPlayer);
-        emit playerCountChanged();
-        return newPlayer;
-    }
+    Player *getPlayer(int playerId) const;
 
-    void removePlayer(int playerId)
-    {
-        Player *player = getPlayer(playerId);
-        if (!player) {
-            return;
-        }
-        players.remove(playerId);
-        emit playerCountChanged();
-        emit playerRemoved(player);
-    }
+    void onPlayerConceded(int playerId, bool conceded);
 
-    Player *getPlayer(int playerId) const
-    {
-        Player *player = players.value(playerId, 0);
-        if (!player)
-            return nullptr;
-        return player;
-    }
-
-    [[nodiscard]] bool isMainPlayerConceded() const
-    {
-        Player *player = players.value(localPlayerId, nullptr);
-        return player && player->getPlayerInfo()->getConceded();
-    }
+    [[nodiscard]] bool isMainPlayerConceded() const;
 
     [[nodiscard]] bool isLocalPlayer(int playerId) const
     {
         return playerId == getLocalPlayerId();
     }
 
+    const QMap<int, ServerInfo_User> &getSpectators() const
+    {
+        return spectators;
+    }
+
+    ServerInfo_User getSpectator(int playerId) const
+    {
+        return spectators.value(playerId);
+    }
+
+    QString getSpectatorName(int spectatorId) const
+    {
+        return QString::fromStdString(spectators.value(spectatorId).name());
+    }
+
+    void addSpectator(int spectatorId, const ServerInfo_PlayerProperties &prop)
+    {
+        if (!spectators.contains(spectatorId)) {
+            spectators.insert(spectatorId, prop.user_info());
+            emit spectatorAdded(prop);
+        }
+    }
+
+    void removeSpectator(int spectatorId)
+    {
+        ServerInfo_User spectatorInfo = spectators.value(spectatorId);
+        spectators.remove(spectatorId);
+        emit spectatorRemoved(spectatorId, spectatorInfo);
+    }
+
+    Game *getGame() const
+    {
+        return game;
+    }
+
 signals:
     void playerAdded(Player *player);
     void playerRemoved(Player *player);
+    void activeLocalPlayerConceded();
+    void activeLocalPlayerUnconceded();
+    void playerConceded(int playerId);
+    void playerUnconceded(int playerId);
     void playerCountChanged();
+    void spectatorAdded(ServerInfo_PlayerProperties spectator);
+    void spectatorRemoved(int spectatorId, ServerInfo_User spectator);
 };
 
 #endif // COCKATRICE_PLAYER_MANAGER_H

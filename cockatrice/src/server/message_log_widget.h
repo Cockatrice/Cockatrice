@@ -8,6 +8,7 @@
 class Player;
 class PlayerEventHandler;
 class CardZone;
+class Game;
 class GameEventContext;
 class CardItem;
 
@@ -27,14 +28,18 @@ private:
 
     static QPair<QString, QString> getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange);
 
+public:
+    void connectToPlayerEventHandler(PlayerEventHandler *player);
+    MessageLogWidget(TabSupervisor *_tabSupervisor, Game *_game, QWidget *parent = nullptr);
+
 public slots:
     void containerProcessingDone();
     void containerProcessingStarted(const GameEventContext &context);
     void logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal);
     void logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal);
     void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
-    void logConcede(Player *player);
-    void logUnconcede(Player *player);
+    void logConcede(int playerId);
+    void logUnconcede(int playerId);
     void logConnectionStateChanged(Player *player, bool connectionState);
     void logCreateArrow(Player *player,
                         Player *startPlayer,
@@ -89,10 +94,6 @@ public slots:
     void appendHtmlServerMessage(const QString &html,
                                  bool optionalIsBold = false,
                                  QString optionalFontColor = QString()) override;
-
-public:
-    void connectToPlayerEventHandler(PlayerEventHandler *player);
-    MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = nullptr);
 };
 
 #endif

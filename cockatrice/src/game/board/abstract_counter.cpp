@@ -22,11 +22,10 @@ AbstractCounter::AbstractCounter(Player *_player,
                                  bool _shownInCounterArea,
                                  int _value,
                                  bool _useNameForShortcut,
-                                 QGraphicsItem *parent,
-                                 QWidget *_game)
+                                 QGraphicsItem *parent)
     : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value),
       useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
-      deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea), game(_game)
+      deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
     setAcceptHoverEvents(true);
 
@@ -173,7 +172,7 @@ void AbstractCounter::incrementCounter()
 void AbstractCounter::setCounter()
 {
     dialogSemaphore = true;
-    AbstractCounterDialog dialog(name, QString::number(value), game);
+    AbstractCounterDialog dialog(name, QString::number(value) /*, game */);
     const int ok = dialog.exec();
 
     if (deleteAfterDialog) {

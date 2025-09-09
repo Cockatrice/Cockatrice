@@ -51,8 +51,6 @@ void GameScene::addPlayer(Player *player)
     players << player->getGraphicsItem();
     addItem(player->getGraphicsItem());
     connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
-    //  TODO: game scene really shouldn't cue off of this
-    // connect(player, &Player::playerCountChanged, this, &GameScene::rearrange);
 }
 
 void GameScene::removePlayer(Player *player)
@@ -85,7 +83,7 @@ void GameScene::rearrange()
     QListIterator<PlayerGraphicsItem *> playersIter(players);
     while (playersIter.hasNext()) {
         Player *p = playersIter.next()->getPlayer();
-        if (p && !p->getPlayerInfo()->getConceded()) {
+        if (p && !p->getConceded()) {
             playersPlaying.append(p);
             if (!firstPlayerFound && (p->getPlayerInfo()->getLocal())) {
                 firstPlayerIndex = playersPlaying.size() - 1;

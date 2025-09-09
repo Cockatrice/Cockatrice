@@ -146,7 +146,8 @@ void PlayerActions::actViewTopCards()
 {
     int deckSize = player->getDeckZone()->getCards().size();
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("View top cards of library"),
+    // TODO: Signal this
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("View top cards of library"),
                                       tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
                                       deckSize, 1, &ok);
     if (ok) {
@@ -159,7 +160,7 @@ void PlayerActions::actViewBottomCards()
 {
     int deckSize = player->getDeckZone()->getCards().size();
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("View bottom cards of library"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("View bottom cards of library"),
                                       tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberBottomCards, 1,
                                       deckSize, 1, &ok);
     if (ok) {
@@ -232,7 +233,7 @@ void PlayerActions::actShuffleTop()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Shuffle top cards of library"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Shuffle top cards of library"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberTopCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -261,7 +262,7 @@ void PlayerActions::actShuffleBottom()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Shuffle bottom cards of library"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Shuffle bottom cards of library"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -295,7 +296,7 @@ void PlayerActions::actMulligan()
     int handSize = player->getHandZone()->getCards().size();
     int deckSize = player->getDeckZone()->getCards().size() + handSize; // hand is shuffled back into the deck
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Draw hand"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Draw hand"),
                                       tr("Number of cards: (max. %1)").arg(deckSize) + '\n' +
                                           tr("0 and lower are in comparison to current hand size"),
                                       startSize, -handSize, deckSize, 1, &ok);
@@ -321,9 +322,8 @@ void PlayerActions::actDrawCards()
 {
     int deckSize = player->getDeckZone()->getCards().size();
     bool ok;
-    int number =
-        QInputDialog::getInt(player->getGame(), tr("Draw cards"), tr("Number of cards: (max. %1)").arg(deckSize),
-                             defaultNumberTopCards, 1, deckSize, 1, &ok);
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Draw cards"),
+                                      tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1, deckSize, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
         Command_DrawCards cmd;
@@ -393,7 +393,7 @@ void PlayerActions::actMoveTopCardsToGrave()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Move top cards to grave"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Move top cards to grave"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberTopCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -425,7 +425,7 @@ void PlayerActions::actMoveTopCardsToExile()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Move top cards to exile"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Move top cards to exile"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberTopCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -453,7 +453,7 @@ void PlayerActions::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(player->getGame(), movingCardsUntilExprs, movingCardsUntilNumberOfHits,
+    DlgMoveTopCardsUntil dlg(/* player->getGame() */ nullptr, movingCardsUntilExprs, movingCardsUntilNumberOfHits,
                              movingCardsUntilAutoPlay);
     if (!dlg.exec()) {
         return;
@@ -597,7 +597,7 @@ void PlayerActions::actMoveBottomCardsToGrave()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Move bottom cards to grave"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Move bottom cards to grave"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -629,7 +629,7 @@ void PlayerActions::actMoveBottomCardsToExile()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame(), tr("Move bottom cards to exile"),
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Move bottom cards to exile"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -746,9 +746,8 @@ void PlayerActions::actDrawBottomCards()
     }
 
     bool ok;
-    int number =
-        QInputDialog::getInt(player->getGame(), tr("Draw bottom cards"), tr("Number of cards: (max. %1)").arg(maxCards),
-                             defaultNumberBottomCards, 1, maxCards, 1, &ok);
+    int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Draw bottom cards"),
+                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1, maxCards, 1, &ok);
     if (!ok) {
         return;
     } else if (number > maxCards) {
@@ -820,7 +819,7 @@ void PlayerActions::actUntapAll()
 
 void PlayerActions::actRollDie()
 {
-    DlgRollDice dlg(player->getGame());
+    DlgRollDice dlg(/* player->getGame() */ nullptr);
     if (!dlg.exec()) {
         return;
     }
@@ -833,7 +832,7 @@ void PlayerActions::actRollDie()
 
 void PlayerActions::actCreateToken()
 {
-    DlgCreateToken dlg(player->getPlayerMenu()->getPredefinedTokens(), player->getGame());
+    DlgCreateToken dlg(player->getPlayerMenu()->getPredefinedTokens(), /* player->getGame() */ nullptr);
     if (!dlg.exec()) {
         return;
     }
@@ -1021,7 +1020,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
     if (cardRelation->getIsVariable()) {
         bool ok;
         player->setDialogSemaphore(true);
-        int count = QInputDialog::getInt(player->getGame(), tr("Create tokens"), tr("Number:"),
+        int count = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Create tokens"), tr("Number:"),
                                          cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
         player->setDialogSemaphore(false);
         if (!ok) {
@@ -1187,7 +1186,7 @@ void PlayerActions::actMoveCardXCardsFromTop()
     int deckSize = player->getDeckZone()->getCards().size() + 1; // add the card to move to the deck
     bool ok;
     int number =
-        QInputDialog::getInt(player->getGame(), tr("Place card X cards from top of library"),
+        QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Place card X cards from top of library"),
                              tr("Which position should this card be placed:") + "\n" + tr("(max. %1)").arg(deckSize),
                              defaultNumberTopCardsToPlaceBelow, 1, deckSize, 1, &ok);
     number -= 1; // indexes start at 0
@@ -1347,7 +1346,7 @@ void PlayerActions::actSetPT()
     }
     bool ok;
     player->setDialogSemaphore(true);
-    QString pt = getTextWithMax(player->getGame(), tr("Change power/toughness"), tr("Change stats to:"),
+    QString pt = getTextWithMax(/* player->getGame() */ nullptr, tr("Change power/toughness"), tr("Change stats to:"),
                                 QLineEdit::Normal, oldPT, &ok);
     player->setDialogSemaphore(false);
     if (player->clearCardsToDelete() || !ok) {
@@ -1465,7 +1464,7 @@ void PlayerActions::actSetAnnotation()
     }
 
     player->setDialogSemaphore(true);
-    AnnotationDialog *dialog = new AnnotationDialog(player->getGame());
+    AnnotationDialog *dialog = new AnnotationDialog(/* player->getGame() */);
     dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
     dialog->setWindowTitle(tr("Set annotation"));
     dialog->setLabelText(tr("Please enter the new annotation:"));
@@ -1561,8 +1560,8 @@ void PlayerActions::actCardCounterTrigger()
                 auto *card = static_cast<CardItem *>(player->getGameScene()->selectedItems().first());
                 oldValue = card->getCounters().value(counterId, 0);
             }
-            int number = QInputDialog::getInt(player->getGame(), tr("Set counters"), tr("Number:"), oldValue, 0,
-                                              MAX_COUNTERS_ON_CARD, 1, &ok);
+            int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Set counters"), tr("Number:"),
+                                              oldValue, 0, MAX_COUNTERS_ON_CARD, 1, &ok);
             player->setDialogSemaphore(false);
             if (player->clearCardsToDelete() || !ok) {
                 return;

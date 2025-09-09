@@ -16,7 +16,7 @@ class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
 class UserListProxy;
-class TabGame;
+class Game;
 
 class UserMessagePosition
 {
@@ -34,7 +34,7 @@ class ChatView : public QTextBrowser
     Q_OBJECT
 protected:
     TabSupervisor *const tabSupervisor;
-    TabGame *const game;
+    Game *const game;
 
 private:
     enum HoveredItemType
@@ -83,7 +83,7 @@ private slots:
     void actMessageClicked();
 
 public:
-    ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
+    ChatView(TabSupervisor *_tabSupervisor, Game *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
     void virtual appendHtmlServerMessage(const QString &html,

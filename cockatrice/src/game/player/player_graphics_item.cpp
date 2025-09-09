@@ -13,7 +13,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
 
     playerArea = new PlayerArea(this);
 
-    playerTarget = new PlayerTarget(player, playerArea, player->getGame());
+    playerTarget = new PlayerTarget(player, playerArea);
     qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 

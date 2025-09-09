@@ -12,10 +12,8 @@
 PlayerCounter::PlayerCounter(Player *_player,
                              int _id,
                              const QString &_name,
-                             int _value,
-                             QGraphicsItem *parent,
-                             QWidget *game)
-    : AbstractCounter(_player, _id, _name, false, _value, false, parent, game)
+                             int _value, QGraphicsItem *parent)
+    : AbstractCounter(_player, _id, _name, false, _value, false, parent)
 {
 }
 
@@ -52,8 +50,8 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
 }
 
-PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem, QWidget *_game)
-    : ArrowTarget(_owner, parentItem), playerCounter(nullptr), game(_game)
+PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
+    : ArrowTarget(_owner, parentItem), playerCounter(nullptr)
 {
     setCacheMode(DeviceCoordinateCache);
 
@@ -160,7 +158,7 @@ AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, 
         playerCounter->delCounter();
     }
 
-    playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this, game);
+    playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this);
     playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(),
                           boundingRect().height() - playerCounter->boundingRect().height());
     connect(playerCounter, &PlayerCounter::destroyed, this, &PlayerTarget::counterDeleted);

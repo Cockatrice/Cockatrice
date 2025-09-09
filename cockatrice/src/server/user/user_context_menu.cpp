@@ -29,7 +29,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, Game *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
       userListProxy(_tabSupervisor->getUserListManager()), game(_game)
 {

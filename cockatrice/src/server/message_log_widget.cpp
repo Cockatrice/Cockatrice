@@ -1,6 +1,7 @@
 #include "message_log_widget.h"
 
 #include "../client/sound_engine.h"
+#include "../client/tabs/tab_game.h"
 #include "../client/translate_counter_name.h"
 #include "../game/board/card_item.h"
 #include "../game/phase.h"
@@ -141,18 +142,22 @@ void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *t
                                 .arg(cardLink(std::move(targetCardName))));
 }
 
-void MessageLogWidget::logConcede(Player *player)
+void MessageLogWidget::logConcede(int playerId)
 {
     soundEngine->playSound("player_concede");
-    appendHtmlServerMessage(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())),
-                            true);
+    appendHtmlServerMessage(
+        tr("%1 has conceded the game.")
+            .arg(sanitizeHtml(game->getPlayerManager()->getPlayer(playerId)->getPlayerInfo()->getName())),
+        true);
 }
 
-void MessageLogWidget::logUnconcede(Player *player)
+void MessageLogWidget::logUnconcede(int playerId)
 {
     soundEngine->playSound("player_concede");
-    appendHtmlServerMessage(tr("%1 has unconceded the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())),
-                            true);
+    appendHtmlServerMessage(
+        tr("%1 has unconceded the game.")
+            .arg(sanitizeHtml(game->getPlayerManager()->getPlayer(playerId)->getPlayerInfo()->getName())),
+        true);
 }
 
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
@@ -834,7 +839,7 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
     // &PlayerEventHandler::logAlwaysLookAtTopCard, this, &MessageLogWidget::logAlwaysLookAtTopCard);
 }
 
-MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, Game *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
 }

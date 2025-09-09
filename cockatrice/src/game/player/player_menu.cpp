@@ -14,9 +14,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
-        // TODO
-        // connect(_parent, &TabGame::playerAdded, this, &Player::addPlayer);
-        // connect(_parent, &TabGame::playerRemoved, this, &Player::removePlayer);
+        connect(player->getGame()->getPlayerManager(), &PlayerManager::playerAdded, this, &PlayerMenu::addPlayer);
+        connect(player->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this, &PlayerMenu::removePlayer);
     }
 
     const QList<Player *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
@@ -520,7 +519,8 @@ void PlayerMenu::playerListActionTriggered()
     } else if (menu == mRevealTopCard) {
         int deckSize = player->getDeckZone()->getCards().size();
         bool ok;
-        int number = QInputDialog::getInt(player->getGame(), tr("Reveal top cards of library"),
+        // TODO: Correctly parent this
+        int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Reveal top cards of library"),
                                           tr("Number of cards: (max. %1)").arg(deckSize), /* defaultNumberTopCards */ 1,
                                           1, deckSize, 1, &ok);
         if (ok) {
@@ -821,8 +821,10 @@ void PlayerMenu::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         QString relatedCardName = relatedCard->getName();
         CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, player->getGame(),
-                [this, cardRef] { player->getGame()->viewCardInfo(cardRef); });
+        Q_UNUSED(viewCard);
+        // TODO: Signal this
+        /*connect(viewCard, &QAction::triggered, player->getGame(),
+                [this, cardRef] { player->getGame()->viewCardInfo(cardRef); });*/
     }
 }
 
@@ -1200,7 +1202,8 @@ void PlayerMenu::setShortcutsActive()
     if (!player->getGame()->getGameState()->getIsLocalGame()) {
         // unattach action is only active in card menu if the active card is attached.
         // make unattach shortcut always active so that it consistently works when multiple cards are selected.
-        player->getGame()->addAction(aUnattach);
+        // TODO: Signal this
+        // player->getGame()->addAction(aUnattach);
     }
 }
 

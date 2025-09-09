@@ -1,6 +1,7 @@
 #include "game_state.h"
 
-GameState::GameState(int _secondsElapsed,
+GameState::GameState(Game *_game,
+                     int _secondsElapsed,
                      int _hostId,
                      bool _isLocalGame,
                      const QList<AbstractClient *> _clients,
@@ -8,8 +9,9 @@ GameState::GameState(int _secondsElapsed,
                      bool _resuming,
                      int _currentPhase,
                      bool _gameClosed)
-    : secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame), clients(_clients),
-      gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase), gameClosed(_gameClosed)
+    : QObject(_game), game(_game), secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame),
+      clients(_clients), gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase),
+      gameClosed(_gameClosed)
 {
 }
 

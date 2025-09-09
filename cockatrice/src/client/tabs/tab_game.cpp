@@ -46,18 +46,18 @@
 #include <QWidget>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), activeCard(nullptr), sayLabel(nullptr), sayEdit(nullptr)
+    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
 
-    gameMetaInfo = new GameMetaInfo();
-    gameState =
+    /*game->getGameMetaInfo() = new GameMetaInfo();
+    game->getGameState() =
         new GameState(0, -1, _tabSupervisor->getIsLocalGame(), QList<AbstractClient *>(), false, false, -1, false);
     connectToGameState();
 
-    playerManager = new PlayerManager(this, -1, true, false);
+    game->getPlayerManager() = new PlayerManager(this, -1, true, false);
 
-    gameEventHandler = new GameEventHandler(this);
+    game->getGameEventHandler() = new GameEventHandler(this);*/
     connectToGameEventHandler();
 
     createCardInfoDock(true);
@@ -85,7 +85,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);
     refreshShortcuts();
-    messageLog->logReplayStarted(gameMetaInfo->gameId());
+    messageLog->logReplayStarted(game->getGameMetaInfo()->gameId());
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
@@ -94,32 +94,14 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
                  QList<AbstractClient *> &_clients,
                  const Event_GameJoined &event,
                  const QMap<int, QString> &_roomGameTypes)
-    : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager()), activeCard(nullptr)
+    : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
-
-    gameMetaInfo = new GameMetaInfo();
-    gameMetaInfo->setFromProto(event.game_info());
-    gameMetaInfo->setRoomGameTypes(_roomGameTypes);
-    gameState = new GameState(0, event.host_id(), _tabSupervisor->getIsLocalGame(), _clients, false, event.resuming(),
-                              -1, false);
-    connectToGameState();
-
-    playerManager = new PlayerManager(this, event.player_id(), event.spectator(), event.judge());
-    connectToPlayerManager();
-
     // THIS CTOR IS USED ON GAMES
-    gameMetaInfo->setStarted(false);
-
-    connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
-
-    gameEventHandler = new GameEventHandler(this);
-    connectToGameEventHandler();
+    game = new Game(_clients, event, _roomGameTypes);
 
     createCardInfoDock();
     createPlayerListDock();
-    connectPlayerListToGameEventHandler();
     createMessageDock();
-    connectMessageLogToGameEventHandler();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
     createReplayDock(nullptr);
@@ -137,100 +119,115 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     createMenuItems();
     createViewMenuItems();
+
+    connectToGameState();
+    connectToPlayerManager();
+    connectToGameEventHandler();
+    connectPlayerListToGameEventHandler();
+    connectMessageLogToGameEventHandler();
+    connectMessageLogToPlayerHandler();
+
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);
     refreshShortcuts();
 
     // append game to rooms game list for others to see
-    for (int i = gameMetaInfo->gameTypesSize() - 1; i >= 0; i--)
-        gameTypes.append(gameMetaInfo->findRoomGameType(i));
+    for (int i = game->getGameMetaInfo()->gameTypesSize() - 1; i >= 0; i--)
+        gameTypes.append(game->getGameMetaInfo()->findRoomGameType(i));
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
 
 void TabGame::connectToGameState()
 {
-    connect(gameState, &GameState::playerAdded, this, &TabGame::addPlayer);
-    connect(gameState, &GameState::gameStarted, this, &TabGame::startGame);
-    connect(gameState, &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
-    connect(gameState, &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
+    connect(game->getGameState(), &GameState::gameStarted, this, &TabGame::startGame);
+    connect(game->getGameState(), &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
+    connect(game->getGameState(), &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
 }
 
 void TabGame::connectToPlayerManager()
 {
-    connect(playerManager, &PlayerManager::playerAdded, this, &TabGame::addPlayer);
+    connect(game->getPlayerManager(), &PlayerManager::playerAdded, this, &TabGame::addPlayer);
+    // update menu text when player concedes so that "concede" gets updated to "unconcede"
+    connect(game->getPlayerManager(), &PlayerManager::playerConceded, this, &TabGame::retranslateUi);
 }
 
 void TabGame::connectToGameEventHandler()
 {
-    connect(this, &TabGame::gameLeft, gameEventHandler, &GameEventHandler::handleGameLeft);
-    connect(gameEventHandler, &GameEventHandler::gameStopped, this, &TabGame::stopGame);
-    connect(gameEventHandler, &GameEventHandler::gameClosed, this, &TabGame::closeGame);
-    connect(gameEventHandler, &GameEventHandler::localPlayerReadyStateChanged, this,
+    connect(this, &TabGame::gameLeft, game->getGameEventHandler(), &GameEventHandler::handleGameLeft);
+    connect(game->getGameEventHandler(), &GameEventHandler::emitUserEvent, this, &TabGame::emitUserEvent);
+    connect(game->getGameEventHandler(), &GameEventHandler::gameStopped, this, &TabGame::stopGame);
+    connect(game->getGameEventHandler(), &GameEventHandler::gameClosed, this, &TabGame::closeGame);
+    connect(game->getGameEventHandler(), &GameEventHandler::localPlayerReadyStateChanged, this,
             &TabGame::processLocalPlayerReadyStateChanged);
-    connect(gameEventHandler, &GameEventHandler::localPlayerSideboardLocked, this,
+    connect(game->getGameEventHandler(), &GameEventHandler::localPlayerSideboardLocked, this,
             &TabGame::processLocalPlayerSideboardLocked);
-    connect(gameEventHandler, &GameEventHandler::localPlayerDeckSelected, this, &TabGame::processLocalPlayerDeckSelect);
+    connect(game->getGameEventHandler(), &GameEventHandler::localPlayerDeckSelected, this,
+            &TabGame::processLocalPlayerDeckSelect);
 }
 
 void TabGame::connectMessageLogToGameEventHandler()
 {
-    // connect(gameEventHandler, &GameEventHandler:: , messageLog, &MessageLogWidget::);
-    connect(gameEventHandler, &GameEventHandler::gameFlooded, messageLog, &MessageLogWidget::logGameFlooded);
-    connect(gameEventHandler, &GameEventHandler::containerProcessingStarted, messageLog,
+    // connect(game->getGameEventHandler(), &GameEventHandler:: , messageLog, &MessageLogWidget::);
+    connect(game->getGameEventHandler(), &GameEventHandler::gameFlooded, messageLog, &MessageLogWidget::logGameFlooded);
+    connect(game->getGameEventHandler(), &GameEventHandler::containerProcessingStarted, messageLog,
             &MessageLogWidget::containerProcessingStarted);
-    connect(gameEventHandler, &GameEventHandler::containerProcessingDone, messageLog,
+    connect(game->getGameEventHandler(), &GameEventHandler::containerProcessingDone, messageLog,
             &MessageLogWidget::containerProcessingDone);
-    connect(gameEventHandler, &GameEventHandler::setContextJudgeName, messageLog,
+    connect(game->getGameEventHandler(), &GameEventHandler::setContextJudgeName, messageLog,
             &MessageLogWidget::setContextJudgeName);
-    connect(gameEventHandler, &GameEventHandler::logSpectatorSay, messageLog, &MessageLogWidget::logSpectatorSay);
+    connect(game->getGameEventHandler(), &GameEventHandler::logSpectatorSay, messageLog,
+            &MessageLogWidget::logSpectatorSay);
 
-    connect(gameEventHandler, &GameEventHandler::logJoinPlayer, messageLog, &MessageLogWidget::logJoin);
-    connect(gameEventHandler, &GameEventHandler::logJoinSpectator, messageLog, &MessageLogWidget::logJoinSpectator);
-    connect(gameEventHandler, &GameEventHandler::logLeave, messageLog, &MessageLogWidget::logLeave);
-    connect(gameEventHandler, &GameEventHandler::logKicked, messageLog, &MessageLogWidget::logKicked);
-    connect(gameEventHandler, &GameEventHandler::logConnectionStateChanged, messageLog,
+    connect(game->getGameEventHandler(), &GameEventHandler::logJoinPlayer, messageLog, &MessageLogWidget::logJoin);
+    connect(game->getGameEventHandler(), &GameEventHandler::logJoinSpectator, messageLog,
+            &MessageLogWidget::logJoinSpectator);
+    connect(game->getGameEventHandler(), &GameEventHandler::logLeave, messageLog, &MessageLogWidget::logLeave);
+    connect(game->getGameEventHandler(), &GameEventHandler::logKicked, messageLog, &MessageLogWidget::logKicked);
+    connect(game->getGameEventHandler(), &GameEventHandler::logConnectionStateChanged, messageLog,
             &MessageLogWidget::logConnectionStateChanged);
 
-    connect(gameEventHandler, &GameEventHandler::logDeckSelect, messageLog, &MessageLogWidget::logDeckSelect);
-    connect(gameEventHandler, &GameEventHandler::logSideboardLockSet, messageLog,
+    connect(game->getGameEventHandler(), &GameEventHandler::logDeckSelect, messageLog,
+            &MessageLogWidget::logDeckSelect);
+    connect(game->getGameEventHandler(), &GameEventHandler::logSideboardLockSet, messageLog,
             &MessageLogWidget::logSetSideboardLock);
-    connect(gameEventHandler, &GameEventHandler::logReadyStart, messageLog, &MessageLogWidget::logReadyStart);
-    connect(gameEventHandler, &GameEventHandler::logNotReadyStart, messageLog, &MessageLogWidget::logNotReadyStart);
-    connect(gameEventHandler, &GameEventHandler::logGameStart, messageLog, &MessageLogWidget::logGameStart);
+    connect(game->getGameEventHandler(), &GameEventHandler::logReadyStart, messageLog,
+            &MessageLogWidget::logReadyStart);
+    connect(game->getGameEventHandler(), &GameEventHandler::logNotReadyStart, messageLog,
+            &MessageLogWidget::logNotReadyStart);
+    connect(game->getGameEventHandler(), &GameEventHandler::logGameStart, messageLog, &MessageLogWidget::logGameStart);
 
-    connect(gameEventHandler, &GameEventHandler::playerConceded, messageLog, &MessageLogWidget::logConcede);
-    connect(gameEventHandler, &GameEventHandler::playerUnconceded, messageLog, &MessageLogWidget::logUnconcede);
-
-    connect(gameEventHandler, &GameEventHandler::logActivePlayer, messageLog, &MessageLogWidget::logSetActivePlayer);
-    connect(gameEventHandler, &GameEventHandler::logActivePhaseChanged, messageLog,
+    connect(game->getGameEventHandler(), &GameEventHandler::logActivePlayer, messageLog,
+            &MessageLogWidget::logSetActivePlayer);
+    connect(game->getGameEventHandler(), &GameEventHandler::logActivePhaseChanged, messageLog,
             &MessageLogWidget::logSetActivePhase);
 
-    connect(gameEventHandler, &GameEventHandler::logTurnReversed, messageLog, &MessageLogWidget::logReverseTurn);
+    connect(game->getGameEventHandler(), &GameEventHandler::logTurnReversed, messageLog,
+            &MessageLogWidget::logReverseTurn);
 
-    connect(gameEventHandler, &GameEventHandler::logGameClosed, messageLog, &MessageLogWidget::logGameClosed);
+    connect(game->getGameEventHandler(), &GameEventHandler::logGameClosed, messageLog,
+            &MessageLogWidget::logGameClosed);
+}
+
+void TabGame::connectMessageLogToPlayerHandler()
+{
+    connect(game->getPlayerManager(), &PlayerManager::playerConceded, messageLog, &MessageLogWidget::logConcede);
+    connect(game->getPlayerManager(), &PlayerManager::playerUnconceded, messageLog, &MessageLogWidget::logUnconcede);
 }
 
 void TabGame::connectPlayerListToGameEventHandler()
 {
-    connect(gameEventHandler, &GameEventHandler::playerJoined, playerListWidget, &PlayerListWidget::addPlayer);
-    connect(gameEventHandler, &GameEventHandler::playerLeft, playerListWidget, &PlayerListWidget::removePlayer);
-    connect(gameEventHandler, &GameEventHandler::spectatorJoined, playerListWidget, &PlayerListWidget::addPlayer);
-    connect(gameEventHandler, &GameEventHandler::spectatorLeft, playerListWidget, &PlayerListWidget::removePlayer);
-    connect(gameEventHandler, &GameEventHandler::playerPropertiesChanged, playerListWidget,
+    connect(game->getGameEventHandler(), &GameEventHandler::playerJoined, playerListWidget,
+            &PlayerListWidget::addPlayer);
+    connect(game->getGameEventHandler(), &GameEventHandler::playerLeft, playerListWidget,
+            &PlayerListWidget::removePlayer);
+    connect(game->getGameEventHandler(), &GameEventHandler::spectatorJoined, playerListWidget,
+            &PlayerListWidget::addPlayer);
+    connect(game->getGameEventHandler(), &GameEventHandler::spectatorLeft, playerListWidget,
+            &PlayerListWidget::removePlayer);
+    connect(game->getGameEventHandler(), &GameEventHandler::playerPropertiesChanged, playerListWidget,
             &PlayerListWidget::updatePlayerProperties);
-}
-
-bool TabGame::isHost() const
-{
-    return gameState->getHostId() == playerManager->getLocalPlayerId();
-}
-
-void TabGame::loadReplay(GameReplay *replay)
-{
-    gameMetaInfo->setFromProto(replay->game_info());
-    gameMetaInfo->setSpectatorsOmniscient(true);
 }
 
 void TabGame::addMentionTag(const QString &value)
@@ -251,12 +248,12 @@ void TabGame::resetChatAndPhase()
     messageLog->clearChat();
 
     // reset phase markers
-    gameState->setCurrentPhase(-1);
+    game->getGameState()->setCurrentPhase(-1);
 }
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent = !playerManager->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent = !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
@@ -268,9 +265,9 @@ TabGame::~TabGame()
 
 void TabGame::updatePlayerListDockTitle()
 {
-    QString tabText =
-        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameMetaInfo->gameId());
-    QString userCountInfo = QString(" %1/%2").arg(playerManager->getPlayerCount()).arg(gameMetaInfo->maxPlayers());
+    QString tabText = " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" +
+                      QString::number(game->getGameMetaInfo()->gameId());
+    QString userCountInfo = QString(" %1/%2").arg(game->getPlayerManager()->getPlayerCount()).arg(game->getGameMetaInfo()->maxPlayers());
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
                                    (playerListDock->isWindow() ? tabText : QString()));
 }
@@ -278,7 +275,7 @@ void TabGame::updatePlayerListDockTitle()
 void TabGame::retranslateUi()
 {
     QString tabText =
-        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(gameMetaInfo->gameId());
+        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(game->getGameMetaInfo()->gameId());
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -317,7 +314,7 @@ void TabGame::retranslateUi()
     if (aGameInfo)
         aGameInfo->setText(tr("Game &information"));
     if (aConcede) {
-        if (playerManager->isMainPlayerConceded()) {
+        if (game->getPlayerManager()->isMainPlayerConceded()) {
             aConcede->setText(tr("Un&concede"));
         } else {
             aConcede->setText(tr("&Concede"));
@@ -364,7 +361,7 @@ void TabGame::retranslateUi()
 
     cardInfoFrameWidget->retranslateUi();
 
-    QMapIterator<int, Player *> i(playerManager->getPlayers());
+    QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
 
     while (i.hasNext())
         i.next().value()->retranslateUi();
@@ -478,35 +475,34 @@ void TabGame::updateTimeElapsedLabel(const QString newTime)
 
 void TabGame::adminLockChanged(bool lock)
 {
-    bool v = !(playerManager->isSpectator() && !gameMetaInfo->spectatorsCanChat() && lock);
+    bool v = !(game->getPlayerManager()->isSpectator() && !game->getGameMetaInfo()->spectatorsCanChat() && lock);
     sayLabel->setVisible(v);
     sayEdit->setVisible(v);
 }
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(gameMetaInfo->proto(), gameMetaInfo->getRoomGameTypes(), this);
+    DlgCreateGame dlg(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
     dlg.exec();
 }
 
 void TabGame::actConcede()
 {
-    Player *player = playerManager->getActiveLocalPlayer(gameState->getActivePlayer());
+    Player *player = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     if (player == nullptr)
         return;
-    if (!player->getPlayerInfo()->getConceded()) {
+    if (!player->getConceded()) {
         if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
-
-        emit playerConceded();
+        player->setConceded(true);
     } else {
         if (QMessageBox::question(this, tr("Unconcede"),
                                   tr("You have already conceded.  Do you want to return to this game?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
 
-        emit playerUnconceded();
+        player->setConceded(false);
     }
 }
 
@@ -517,8 +513,8 @@ void TabGame::actConcede()
  */
 bool TabGame::leaveGame()
 {
-    if (!gameState->isGameClosed()) {
-        if (!playerManager->isSpectator()) {
+    if (!game->getGameState()->isGameClosed()) {
+        if (!game->getPlayerManager()->isSpectator()) {
             tabSupervisor->setCurrentWidget(this);
             if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                       QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
@@ -566,7 +562,7 @@ void TabGame::removePlayerFromAutoCompleteList(QString playerName)
 void TabGame::removeSpectator(int spectatorId, ServerInfo_User spectator)
 {
     Q_UNUSED(spectator);
-    QString playerName = "@" + gameState->getSpectatorName(spectatorId);
+    QString playerName = "@" + game->getPlayerManager()->getSpectatorName(spectatorId);
     removePlayerFromAutoCompleteList(playerName);
 }
 
@@ -578,7 +574,7 @@ void TabGame::actPhaseAction()
 
 void TabGame::actNextPhase()
 {
-    int phase = gameState->getCurrentPhase();
+    int phase = game->getGameState()->getCurrentPhase();
     if (++phase >= phasesToolbar->phaseCount())
         phase = 0;
 
@@ -587,7 +583,7 @@ void TabGame::actNextPhase()
 
 void TabGame::actNextPhaseAction()
 {
-    int phase = gameState->getCurrentPhase() + 1;
+    int phase = game->getGameState()->getCurrentPhase() + 1;
     if (phase >= phasesToolbar->phaseCount()) {
         phase = 0;
     }
@@ -603,7 +599,7 @@ void TabGame::actNextPhaseAction()
 
 void TabGame::actRemoveLocalArrows()
 {
-    QMapIterator<int, Player *> playerIterator(playerManager->getPlayers());
+    QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
     while (playerIterator.hasNext()) {
         Player *player = playerIterator.next().value();
         if (!player->getPlayerInfo()->getLocal())
@@ -635,7 +631,7 @@ void TabGame::actCompleterChanged()
 void TabGame::notifyPlayerJoin(QString playerName)
 {
     if (trayIcon) {
-        QString gameId(QString::number(gameMetaInfo->gameId()));
+        QString gameId(QString::number(game->getGameMetaInfo()->gameId()));
         trayIcon->showMessage(tr("A player has joined game #%1").arg(gameId),
                               tr("%1 has joined the game").arg(playerName));
     }
@@ -671,7 +667,8 @@ Player *TabGame::addPlayer(Player *newPlayer)
 
     messageLog->connectToPlayerEventHandler(newPlayer->getPlayerEventHandler());
 
-    if (playerManager->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) && !playerManager->isSpectator()) {
+    if (game->getGameState()->getIsLocalGame() ||
+        (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) && !game->getPlayerManager()->isSpectator())) {
         addLocalPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
     }
 
@@ -679,17 +676,12 @@ Player *TabGame::addPlayer(Player *newPlayer)
 
     createZoneForPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
 
-    // update menu text when player concedes so that "concede" gets updated to "unconcede"
-    // TODO: Hook this back up
-    // connect(newPlayer, &Player::playerCountChanged, this, &TabGame::retranslateUi);
-
-    emit playerAdded(newPlayer);
     return newPlayer;
 }
 
 void TabGame::addLocalPlayer(Player *newPlayer, int playerId)
 {
-    if (gameState->getClients().size() == 1) {
+    if (game->getGameState()->getClients().size() == 1) {
         newPlayer->getPlayerMenu()->setShortcutsActive();
     }
 
@@ -765,12 +757,12 @@ void TabGame::processLocalPlayerReadyStateChanged(int playerId, bool ready)
 
 void TabGame::createZoneForPlayer(Player *newPlayer, int playerId)
 {
-    if (!gameState->getSpectators().contains(playerId)) {
+    if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
 
         // Loop for each player, the idea is to have one assigned zone for each non-spectator player
-        for (int i = 1; i <= playerManager->getPlayerCount(); ++i) {
+        for (int i = 1; i <= game->getPlayerManager()->getPlayerCount(); ++i) {
             bool aPlayerHasThisZone = false;
-            for (auto &player : playerManager->getPlayers()) {
+            for (auto &player : game->getPlayerManager()->getPlayers()) {
                 if (player->getPlayerInfo()->getZoneId() == i) {
                     aPlayerHasThisZone = true;
                     break;
@@ -784,23 +776,9 @@ void TabGame::createZoneForPlayer(Player *newPlayer, int playerId)
     }
 }
 
-AbstractClient *TabGame::getClientForPlayer(int playerId) const
-{
-    if (gameState->getClients().size() > 1) {
-        if (playerId == -1) {
-            playerId = playerManager->getActiveLocalPlayer(gameState->getActivePlayer())->getPlayerInfo()->getId();
-        }
-
-        return gameState->getClients().at(playerId);
-    } else if (gameState->getClients().isEmpty())
-        return nullptr;
-    else
-        return gameState->getClients().first();
-}
-
 void TabGame::startGame(bool _resuming)
 {
-    gameState->setCurrentPhase(-1);
+    game->getGameState()->setCurrentPhase(-1);
 
     QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
     while (i.hasNext()) {
@@ -813,13 +791,13 @@ void TabGame::startGame(bool _resuming)
     mainWidget->setCurrentWidget(gamePlayAreaWidget);
 
     if (!_resuming) {
-        QMapIterator<int, Player *> playerIterator(playerManager->getPlayers());
+        QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
         while (playerIterator.hasNext())
             playerIterator.next().value()->setGameStarted();
     }
 
-    playerListWidget->setGameStarted(true, gameState->isResuming());
-    gameMetaInfo->setStarted(true);
+    playerListWidget->setGameStarted(true, game->getGameState()->isResuming());
+    game->getGameMetaInfo()->setStarted(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
 }
 
@@ -847,27 +825,27 @@ void TabGame::closeGame()
 
 Player *TabGame::setActivePlayer(int id)
 {
-    Player *player = playerManager->getPlayer(id);
+    Player *player = game->getPlayerManager()->getPlayer(id);
     if (!player)
         return nullptr;
 
     playerListWidget->setActivePlayer(id);
-    QMapIterator<int, Player *> i(playerManager->getPlayers());
+    QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
     while (i.hasNext()) {
         i.next();
         if (i.value() == player) {
             i.value()->setActive(true);
-            if (gameState->getClients().size() > 1) {
+            if (game->getGameState()->getClients().size() > 1) {
                 i.value()->getPlayerMenu()->setShortcutsActive();
             }
         } else {
             i.value()->setActive(false);
-            if (gameState->getClients().size() > 1) {
+            if (game->getGameState()->getClients().size() > 1) {
                 i.value()->getPlayerMenu()->setShortcutsInactive();
             }
         }
     }
-    gameState->setCurrentPhase(-1);
+    game->getGameState()->setCurrentPhase(-1);
     emitUserEvent();
     return player;
 }
@@ -886,19 +864,6 @@ void TabGame::newCardAdded(AbstractCardItem *card)
     connect(card, &AbstractCardItem::cardShiftClicked, this, &TabGame::linkCardToChat);
 }
 
-CardItem *TabGame::getCard(int playerId, const QString &zoneName, int cardId) const
-{
-    Player *player = playerManager->getPlayer(playerId);
-    if (!player)
-        return nullptr;
-
-    CardZoneLogic *zone = player->getZones().value(zoneName, 0);
-    if (!zone)
-        return nullptr;
-
-    return zone->getCard(cardId);
-}
-
 QString TabGame::getTabText() const
 {
     QString gameTypeInfo;
@@ -908,8 +873,8 @@ QString TabGame::getTabText() const
             gameTypeInfo.append("...");
     }
 
-    QString gameDesc(gameMetaInfo->description());
-    QString gameId(QString::number(gameMetaInfo->gameId()));
+    QString gameDesc(game->getGameMetaInfo()->description());
+    QString gameId(QString::number(game->getGameMetaInfo()->gameId()));
 
     QString tabText;
     if (replayManager->replay)
@@ -927,11 +892,6 @@ QString TabGame::getTabText() const
     tabText.append("#" + gameId);
 
     return tabText;
-}
-
-void TabGame::setActiveCard(CardItem *card)
-{
-    activeCard = card;
 }
 
 /**
@@ -954,17 +914,17 @@ void TabGame::createMenuItems()
 {
     aNextPhase = new QAction(this);
     connect(aNextPhase, &QAction::triggered, this, &TabGame::actNextPhase);
-    connect(this, &TabGame::phaseChanged, gameEventHandler, &GameEventHandler::handleActivePhaseChanged);
+    connect(this, &TabGame::phaseChanged, game->getGameEventHandler(), &GameEventHandler::handleActivePhaseChanged);
     aNextPhaseAction = new QAction(this);
     connect(aNextPhaseAction, &QAction::triggered, this, &TabGame::actNextPhaseAction);
-    connect(this, &TabGame::turnAdvanced, gameEventHandler, &GameEventHandler::handleNextTurn);
+    connect(this, &TabGame::turnAdvanced, game->getGameEventHandler(), &GameEventHandler::handleNextTurn);
     aNextTurn = new QAction(this);
-    connect(aNextTurn, &QAction::triggered, gameEventHandler, &GameEventHandler::handleNextTurn);
+    connect(aNextTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleNextTurn);
     aReverseTurn = new QAction(this);
-    connect(aReverseTurn, &QAction::triggered, gameEventHandler, &GameEventHandler::handleReverseTurn);
+    connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
-    connect(this, &TabGame::arrowDeletionRequested, gameEventHandler, &GameEventHandler::handleArrowDeletion);
+    connect(this, &TabGame::arrowDeletionRequested, game->getGameEventHandler(), &GameEventHandler::handleArrowDeletion);
     aRotateViewCW = new QAction(this);
     connect(aRotateViewCW, &QAction::triggered, this, &TabGame::actRotateViewCW);
     aRotateViewCCW = new QAction(this);
@@ -973,8 +933,10 @@ void TabGame::createMenuItems()
     connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
-    connect(this, &TabGame::playerConceded, gameEventHandler, &GameEventHandler::handlePlayerConceded);
-    connect(this, &TabGame::playerUnconceded, gameEventHandler, &GameEventHandler::handlePlayerUnconceded);
+    connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerConceded, game->getGameEventHandler(),
+            &GameEventHandler::handleActiveLocalPlayerConceded);
+    connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerUnconceded, game->getGameEventHandler(),
+            &GameEventHandler::handleActiveLocalPlayerUnconceded);
     aLeaveGame = new QAction(this);
     connect(aLeaveGame, &QAction::triggered, this, &TabGame::closeRequest);
     aFocusChat = new QAction(this);
@@ -1209,9 +1171,11 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay)
-        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, gameEventHandler,
+        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
                 qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
     scene = new GameScene(phasesToolbar, this);
+    connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
+    connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
     gameView = new GameView(scene);
 
     auto gamePlayAreaVBox = new QVBoxLayout;
@@ -1282,9 +1246,9 @@ void TabGame::createCardInfoDock(bool bReplay)
 void TabGame::createPlayerListDock(bool bReplay)
 {
     if (bReplay) {
-        playerListWidget = new PlayerListWidget(nullptr, nullptr, this);
+        playerListWidget = new PlayerListWidget(nullptr, nullptr, game);
     } else {
-        playerListWidget = new PlayerListWidget(tabSupervisor, gameState->getClients().first(), this);
+        playerListWidget = new PlayerListWidget(tabSupervisor, game->getGameState()->getClients().first(), game);
         connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this,
                 SIGNAL(openMessageDialog(QString, bool)));
     }
@@ -1310,14 +1274,14 @@ void TabGame::createMessageDock(bool bReplay)
     if (!bReplay) {
         timeElapsedLabel = new QLabel;
         timeElapsedLabel->setAlignment(Qt::AlignCenter);
-        connect(gameState, &GameState::updateTimeElapsedLabel, this, &TabGame::updateTimeElapsedLabel);
-        gameState->startGameTimer();
+        connect(game->getGameState(), &GameState::updateTimeElapsedLabel, this, &TabGame::updateTimeElapsedLabel);
+        game->getGameState()->startGameTimer();
 
         messageLogLayout->addWidget(timeElapsedLabel);
     }
 
     // message log
-    messageLog = new MessageLogWidget(tabSupervisor, this);
+    messageLog = new MessageLogWidget(tabSupervisor, game);
     connect(messageLog, &MessageLogWidget::cardNameHovered, cardInfoFrameWidget,
             qOverload<const QString &>(&CardInfoFrameWidget::setCard));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
@@ -1338,7 +1302,7 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit = new LineEditCompleter;
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
         sayLabel->setBuddy(sayEdit);
-        connect(this, &TabGame::chatMessageSent, gameEventHandler, &GameEventHandler::handleChatMessageSent);
+        connect(this, &TabGame::chatMessageSent, game->getGameEventHandler(), &GameEventHandler::handleChatMessageSent);
         completer = new QCompleter(autocompleteUserList, sayEdit);
         completer->setCaseSensitivity(Qt::CaseInsensitive);
         completer->setMaxVisibleItems(5);
@@ -1347,14 +1311,14 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setCompleter(completer);
         actCompleterChanged();
 
-        if (playerManager->isSpectator()) {
+        if (game->getPlayerManager()->isSpectator()) {
             /* Spectators can only talk if:
              * (a) the game creator allows it
              * (b) the spectator is a moderator/administrator
              * (c) the spectator is a judge
              */
-            bool isModOrJudge = !tabSupervisor->getAdminLocked() || playerManager->isJudge();
-            if (!isModOrJudge && !gameMetaInfo->spectatorsCanChat()) {
+            bool isModOrJudge = !tabSupervisor->getAdminLocked() || game->getPlayerManager()->isJudge();
+            if (!isModOrJudge && !game->getGameMetaInfo()->spectatorsCanChat()) {
                 sayLabel->hide();
                 sayEdit->hide();
             }

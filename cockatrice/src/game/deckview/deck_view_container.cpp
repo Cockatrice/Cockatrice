@@ -157,7 +157,7 @@ void DeckViewContainer::switchToDeckSelectView()
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
-    setVisibility(loadRemoteButton, !parentGame->getGameState()->getIsLocalGame());
+    setVisibility(loadRemoteButton, !parentGame->getGame()->getGameState()->getIsLocalGame());
     setVisibility(loadFromClipboardButton, true);
     setVisibility(loadFromWebsiteButton, true);
     setVisibility(unloadDeckButton, false);
@@ -190,7 +190,7 @@ void DeckViewContainer::switchToDeckLoadedView()
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
 
-    if (parentGame->isHost()) {
+    if (parentGame->getGame()->isHost()) {
         setVisibility(forceStartGameButton, true);
     }
 }
@@ -287,20 +287,20 @@ void DeckViewContainer::loadDeckFromDeckLoader(const DeckLoader *deck)
 
     Command_DeckSelect cmd;
     cmd.set_deck(deckString.toStdString());
-    PendingCommand *pend = parentGame->getGameEventHandler()->prepareGameCommand(cmd);
+    PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
-    parentGame->getGameEventHandler()->sendGameCommand(pend, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
 }
 
 void DeckViewContainer::loadRemoteDeck()
 {
-    DlgLoadRemoteDeck dlg(parentGame->getClientForPlayer(playerId), this);
+    DlgLoadRemoteDeck dlg(parentGame->getGame()->getClientForPlayer(playerId), this);
     if (dlg.exec()) {
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
-        PendingCommand *pend = parentGame->getGameEventHandler()->prepareGameCommand(cmd);
+        PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
-        parentGame->getGameEventHandler()->sendGameCommand(pend, playerId);
+        parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
     }
 }
 
@@ -354,7 +354,7 @@ void DeckViewContainer::forceStart()
     Command_ReadyStart cmd;
     cmd.set_force_start(true);
     cmd.set_ready(true);
-    parentGame->getGameEventHandler()->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::sideboardLockButtonClicked()
@@ -362,7 +362,7 @@ void DeckViewContainer::sideboardLockButtonClicked()
     Command_SetSideboardLock cmd;
     cmd.set_locked(sideboardLockButton->getState());
 
-    parentGame->getGameEventHandler()->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::sideboardPlanChanged()
@@ -371,7 +371,7 @@ void DeckViewContainer::sideboardPlanChanged()
     const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
     for (const auto &i : newPlan)
         cmd.add_move_list()->CopyFrom(i);
-    parentGame->getGameEventHandler()->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 /**
@@ -381,7 +381,7 @@ void DeckViewContainer::sendReadyStartCommand(bool ready)
 {
     Command_ReadyStart cmd;
     cmd.set_ready(ready);
-    parentGame->getGameEventHandler()->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 /**

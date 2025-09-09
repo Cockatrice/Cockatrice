@@ -1,7 +1,7 @@
 #ifndef REPLAY_TIMELINE_WIDGET
 #define REPLAY_TIMELINE_WIDGET
 
-#include "../../game/player/player.h"
+#include "../../game/player/event_processing_options.h"
 
 #include <QList>
 #include <QMouseEvent>
