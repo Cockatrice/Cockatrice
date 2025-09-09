@@ -365,9 +365,9 @@ void CardItem::playCard(bool faceDown)
     if (!owner->getPlayerInfo()->getLocalOrJudge())
         return;
 
-    TableZone *tz = qobject_cast<TableZone *>(zone);
+    TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(zone);
     if (tz)
-        tz->toggleTapped();
+        emit tz->toggleTapped();
     else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
             faceDown ? zone->getPlayer()->getPlayerActions()->actPlayFacedown()

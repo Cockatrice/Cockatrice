@@ -7,6 +7,7 @@ class TableZoneLogic : public CardZoneLogic
     Q_OBJECT
 signals:
     void contentSizeChanged();
+    void toggleTapped();
 
 public:
     TableZoneLogic(Player *_player,

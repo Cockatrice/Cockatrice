@@ -23,6 +23,7 @@ const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone(_logic, parent), active(false)
 {
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
+    connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
     connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
             &TableZone::reorganizeCards);
