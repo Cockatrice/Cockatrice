@@ -47,6 +47,8 @@ public slots:
     void actSwapCard();
     void actRemoveCard();
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void initializeFormats();
+    void checkDeckFormatLegality();
 
 signals:
     void nameChanged();
@@ -72,6 +74,8 @@ private:
     LineEditUnfocusable *hashLabel;
     QLabel *activeGroupCriteriaLabel;
     QComboBox *activeGroupCriteriaComboBox;
+    QLabel *formatLabel;
+    QComboBox *formatComboBox;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 

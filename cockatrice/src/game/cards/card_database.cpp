@@ -547,6 +547,24 @@ QMap<QString, int> CardDatabase::getAllSubCardTypesWithCount() const
     return typeCounts;
 }
 
+QMap<QString, int> CardDatabase::getAllFormatsWithCount() const
+{
+    QMap<QString, int> formatCounts;
+
+    for (const auto &card : cards.values()) {
+        QStringList allProps = card->getProperties();
+
+        for (const QString &prop : allProps) {
+            if (prop.startsWith("format-")) {
+                QString formatName = prop.mid(QStringLiteral("format-").size());
+                formatCounts[formatName]++;
+            }
+        }
+    }
+
+    return formatCounts;
+}
+
 void CardDatabase::checkUnknownSets()
 {
     auto _sets = getSetList();

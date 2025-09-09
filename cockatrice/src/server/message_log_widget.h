@@ -6,6 +6,7 @@
 #include "user_level.h"
 
 class Player;
+class PlayerEventHandler;
 class CardZone;
 class GameEventContext;
 class CardItem;
@@ -90,7 +91,7 @@ public slots:
                                  QString optionalFontColor = QString()) override;
 
 public:
-    void connectToPlayer(Player *player);
+    void connectToPlayerEventHandler(PlayerEventHandler *player);
     MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent = nullptr);
 };
 

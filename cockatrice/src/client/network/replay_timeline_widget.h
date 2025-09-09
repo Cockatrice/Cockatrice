@@ -14,7 +14,7 @@ class ReplayTimelineWidget : public QWidget
 {
     Q_OBJECT
 signals:
-    void processNextEvent(Player::EventProcessingOptions options);
+    void processNextEvent(EventProcessingOptions options);
     void replayFinished();
     void rewound();
 

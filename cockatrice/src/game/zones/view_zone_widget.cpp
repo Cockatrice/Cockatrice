@@ -29,7 +29,7 @@
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  */
 ZoneViewWidget::ZoneViewWidget(Player *_player,
-                               CardZone *_origZone,
+                               CardZoneLogic *_origZone,
                                int numberCards,
                                bool _revealZone,
                                bool _writeableRevealZone,
@@ -130,8 +130,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     vbox->addItem(zoneHBox);
 
-    zone =
-        new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer, _isReversed);
+    zone = new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
+                                                  _isReversed, zoneContainer),
+                            zoneContainer);
     connect(zone, &ZoneViewZone::wheelEventReceived, scrollBarProxy, &ScrollableGraphicsProxyWidget::recieveWheelEvent);
 
     retranslateUi();
@@ -211,7 +212,7 @@ void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 
 void ZoneViewWidget::retranslateUi()
 {
-    setWindowTitle(zone->getTranslatedName(false, CaseNominative));
+    setWindowTitle(zone->getLogic()->getTranslatedName(false, CaseNominative));
 
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
         int oldIndex = groupBySelector.currentIndex();
@@ -353,7 +354,7 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
     if (shuffleCheckBox.isChecked())
-        player->sendGameCommand(Command_Shuffle());
+        player->getPlayerActions()->sendGameCommand(Command_Shuffle());
     zoneDeleted();
     event->accept();
 }

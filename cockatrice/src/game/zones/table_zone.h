@@ -2,6 +2,7 @@
 #define TABLEZONE_H
 
 #include "../board/abstract_card_item.h"
+#include "logic/table_zone_logic.h"
 #include "select_zone.h"
 
 /*
@@ -75,7 +76,7 @@ private:
     /*
        If this TableZone is currently active
      */
-    bool active;
+    bool active = false;
 
     bool isInverted() const;
 
@@ -98,7 +99,7 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    explicit TableZone(Player *_p, const QString &name, QGraphicsItem *parent = nullptr);
+    explicit TableZone(TableZoneLogic *_logic, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.
@@ -121,12 +122,14 @@ public:
     /**
        See HandleDropEventByGrid
      */
-    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint) override;
+    void
+    handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
 
     /**
        Handles the placement of cards
      */
-    void handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint);
+    void
+    handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &gridPoint);
 
     /**
        @return CardItem from grid location
@@ -141,16 +144,6 @@ public:
     QPointF closestGridPoint(const QPointF &point) override;
 
     static int clampValidTableRow(const int row);
-
-    /**
-       Removes a card from view.
-
-       @param position card position
-       @param cardId id of card to take
-       @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
-       @return CardItem that has been removed
-     */
-    CardItem *takeCard(int position, int cardId, bool toNewZone = true) override;
 
     /**
        Resizes the TableZone in case CardItems are within or
@@ -176,9 +169,6 @@ public:
         active = _active;
         update();
     }
-
-protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
 
 private:
     void paintZoneOutline(QPainter *painter);

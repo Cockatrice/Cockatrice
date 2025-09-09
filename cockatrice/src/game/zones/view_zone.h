@@ -2,6 +2,7 @@
 #define ZONEVIEWERZONE_H
 
 #include "../filters/filter_string.h"
+#include "logic/view_zone_logic.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
@@ -33,22 +34,10 @@ private:
     static constexpr int VERTICAL_PADDING = 5;
 
     QRectF bRect, optimumRect;
-    int minRows, numberCards;
-    CardZone *origZone;
-    bool revealZone, writeableRevealZone;
+    int minRows;
     FilterString filterString = FilterString("");
     CardList::SortOption groupBy, sortBy;
     bool pileView;
-    bool isReversed;
-
-    enum CardAction
-    {
-        INITIALIZE,
-        ADD_CARD,
-        REMOVE_CARD
-    };
-
-    void updateCardIds(CardAction action);
 
     struct GridSize
     {
@@ -58,43 +47,19 @@ private:
 
     GridSize positionCardsForDisplay(CardList &cards, CardList::SortOption pileOption = CardList::NoSort);
 
-    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint) override;
+    void
+    handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
 
 public:
-    ZoneViewZone(Player *_p,
-                 CardZone *_origZone,
-                 int _numberCards = -1,
-                 bool _revealZone = false,
-                 bool _writeableRevealZone = false,
-                 QGraphicsItem *parent = nullptr,
-                 bool _isReversed = false);
+    ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void reorganizeCards() override;
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
-    bool prepareAddCard(int x);
-    void removeCard(int position, bool toNewZone);
-    int getNumberCards() const
-    {
-        return numberCards;
-    }
     void setGeometry(const QRectF &rect) override;
     QRectF getOptimumRect() const
     {
         return optimumRect;
-    }
-    bool getRevealZone() const
-    {
-        return revealZone;
-    }
-    bool getWriteableRevealZone() const
-    {
-        return writeableRevealZone;
-    }
-    void setWriteableRevealZone(bool _writeableRevealZone);
-    bool getIsReversed() const
-    {
-        return isReversed;
     }
 public slots:
     void close();
@@ -110,7 +75,6 @@ signals:
     void wheelEventReceived(QGraphicsSceneWheelEvent *event);
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 };

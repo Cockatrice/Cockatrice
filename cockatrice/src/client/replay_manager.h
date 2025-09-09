@@ -26,7 +26,7 @@ private:
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
 private slots:
-    void replayNextEvent(Player::EventProcessingOptions options);
+    void replayNextEvent(EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
     void replayFastForwardButtonToggled(bool checked);

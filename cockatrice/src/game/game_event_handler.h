@@ -75,9 +75,8 @@ public:
 
     void commandFinished(const Response &response);
 
-    void processGameEventContainer(const GameEventContainer &cont,
-                                   AbstractClient *client,
-                                   Player::EventProcessingOptions options);
+    void
+    processGameEventContainer(const GameEventContainer &cont, AbstractClient *client, EventProcessingOptions options);
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 public slots:

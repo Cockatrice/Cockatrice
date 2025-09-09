@@ -190,7 +190,7 @@ void DeckViewContainer::switchToDeckLoadedView()
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
 
-    if (parentGame->getGameState()->isHost()) {
+    if (parentGame->isHost()) {
         setVisibility(forceStartGameButton, true);
     }
 }

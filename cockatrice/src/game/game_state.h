@@ -18,25 +18,13 @@ class GameState : public QObject
 public:
     explicit GameState(int secondsElapsed,
                        int hostId,
-                       int localPlayerId,
                        bool isLocalGame,
                        QList<AbstractClient *> clients,
-                       bool spectator,
-                       bool judge,
                        bool gameStateKnown,
                        bool resuming,
                        int currentPhase,
                        bool gameClosed);
 
-    const QMap<int, Player *> &getPlayers() const
-    {
-        return players;
-    }
-
-    int getPlayerCount() const
-    {
-        return players.size();
-    }
 
     const QMap<int, ServerInfo_User> &getSpectators() const
     {
@@ -68,24 +56,9 @@ public:
         emit spectatorRemoved(spectatorId, spectatorInfo);
     }
 
-    bool isHost() const
-    {
-        return hostId == localPlayerId;
-    }
-
     void setHostId(int _hostId)
     {
         hostId = _hostId;
-    }
-
-    bool isJudge() const
-    {
-        return judge;
-    }
-
-    int getLocalPlayerId() const
-    {
-        return localPlayerId;
     }
 
     QList<AbstractClient *> getClients() const
@@ -93,70 +66,9 @@ public:
         return clients;
     }
 
-    bool isLocalPlayer(int playerId) const
-    {
-        return clients.size() > 1 || playerId == getLocalPlayerId();
-    }
-
-    Player *addPlayer(int playerId, const ServerInfo_User &info, TabGame *game)
-    {
-        auto *newPlayer = new Player(info, playerId, isLocalPlayer(playerId), isJudge(), game);
-        // TODO
-        // connect(newPlayer, &Player::openDeckEditor, game, &TabGame::openDeckEditor);
-        players.insert(playerId, newPlayer);
-        emit playerAdded(newPlayer);
-        return newPlayer;
-    }
-
-    void removePlayer(int playerId)
-    {
-        Player *player = getPlayer(playerId);
-        if (!player) {
-            return;
-        }
-        players.remove(playerId);
-        emit playerRemoved(player);
-    }
-
-    Player *getPlayer(int playerId)
-    {
-        Player *player = players.value(playerId, 0);
-        if (!player)
-            return nullptr;
-        return player;
-    }
-
-    Player *getActiveLocalPlayer() const
-    {
-        Player *active = players.value(activePlayer, 0);
-        if (active)
-            if (active->getLocal())
-                return active;
-
-        QMapIterator<int, Player *> playerIterator(players);
-        while (playerIterator.hasNext()) {
-            Player *temp = playerIterator.next().value();
-            if (temp->getLocal())
-                return temp;
-        }
-
-        return nullptr;
-    }
-
-    void setActivePlayer(int activePlayerId)
-    {
-        activePlayer = activePlayerId;
-        emit activePlayerChanged(activePlayer);
-    }
-
     bool getIsLocalGame() const
     {
         return isLocalGame;
-    }
-
-    bool isSpectator() const
-    {
-        return spectator;
     }
 
     bool isResuming() const
@@ -185,10 +97,15 @@ public:
         emit activePhaseChanged(phase);
     }
 
-    bool isMainPlayerConceded() const
+    void setActivePlayer(int activePlayerId)
     {
-        Player *player = players.value(localPlayerId, nullptr);
-        return player && player->getConceded();
+        activePlayer = activePlayerId;
+        emit activePlayerChanged(activePlayer);
+    }
+
+    int getActivePlayer() const
+    {
+        return activePlayer;
     }
 
     void setGameClosed(bool closed)
@@ -213,9 +130,24 @@ public:
 
     void startGameTimer();
 
+    QMap<int, QString> getRoomGameTypes() const
+    {
+        return roomGameTypes;
+    }
+
+    void setRoomGameTypes(QMap<int, QString> _roomGameTypes)
+    {
+        roomGameTypes = _roomGameTypes;
+    }
+
     void setGameStateKnown(bool known)
     {
         gameStateKnown = known;
+    }
+
+    int getHostId() const
+    {
+        return hostId;
     }
 
 signals:
@@ -236,14 +168,11 @@ public slots:
 private:
     QTimer *gameTimer;
     int secondsElapsed;
+    QMap<int, QString> roomGameTypes;
     int hostId;
-    int localPlayerId;
     const bool isLocalGame;
-    QMap<int, Player *> players;
     QMap<int, ServerInfo_User> spectators;
     QList<AbstractClient *> clients;
-    bool spectator;
-    bool judge;
     bool gameStateKnown;
     bool resuming;
     QStringList phasesList;

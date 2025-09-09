@@ -4,6 +4,7 @@
 #include "../cards/exact_card.h"
 #include "arrow_target.h"
 #include "card_ref.h"
+#include "graphics_item_type.h"
 
 class Player;
 

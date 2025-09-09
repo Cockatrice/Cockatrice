@@ -5,6 +5,7 @@
 #include "../board/card_item.h"
 #include "../cards/card_info.h"
 #include "../player/player.h"
+#include "logic/view_zone_logic.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/response_dump_zone.pb.h"
@@ -23,21 +24,14 @@
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  * @param parent the parent QGraphicsWidget containing the reveal zone
  */
-ZoneViewZone::ZoneViewZone(Player *_p,
-                           CardZone *_origZone,
-                           int _numberCards,
-                           bool _revealZone,
-                           bool _writeableRevealZone,
-                           QGraphicsItem *parent,
-                           bool _isReversed)
-    : SelectZone(_p, _origZone->getName(), false, false, true, parent), bRect(QRectF()), minRows(0),
-      numberCards(_numberCards), origZone(_origZone), revealZone(_revealZone),
-      writeableRevealZone(_writeableRevealZone), groupBy(CardList::NoSort), sortBy(CardList::NoSort),
-      isReversed(_isReversed)
+ZoneViewZone::ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent)
+    : SelectZone(_logic, parent), bRect(QRectF()), minRows(0), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {
-    if (!(revealZone && !writeableRevealZone)) {
-        origZone->getViews().append(this);
+    if (!(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getRevealZone() &&
+          !qobject_cast<ZoneViewZoneLogic *>(getLogic())->getWriteableRevealZone())) {
+        qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().append(this);
     }
+    connect(_logic, &ZoneViewZoneLogic::closeView, this, &ZoneViewZone::close);
 }
 
 /**
@@ -47,8 +41,9 @@ ZoneViewZone::ZoneViewZone(Player *_p,
 void ZoneViewZone::close()
 {
     emit closed();
-    if (!(revealZone && !writeableRevealZone)) {
-        origZone->getViews().removeOne(this);
+    if (!(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getRevealZone() &&
+          !qobject_cast<ZoneViewZoneLogic *>(getLogic())->getWriteableRevealZone())) {
+        qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().removeOne(this);
     }
     deleteLater();
 }
@@ -67,29 +62,31 @@ void ZoneViewZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
 void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardList)
 {
+    int numberCards = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getNumberCards();
     if (!cardList.isEmpty()) {
         for (int i = 0; i < cardList.size(); ++i) {
             auto card = cardList[i];
             CardRef cardRef = {QString::fromStdString(card->name()), QString::fromStdString(card->provider_id())};
-            addCard(new CardItem(player, this, cardRef, card->id()), false, i);
+            getLogic()->addCard(new CardItem(getLogic()->getPlayer(), this, cardRef, card->id()), false, i);
         }
         reorganizeCards();
-    } else if (!origZone->contentsKnown()) {
+    } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
         Command_DumpZone cmd;
-        cmd.set_player_id(player->getId());
-        cmd.set_zone_name(name.toStdString());
+        cmd.set_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
+        cmd.set_zone_name(getLogic()->getName().toStdString());
         cmd.set_number_cards(numberCards);
-        cmd.set_is_reversed(isReversed);
+        cmd.set_is_reversed(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getIsReversed());
 
-        PendingCommand *pend = player->prepareGameCommand(cmd);
+        PendingCommand *pend = getLogic()->getPlayer()->getPlayerActions()->prepareGameCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &ZoneViewZone::zoneDumpReceived);
-        player->sendGameCommand(pend);
+        getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(pend);
     } else {
-        const CardList &c = origZone->getCards();
+        const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
-            addCard(new CardItem(player, this, card->getCardRef(), card->getId()), false, i);
+            getLogic()->addCard(new CardItem(getLogic()->getPlayer(), this, card->getCardRef(), card->getId()), false,
+                                i);
         }
         reorganizeCards();
     }
@@ -103,55 +100,21 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         const ServerInfo_Card &cardInfo = resp.zone_info().card_list(i);
         auto cardName = QString::fromStdString(cardInfo.name());
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
-        auto *card = new CardItem(player, this, {cardName, cardProviderId}, cardInfo.id(), this);
-        cards.insert(i, card);
+        auto card = new CardItem(getLogic()->getPlayer(), this, {cardName, cardProviderId}, cardInfo.id(), getLogic());
+        getLogic()->rawInsertCard(card, i);
     }
 
-    updateCardIds(INITIALIZE);
+    qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
     reorganizeCards();
-    emit cardCountChanged();
-}
-
-void ZoneViewZone::updateCardIds(CardAction action)
-{
-    if (origZone->contentsKnown()) {
-        return;
-    }
-
-    if (cards.isEmpty()) {
-        return;
-    }
-
-    int cardCount = cards.size();
-
-    auto startId = 0;
-
-    if (isReversed) {
-        // the card has not been added to origZone's cardList at this point
-        startId = origZone->getCards().size() - cardCount;
-        switch (action) {
-            case INITIALIZE:
-                break;
-            case ADD_CARD:
-                startId += 1;
-                break;
-            case REMOVE_CARD:
-                startId -= 1;
-                break;
-        }
-    }
-
-    for (int i = 0; i < cardCount; ++i) {
-        cards[i]->setId(i + startId);
-    }
+    emit getLogic()->cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
 void ZoneViewZone::reorganizeCards()
 {
     // filter cards
-    CardList cardsToDisplay = CardList(cards.getContentsKnown());
-    for (auto card : cards) {
+    CardList cardsToDisplay = CardList(getLogic()->getCards().getContentsKnown());
+    for (auto card : getLogic()->getCards()) {
         if (filterString.check(card->getCard().getCardPtr())) {
             card->show();
             cardsToDisplay.append(card);
@@ -297,122 +260,23 @@ void ZoneViewZone::setPileView(int _pileView)
     reorganizeCards();
 }
 
-/**
- * Checks if inserting a card at the given position requires an actual new card to be created and added to the view.
- * Also does any cardId updates that would be required if a card is inserted in that position.
- *
- * Note that this method can end up modifying the cardIds despite returning false.
- * (for example, if the card is inserted into a hidden portion of the deck while the view is reversed)
- *
- * Make sure to call this method once before calling addCard(), so that you skip creating a new CardItem and calling
- * addCard() if it's not required.
- *
- * @param x The position to insert the card at.
- * @return Whether to proceed with calling addCard.
- */
-bool ZoneViewZone::prepareAddCard(int x)
-{
-    bool doInsert = false;
-    if (!isReversed) {
-        if (x <= cards.size() || cards.size() == -1) {
-            doInsert = true;
-        }
-    } else {
-        // map x (which is in origZone indexes) to this viewZone's cardList index
-        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
-        int insertionIndex = x - firstId;
-        if (insertionIndex >= 0) {
-            // card was put into a portion of the deck that's in the view
-            doInsert = true;
-        } else {
-            // card was put into a portion of the deck that's not in the view; update ids but don't insert card
-            updateCardIds(ADD_CARD);
-        }
-    }
-
-    // autoclose check is done both here and in removeCard
-    if (cards.isEmpty() && !doInsert && SettingsCache::instance().getCloseEmptyCardView()) {
-        close();
-    }
-
-    return doInsert;
-}
-
-/**
- * Make sure prepareAddCard() was called before calling addCard().
- * This method assumes we already checked that the card is being inserted into the visible portion
- */
-void ZoneViewZone::addCardImpl(CardItem *card, int x, int /*y*/)
-{
-    if (!isReversed) {
-        // if x is negative set it to add at end
-        // if x is out-of-bounds then also set it to add at the end
-        if (x < 0 || x >= cards.size()) {
-            x = cards.size();
-        }
-        cards.insert(x, card);
-    } else {
-        // map x (which is in origZone indexes) to this viewZone's cardList index
-        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
-        int insertionIndex = x - firstId;
-        // qMin to prevent out-of-bounds error when bottoming a card that is already in the view
-        cards.insert(qMin(insertionIndex, cards.size()), card);
-    }
-
-    card->setParentItem(this);
-    card->update();
-
-    updateCardIds(ADD_CARD);
-    reorganizeCards();
-}
-
 void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
-                                   CardZone *startZone,
+                                   CardZoneLogic *startZone,
                                    const QPoint & /*dropPoint*/)
 {
     Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getId());
+    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
     cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(player->getId());
-    cmd.set_target_zone(getName().toStdString());
+    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_target_zone(getLogic()->getName().toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
-    cmd.set_is_reversed(isReversed);
+    cmd.set_is_reversed(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getIsReversed());
 
     for (int i = 0; i < dragItems.size(); ++i)
         cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
 
-    player->sendGameCommand(cmd);
-}
-
-void ZoneViewZone::removeCard(int position, bool toNewZone)
-{
-    if (isReversed) {
-        position -= cards.first()->getId();
-        if (position < 0 || position >= cards.size()) {
-            updateCardIds(REMOVE_CARD);
-            return;
-        }
-    }
-
-    if (position >= cards.size()) {
-        return;
-    }
-
-    CardItem *card = cards.takeAt(position);
-    card->deleteLater();
-
-    // The toNewZone check is to prevent the view from auto-closing if the view contains only a single card and that
-    // card gets dragged within the view.
-    // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
-    // unrevealed portion of the same zone.
-    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView() && toNewZone) {
-        close();
-        return;
-    }
-
-    updateCardIds(REMOVE_CARD);
-    reorganizeCards();
+    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
 }
 
 void ZoneViewZone::setGeometry(const QRectF &rect)
@@ -425,16 +289,6 @@ void ZoneViewZone::setGeometry(const QRectF &rect)
 QSizeF ZoneViewZone::sizeHint(Qt::SizeHint /*which*/, const QSizeF & /*constraint*/) const
 {
     return optimumRect.size();
-}
-
-void ZoneViewZone::setWriteableRevealZone(bool _writeableRevealZone)
-{
-    if (writeableRevealZone && !_writeableRevealZone) {
-        origZone->getViews().append(this);
-    } else if (!writeableRevealZone && _writeableRevealZone) {
-        origZone->getViews().removeOne(this);
-    }
-    writeableRevealZone = _writeableRevealZone;
 }
 
 void ZoneViewZone::wheelEvent(QGraphicsSceneWheelEvent *event)

@@ -32,7 +32,7 @@ AbstractCounter::AbstractCounter(Player *_player,
 
     shortcutActive = false;
 
-    if (player->getLocalOrJudge()) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         QString displayName = TranslateCounterName::getDisplayName(_name);
         menu = new TearOffMenu(displayName);
         aSet = new QAction(this);
@@ -85,7 +85,7 @@ void AbstractCounter::retranslateUi()
 
 void AbstractCounter::setShortcutsActive()
 {
-    if (!player->getLocal()) {
+    if (!player->getPlayerInfo()->getLocal()) {
         return;
     }
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
@@ -127,7 +127,7 @@ void AbstractCounter::setValue(int _value)
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (isUnderMouse() && player->getLocalOrJudge()) {
+    if (isUnderMouse() && player->getPlayerInfo()->getLocalOrJudge()) {
         if (event->button() == Qt::MiddleButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
             if (menu)
                 menu->exec(event->screenPos());
@@ -136,13 +136,13 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(1);
-            player->sendGameCommand(cmd);
+            player->getPlayerActions()->sendGameCommand(cmd);
             event->accept();
         } else if (event->button() == Qt::RightButton) {
             Command_IncCounter cmd;
             cmd.set_counter_id(id);
             cmd.set_delta(-1);
-            player->sendGameCommand(cmd);
+            player->getPlayerActions()->sendGameCommand(cmd);
             event->accept();
         }
     } else
@@ -167,7 +167,7 @@ void AbstractCounter::incrementCounter()
     Command_IncCounter cmd;
     cmd.set_counter_id(id);
     cmd.set_delta(delta);
-    player->sendGameCommand(cmd);
+    player->getPlayerActions()->sendGameCommand(cmd);
 }
 
 void AbstractCounter::setCounter()
@@ -191,7 +191,7 @@ void AbstractCounter::setCounter()
     Command_SetCounter cmd;
     cmd.set_counter_id(id);
     cmd.set_value(newValue);
-    player->sendGameCommand(cmd);
+    player->getPlayerActions()->sendGameCommand(cmd);
 }
 
 AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value, QWidget *parent)

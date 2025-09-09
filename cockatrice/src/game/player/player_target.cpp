@@ -57,7 +57,7 @@ PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem, QWidget *_
 {
     setCacheMode(DeviceCoordinateCache);
 
-    const std::string &bmp = _owner->getUserInfo()->avatar_bmp();
+    const std::string &bmp = _owner->getPlayerInfo()->getUserInfo()->avatar_bmp();
     if (!fullPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
         fullPixmap = QPixmap();
     }
@@ -77,7 +77,7 @@ QRectF PlayerTarget::boundingRect() const
 
 void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    const ServerInfo_User *const info = owner->getUserInfo();
+    const ServerInfo_User *const info = owner->getPlayerInfo()->getUserInfo();
 
     const qreal border = 2;
 

@@ -3,6 +3,7 @@
 
 #include "../board/abstract_counter.h"
 #include "../board/arrow_target.h"
+#include "../board/graphics_item_type.h"
 
 #include <QFont>
 #include <QPixmap>

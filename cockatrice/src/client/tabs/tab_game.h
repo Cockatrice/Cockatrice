@@ -6,6 +6,7 @@
 #include "../../game/game_meta_info.h"
 #include "../../game/game_state.h"
 #include "../../game/player/player.h"
+#include "../../game/player/player_manager.h"
 #include "../replay_manager.h"
 #include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
@@ -55,6 +56,7 @@ private:
     GameMetaInfo *gameMetaInfo;
     GameState *gameState;
     GameEventHandler *gameEventHandler;
+    PlayerManager *playerManager;
     const UserListProxy *userListProxy;
     CardItem *activeCard;
     ReplayManager *replayManager;
@@ -173,6 +175,7 @@ public:
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
     void connectToGameState();
+    void connectToPlayerManager();
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
@@ -197,6 +200,13 @@ public:
     {
         return gameEventHandler;
     }
+
+    PlayerManager *getPlayerManager() const
+    {
+        return playerManager;
+    }
+
+    bool isHost() const;
 
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 

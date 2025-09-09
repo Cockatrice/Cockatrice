@@ -2,6 +2,7 @@
 #define ZONEVIEWWIDGET_H
 
 #include "../../utility/macros.h"
+#include "logic/card_zone_logic.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -75,7 +76,7 @@ private slots:
 
 public:
     ZoneViewWidget(Player *_player,
-                   CardZone *_origZone,
+                   CardZoneLogic *_origZone,
                    int numberCards = 0,
                    bool _revealZone = false,
                    bool _writeableRevealZone = false,

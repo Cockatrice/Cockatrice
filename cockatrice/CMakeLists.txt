@@ -216,8 +216,17 @@ set(cockatrice_SOURCES
     src/game/games_model.cpp
     src/game/hand_counter.cpp
     src/game/phase.cpp
+    src/game/player/event_processing_options.h
     src/game/player/player.cpp
+    src/game/player/player_actions.cpp
+    src/game/player/player_area.cpp
+    src/game/player/player_event_handler.cpp
+    src/game/player/player_graphics_item.cpp
+    src/game/player/player_info.cpp
     src/game/player/player_list_widget.cpp
+    src/game/player/player_logger.cpp
+    src/game/player/player_manager.cpp
+    src/game/player/player_menu.cpp
     src/game/player/player_target.cpp
     src/game/zones/card_zone.cpp
     src/game/zones/hand_zone.cpp
@@ -227,6 +236,12 @@ set(cockatrice_SOURCES
     src/game/zones/table_zone.cpp
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
+    src/game/zones/logic/card_zone_logic.cpp
+    src/game/zones/logic/hand_zone_logic.cpp
+    src/game/zones/logic/pile_zone_logic.cpp
+    src/game/zones/logic/stack_zone_logic.cpp
+    src/game/zones/logic/table_zone_logic.cpp
+    src/game/zones/logic/view_zone_logic.cpp
     src/main.cpp
     src/server/abstract_client.cpp
     src/server/chat_view/chat_view.cpp

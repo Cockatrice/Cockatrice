@@ -2,18 +2,14 @@
 
 GameState::GameState(int _secondsElapsed,
                      int _hostId,
-                     int _localPlayerId,
                      bool _isLocalGame,
                      const QList<AbstractClient *> _clients,
-                     bool _spectator,
-                     bool _judge,
                      bool _gameStateKnown,
                      bool _resuming,
                      int _currentPhase,
                      bool _gameClosed)
-    : secondsElapsed(_secondsElapsed), hostId(_hostId), localPlayerId(_localPlayerId), isLocalGame(_isLocalGame),
-      clients(_clients), spectator(_spectator), judge(_judge), gameStateKnown(_gameStateKnown), resuming(_resuming),
-      currentPhase(_currentPhase), gameClosed(_gameClosed)
+    : secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame), clients(_clients),
+      gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase), gameClosed(_gameClosed)
 {
 }
 

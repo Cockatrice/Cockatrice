@@ -151,16 +151,16 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
     currentProcessedTime = currentVisualTime;
 
     while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentProcessedTime)) {
-        Player::EventProcessingOptions options;
+        EventProcessingOptions options;
 
         // backwards skip => always skip reveal windows
         // forwards skip => skip reveal windows that don't happen within a big skip of the target
         if (playbackMode == BACKWARD_SKIP || currentProcessedTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
-            options |= Player::EventProcessingOption::SKIP_REVEAL_WINDOW;
+            options |= SKIP_REVEAL_WINDOW;
 
         // backwards skip => always skip tap animation
         if (playbackMode == BACKWARD_SKIP)
-            options |= Player::EventProcessingOption::SKIP_TAP_ANIMATION;
+            options |= SKIP_TAP_ANIMATION;
 
         emit processNextEvent(options);
         ++currentEvent;

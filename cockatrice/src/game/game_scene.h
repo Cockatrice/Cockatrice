@@ -1,6 +1,8 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
+#include "zones/logic/card_zone_logic.h"
+
 #include <QGraphicsScene>
 #include <QList>
 #include <QLoggingCategory>
@@ -11,6 +13,7 @@ inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
 
 class Player;
+class PlayerGraphicsItem;
 class ZoneViewWidget;
 class CardZone;
 class AbstractCardItem;
@@ -26,8 +29,8 @@ private:
     static const int playerAreaSpacing = 5;
 
     PhasesToolbar *phasesToolbar;
-    QList<Player *> players;
-    QList<QList<Player *>> playersByColumn;
+    QList<PlayerGraphicsItem *> players;
+    QList<QList<PlayerGraphicsItem *>> playersByColumn;
     QList<ZoneViewWidget *> zoneViews;
     QSize viewSize;
     QPointer<CardItem> hoveredCard;
@@ -53,7 +56,7 @@ public:
 public slots:
     void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
     void addRevealedZoneView(Player *player,
-                             CardZone *zone,
+                             CardZoneLogic *zone,
                              const QList<const ServerInfo_Card *> &cardList,
                              bool withWritePermission);
     void removeZoneView(ZoneViewWidget *item);

@@ -93,7 +93,7 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
     refreshShortcuts();
 }
 
-void ReplayManager::replayNextEvent(Player::EventProcessingOptions options)
+void ReplayManager::replayNextEvent(EventProcessingOptions options)
 {
     game->getGameEventHandler()->processGameEventContainer(replay->event_list(timelineWidget->getCurrentEvent()),
                                                            nullptr, options);
