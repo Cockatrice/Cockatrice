@@ -28,16 +28,6 @@ public:
     DeckLoader *deck;
     QStringList predefinedTokens;
 
-    StackZone *stack;
-    TableZone *table;
-    HandZone *hand;
-    PlayerTarget *playerTarget;
-
-    PlayerTarget *getPlayerTarget() const
-    {
-        return playerTarget;
-    }
-
     int getZoneId() const
     {
         return zoneId;

@@ -57,6 +57,7 @@ const int MAX_TOKENS_PER_DIALOG = 99;
 class Player : public QObject
 {
     Q_OBJECT
+
 signals:
     void openDeckEditor(const DeckLoader *deck);
     void newCardAdded(AbstractCardItem *card);
@@ -74,9 +75,35 @@ public:
     ~Player() override;
     void retranslateUi();
 
-    [[nodiscard]] PlayerInfo *getPlayerInfo() const
+    void initializeZones();
+    void updateZones();
+    void clear();
+
+    void processPlayerInfo(const ServerInfo_Player &info);
+    void processCardAttachment(const ServerInfo_Player &info);
+
+    void addCard(CardItem *c);
+    void deleteCard(CardItem *c);
+
+    bool clearCardsToDelete();
+
+    bool getActive() const
     {
-        return playerInfo;
+        return active;
+    }
+
+    TabGame *getGame() const
+    {
+        return game;
+    }
+
+    GameScene *getGameScene();
+
+    [[nodiscard]] PlayerGraphicsItem *getGraphicsItem();
+
+    [[nodiscard]] PlayerActions *getPlayerActions() const
+    {
+        return playerActions;
     };
 
     [[nodiscard]] PlayerEventHandler *getPlayerEventHandler() const
@@ -84,19 +111,14 @@ public:
         return playerEventHandler;
     }
 
-    [[nodiscard]] PlayerActions *getPlayerActions() const
+    [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
-        return playerActions;
+        return playerInfo;
     };
 
-    TabGame *getGame() const
+    [[nodiscard]] PlayerMenu *getPlayerMenu() const
     {
-        return game;
-    }
-
-    const QMap<int, ArrowItem *> &getArrows() const
-    {
-        return arrows;
+        return playerMenu;
     }
 
     template <typename T> T *addZone(T *zone)
@@ -105,14 +127,14 @@ public:
         return zone;
     }
 
-    const QMap<QString, CardZoneLogic *> &getZones() const
-    {
-        return zones;
-    }
-
     CardZoneLogic *getZone(const QString zoneName)
     {
         return zones.value(zoneName);
+    }
+
+    const QMap<QString, CardZoneLogic *> &getZones() const
+    {
+        return zones;
     }
 
     PileZoneLogic *getDeckZone()
@@ -150,43 +172,12 @@ public:
         return qobject_cast<HandZoneLogic *>(zones.value("hand"));
     }
 
-    void updateZones();
-
-    void clear();
-    void initializeZones();
-
-    bool getActive() const
-    {
-        return active;
-    }
-
-    [[nodiscard]] PlayerGraphicsItem *getGraphicsItem();
-
-    GameScene *getGameScene();
-
-    PlayerMenu *getPlayerMenu() const
-    {
-        return playerMenu;
-    }
-
-    void setDialogSemaphore(const bool _active)
-    {
-        dialogSemaphore = _active;
-    }
-
-    void processPlayerInfo(const ServerInfo_Player &info);
-    void processCardAttachment(const ServerInfo_Player &info);
-
-    void addCard(CardItem *c);
-    void deleteCard(CardItem *c);
-
-    bool clearCardsToDelete();
-
     AbstractCounter *addCounter(const ServerInfo_Counter &counter);
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
     void incrementAllCardCounters();
+
     QMap<int, AbstractCounter *> getCounters()
     {
         return counters;
@@ -198,7 +189,17 @@ public:
     void removeArrow(ArrowItem *arrow);
     void clearArrows();
 
+    const QMap<int, ArrowItem *> &getArrows() const
+    {
+        return arrows;
+    }
+
     void setGameStarted();
+
+    void setDialogSemaphore(const bool _active)
+    {
+        dialogSemaphore = _active;
+    }
 
 private:
     TabGame *game;
@@ -208,14 +209,14 @@ private:
     PlayerMenu *playerMenu;
     PlayerGraphicsItem *graphicsItem;
 
+    bool active;
+
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, AbstractCounter *> counters;
     QMap<int, ArrowItem *> arrows;
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;
-
-    bool active;
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
 };
