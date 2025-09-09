@@ -22,7 +22,7 @@ set(PROTO_FILES
     command_del_counter.proto
     command_delete_arrow.proto
     command_draft_options_select.proto
-    command_draft_pick_submit.proto
+    command_draft_pick_select.proto
     command_draw_cards.proto
     command_dump_zone.proto
     command_flip_card.proto
@@ -74,7 +74,7 @@ set(PROTO_FILES
     event_delete_arrow.proto
     event_destroy_card.proto
     event_draft_pack.proto
-    event_draft_pick.proto
+    event_draft_pick_select.proto
     event_draw_cards.proto
     event_dump_zone.proto
     event_flip_card.proto
@@ -82,6 +82,7 @@ set(PROTO_FILES
     event_game_host_changed.proto
     event_game_joined.proto
     event_game_say.proto
+    event_game_state_changed.proto
     event_game_state_changed.proto
     event_join.proto
     event_join_room.proto
@@ -129,7 +130,7 @@ set(PROTO_FILES
     response_deck_list.proto
     response_deck_upload.proto
     response_draft_deck_invalid.proto
-    response_draft_pick_invalid.proto
+    response_draft_pick_selection_invalid.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
     response_get_admin_notes.proto
@@ -148,6 +149,7 @@ set(PROTO_FILES
     response_warn_list.proto
     room_commands.proto
     room_event.proto
+    server_message.proto
     serverinfo_arrow.proto
     serverinfo_ban.proto
     serverinfo_card.proto
@@ -166,7 +168,6 @@ set(PROTO_FILES
     serverinfo_user.proto
     serverinfo_warning.proto
     serverinfo_zone.proto
-    server_message.proto
     session_commands.proto
     session_event.proto
 )

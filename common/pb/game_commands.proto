@@ -49,6 +49,10 @@ message Command_Judge {
     extend GameCommand {
         optional Command_Judge ext = 1033;
     }
+
+    // The player on whose behalf this command is sent
     optional sint32 target_id = 1 [default = -1];
+
+    // The wrapped game command
     repeated GameCommand game_command = 2;
 }

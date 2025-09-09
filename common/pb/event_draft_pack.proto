@@ -7,6 +7,10 @@ message Event_DraftPack {
     extend GameEvent {
         optional Event_DraftPack ext = 2022;
     }
-    optional sint32 selection_index = 1 [default = -1]; // Index in the sequence of pick selections made
-    repeated ServerInfo_Card cards = 2; // sequence of cards in the pack by index
+
+    // Index in the sequence of pick selections made
+    optional sint32 selection_index = 1 [default = -1];
+
+    // sequence of cards in the pack by index
+    repeated ServerInfo_Card cards = 2;
 }
