@@ -1,6 +1,6 @@
 #include "player_menu.h"
 
-#include "../../../../cmake-build-debug/common/pb/command_reveal_cards.pb.h"
+#include "../../../common/pb/command_reveal_cards.pb.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../settings/card_counter_settings.h"
 #include "../board/card_item.h"
