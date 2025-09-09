@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_GAME_H
 #define COCKATRICE_GAME_H
 
-#include "../../../cmake-build-debug/common/pb/game_replay.pb.h"
+#include "../../../common/pb/game_replay.pb.h"
 #include "game_event_handler.h"
 #include "game_meta_info.h"
 #include "game_state.h"
