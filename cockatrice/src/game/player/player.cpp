@@ -1,29 +1,17 @@
 #include "player.h"
 
-#include "../../client/get_text_with_max.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../client/ui/theme_manager.h"
-#include "../../deck/deck_loader.h"
-#include "../../dialogs/dlg_move_top_cards_until.h"
-#include "../../dialogs/dlg_roll_dice.h"
-#include "../../main.h"
-#include "../../settings/cache_settings.h"
-#include "../../settings/card_counter_settings.h"
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
 #include "../board/counter_general.h"
-#include "../cards/card_database.h"
-#include "../cards/card_database_manager.h"
 #include "../game_scene.h"
-#include "../hand_counter.h"
-#include "../zones/card_zone.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
-#include "../zones/view_zone_widget.h"
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_set_card_counter.pb.h"
@@ -34,15 +22,11 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
 #include "player_target.h"
-#include "trice_limits.h"
 
 #include <QDebug>
 #include <QMenu>
-#include <QMessageBox>
 #include <QMetaType>
 #include <QPainter>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
 #include <QtConcurrent>
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, TabGame *_parent)
