@@ -263,8 +263,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     if (static_cast<TabGame *>(owner->parent())->getGame()->getPlayerManager()->isSpectator())
         return;
 
-    Player *arrowOwner =
-        static_cast<TabGame *>(owner->parent())
+    Player *arrowOwner = static_cast<TabGame *>(owner->parent())
                              ->getGame()
                              ->getPlayerManager()
                              ->getActiveLocalPlayer(
