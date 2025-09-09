@@ -1,4 +1,6 @@
 syntax = "proto2";
+
+// Sent every time something happens in the game to update the client's state
 message GameEvent {
     enum GameEventType {
         JOIN = 1000;
@@ -32,7 +34,7 @@ message GameEvent {
         CHANGE_ZONE_PROPERTIES = 2020;
         REVERSE_TURN = 2021;
         DRAFT_PACK = 2022;
-        DRAFT_PICK = 2023;
+        DRAFT_PICK_SELECT = 2023;
     }
     optional sint32 player_id = 1 [default = -1];
     extensions 100 to max;

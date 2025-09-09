@@ -3,6 +3,7 @@ import "game_event.proto";
 import "serverinfo_player.proto";
 import "draft_options.proto";
 
+// Signals that the game state has changed, if a field is present in this message it will overwrite the client's game state, also used to provide the entire game state when joining a game
 message Event_GameStateChanged {
     extend GameEvent {
         optional Event_GameStateChanged ext = 1005;

@@ -1,4 +1,6 @@
 syntax = "proto2";
+
+// Commands that are sent during a game to change the game state
 message GameCommand {
     enum GameCommandType {
         KICK_FROM_GAME = 1000;
@@ -37,11 +39,12 @@ message GameCommand {
         JUDGE = 1033;
         REVERSE_TURN = 1034;
         DRAFT_OPTIONS_SELECT = 1035;
-        DRAFT_PICK_SUBMIT = 1036;
+        DRAFT_PICK_SELECT = 1036;
     }
     extensions 100 to max;
 }
 
+// A wrapper around a normal game command that allows a priviledged user to send a command on behalf of another player
 message Command_Judge {
     extend GameCommand {
         optional Command_Judge ext = 1033;
