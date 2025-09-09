@@ -25,7 +25,6 @@ public:
                        int currentPhase,
                        bool gameClosed);
 
-
     const QMap<int, ServerInfo_User> &getSpectators() const
     {
         return spectators;
