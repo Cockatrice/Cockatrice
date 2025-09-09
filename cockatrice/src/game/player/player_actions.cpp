@@ -323,7 +323,8 @@ void PlayerActions::actDrawCards()
     int deckSize = player->getDeckZone()->getCards().size();
     bool ok;
     int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Draw cards"),
-                                      tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1, deckSize, 1, &ok);
+                                      tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
+                                      deckSize, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
         Command_DrawCards cmd;
@@ -747,7 +748,8 @@ void PlayerActions::actDrawBottomCards()
 
     bool ok;
     int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Draw bottom cards"),
-                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1, maxCards, 1, &ok);
+                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
+                                      maxCards, 1, &ok);
     if (!ok) {
         return;
     } else if (number > maxCards) {

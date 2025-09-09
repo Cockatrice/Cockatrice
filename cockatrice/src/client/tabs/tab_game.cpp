@@ -253,7 +253,8 @@ void TabGame::resetChatAndPhase()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent = !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent =
+        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
@@ -267,15 +268,16 @@ void TabGame::updatePlayerListDockTitle()
 {
     QString tabText = " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" +
                       QString::number(game->getGameMetaInfo()->gameId());
-    QString userCountInfo = QString(" %1/%2").arg(game->getPlayerManager()->getPlayerCount()).arg(game->getGameMetaInfo()->maxPlayers());
+    QString userCountInfo =
+        QString(" %1/%2").arg(game->getPlayerManager()->getPlayerCount()).arg(game->getGameMetaInfo()->maxPlayers());
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
                                    (playerListDock->isWindow() ? tabText : QString()));
 }
 
 void TabGame::retranslateUi()
 {
-    QString tabText =
-        " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" + QString::number(game->getGameMetaInfo()->gameId());
+    QString tabText = " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" +
+                      QString::number(game->getGameMetaInfo()->gameId());
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -668,7 +670,8 @@ Player *TabGame::addPlayer(Player *newPlayer)
     messageLog->connectToPlayerEventHandler(newPlayer->getPlayerEventHandler());
 
     if (game->getGameState()->getIsLocalGame() ||
-        (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) && !game->getPlayerManager()->isSpectator())) {
+        (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) &&
+         !game->getPlayerManager()->isSpectator())) {
         addLocalPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
     }
 
@@ -924,7 +927,8 @@ void TabGame::createMenuItems()
     connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
-    connect(this, &TabGame::arrowDeletionRequested, game->getGameEventHandler(), &GameEventHandler::handleArrowDeletion);
+    connect(this, &TabGame::arrowDeletionRequested, game->getGameEventHandler(),
+            &GameEventHandler::handleArrowDeletion);
     aRotateViewCW = new QAction(this);
     connect(aRotateViewCW, &QAction::triggered, this, &TabGame::actRotateViewCW);
     aRotateViewCCW = new QAction(this);
