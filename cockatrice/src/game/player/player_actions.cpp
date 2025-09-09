@@ -1,6 +1,6 @@
 #include "player_actions.h"
 
-#include "../../../../cmake-build-debug/common/pb/context_move_card.pb.h"
+#include "../../../common/pb/context_move_card.pb.h"
 #include "../../client/get_text_with_max.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../dialogs/dlg_move_top_cards_until.h"
