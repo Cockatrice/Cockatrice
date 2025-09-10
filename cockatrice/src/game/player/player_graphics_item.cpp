@@ -5,10 +5,10 @@
 
 PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
 {
-    /*connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
-            &PlayerGraphicsItem::rearrangeZones);*/
+            &PlayerGraphicsItem::rearrangeZones);
     connect(player, &Player::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
 
     playerArea = new PlayerArea(this);
@@ -29,18 +29,17 @@ PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
 
 void PlayerGraphicsItem::retranslateUi()
 {
-        player->getPlayerMenu()->retranslateUi();
+    player->getPlayerMenu()->retranslateUi();
 
-        QMapIterator<QString, CardZoneLogic *> zoneIterator(player->getZones());
-        while (zoneIterator.hasNext()) {
-            emit zoneIterator.next().value()->retranslateUi();
-        }
+    QMapIterator<QString, CardZoneLogic *> zoneIterator(player->getZones());
+    while (zoneIterator.hasNext()) {
+        emit zoneIterator.next().value()->retranslateUi();
+    }
 
-        QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-        while (counterIterator.hasNext()) {
-            counterIterator.next().value()->retranslateUi();
-        }
-
+    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
+    while (counterIterator.hasNext()) {
+        counterIterator.next().value()->retranslateUi();
+    }
 }
 
 void PlayerGraphicsItem::onPlayerActiveChanged(bool _active)
@@ -56,6 +55,9 @@ void PlayerGraphicsItem::initializeZones()
     deckZoneGraphicsItem->setPos(base);
 
     qreal h = deckZoneGraphicsItem->boundingRect().width() + 5;
+
+    sideboardGraphicsItem = new PileZone(player->getSideboardZone(), this);
+    player->getSideboardZone()->setGraphicsVisibility(false);
 
     auto *handCounter = new HandCounter(playerArea);
     handCounter->setPos(base + QPointF(0, h + 10));

@@ -271,7 +271,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
         sbMenu = playerMenu->addMenu(QString());
         sbMenu->addAction(aViewSideboard);
-        // sb->setMenu(sbMenu, aViewSideboard);
+
+        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sbMenu);
 
         mCustomZones = playerMenu->addMenu(QString());
         mCustomZones->menuAction()->setVisible(false);
@@ -359,7 +360,7 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     aDecT = new QAction(this);
     connect(aDecT, &QAction::triggered, playerActions, &PlayerActions::actDecT);
     aIncPT = new QAction(this);
-    // connect(aIncPT, &QAction::triggered, playerActions, [this] { actIncPT(); });
+    connect(aIncPT, &QAction::triggered, playerActions, [playerActions] { playerActions->actIncPT(); });
     aDecPT = new QAction(this);
     connect(aDecPT, &QAction::triggered, playerActions, &PlayerActions::actDecPT);
     aFlowP = new QAction(this);
@@ -757,7 +758,7 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 
 QMenu *PlayerMenu::createPtMenu() const
 {
-    QMenu *ptMenu = new QMenu("Power / toughness");
+    QMenu *ptMenu = new QMenu(tr("Power / toughness"));
     ptMenu->addAction(aIncP);
     ptMenu->addAction(aDecP);
     ptMenu->addAction(aFlowP);
@@ -776,7 +777,7 @@ QMenu *PlayerMenu::createPtMenu() const
 
 QMenu *PlayerMenu::createMoveMenu() const
 {
-    QMenu *moveMenu = new QMenu("Move to");
+    QMenu *moveMenu = new QMenu(tr("Move to"));
     moveMenu->addAction(aMoveToTopLibrary);
     moveMenu->addAction(aMoveToXfromTopOfLibrary);
     moveMenu->addAction(aMoveToBottomLibrary);

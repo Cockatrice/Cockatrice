@@ -68,6 +68,11 @@ public:
         return deckZoneGraphicsItem;
     }
 
+    [[nodiscard]] PileZone *getSideboardZoneGraphicsItem() const
+    {
+        return sideboardGraphicsItem;
+    }
+
     [[nodiscard]] PileZone *getGraveyardZoneGraphicsItem() const
     {
         return graveyardZoneGraphicsItem;
@@ -102,6 +107,7 @@ private:
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     PileZone *deckZoneGraphicsItem;
+    PileZone *sideboardGraphicsItem;
     PileZone *graveyardZoneGraphicsItem;
     PileZone *rfgZoneGraphicsItem;
     TableZone *tableZoneGraphicsItem;
