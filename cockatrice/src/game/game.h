@@ -11,18 +11,28 @@
 
 class CardItem;
 class GameMetaInfo;
+class TabGame;
 class Game : public QObject
 {
     Q_OBJECT
 
 public:
-    Game(QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes);
+    Game(TabGame *tab,
+         QList<AbstractClient *> &_clients,
+         const Event_GameJoined &event,
+         const QMap<int, QString> &_roomGameTypes);
 
+    TabGame *tab;
     GameMetaInfo *gameMetaInfo;
     GameState *gameState;
     GameEventHandler *gameEventHandler;
     PlayerManager *playerManager;
     CardItem *activeCard;
+
+    TabGame *getTab() const
+    {
+        return tab;
+    }
 
     GameMetaInfo *getGameMetaInfo()
     {

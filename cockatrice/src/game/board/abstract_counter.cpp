@@ -172,7 +172,7 @@ void AbstractCounter::incrementCounter()
 void AbstractCounter::setCounter()
 {
     dialogSemaphore = true;
-    AbstractCounterDialog dialog(name, QString::number(value) /*, game */);
+    AbstractCounterDialog dialog(name, QString::number(value), player->getGame()->getTab());
     const int ok = dialog.exec();
 
     if (deleteAfterDialog) {

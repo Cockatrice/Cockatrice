@@ -1202,8 +1202,7 @@ void PlayerMenu::setShortcutsActive()
     if (!player->getGame()->getGameState()->getIsLocalGame()) {
         // unattach action is only active in card menu if the active card is attached.
         // make unattach shortcut always active so that it consistently works when multiple cards are selected.
-        // TODO: Signal this
-        // player->getGame()->addAction(aUnattach);
+        player->getGame()->getTab()->addAction(aUnattach);
     }
 }
 

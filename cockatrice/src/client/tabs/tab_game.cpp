@@ -97,7 +97,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
     // THIS CTOR IS USED ON GAMES
-    game = new Game(_clients, event, _roomGameTypes);
+    game = new Game(this, _clients, event, _roomGameTypes);
 
     createCardInfoDock();
     createPlayerListDock();

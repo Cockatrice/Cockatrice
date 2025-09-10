@@ -2,7 +2,11 @@
 
 #include "pb/event_game_joined.pb.h"
 
-Game::Game(QList<AbstractClient *> &_clients, const Event_GameJoined &event, const QMap<int, QString> &_roomGameTypes)
+Game::Game(TabGame *_tab,
+           QList<AbstractClient *> &_clients,
+           const Event_GameJoined &event,
+           const QMap<int, QString> &_roomGameTypes)
+    : tab(_tab)
 {
     gameMetaInfo = new GameMetaInfo(this);
     gameMetaInfo->setFromProto(event.game_info());
