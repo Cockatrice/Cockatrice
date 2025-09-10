@@ -1,6 +1,7 @@
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
+#include "../zones/logic/card_zone_logic.h"
 #include "abstract_card_item.h"
 #include "server_card.h"
 
@@ -21,7 +22,7 @@ class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardZone *zone;
+    CardZoneLogic *zone;
     bool attacking;
     QMap<int, int> counters;
     QString annotation;
@@ -51,14 +52,14 @@ public:
                       QGraphicsItem *parent = nullptr,
                       const CardRef &cardRef = {},
                       int _cardid = -1,
-                      CardZone *_zone = nullptr);
+                      CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
-    CardZone *getZone() const
+    CardZoneLogic *getZone() const
     {
         return zone;
     }
-    void setZone(CardZone *_zone);
+    void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     QPoint getGridPoint() const
     {

@@ -3,6 +3,7 @@
 
 #include "../board/abstract_counter.h"
 #include "../board/arrow_target.h"
+#include "../board/graphics_item_type.h"
 
 #include <QFont>
 #include <QPixmap>
@@ -13,12 +14,7 @@ class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(Player *_player,
-                  int _id,
-                  const QString &_name,
-                  int _value,
-                  QGraphicsItem *parent = nullptr,
-                  QWidget *game = nullptr);
+    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
@@ -29,7 +25,6 @@ class PlayerTarget : public ArrowTarget
 private:
     QPixmap fullPixmap;
     PlayerCounter *playerCounter;
-    QWidget *game;
 public slots:
     void counterDeleted();
 
@@ -43,7 +38,7 @@ public:
         return Type;
     }
 
-    explicit PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr, QWidget *_game = nullptr);
+    explicit PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr);
     ~PlayerTarget() override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

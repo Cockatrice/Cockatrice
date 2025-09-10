@@ -56,7 +56,7 @@ bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
 
 PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
                                    AbstractClient *_client,
-                                   TabGame *_game,
+                                   AbstractGame *_game,
                                    QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {

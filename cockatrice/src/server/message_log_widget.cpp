@@ -1,6 +1,7 @@
 #include "message_log_widget.h"
 
 #include "../client/sound_engine.h"
+#include "../client/tabs/tab_game.h"
 #include "../client/translate_counter_name.h"
 #include "../game/board/card_item.h"
 #include "../game/phase.h"
@@ -31,7 +32,8 @@ static QString cardLink(const QString &cardName)
     return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
 }
 
-QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange)
+QPair<QString, QString>
+MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange)
 {
     bool cardNameContainsStartZone = false;
     QString fromStr;
@@ -49,14 +51,14 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
         if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
-                    cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getName());
+                    cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     cardName = tr("the top card of their library");
                 }
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getName());
+                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the top of their library");
                 }
@@ -64,21 +66,21 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
         } else if (position >= zone->getCards().size() - 1) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
-                    cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getName());
+                    cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     cardName = tr("the bottom card of their library");
                 }
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getName());
+                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the bottom of their library");
                 }
             }
         } else {
             if (ownerChange) {
-                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getName());
+                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
             } else {
                 fromStr = tr(" from their library");
             }
@@ -112,52 +114,59 @@ void MessageLogWidget::containerProcessingStarted(const GameEventContext &contex
     }
 }
 
-void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal)
+void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZoneLogic *zone, bool reveal)
 {
     appendHtmlServerMessage((reveal ? tr("%1 is now keeping the top card %2 revealed.")
                                     : tr("%1 is not revealing the top card %2 any longer."))
-                                .arg(sanitizeHtml(player->getName()))
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
 
-void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal)
+void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZoneLogic *zone, bool reveal)
 {
     appendHtmlServerMessage((reveal ? tr("%1 can now look at top card %2 at any time.")
                                     : tr("%1 no longer can look at top card %2 at any time."))
-                                .arg(sanitizeHtml(player->getName()))
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
 {
     appendHtmlServerMessage(tr("%1 attaches %2 to %3's %4.")
-                                .arg(sanitizeHtml(player->getName()))
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(cardLink(std::move(cardName)))
-                                .arg(sanitizeHtml(targetPlayer->getName()))
+                                .arg(sanitizeHtml(targetPlayer->getPlayerInfo()->getName()))
                                 .arg(cardLink(std::move(targetCardName))));
 }
 
-void MessageLogWidget::logConcede(Player *player)
+void MessageLogWidget::logConcede(int playerId)
 {
     soundEngine->playSound("player_concede");
-    appendHtmlServerMessage(tr("%1 has conceded the game.").arg(sanitizeHtml(player->getName())), true);
+    appendHtmlServerMessage(
+        tr("%1 has conceded the game.")
+            .arg(sanitizeHtml(game->getPlayerManager()->getPlayer(playerId)->getPlayerInfo()->getName())),
+        true);
 }
 
-void MessageLogWidget::logUnconcede(Player *player)
+void MessageLogWidget::logUnconcede(int playerId)
 {
     soundEngine->playSound("player_concede");
-    appendHtmlServerMessage(tr("%1 has unconceded the game.").arg(sanitizeHtml(player->getName())), true);
+    appendHtmlServerMessage(
+        tr("%1 has unconceded the game.")
+            .arg(sanitizeHtml(game->getPlayerManager()->getPlayer(playerId)->getPlayerInfo()->getName())),
+        true);
 }
 
 void MessageLogWidget::logConnectionStateChanged(Player *player, bool connectionState)
 {
     if (connectionState) {
         soundEngine->playSound("player_reconnect");
-        appendHtmlServerMessage(tr("%1 has restored connection to the game.").arg(sanitizeHtml(player->getName())),
-                                true);
+        appendHtmlServerMessage(
+            tr("%1 has restored connection to the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())), true);
     } else {
         soundEngine->playSound("player_disconnect");
-        appendHtmlServerMessage(tr("%1 has lost connection to the game.").arg(sanitizeHtml(player->getName())), true);
+        appendHtmlServerMessage(
+            tr("%1 has lost connection to the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())), true);
     }
 }
 
@@ -174,44 +183,47 @@ void MessageLogWidget::logCreateArrow(Player *player,
     if (playerTarget) {
         if (player == startPlayer && player == targetPlayer) {
             str = tr("%1 points from their %2 to themselves.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName())).arg(startCard));
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(startCard));
         } else if (player == startPlayer) {
             str = tr("%1 points from their %2 to %3.");
-            appendHtmlServerMessage(
-                str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(sanitizeHtml(targetPlayer->getName())));
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(startCard)
+                                        .arg(sanitizeHtml(targetPlayer->getPlayerInfo()->getName())));
         } else if (player == targetPlayer) {
             str = tr("%1 points from %2's %3 to themselves.");
-            appendHtmlServerMessage(
-                str.arg(sanitizeHtml(player->getName())).arg(sanitizeHtml(startPlayer->getName())).arg(startCard));
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(sanitizeHtml(startPlayer->getPlayerInfo()->getName()))
+                                        .arg(startCard));
         } else {
             str = tr("%1 points from %2's %3 to %4.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName()))
-                                        .arg(sanitizeHtml(startPlayer->getName()))
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(sanitizeHtml(startPlayer->getPlayerInfo()->getName()))
                                         .arg(startCard)
-                                        .arg(sanitizeHtml(targetPlayer->getName())));
+                                        .arg(sanitizeHtml(targetPlayer->getPlayerInfo()->getName())));
         }
     } else {
         if (player == startPlayer && player == targetPlayer) {
             str = tr("%1 points from their %2 to their %3.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName())).arg(startCard).arg(targetCard));
+            appendHtmlServerMessage(
+                str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(startCard).arg(targetCard));
         } else if (player == startPlayer) {
             str = tr("%1 points from their %2 to %3's %4.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName()))
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg(startCard)
-                                        .arg(sanitizeHtml(targetPlayer->getName()))
+                                        .arg(sanitizeHtml(targetPlayer->getPlayerInfo()->getName()))
                                         .arg(targetCard));
         } else if (player == targetPlayer) {
             str = tr("%1 points from %2's %3 to their own %4.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName()))
-                                        .arg(sanitizeHtml(startPlayer->getName()))
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(sanitizeHtml(startPlayer->getPlayerInfo()->getName()))
                                         .arg(startCard)
                                         .arg(targetCard));
         } else {
             str = tr("%1 points from %2's %3 to %4's %5.");
-            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName()))
-                                        .arg(sanitizeHtml(startPlayer->getName()))
+            appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(sanitizeHtml(startPlayer->getPlayerInfo()->getName()))
                                         .arg(startCard)
-                                        .arg(sanitizeHtml(targetPlayer->getName()))
+                                        .arg(sanitizeHtml(targetPlayer->getPlayerInfo()->getName()))
                                         .arg(targetCard));
         }
     }
@@ -220,10 +232,11 @@ void MessageLogWidget::logCreateArrow(Player *player,
 void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString pt, bool faceDown)
 {
     if (faceDown) {
-        appendHtmlServerMessage(tr("%1 creates a face down token.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(
+            tr("%1 creates a face down token.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
         appendHtmlServerMessage(tr("%1 creates token: %2%3.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(cardLink(std::move(cardName)))
                                     .arg(pt.isEmpty() ? QString() : QString(" (%1)").arg(sanitizeHtml(pt))));
     }
@@ -232,10 +245,11 @@ void MessageLogWidget::logCreateToken(Player *player, QString cardName, QString 
 void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideboardSize)
 {
     if (sideboardSize < 0) {
-        appendHtmlServerMessage(tr("%1 has loaded a deck (%2).").arg(sanitizeHtml(player->getName())).arg(deckHash));
+        appendHtmlServerMessage(
+            tr("%1 has loaded a deck (%2).").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(deckHash));
     } else {
         appendHtmlServerMessage(tr("%1 has loaded a deck with %2 sideboard cards (%3).")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg("<font class=\"blue\">" + QString::number(sideboardSize) + "</font>")
                                     .arg(deckHash));
     }
@@ -244,14 +258,14 @@ void MessageLogWidget::logDeckSelect(Player *player, QString deckHash, int sideb
 void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 {
     appendHtmlServerMessage(
-        tr("%1 destroys %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(std::move(cardName))));
+        tr("%1 destroys %2.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(std::move(cardName))));
 }
 
 void MessageLogWidget::logMoveCard(Player *player,
                                    CardItem *card,
-                                   CardZone *startZone,
+                                   CardZoneLogic *startZone,
                                    int oldX,
-                                   CardZone *targetZone,
+                                   CardZoneLogic *targetZone,
                                    int newX)
 {
     if (currentContext == MessageContext_Mulligan) {
@@ -286,8 +300,8 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     if (ownerChanged && (startZone->getPlayer() == player)) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
-                                    .arg(sanitizeHtml(player->getName()))
-                                    .arg(sanitizeHtml(targetZone->getPlayer()->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                    .arg(sanitizeHtml(targetZone->getPlayer()->getPlayerInfo()->getName()))
                                     .arg(cardStr));
         return;
     }
@@ -329,7 +343,7 @@ void MessageLogWidget::logMoveCard(Player *player,
         finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
     }
 
-    QString message = finalStr.arg(sanitizeHtml(player->getName()), cardStr, nameFrom.second);
+    QString message = finalStr.arg(sanitizeHtml(player->getPlayerInfo()->getName()), cardStr, nameFrom.second);
 
     if (fourthArg.has_value()) {
         message = message.arg(fourthArg.value());
@@ -345,25 +359,26 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
         logMulligan(player, number);
     } else {
         if (deckIsEmpty && number == 0) {
-            appendHtmlServerMessage(tr("%1 tries to draw from an empty library").arg(sanitizeHtml(player->getName())));
+            appendHtmlServerMessage(
+                tr("%1 tries to draw from an empty library").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
         } else {
             appendHtmlServerMessage(tr("%1 draws %2 card(s).", "", number)
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg("<font class=\"blue\">" + QString::number(number) + "</font>"));
         }
     }
 }
 
-void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed)
+void MessageLogWidget::logDumpZone(Player *player, CardZoneLogic *zone, int numberCards, bool isReversed)
 {
     if (numberCards == -1) {
         appendHtmlServerMessage(tr("%1 is looking at %2.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     } else {
         appendHtmlServerMessage(
             tr("%1 is looking at the %4 %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
-                .arg(sanitizeHtml(player->getName()))
+                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                 .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
                 .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>")
                 .arg(isReversed ? tr("bottom") : tr("top")));
@@ -374,10 +389,10 @@ void MessageLogWidget::logFlipCard(Player *player, QString cardName, bool faceDo
 {
     if (faceDown) {
         appendHtmlServerMessage(
-            tr("%1 turns %2 face-down.").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+            tr("%1 turns %2 face-down.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(cardName)));
     } else {
         appendHtmlServerMessage(
-            tr("%1 turns %2 face-up.").arg(sanitizeHtml(player->getName())).arg(cardLink(cardName)));
+            tr("%1 turns %2 face-up.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(cardName)));
     }
 }
 
@@ -399,7 +414,7 @@ void MessageLogWidget::logGameFlooded()
 void MessageLogWidget::logJoin(Player *player)
 {
     soundEngine->playSound("player_join");
-    appendHtmlServerMessage(tr("%1 has joined the game.").arg(sanitizeHtml(player->getName())));
+    appendHtmlServerMessage(tr("%1 has joined the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
 }
 
 void MessageLogWidget::logJoinSpectator(QString name)
@@ -416,8 +431,9 @@ void MessageLogWidget::logKicked()
 void MessageLogWidget::logLeave(Player *player, QString reason)
 {
     soundEngine->playSound("player_leave");
-    appendHtmlServerMessage(
-        tr("%1 has left the game (%2).").arg(sanitizeHtml(player->getName()), sanitizeHtml(std::move(reason))), true);
+    appendHtmlServerMessage(tr("%1 has left the game (%2).")
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()), sanitizeHtml(std::move(reason))),
+                            true);
 }
 
 void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
@@ -429,7 +445,8 @@ void MessageLogWidget::logLeaveSpectator(QString name, QString reason)
 
 void MessageLogWidget::logNotReadyStart(Player *player)
 {
-    appendHtmlServerMessage(tr("%1 is not ready to start the game any more.").arg(sanitizeHtml(player->getName())));
+    appendHtmlServerMessage(
+        tr("%1 is not ready to start the game any more.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
 }
 
 void MessageLogWidget::logMulligan(Player *player, int number)
@@ -439,11 +456,11 @@ void MessageLogWidget::logMulligan(Player *player, int number)
     }
     if (number > 0) {
         appendHtmlServerMessage(tr("%1 shuffles their deck and draws a new hand of %2 card(s).", "", number)
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(number));
     } else {
         appendHtmlServerMessage(
-            tr("%1 shuffles their deck and draws a new hand.").arg(sanitizeHtml(player->getName())));
+            tr("%1 shuffles their deck and draws a new hand.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     }
 }
 
@@ -454,11 +471,11 @@ void MessageLogWidget::logReplayStarted(int gameId)
 
 void MessageLogWidget::logReadyStart(Player *player)
 {
-    appendHtmlServerMessage(tr("%1 is ready to start the game.").arg(sanitizeHtml(player->getName())));
+    appendHtmlServerMessage(tr("%1 is ready to start the game.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
 }
 
 void MessageLogWidget::logRevealCards(Player *player,
-                                      CardZone *zone,
+                                      CardZoneLogic *zone,
                                       int cardId,
                                       QString cardName,
                                       Player *otherPlayer,
@@ -492,51 +509,54 @@ void MessageLogWidget::logRevealCards(Player *player,
         if (otherPlayer) {
             if (isLentToAnotherPlayer) {
                 appendHtmlServerMessage(tr("%1 lends %2 to %3.")
-                                            .arg(sanitizeHtml(player->getName()))
+                                            .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                             .arg(zone->getTranslatedName(true, CaseRevealZone))
-                                            .arg(sanitizeHtml(otherPlayer->getName())));
+                                            .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
             } else {
                 appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
-                                            .arg(sanitizeHtml(player->getName()))
+                                            .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                             .arg(zone->getTranslatedName(true, CaseRevealZone))
-                                            .arg(sanitizeHtml(otherPlayer->getName())));
+                                            .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
             }
         } else {
             appendHtmlServerMessage(tr("%1 reveals %2.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg(zone->getTranslatedName(true, CaseRevealZone)));
         }
     } else if (cardId == -2) {
         if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 randomly reveals %2%3 to %4.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
-                                        .arg(sanitizeHtml(otherPlayer->getName())));
+                                        .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
         } else {
-            appendHtmlServerMessage(
-                tr("%1 randomly reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+            appendHtmlServerMessage(tr("%1 randomly reveals %2%3.")
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                        .arg(cardStr)
+                                        .arg(fromStr));
         }
     } else {
         if (faceDown && player == otherPlayer) {
             if (cardName.isEmpty()) {
-                appendHtmlServerMessage(
-                    tr("%1 peeks at face down card #%2.").arg(sanitizeHtml(player->getName())).arg(cardId));
+                appendHtmlServerMessage(tr("%1 peeks at face down card #%2.")
+                                            .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                            .arg(cardId));
             } else {
                 appendHtmlServerMessage(tr("%1 peeks at face down card #%2: %3.")
-                                            .arg(sanitizeHtml(player->getName()))
+                                            .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                             .arg(cardId)
                                             .arg(cardStr));
             }
         } else if (otherPlayer) {
             appendHtmlServerMessage(tr("%1 reveals %2%3 to %4.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg(cardStr)
                                         .arg(fromStr)
-                                        .arg(sanitizeHtml(otherPlayer->getName())));
+                                        .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
         } else {
             appendHtmlServerMessage(
-                tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getName())).arg(cardStr).arg(fromStr));
+                tr("%1 reveals %2%3.").arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardStr).arg(fromStr));
         }
     }
 }
@@ -544,7 +564,7 @@ void MessageLogWidget::logRevealCards(Player *player,
 void MessageLogWidget::logReverseTurn(Player *player, bool reversed)
 {
     appendHtmlServerMessage(tr("%1 reversed turn order, now it's %2.")
-                                .arg(sanitizeHtml(player->getName()))
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(reversed ? tr("reversed") : tr("normal")));
 }
 
@@ -555,18 +575,18 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &
         if (sides == 2) {
             QString coinOptions[2] = {tr("Heads") + " (1)", tr("Tails") + " (2)"};
             appendHtmlServerMessage(tr("%1 flipped a coin. It landed as %2.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg("<font class=\"blue\">" + coinOptions[roll - 1] + "</font>"));
         } else {
             appendHtmlServerMessage(tr("%1 rolls a %2 with a %3-sided die.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg("<font class=\"blue\">" + QString::number(roll) + "</font>")
                                         .arg("<font class=\"blue\">" + QString::number(sides) + "</font>"));
         }
     } else {
         if (sides == 2) {
             appendHtmlServerMessage(tr("%1 flips %2 coins. There are %3 heads and %4 tails.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg("<font class=\"blue\">" + QString::number(rolls.length()) + "</font>")
                                         .arg("<font class=\"blue\">" + QString::number(rolls.count(1)) + "</font>")
                                         .arg("<font class=\"blue\">" + QString::number(rolls.count(2)) + "</font>"));
@@ -576,7 +596,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &
                 rollsStrings.append(QString::number(roll));
             }
             appendHtmlServerMessage(tr("%1 rolls a %2-sided dice %3 times: %4.")
-                                        .arg(sanitizeHtml(player->getName()))
+                                        .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                         .arg("<font class=\"blue\">" + QString::number(sides) + "</font>")
                                         .arg("<font class=\"blue\">" + QString::number(rolls.length()) + "</font>")
                                         .arg("<font class=\"blue\">" + rollsStrings.join(", ") + "</font>"));
@@ -587,7 +607,7 @@ void MessageLogWidget::logRollDie(Player *player, int sides, const QList<uint> &
 
 void MessageLogWidget::logSay(Player *player, QString message)
 {
-    appendMessage(std::move(message), {}, *player->getUserInfo(), true);
+    appendMessage(std::move(message), {}, *player->getPlayerInfo()->getUserInfo(), true);
 }
 
 void MessageLogWidget::logSetActivePhase(int phaseNumber)
@@ -603,14 +623,14 @@ void MessageLogWidget::logSetActivePhase(int phaseNumber)
 void MessageLogWidget::logSetActivePlayer(Player *player)
 {
     appendHtml("<br><font color=\"green\"><b>" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") +
-               QString(tr("%1's turn.")).arg(player->getName()) + "</b></font><br>");
+               QString(tr("%1's turn.")).arg(player->getPlayerInfo()->getName()) + "</b></font><br>");
 }
 
 void MessageLogWidget::logSetAnnotation(Player *player, CardItem *card, QString newAnnotation)
 {
     appendHtmlServerMessage(
         QString(tr("%1 sets annotation of %2 to %3."))
-            .arg(sanitizeHtml(player->getName()))
+            .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
             .arg(cardLink(card->getName()))
             .arg(QString("&quot;<font class=\"blue\">%1</font>&quot;").arg(sanitizeHtml(std::move(newAnnotation)))));
 }
@@ -626,7 +646,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
     }
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-    appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getName()))
+    appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg("<font class=\"blue\">" + QString::number(delta) + "</font>")
                                 .arg(cardCounterSettings.displayName(counterId))
                                 .arg(cardLink(std::move(cardName)))
@@ -641,7 +661,7 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
 
     QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
-                                .arg(sanitizeHtml(player->getName()))
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(value))
                                 .arg(value > oldValue ? "+" : "")
@@ -656,7 +676,7 @@ void MessageLogWidget::logSetDoesntUntap(Player *player, CardItem *card, bool do
     } else {
         str = tr("%1 sets %2 to untap normally.");
     }
-    appendHtmlServerMessage(str.arg(sanitizeHtml(player->getName())).arg(cardLink(card->getName())));
+    appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
 }
 
 void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
@@ -671,7 +691,7 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
     } else {
         name = cardLink(name);
     }
-    QString playerName = sanitizeHtml(player->getName());
+    QString playerName = sanitizeHtml(player->getPlayerInfo()->getName());
     if (newPT.isEmpty()) {
         appendHtmlServerMessage(tr("%1 removes the PT of %2.").arg(playerName).arg(name));
     } else {
@@ -689,9 +709,11 @@ void MessageLogWidget::logSetPT(Player *player, CardItem *card, QString newPT)
 void MessageLogWidget::logSetSideboardLock(Player *player, bool locked)
 {
     if (locked) {
-        appendHtmlServerMessage(tr("%1 has locked their sideboard.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(
+            tr("%1 has locked their sideboard.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
-        appendHtmlServerMessage(tr("%1 has unlocked their sideboard.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(
+            tr("%1 has unlocked their sideboard.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     }
 }
 
@@ -710,15 +732,15 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
     QString str;
     if (!card) {
         appendHtmlServerMessage((tapped ? tr("%1 taps their permanents.") : tr("%1 untaps their permanents."))
-                                    .arg(sanitizeHtml(player->getName())));
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
         appendHtmlServerMessage((tapped ? tr("%1 taps %2.") : tr("%1 untaps %2."))
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(cardLink(card->getName())));
     }
 }
 
-void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
+void MessageLogWidget::logShuffle(Player *player, CardZoneLogic *zone, int start, int end)
 {
     if (currentContext == MessageContext_Mulligan) {
         return;
@@ -729,21 +751,21 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
     // with negitive numbers counging from the bottom up.
     if (start == 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone)));
     } else if (start < 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles the bottom %3 cards of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(-start));
     } else if (start < 0 && end > 0) {
         appendHtmlServerMessage(tr("%1 shuffles the top %3 cards of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(end + 1));
     } else {
         appendHtmlServerMessage(tr("%1 shuffles cards %3 - %4 of %2.")
-                                    .arg(sanitizeHtml(player->getName()))
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(start)
                                     .arg(end));
@@ -757,18 +779,19 @@ void MessageLogWidget::logSpectatorSay(const ServerInfo_User &spectator, QString
 
 void MessageLogWidget::logUnattachCard(Player *player, QString cardName)
 {
-    appendHtmlServerMessage(
-        tr("%1 unattaches %2.").arg(sanitizeHtml(player->getName())).arg(cardLink(std::move(cardName))));
+    appendHtmlServerMessage(tr("%1 unattaches %2.")
+                                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                .arg(cardLink(std::move(cardName))));
 }
 
 void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
 {
     if (cardName.isEmpty()) {
-        appendHtmlServerMessage(tr("%1 undoes their last draw.").arg(sanitizeHtml(player->getName())));
+        appendHtmlServerMessage(tr("%1 undoes their last draw.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
     } else {
         appendHtmlServerMessage(
             tr("%1 undoes their last draw (%2).")
-                .arg(sanitizeHtml(player->getName()))
+                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                 .arg(QString("<a href=\"card://%1\">%2</a>").arg(sanitizeHtml(cardName)).arg(sanitizeHtml(cardName))));
     }
 }
@@ -785,34 +808,35 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
     ChatView::appendHtmlServerMessage(messagePrefix + html + messageSuffix, optionalIsBold, optionalFontColor);
 }
 
-void MessageLogWidget::connectToPlayer(Player *player)
+void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEventHandler)
 {
-
-    connect(player, &Player::logSay, this, &MessageLogWidget::logSay);
-    connect(player, &Player::logShuffle, this, &MessageLogWidget::logShuffle);
-    connect(player, &Player::logRollDie, this, &MessageLogWidget::logRollDie);
-    connect(player, &Player::logCreateArrow, this, &MessageLogWidget::logCreateArrow);
-    connect(player, &Player::logCreateToken, this, &MessageLogWidget::logCreateToken);
-    connect(player, &Player::logSetCounter, this, &MessageLogWidget::logSetCounter);
-    connect(player, &Player::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
-    connect(player, &Player::logSetTapped, this, &MessageLogWidget::logSetTapped);
-    connect(player, &Player::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
-    connect(player, &Player::logSetPT, this, &MessageLogWidget::logSetPT);
-    connect(player, &Player::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
-    connect(player, &Player::logMoveCard, this, &MessageLogWidget::logMoveCard);
-    connect(player, &Player::logFlipCard, this, &MessageLogWidget::logFlipCard);
-    connect(player, &Player::logDestroyCard, this, &MessageLogWidget::logDestroyCard);
-    connect(player, &Player::logAttachCard, this, &MessageLogWidget::logAttachCard);
-    connect(player, &Player::logUnattachCard, this, &MessageLogWidget::logUnattachCard);
-    connect(player, &Player::logDumpZone, this, &MessageLogWidget::logDumpZone);
-    connect(player, &Player::logDrawCards, this, &MessageLogWidget::logDrawCards);
-    connect(player, &Player::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
-    connect(player, &Player::logRevealCards, this, &MessageLogWidget::logRevealCards);
-    connect(player, &Player::logAlwaysRevealTopCard, this, &MessageLogWidget::logAlwaysRevealTopCard);
-    connect(player, &Player::logAlwaysLookAtTopCard, this, &MessageLogWidget::logAlwaysLookAtTopCard);
+    connect(playerEventHandler, &PlayerEventHandler::logSay, this, &MessageLogWidget::logSay);
+    connect(playerEventHandler, &PlayerEventHandler::logShuffle, this, &MessageLogWidget::logShuffle);
+    connect(playerEventHandler, &PlayerEventHandler::logRollDie, this, &MessageLogWidget::logRollDie);
+    connect(playerEventHandler, &PlayerEventHandler::logCreateArrow, this, &MessageLogWidget::logCreateArrow);
+    connect(playerEventHandler, &PlayerEventHandler::logCreateToken, this, &MessageLogWidget::logCreateToken);
+    connect(playerEventHandler, &PlayerEventHandler::logSetCounter, this, &MessageLogWidget::logSetCounter);
+    connect(playerEventHandler, &PlayerEventHandler::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
+    connect(playerEventHandler, &PlayerEventHandler::logSetTapped, this, &MessageLogWidget::logSetTapped);
+    connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
+    connect(playerEventHandler, &PlayerEventHandler::logSetPT, this, &MessageLogWidget::logSetPT);
+    connect(playerEventHandler, &PlayerEventHandler::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
+    connect(playerEventHandler, &PlayerEventHandler::logMoveCard, this, &MessageLogWidget::logMoveCard);
+    connect(playerEventHandler, &PlayerEventHandler::logFlipCard, this, &MessageLogWidget::logFlipCard);
+    connect(playerEventHandler, &PlayerEventHandler::logDestroyCard, this, &MessageLogWidget::logDestroyCard);
+    connect(playerEventHandler, &PlayerEventHandler::logAttachCard, this, &MessageLogWidget::logAttachCard);
+    connect(playerEventHandler, &PlayerEventHandler::logUnattachCard, this, &MessageLogWidget::logUnattachCard);
+    connect(playerEventHandler, &PlayerEventHandler::logDumpZone, this, &MessageLogWidget::logDumpZone);
+    connect(playerEventHandler, &PlayerEventHandler::logDrawCards, this, &MessageLogWidget::logDrawCards);
+    connect(playerEventHandler, &PlayerEventHandler::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
+    connect(playerEventHandler, &PlayerEventHandler::logRevealCards, this, &MessageLogWidget::logRevealCards);
+    connect(playerEventHandler, &PlayerEventHandler::logAlwaysRevealTopCard, this,
+            &MessageLogWidget::logAlwaysRevealTopCard);
+    connect(playerEventHandler, &PlayerEventHandler::logAlwaysLookAtTopCard, this,
+            &MessageLogWidget::logAlwaysLookAtTopCard);
 }
 
-MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, TabGame *_game, QWidget *parent)
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, AbstractGame *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
 }

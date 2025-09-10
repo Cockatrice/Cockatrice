@@ -23,7 +23,7 @@ UserMessagePosition::UserMessagePosition(QTextCursor &cursor)
     relativePosition = cursor.position() - block.position();
 }
 
-ChatView::ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent)
+ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent)
     : QTextBrowser(parent), tabSupervisor(_tabSupervisor), game(_game),
       userListProxy(_tabSupervisor->getUserListManager()), evenNumber(true), showTimestamps(_showTimestamps),
       hoveredItemType(HoveredNothing)

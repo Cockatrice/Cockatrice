@@ -12,11 +12,11 @@
 #include <QTextCursor>
 #include <QTextFragment>
 
+class AbstractGame;
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;
 class UserListProxy;
-class TabGame;
 
 class UserMessagePosition
 {
@@ -34,7 +34,7 @@ class ChatView : public QTextBrowser
     Q_OBJECT
 protected:
     TabSupervisor *const tabSupervisor;
-    TabGame *const game;
+    AbstractGame *const game;
 
 private:
     enum HoveredItemType
@@ -83,7 +83,7 @@ private slots:
     void actMessageClicked();
 
 public:
-    ChatView(TabSupervisor *_tabSupervisor, TabGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
+    ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
     void virtual appendHtmlServerMessage(const QString &html,

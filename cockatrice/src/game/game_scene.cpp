@@ -4,6 +4,7 @@
 #include "../settings/cache_settings.h"
 #include "board/card_item.h"
 #include "player/player.h"
+#include "player/player_graphics_item.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
@@ -46,23 +47,22 @@ void GameScene::retranslateUi()
 
 void GameScene::addPlayer(Player *player)
 {
-    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getName();
-    players << player;
-    addItem(player);
-    connect(player, &Player::sizeChanged, this, &GameScene::rearrange);
-    connect(player, &Player::playerCountChanged, this, &GameScene::rearrange);
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
+    players << player->getGraphicsItem();
+    addItem(player->getGraphicsItem());
+    connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
 }
 
 void GameScene::removePlayer(Player *player)
 {
-    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();
         }
     }
-    players.removeOne(player);
-    removeItem(player);
+    players.removeOne(player->getGraphicsItem());
+    removeItem(player->getGraphicsItem());
     rearrange();
 }
 
@@ -80,12 +80,12 @@ void GameScene::rearrange()
     QList<Player *> playersPlaying;
     int firstPlayerIndex = 0;
     bool firstPlayerFound = false;
-    QListIterator<Player *> playersIter(players);
+    QListIterator<PlayerGraphicsItem *> playersIter(players);
     while (playersIter.hasNext()) {
-        Player *p = playersIter.next();
+        Player *p = playersIter.next()->getPlayer();
         if (p && !p->getConceded()) {
             playersPlaying.append(p);
-            if (!firstPlayerFound && (p->getLocal())) {
+            if (!firstPlayerFound && (p->getPlayerInfo()->getLocal())) {
                 firstPlayerIndex = playersPlaying.size() - 1;
                 firstPlayerFound = true;
             }
@@ -111,19 +111,19 @@ void GameScene::rearrange()
 
     QListIterator<Player *> playersPlayingIter(playersPlaying);
     for (int col = 0; col < columns; ++col) {
-        playersByColumn.append(QList<Player *>());
+        playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
         qreal thisColumnHeight = -playerAreaSpacing;
         const int rowsInColumn = rows - (playersCount % columns) * col; // only correct for max. 2 cols
         for (int j = 0; j < rowsInColumn; ++j) {
             Player *player = playersPlayingIter.next();
             if (col == 0)
-                playersByColumn[col].prepend(player);
+                playersByColumn[col].prepend(player->getGraphicsItem());
             else
-                playersByColumn[col].append(player);
-            thisColumnHeight += player->boundingRect().height() + playerAreaSpacing;
-            if (player->boundingRect().width() > columnWidth[col])
-                columnWidth[col] = player->boundingRect().width();
+                playersByColumn[col].append(player->getGraphicsItem());
+            thisColumnHeight += player->getGraphicsItem()->boundingRect().height() + playerAreaSpacing;
+            if (player->getGraphicsItem()->boundingRect().width() > columnWidth[col])
+                columnWidth[col] = player->getGraphicsItem()->boundingRect().width();
         }
         if (thisColumnHeight > sceneHeight)
             sceneHeight = thisColumnHeight;
@@ -138,7 +138,7 @@ void GameScene::rearrange()
     for (int col = 0; col < columns; ++col) {
         qreal y = 0;
         for (int row = 0; row < playersByColumn[col].size(); ++row) {
-            Player *player = playersByColumn[col][row];
+            PlayerGraphicsItem *player = playersByColumn[col][row];
             player->setPos(x, y);
             player->setMirrored(row != rows - 1);
             y += player->boundingRect().height() + playerAreaSpacing;
@@ -154,7 +154,8 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 {
     for (auto &view : zoneViews) {
         ZoneViewZone *temp = view->getZone();
-        if (temp->getName() == zoneName && temp->getPlayer() == player && temp->getNumberCards() == numberCards) {
+        if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
+            qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
             view->close();
         }
     }
@@ -174,7 +175,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 }
 
 void GameScene::addRevealedZoneView(Player *player,
-                                    CardZone *zone,
+                                    CardZoneLogic *zone,
                                     const QList<const ServerInfo_Card *> &cardList,
                                     bool withWritePermission)
 {
@@ -272,9 +273,9 @@ void GameScene::updateHover(const QPointF &scenePos)
             if (!card)
                 continue;
             if (card->getAttachedTo()) {
-                if (card->getAttachedTo()->getZone() != zone)
+                if (card->getAttachedTo()->getZone() != zone->getLogic())
                     continue;
-            } else if (card->getZone() != zone)
+            } else if (card->getZone() != zone->getLogic())
                 continue;
 
             if (card->getRealZValue() > maxZ) {

@@ -32,13 +32,7 @@ qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal
     return y;
 }
 
-SelectZone::SelectZone(Player *_player,
-                       const QString &_name,
-                       bool _hasCardAttr,
-                       bool _isShufflable,
-                       bool _contentsKnown,
-                       QGraphicsItem *parent)
-    : CardZone(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent)
+SelectZone::SelectZone(CardZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)
 {
 }
 
@@ -57,8 +51,8 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             pos.setY(br.height());
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
-        for (auto card : cards) {
-            if (card->getAttachedTo() && card->getAttachedTo()->getZone() != this) {
+        for (auto card : getLogic()->getCards()) {
+            if (card->getAttachedTo() && card->getAttachedTo()->getZone() != getLogic()) {
                 continue;
             }
 

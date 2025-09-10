@@ -3,12 +3,12 @@
 
 #include "pb/event_leave.pb.h"
 #include "pb/serverinfo_player.pb.h"
-#include "player/player.h"
+#include "player/event_processing_options.h"
 
+#include <QLoggingCategory>
 #include <QObject>
 
 class AbstractClient;
-class TabGame;
 class Response;
 class GameEventContainer;
 class GameEventContext;
@@ -30,24 +30,27 @@ class Event_Ping;
 class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
+class AbstractGame;
 class PendingCommand;
+class Player;
+
+inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "tab_game");
 
 class GameEventHandler : public QObject
 {
     Q_OBJECT
 
 private:
-    TabGame *game;
-    GameState *gameState;
+    AbstractGame *game;
 
 public:
-    GameEventHandler(TabGame *game);
+    explicit GameEventHandler(AbstractGame *_game);
 
     void handleNextTurn();
     void handleReverseTurn();
 
-    void handlePlayerConceded();
-    void handlePlayerUnconceded();
+    void handleActiveLocalPlayerConceded();
+    void handleActiveLocalPlayerUnconceded();
     void handleActivePhaseChanged(int phase);
     void handleGameLeft();
     void handleChatMessageSent(const QString &chatMessage);
@@ -75,9 +78,8 @@ public:
 
     void commandFinished(const Response &response);
 
-    void processGameEventContainer(const GameEventContainer &cont,
-                                   AbstractClient *client,
-                                   Player::EventProcessingOptions options);
+    void
+    processGameEventContainer(const GameEventContainer &cont, AbstractClient *client, EventProcessingOptions options);
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 public slots:
@@ -85,6 +87,8 @@ public slots:
     void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
 
 signals:
+    void emitUserEvent();
+    void addPlayerToAutoCompleteList(QString playerName);
     void localPlayerDeckSelected(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
     void remotePlayerDeckSelected(QString deckList, int playerId, QString playerName);
     void remotePlayersDecksSelected(QVector<QPair<int, QPair<QString, QString>>> opponentDecks);
@@ -107,8 +111,6 @@ signals:
     void logGameStart();
     void logReadyStart(Player *player);
     void logNotReadyStart(Player *player);
-    void playerConceded(Player *player);
-    void playerUnconceded(Player *player);
     void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
     void logSideboardLockSet(Player *player, bool sideboardLocked);
     void logConnectionStateChanged(Player *player, bool connected);

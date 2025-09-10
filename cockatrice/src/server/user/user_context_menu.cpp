@@ -29,7 +29,7 @@
 #include <QtGui>
 #include <QtWidgets>
 
-UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, TabGame *_game)
+UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, AbstractGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),
       userListProxy(_tabSupervisor->getUserListManager()), game(_game)
 {
@@ -380,7 +380,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
         menu->addAction(aRemoveMessages);
     }
-    if (game && (game->getGameState()->isHost() || !tabSupervisor->getAdminLocked())) {
+    if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
         menu->addAction(aKick);
     }

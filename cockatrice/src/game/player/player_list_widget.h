@@ -11,7 +11,7 @@
 class ServerInfo_PlayerProperties;
 class TabSupervisor;
 class AbstractClient;
-class TabGame;
+class AbstractGame;
 class UserContextMenu;
 
 class PlayerListItemDelegate : public QStyledItemDelegate
@@ -39,7 +39,7 @@ private:
     QMap<int, QTreeWidgetItem *> players;
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
-    TabGame *game;
+    AbstractGame *game;
     UserContextMenu *userContextMenu;
     QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, judgeIcon, spectatorIcon, lockIcon;
     bool gameStarted;
@@ -47,7 +47,10 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 public:
-    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = nullptr);
+    PlayerListWidget(TabSupervisor *_tabSupervisor,
+                     AbstractClient *_client,
+                     AbstractGame *_game,
+                     QWidget *parent = nullptr);
     void retranslateUi();
     void setActivePlayer(int playerId);
     void setGameStarted(bool _gameStarted, bool resuming);

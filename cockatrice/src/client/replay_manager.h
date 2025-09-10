@@ -2,6 +2,7 @@
 #define REPLAY_MANAGER_H
 #include "network/replay_timeline_widget.h"
 #include "pb/game_replay.pb.h"
+#include "tabs/tab_game.h"
 
 #include <QWidget>
 
@@ -26,7 +27,7 @@ private:
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
 private slots:
-    void replayNextEvent(Player::EventProcessingOptions options);
+    void replayNextEvent(EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
     void replayFastForwardButtonToggled(bool checked);
