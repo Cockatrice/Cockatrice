@@ -19,14 +19,15 @@ public:
 
 protected:
     void addCardImpl(CardItem *card, int x, int y) override;
-    /**
-   Removes a card from view.
 
-   @param position card position
-   @param cardId id of card to take
-   @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
-   @return CardItem that has been removed
- */
+    /**
+     *  @brief Removes a card from view.
+     *
+     *  @param position card position
+     *  @param cardId id of card to take
+     *  @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
+     *  @return CardItem that has been removed
+     */
     CardItem *takeCard(int position, int cardId, bool toNewZone = true) override;
 };
 
