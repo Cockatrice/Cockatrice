@@ -3,7 +3,8 @@
 
 #include "abstract_game.h"
 
-class Replay : public AbstractGame {
+class Replay : public AbstractGame
+{
     Q_OBJECT
 
 public:

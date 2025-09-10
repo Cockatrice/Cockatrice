@@ -2,6 +2,7 @@
 #define COCKATRICE_GAME_H
 
 #include "abstract_game.h"
+
 #include <QObject>
 
 class Game : public AbstractGame

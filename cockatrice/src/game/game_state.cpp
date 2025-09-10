@@ -1,4 +1,5 @@
 #include "game_state.h"
+
 #include "abstract_game.h"
 
 GameState::GameState(AbstractGame *_game,

@@ -17,4 +17,3 @@ Game::Game(TabGame *_tab,
     playerManager = new PlayerManager(this, event.player_id(), event.judge(), event.spectator());
     gameMetaInfo->setStarted(false);
 }
-

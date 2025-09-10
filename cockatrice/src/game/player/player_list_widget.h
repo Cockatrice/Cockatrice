@@ -47,7 +47,10 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 public:
-    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, AbstractGame *_game, QWidget *parent = nullptr);
+    PlayerListWidget(TabSupervisor *_tabSupervisor,
+                     AbstractClient *_client,
+                     AbstractGame *_game,
+                     QWidget *parent = nullptr);
     void retranslateUi();
     void setActivePlayer(int playerId);
     void setGameStarted(bool _gameStarted, bool resuming);

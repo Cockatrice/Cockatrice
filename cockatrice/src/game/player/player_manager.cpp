@@ -3,7 +3,10 @@
 #include "../abstract_game.h"
 #include "player.h"
 
-PlayerManager::PlayerManager(AbstractGame *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator)
+PlayerManager::PlayerManager(AbstractGame *_game,
+                             int _localPlayerId,
+                             bool _localPlayerIsJudge,
+                             bool localPlayerIsSpectator)
     : QObject(_game), game(_game), players(QMap<int, Player *>()), localPlayerId(_localPlayerId),
       localPlayerIsJudge(_localPlayerIsJudge), localPlayerIsSpectator(localPlayerIsSpectator)
 {
