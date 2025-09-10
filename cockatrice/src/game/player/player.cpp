@@ -71,19 +71,6 @@ Player::~Player()
     delete getPlayerInfo()->userInfo;
 }
 
-void Player::retranslateUi()
-{
-    QMapIterator<QString, CardZoneLogic *> zoneIterator(zones);
-    while (zoneIterator.hasNext()) {
-        emit zoneIterator.next().value()->retranslateUi();
-    }
-
-    QMapIterator<int, AbstractCounter *> counterIterator(counters);
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->retranslateUi();
-    }
-}
-
 void Player::clear()
 {
     clearArrows();

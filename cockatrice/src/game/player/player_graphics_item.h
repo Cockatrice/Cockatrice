@@ -91,6 +91,7 @@ public:
 
 public slots:
     void onPlayerActiveChanged(bool _active);
+    void retranslateUi();
 
 signals:
     void sizeChanged();

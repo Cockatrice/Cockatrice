@@ -24,7 +24,23 @@ PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
     updateBoundingRect();
 
     rearrangeZones();
-    // retranslateUi();
+    retranslateUi();
+}
+
+void PlayerGraphicsItem::retranslateUi()
+{
+        player->getPlayerMenu()->retranslateUi();
+
+        QMapIterator<QString, CardZoneLogic *> zoneIterator(player->getZones());
+        while (zoneIterator.hasNext()) {
+            emit zoneIterator.next().value()->retranslateUi();
+        }
+
+        QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
+        while (counterIterator.hasNext()) {
+            counterIterator.next().value()->retranslateUi();
+        }
+
 }
 
 void PlayerGraphicsItem::onPlayerActiveChanged(bool _active)

@@ -169,7 +169,6 @@ void TabGame::connectToGameEventHandler()
 
 void TabGame::connectMessageLogToGameEventHandler()
 {
-    // connect(game->getGameEventHandler(), &GameEventHandler:: , messageLog, &MessageLogWidget::);
     connect(game->getGameEventHandler(), &GameEventHandler::gameFlooded, messageLog, &MessageLogWidget::logGameFlooded);
     connect(game->getGameEventHandler(), &GameEventHandler::containerProcessingStarted, messageLog,
             &MessageLogWidget::containerProcessingStarted);
@@ -366,7 +365,7 @@ void TabGame::retranslateUi()
     QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
 
     while (i.hasNext())
-        i.next().value()->retranslateUi();
+        i.next().value()->getGraphicsItem()->retranslateUi();
     QMapIterator<int, TabbedDeckViewContainer *> j(deckViewContainers);
     while (j.hasNext())
         j.next().value()->playerDeckView->retranslateUi();

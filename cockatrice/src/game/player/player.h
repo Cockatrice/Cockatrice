@@ -76,7 +76,6 @@ public slots:
 public:
     Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent);
     ~Player() override;
-    void retranslateUi();
 
     void initializeZones();
     void updateZones();
