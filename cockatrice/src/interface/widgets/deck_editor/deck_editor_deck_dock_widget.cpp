@@ -118,6 +118,12 @@ void DeckEditorDeckDockWidget::createDeckDock()
         deckView->expandAll();
     });
 
+    formatLabel = new QLabel(this);
+
+    formatComboBox = new QComboBox(this);
+    formatComboBox->addItem(tr("Loading Database..."));
+    formatComboBox->setEnabled(false); // Disable until loaded
+
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -160,6 +166,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
     upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
+
+    upperLayout->addWidget(formatLabel, 5, 0);
+    upperLayout->addWidget(formatComboBox, 5, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -207,6 +216,44 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     refreshShortcuts();
     retranslateUi();
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &DeckEditorDeckDockWidget::initializeFormats);
+
+    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
+        initializeFormats();
+    }
+}
+
+void DeckEditorDeckDockWidget::initializeFormats()
+{
+    QMap<QString, int> allFormats = CardDatabaseManager::getInstance()->getAllFormatsWithCount();
+
+    formatComboBox->clear(); // Remove "Loading Database..."
+    formatComboBox->setEnabled(true);
+
+    // Populate with formats (just the names, or names + counts?)
+    for (auto it = allFormats.constBegin(); it != allFormats.constEnd(); ++it) {
+        QString displayText = QString("%1 (%2)").arg(it.key()).arg(it.value());
+        formatComboBox->addItem(displayText, it.key()); // store the raw key in itemData
+    }
+
+    if (!deckModel->getDeckList()->getGameFormat().isEmpty()) {
+        deckModel->setActiveFormat(deckModel->getDeckList()->getGameFormat());
+        formatComboBox->setCurrentIndex(formatComboBox->findData(deckModel->getDeckList()->getGameFormat()));
+    } else {
+        // Ensure no selection is visible initially
+        formatComboBox->setCurrentIndex(-1);
+    }
+
+    connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        if (index >= 0) {
+            QString formatKey = formatComboBox->itemData(index).toString();
+            deckModel->setActiveFormat(formatKey);
+        } else {
+            deckModel->setActiveFormat(QString()); // clear format if deselected
+        }
+    });
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -375,6 +422,8 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     updateBannerCardComboBox();
     updateHash();
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
+    deckModel->setActiveFormat(_deck->getGameFormat());
+    formatComboBox->setCurrentIndex(formatComboBox->findData(_deck->getGameFormat()));
     deckView->expandAll();
     deckView->expandAll();
 
@@ -604,6 +653,8 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
+    formatLabel->setText(tr("Format:"));
+
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));

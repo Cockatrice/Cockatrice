@@ -83,7 +83,8 @@ DeckList::DeckList()
 // TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
 DeckList::DeckList(const DeckList &other)
     : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard),
-      lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags), cachedDeckHash(other.cachedDeckHash)
+      lastLoadedTimestamp(other.lastLoadedTimestamp), gameFormat(other.gameFormat), tags(other.tags),
+      cachedDeckHash(other.cachedDeckHash)
 {
     root = new InnerDecklistNode(other.getRoot());
 
@@ -137,6 +138,8 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             lastLoadedTimestamp = xml->readElementText();
         } else if (childName == "deckname") {
             name = xml->readElementText();
+        } else if (childName == "format") {
+            gameFormat = xml->readElementText();
         } else if (childName == "comments") {
             comments = xml->readElementText();
         } else if (childName == "bannerCard") {
@@ -173,6 +176,7 @@ void DeckList::write(QXmlStreamWriter *xml) const
     xml->writeAttribute("version", "1");
     xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
     xml->writeTextElement("deckname", name);
+    xml->writeTextElement("format", gameFormat);
     xml->writeStartElement("bannerCard");
     xml->writeAttribute("providerId", bannerCard.providerId);
     xml->writeCharacters(bannerCard.name);
@@ -585,15 +589,16 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const int position,
                                     const QString &cardSetName,
                                     const QString &cardSetCollectorNumber,
-                                    const QString &cardProviderId)
+                                    const QString &cardProviderId,
+                                    const bool formatLegal)
 {
     auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (zoneNode == nullptr) {
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node =
-        new DecklistCardNode(cardName, 1, zoneNode, position, cardSetName, cardSetCollectorNumber, cardProviderId);
+    auto *node = new DecklistCardNode(cardName, 1, zoneNode, position, cardSetName, cardSetCollectorNumber,
+                                      cardProviderId, formatLegal);
     refreshDeckHash();
 
     return node;

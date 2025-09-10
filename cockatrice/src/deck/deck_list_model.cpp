@@ -177,7 +177,12 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                 return true;
             case Qt::BackgroundRole: {
                 int color = 255 - (index.row() % 2) * 30;
-                return QBrush(QColor(color, color, color));
+
+                if (card->getFormatLegality()) {
+                    return QBrush(QColor(color, color, color)); // alternating grey
+                } else {
+                    return QBrush(QColor(255, color / 3, color / 3)); // stronger red, still alternates
+                }
             }
             case Qt::ForegroundRole: {
                 return QBrush(QColor(0, 0, 0));
@@ -185,6 +190,22 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             default:
                 return {};
         }
+    }
+}
+
+void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
+{
+    int rows = rowCount(parent);
+    if (rows == 0)
+        return;
+
+    QModelIndex topLeft = index(0, 0, parent);
+    QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
+    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
+
+    for (int r = 0; r < rows; ++r) {
+        QModelIndex child = index(r, 0, parent);
+        emitBackgroundUpdates(child);
     }
 }
 
@@ -411,8 +432,8 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Determine the correct index
         int insertRow = findSortedInsertRow(groupNode, cardInfo);
 
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
-                                               printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName, printingInfo.getProperty("num"),
+                              printingInfo.getProperty("uuid"), isCardLegalForCurrentFormat(cardInfo));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, groupNode, insertRow);
@@ -528,6 +549,13 @@ void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteri
     rebuildTree();
 }
 
+void DeckListModel::setActiveFormat(const QString &_format)
+{
+    deckList->setGameFormat(_format);
+    refreshCardFormatLegalities();
+    emitBackgroundUpdates(QModelIndex()); // start from root
+}
+
 void DeckListModel::cleanList()
 {
     setDeckList(new DeckLoader);
@@ -630,6 +658,42 @@ QList<QString> *DeckListModel::getZones() const
         zones->append(currentZone->getName());
     }
     return zones;
+}
+
+bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
+{
+    if (!deckList->getGameFormat().isEmpty()) {
+        if (cardInfo->getProperties().contains("format-" + deckList->getGameFormat())) {
+            return cardInfo->getProperty("format-" + deckList->getGameFormat()) == "legal";
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+void DeckListModel::refreshCardFormatLegalities()
+{
+    InnerDecklistNode *listRoot = deckList->getRoot();
+
+    for (int i = 0; i < listRoot->size(); i++) {
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        for (int j = 0; j < currentZone->size(); j++) {
+            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+
+            // TODO: better sanity checking
+            if (currentCard == nullptr) {
+                continue;
+            }
+
+            ExactCard exactCard = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+            if (!exactCard) {
+                continue;
+            }
+
+            currentCard->setFormatLegality(isCardLegalForCurrentFormat(exactCard.getCardPtr()));
+        }
+    }
 }
 
 void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)

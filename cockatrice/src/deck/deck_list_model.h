@@ -87,6 +87,14 @@ public:
     {
         dataNode->setCardCollectorNumber(_cardSetNumber);
     }
+    bool getFormatLegality() const override
+    {
+        return dataNode->getFormatLegality();
+    }
+    void setFormatLegality(const bool _formatLegal) override
+    {
+        dataNode->setFormatLegality(_formatLegal);
+    }
 
     /**
      * @brief Returns the underlying data node.
@@ -136,6 +144,7 @@ public slots:
      * @param printer The printer to render the decklist to.
      */
     void printDeckList(QPrinter *printer);
+    void setActiveFormat(const QString &_format);
 
 signals:
     /**
@@ -167,6 +176,7 @@ public:
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
+    void emitBackgroundUpdates(const QModelIndex &parent);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     QModelIndex parent(const QModelIndex &index) const override;
@@ -228,6 +238,8 @@ public:
     QList<ExactCard> getCards() const;
     QList<ExactCard> getCardsForZone(const QString &zoneName) const;
     QList<QString> *getZones() const;
+    bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
+    void refreshCardFormatLegalities();
 
     /**
      * @brief Sets the criteria used to group cards in the model.
