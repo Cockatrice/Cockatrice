@@ -127,6 +127,9 @@ void CardZoneLogic::refreshCardInfos()
 void CardZoneLogic::moveAllToZone()
 {
     QList<QVariant> data = static_cast<QAction *>(sender())->data().toList();
+    if (data.length() < 2) {
+        return;
+    }
     QString targetZone = data[0].toString();
     int targetX = data[1].toInt();
 
