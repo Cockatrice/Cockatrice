@@ -37,10 +37,11 @@ public:
                            QObject *parent = nullptr);
 
     void addCard(CardItem *card, bool reorganize, int x, int y = -1);
-    void removeCard(CardItem *card);
     // getCard() finds a card by id.
-    virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
     CardItem *getCard(int cardId);
+    void removeCard(CardItem *card);
+    // takeCard() finds a card by position and removes it from the zone and from all of its views.
+    virtual CardItem *takeCard(int position, int cardId, bool canResize = true);
 
     void rawInsertCard(CardItem *card, int index)
     {
@@ -107,7 +108,6 @@ protected:
     bool alwaysRevealTopCard;
 
     virtual void addCardImpl(CardItem *card, int x, int y) = 0;
-    // takeCard() finds a card by position and removes it from the zone and from all of its views.
 };
 
 #endif // COCKATRICE_CARD_ZONE_LOGIC_H
