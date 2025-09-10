@@ -25,4 +25,5 @@ void StackZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
         card->setCardRef({});
     }
     card->resetState(true);
+    card->setVisible(true);
 }
