@@ -167,7 +167,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
                 default: {
                     Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
                     if (!player) {
-                        // qCWarning(GameEventHandlerLog) << "unhandled game event: invalid player id";
+                        qCWarning(GameEventHandlerLog) << "unhandled game event: invalid player id";
                         break;
                     }
                     player->getPlayerEventHandler()->processGameEvent(eventType, event, context, options);
@@ -455,11 +455,8 @@ void GameEventHandler::eventKicked(const Event_Kicked & /*event*/,
                                    const GameEventContext & /*context*/)
 {
     emit gameClosed();
-
     emit logKicked();
-
     emit playerKicked();
-
     emitUserEvent();
 }
 

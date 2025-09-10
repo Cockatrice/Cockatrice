@@ -5,6 +5,7 @@
 #include "pb/serverinfo_player.pb.h"
 #include "player/event_processing_options.h"
 
+#include <QLoggingCategory>
 #include <QObject>
 
 class AbstractClient;
@@ -32,6 +33,8 @@ class Event_ReverseTurn;
 class Game;
 class PendingCommand;
 class Player;
+
+inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "tab_game");
 
 class GameEventHandler : public QObject
 {
