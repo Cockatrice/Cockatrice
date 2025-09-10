@@ -103,7 +103,6 @@ public:
     QStringList getAllMainCardTypes() const;
     QMap<QString, int> getAllMainCardTypesWithCount() const;
     QMap<QString, int> getAllSubCardTypesWithCount() const;
-    QMap<QString, int> getAllFormatsWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;

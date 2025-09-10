@@ -4,11 +4,9 @@
 #include "../../../../settings/cache_settings.h"
 
 #include <QComboBox>
-#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
-#include <QMessageBox>
 #include <QSplitter>
 #include <QTextEdit>
 #include <trice_limits.h>
@@ -120,16 +118,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
         deckView->expandAll();
     });
 
-    formatLabel = new QLabel(this);
-
-    formatComboBox = new QComboBox(this);
-    formatComboBox->addItem("Loading Database...");
-    formatComboBox->setEnabled(false); // Disable until loaded
-
-    legalityCheckerButton = new QPushButton(this);
-
-    connect(legalityCheckerButton, &QPushButton::clicked, this, &DeckEditorDeckDockWidget::checkDeckFormatLegality);
-
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -172,11 +160,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
     upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
-
-    upperLayout->addWidget(formatLabel, 5, 0);
-    upperLayout->addWidget(formatComboBox, 5, 1);
-
-    upperLayout->addWidget(legalityCheckerButton, 6, 0);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -224,112 +207,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     refreshShortcuts();
     retranslateUi();
-
-    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-            &DeckEditorDeckDockWidget::initializeFormats);
-
-    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
-        initializeFormats();
-    }
-}
-
-void DeckEditorDeckDockWidget::initializeFormats()
-{
-    QMap<QString, int> allFormats = CardDatabaseManager::getInstance()->getAllFormatsWithCount();
-
-    formatComboBox->clear(); // Remove "Loading Database..."
-    formatComboBox->setEnabled(true);
-
-    // Populate with formats (just the names, or names + counts?)
-    for (auto it = allFormats.constBegin(); it != allFormats.constEnd(); ++it) {
-        QString displayText = QString("%1 (%2)").arg(it.key()).arg(it.value());
-        formatComboBox->addItem(displayText, it.key()); // store the raw key in itemData
-    }
-
-    // Ensure no selection is visible initially
-    formatComboBox->setCurrentIndex(-1);
-}
-
-void DeckEditorDeckDockWidget::checkDeckFormatLegality()
-{
-    if (formatComboBox->currentIndex() < 0) {
-        QMessageBox::information(this, tr("Deck Legality"), tr("No format selected."));
-        return;
-    }
-
-    QString selectedFormat = formatComboBox->currentData().toString();
-    QString formatProperty = "format-" + selectedFormat;
-
-    QStringList illegalCards;
-    QStringList unknownCards;
-    QStringList legalCards;
-
-    InnerDecklistNode *listRoot = deckModel->getDeckList()->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-
-            ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
-            if (!card) {
-                unknownCards << currentCard->getName();
-                continue;
-            }
-
-            bool hasFormatProperty = false;
-            bool isLegal = false;
-
-            for (const QString &prop : card.getCardPtr()->getProperties()) {
-                if (prop.startsWith("format-")) {
-                    hasFormatProperty = true;
-                    if (prop == formatProperty && card.getCardPtr()->getProperty(formatProperty) == "legal") {
-                        isLegal = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!hasFormatProperty) {
-                unknownCards << card.getName();
-            } else if (isLegal) {
-                legalCards << card.getName();
-            } else {
-                illegalCards << card.getName();
-            }
-        }
-    }
-
-    // Build the output text
-    QString output;
-    output += tr("=== Deck Legality Check for Format: %1 ===\n\n").arg(selectedFormat);
-    output += tr("Illegal cards:\n\n");
-    output += illegalCards.join("\n") + "\n\n";
-    output += tr("Unknown cards:\n\n");
-    output += unknownCards.join("\n") + "\n\n";
-    output += tr("Legal cards:\n\n");
-    output += legalCards.join("\n");
-
-    // Create a scrollable dialog
-    QDialog dialog(this);
-    dialog.setWindowTitle(tr("Deck Legality Results"));
-    dialog.resize(500, 400);
-
-    QVBoxLayout layout(&dialog);
-    QTextEdit *textEdit = new QTextEdit(&dialog);
-    textEdit->setReadOnly(true);
-    textEdit->setPlainText(output);
-    layout.addWidget(textEdit);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
-    connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-    layout.addWidget(buttonBox);
-
-    dialog.exec();
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -727,9 +604,6 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
-    formatLabel->setText(tr("Format:"));
-    legalityCheckerButton->setText(tr("Check card legality"));
-
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));
