@@ -59,6 +59,7 @@ public slots:
     void actCheckCardUpdatesBackground();
     void actCheckServerUpdates();
     void actCheckClientUpdates();
+    void actConnect();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -77,7 +78,6 @@ private slots:
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void notifyUserAboutUpdate();
-    void actConnect();
     void actDisconnect();
     void actSinglePlayer();
     void actWatchReplay();

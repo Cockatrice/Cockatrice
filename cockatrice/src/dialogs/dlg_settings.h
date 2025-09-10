@@ -107,6 +107,10 @@ private:
     QLabel themeLabel;
     QComboBox themeBox;
     QPushButton openThemeButton;
+    QLabel homeTabBackgroundSourceLabel;
+    QComboBox homeTabBackgroundSourceBox;
+    QLabel homeTabBackgroundShuffleFrequencyLabel;
+    QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;

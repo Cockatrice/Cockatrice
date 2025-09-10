@@ -1,7 +1,9 @@
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
+#include "../../../../server/abstract_client.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../cards/card_info_picture_art_crop_widget.h"
+#include "home_styled_button.h"
 
 #include <QGridLayout>
 #include <QGroupBox>
@@ -14,26 +16,25 @@ class HomeWidget : public QWidget
 
 public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
-    void startCardShuffleTimer();
     void updateRandomCard();
-    QGroupBox *createSettingsButtonGroup(const QString &title);
-    QGroupBox *createUpdatesButtonGroup(const QString &title);
-    QGroupBox *createNavigationButtonGroup(const QString &title);
-    QGroupBox *createPlayButtonGroup(const QString &title);
     QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
+    void initializeBackgroundFromSource();
     void updateBackgroundProperties();
+    QGroupBox *createButtons();
+    void updateConnectButton(const ClientStatus status);
 
 private:
     QGridLayout *layout;
     QTimer *cardChangeTimer;
     TabSupervisor *tabSupervisor;
     QPixmap background;
-    CardInfoPictureArtCropWidget *backgroundSource = nullptr;
+    CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
+    HomeStyledButton *connectButton;
 };
 
 #endif // HOME_WIDGET_H

@@ -740,6 +740,15 @@ void TabSupervisor::roomLeft(TabRoom *tab)
     removeTab(indexOf(tab));
 }
 
+void TabSupervisor::switchToFirstAvailableNetworkTab()
+{
+    if (!roomTabs.isEmpty()) {
+        setCurrentWidget(roomTabs.first());
+    } else if (tabServer) {
+        setCurrentWidget(tabServer);
+    }
+}
+
 void TabSupervisor::openReplay(GameReplay *replay)
 {
     auto *replayTab = new TabGame(this, replay);

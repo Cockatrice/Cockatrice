@@ -168,6 +168,7 @@ public slots:
     TabEdhRecMain *addEdhrecMainTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
+    void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);

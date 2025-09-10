@@ -102,6 +102,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/client/ui/widgets/general/background_sources.cpp
     src/client/ui/widgets/general/home_styled_button.cpp
     src/client/ui/widgets/general/home_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp

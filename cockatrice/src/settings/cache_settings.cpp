@@ -217,6 +217,9 @@ SettingsCache::SettingsCache()
 
     themeName = settings->value("theme/name").toString();
 
+    homeTabBackgroundSource = settings->value("home/background", "themed").toString();
+    homeTabBackgroundShuffleFrequency = settings->value("home/background/shuffleTimer", 0).toInt();
+
     tabVisualDeckStorageOpen = settings->value("tabs/visualDeckStorage", true).toBool();
     tabServerOpen = settings->value("tabs/server", true).toBool();
     tabAccountOpen = settings->value("tabs/account", true).toBool();
@@ -548,6 +551,20 @@ void SettingsCache::setThemeName(const QString &_themeName)
     themeName = _themeName;
     settings->setValue("theme/name", themeName);
     emit themeChanged();
+}
+
+void SettingsCache::setHomeTabBackground(const QString &_backgroundSource)
+{
+    homeTabBackgroundSource = _backgroundSource;
+    settings->setValue("home/background", homeTabBackgroundSource);
+    emit homeTabBackgroundSourceChanged();
+}
+
+void SettingsCache::setHomeTabBackgroundShuffleFrequency(int _frequency)
+{
+    homeTabBackgroundShuffleFrequency = _frequency;
+    settings->setValue("home/background/shuffleTimer", homeTabBackgroundShuffleFrequency);
+    emit homeTabBackgroundShuffleFrequencyChanged();
 }
 
 void SettingsCache::setTabVisualDeckStorageOpen(bool value)

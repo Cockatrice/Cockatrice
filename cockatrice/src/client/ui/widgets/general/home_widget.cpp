@@ -1,7 +1,11 @@
 #include "home_widget.h"
 
 #include "../../../../game/cards/card_database_manager.h"
+#include "../../../../server/remote/remote_client.h"
+#include "../../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
+#include "../../window_main.h"
+#include "background_sources.h"
 #include "home_styled_button.h"
 
 #include <QPainter>
@@ -15,18 +19,11 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     setAttribute(Qt::WA_OpaquePaintEvent);
     layout = new QGridLayout(this);
 
-    backgroundSource = new CardInfoPictureArtCropWidget(this);
-
-    backgroundSource->setCard(CardDatabaseManager::getInstance()->getRandomCard());
-
-    background = backgroundSource->getProcessedBackground(size());
+    backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
 
     gradientColors = extractDominantColors(background);
 
-    layout->addWidget(createSettingsButtonGroup("Settings"), 0, 0, Qt::AlignTop | Qt::AlignLeft);
-    layout->addWidget(createUpdatesButtonGroup("Updates"), 0, 2, Qt::AlignTop | Qt::AlignRight);
-    layout->addWidget(createNavigationButtonGroup("Navigation"), 2, 0, Qt::AlignBottom | Qt::AlignLeft);
-    layout->addWidget(createPlayButtonGroup("Play"), 2, 2, Qt::AlignBottom | Qt::AlignRight);
+    layout->addWidget(createButtons(), 1, 1, Qt::AlignVCenter | Qt::AlignHCenter);
 
     layout->setRowStretch(0, 1);
     layout->setRowStretch(2, 1);
@@ -35,19 +32,39 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
 
     setLayout(layout);
 
-    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-            &HomeWidget::startCardShuffleTimer);
-
-    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
-        startCardShuffleTimer();
-    }
-}
-
-void HomeWidget::startCardShuffleTimer()
-{
     cardChangeTimer = new QTimer(this);
     connect(cardChangeTimer, &QTimer::timeout, this, &HomeWidget::updateRandomCard);
-    cardChangeTimer->start(5000); // 20 seconds
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &HomeWidget::initializeBackgroundFromSource);
+
+    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
+        initializeBackgroundFromSource();
+    }
+
+    connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
+    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
+            &HomeWidget::initializeBackgroundFromSource);
+}
+
+void HomeWidget::initializeBackgroundFromSource()
+{
+    auto type = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+
+    cardChangeTimer->stop();
+
+    switch (type) {
+        case BackgroundSources::Theme:
+            background = QPixmap("theme:backgrounds/home");
+            update();
+            break;
+        case BackgroundSources::RandomCardArt:
+            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            break;
+        case BackgroundSources::DeckFileArt:
+            // do deck file stuff if and when we implement it
+            break;
+    }
 }
 
 void HomeWidget::updateRandomCard()
@@ -57,13 +74,13 @@ void HomeWidget::updateRandomCard()
         return;
 
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
-    backgroundSource->setCard(newCard);
+    backgroundSourceCard->setCard(newCard);
+    background = backgroundSourceCard->getProcessedBackground(size());
 }
 
 void HomeWidget::updateBackgroundProperties()
 {
-    background = backgroundSource->getProcessedBackground(size());
-
+    background = backgroundSourceCard->getProcessedBackground(size());
     gradientColors = extractDominantColors(background);
     for (HomeStyledButton *button : findChildren<HomeStyledButton *>()) {
         button->updateStylesheet(gradientColors);
@@ -72,55 +89,9 @@ void HomeWidget::updateBackgroundProperties()
     update(); // Triggers repaint
 }
 
-QGroupBox *HomeWidget::createSettingsButtonGroup(const QString &title)
+QGroupBox *HomeWidget::createButtons()
 {
-    QGroupBox *box = new QGroupBox(title);
-    box->setStyleSheet(R"(
-    QGroupBox {
-        font-size: 20px;
-        color: white;         /* Title text color */
-        background: transparent;
-    }
-
-    QGroupBox::title {
-        color: white;
-        subcontrol-origin: margin;
-        subcontrol-position: top center;  /* or top left / right */
-    }
-)");
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    layout->addWidget(new HomeStyledButton("Settings", gradientColors));
-    box->setLayout(layout);
-    return box;
-}
-
-QGroupBox *HomeWidget::createUpdatesButtonGroup(const QString &title)
-{
-    QGroupBox *box = new QGroupBox(title);
-    box->setStyleSheet(R"(
-    QGroupBox {
-        font-size: 20px;
-        color: white;         /* Title text color */
-        background: transparent;
-    }
-
-    QGroupBox::title {
-        color: white;
-        subcontrol-origin: margin;
-        subcontrol-position: top center;  /* or top left / right */
-    }
-)");
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    layout->addWidget(new HomeStyledButton("Updates", gradientColors));
-    box->setLayout(layout);
-    return box;
-}
-
-QGroupBox *HomeWidget::createNavigationButtonGroup(const QString &title)
-{
-    QGroupBox *box = new QGroupBox(title);
+    QGroupBox *box = new QGroupBox(this);
     box->setStyleSheet(R"(
     QGroupBox {
         font-size: 20px;
@@ -135,58 +106,65 @@ QGroupBox *HomeWidget::createNavigationButtonGroup(const QString &title)
     }
 )");
     box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-    auto replaybutton = new HomeStyledButton("View Replays", gradientColors);
-    connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
-    layout->addWidget(replaybutton);
-    auto edhrecButton = new HomeStyledButton("Browse EDHRec", gradientColors);
-    connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
-    layout->addWidget(edhrecButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton("Browse Card Database", gradientColors);
-    connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
-            &TabSupervisor::addVisualDatabaseDisplayTab);
-    layout->addWidget(visualDatabaseDisplayButton);
-    auto visualDeckStorageButton = new HomeStyledButton("Browse Decks", gradientColors);
-    connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
-            [this] { tabSupervisor->actTabVisualDeckStorage(true); });
-    layout->addWidget(visualDeckStorageButton);
+    QVBoxLayout *boxLayout = new QVBoxLayout;
+    boxLayout->setAlignment(Qt::AlignHCenter);
+
+    QLabel *logoLabel = new QLabel;
+    logoLabel->setPixmap(overlay.scaledToWidth(200, Qt::SmoothTransformation));
+    logoLabel->setAlignment(Qt::AlignCenter);
+    boxLayout->addWidget(logoLabel);
+    boxLayout->addSpacing(25);
+
+    connectButton = new HomeStyledButton("Connect/Play", gradientColors);
+    boxLayout->addWidget(connectButton, 1);
+
     auto visualDeckEditorButton = new HomeStyledButton("Create New Deck", gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->addVisualDeckEditorTab(nullptr); });
-    layout->addWidget(visualDeckEditorButton);
-    box->setLayout(layout);
+    boxLayout->addWidget(visualDeckEditorButton);
+    auto visualDeckStorageButton = new HomeStyledButton("Browse Decks", gradientColors);
+    connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
+            [this] { tabSupervisor->actTabVisualDeckStorage(true); });
+    boxLayout->addWidget(visualDeckStorageButton);
+    auto visualDatabaseDisplayButton = new HomeStyledButton("Browse Card Database", gradientColors);
+    connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
+            &TabSupervisor::addVisualDatabaseDisplayTab);
+    boxLayout->addWidget(visualDatabaseDisplayButton);
+    auto edhrecButton = new HomeStyledButton("Browse EDHRec", gradientColors);
+    connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
+    boxLayout->addWidget(edhrecButton);
+    auto replaybutton = new HomeStyledButton("View Replays", gradientColors);
+    connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
+    boxLayout->addWidget(replaybutton);
+
+    box->setLayout(boxLayout);
+
     return box;
 }
 
-QGroupBox *HomeWidget::createPlayButtonGroup(const QString &title)
+void HomeWidget::updateConnectButton(const ClientStatus status)
 {
-    QGroupBox *box = new QGroupBox(title);
-    box->setStyleSheet(R"(
-    QGroupBox {
-        font-size: 20px;
-        color: white;         /* Title text color */
-        background: transparent;
+    disconnect(connectButton);
+    switch (status) {
+        case StatusConnecting:
+            connectButton->setText("Connecting...");
+            connectButton->setEnabled(false);
+            break;
+        case StatusDisconnected:
+            connectButton->setText("Connect");
+            connectButton->setEnabled(true);
+            connect(connectButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
+                    &MainWindow::actConnect);
+            break;
+        case StatusLoggedIn:
+            connectButton->setText("Play");
+            connectButton->setEnabled(true);
+            connect(connectButton, &QPushButton::clicked, tabSupervisor,
+                    &TabSupervisor::switchToFirstAvailableNetworkTab);
+            break;
+        default:
+            break;
     }
-
-    QGroupBox::title {
-        color: white;
-        subcontrol-origin: margin;
-        subcontrol-position: top center;  /* or top left / right */
-    }
-)");
-    box->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setAlignment(Qt::AlignHCenter); // Center widgets horizontally
-
-    auto connectButton = new HomeStyledButton("Connect", gradientColors);
-    layout->addWidget(connectButton, 1); // stretch factor 1
-
-    auto playButton = new HomeStyledButton("Play", gradientColors);
-    layout->addWidget(playButton, 1);
-
-    box->setLayout(layout);
-    return box;
 }
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
@@ -241,10 +219,7 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    // Update background if we have a source
-    if (backgroundSource) {
-        background = backgroundSource->getProcessedBackground(size());
-    }
+    background = background.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
     // Draw already-scaled background centered
     QSize widgetSize = size();
@@ -261,11 +236,6 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillPath(roundedRectPath, semiTransparentBlack);
-
-    // Draw centered overlay image
-    QSize overlaySize = overlay.size();
-    QPoint center((width() - overlaySize.width()) / 2, (height() - overlaySize.height()) / 2);
-    painter.drawPixmap(center, overlay);
 
     QWidget::paintEvent(event);
 }
