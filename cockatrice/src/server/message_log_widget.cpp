@@ -32,11 +32,12 @@ static QString cardLink(const QString &cardName)
     return QString("<i><a href=\"card://%1\">%2</a></i>").arg(cardName).arg(cardName);
 }
 
-QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString cardName, int position, bool ownerChange)
+QPair<QString, QString>
+MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position, bool ownerChange)
 {
     bool cardNameContainsStartZone = false;
     QString fromStr;
-    QString zoneName = zone->getLogic()->getName();
+    QString zoneName = zone->getName();
 
     if (zoneName == TABLE_ZONE_NAME) {
         fromStr = tr(" from play");
@@ -50,8 +51,7 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
         if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
-                    cardName = tr("the top card of %1's library")
-                                   .arg(zone->getLogic()->getPlayer()->getPlayerInfo()->getName());
+                    cardName = tr("the top card of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     cardName = tr("the top card of their library");
                 }
@@ -59,16 +59,16 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
             } else {
                 if (ownerChange) {
                     fromStr = tr(" from the top of %1's library")
-                                  .arg(zone->getLogic()->getPlayer()->getPlayerInfo()->getName());
+                                  .arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the top of their library");
                 }
             }
-        } else if (position >= zone->getLogic()->getCards().size() - 1) {
+        } else if (position >= zone->getCards().size() - 1) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
                     cardName = tr("the bottom card of %1's library")
-                                   .arg(zone->getLogic()->getPlayer()->getPlayerInfo()->getName());
+                                   .arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     cardName = tr("the bottom card of their library");
                 }
@@ -76,14 +76,14 @@ QPair<QString, QString> MessageLogWidget::getFromStr(CardZone *zone, QString car
             } else {
                 if (ownerChange) {
                     fromStr = tr(" from the bottom of %1's library")
-                                  .arg(zone->getLogic()->getPlayer()->getPlayerInfo()->getName());
+                                  .arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the bottom of their library");
                 }
             }
         } else {
             if (ownerChange) {
-                fromStr = tr(" from %1's library").arg(zone->getLogic()->getPlayer()->getPlayerInfo()->getName());
+                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
             } else {
                 fromStr = tr(" from their library");
             }
@@ -117,20 +117,20 @@ void MessageLogWidget::containerProcessingStarted(const GameEventContext &contex
     }
 }
 
-void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZone *zone, bool reveal)
+void MessageLogWidget::logAlwaysRevealTopCard(Player *player, CardZoneLogic *zone, bool reveal)
 {
     appendHtmlServerMessage((reveal ? tr("%1 is now keeping the top card %2 revealed.")
                                     : tr("%1 is not revealing the top card %2 any longer."))
                                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                .arg(zone->getLogic()->getTranslatedName(true, CaseTopCardsOfZone)));
+                                .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
 
-void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZone *zone, bool reveal)
+void MessageLogWidget::logAlwaysLookAtTopCard(Player *player, CardZoneLogic *zone, bool reveal)
 {
     appendHtmlServerMessage((reveal ? tr("%1 can now look at top card %2 at any time.")
                                     : tr("%1 no longer can look at top card %2 at any time."))
                                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                .arg(zone->getLogic()->getTranslatedName(true, CaseTopCardsOfZone)));
+                                .arg(zone->getTranslatedName(true, CaseTopCardsOfZone)));
 }
 
 void MessageLogWidget::logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName)
@@ -266,18 +266,18 @@ void MessageLogWidget::logDestroyCard(Player *player, QString cardName)
 
 void MessageLogWidget::logMoveCard(Player *player,
                                    CardItem *card,
-                                   CardZone *startZone,
+                                   CardZoneLogic *startZone,
                                    int oldX,
-                                   CardZone *targetZone,
+                                   CardZoneLogic *targetZone,
                                    int newX)
 {
     if (currentContext == MessageContext_Mulligan) {
         return;
     }
 
-    QString startZoneName = startZone->getLogic()->getName();
-    QString targetZoneName = targetZone->getLogic()->getName();
-    bool ownerChanged = startZone->getLogic()->getPlayer() != targetZone->getLogic()->getPlayer();
+    QString startZoneName = startZone->getName();
+    QString targetZoneName = targetZone->getName();
+    bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
 
     // do not log if moved within the same zone
     if ((startZoneName == TABLE_ZONE_NAME && targetZoneName == TABLE_ZONE_NAME && !ownerChanged) ||
@@ -301,10 +301,10 @@ void MessageLogWidget::logMoveCard(Player *player,
         cardStr = cardLink(cardName);
     }
 
-    if (ownerChanged && (startZone->getLogic()->getPlayer() == player)) {
+    if (ownerChanged && (startZone->getPlayer() == player)) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                    .arg(sanitizeHtml(targetZone->getLogic()->getPlayer()->getPlayerInfo()->getName()))
+                                    .arg(sanitizeHtml(targetZone->getPlayer()->getPlayerInfo()->getName()))
                                     .arg(cardStr));
         return;
     }
@@ -327,7 +327,7 @@ void MessageLogWidget::logMoveCard(Player *player,
     } else if (targetZoneName == DECK_ZONE_NAME) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
-        } else if (newX >= targetZone->getLogic()->getCards().size()) {
+        } else if (newX >= targetZone->getCards().size()) {
             finalStr = tr("%1 puts %2%3 onto the bottom of their library.");
         } else if (newX == 0) {
             finalStr = tr("%1 puts %2%3 on top of their library.");
@@ -372,18 +372,18 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
     }
 }
 
-void MessageLogWidget::logDumpZone(Player *player, CardZone *zone, int numberCards, bool isReversed)
+void MessageLogWidget::logDumpZone(Player *player, CardZoneLogic *zone, int numberCards, bool isReversed)
 {
     if (numberCards == -1) {
         appendHtmlServerMessage(
             tr("%1 is looking at %2.")
                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                .arg(zone->getLogic()->getTranslatedName(zone->getLogic()->getPlayer() == player, CaseLookAtZone)));
+                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     } else {
         appendHtmlServerMessage(
             tr("%1 is looking at the %4 %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                .arg(zone->getLogic()->getTranslatedName(zone->getLogic()->getPlayer() == player, CaseTopCardsOfZone))
+                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseTopCardsOfZone))
                 .arg("<font class=\"blue\">" + QString::number(numberCards) + "</font>")
                 .arg(isReversed ? tr("bottom") : tr("top")));
     }
@@ -479,7 +479,7 @@ void MessageLogWidget::logReadyStart(Player *player)
 }
 
 void MessageLogWidget::logRevealCards(Player *player,
-                                      CardZone *zone,
+                                      CardZoneLogic *zone,
                                       int cardId,
                                       QString cardName,
                                       Player *otherPlayer,
@@ -514,18 +514,18 @@ void MessageLogWidget::logRevealCards(Player *player,
             if (isLentToAnotherPlayer) {
                 appendHtmlServerMessage(tr("%1 lends %2 to %3.")
                                             .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                            .arg(zone->getLogic()->getTranslatedName(true, CaseRevealZone))
+                                            .arg(zone->getTranslatedName(true, CaseRevealZone))
                                             .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
             } else {
                 appendHtmlServerMessage(tr("%1 reveals %2 to %3.")
                                             .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                            .arg(zone->getLogic()->getTranslatedName(true, CaseRevealZone))
+                                            .arg(zone->getTranslatedName(true, CaseRevealZone))
                                             .arg(sanitizeHtml(otherPlayer->getPlayerInfo()->getName())));
             }
         } else {
             appendHtmlServerMessage(tr("%1 reveals %2.")
                                         .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                        .arg(zone->getLogic()->getTranslatedName(true, CaseRevealZone)));
+                                        .arg(zone->getTranslatedName(true, CaseRevealZone)));
         }
     } else if (cardId == -2) {
         if (otherPlayer) {
@@ -744,7 +744,7 @@ void MessageLogWidget::logSetTapped(Player *player, CardItem *card, bool tapped)
     }
 }
 
-void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int end)
+void MessageLogWidget::logShuffle(Player *player, CardZoneLogic *zone, int start, int end)
 {
     if (currentContext == MessageContext_Mulligan) {
         return;
@@ -756,21 +756,21 @@ void MessageLogWidget::logShuffle(Player *player, CardZone *zone, int start, int
     if (start == 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles %2.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                    .arg(zone->getLogic()->getTranslatedName(true, CaseShuffleZone)));
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone)));
     } else if (start < 0 && end == -1) {
         appendHtmlServerMessage(tr("%1 shuffles the bottom %3 cards of %2.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                    .arg(zone->getLogic()->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(-start));
     } else if (start < 0 && end > 0) {
         appendHtmlServerMessage(tr("%1 shuffles the top %3 cards of %2.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                    .arg(zone->getLogic()->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(end + 1));
     } else {
         appendHtmlServerMessage(tr("%1 shuffles cards %3 - %4 of %2.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                                    .arg(zone->getLogic()->getTranslatedName(true, CaseShuffleZone))
+                                    .arg(zone->getTranslatedName(true, CaseShuffleZone))
                                     .arg(start)
                                     .arg(end));
     }
@@ -814,29 +814,30 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
 
 void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEventHandler)
 {
-    // connect(playerEventHandler, &PlayerEventHandler::logSay, this, &MessageLogWidget::logSay);
-    // connect(playerEventHandler, &PlayerEventHandler::logShuffle, this, &MessageLogWidget::logShuffle);
-    // connect(playerEventHandler, &PlayerEventHandler::logRollDie, this, &MessageLogWidget::logRollDie);
-    // connect(playerEventHandler, &PlayerEventHandler::logCreateArrow, this, &MessageLogWidget::logCreateArrow);
+    connect(playerEventHandler, &PlayerEventHandler::logSay, this, &MessageLogWidget::logSay);
+    connect(playerEventHandler, &PlayerEventHandler::logShuffle, this, &MessageLogWidget::logShuffle);
+    connect(playerEventHandler, &PlayerEventHandler::logRollDie, this, &MessageLogWidget::logRollDie);
+    connect(playerEventHandler, &PlayerEventHandler::logCreateArrow, this, &MessageLogWidget::logCreateArrow);
     connect(playerEventHandler, &PlayerEventHandler::logCreateToken, this, &MessageLogWidget::logCreateToken);
     connect(playerEventHandler, &PlayerEventHandler::logSetCounter, this, &MessageLogWidget::logSetCounter);
     connect(playerEventHandler, &PlayerEventHandler::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
-    // connect(playerEventHandler, &PlayerEventHandler::logSetTapped, this, &MessageLogWidget::logSetTapped);
-    // connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
+    connect(playerEventHandler, &PlayerEventHandler::logSetTapped, this, &MessageLogWidget::logSetTapped);
+    connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
     connect(playerEventHandler, &PlayerEventHandler::logSetPT, this, &MessageLogWidget::logSetPT);
     connect(playerEventHandler, &PlayerEventHandler::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
-    // connect(playerEventHandler, &PlayerEventHandler::logMoveCard, this, &MessageLogWidget::logMoveCard);
+    connect(playerEventHandler, &PlayerEventHandler::logMoveCard, this, &MessageLogWidget::logMoveCard);
     connect(playerEventHandler, &PlayerEventHandler::logFlipCard, this, &MessageLogWidget::logFlipCard);
     connect(playerEventHandler, &PlayerEventHandler::logDestroyCard, this, &MessageLogWidget::logDestroyCard);
     connect(playerEventHandler, &PlayerEventHandler::logAttachCard, this, &MessageLogWidget::logAttachCard);
     connect(playerEventHandler, &PlayerEventHandler::logUnattachCard, this, &MessageLogWidget::logUnattachCard);
-    // connect(playerEventHandler, &PlayerEventHandler::logDumpZone, this, &MessageLogWidget::logDumpZone);
+    connect(playerEventHandler, &PlayerEventHandler::logDumpZone, this, &MessageLogWidget::logDumpZone);
     connect(playerEventHandler, &PlayerEventHandler::logDrawCards, this, &MessageLogWidget::logDrawCards);
     connect(playerEventHandler, &PlayerEventHandler::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
-    // connect(playerEventHandler, &PlayerEventHandler::logRevealCards, this, &MessageLogWidget::logRevealCards);
-    // connect(playerEventHandler, &PlayerEventHandler::logAlwaysRevealTopCard, this,
-    // &MessageLogWidget::logAlwaysRevealTopCard); connect(playerEventHandler,
-    // &PlayerEventHandler::logAlwaysLookAtTopCard, this, &MessageLogWidget::logAlwaysLookAtTopCard);
+    connect(playerEventHandler, &PlayerEventHandler::logRevealCards, this, &MessageLogWidget::logRevealCards);
+    connect(playerEventHandler, &PlayerEventHandler::logAlwaysRevealTopCard, this,
+            &MessageLogWidget::logAlwaysRevealTopCard);
+    connect(playerEventHandler, &PlayerEventHandler::logAlwaysLookAtTopCard, this,
+            &MessageLogWidget::logAlwaysLookAtTopCard);
 }
 
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, Game *_game, QWidget *parent)
