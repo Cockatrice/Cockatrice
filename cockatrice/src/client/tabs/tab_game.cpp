@@ -672,6 +672,9 @@ Player *TabGame::addPlayer(Player *newPlayer)
     if (game->getGameState()->getIsLocalGame() ||
         (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) &&
          !game->getPlayerManager()->isSpectator())) {
+        if (game->getGameState()->getIsLocalGame()) {
+            newPlayer->getPlayerInfo()->setLocal(true);
+        }
         addLocalPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
     }
 

@@ -32,6 +32,11 @@ public:
         return userInfo;
     }
 
+    void setLocal(bool _local)
+    {
+        local = _local;
+    }
+
     bool getLocal() const
     {
         return local;
