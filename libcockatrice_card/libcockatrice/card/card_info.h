@@ -1,6 +1,7 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
+#include "format/format_legality_rules.h"
 #include "printing/printing_info.h"
 
 #include <QDate>
@@ -22,10 +23,12 @@ class ICardDatabaseParser;
 
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
+typedef QSharedPointer<FormatRules> FormatRulesPtr;
 typedef QMap<QString, QList<PrintingInfo>> SetToPrintingsMap;
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
 typedef QHash<QString, CardSetPtr> SetNameMap;
+typedef QHash<QString, FormatRulesPtr> FormatRulesNameMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 

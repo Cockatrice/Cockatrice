@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
+#include <libcockatrice/card/format/format_legality_rules.h>
 #include <version_string.h>
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
@@ -60,7 +61,9 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
                 }
 
                 auto xmlName = xml.name().toString();
-                if (xmlName == "sets") {
+                if (xmlName == "formats") {
+                    loadFormats(xml);
+                } else if (xmlName == "sets") {
                     loadSetsFromXml(xml);
                 } else if (xmlName == "cards") {
                     loadCardsFromXml(xml);
@@ -75,6 +78,110 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
     if (xml.hasError()) {
         QString preamble = tr("Parse error at line %1 col %2:").arg(xml.lineNumber()).arg(xml.columnNumber());
         qCWarning(CockatriceXml4Log).noquote() << preamble << xml.errorString();
+    }
+}
+
+static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
+{
+    auto rulesPtr = FormatRulesPtr(new FormatRules());
+
+    if (xml.attributes().hasAttribute("formatName")) {
+        rulesPtr->formatName = xml.attributes().value("formatName").toString();
+    }
+
+    while (!xml.atEnd()) {
+        auto token = xml.readNext();
+
+        if (token == QXmlStreamReader::EndElement && xml.name() == "format") {
+            break;
+        }
+
+        if (token != QXmlStreamReader::StartElement) {
+            continue;
+        }
+
+        QString xmlName = xml.name().toString();
+
+        if (xmlName == "minDeckSize") {
+            rulesPtr->minDeckSize = xml.readElementText().toInt();
+        } else if (xmlName == "maxDeckSize") {
+            QString text = xml.readElementText();
+            rulesPtr->maxDeckSize = text.toInt();
+        } else if (xmlName == "maxSideboardSize") {
+            rulesPtr->maxSideboardSize = xml.readElementText().toInt();
+        } else if (xmlName == "maxCopies") {
+            rulesPtr->maxCopies = xml.readElementText().toInt();
+        } else if (xmlName == "maxRestrictedCopies") {
+            rulesPtr->maxRestrictedCopies = xml.readElementText().toInt();
+        } else if (xmlName == "exceptions") {
+            while (!xml.atEnd()) {
+                token = xml.readNext();
+
+                if (token == QXmlStreamReader::EndElement && xml.name() == "exceptions") {
+                    break;
+                }
+
+                if (token == QXmlStreamReader::StartElement && xml.name() == "exception") {
+                    ExceptionRule ex;
+
+                    while (!xml.atEnd()) {
+                        token = xml.readNext();
+
+                        if (token == QXmlStreamReader::EndElement && xml.name() == "exception") {
+                            break;
+                        }
+
+                        if (token == QXmlStreamReader::StartElement) {
+                            QString ename = xml.name().toString();
+
+                            if (ename == "maxCopies") {
+                                QString text = xml.readElementText();
+                                ex.maxCopies = (text == "unlimited") ? -1 : text.toInt();
+                            } else if (ename == "cardCondition") {
+                                CardCondition cond;
+                                cond.field = xml.attributes().value("field").toString();
+                                cond.matchType = xml.attributes().value("match").toString();
+                                cond.value = xml.attributes().value("value").toString();
+                                ex.conditions.append(cond);
+                                xml.skipCurrentElement();
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    }
+
+                    rulesPtr->exceptions.append(ex);
+                }
+            }
+        } else {
+            xml.skipCurrentElement();
+        }
+    }
+
+    return rulesPtr;
+}
+
+void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
+{
+    while (!xml.atEnd()) {
+        auto token = xml.readNext();
+
+        // Stop when we hit </formats>
+        if (token == QXmlStreamReader::EndElement && xml.name() == "formats") {
+            break;
+        }
+
+        // Only handle start elements
+        if (token != QXmlStreamReader::StartElement)
+            continue;
+
+        if (xml.name() == "format") {
+            auto rulesPtr = parseFormat(xml);
+            emit addFormat(rulesPtr);
+        } else {
+            qCInfo(CockatriceXml4Log) << "Unknown format child" << xml.name() << ", skipping";
+            xml.skipCurrentElement();
+        }
     }
 }
 
@@ -273,6 +380,49 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
     }
 }
 
+static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const QSharedPointer<FormatRules> &rulesPtr)
+{
+    if (rulesPtr.isNull()) {
+        qCWarning(CockatriceXml4Log) << "&operator<< FormatRules is nullptr";
+        return xml;
+    }
+
+    const FormatRules &rules = *rulesPtr;
+
+    xml.writeStartElement("format");
+    if (!rules.formatName.isEmpty()) {
+        xml.writeAttribute("formatName", rules.formatName);
+    }
+
+    xml.writeTextElement("minDeckSize", QString::number(rules.minDeckSize));
+    xml.writeTextElement("maxDeckSize", rules.maxDeckSize >= 0 ? QString::number(rules.maxDeckSize) : "0");
+    xml.writeTextElement("maxSideboardSize", QString::number(rules.maxSideboardSize));
+    xml.writeTextElement("maxCopies", QString::number(rules.maxCopies));
+    xml.writeTextElement("maxRestrictedCopies", QString::number(rules.maxRestrictedCopies));
+
+    if (!rules.exceptions.isEmpty()) {
+        xml.writeStartElement("exceptions");
+        for (const ExceptionRule &ex : rules.exceptions) {
+            xml.writeStartElement("exception");
+            xml.writeTextElement("maxCopies", ex.maxCopies == -1 ? "unlimited" : QString::number(ex.maxCopies));
+
+            for (const CardCondition &cond : ex.conditions) {
+                xml.writeStartElement("cardCondition");
+                xml.writeAttribute("field", cond.field);
+                xml.writeAttribute("match", cond.matchType);
+                xml.writeAttribute("value", cond.value);
+                xml.writeEndElement(); // cardCondition
+            }
+
+            xml.writeEndElement(); // exception
+        }
+        xml.writeEndElement(); // exceptions
+    }
+
+    xml.writeEndElement(); // format
+    return xml;
+}
+
 static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardSetPtr &set)
 {
     if (set.isNull()) {
@@ -399,7 +549,8 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml4Parser::saveToFile(SetNameMap _sets,
+bool CockatriceXml4Parser::saveToFile(FormatRulesNameMap _formats,
+                                      SetNameMap _sets,
                                       CardNameMap cards,
                                       const QString &fileName,
                                       const QString &sourceUrl,
@@ -425,6 +576,14 @@ bool CockatriceXml4Parser::saveToFile(SetNameMap _sets,
     xml.writeTextElement("sourceUrl", sourceUrl);
     xml.writeTextElement("sourceVersion", sourceVersion);
     xml.writeEndElement();
+
+    if (_formats.count() > 0) {
+        xml.writeStartElement("formats");
+        for (FormatRulesPtr format : _formats) {
+            xml << format;
+        }
+        xml.writeEndElement();
+    }
 
     if (_sets.count() > 0) {
         xml.writeStartElement("sets");

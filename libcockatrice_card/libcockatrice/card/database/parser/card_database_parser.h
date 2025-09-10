@@ -38,6 +38,7 @@ public:
 
     /**
      * @brief Saves card and set data to a file.
+     * @param _formats
      * @param sets Map of sets to save.
      * @param cards Map of cards to save.
      * @param fileName Target file path.
@@ -45,7 +46,8 @@ public:
      * @param sourceVersion Optional version string of the source.
      * @return true if save succeeded.
      */
-    virtual bool saveToFile(SetNameMap sets,
+    virtual bool saveToFile(FormatRulesNameMap _formats,
+                            SetNameMap sets,
                             CardNameMap cards,
                             const QString &fileName,
                             const QString &sourceUrl = "unknown",
@@ -79,6 +81,8 @@ signals:
 
     /** Emitted when a set is loaded from the database. */
     void addSet(CardSetPtr set);
+
+    void addFormat(FormatRulesPtr format);
 };
 
 Q_DECLARE_INTERFACE(ICardDatabaseParser, "ICardDatabaseParser")

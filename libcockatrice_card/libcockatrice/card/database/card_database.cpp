@@ -199,3 +199,8 @@ void CardDatabase::notifyEnabledSetsChanged()
     // inform the carddatabasemodels that they need to re-check their list of cards
     emit cardDatabaseEnabledSetsChanged();
 }
+
+void CardDatabase::addFormat(FormatRulesPtr format)
+{
+    formats.insert(format->formatName.toLower(), format);
+}

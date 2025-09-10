@@ -164,6 +164,14 @@ public:
     {
         dataNode->setCardCollectorNumber(_cardSetNumber);
     }
+    bool getFormatLegality() const override
+    {
+        return dataNode->getFormatLegality();
+    }
+    void setFormatLegality(const bool _formatLegal) override
+    {
+        dataNode->setFormatLegality(_formatLegal);
+    }
 
     /**
      * @brief Returns the underlying data node.
@@ -208,6 +216,9 @@ public slots:
      * state of the deck.
      */
     void rebuildTree();
+
+public slots:
+    void setActiveFormat(const QString &_format);
 
 signals:
     /**
@@ -301,6 +312,9 @@ public:
     [[nodiscard]] QList<ExactCard> getCards() const;
     [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
     [[nodiscard]] QList<QString> getZones() const;
+    bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
+    bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);
+    void refreshCardFormatLegalities();
 
     /**
      * @brief Sets the criteria used to group cards in the model.

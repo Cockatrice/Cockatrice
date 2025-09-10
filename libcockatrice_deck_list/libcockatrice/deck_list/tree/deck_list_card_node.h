@@ -51,6 +51,7 @@ class DecklistCardNode : public AbstractDecklistCardNode
     QString cardSetShortName; ///< Short set code (e.g., "NEO").
     QString cardSetNumber;    ///< Collector number within the set.
     QString cardProviderId;   ///< External provider identifier (e.g., UUID).
+    bool formatLegal;         ///< Format legality
 
 public:
     /**
@@ -63,6 +64,7 @@ public:
      * @param _cardSetShortName Short set code (e.g., "NEO").
      * @param _cardSetNumber Collector number within the set.
      * @param _cardProviderId External provider ID (e.g., UUID).
+     * @param _formatLegality If the card is legal in the format
      *
      * On construction, if a parent is provided, this node is inserted into
      * the parent’s children list automatically.
@@ -73,10 +75,11 @@ public:
                               int position = -1,
                               QString _cardSetShortName = QString(),
                               QString _cardSetNumber = QString(),
-                              QString _cardProviderId = QString())
+                              QString _cardProviderId = QString(),
+                              bool _formatLegality = true)
         : AbstractDecklistCardNode(_parent, position), name(std::move(_name)), number(_number),
           cardSetShortName(std::move(_cardSetShortName)), cardSetNumber(std::move(_cardSetNumber)),
-          cardProviderId(std::move(_cardProviderId))
+          cardProviderId(std::move(_cardProviderId)), formatLegal(_formatLegality)
     {
     }
 
@@ -148,6 +151,18 @@ public:
     void setCardCollectorNumber(const QString &_cardSetNumber) override
     {
         cardSetNumber = _cardSetNumber;
+    }
+
+    /// @return The format legality of the card
+    [[nodiscard]] bool getFormatLegality() const override
+    {
+        return formatLegal;
+    }
+
+    /// @param _formatLegal If the card is considered legal
+    void setFormatLegality(const bool _formatLegal) override
+    {
+        formatLegal = _formatLegal;
     }
 
     /// @return Always false; card nodes are not deck headers.

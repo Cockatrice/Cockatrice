@@ -342,3 +342,26 @@ QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
 
     return typeCounts;
 }
+
+FormatRulesPtr CardDatabaseQuerier::getFormat(const QString &formatName) const
+{
+    return db->formats.value(formatName.toLower());
+}
+
+QMap<QString, int> CardDatabaseQuerier::getAllFormatsWithCount() const
+{
+    QMap<QString, int> formatCounts;
+
+    for (const auto &card : db->cards.values()) {
+        QStringList allProps = card->getProperties();
+
+        for (const QString &prop : allProps) {
+            if (prop.startsWith("format-")) {
+                QString formatName = prop.mid(QStringLiteral("format-").size());
+                formatCounts[formatName]++;
+            }
+        }
+    }
+
+    return formatCounts;
+}

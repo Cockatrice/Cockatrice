@@ -126,6 +126,7 @@ public:
     {
         QString name;                ///< User-defined deck name.
         QString comments;            ///< Free-form comments or notes.
+        QString gameFormat;          ///< The name of the game format this deck contains legal cards for
         CardRef bannerCard;          ///< Optional representative card for the deck.
         QStringList tags;            ///< User-defined tags for deck classification.
         QString lastLoadedTimestamp; ///< Timestamp string of last load.
@@ -181,6 +182,10 @@ public:
     {
         metadata.lastLoadedTimestamp = _lastLoadedTimestamp;
     }
+    void setGameFormat(const QString &_gameFormat = QString())
+    {
+        metadata.gameFormat = _gameFormat;
+    }
     ///@}
 
     /// @brief Construct an empty deck.
@@ -218,6 +223,10 @@ public:
     QString getLastLoadedTimestamp() const
     {
         return metadata.lastLoadedTimestamp;
+    }
+    QString getGameFormat() const
+    {
+        return metadata.gameFormat;
     }
     ///@}
 
@@ -277,7 +286,8 @@ public:
                               int position,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString());
+                              const QString &cardProviderId = QString(),
+                              const bool formatLegal = true);
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
     ///@}
 
