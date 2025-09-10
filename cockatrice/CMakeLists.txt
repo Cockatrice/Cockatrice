@@ -207,8 +207,11 @@ set(cockatrice_SOURCES
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
     src/game/filters/syntax_help.cpp
+    src/game/game_event_handler.cpp
+    src/game/game_meta_info.cpp
     src/game/game_scene.cpp
     src/game/game_selector.cpp
+    src/game/game_state.cpp
     src/game/game_view.cpp
     src/game/games_model.cpp
     src/game/hand_counter.cpp

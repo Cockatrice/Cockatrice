@@ -150,16 +150,19 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
 
     stack = addZone(new StackZone(this, (int)table->boundingRect().height(), this));
 
-    hand = addZone(new HandZone(this, _local || _judge || (_parent->isSpectator() && _parent->isSpectatorsOmniscient()),
-                                (int)table->boundingRect().height(), this));
+    hand = addZone(
+        new HandZone(this,
+                     _local || _judge ||
+                         (_parent->getGameState()->isSpectator() && _parent->getGameMetaInfo()->spectatorsOmniscient()),
+                     (int)table->boundingRect().height(), this));
     connect(hand, &HandZone::cardCountChanged, handCounter, &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, hand, &HandZone::showContextMenu);
 
     updateBoundingRect();
 
     if (local || judge) {
-        connect(_parent, &TabGame::playerAdded, this, &Player::addPlayer);
-        connect(_parent, &TabGame::playerRemoved, this, &Player::removePlayer);
+        connect(_parent->getGameState(), &GameState::playerAdded, this, &Player::addPlayer);
+        connect(_parent->getGameState(), &GameState::playerRemoved, this, &Player::removePlayer);
     }
 
     if (local || judge) {
@@ -558,7 +561,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, T
         connect(tempSetCounter, &QAction::triggered, this, &Player::actCardCounterTrigger);
     }
 
-    const QList<Player *> &players = game->getPlayers().values();
+    const QList<Player *> &players = game->getGameState()->getPlayers().values();
     for (const auto player : players) {
         addPlayer(player);
     }
@@ -1015,7 +1018,7 @@ void Player::setShortcutsActive()
 
     // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
     // when there are more than 1 player.
-    if (!game->getIsLocalGame()) {
+    if (!game->getGameState()->getIsLocalGame()) {
         // unattach action is only active in card menu if the active card is attached.
         // make unattach shortcut always active so that it consistently works when multiple cards are selected.
         game->addAction(aUnattach);
@@ -2341,7 +2344,7 @@ void Player::eventDelCounter(const Event_DelCounter &event)
 
 void Player::eventDumpZone(const Event_DumpZone &event)
 {
-    Player *zoneOwner = game->getPlayers().value(event.zone_owner_id(), 0);
+    Player *zoneOwner = game->getGameState()->getPlayers().value(event.zone_owner_id(), 0);
     if (!zoneOwner) {
         return;
     }
@@ -2354,13 +2357,13 @@ void Player::eventDumpZone(const Event_DumpZone &event)
 
 void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &context)
 {
-    Player *startPlayer = game->getPlayers().value(event.start_player_id());
+    Player *startPlayer = game->getGameState()->getPlayers().value(event.start_player_id());
     if (!startPlayer) {
         return;
     }
     QString startZoneString = QString::fromStdString(event.start_zone());
     CardZone *startZone = startPlayer->getZones().value(startZoneString, 0);
-    Player *targetPlayer = game->getPlayers().value(event.target_player_id());
+    Player *targetPlayer = game->getGameState()->getPlayers().value(event.target_player_id());
     if (!targetPlayer) {
         return;
     }
@@ -2433,7 +2436,7 @@ void Player::eventMoveCard(const Event_MoveCard &event, const GameEventContext &
 
     // Look at all arrows from and to the card.
     // If the card was moved to another zone, delete the arrows, otherwise update them.
-    QMapIterator<int, Player *> playerIterator(game->getPlayers());
+    QMapIterator<int, Player *> playerIterator(game->getGameState()->getPlayers());
     while (playerIterator.hasNext()) {
         Player *p = playerIterator.next().value();
 
@@ -2507,7 +2510,7 @@ void Player::eventDestroyCard(const Event_DestroyCard &event)
 
 void Player::eventAttachCard(const Event_AttachCard &event)
 {
-    const QMap<int, Player *> &playerList = game->getPlayers();
+    const QMap<int, Player *> &playerList = game->getGameState()->getPlayers();
     Player *targetPlayer = nullptr;
     CardZone *targetZone = nullptr;
     CardItem *targetCard = nullptr;
@@ -2586,7 +2589,7 @@ void Player::eventRevealCards(const Event_RevealCards &event, EventProcessingOpt
     }
     Player *otherPlayer = nullptr;
     if (event.has_other_player_id()) {
-        otherPlayer = game->getPlayers().value(event.other_player_id());
+        otherPlayer = game->getGameState()->getPlayers().value(event.other_player_id());
         if (!otherPlayer) {
             return;
         }
@@ -2790,7 +2793,9 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 
                 switch (zoneInfo.type()) {
                     case ServerInfo_Zone::PrivateZone:
-                        contentsKnown = local || judge || (game->isSpectator() && game->isSpectatorsOmniscient());
+                        contentsKnown =
+                            local || judge ||
+                            (game->getGameState()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
                         break;
 
                     case ServerInfo_Zone::PublicZone:
@@ -3084,7 +3089,7 @@ void Player::incrementAllCardCounters()
 
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
 {
-    const QMap<int, Player *> &playerList = game->getPlayers();
+    const QMap<int, Player *> &playerList = game->getGameState()->getPlayers();
     Player *startPlayer = playerList.value(arrow.start_player_id(), 0);
     Player *targetPlayer = playerList.value(arrow.target_player_id(), 0);
     if (!startPlayer || !targetPlayer) {
@@ -3178,9 +3183,9 @@ PendingCommand *Player::prepareGameCommand(const google::protobuf::Message &cmd)
         GameCommand *c = base.add_game_command();
         base.set_target_id(id);
         c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
-        return game->prepareGameCommand(base);
+        return game->getGameEventHandler()->prepareGameCommand(base);
     } else {
-        return game->prepareGameCommand(cmd);
+        return game->getGameEventHandler()->prepareGameCommand(cmd);
     }
 }
 
@@ -3196,9 +3201,9 @@ PendingCommand *Player::prepareGameCommand(const QList<const ::google::protobuf:
                 ->CopyFrom(*cmdList[i]);
             delete cmdList[i];
         }
-        return game->prepareGameCommand(base);
+        return game->getGameEventHandler()->prepareGameCommand(base);
     } else {
-        return game->prepareGameCommand(cmdList);
+        return game->getGameEventHandler()->prepareGameCommand(cmdList);
     }
 }
 
@@ -3209,15 +3214,15 @@ void Player::sendGameCommand(const google::protobuf::Message &command)
         GameCommand *c = base.add_game_command();
         base.set_target_id(id);
         c->GetReflection()->MutableMessage(c, command.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(command);
-        game->sendGameCommand(base, id);
+        game->getGameEventHandler()->sendGameCommand(base, id);
     } else {
-        game->sendGameCommand(command, id);
+        game->getGameEventHandler()->sendGameCommand(command, id);
     }
 }
 
 void Player::sendGameCommand(PendingCommand *pend)
 {
-    game->sendGameCommand(pend, id);
+    game->getGameEventHandler()->sendGameCommand(pend, id);
 }
 
 bool Player::clearCardsToDelete()
@@ -3284,7 +3289,7 @@ void Player::actMoveCardXCardsFromTop()
     if (local) {
         sendGameCommand(prepareGameCommand(commandList));
     } else {
-        game->sendGameCommand(prepareGameCommand(commandList));
+        game->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList));
     }
 }
 
@@ -3470,7 +3475,7 @@ void Player::cardMenuAction()
     if (local) {
         sendGameCommand(prepareGameCommand(commandList));
     } else {
-        game->sendGameCommand(prepareGameCommand(commandList));
+        game->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList));
     }
 }
 
@@ -3505,7 +3510,7 @@ void Player::actIncPT(int deltaP, int deltaT)
         }
     }
 
-    game->sendGameCommand(prepareGameCommand(commandList), playerid);
+    game->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
 void Player::actResetPT()
@@ -3538,7 +3543,7 @@ void Player::actResetPT()
     }
 
     if (!commandList.empty()) {
-        game->sendGameCommand(prepareGameCommand(commandList), playerid);
+        game->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList), playerid);
     }
 }
 
@@ -3632,7 +3637,7 @@ void Player::actSetPT()
         }
     }
 
-    game->sendGameCommand(prepareGameCommand(commandList), playerid);
+    game->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList), playerid);
 }
 
 void Player::actDrawArrow()
@@ -4045,6 +4050,7 @@ QMenu *Player::createCardMenu(const CardItem *card)
 
                 QMenu *revealMenu = cardMenu->addMenu(tr("Re&veal to..."));
                 initContextualPlayersMenu(revealMenu);
+
                 connect(revealMenu, &QMenu::triggered, this, &Player::actReveal);
 
                 cardMenu->addSeparator();
@@ -4243,7 +4249,7 @@ QMenu *Player::updateCardMenu(const CardItem *card)
 
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
-    if ((game->isSpectator() && !judge) || game->getActiveCard() != card) {
+    if ((game->getGameState()->isSpectator() && !judge) || game->getActiveCard() != card) {
         return nullptr;
     }
 

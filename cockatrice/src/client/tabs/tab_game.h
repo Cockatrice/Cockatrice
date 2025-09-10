@@ -2,17 +2,20 @@
 #define TAB_GAME_H
 
 #include "../../client/tearoff_menu.h"
+#include "../../game/game_event_handler.h"
+#include "../../game/game_meta_info.h"
+#include "../../game/game_state.h"
 #include "../../game/player/player.h"
 #include "../replay_manager.h"
 #include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
-#include "pb/serverinfo_game.pb.h"
 #include "tab.h"
 
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
 
+class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
@@ -24,7 +27,6 @@ class GameView;
 class GameScene;
 class ReplayManager;
 class CardInfoFrameWidget;
-class MessageLogWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
@@ -35,25 +37,6 @@ class ZoneViewWidget;
 class PhasesToolbar;
 class PlayerListWidget;
 class ReplayTimelineWidget;
-class Response;
-class GameEventContainer;
-class GameEventContext;
-class GameCommand;
-class CommandContainer;
-class Event_GameJoined;
-class Event_GameStateChanged;
-class Event_PlayerPropertiesChanged;
-class Event_Join;
-class Event_Leave;
-class Event_GameHostChanged;
-class Event_GameClosed;
-class Event_GameStart;
-class Event_SetActivePlayer;
-class Event_SetActivePhase;
-class Event_Ping;
-class Event_GameSay;
-class Event_Kicked;
-class Event_ReverseTurn;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
@@ -61,8 +44,6 @@ class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;
 class GameReplay;
-class ServerInfo_User;
-class PendingCommand;
 class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
@@ -71,26 +52,11 @@ class TabGame : public Tab
 {
     Q_OBJECT
 private:
-    QTimer *gameTimer;
-    int secondsElapsed;
+    GameMetaInfo *gameMetaInfo;
+    GameState *gameState;
+    GameEventHandler *gameEventHandler;
     const UserListProxy *userListProxy;
-    QList<AbstractClient *> clients;
-    ServerInfo_Game gameInfo;
-    QMap<int, QString> roomGameTypes;
-    int hostId;
-    int localPlayerId;
-    const bool isLocalGame;
-    bool spectator;
-    bool judge;
-    QMap<int, Player *> players;
-    QMap<int, ServerInfo_User> spectators;
-    bool gameStateKnown;
-    bool resuming;
-    QStringList phasesList;
-    int currentPhase;
-    int activePlayer;
     CardItem *activeCard;
-    bool gameClosed;
     ReplayManager *replayManager;
     QStringList gameTypes;
     QCompleter *completer;
@@ -121,34 +87,22 @@ private:
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
 
-    Player *addPlayer(int playerId, const ServerInfo_User &info);
-
-    bool isMainPlayerConceded() const;
+    Player *addPlayer(Player *newPlayer);
+    void addLocalPlayer(Player *newPlayer, int playerId);
+    void processRemotePlayerDeckSelect(QString deckList, int playerId, QString playerName);
+    void processMultipleRemotePlayerDeckSelect(QVector<QPair<int, QPair<QString, QString>>> playerIdDeckMap);
+    void processLocalPlayerDeckSelect(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
+    void loadDeckForLocalPlayer(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
+    void processLocalPlayerReady(int playerId, ServerInfo_Player playerInfo);
+    void createZoneForPlayer(Player *newPlayer, int playerId);
 
     void startGame(bool resuming);
     void stopGame();
     void closeGame();
     bool leaveGame();
 
-    void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
-    void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
-
-    void eventGameStateChanged(const Event_GameStateChanged &event, int eventPlayerId, const GameEventContext &context);
-    void eventPlayerPropertiesChanged(const Event_PlayerPropertiesChanged &event,
-                                      int eventPlayerId,
-                                      const GameEventContext &context);
-    void eventJoin(const Event_Join &event, int eventPlayerId, const GameEventContext &context);
-    void eventLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
-    void eventKicked(const Event_Kicked &event, int eventPlayerId, const GameEventContext &context);
-    void eventGameHostChanged(const Event_GameHostChanged &event, int eventPlayerId, const GameEventContext &context);
-    void eventGameClosed(const Event_GameClosed &event, int eventPlayerId, const GameEventContext &context);
     Player *setActivePlayer(int id);
-    void eventSetActivePlayer(const Event_SetActivePlayer &event, int eventPlayerId, const GameEventContext &context);
     void setActivePhase(int phase);
-    void eventSetActivePhase(const Event_SetActivePhase &event, int eventPlayerId, const GameEventContext &context);
-    void eventPing(const Event_Ping &event, int eventPlayerId, const GameEventContext &context);
-    void eventReverseTurn(const Event_ReverseTurn &event, int eventPlayerId, const GameEventContext & /*context*/);
-    void emitUserEvent();
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
@@ -158,7 +112,6 @@ private:
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
-    QString getLeaveReason(Event_Leave::LeaveReason reason);
 signals:
     void gameClosing(TabGame *tab);
     void playerAdded(Player *player);
@@ -169,8 +122,15 @@ signals:
     void openDeckEditor(const DeckLoader *deck);
     void notIdle();
 
+    void playerConceded();
+    void playerUnconceded();
+    void phaseChanged(int phase);
+    void gameLeft();
+    void chatMessageSent(QString chatMessage);
+    void turnAdvanced();
+    void arrowDeletionRequested(int arrowId);
+
 private slots:
-    void incrementGameTime();
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
     void setCardMenu(QMenu *menu);
@@ -184,17 +144,17 @@ private slots:
     void actPhaseAction();
     void actNextPhase();
     void actNextPhaseAction();
-    void actNextTurn();
-    void actReverseTurn();
 
     void addMentionTag(const QString &value);
     void linkCardToChat(const QString &cardName);
-    void commandFinished(const Response &response);
 
     void refreshShortcuts();
 
     void loadLayout();
     void actCompleterChanged();
+    void notifyPlayerJoin(QString playerName);
+    void notifyPlayerKicked();
+    void processPlayerLeave(Player *leavingPlayer);
     void actResetLayout();
     void freeDocksSize();
 
@@ -212,39 +172,36 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void connectToGameState();
+    void connectToGameEventHandler();
+    void connectMessageLogToGameEventHandler();
+    void connectPlayerListToGameEventHandler();
     void loadReplay(GameReplay *replay);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
     void updatePlayerListDockTitle();
     bool closeRequest() override;
-    const QMap<int, Player *> &getPlayers() const
+
+    GameMetaInfo *getGameMetaInfo()
     {
-        return players;
+        return gameMetaInfo;
     }
+
+    GameState *getGameState() const
+    {
+        return gameState;
+    }
+
+    GameEventHandler *getGameEventHandler() const
+    {
+        return gameEventHandler;
+    }
+
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
-    bool isHost() const
-    {
-        return hostId == localPlayerId;
-    }
-    bool getIsLocalGame() const
-    {
-        return isLocalGame;
-    }
-    int getGameId() const
-    {
-        return gameInfo.game_id();
-    }
+
     QString getTabText() const override;
-    bool isSpectator() const
-    {
-        return spectator;
-    }
-    bool isSpectatorsOmniscient() const
-    {
-        return gameInfo.spectators_omniscient();
-    }
-    Player *getActiveLocalPlayer() const;
+
     AbstractClient *getClientForPlayer(int playerId) const;
 
     void setActiveCard(CardItem *card);
@@ -253,16 +210,16 @@ public:
         return activeCard;
     }
 
-    void processGameEventContainer(const GameEventContainer &cont,
-                                   AbstractClient *client,
-                                   Player::EventProcessingOptions options);
-    PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
-    PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 public slots:
-    void sendGameCommand(PendingCommand *pend, int playerId = -1);
-    void sendGameCommand(const ::google::protobuf::Message &command, int playerId = -1);
     void viewCardInfo(const CardRef &cardRef = {}) const;
     void resetChatAndPhase();
+    void updateTimeElapsedLabel(QString newTime);
+    void addPlayerToAutoCompleteList(QString playerName);
+    void removePlayerFromAutoCompleteList(QString playerName);
+    void removeSpectator(int spectatorId, ServerInfo_User spectator);
+    void processLocalPlayerSideboardLocked(int playerId, bool sideboardLocked);
+    void processLocalPlayerReadyStateChanged(int playerId, bool ready);
+    void emitUserEvent();
 };
 
 #endif

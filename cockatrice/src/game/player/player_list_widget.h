@@ -1,6 +1,8 @@
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 
+#include "player.h"
+
 #include <QIcon>
 #include <QMap>
 #include <QStyledItemDelegate>
@@ -47,12 +49,14 @@ signals:
 public:
     PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = nullptr);
     void retranslateUi();
-    void addPlayer(const ServerInfo_PlayerProperties &player);
-    void removePlayer(int playerId);
     void setActivePlayer(int playerId);
-    void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
     void setGameStarted(bool _gameStarted, bool resuming);
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
+
+public slots:
+    void addPlayer(const ServerInfo_PlayerProperties &player);
+    void removePlayer(int playerId);
+    void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
 };
 
 #endif
