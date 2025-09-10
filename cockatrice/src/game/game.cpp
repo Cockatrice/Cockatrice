@@ -11,7 +11,7 @@ Game::Game(TabGame *_tab,
     gameMetaInfo = new GameMetaInfo(this);
     gameMetaInfo->setFromProto(event.game_info());
     gameMetaInfo->setRoomGameTypes(_roomGameTypes);
-    gameState = new GameState(this, 0, event.host_id(), /* _tabSupervisor->getIsLocalGame() */ true, _clients, false,
+    gameState = new GameState(this, 0, event.host_id(), tab->getTabSupervisor()->getIsLocalGame(), _clients, false,
                               event.resuming(), -1, false);
     playerManager = new PlayerManager(this, event.player_id(), event.spectator(), event.judge());
     gameMetaInfo->setStarted(false);
