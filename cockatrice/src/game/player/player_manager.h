@@ -6,16 +6,16 @@
 #include <QMap>
 #include <QObject>
 
-class Game;
+class AbstractGame;
 class Player;
 class PlayerManager : public QObject
 {
     Q_OBJECT
 
 public:
-    PlayerManager(Game *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
+    PlayerManager(AbstractGame *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
 
-    Game *game;
+    AbstractGame *game;
     QMap<int, Player *> players;
     int localPlayerId;
     bool localPlayerIsJudge;
@@ -94,7 +94,7 @@ public:
         emit spectatorRemoved(spectatorId, spectatorInfo);
     }
 
-    Game *getGame() const
+    AbstractGame *getGame() const
     {
         return game;
     }

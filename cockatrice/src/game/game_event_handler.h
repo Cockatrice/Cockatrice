@@ -30,7 +30,7 @@ class Event_Ping;
 class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
-class Game;
+class AbstractGame;
 class PendingCommand;
 class Player;
 
@@ -41,10 +41,10 @@ class GameEventHandler : public QObject
     Q_OBJECT
 
 private:
-    Game *game;
+    AbstractGame *game;
 
 public:
-    explicit GameEventHandler(Game *_game);
+    explicit GameEventHandler(AbstractGame *_game);
 
     void handleNextTurn();
     void handleReverseTurn();

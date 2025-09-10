@@ -370,7 +370,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     retranslateUi();
 }
 
-void PlayerMenu::setMenusForGraphicItems(){
+void PlayerMenu::setMenusForGraphicItems()
+{
     player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
     player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
     player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);

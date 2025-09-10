@@ -29,7 +29,7 @@
 #include <QPainter>
 #include <QtConcurrent>
 
-Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent)
+Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
       conceded(false), deck(nullptr), zoneId(0), dialogSemaphore(false)

@@ -207,6 +207,7 @@ set(cockatrice_SOURCES
     src/game/filters/filter_tree.cpp
     src/game/filters/filter_tree_model.cpp
     src/game/filters/syntax_help.cpp
+    src/game/abstract_game.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp
     src/game/game_meta_info.cpp
@@ -228,6 +229,7 @@ set(cockatrice_SOURCES
     src/game/player/player_manager.cpp
     src/game/player/player_menu.cpp
     src/game/player/player_target.cpp
+    src/game/replay.cpp
     src/game/zones/card_zone.cpp
     src/game/zones/hand_zone.cpp
     src/game/zones/pile_zone.cpp

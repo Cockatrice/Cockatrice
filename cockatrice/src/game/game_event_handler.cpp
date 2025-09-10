@@ -4,7 +4,7 @@
 #include "../server/abstract_client.h"
 #include "../server/message_log_widget.h"
 #include "../server/pending_command.h"
-#include "game.h"
+#include "abstract_game.h"
 #include "get_pb_extension.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_delete_arrow.pb.h"
@@ -29,7 +29,7 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_event_container.pb.h"
 
-GameEventHandler::GameEventHandler(Game *_game) : QObject(_game), game(_game)
+GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {
 }
 

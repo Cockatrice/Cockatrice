@@ -6,11 +6,11 @@
 #include "chat_view/chat_view.h"
 #include "user_level.h"
 
+class AbstractGame;
+class CardItem;
+class GameEventContext;
 class Player;
 class PlayerEventHandler;
-class Game;
-class GameEventContext;
-class CardItem;
 
 class MessageLogWidget : public ChatView
 {
@@ -30,7 +30,7 @@ private:
 
 public:
     void connectToPlayerEventHandler(PlayerEventHandler *player);
-    MessageLogWidget(TabSupervisor *_tabSupervisor, Game *_game, QWidget *parent = nullptr);
+    MessageLogWidget(TabSupervisor *_tabSupervisor, AbstractGame *_game, QWidget *parent = nullptr);
 
 public slots:
     void containerProcessingDone();

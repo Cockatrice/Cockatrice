@@ -10,12 +10,12 @@
 // This class de-couples the domain object (i.e. the GameMetaInfo) from the network object.
 // If the network object changes, only this class needs to be adjusted.
 
-class Game;
+class AbstractGame;
 class GameMetaInfo : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameMetaInfo(Game *_game);
+    explicit GameMetaInfo(AbstractGame *_game);
 
     QMap<int, QString> roomGameTypes;
 
@@ -79,7 +79,7 @@ public:
         return roomGameTypes.find(gameInfo_.game_types(index)).value();
     }
 
-    Game *getGame() const
+    AbstractGame *getGame() const
     {
         return game;
     }
@@ -105,7 +105,7 @@ signals:
     void spectatorsOmniscienceChanged(bool omniscient);
 
 private:
-    Game *game;
+    AbstractGame *game;
     ServerInfo_Game gameInfo_;
 };
 

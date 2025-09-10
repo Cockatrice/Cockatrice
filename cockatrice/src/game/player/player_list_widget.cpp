@@ -54,7 +54,7 @@ bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
     return data(4, Qt::UserRole + 1).toInt() < other.data(4, Qt::UserRole + 1).toInt();
 }
 
-PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, Game *_game, QWidget *parent)
+PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, AbstractGame *_game, QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
     readyIcon = QPixmap("theme:icons/ready_start");

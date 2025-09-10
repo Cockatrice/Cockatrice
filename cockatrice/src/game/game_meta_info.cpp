@@ -1,7 +1,7 @@
 #include "game_meta_info.h"
 
-#include "game.h"
+#include "abstract_game.h"
 
-GameMetaInfo::GameMetaInfo(Game *_game) : QObject(_game), game(_game)
+GameMetaInfo::GameMetaInfo(AbstractGame *_game) : QObject(_game), game(_game)
 {
 }

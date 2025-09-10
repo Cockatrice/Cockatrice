@@ -1,6 +1,7 @@
 #include "game_state.h"
+#include "abstract_game.h"
 
-GameState::GameState(Game *_game,
+GameState::GameState(AbstractGame *_game,
                      int _secondsElapsed,
                      int _hostId,
                      bool _isLocalGame,

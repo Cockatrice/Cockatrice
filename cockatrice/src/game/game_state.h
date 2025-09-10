@@ -1,13 +1,13 @@
 #ifndef COCKATRICE_GAME_STATE_H
 #define COCKATRICE_GAME_STATE_H
 
-#include "../client/tabs/tab_game.h"
 #include "../server/abstract_client.h"
 #include "pb/serverinfo_game.pb.h"
-#include "pb/serverinfo_playerproperties.pb.h"
 
 #include <QObject>
+#include <QTimer>
 
+class AbstractGame;
 class ServerInfo_PlayerProperties;
 class ServerInfo_User;
 
@@ -16,7 +16,7 @@ class GameState : public QObject
     Q_OBJECT
 
 public:
-    explicit GameState(Game *_game,
+    explicit GameState(AbstractGame *_game,
                        int secondsElapsed,
                        int hostId,
                        bool isLocalGame,
@@ -132,7 +132,7 @@ public slots:
     void setGameTime(int _secondsElapsed);
 
 private:
-    Game *game;
+    AbstractGame *game;
     QTimer *gameTimer;
     int secondsElapsed;
     QMap<int, QString> roomGameTypes;

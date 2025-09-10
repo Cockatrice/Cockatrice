@@ -58,8 +58,7 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the top of %1's library")
-                                  .arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the top of their library");
                 }
@@ -67,16 +66,14 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
         } else if (position >= zone->getCards().size() - 1) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
-                    cardName = tr("the bottom card of %1's library")
-                                   .arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     cardName = tr("the bottom card of their library");
                 }
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the bottom of %1's library")
-                                  .arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
                     fromStr = tr(" from the bottom of their library");
                 }
@@ -375,10 +372,9 @@ void MessageLogWidget::logDrawCards(Player *player, int number, bool deckIsEmpty
 void MessageLogWidget::logDumpZone(Player *player, CardZoneLogic *zone, int numberCards, bool isReversed)
 {
     if (numberCards == -1) {
-        appendHtmlServerMessage(
-            tr("%1 is looking at %2.")
-                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
-                .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
+        appendHtmlServerMessage(tr("%1 is looking at %2.")
+                                    .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                                    .arg(zone->getTranslatedName(zone->getPlayer() == player, CaseLookAtZone)));
     } else {
         appendHtmlServerMessage(
             tr("%1 is looking at the %4 %3 card(s) %2.", "top card for singular, top %3 cards for plural", numberCards)
@@ -840,7 +836,7 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
             &MessageLogWidget::logAlwaysLookAtTopCard);
 }
 
-MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, Game *_game, QWidget *parent)
+MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, AbstractGame *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
 }

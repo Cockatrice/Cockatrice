@@ -6,7 +6,6 @@
 #include "../board/abstract_graphics_item.h"
 #include "../cards/card_info.h"
 #include "../filters/filter_string.h"
-#include "../game.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "player_actions.h"
@@ -33,6 +32,7 @@ class Message;
 } // namespace google
 class AbstractCardItem;
 class AbstractCounter;
+class AbstractGame;
 class ArrowItem;
 class ArrowTarget;
 class CardDatabase;
@@ -74,7 +74,7 @@ public slots:
     void setActive(bool _active);
 
 public:
-    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent);
+    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
     ~Player() override;
 
     void initializeZones();
@@ -94,7 +94,7 @@ public:
         return active;
     }
 
-    Game *getGame() const
+    AbstractGame *getGame() const
     {
         return game;
     }
@@ -224,7 +224,7 @@ public:
     void setZoneId(int _zoneId);
 
 private:
-    Game *game;
+    AbstractGame *game;
     PlayerInfo *playerInfo;
     PlayerEventHandler *playerEventHandler;
     PlayerActions *playerActions;

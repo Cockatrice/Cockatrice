@@ -8,10 +8,12 @@
 #include "../../game/cards/card_database_manager.h"
 #include "../../game/deckview/deck_view_container.h"
 #include "../../game/deckview/tabbed_deck_view_container.h"
+#include "../../game/game.h"
 #include "../../game/game_scene.h"
 #include "../../game/game_view.h"
 #include "../../game/player/player.h"
 #include "../../game/player/player_list_widget.h"
+#include "../../game/replay.h"
 #include "../../game/zones/card_zone.h"
 #include "../../main.h"
 #include "../../server/abstract_client.h"
@@ -49,22 +51,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-
-    /*game->getGameMetaInfo() = new GameMetaInfo();
-    game->getGameState() =
-        new GameState(0, -1, _tabSupervisor->getIsLocalGame(), QList<AbstractClient *>(), false, false, -1, false);
-    connectToGameState();
-
-    game->getPlayerManager() = new PlayerManager(this, -1, true, false);
-
-    game->getGameEventHandler() = new GameEventHandler(this);*/
-    connectToGameEventHandler();
+    game = new Replay(this, _replay);
 
     createCardInfoDock(true);
     createPlayerListDock(true);
-    connectPlayerListToGameEventHandler();
     createMessageDock(true);
-    connectMessageLogToGameEventHandler();
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
     createReplayDock(_replay);
@@ -81,6 +72,14 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 
     createReplayMenuItems();
     createViewMenuItems();
+
+    connectToGameState();
+    connectToPlayerManager();
+    connectToGameEventHandler();
+    connectPlayerListToGameEventHandler();
+    connectMessageLogToGameEventHandler();
+    connectMessageLogToPlayerHandler();
+
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);

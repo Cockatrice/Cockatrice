@@ -2,7 +2,7 @@
 #define TAB_GAME_H
 
 #include "../../client/tearoff_menu.h"
-#include "../../game/game.h"
+#include "../../game/abstract_game.h"
 #include "../../game/player/player.h"
 #include "../../server/message_log_widget.h"
 #include "../replay_manager.h"
@@ -51,7 +51,7 @@ class TabGame : public Tab
 {
     Q_OBJECT
 private:
-    Game *game;
+    AbstractGame *game;
     const UserListProxy *userListProxy;
     ReplayManager *replayManager;
     QStringList gameTypes;
@@ -178,7 +178,7 @@ public:
 
     QString getTabText() const override;
 
-    Game *getGame() const
+    AbstractGame *getGame() const
     {
         return game;
     }
