@@ -766,13 +766,13 @@ void TabGame::createZoneForPlayer(Player *newPlayer, int playerId)
         for (int i = 1; i <= game->getPlayerManager()->getPlayerCount(); ++i) {
             bool aPlayerHasThisZone = false;
             for (auto &player : game->getPlayerManager()->getPlayers()) {
-                if (player->getPlayerInfo()->getZoneId() == i) {
+                if (player->getZoneId() == i) {
                     aPlayerHasThisZone = true;
                     break;
                 }
             }
             if (!aPlayerHasThisZone) {
-                newPlayer->getPlayerInfo()->setZoneId(i);
+                newPlayer->setZoneId(i);
                 break;
             }
         }

@@ -53,6 +53,11 @@ public:
         return player;
     }
 
+    PlayerArea *getPlayerArea() const
+    {
+        return playerArea;
+    }
+
     PlayerTarget *getPlayerTarget() const
     {
         return playerTarget;

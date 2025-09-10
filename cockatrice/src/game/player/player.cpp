@@ -32,7 +32,7 @@
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, Game *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), deck(nullptr), dialogSemaphore(false)
+      conceded(false), deck(nullptr), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
 
@@ -44,7 +44,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, G
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::enableOpenInDeckEditorAction);
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::populatePredefinedTokensMenu);
 
-    // connect(this, &Player::openDeckEditor, game, &TabGame::openDeckEditor);
+    connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
 }
 
 void Player::initializeZones()
@@ -107,6 +107,12 @@ void Player::setConceded(bool _conceded)
         }
         emit concededChanged(getPlayerInfo()->getId(), conceded);
     }
+}
+
+void Player::setZoneId(int _zoneId)
+{
+    zoneId = _zoneId;
+    graphicsItem->getPlayerArea()->setPlayerZoneId(zoneId);
 }
 
 void Player::processPlayerInfo(const ServerInfo_Player &info)

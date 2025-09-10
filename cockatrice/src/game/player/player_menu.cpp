@@ -519,8 +519,7 @@ void PlayerMenu::playerListActionTriggered()
     } else if (menu == mRevealTopCard) {
         int deckSize = player->getDeckZone()->getCards().size();
         bool ok;
-        // TODO: Correctly parent this
-        int number = QInputDialog::getInt(/* player->getGame() */ nullptr, tr("Reveal top cards of library"),
+        int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Reveal top cards of library"),
                                           tr("Number of cards: (max. %1)").arg(deckSize), /* defaultNumberTopCards */ 1,
                                           1, deckSize, 1, &ok);
         if (ok) {
@@ -822,9 +821,9 @@ void PlayerMenu::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
         CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         Q_UNUSED(viewCard);
-        // TODO: Signal this
-        /*connect(viewCard, &QAction::triggered, player->getGame(),
-                [this, cardRef] { player->getGame()->viewCardInfo(cardRef); });*/
+
+        connect(viewCard, &QAction::triggered, player->getGame(),
+                [this, cardRef] { player->getGame()->getTab()->viewCardInfo(cardRef); });
     }
 }
 

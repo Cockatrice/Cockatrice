@@ -217,6 +217,13 @@ public:
         dialogSemaphore = _active;
     }
 
+    int getZoneId() const
+    {
+        return zoneId;
+    }
+
+    void setZoneId(int _zoneId);
+
 private:
     Game *game;
     PlayerInfo *playerInfo;
@@ -230,6 +237,7 @@ private:
 
     DeckLoader *deck;
 
+    int zoneId;
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, AbstractCounter *> counters;
     QMap<int, ArrowItem *> arrows;

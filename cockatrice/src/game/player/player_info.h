@@ -22,14 +22,6 @@ public:
     bool local;
     bool judge;
     bool handVisible;
-    int zoneId;
-
-    int getZoneId() const
-    {
-        return zoneId;
-    }
-
-    void setZoneId(int _zoneId);
 
     int getId() const
     {

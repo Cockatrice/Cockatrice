@@ -62,8 +62,7 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush =
-        themeManager->getExtraBgBrush(ThemeManager::Hand, getLogic()->getPlayer()->getPlayerInfo()->getZoneId());
+    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Hand, getLogic()->getPlayer()->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 

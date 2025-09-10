@@ -146,7 +146,6 @@ void PlayerActions::actViewTopCards()
 {
     int deckSize = player->getDeckZone()->getCards().size();
     bool ok;
-    // TODO: Signal this
     int number = QInputDialog::getInt(player->getGame()->getTab(), tr("View top cards of library"),
                                       tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
                                       deckSize, 1, &ok);
