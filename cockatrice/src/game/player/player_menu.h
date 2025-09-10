@@ -19,6 +19,7 @@ public slots:
     QMenu *createMoveMenu() const;
     void enableOpenInDeckEditorAction() const;
     void populatePredefinedTokensMenu();
+    void setMenusForGraphicItems();
 
 private slots:
     void addPlayer(Player *playerToAdd);
@@ -31,6 +32,10 @@ private slots:
 
 public:
     PlayerMenu(Player *player);
+    void createDrawActions();
+    void createShuffleActions();
+    void createMoveActions();
+    void createViewActions();
     void retranslateUi();
 
     void addPlayerToList(QMenu *playerList, Player *playerToAdd);
@@ -80,6 +85,8 @@ public:
     }
 
     void setShortcutsActive();
+    void setShortcutIfItExists(QAction *action, ShortcutKey shortcut);
+    void clearShortcutIfItExists(QAction *action);
     void setShortcutsInactive();
 
 private:

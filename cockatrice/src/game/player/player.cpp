@@ -36,8 +36,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, G
 {
     initializeZones();
 
-    graphicsItem = new PlayerGraphicsItem(this);
     playerMenu = new PlayerMenu(this);
+    graphicsItem = new PlayerGraphicsItem(this);
+    playerMenu->setMenusForGraphicItems();
 
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
 

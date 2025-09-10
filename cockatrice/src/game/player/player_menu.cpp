@@ -24,147 +24,13 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     }
 
     PlayerActions *playerActions = player->getPlayerActions();
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
-        aMoveHandToTopLibrary = new QAction(this);
-        aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
-        aMoveHandToBottomLibrary = new QAction(this);
-        aMoveHandToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
-        aMoveHandToGrave = new QAction(this);
-        aMoveHandToGrave->setData(QList<QVariant>() << "grave" << 0);
-        aMoveHandToRfg = new QAction(this);
-        aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        auto hand = player->getHandZone();
-        auto grave = player->getGraveZone();
-        auto rfg = player->getRfgZone();
-
-        connect(aMoveHandToTopLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
-        connect(aMoveHandToBottomLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
-        connect(aMoveHandToGrave, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
-        connect(aMoveHandToRfg, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
-
-        aMoveGraveToTopLibrary = new QAction(this);
-        aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
-        aMoveGraveToBottomLibrary = new QAction(this);
-        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
-        aMoveGraveToHand = new QAction(this);
-        aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
-        aMoveGraveToRfg = new QAction(this);
-        aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
-
-        connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-        connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-        connect(aMoveGraveToHand, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-        connect(aMoveGraveToRfg, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-
-        aMoveRfgToTopLibrary = new QAction(this);
-        aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
-        aMoveRfgToBottomLibrary = new QAction(this);
-        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
-        aMoveRfgToHand = new QAction(this);
-        aMoveRfgToHand->setData(QList<QVariant>() << "hand" << 0);
-        aMoveRfgToGrave = new QAction(this);
-        aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
-
-        connect(aMoveRfgToTopLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
-        connect(aMoveRfgToBottomLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
-        connect(aMoveRfgToHand, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
-        connect(aMoveRfgToGrave, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
-
-        aViewLibrary = new QAction(this);
-        connect(aViewLibrary, &QAction::triggered, playerActions, &PlayerActions::actViewLibrary);
-        aViewHand = new QAction(this);
-        connect(aViewHand, &QAction::triggered, playerActions, &PlayerActions::actViewHand);
-        aSortHand = new QAction(this);
-        connect(aSortHand, &QAction::triggered, playerActions, &PlayerActions::actSortHand);
-
-        aViewTopCards = new QAction(this);
-        connect(aViewTopCards, &QAction::triggered, playerActions, &PlayerActions::actViewTopCards);
-        aViewBottomCards = new QAction(this);
-        connect(aViewBottomCards, &QAction::triggered, playerActions, &PlayerActions::actViewBottomCards);
-        aAlwaysRevealTopCard = new QAction(this);
-        aAlwaysRevealTopCard->setCheckable(true);
-        connect(aAlwaysRevealTopCard, &QAction::triggered, playerActions, &PlayerActions::actAlwaysRevealTopCard);
-        aAlwaysLookAtTopCard = new QAction(this);
-        aAlwaysLookAtTopCard->setCheckable(true);
-        connect(aAlwaysLookAtTopCard, &QAction::triggered, playerActions, &PlayerActions::actAlwaysLookAtTopCard);
-        aOpenDeckInDeckEditor = new QAction(this);
-        aOpenDeckInDeckEditor->setEnabled(false);
-        connect(aOpenDeckInDeckEditor, &QAction::triggered, playerActions, &PlayerActions::actOpenDeckInDeckEditor);
-    }
-
-    aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
-
-    aViewRfg = new QAction(this);
-    connect(aViewRfg, &QAction::triggered, playerActions, &PlayerActions::actViewRfg);
-
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
-        aViewSideboard = new QAction(this);
-        connect(aViewSideboard, &QAction::triggered, playerActions, &PlayerActions::actViewSideboard);
-
-        aDrawCard = new QAction(this);
-        connect(aDrawCard, &QAction::triggered, playerActions, &PlayerActions::actDrawCard);
-        aDrawCards = new QAction(this);
-        connect(aDrawCards, &QAction::triggered, playerActions, &PlayerActions::actDrawCards);
-        aUndoDraw = new QAction(this);
-        connect(aUndoDraw, &QAction::triggered, playerActions, &PlayerActions::actUndoDraw);
-
-        aShuffle = new QAction(this);
-        connect(aShuffle, &QAction::triggered, playerActions, &PlayerActions::actShuffle);
-
-        aMulligan = new QAction(this);
-        connect(aMulligan, &QAction::triggered, playerActions, &PlayerActions::actMulligan);
-
-        aMoveTopToPlay = new QAction(this);
-        connect(aMoveTopToPlay, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToPlay);
-        aMoveTopToPlayFaceDown = new QAction(this);
-        connect(aMoveTopToPlayFaceDown, &QAction::triggered, playerActions,
-                &PlayerActions::actMoveTopCardToPlayFaceDown);
-        aMoveTopCardToGraveyard = new QAction(this);
-        connect(aMoveTopCardToGraveyard, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToGrave);
-        aMoveTopCardToExile = new QAction(this);
-        connect(aMoveTopCardToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToExile);
-        aMoveTopCardsToGraveyard = new QAction(this);
-        connect(aMoveTopCardsToGraveyard, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToGrave);
-        aMoveTopCardsToExile = new QAction(this);
-        connect(aMoveTopCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToExile);
-        aMoveTopCardsUntil = new QAction(this);
-        connect(aMoveTopCardsUntil, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsUntil);
-        aMoveTopCardToBottom = new QAction(this);
-        connect(aMoveTopCardToBottom, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToBottom);
-
-        aShuffleTopCards = new QAction(this);
-        connect(aShuffleTopCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleTop);
-
-        aDrawBottomCard = new QAction(this);
-        connect(aDrawBottomCard, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCard);
-        aDrawBottomCards = new QAction(this);
-        connect(aDrawBottomCards, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCards);
-        aMoveBottomToPlay = new QAction(this);
-        connect(aMoveBottomToPlay, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToPlay);
-        aMoveBottomToPlayFaceDown = new QAction(this);
-        connect(aMoveBottomToPlayFaceDown, &QAction::triggered, playerActions,
-                &PlayerActions::actMoveBottomCardToPlayFaceDown);
-        aMoveBottomCardToGraveyard = new QAction(this);
-        connect(aMoveBottomCardToGraveyard, &QAction::triggered, playerActions,
-                &PlayerActions::actMoveBottomCardToGrave);
-        aMoveBottomCardToExile = new QAction(this);
-        connect(aMoveBottomCardToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToExile);
-        aMoveBottomCardsToGraveyard = new QAction(this);
-        connect(aMoveBottomCardsToGraveyard, &QAction::triggered, playerActions,
-                &PlayerActions::actMoveBottomCardsToGrave);
-        aMoveBottomCardsToExile = new QAction(this);
-        connect(aMoveBottomCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardsToExile);
-        aMoveBottomCardToTop = new QAction(this);
-        connect(aMoveBottomCardToTop, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToTop);
-
-        aShuffleBottomCards = new QAction(this);
-        connect(aShuffleBottomCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleBottom);
-    }
+    createDrawActions();
+    createShuffleActions();
+    createMoveActions();
+    createViewActions();
 
     playerMenu = new TearOffMenu();
-    player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         handMenu = playerMenu->addTearOffMenu(QString());
@@ -182,7 +48,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         moveHandMenu->addAction(aMoveHandToGrave);
         moveHandMenu->addSeparator();
         moveHandMenu->addAction(aMoveHandToRfg);
-        player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
 
         libraryMenu = playerMenu->addTearOffMenu(QString());
         libraryMenu->addAction(aDrawCard);
@@ -205,7 +70,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         bottomLibraryMenu = libraryMenu->addTearOffMenu(QString());
         libraryMenu->addSeparator();
         libraryMenu->addAction(aOpenDeckInDeckEditor);
-        player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, aDrawCard);
         topLibraryMenu->addAction(aMoveTopToPlay);
         topLibraryMenu->addAction(aMoveTopToPlayFaceDown);
         topLibraryMenu->addAction(aMoveTopCardToBottom);
@@ -244,11 +108,9 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         allPlayersActions.append(newAction);
         mRevealRandomGraveyardCard->addSeparator();
     }
-    player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
 
     rfgMenu = playerMenu->addTearOffMenu(QString());
     rfgMenu->addAction(aViewRfg);
-    player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         graveMenu->addSeparator();
@@ -271,8 +133,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
         sbMenu = playerMenu->addMenu(QString());
         sbMenu->addAction(aViewSideboard);
-
-        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sbMenu);
 
         mCustomZones = playerMenu->addMenu(QString());
         mCustomZones->menuAction()->setVisible(false);
@@ -330,6 +190,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         }
     }
 
+    // We have to explicitly not-instantiate a bunch of things if we are not local or a judge or else we have to
+    // consider it everywhere instead of just null-checking
     if (!player->getPlayerInfo()->local && !player->getPlayerInfo()->judge) {
         countersMenu = nullptr;
         sbMenu = nullptr;
@@ -337,6 +199,73 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
         mCardCounters = nullptr;
+        moveHandMenu = nullptr;
+        aMoveHandToTopLibrary = nullptr;
+        aMoveHandToBottomLibrary = nullptr;
+        aMoveHandToGrave = nullptr;
+        aMoveHandToRfg = nullptr;
+
+        moveGraveMenu = nullptr;
+        aMoveGraveToTopLibrary = nullptr;
+        aMoveGraveToBottomLibrary = nullptr;
+        aMoveGraveToHand = nullptr;
+        aMoveGraveToRfg = nullptr;
+
+        moveRfgMenu = nullptr;
+        aMoveRfgToTopLibrary = nullptr;
+        aMoveRfgToBottomLibrary = nullptr;
+        aMoveRfgToHand = nullptr;
+        aMoveRfgToGrave = nullptr;
+
+        aViewLibrary = nullptr;
+        aViewHand = nullptr;
+        aSortHand = nullptr;
+        aViewTopCards = nullptr;
+        aViewBottomCards = nullptr;
+        mRevealLibrary = nullptr;
+        mLendLibrary = nullptr;
+        mRevealTopCard = nullptr;
+        topLibraryMenu = nullptr;
+        bottomLibraryMenu = nullptr;
+        aAlwaysRevealTopCard = nullptr;
+        aAlwaysLookAtTopCard = nullptr;
+        aOpenDeckInDeckEditor = nullptr;
+        aViewSideboard = nullptr;
+        aDrawCard = nullptr;
+        aDrawCards = nullptr;
+        aUndoDraw = nullptr;
+        aMulligan = nullptr;
+
+        aShuffle = nullptr;
+        aMoveTopToPlay = nullptr;
+        aMoveTopToPlayFaceDown = nullptr;
+        aMoveTopCardToBottom = nullptr;
+        aMoveTopCardToGraveyard = nullptr;
+        aMoveTopCardToExile = nullptr;
+        aMoveTopCardsToGraveyard = nullptr;
+        aMoveTopCardsToExile = nullptr;
+        aMoveTopCardsUntil = nullptr;
+        aShuffleTopCards = nullptr;
+
+        aDrawBottomCard = nullptr;
+        aDrawBottomCards = nullptr;
+        aMoveBottomToPlay = nullptr;
+        aMoveBottomToPlayFaceDown = nullptr;
+        aMoveBottomCardToGraveyard = nullptr;
+        aMoveBottomCardToExile = nullptr;
+        aMoveBottomCardsToGraveyard = nullptr;
+        aMoveBottomCardsToExile = nullptr;
+        aMoveBottomCardToTop = nullptr;
+        aShuffleBottomCards = nullptr;
+
+        handMenu = nullptr;
+        mRevealHand = nullptr;
+        mRevealRandomHandCard = nullptr;
+        mRevealRandomGraveyardCard = nullptr;
+        sbMenu = nullptr;
+        libraryMenu = nullptr;
+        countersMenu = nullptr;
+        mCustomZones = nullptr;
     }
 
     aTap = new QAction(this);
@@ -439,6 +368,177 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     connect(player, &Player::resetTopCardMenuActions, this, &PlayerMenu::resetTopCardMenuActions);
 
     retranslateUi();
+}
+
+void PlayerMenu::setMenusForGraphicItems(){
+    player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
+    player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
+    player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);
+    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+        player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
+        player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, aDrawCard);
+        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sbMenu);
+    }
+}
+
+void PlayerMenu::createDrawActions()
+{
+    PlayerActions *playerActions = player->getPlayerActions();
+
+    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+        aDrawCard = new QAction(this);
+        connect(aDrawCard, &QAction::triggered, playerActions, &PlayerActions::actDrawCard);
+        aDrawCards = new QAction(this);
+        connect(aDrawCards, &QAction::triggered, playerActions, &PlayerActions::actDrawCards);
+        aUndoDraw = new QAction(this);
+        connect(aUndoDraw, &QAction::triggered, playerActions, &PlayerActions::actUndoDraw);
+        aMulligan = new QAction(this);
+        connect(aMulligan, &QAction::triggered, playerActions, &PlayerActions::actMulligan);
+        aDrawBottomCard = new QAction(this);
+        connect(aDrawBottomCard, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCard);
+        aDrawBottomCards = new QAction(this);
+        connect(aDrawBottomCards, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCards);
+    }
+}
+
+void PlayerMenu::createShuffleActions()
+{
+    PlayerActions *playerActions = player->getPlayerActions();
+
+    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+        aShuffle = new QAction(this);
+        connect(aShuffle, &QAction::triggered, playerActions, &PlayerActions::actShuffle);
+        aShuffleTopCards = new QAction(this);
+        connect(aShuffleTopCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleTop);
+        aShuffleBottomCards = new QAction(this);
+        connect(aShuffleBottomCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleBottom);
+    }
+}
+
+void PlayerMenu::createMoveActions()
+{
+    PlayerActions *playerActions = player->getPlayerActions();
+
+    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+        aMoveHandToTopLibrary = new QAction(this);
+        aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveHandToBottomLibrary = new QAction(this);
+        aMoveHandToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveHandToGrave = new QAction(this);
+        aMoveHandToGrave->setData(QList<QVariant>() << "grave" << 0);
+        aMoveHandToRfg = new QAction(this);
+        aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
+
+        auto hand = player->getHandZone();
+        auto grave = player->getGraveZone();
+        auto rfg = player->getRfgZone();
+
+        connect(aMoveHandToTopLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
+        connect(aMoveHandToBottomLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
+        connect(aMoveHandToGrave, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
+        connect(aMoveHandToRfg, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
+
+        aMoveGraveToTopLibrary = new QAction(this);
+        aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveGraveToBottomLibrary = new QAction(this);
+        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveGraveToHand = new QAction(this);
+        aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveGraveToRfg = new QAction(this);
+        aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+
+        connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToHand, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToRfg, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+
+        aMoveRfgToTopLibrary = new QAction(this);
+        aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveRfgToBottomLibrary = new QAction(this);
+        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveRfgToHand = new QAction(this);
+        aMoveRfgToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveRfgToGrave = new QAction(this);
+        aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
+
+        connect(aMoveRfgToTopLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
+        connect(aMoveRfgToBottomLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
+        connect(aMoveRfgToHand, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
+        connect(aMoveRfgToGrave, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
+
+        aMoveTopToPlay = new QAction(this);
+        connect(aMoveTopToPlay, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToPlay);
+        aMoveTopToPlayFaceDown = new QAction(this);
+        connect(aMoveTopToPlayFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveTopCardToPlayFaceDown);
+        aMoveTopCardToGraveyard = new QAction(this);
+        connect(aMoveTopCardToGraveyard, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToGrave);
+        aMoveTopCardToExile = new QAction(this);
+        connect(aMoveTopCardToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToExile);
+        aMoveTopCardsToGraveyard = new QAction(this);
+        connect(aMoveTopCardsToGraveyard, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToGrave);
+        aMoveTopCardsToExile = new QAction(this);
+        connect(aMoveTopCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToExile);
+        aMoveTopCardsUntil = new QAction(this);
+        connect(aMoveTopCardsUntil, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsUntil);
+        aMoveTopCardToBottom = new QAction(this);
+        connect(aMoveTopCardToBottom, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToBottom);
+
+        aMoveBottomToPlay = new QAction(this);
+        connect(aMoveBottomToPlay, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToPlay);
+        aMoveBottomToPlayFaceDown = new QAction(this);
+        connect(aMoveBottomToPlayFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveBottomCardToPlayFaceDown);
+        aMoveBottomCardToGraveyard = new QAction(this);
+        connect(aMoveBottomCardToGraveyard, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveBottomCardToGrave);
+        aMoveBottomCardToExile = new QAction(this);
+        connect(aMoveBottomCardToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToExile);
+        aMoveBottomCardsToGraveyard = new QAction(this);
+        connect(aMoveBottomCardsToGraveyard, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveBottomCardsToGrave);
+        aMoveBottomCardsToExile = new QAction(this);
+        connect(aMoveBottomCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardsToExile);
+        aMoveBottomCardToTop = new QAction(this);
+        connect(aMoveBottomCardToTop, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToTop);
+    }
+}
+
+void PlayerMenu::createViewActions()
+{
+    PlayerActions *playerActions = player->getPlayerActions();
+
+    aViewGraveyard = new QAction(this);
+    connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
+
+    aViewRfg = new QAction(this);
+    connect(aViewRfg, &QAction::triggered, playerActions, &PlayerActions::actViewRfg);
+
+    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+        aViewLibrary = new QAction(this);
+        connect(aViewLibrary, &QAction::triggered, playerActions, &PlayerActions::actViewLibrary);
+        aViewSideboard = new QAction(this);
+        connect(aViewSideboard, &QAction::triggered, playerActions, &PlayerActions::actViewSideboard);
+
+        aViewHand = new QAction(this);
+        connect(aViewHand, &QAction::triggered, playerActions, &PlayerActions::actViewHand);
+        aSortHand = new QAction(this);
+        connect(aSortHand, &QAction::triggered, playerActions, &PlayerActions::actSortHand);
+
+        aViewTopCards = new QAction(this);
+        connect(aViewTopCards, &QAction::triggered, playerActions, &PlayerActions::actViewTopCards);
+        aViewBottomCards = new QAction(this);
+        connect(aViewBottomCards, &QAction::triggered, playerActions, &PlayerActions::actViewBottomCards);
+        aAlwaysRevealTopCard = new QAction(this);
+        aAlwaysRevealTopCard->setCheckable(true);
+        connect(aAlwaysRevealTopCard, &QAction::triggered, playerActions, &PlayerActions::actAlwaysRevealTopCard);
+        aAlwaysLookAtTopCard = new QAction(this);
+        aAlwaysLookAtTopCard->setCheckable(true);
+        connect(aAlwaysLookAtTopCard, &QAction::triggered, playerActions, &PlayerActions::actAlwaysLookAtTopCard);
+        aOpenDeckInDeckEditor = new QAction(this);
+        aOpenDeckInDeckEditor->setEnabled(false);
+        connect(aOpenDeckInDeckEditor, &QAction::triggered, playerActions, &PlayerActions::actOpenDeckInDeckEditor);
+    }
 }
 
 void PlayerMenu::refreshShortcuts()
@@ -1108,48 +1208,62 @@ void PlayerMenu::retranslateUi()
     aMoveToExile->setText(tr("&Exile"));
 }
 
+void PlayerMenu::setShortcutIfItExists(QAction *action, ShortcutKey shortcut)
+{
+    if (action) {
+        action->setShortcuts(shortcut);
+    }
+}
+
+void PlayerMenu::clearShortcutIfItExists(QAction *action)
+{
+    if (action) {
+        action->setShortcut(QKeySequence());
+    }
+}
+
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    aHide->setShortcuts(shortcuts.getShortcut("Player/aHide"));
-    aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
-    aTap->setShortcuts(shortcuts.getShortcut("Player/aTap"));
-    aDoesntUntap->setShortcuts(shortcuts.getShortcut("Player/aDoesntUntap"));
-    aFlip->setShortcuts(shortcuts.getShortcut("Player/aFlip"));
-    aPeek->setShortcuts(shortcuts.getShortcut("Player/aPeek"));
-    aClone->setShortcuts(shortcuts.getShortcut("Player/aClone"));
-    aAttach->setShortcuts(shortcuts.getShortcut("Player/aAttach"));
-    aUnattach->setShortcuts(shortcuts.getShortcut("Player/aUnattach"));
-    aDrawArrow->setShortcuts(shortcuts.getShortcut("Player/aDrawArrow"));
-    aIncP->setShortcuts(shortcuts.getShortcut("Player/aIncP"));
-    aDecP->setShortcuts(shortcuts.getShortcut("Player/aDecP"));
-    aIncT->setShortcuts(shortcuts.getShortcut("Player/aIncT"));
-    aDecT->setShortcuts(shortcuts.getShortcut("Player/aDecT"));
-    aIncPT->setShortcuts(shortcuts.getShortcut("Player/aIncPT"));
-    aDecPT->setShortcuts(shortcuts.getShortcut("Player/aDecPT"));
-    aFlowP->setShortcuts(shortcuts.getShortcut("Player/aFlowP"));
-    aFlowT->setShortcuts(shortcuts.getShortcut("Player/aFlowT"));
-    aSetPT->setShortcuts(shortcuts.getShortcut("Player/aSetPT"));
-    aResetPT->setShortcuts(shortcuts.getShortcut("Player/aResetPT"));
-    aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
-    aMoveToTopLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToTopLibrary"));
-    aMoveToBottomLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToBottomLibrary"));
-    aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
-    aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
-    aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
-    aSortHand->setShortcuts(shortcuts.getShortcut("Player/aSortHand"));
+    setShortcutIfItExists(aHide, shortcuts.getShortcut("Player/aHide"));
+    setShortcutIfItExists(aPlay, shortcuts.getShortcut("Player/aPlay"));
+    setShortcutIfItExists(aTap, shortcuts.getShortcut("Player/aTap"));
+    setShortcutIfItExists(aDoesntUntap, shortcuts.getShortcut("Player/aDoesntUntap"));
+    setShortcutIfItExists(aFlip, shortcuts.getShortcut("Player/aFlip"));
+    setShortcutIfItExists(aPeek, shortcuts.getShortcut("Player/aPeek"));
+    setShortcutIfItExists(aClone, shortcuts.getShortcut("Player/aClone"));
+    setShortcutIfItExists(aAttach, shortcuts.getShortcut("Player/aAttach"));
+    setShortcutIfItExists(aUnattach, shortcuts.getShortcut("Player/aUnattach"));
+    setShortcutIfItExists(aDrawArrow, shortcuts.getShortcut("Player/aDrawArrow"));
+    setShortcutIfItExists(aIncP, shortcuts.getShortcut("Player/aIncP"));
+    setShortcutIfItExists(aDecP, shortcuts.getShortcut("Player/aDecP"));
+    setShortcutIfItExists(aIncT, shortcuts.getShortcut("Player/aIncT"));
+    setShortcutIfItExists(aDecT, shortcuts.getShortcut("Player/aDecT"));
+    setShortcutIfItExists(aIncPT, shortcuts.getShortcut("Player/aIncPT"));
+    setShortcutIfItExists(aDecPT, shortcuts.getShortcut("Player/aDecPT"));
+    setShortcutIfItExists(aFlowP, shortcuts.getShortcut("Player/aFlowP"));
+    setShortcutIfItExists(aFlowT, shortcuts.getShortcut("Player/aFlowT"));
+    setShortcutIfItExists(aSetPT, shortcuts.getShortcut("Player/aSetPT"));
+    setShortcutIfItExists(aResetPT, shortcuts.getShortcut("Player/aResetPT"));
+    setShortcutIfItExists(aSetAnnotation, shortcuts.getShortcut("Player/aSetAnnotation"));
+    setShortcutIfItExists(aMoveToTopLibrary, shortcuts.getShortcut("Player/aMoveToTopLibrary"));
+    setShortcutIfItExists(aMoveToBottomLibrary, shortcuts.getShortcut("Player/aMoveToBottomLibrary"));
+    setShortcutIfItExists(aMoveToHand, shortcuts.getShortcut("Player/aMoveToHand"));
+    setShortcutIfItExists(aMoveToGraveyard, shortcuts.getShortcut("Player/aMoveToGraveyard"));
+    setShortcutIfItExists(aMoveToExile, shortcuts.getShortcut("Player/aMoveToExile"));
+    setShortcutIfItExists(aSortHand, shortcuts.getShortcut("Player/aSortHand"));
 
-    aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
-    aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
-    aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
+    setShortcutIfItExists(aSelectAll, shortcuts.getShortcut("Player/aSelectAll"));
+    setShortcutIfItExists(aSelectRow, shortcuts.getShortcut("Player/aSelectRow"));
+    setShortcutIfItExists(aSelectColumn, shortcuts.getShortcut("Player/aSelectColumn"));
 
     static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
     for (int i = 0; i < aAddCounter.size(); i++) {
-        aAddCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aCC" + colorWords[i]));
-        aRemoveCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aRC" + colorWords[i]));
-        aSetCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aSC" + colorWords[i]));
+        setShortcutIfItExists(aAddCounter[i], shortcuts.getShortcut("Player/aCC" + colorWords[i]));
+        setShortcutIfItExists(aRemoveCounter[i], shortcuts.getShortcut("Player/aRC" + colorWords[i]));
+        setShortcutIfItExists(aSetCounter[i], shortcuts.getShortcut("Player/aSC" + colorWords[i]));
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
@@ -1157,45 +1271,45 @@ void PlayerMenu::setShortcutsActive()
         counterIterator.next().value()->setShortcutsActive();
     }
 
-    aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
-    aViewSideboard->setShortcuts(shortcuts.getShortcut("Player/aViewSideboard"));
-    aViewLibrary->setShortcuts(shortcuts.getShortcut("Player/aViewLibrary"));
-    aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
-    aViewTopCards->setShortcuts(shortcuts.getShortcut("Player/aViewTopCards"));
-    aViewBottomCards->setShortcuts(shortcuts.getShortcut("Player/aViewBottomCards"));
-    aViewGraveyard->setShortcuts(shortcuts.getShortcut("Player/aViewGraveyard"));
-    aDrawCard->setShortcuts(shortcuts.getShortcut("Player/aDrawCard"));
-    aDrawCards->setShortcuts(shortcuts.getShortcut("Player/aDrawCards"));
-    aUndoDraw->setShortcuts(shortcuts.getShortcut("Player/aUndoDraw"));
-    aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));
-    aShuffle->setShortcuts(shortcuts.getShortcut("Player/aShuffle"));
-    aShuffleTopCards->setShortcuts(shortcuts.getShortcut("Player/aShuffleTopCards"));
-    aShuffleBottomCards->setShortcuts(shortcuts.getShortcut("Player/aShuffleBottomCards"));
-    aUntapAll->setShortcuts(shortcuts.getShortcut("Player/aUntapAll"));
-    aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
-    aCreateToken->setShortcuts(shortcuts.getShortcut("Player/aCreateToken"));
-    aCreateAnotherToken->setShortcuts(shortcuts.getShortcut("Player/aCreateAnotherToken"));
-    aAlwaysRevealTopCard->setShortcuts(shortcuts.getShortcut("Player/aAlwaysRevealTopCard"));
-    aAlwaysLookAtTopCard->setShortcuts(shortcuts.getShortcut("Player/aAlwaysLookAtTopCard"));
-    aMoveTopToPlay->setShortcuts(shortcuts.getShortcut("Player/aMoveTopToPlay"));
-    aMoveTopToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveTopToPlayFaceDown"));
-    aMoveTopCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToGraveyard"));
-    aMoveTopCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToGraveyard"));
-    aMoveTopCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToExile"));
-    aMoveTopCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToExile"));
-    aMoveTopCardsUntil->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsUntil"));
-    aMoveTopCardToBottom->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToBottom"));
-    aDrawBottomCard->setShortcuts(shortcuts.getShortcut("Player/aDrawBottomCard"));
-    aDrawBottomCards->setShortcuts(shortcuts.getShortcut("Player/aDrawBottomCards"));
-    aMoveBottomToPlay->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomToPlay"));
-    aMoveBottomToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomToPlayFaceDown"));
-    aMoveBottomCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToGrave"));
-    aMoveBottomCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToGrave"));
-    aMoveBottomCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToExile"));
-    aMoveBottomCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToExile"));
-    aMoveBottomCardToTop->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToTop"));
-    aPlayFacedown->setShortcuts(shortcuts.getShortcut("Player/aPlayFacedown"));
-    aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
+    setShortcutIfItExists(aIncrementAllCardCounters, shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
+    setShortcutIfItExists(aViewSideboard, shortcuts.getShortcut("Player/aViewSideboard"));
+    setShortcutIfItExists(aViewLibrary, shortcuts.getShortcut("Player/aViewLibrary"));
+    setShortcutIfItExists(aViewHand, shortcuts.getShortcut("Player/aViewHand"));
+    setShortcutIfItExists(aViewTopCards, shortcuts.getShortcut("Player/aViewTopCards"));
+    setShortcutIfItExists(aViewBottomCards, shortcuts.getShortcut("Player/aViewBottomCards"));
+    setShortcutIfItExists(aViewGraveyard, shortcuts.getShortcut("Player/aViewGraveyard"));
+    setShortcutIfItExists(aDrawCard, shortcuts.getShortcut("Player/aDrawCard"));
+    setShortcutIfItExists(aDrawCards, shortcuts.getShortcut("Player/aDrawCards"));
+    setShortcutIfItExists(aUndoDraw, shortcuts.getShortcut("Player/aUndoDraw"));
+    setShortcutIfItExists(aMulligan, shortcuts.getShortcut("Player/aMulligan"));
+    setShortcutIfItExists(aShuffle, shortcuts.getShortcut("Player/aShuffle"));
+    setShortcutIfItExists(aShuffleTopCards, shortcuts.getShortcut("Player/aShuffleTopCards"));
+    setShortcutIfItExists(aShuffleBottomCards, shortcuts.getShortcut("Player/aShuffleBottomCards"));
+    setShortcutIfItExists(aUntapAll, shortcuts.getShortcut("Player/aUntapAll"));
+    setShortcutIfItExists(aRollDie, shortcuts.getShortcut("Player/aRollDie"));
+    setShortcutIfItExists(aCreateToken, shortcuts.getShortcut("Player/aCreateToken"));
+    setShortcutIfItExists(aCreateAnotherToken, shortcuts.getShortcut("Player/aCreateAnotherToken"));
+    setShortcutIfItExists(aAlwaysRevealTopCard, shortcuts.getShortcut("Player/aAlwaysRevealTopCard"));
+    setShortcutIfItExists(aAlwaysLookAtTopCard, shortcuts.getShortcut("Player/aAlwaysLookAtTopCard"));
+    setShortcutIfItExists(aMoveTopToPlay, shortcuts.getShortcut("Player/aMoveTopToPlay"));
+    setShortcutIfItExists(aMoveTopToPlayFaceDown, shortcuts.getShortcut("Player/aMoveTopToPlayFaceDown"));
+    setShortcutIfItExists(aMoveTopCardToGraveyard, shortcuts.getShortcut("Player/aMoveTopCardToGraveyard"));
+    setShortcutIfItExists(aMoveTopCardsToGraveyard, shortcuts.getShortcut("Player/aMoveTopCardsToGraveyard"));
+    setShortcutIfItExists(aMoveTopCardToExile, shortcuts.getShortcut("Player/aMoveTopCardToExile"));
+    setShortcutIfItExists(aMoveTopCardsToExile, shortcuts.getShortcut("Player/aMoveTopCardsToExile"));
+    setShortcutIfItExists(aMoveTopCardsUntil, shortcuts.getShortcut("Player/aMoveTopCardsUntil"));
+    setShortcutIfItExists(aMoveTopCardToBottom, shortcuts.getShortcut("Player/aMoveTopCardToBottom"));
+    setShortcutIfItExists(aDrawBottomCard, shortcuts.getShortcut("Player/aDrawBottomCard"));
+    setShortcutIfItExists(aDrawBottomCards, shortcuts.getShortcut("Player/aDrawBottomCards"));
+    setShortcutIfItExists(aMoveBottomToPlay, shortcuts.getShortcut("Player/aMoveBottomToPlay"));
+    setShortcutIfItExists(aMoveBottomToPlayFaceDown, shortcuts.getShortcut("Player/aMoveBottomToPlayFaceDown"));
+    setShortcutIfItExists(aMoveBottomCardToGraveyard, shortcuts.getShortcut("Player/aMoveBottomCardToGrave"));
+    setShortcutIfItExists(aMoveBottomCardsToGraveyard, shortcuts.getShortcut("Player/aMoveBottomCardsToGrave"));
+    setShortcutIfItExists(aMoveBottomCardToExile, shortcuts.getShortcut("Player/aMoveBottomCardToExile"));
+    setShortcutIfItExists(aMoveBottomCardsToExile, shortcuts.getShortcut("Player/aMoveBottomCardsToExile"));
+    setShortcutIfItExists(aMoveBottomCardToTop, shortcuts.getShortcut("Player/aMoveBottomCardToTop"));
+    setShortcutIfItExists(aPlayFacedown, shortcuts.getShortcut("Player/aPlayFacedown"));
+    setShortcutIfItExists(aPlay, shortcuts.getShortcut("Player/aPlay"));
 
     // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
     // when there are more than 1 player.
@@ -1210,42 +1324,42 @@ void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
 
-    aViewSideboard->setShortcut(QKeySequence());
-    aViewLibrary->setShortcut(QKeySequence());
-    aViewHand->setShortcut(QKeySequence());
-    aViewTopCards->setShortcut(QKeySequence());
-    aViewBottomCards->setShortcut(QKeySequence());
-    aViewGraveyard->setShortcut(QKeySequence());
-    aDrawCard->setShortcut(QKeySequence());
-    aDrawCards->setShortcut(QKeySequence());
-    aUndoDraw->setShortcut(QKeySequence());
-    aMulligan->setShortcut(QKeySequence());
-    aShuffle->setShortcut(QKeySequence());
-    aShuffleTopCards->setShortcut(QKeySequence());
-    aShuffleBottomCards->setShortcut(QKeySequence());
-    aUntapAll->setShortcut(QKeySequence());
-    aRollDie->setShortcut(QKeySequence());
-    aCreateToken->setShortcut(QKeySequence());
-    aCreateAnotherToken->setShortcut(QKeySequence());
-    aAlwaysRevealTopCard->setShortcut(QKeySequence());
-    aAlwaysLookAtTopCard->setShortcut(QKeySequence());
-    aMoveTopToPlay->setShortcut(QKeySequence());
-    aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
-    aMoveTopCardToGraveyard->setShortcut(QKeySequence());
-    aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
-    aMoveTopCardToExile->setShortcut(QKeySequence());
-    aMoveTopCardsToExile->setShortcut(QKeySequence());
-    aMoveTopCardsUntil->setShortcut(QKeySequence());
-    aDrawBottomCard->setShortcut(QKeySequence());
-    aDrawBottomCards->setShortcut(QKeySequence());
-    aMoveBottomToPlay->setShortcut(QKeySequence());
-    aMoveBottomToPlayFaceDown->setShortcut(QKeySequence());
-    aMoveBottomCardToGraveyard->setShortcut(QKeySequence());
-    aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
-    aMoveBottomCardToExile->setShortcut(QKeySequence());
-    aMoveBottomCardsToExile->setShortcut(QKeySequence());
-    aIncrementAllCardCounters->setShortcut(QKeySequence());
-    aSortHand->setShortcut(QKeySequence());
+    clearShortcutIfItExists(aViewSideboard);
+    clearShortcutIfItExists(aViewLibrary);
+    clearShortcutIfItExists(aViewHand);
+    clearShortcutIfItExists(aViewTopCards);
+    clearShortcutIfItExists(aViewBottomCards);
+    clearShortcutIfItExists(aViewGraveyard);
+    clearShortcutIfItExists(aDrawCard);
+    clearShortcutIfItExists(aDrawCards);
+    clearShortcutIfItExists(aUndoDraw);
+    clearShortcutIfItExists(aMulligan);
+    clearShortcutIfItExists(aShuffle);
+    clearShortcutIfItExists(aShuffleTopCards);
+    clearShortcutIfItExists(aShuffleBottomCards);
+    clearShortcutIfItExists(aUntapAll);
+    clearShortcutIfItExists(aRollDie);
+    clearShortcutIfItExists(aCreateToken);
+    clearShortcutIfItExists(aCreateAnotherToken);
+    clearShortcutIfItExists(aAlwaysRevealTopCard);
+    clearShortcutIfItExists(aAlwaysLookAtTopCard);
+    clearShortcutIfItExists(aMoveTopToPlay);
+    clearShortcutIfItExists(aMoveTopToPlayFaceDown);
+    clearShortcutIfItExists(aMoveTopCardToGraveyard);
+    clearShortcutIfItExists(aMoveTopCardsToGraveyard);
+    clearShortcutIfItExists(aMoveTopCardToExile);
+    clearShortcutIfItExists(aMoveTopCardsToExile);
+    clearShortcutIfItExists(aMoveTopCardsUntil);
+    clearShortcutIfItExists(aDrawBottomCard);
+    clearShortcutIfItExists(aDrawBottomCards);
+    clearShortcutIfItExists(aMoveBottomToPlay);
+    clearShortcutIfItExists(aMoveBottomToPlayFaceDown);
+    clearShortcutIfItExists(aMoveBottomCardToGraveyard);
+    clearShortcutIfItExists(aMoveBottomCardsToGraveyard);
+    clearShortcutIfItExists(aMoveBottomCardToExile);
+    clearShortcutIfItExists(aMoveBottomCardsToExile);
+    clearShortcutIfItExists(aIncrementAllCardCounters);
+    clearShortcutIfItExists(aSortHand);
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
