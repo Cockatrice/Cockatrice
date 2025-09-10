@@ -20,6 +20,11 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
+    backgroundSourceDeck = new DeckLoader();
+
+    qInfo() << "Loading from " << SettingsCache::instance().getDeckPath() + "background.cod";
+    backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
+                                       DeckLoader::CockatriceFormat, false);
 
     gradientColors = extractDominantColors(background);
 
@@ -35,12 +40,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     cardChangeTimer = new QTimer(this);
     connect(cardChangeTimer, &QTimer::timeout, this, &HomeWidget::updateRandomCard);
 
-    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-            &HomeWidget::initializeBackgroundFromSource);
-
-    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
-        initializeBackgroundFromSource();
-    }
+    initializeBackgroundFromSource();
 
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
@@ -49,11 +49,17 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
 
 void HomeWidget::initializeBackgroundFromSource()
 {
-    auto type = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
+        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+                &HomeWidget::initializeBackgroundFromSource);
+        return;
+    }
+
+    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
 
     cardChangeTimer->stop();
 
-    switch (type) {
+    switch (backgroundSourceType) {
         case BackgroundSources::Theme:
             background = QPixmap("theme:backgrounds/home");
             update();
@@ -62,14 +68,49 @@ void HomeWidget::initializeBackgroundFromSource()
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
         case BackgroundSources::DeckFileArt:
-            // do deck file stuff if and when we implement it
+            backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
+                                               DeckLoader::CockatriceFormat, false);
+            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
     }
 }
 
 void HomeWidget::updateRandomCard()
 {
-    ExactCard newCard = CardDatabaseManager::getInstance()->getRandomCard();
+    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+
+    ExactCard newCard;
+
+    switch (backgroundSourceType) {
+        case BackgroundSources::Theme:
+            break;
+        case BackgroundSources::RandomCardArt:
+            do {
+                newCard = CardDatabaseManager::getInstance()->getRandomCard();
+            } while (newCard == backgroundSourceCard->getCard());
+            break;
+        case BackgroundSources::DeckFileArt:
+            QList<CardRef> cardRefs = backgroundSourceDeck->getCardRefList();
+            ExactCard oldCard = backgroundSourceCard->getCard();
+
+            if (!cardRefs.empty()) {
+                if (cardRefs.size() == 1) {
+                    newCard = CardDatabaseManager::getInstance()->getCard(cardRefs.first());
+                } else {
+                    // Keep picking until different
+                    do {
+                        int idx = QRandomGenerator::global()->bounded(cardRefs.size());
+                        newCard = CardDatabaseManager::getInstance()->getCard(cardRefs.at(idx));
+                        qInfo() << "Picked " << newCard.getName();
+                    } while (newCard == oldCard);
+                }
+            } else {
+                do {
+                    newCard = CardDatabaseManager::getInstance()->getRandomCard();
+                } while (newCard == oldCard);
+            }
+            break;
+    }
     if (!newCard)
         return;
 

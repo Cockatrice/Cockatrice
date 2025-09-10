@@ -32,6 +32,7 @@ private:
     TabSupervisor *tabSupervisor;
     QPixmap background;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
+    DeckLoader *backgroundSourceDeck;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
