@@ -225,7 +225,6 @@ set(cockatrice_SOURCES
     src/game/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
     src/game/player/player_list_widget.cpp
-    src/game/player/player_logger.cpp
     src/game/player/player_manager.cpp
     src/game/player/player_menu.cpp
     src/game/player/player_target.cpp
