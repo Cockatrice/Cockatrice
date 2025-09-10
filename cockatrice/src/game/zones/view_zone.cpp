@@ -34,6 +34,16 @@ ZoneViewZone::ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent)
     connect(_logic, &ZoneViewZoneLogic::closeView, this, &ZoneViewZone::close);
 }
 
+void ZoneViewZone::addToViews()
+{
+    qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().append(this);
+}
+
+void ZoneViewZone::removeFromViews()
+{
+    qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getViews().removeOne(this);
+}
+
 /**
  * Deletes this ZoneView and removes it from the origZone's views.
  * You should normally call this method instead of deleteLater()

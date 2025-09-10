@@ -6,6 +6,8 @@ class ZoneViewZoneLogic : public CardZoneLogic
 {
     Q_OBJECT
 signals:
+    void addToViews();
+    void removeFromViews();
     void closeView();
 
 private:

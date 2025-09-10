@@ -149,11 +149,11 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
 
 void ZoneViewZoneLogic::setWriteableRevealZone(bool _writeableRevealZone)
 {
-    // TODO: Deal with this
-    /*if (writeableRevealZone && !_writeableRevealZone) {
-        origZone->getViews().append(this);
+
+    if (writeableRevealZone && !_writeableRevealZone) {
+        emit addToViews();
     } else if (!writeableRevealZone && _writeableRevealZone) {
-        origZone->getViews().removeOne(this);
-    }*/
+        emit removeFromViews();
+    }
     writeableRevealZone = _writeableRevealZone;
 }

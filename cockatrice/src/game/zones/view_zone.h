@@ -62,6 +62,8 @@ public:
         return optimumRect;
     }
 public slots:
+    void addToViews();
+    void removeFromViews();
     void close();
     void setFilterString(const QString &_filterString);
     void setGroupBy(CardList::SortOption _groupBy);
