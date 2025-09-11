@@ -746,6 +746,8 @@ void TabSupervisor::switchToFirstAvailableNetworkTab()
         setCurrentWidget(roomTabs.first());
     } else if (tabServer) {
         setCurrentWidget(tabServer);
+    } else {
+        openTabServer();
     }
 }
 

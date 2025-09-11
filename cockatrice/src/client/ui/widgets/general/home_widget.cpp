@@ -41,6 +41,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
 
     initializeBackgroundFromSource();
 
+    updateConnectButton(tabSupervisor->getClient()->getStatus());
+
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
@@ -194,7 +196,7 @@ QGroupBox *HomeWidget::createButtons()
 
 void HomeWidget::updateConnectButton(const ClientStatus status)
 {
-    disconnect(connectButton);
+    connectButton->disconnect();
     switch (status) {
         case StatusConnecting:
             connectButton->setText(tr("Connecting..."));
