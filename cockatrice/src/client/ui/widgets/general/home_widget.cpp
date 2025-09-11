@@ -62,6 +62,7 @@ void HomeWidget::initializeBackgroundFromSource()
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
             background = QPixmap("theme:backgrounds/home");
+            updateButtonsToBackgroundColor();
             update();
             break;
         case BackgroundSources::RandomCardArt:
@@ -122,12 +123,17 @@ void HomeWidget::updateRandomCard()
 void HomeWidget::updateBackgroundProperties()
 {
     background = backgroundSourceCard->getProcessedBackground(size());
+    updateButtonsToBackgroundColor();
+    update(); // Triggers repaint
+}
+
+void HomeWidget::updateButtonsToBackgroundColor()
+{
     gradientColors = extractDominantColors(background);
     for (HomeStyledButton *button : findChildren<HomeStyledButton *>()) {
         button->updateStylesheet(gradientColors);
         button->update();
     }
-    update(); // Triggers repaint
 }
 
 QGroupBox *HomeWidget::createButtons()
@@ -210,6 +216,11 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
+    if (SettingsCache::instance().getThemeName() == "Default" &&
+        SettingsCache::instance().getHomeTabBackgroundSource() == BackgroundSources::toId(BackgroundSources::Theme)) {
+        return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
+    }
+
     // Step 1: Downscale image for performance
     QImage image = pixmap.toImage()
                        .scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation)

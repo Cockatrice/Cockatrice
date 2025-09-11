@@ -29,6 +29,9 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
     QColor pressed1 = base1.darker(130); // 30% darker
     QColor pressed2 = base2.darker(130);
 
+    qInfo() << base1.name();
+    qInfo() << base2.toRgb();
+
     return QString(R"(
         QPushButton {
             font-size: 34px;
