@@ -182,10 +182,13 @@ void PlayerGraphicsItem::rearrangeZones()
         handZoneGraphicsItem->setWidth(tableZoneGraphicsItem->getWidth() +
                                        stackZoneGraphicsItem->boundingRect().width());
     } else {
-        player->setHandVisible(true);
-
-        handZoneGraphicsItem->setPos(base);
-        base += QPointF(handZoneGraphicsItem->boundingRect().width(), 0);
+        if (player->getHandZone()->contentsKnown()) {
+            player->setHandVisible(true);
+            handZoneGraphicsItem->setPos(base);
+            base += QPointF(handZoneGraphicsItem->boundingRect().width(), 0);
+        } else {
+            player->setHandVisible(false);
+        }
 
         stackZoneGraphicsItem->setPos(base);
         base += QPointF(stackZoneGraphicsItem->boundingRect().width(), 0);
