@@ -217,12 +217,12 @@ ExactCard CardDatabase::guessCard(const CardRef &cardRef) const
 ExactCard CardDatabase::getRandomCard()
 {
     if (cards.isEmpty())
-        return ExactCard();
+        return {};
 
     const auto keys = cards.keys();
     int randomIndex = QRandomGenerator::global()->bounded(keys.size());
     const QString &randomKey = keys.at(randomIndex);
-    CardInfoPtr randomCard = getCardFromMap(cards, randomKey);
+    CardInfoPtr randomCard = getCardInfo(randomKey);
 
     return ExactCard{randomCard, getPreferredPrinting(randomCard)};
 }
@@ -250,14 +250,6 @@ SetList CardDatabase::getSetList() const
         result << set;
     }
     return result;
-}
-
-CardInfoPtr CardDatabase::getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const
-{
-    if (cardMap.contains(cardName))
-        return cardMap.value(cardName);
-
-    return {};
 }
 
 LoadStatus CardDatabase::loadFromFile(const QString &fileName)
