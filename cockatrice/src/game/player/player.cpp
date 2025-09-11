@@ -30,10 +30,12 @@
 #include <QtConcurrent>
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
-    : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
-      playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), handVisible(false), deck(nullptr), zoneId(0), dialogSemaphore(false)
+    : QObject(_parent), game(_parent), playerEventHandler(new PlayerEventHandler(this)),
+      playerActions(new PlayerActions(this)), active(false), conceded(false), handVisible(_local), deck(nullptr),
+      zoneId(0), dialogSemaphore(false)
 {
+    playerInfo = new PlayerInfo(info, _id, _local, _judge);
+
     initializeZones();
 
     playerMenu = new PlayerMenu(this);

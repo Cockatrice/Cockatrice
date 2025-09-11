@@ -85,6 +85,7 @@ private slots:
        Loads in any found custom background and updates
      */
     void updateBg();
+    void updateHeight();
 
 public slots:
     /**
