@@ -731,7 +731,7 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event2.set_active_phase(activePhase);
 
     for (auto *_player : players.values()) {
-        _player->getInfo(event2.add_player_list(), _player,
+        _player->getInfo(event2.add_player_list(), player,
                          (_player->getSpectator() && (spectatorsSeeEverything || _player->getJudge())), true);
     }
 
