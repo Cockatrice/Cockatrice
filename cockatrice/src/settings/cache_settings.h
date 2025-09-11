@@ -958,7 +958,7 @@ public slots:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
-    void setHomeTabBackground(const QString &_backgroundSource);
+    void setHomeTabBackgroundSource(const QString &_backgroundSource);
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
     void setTabVisualDeckStorageOpen(bool value);
     void setTabServerOpen(bool value);

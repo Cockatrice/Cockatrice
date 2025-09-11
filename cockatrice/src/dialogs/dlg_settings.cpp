@@ -438,7 +438,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
-        SettingsCache::instance().setHomeTabBackground(BackgroundSources::toId(type));
+        SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);

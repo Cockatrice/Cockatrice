@@ -553,7 +553,7 @@ void SettingsCache::setThemeName(const QString &_themeName)
     emit themeChanged();
 }
 
-void SettingsCache::setHomeTabBackground(const QString &_backgroundSource)
+void SettingsCache::setHomeTabBackgroundSource(const QString &_backgroundSource)
 {
     homeTabBackgroundSource = _backgroundSource;
     settings->setValue("home/background", homeTabBackgroundSource);
