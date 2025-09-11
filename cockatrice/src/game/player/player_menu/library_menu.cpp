@@ -177,6 +177,8 @@ void LibraryMenu::createViewActions()
 
 void LibraryMenu::retranslateUi()
 {
+    setTitle(tr("&Library"));
+
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));

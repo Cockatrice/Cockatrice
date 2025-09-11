@@ -2,15 +2,13 @@
 
 #include "../../../client/tabs/tab_game.h"
 #include "../../../common/pb/command_reveal_cards.pb.h"
-#include "../../../settings/card_counter_settings.h"
 #include "../../board/card_item.h"
 #include "../../cards/card_database_manager.h"
 #include "../../zones/hand_zone.h"
-#include "../../zones/logic/view_zone_logic.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"
+#include "card_menu.h"
 #include "hand_menu.h"
-#include "pt_menu.h"
 
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {
@@ -73,8 +71,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
 
-        mCardCounters = new QMenu;
-
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
         playerMenu->addAction(aIncrementAllCardCounters);
@@ -116,7 +112,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
         aIncrementAllCardCounters = nullptr;
-        mCardCounters = nullptr;
 
         aViewSideboard = nullptr;
         handMenu = nullptr;
@@ -125,76 +120,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
         aUntapAll = nullptr;
         aRollDie = nullptr;
-    }
-
-    aTap = new QAction(this);
-    aTap->setData(cmTap);
-    connect(aTap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
-    aDoesntUntap = new QAction(this);
-    aDoesntUntap->setData(cmDoesntUntap);
-    connect(aDoesntUntap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
-    aAttach = new QAction(this);
-    connect(aAttach, &QAction::triggered, playerActions, &PlayerActions::actAttach);
-    aUnattach = new QAction(this);
-    connect(aUnattach, &QAction::triggered, playerActions, &PlayerActions::actUnattach);
-    aDrawArrow = new QAction(this);
-    connect(aDrawArrow, &QAction::triggered, playerActions, &PlayerActions::actDrawArrow);
-    aSetAnnotation = new QAction(this);
-    connect(aSetAnnotation, &QAction::triggered, playerActions, &PlayerActions::actSetAnnotation);
-    aFlip = new QAction(this);
-    aFlip->setData(cmFlip);
-    connect(aFlip, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    aPeek = new QAction(this);
-    aPeek->setData(cmPeek);
-    connect(aPeek, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    aClone = new QAction(this);
-    aClone->setData(cmClone);
-    connect(aClone, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    aMoveToTopLibrary = new QAction(this);
-    aMoveToTopLibrary->setData(cmMoveToTopLibrary);
-    aMoveToBottomLibrary = new QAction(this);
-    aMoveToBottomLibrary->setData(cmMoveToBottomLibrary);
-    aMoveToXfromTopOfLibrary = new QAction(this);
-    aMoveToGraveyard = new QAction(this);
-    aMoveToHand = new QAction(this);
-    aMoveToHand->setData(cmMoveToHand);
-    aMoveToGraveyard->setData(cmMoveToGraveyard);
-    aMoveToExile = new QAction(this);
-    aMoveToExile->setData(cmMoveToExile);
-    connect(aMoveToTopLibrary, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToBottomLibrary, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, playerActions, &PlayerActions::actMoveCardXCardsFromTop);
-    connect(aMoveToHand, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToGraveyard, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToExile, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-
-    aSelectAll = new QAction(this);
-    connect(aSelectAll, &QAction::triggered, playerActions, &PlayerActions::actSelectAll);
-    aSelectRow = new QAction(this);
-    connect(aSelectRow, &QAction::triggered, playerActions, &PlayerActions::actSelectRow);
-    aSelectColumn = new QAction(this);
-    connect(aSelectColumn, &QAction::triggered, playerActions, &PlayerActions::actSelectColumn);
-
-    aPlay = new QAction(this);
-    connect(aPlay, &QAction::triggered, playerActions, &PlayerActions::actPlay);
-    aHide = new QAction(this);
-    connect(aHide, &QAction::triggered, playerActions, &PlayerActions::actHide);
-    aPlayFacedown = new QAction(this);
-    connect(aPlayFacedown, &QAction::triggered, playerActions, &PlayerActions::actPlayFacedown);
-
-    for (int i = 0; i < 6; ++i) {
-        auto *tempAddCounter = new QAction(this);
-        tempAddCounter->setData(9 + i * 1000);
-        auto *tempRemoveCounter = new QAction(this);
-        tempRemoveCounter->setData(10 + i * 1000);
-        auto *tempSetCounter = new QAction(this);
-        tempSetCounter->setData(11 + i * 1000);
-        aAddCounter.append(tempAddCounter);
-        aRemoveCounter.append(tempRemoveCounter);
-        aSetCounter.append(tempSetCounter);
-        connect(tempAddCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
-        connect(tempRemoveCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
-        connect(tempSetCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
     }
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -331,207 +256,6 @@ void PlayerMenu::playerListActionTriggered()
     player->getPlayerActions()->sendGameCommand(cmd);
 }
 
-void PlayerMenu::initContextualPlayersMenu(QMenu *menu)
-{
-    menu->addAction(tr("&All players"))->setData(-1);
-    menu->addSeparator();
-
-    for (const auto &playerInfo : playersInfo) {
-        menu->addAction(playerInfo.first)->setData(playerInfo.second);
-    }
-}
-
-QMenu *PlayerMenu::createCardMenu(const CardItem *card)
-{
-    if (card == nullptr) {
-        return nullptr;
-    }
-
-    bool revealedCard = false;
-    bool writeableCard = player->getPlayerInfo()->getLocalOrJudge();
-    if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
-        if (view->getRevealZone()) {
-            if (view->getWriteableRevealZone()) {
-                writeableCard = true;
-            } else {
-                revealedCard = true;
-            }
-        }
-    }
-
-    QMenu *cardMenu = new QMenu;
-
-    if (revealedCard) {
-        cardMenu->addAction(aHide);
-        cardMenu->addAction(aClone);
-        cardMenu->addSeparator();
-        cardMenu->addAction(aSelectAll);
-        cardMenu->addAction(aSelectColumn);
-        addRelatedCardView(card, cardMenu);
-    } else if (writeableCard) {
-        bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
-
-        if (card->getZone()) {
-            if (card->getZone()->getName() == "table") {
-                // Card is on the battlefield
-
-                if (!canModifyCard) {
-                    addRelatedCardView(card, cardMenu);
-                    addRelatedCardActions(card, cardMenu);
-
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aDrawArrow);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aClone);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aSelectAll);
-                    cardMenu->addAction(aSelectRow);
-                    return cardMenu;
-                }
-
-                cardMenu->addAction(aTap);
-                cardMenu->addAction(aDoesntUntap);
-                cardMenu->addAction(aFlip);
-                if (card->getFaceDown()) {
-                    cardMenu->addAction(aPeek);
-                }
-
-                addRelatedCardView(card, cardMenu);
-                addRelatedCardActions(card, cardMenu);
-
-                cardMenu->addSeparator();
-                cardMenu->addAction(aAttach);
-                if (card->getAttachedTo()) {
-                    cardMenu->addAction(aUnattach);
-                }
-                cardMenu->addAction(aDrawArrow);
-                cardMenu->addSeparator();
-                cardMenu->addMenu(new PtMenu(player));
-                cardMenu->addAction(aSetAnnotation);
-                cardMenu->addSeparator();
-                cardMenu->addAction(aClone);
-                cardMenu->addMenu(createMoveMenu());
-                cardMenu->addSeparator();
-                cardMenu->addAction(aSelectAll);
-                cardMenu->addAction(aSelectRow);
-
-                cardMenu->addSeparator();
-                mCardCounters->clear();
-                for (int i = 0; i < aAddCounter.size(); ++i) {
-                    mCardCounters->addSeparator();
-                    mCardCounters->addAction(aAddCounter[i]);
-                    if (card->getCounters().contains(i)) {
-                        mCardCounters->addAction(aRemoveCounter[i]);
-                    }
-                    mCardCounters->addAction(aSetCounter[i]);
-                }
-                cardMenu->addSeparator();
-                cardMenu->addMenu(mCardCounters);
-            } else if (card->getZone()->getName() == "stack") {
-                // Card is on the stack
-                if (canModifyCard) {
-                    cardMenu->addAction(aAttach);
-                    cardMenu->addAction(aDrawArrow);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aClone);
-                    cardMenu->addMenu(createMoveMenu());
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aSelectAll);
-                } else {
-                    cardMenu->addAction(aDrawArrow);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aClone);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aSelectAll);
-                }
-
-                addRelatedCardView(card, cardMenu);
-                addRelatedCardActions(card, cardMenu);
-            } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
-                // Card is in the graveyard or exile
-                if (canModifyCard) {
-                    cardMenu->addAction(aPlay);
-                    cardMenu->addAction(aPlayFacedown);
-
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aClone);
-                    cardMenu->addMenu(createMoveMenu());
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aSelectAll);
-                    cardMenu->addAction(aSelectColumn);
-
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aAttach);
-                    cardMenu->addAction(aDrawArrow);
-                } else {
-                    cardMenu->addAction(aClone);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aSelectAll);
-                    cardMenu->addAction(aSelectColumn);
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aDrawArrow);
-                }
-
-                addRelatedCardView(card, cardMenu);
-                addRelatedCardActions(card, cardMenu);
-            } else {
-                // Card is in hand or a custom zone specified by server
-                cardMenu->addAction(aPlay);
-                cardMenu->addAction(aPlayFacedown);
-
-                QMenu *revealMenu = cardMenu->addMenu(tr("Re&veal to..."));
-                initContextualPlayersMenu(revealMenu);
-
-                connect(revealMenu, &QMenu::triggered, player->getPlayerActions(), &PlayerActions::actReveal);
-
-                cardMenu->addSeparator();
-                cardMenu->addAction(aClone);
-                cardMenu->addMenu(createMoveMenu());
-
-                // actions that are really wonky when done from deck or sideboard
-                if (card->getZone()->getName() == "hand") {
-                    cardMenu->addSeparator();
-                    cardMenu->addAction(aAttach);
-                    cardMenu->addAction(aDrawArrow);
-                }
-
-                cardMenu->addSeparator();
-                cardMenu->addAction(aSelectAll);
-                if (qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
-                    cardMenu->addAction(aSelectColumn);
-                }
-
-                addRelatedCardView(card, cardMenu);
-                if (card->getZone()->getName() == "hand") {
-                    addRelatedCardActions(card, cardMenu);
-                }
-            }
-        } else {
-            cardMenu->addMenu(createMoveMenu());
-        }
-    } else {
-        if (card->getZone() && card->getZone()->getName() != "hand") {
-            cardMenu->addAction(aDrawArrow);
-            cardMenu->addSeparator();
-            addRelatedCardView(card, cardMenu);
-            addRelatedCardActions(card, cardMenu);
-            cardMenu->addSeparator();
-            cardMenu->addAction(aClone);
-            cardMenu->addSeparator();
-            cardMenu->addAction(aSelectAll);
-        }
-    }
-
-    return cardMenu;
-}
-
-/**
- * Creates a card menu from the given card and sets it as the currently active card menu.
- * Will first check if the card should have a card menu, and no-ops if not.
- *
- * @param card The card to create the menu for. Pass nullptr to disable the card menu.
- * @return The new card menu, or nullptr if failed.
- */
 QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 {
     if (!card) {
@@ -546,136 +270,10 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
         return nullptr;
     }
 
-    QMenu *menu = createCardMenu(card);
+    QMenu *menu = new CardMenu(player, card, playersInfo, shortcutsActive);
     emit cardMenuUpdated(menu);
 
     return menu;
-}
-
-QMenu *PlayerMenu::createMoveMenu() const
-{
-    QMenu *moveMenu = new QMenu(tr("Move to"));
-    moveMenu->addAction(aMoveToTopLibrary);
-    moveMenu->addAction(aMoveToXfromTopOfLibrary);
-    moveMenu->addAction(aMoveToBottomLibrary);
-    moveMenu->addSeparator();
-    moveMenu->addAction(aMoveToHand);
-    moveMenu->addSeparator();
-    moveMenu->addAction(aMoveToGraveyard);
-    moveMenu->addSeparator();
-    moveMenu->addAction(aMoveToExile);
-    return moveMenu;
-}
-
-void PlayerMenu::addRelatedCardView(const CardItem *card, QMenu *cardMenu)
-{
-    if (!card || !cardMenu) {
-        return;
-    }
-    auto exactCard = card->getCard();
-    if (!exactCard) {
-        return;
-    }
-
-    bool atLeastOneGoodRelationFound = false;
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
-        if (relatedCard != nullptr) {
-            atLeastOneGoodRelationFound = true;
-            break;
-        }
-    }
-
-    if (!atLeastOneGoodRelationFound) {
-        return;
-    }
-
-    cardMenu->addSeparator();
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
-    cardMenu->addMenu(viewRelatedCards);
-    for (const CardRelation *relatedCard : relatedCards) {
-        QString relatedCardName = relatedCard->getName();
-        CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
-        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        Q_UNUSED(viewCard);
-
-        connect(viewCard, &QAction::triggered, player->getGame(),
-                [this, cardRef] { player->getGame()->getTab()->viewCardInfo(cardRef); });
-    }
-}
-
-void PlayerMenu::addRelatedCardActions(const CardItem *card, QMenu *cardMenu)
-{
-    if (!card || !cardMenu) {
-        return;
-    }
-    auto exactCard = card->getCard();
-    if (!exactCard) {
-        return;
-    }
-
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
-        return;
-    }
-
-    cardMenu->addSeparator();
-    int index = 0;
-    QAction *createRelatedCards = nullptr;
-    for (const CardRelation *cardRelation : relatedCards) {
-        ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardRelation->getName(),
-                                                                                       card->getCard().getPrinting());
-        if (!relatedCard) {
-            relatedCard = CardDatabaseManager::getInstance()->getCard({cardRelation->getName()});
-        }
-        if (!relatedCard) {
-            continue;
-        }
-
-        QString relatedCardName;
-        if (relatedCard.getInfo().getPowTough().size() > 0) {
-            relatedCardName = relatedCard.getInfo().getPowTough() + " " + relatedCard.getName(); // "n/n name"
-        } else {
-            relatedCardName = relatedCard.getName(); // "name"
-        }
-
-        QString text = tr("Token: ");
-        if (cardRelation->getDoesAttach()) {
-            text +=
-                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
-        } else if (cardRelation->getIsVariable()) {
-            text += "X " + relatedCardName;
-        } else if (cardRelation->getDefaultCount() != 1) {
-            text += QString::number(cardRelation->getDefaultCount()) + "x " + relatedCardName;
-        } else {
-            text += relatedCardName;
-        }
-
-        if (createRelatedCards == nullptr) {
-            if (relatedCards.length() == 1) {
-                createRelatedCards = new QAction(text, this); // set actCreateAllRelatedCards with this text
-                break; // do not set an individual entry as there is only one entry
-            } else {
-                createRelatedCards = new QAction(tr("All tokens"), this);
-            }
-        }
-
-        auto *createRelated = new QAction(text, this);
-        createRelated->setData(QVariant(index++));
-        connect(createRelated, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actCreateRelatedCard);
-        cardMenu->addAction(createRelated);
-    }
-
-    if (createRelatedCards) {
-        if (shortcutsActive) {
-            createRelatedCards->setShortcuts(
-                SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
-        }
-        connect(createRelatedCards, &QAction::triggered, player->getPlayerActions(),
-                &PlayerActions::actCreateAllRelatedCards);
-        cardMenu->addAction(createRelatedCards);
-    }
 }
 
 void PlayerMenu::clearCustomZonesMenu()
@@ -722,20 +320,18 @@ void PlayerMenu::populatePredefinedTokensMenu()
     }
 }
 
-
-
 void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
-    graveMenu->setTitle(tr("&Graveyard"));
-    rfgMenu->setTitle(tr("&Exile"));
+    graveMenu->retranslateUi();
+    rfgMenu->retranslateUi();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aViewSideboard->setText(tr("&View sideboard"));
 
-        handMenu->setTitle(tr("&Hand"));
+        handMenu->retranslateUi();
         sbMenu->setTitle(tr("&Sideboard"));
-        libraryMenu->setTitle(tr("&Library"));
+        libraryMenu->retranslateUi();
         countersMenu->setTitle(tr("&Counters"));
         mCustomZones->setTitle(tr("C&ustom Zones"));
 
@@ -750,8 +346,6 @@ void PlayerMenu::retranslateUi()
         aCreateAnotherToken->setText(tr("C&reate another token"));
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 
-        mCardCounters->setTitle(tr("Ca&rd counters"));
-
         for (auto &allPlayersAction : allPlayersActions) {
             allPlayersAction->setText(tr("&All players"));
         }
@@ -760,46 +354,6 @@ void PlayerMenu::retranslateUi()
     if (player->getPlayerInfo()->getLocal()) {
         sayMenu->setTitle(tr("S&ay"));
     }
-
-    aSelectAll->setText(tr("&Select All"));
-    aSelectRow->setText(tr("S&elect Row"));
-    aSelectColumn->setText(tr("S&elect Column"));
-
-    aPlay->setText(tr("&Play"));
-    aHide->setText(tr("&Hide"));
-    aPlayFacedown->setText(tr("Play &Face Down"));
-    //: Turn sideways or back again
-    aTap->setText(tr("&Tap / Untap"));
-    aDoesntUntap->setText(tr("Toggle &normal untapping"));
-    //: Turn face up/face down
-    aFlip->setText(tr("T&urn Over")); // Only the user facing names in client got renamed to "turn over"
-                                      // All code and proto bits are still unchanged (flip) for compatibility reasons
-                                      // A protocol rewrite with v3 could incorporate that, see #3100
-    aPeek->setText(tr("&Peek at card face"));
-    aClone->setText(tr("&Clone"));
-    aAttach->setText(tr("Attac&h to card..."));
-    aUnattach->setText(tr("Unattac&h"));
-    aDrawArrow->setText(tr("&Draw arrow..."));
-    aSetAnnotation->setText(tr("&Set annotation..."));
-
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-
-    for (int i = 0; i < aAddCounter.size(); ++i) {
-        aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
-    }
-    for (int i = 0; i < aRemoveCounter.size(); ++i) {
-        aRemoveCounter[i]->setText(tr("&Remove counter (%1)").arg(cardCounterSettings.displayName(i)));
-    }
-    for (int i = 0; i < aSetCounter.size(); ++i) {
-        aSetCounter[i]->setText(tr("&Set counters (%1)...").arg(cardCounterSettings.displayName(i)));
-    }
-
-    aMoveToTopLibrary->setText(tr("&Top of library in random order"));
-    aMoveToXfromTopOfLibrary->setText(tr("X cards from the top of library..."));
-    aMoveToBottomLibrary->setText(tr("&Bottom of library in random order"));
-    aMoveToHand->setText(tr("&Hand"));
-    aMoveToGraveyard->setText(tr("&Graveyard"));
-    aMoveToExile->setText(tr("&Exile"));
 }
 
 void PlayerMenu::setShortcutIfItExists(QAction *action, ShortcutKey shortcut)
@@ -821,34 +375,6 @@ void PlayerMenu::setShortcutsActive()
     shortcutsActive = true;
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    setShortcutIfItExists(aHide, shortcuts.getShortcut("Player/aHide"));
-    setShortcutIfItExists(aPlay, shortcuts.getShortcut("Player/aPlay"));
-    setShortcutIfItExists(aTap, shortcuts.getShortcut("Player/aTap"));
-    setShortcutIfItExists(aDoesntUntap, shortcuts.getShortcut("Player/aDoesntUntap"));
-    setShortcutIfItExists(aFlip, shortcuts.getShortcut("Player/aFlip"));
-    setShortcutIfItExists(aPeek, shortcuts.getShortcut("Player/aPeek"));
-    setShortcutIfItExists(aClone, shortcuts.getShortcut("Player/aClone"));
-    setShortcutIfItExists(aAttach, shortcuts.getShortcut("Player/aAttach"));
-    setShortcutIfItExists(aUnattach, shortcuts.getShortcut("Player/aUnattach"));
-    setShortcutIfItExists(aDrawArrow, shortcuts.getShortcut("Player/aDrawArrow"));
-    setShortcutIfItExists(aSetAnnotation, shortcuts.getShortcut("Player/aSetAnnotation"));
-    setShortcutIfItExists(aMoveToTopLibrary, shortcuts.getShortcut("Player/aMoveToTopLibrary"));
-    setShortcutIfItExists(aMoveToBottomLibrary, shortcuts.getShortcut("Player/aMoveToBottomLibrary"));
-    setShortcutIfItExists(aMoveToHand, shortcuts.getShortcut("Player/aMoveToHand"));
-    setShortcutIfItExists(aMoveToGraveyard, shortcuts.getShortcut("Player/aMoveToGraveyard"));
-    setShortcutIfItExists(aMoveToExile, shortcuts.getShortcut("Player/aMoveToExile"));
-
-    setShortcutIfItExists(aSelectAll, shortcuts.getShortcut("Player/aSelectAll"));
-    setShortcutIfItExists(aSelectRow, shortcuts.getShortcut("Player/aSelectRow"));
-    setShortcutIfItExists(aSelectColumn, shortcuts.getShortcut("Player/aSelectColumn"));
-
-    static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
-    for (int i = 0; i < aAddCounter.size(); i++) {
-        setShortcutIfItExists(aAddCounter[i], shortcuts.getShortcut("Player/aCC" + colorWords[i]));
-        setShortcutIfItExists(aRemoveCounter[i], shortcuts.getShortcut("Player/aRC" + colorWords[i]));
-        setShortcutIfItExists(aSetCounter[i], shortcuts.getShortcut("Player/aSC" + colorWords[i]));
-    }
-
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
@@ -860,16 +386,6 @@ void PlayerMenu::setShortcutsActive()
     setShortcutIfItExists(aRollDie, shortcuts.getShortcut("Player/aRollDie"));
     setShortcutIfItExists(aCreateToken, shortcuts.getShortcut("Player/aCreateToken"));
     setShortcutIfItExists(aCreateAnotherToken, shortcuts.getShortcut("Player/aCreateAnotherToken"));
-    setShortcutIfItExists(aPlayFacedown, shortcuts.getShortcut("Player/aPlayFacedown"));
-    setShortcutIfItExists(aPlay, shortcuts.getShortcut("Player/aPlay"));
-
-    // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
-    // when there are more than 1 player.
-    if (!player->getGame()->getGameState()->getIsLocalGame()) {
-        // unattach action is only active in card menu if the active card is attached.
-        // make unattach shortcut always active so that it consistently works when multiple cards are selected.
-        player->getGame()->getTab()->addAction(aUnattach);
-    }
 }
 
 void PlayerMenu::setShortcutsInactive()

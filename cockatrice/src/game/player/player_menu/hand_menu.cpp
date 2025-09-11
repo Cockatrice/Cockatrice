@@ -57,6 +57,8 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
 
 void HandMenu::retranslateUi()
 {
+    setTitle(tr("&Hand"));
+
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aViewHand->setText(tr("&View hand"));
         aSortHand->setText(tr("&Sort hand"));

@@ -63,6 +63,8 @@ void GraveyardMenu::createViewActions()
 
 void GraveyardMenu::retranslateUi()
 {
+    setTitle(tr("&Graveyard"));
+
     aViewGraveyard->setText(tr("&View graveyard"));
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {

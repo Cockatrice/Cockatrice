@@ -19,7 +19,6 @@ signals:
     void cardMenuUpdated(QMenu *cardMenu);
 
 public slots:
-    QMenu *createMoveMenu() const;
     void populatePredefinedTokensMenu();
     void setMenusForGraphicItems();
 
@@ -84,7 +83,7 @@ public:
 
 private:
     Player *player;
-    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones, *mCardCounters;
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones;
     HandMenu *handMenu;
     LibraryMenu *libraryMenu;
     GraveyardMenu *graveMenu;
@@ -96,21 +95,12 @@ private:
     QList<QPair<QString, int>> playersInfo;
     QAction *aViewSideboard, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
 
-    QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetAnnotation,
-        *aFlip, *aPeek, *aClone, *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard,
-        *aMoveToExile, *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCounters;
+    QAction *aIncrementAllCardCounters;
 
     bool shortcutsActive;
     QStringList predefinedTokens;
 
-    QMenu *createCardMenu(const CardItem *card);
-
-    void addRelatedCardActions(const CardItem *card, QMenu *cardMenu);
-    void addRelatedCardView(const CardItem *card, QMenu *cardMenu);
-
     void initSayMenu();
-    void initContextualPlayersMenu(QMenu *menu);
 };
 
 #endif // COCKATRICE_PLAYER_MENU_H

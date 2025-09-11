@@ -55,6 +55,8 @@ void RfgMenu::createViewActions()
 
 void RfgMenu::retranslateUi()
 {
+    setTitle(tr("&Exile"));
+
     aViewRfg->setText(tr("&View exile"));
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
