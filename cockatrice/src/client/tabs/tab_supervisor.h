@@ -26,6 +26,7 @@ class AbstractClient;
 class Tab;
 class TabServer;
 class TabRoom;
+class TabHome;
 class TabGame;
 class TabDeckStorage;
 class TabReplays;
@@ -167,15 +168,16 @@ public slots:
     TabEdhRecMain *addEdhrecMainTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
+    void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
+    void actTabVisualDeckStorage(bool checked);
+    void actTabReplays(bool checked);
 private slots:
     void refreshShortcuts();
 
-    void actTabVisualDeckStorage(bool checked);
     void actTabServer(bool checked);
     void actTabAccount(bool checked);
     void actTabDeckStorage(bool checked);
-    void actTabReplays(bool checked);
     void actTabAdmin(bool checked);
     void actTabLog(bool checked);
 
@@ -199,6 +201,7 @@ private slots:
     void processUserLeft(const QString &userName);
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
+    TabHome *addHomeTab();
     void deckEditorClosed(AbstractTabDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);

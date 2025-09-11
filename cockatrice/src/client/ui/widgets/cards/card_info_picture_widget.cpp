@@ -65,8 +65,10 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
 
 CardInfoPictureWidget::~CardInfoPictureWidget()
 {
-    enlargedPixmapWidget->hide();
-    enlargedPixmapWidget->deleteLater();
+    if (enlargedPixmapWidget) {
+        enlargedPixmapWidget->hide();
+        enlargedPixmapWidget->deleteLater();
+    }
 }
 
 /**

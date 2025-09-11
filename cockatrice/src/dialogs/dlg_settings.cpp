@@ -7,6 +7,7 @@
 #include "../client/tabs/tab_supervisor.h"
 #include "../client/ui/picture_loader/picture_loader.h"
 #include "../client/ui/theme_manager.h"
+#include "../client/ui/widgets/general/background_sources.h"
 #include "../deck/custom_line_edit.h"
 #include "../game/cards/card_database.h"
 #include "../game/cards/card_database_manager.h"
@@ -424,10 +425,36 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
+    for (const auto &entry : BackgroundSources::all()) {
+        homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
+    }
+
+    QString homeTabBackgroundSource = SettingsCache::instance().getHomeTabBackgroundSource();
+    int homeTabBackgroundSourceId =
+        homeTabBackgroundSourceBox.findData(BackgroundSources::fromId(homeTabBackgroundSource));
+    if (homeTabBackgroundSourceId != -1) {
+        homeTabBackgroundSourceBox.setCurrentIndex(homeTabBackgroundSourceId);
+    }
+
+    connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
+        auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
+        SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
+    });
+
+    homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
+    homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
+    homeTabBackgroundShuffleFrequencySpinBox.setValue(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency());
+    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged),
+            &SettingsCache::instance(), &SettingsCache::setHomeTabBackgroundShuffleFrequency);
+
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
     themeGrid->addWidget(&openThemeButton, 1, 1);
+    themeGrid->addWidget(&homeTabBackgroundSourceLabel, 2, 0);
+    themeGrid->addWidget(&homeTabBackgroundSourceBox, 2, 1);
+    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 3, 0);
+    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 3, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -656,6 +683,8 @@ void AppearanceSettingsPage::retranslateUi()
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
+    homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
+    homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));

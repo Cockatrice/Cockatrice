@@ -85,6 +85,7 @@ public:
     ExactCard getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const;
 
     [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
+    [[nodiscard]] ExactCard getRandomCard();
 
     /*
      * Get a card by its simple name. The name will be simplified in this
@@ -98,6 +99,7 @@ public:
         return cards;
     }
     SetList getSetList() const;
+    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
     LoadStatus loadFromFile(const QString &fileName);
     bool saveCustomTokensToFile();
     QStringList getAllMainCardTypes() const;

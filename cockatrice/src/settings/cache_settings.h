@@ -135,6 +135,8 @@ signals:
     void picsPathChanged();
     void cardDatabasePathChanged();
     void themeChanged();
+    void homeTabBackgroundSourceChanged();
+    void homeTabBackgroundShuffleFrequencyChanged();
     void picDownloadChanged();
     void showStatusBarChanged(bool state);
     void displayCardNamesChanged();
@@ -195,7 +197,7 @@ private:
     QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
-        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName;
+        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName, homeTabBackgroundSource;
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
     bool checkUpdatesOnStartup;
@@ -208,6 +210,7 @@ private:
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
     QList<int> seenTips;
+    int homeTabBackgroundShuffleFrequency;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -384,6 +387,14 @@ public:
     QString getThemeName() const
     {
         return themeName;
+    }
+    QString getHomeTabBackgroundSource() const
+    {
+        return homeTabBackgroundSource;
+    }
+    int getHomeTabBackgroundShuffleFrequency() const
+    {
+        return homeTabBackgroundShuffleFrequency;
     }
     bool getTabVisualDeckStorageOpen() const
     {
@@ -947,6 +958,8 @@ public slots:
     void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
     void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
+    void setHomeTabBackgroundSource(const QString &_backgroundSource);
+    void setHomeTabBackgroundShuffleFrequency(int _frequency);
     void setTabVisualDeckStorageOpen(bool value);
     void setTabServerOpen(bool value);
     void setTabAccountOpen(bool value);

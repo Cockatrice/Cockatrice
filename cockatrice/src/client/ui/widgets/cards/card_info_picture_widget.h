@@ -74,7 +74,7 @@ private:
     bool hoverToZoomEnabled;
     bool raiseOnEnter;
     int hoverActivateThresholdInMs = 500;
-    CardInfoPictureEnlargedWidget *enlargedPixmapWidget;
+    CardInfoPictureEnlargedWidget *enlargedPixmapWidget = nullptr;
     int enlargedPixmapOffset = 10;
     QTimer *hoverTimer;
     QPropertyAnimation *animation;

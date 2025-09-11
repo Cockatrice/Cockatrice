@@ -21,6 +21,7 @@
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
 #include "tab_game.h"
+#include "tab_home.h"
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_replays.h"
@@ -312,7 +313,9 @@ static void checkAndTrigger(QAction *checkableAction, bool checked)
  */
 void TabSupervisor::initStartupTabs()
 {
+    auto homeTab = addHomeTab();
     addDeckEditorTab(nullptr);
+    setCurrentWidget(homeTab);
 
     if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
         openTabVisualDeckStorage();
@@ -500,6 +503,8 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
     SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
         openTabVisualDeckStorage();
+        setCurrentWidget(tabVisualDeckStorage);
+    } else if (checked && tabVisualDeckStorage) {
         setCurrentWidget(tabVisualDeckStorage);
     } else if (!checked && tabVisualDeckStorage) {
         tabVisualDeckStorage->closeRequest();
@@ -735,6 +740,17 @@ void TabSupervisor::roomLeft(TabRoom *tab)
     removeTab(indexOf(tab));
 }
 
+void TabSupervisor::switchToFirstAvailableNetworkTab()
+{
+    if (!roomTabs.isEmpty()) {
+        setCurrentWidget(roomTabs.first());
+    } else if (tabServer) {
+        setCurrentWidget(tabServer);
+    } else {
+        openTabServer();
+    }
+}
+
 void TabSupervisor::openReplay(GameReplay *replay)
 {
     auto *replayTab = new TabGame(this, replay);
@@ -794,6 +810,14 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
+}
+
+TabHome *TabSupervisor::addHomeTab()
+{
+    auto *tab = new TabHome(this, client);
+    myAddTab(tab);
+    setCurrentWidget(tab);
+    return tab;
 }
 
 /**

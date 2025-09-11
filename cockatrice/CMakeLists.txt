@@ -50,6 +50,7 @@ set(cockatrice_SOURCES
     src/client/tabs/tab_deck_editor.cpp
     src/client/tabs/tab_deck_storage.cpp
     src/client/tabs/tab_game.cpp
+    src/client/tabs/tab_home.cpp
     src/client/tabs/tab_logs.cpp
     src/client/tabs/tab_message.cpp
     src/client/tabs/tab_replays.cpp
@@ -84,6 +85,7 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
     src/client/ui/widgets/cards/card_info_display_widget.cpp
     src/client/ui/widgets/cards/card_info_frame_widget.cpp
+    src/client/ui/widgets/cards/card_info_picture_art_crop_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_enlarged_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_widget.cpp
     src/client/ui/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
@@ -100,6 +102,9 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/client/ui/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/client/ui/widgets/general/background_sources.cpp
+    src/client/ui/widgets/general/home_styled_button.cpp
+    src/client/ui/widgets/general/home_widget.cpp
     src/client/ui/widgets/general/display/banner_widget.cpp
     src/client/ui/widgets/general/display/bar_widget.cpp
     src/client/ui/widgets/general/display/dynamic_font_size_label.cpp

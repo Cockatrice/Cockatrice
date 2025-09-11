@@ -136,6 +136,12 @@ void SettingsCache::setTokenDatabasePath(const QString & /* _tokenDatabasePath *
 void SettingsCache::setThemeName(const QString & /* _themeName */)
 {
 }
+void SettingsCache::setHomeTabBackgroundSource(const QString & /* _backgroundSource */)
+{
+}
+void SettingsCache::setHomeTabBackgroundShuffleFrequency(int /* frequency */)
+{
+}
 void SettingsCache::setTabVisualDeckStorageOpen(bool /*value*/)
 {
 }
