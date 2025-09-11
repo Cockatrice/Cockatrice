@@ -3,6 +3,12 @@
 #include "../../../settings/cache_settings.h"
 #include "../../board/card_item.h"
 
+/**
+ * @param _player the player that the cards are revealed to.
+ * @param _origZone the zone the cards were revealed from.
+ * @param _revealZone if false, the cards will be face down.
+ * @param _writeableRevealZone whether the player can interact with the revealed cards.
+ */
 ZoneViewZoneLogic::ZoneViewZoneLogic(Player *_player,
                                      CardZoneLogic *_origZone,
                                      int _numberCards,

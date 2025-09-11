@@ -18,10 +18,6 @@
 #include <QtMath>
 
 /**
- * @param _p the player that the cards are revealed to.
- * @param _origZone the zone the cards were revealed from.
- * @param _revealZone if false, the cards will be face down.
- * @param _writeableRevealZone whether the player can interact with the revealed cards.
  * @param parent the parent QGraphicsWidget containing the reveal zone
  */
 ZoneViewZone::ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent)
@@ -116,7 +112,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
     qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
     reorganizeCards();
-    emit getLogic()->cardCountChanged();
+    emit getLogic() -> cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
