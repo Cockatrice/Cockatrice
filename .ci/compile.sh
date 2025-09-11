@@ -95,6 +95,9 @@ fi
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
+# Set minimum CMake Version
+export CMAKE_POLICY_VERSION_MINIMUM=3.10
+
 # Add cmake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
