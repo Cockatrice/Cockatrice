@@ -101,8 +101,8 @@ Server_Game::~Server_Game()
 
     gameClosed = true;
     sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
-    for (auto *player : players.values()) {
-        player->prepareDestroy();
+    for (auto *anyPlayer : players.values()) {
+        anyPlayer->prepareDestroy();
     }
     players.clear();
 
@@ -189,36 +189,36 @@ void Server_Game::pingClockTimeout()
 
     bool allPlayersInactive = true;
     int playerCount = 0;
-    for (auto *player : players) {
-        if (player == nullptr)
+    for (auto *anyPlayer : players) {
+        if (anyPlayer == nullptr)
             continue;
 
-        if (!player->getSpectator()) {
+        if (!anyPlayer->getSpectator()) {
             ++playerCount;
         }
 
-        int oldPingTime = player->getPingTime();
+        int oldPingTime = anyPlayer->getPingTime();
         int newPingTime;
         {
-            QMutexLocker playerMutexLocker(&player->playerMutex);
-            if (player->getUserInterface()) {
-                newPingTime = player->getUserInterface()->getLastCommandTime();
+            QMutexLocker playerMutexLocker(&anyPlayer->playerMutex);
+            if (anyPlayer->getUserInterface()) {
+                newPingTime = anyPlayer->getUserInterface()->getLastCommandTime();
             } else {
                 newPingTime = -1;
             }
         }
 
-        if ((newPingTime != -1) && (!player->getSpectator() || player->getPlayerId() == hostId)) {
+        if ((newPingTime != -1) && (!anyPlayer->getSpectator() || anyPlayer->getPlayerId() == hostId)) {
             allPlayersInactive = false;
         }
 
         if ((abs(oldPingTime - newPingTime) > 1) || ((newPingTime == -1) && (oldPingTime != -1)) ||
             ((newPingTime != -1) && (oldPingTime == -1))) {
-            player->setPingTime(newPingTime);
+            anyPlayer->setPingTime(newPingTime);
 
             Event_PlayerPropertiesChanged event;
             event.mutable_player_properties()->set_ping_seconds(newPingTime);
-            ges.enqueueGameEvent(event, player->getPlayerId());
+            ges.enqueueGameEvent(event, anyPlayer->getPlayerId());
         }
     }
     ges.sendToGame(this);
@@ -238,8 +238,8 @@ int Server_Game::getPlayerCount() const
     QMutexLocker locker(&gameMutex);
 
     int result = 0;
-    for (Server_Player *player : players.values()) {
-        if (!player->getSpectator())
+    for (Server_Player *anyPlayer : players.values()) {
+        if (!anyPlayer->getSpectator())
             ++result;
     }
     return result;
@@ -250,8 +250,8 @@ int Server_Game::getSpectatorCount() const
     QMutexLocker locker(&gameMutex);
 
     int result = 0;
-    for (Server_Player *player : players.values()) {
-        if (player->getSpectator())
+    for (Server_Player *anyPlayer : players.values()) {
+        if (anyPlayer->getSpectator())
             ++result;
     }
     return result;
@@ -270,8 +270,8 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
     } else
         event->set_game_started(false);
 
-    for (Server_Player *otherPlayer : players.values()) {
-        otherPlayer->getInfo(event->add_player_list(), playerWhosAsking, omniscient, withUserInfo);
+    for (Server_Player *anyPlayer : players.values()) {
+        anyPlayer->getInfo(event->add_player_list(), playerWhosAsking, omniscient, withUserInfo);
     }
 }
 
@@ -294,21 +294,21 @@ void Server_Game::sendGameStateToPlayers()
     createGameStateChangedEvent(&spectatorNormalEvent, nullptr, false, false);
 
     // send game state info to clients according to their role in the game
-    for (Server_Player *player : players.values()) {
+    for (Server_Player *anyPlayer : players.values()) {
         GameEventContainer *gec;
-        if (player->getSpectator()) {
-            if (spectatorsSeeEverything || player->getJudge()) {
+        if (anyPlayer->getSpectator()) {
+            if (spectatorsSeeEverything || anyPlayer->getJudge()) {
                 gec = prepareGameEvent(omniscientEvent, -1);
             } else {
                 gec = prepareGameEvent(spectatorNormalEvent, -1);
             }
         } else {
             Event_GameStateChanged event;
-            createGameStateChangedEvent(&event, player, false, false);
+            createGameStateChangedEvent(&event, anyPlayer, false, false);
 
             gec = prepareGameEvent(event, -1);
         }
-        player->sendGameEvent(*gec);
+        anyPlayer->sendGameEvent(*gec);
         delete gec;
     }
 }
@@ -322,28 +322,28 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         return;
     }
 
-    for (Server_Player *player : players.values()) {
-        if (!player->getReadyStart() && !player->getSpectator()) {
+    for (Server_Player *anyPlayer : players.values()) {
+        if (!anyPlayer->getReadyStart() && !anyPlayer->getSpectator()) {
             if (forceStartGame) {
                 // Player is not ready to start, so kick them
                 // TODO: Move them to Spectators instead
-                kickPlayer(player->getPlayerId());
+                kickPlayer(anyPlayer->getPlayerId());
             } else {
                 return;
             }
         }
     }
 
-    for (Server_Player *player : players.values()) {
-        if (!player->getSpectator()) {
-            player->setupZones();
+    for (Server_Player *anyPlayer : players.values()) {
+        if (!anyPlayer->getSpectator()) {
+            anyPlayer->setupZones();
         }
     }
 
     gameStarted = true;
-    for (Server_Player *player : players.values()) {
-        player->setConceded(false);
-        player->setReadyStart(false);
+    for (Server_Player *anyPlayer : players.values()) {
+        anyPlayer->setConceded(false);
+        anyPlayer->setReadyStart(false);
     }
 
     if (firstGameStarted) {
@@ -392,8 +392,8 @@ void Server_Game::stopGameIfFinished()
     QMutexLocker locker(&gameMutex);
 
     int playing = 0;
-    for (Server_Player *player : players.values()) {
-        if (!player->getConceded() && !player->getSpectator())
+    for (Server_Player *anyPlayer : players.values()) {
+        if (!anyPlayer->getConceded() && !anyPlayer->getSpectator())
             ++playing;
     }
     if (playing > 1)
@@ -401,9 +401,9 @@ void Server_Game::stopGameIfFinished()
 
     gameStarted = false;
 
-    for (Server_Player *player : players.values()) {
-        player->clearZones();
-        player->setConceded(false);
+    for (Server_Player *anyPlayer : players.values()) {
+        anyPlayer->clearZones();
+        anyPlayer->setConceded(false);
     }
 
     sendGameStateToPlayers();
@@ -424,8 +424,8 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                                               bool asJudge)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
-    for (Server_Player *player : players.values()) {
-        if (player->getUserInfo()->name() == user->name())
+    for (Server_Player *anyPlayer : players.values()) {
+        if (anyPlayer->getUserInfo()->name() == user->name())
             return Response::RespContextError;
     }
 
@@ -459,8 +459,8 @@ bool Server_Game::containsUser(const QString &userName) const
 {
     QMutexLocker locker(&gameMutex);
 
-    for (Server_Player *player : players.values()) {
-        if (player->getUserInfo()->name() == userName.toStdString())
+    for (Server_Player *anyPlayer : players.values()) {
+        if (anyPlayer->getUserInfo()->name() == userName.toStdString())
             return true;
     }
     return false;
@@ -573,8 +573,8 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
     // Remove all arrows of other players pointing to the player being removed or to one of his cards.
     // Also remove all arrows starting at one of his cards. This is necessary since players can create
     // arrows that start at another person's cards.
-    for (Server_Player *otherPlayer : players.values()) {
-        QList<Server_Arrow *> arrows = otherPlayer->getArrows().values();
+    for (Server_Player *anyPlayer : players.values()) {
+        QList<Server_Arrow *> arrows = anyPlayer->getArrows().values();
         QList<Server_Arrow *> toDelete;
         for (int i = 0; i < arrows.size(); ++i) {
             Server_Arrow *a = arrows[i];
@@ -592,9 +592,9 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
         for (int i = 0; i < toDelete.size(); ++i) {
             Event_DeleteArrow event;
             event.set_arrow_id(toDelete[i]->getId());
-            ges.enqueueGameEvent(event, otherPlayer->getPlayerId());
+            ges.enqueueGameEvent(event, anyPlayer->getPlayerId());
 
-            otherPlayer->deleteArrow(toDelete[i]->getId());
+            anyPlayer->deleteArrow(toDelete[i]->getId());
         }
     }
 }
@@ -655,16 +655,16 @@ void Server_Game::setActivePhase(int _activePhase)
 {
     QMutexLocker locker(&gameMutex);
 
-    for (Server_Player *player : players.values()) {
-        QList<Server_Arrow *> toDelete = player->getArrows().values();
+    for (Server_Player *anyPlayer : players.values()) {
+        QList<Server_Arrow *> toDelete = anyPlayer->getArrows().values();
         for (int i = 0; i < toDelete.size(); ++i) {
             Server_Arrow *a = toDelete[i];
 
             Event_DeleteArrow event;
             event.set_arrow_id(a->getId());
-            sendGameEventContainer(prepareGameEvent(event, player->getPlayerId()));
+            sendGameEventContainer(prepareGameEvent(event, anyPlayer->getPlayerId()));
 
-            player->deleteArrow(a->getId());
+            anyPlayer->deleteArrow(a->getId());
         }
     }
 
@@ -705,14 +705,14 @@ void Server_Game::nextTurn()
     setActivePlayer(keys[listPos]);
 }
 
-void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming)
+void Server_Game::createGameJoinedEvent(Server_Player *joiningPlayer, ResponseContainer &rc, bool resuming)
 {
     Event_GameJoined event1;
     getInfo(*event1.mutable_game_info());
     event1.set_host_id(hostId);
-    event1.set_player_id(player->getPlayerId());
-    event1.set_spectator(player->getSpectator());
-    event1.set_judge(player->getJudge());
+    event1.set_player_id(joiningPlayer->getPlayerId());
+    event1.set_spectator(joiningPlayer->getSpectator());
+    event1.set_judge(joiningPlayer->getJudge());
     event1.set_resuming(resuming);
     if (resuming) {
         const QStringList &allGameTypes = room->getGameTypes();
@@ -730,9 +730,10 @@ void Server_Game::createGameJoinedEvent(Server_Player *player, ResponseContainer
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    for (auto *_player : players.values()) {
-        _player->getInfo(event2.add_player_list(), _player,
-                         (_player->getSpectator() && (spectatorsSeeEverything || _player->getJudge())), true);
+    for (auto *anyPlayer : players.values()) {
+        anyPlayer->getInfo(event2.add_player_list(), joiningPlayer,
+                           (joiningPlayer->getSpectator() && (spectatorsSeeEverything || joiningPlayer->getJudge())),
+                           true);
     }
 
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
@@ -745,12 +746,12 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
     QMutexLocker locker(&gameMutex);
 
     cont->set_game_id(gameId);
-    for (Server_Player *player : players.values()) {
-        const bool playerPrivate = (player->getPlayerId() == privatePlayerId) ||
-                                   (player->getSpectator() && (spectatorsSeeEverything || player->getJudge()));
+    for (Server_Player *anyPlayer : players.values()) {
+        const bool playerPrivate = (anyPlayer->getPlayerId() == privatePlayerId) ||
+                                   (anyPlayer->getSpectator() && (spectatorsSeeEverything || anyPlayer->getJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
-            player->sendGameEvent(*cont);
+            anyPlayer->sendGameEvent(*cont);
     }
     if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
         cont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
