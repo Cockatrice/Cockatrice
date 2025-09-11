@@ -8,7 +8,7 @@ HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _g
     : QPushButton(text, parent), gradientColors(_gradientColors)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumHeight(100); // or higher if needed
+    setMinimumHeight(50);
     setStyleSheet(generateButtonStylesheet(gradientColors));
 }
 
@@ -38,7 +38,7 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
             padding: 30px;
             color: white;
             border: 2px solid %1;
-            border-radius: 6px;
+            border-radius: 20px;
             background: qlineargradient(x1:0, y1:1, x2:0, y2:0,
                                         stop:0 %2, stop:1 %3);
         }
