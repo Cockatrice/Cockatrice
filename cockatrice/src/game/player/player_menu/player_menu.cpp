@@ -211,8 +211,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 void PlayerMenu::setMenusForGraphicItems()
 {
     player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
-    //player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
-    //player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);
+    // player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
+    // player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
         // player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, aDrawCard);

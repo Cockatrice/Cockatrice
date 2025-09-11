@@ -37,9 +37,18 @@ public:
     }
 
     // expose useful actions/menus if PlayerMenu needs them
-    QMenu* revealLibrary() const { return mRevealLibrary; }
-    QMenu* lendLibraryMenu() const { return mLendLibrary; }
-    QMenu* revealTopCardMenu() const { return mRevealTopCard; }
+    QMenu *revealLibrary() const
+    {
+        return mRevealLibrary;
+    }
+    QMenu *lendLibraryMenu() const
+    {
+        return mLendLibrary;
+    }
+    QMenu *revealTopCardMenu() const
+    {
+        return mRevealTopCard;
+    }
 
     QMenu *topLibraryMenu = nullptr;
     QMenu *bottomLibraryMenu = nullptr;

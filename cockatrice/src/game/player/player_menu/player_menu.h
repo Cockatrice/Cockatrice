@@ -84,8 +84,7 @@ public:
 
 private:
     Player *player;
-    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones,
-        *mCardCounters;
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones, *mCardCounters;
     HandMenu *handMenu;
     LibraryMenu *libraryMenu;
     GraveyardMenu *graveMenu;
@@ -98,9 +97,9 @@ private:
     QAction *aViewSideboard, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetAnnotation, *aFlip, *aPeek, *aClone,
-        *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCounters;
+    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetAnnotation,
+        *aFlip, *aPeek, *aClone, *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard,
+        *aMoveToExile, *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCounters;
 
     bool shortcutsActive;
     QStringList predefinedTokens;

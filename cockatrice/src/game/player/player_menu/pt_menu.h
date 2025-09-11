@@ -3,7 +3,8 @@
 #include <QMenu>
 
 class Player;
-class PtMenu : public QMenu {
+class PtMenu : public QMenu
+{
 
     Q_OBJECT
 
@@ -23,7 +24,6 @@ public:
     QAction *aDecPT = nullptr;
     QAction *aSetPT = nullptr;
     QAction *aResetPT = nullptr;
-
 };
 
 #endif // COCKATRICE_PT_MENU_H
