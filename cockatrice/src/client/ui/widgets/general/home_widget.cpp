@@ -22,7 +22,6 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
     backgroundSourceDeck = new DeckLoader();
 
-    qInfo() << "Loading from " << SettingsCache::instance().getDeckPath() + "background.cod";
     backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
                                        DeckLoader::CockatriceFormat, false);
 
@@ -102,7 +101,6 @@ void HomeWidget::updateRandomCard()
                     do {
                         int idx = QRandomGenerator::global()->bounded(cardRefs.size());
                         newCard = CardDatabaseManager::getInstance()->getCard(cardRefs.at(idx));
-                        qInfo() << "Picked " << newCard.getName();
                     } while (newCard == oldCard);
                 }
             } else {
@@ -165,27 +163,32 @@ QGroupBox *HomeWidget::createButtons()
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
     boxLayout->addWidget(connectButton, 1);
 
-    auto visualDeckEditorButton = new HomeStyledButton("Create New Deck", gradientColors);
+    auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->addVisualDeckEditorTab(nullptr); });
     boxLayout->addWidget(visualDeckEditorButton);
-    auto visualDeckStorageButton = new HomeStyledButton("Browse Decks", gradientColors);
+    auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     boxLayout->addWidget(visualDeckStorageButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton("Browse Card Database", gradientColors);
+    auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     boxLayout->addWidget(visualDatabaseDisplayButton);
-    auto edhrecButton = new HomeStyledButton("Browse EDHRec", gradientColors);
+    auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
-    auto replaybutton = new HomeStyledButton("View Replays", gradientColors);
+    auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
     connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replaybutton);
+    if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
+        auto exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
+        connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
+                &MainWindow::actExit);
+        boxLayout->addWidget(exitButton);
+    }
 
     box->setLayout(boxLayout);
-
     return box;
 }
 
@@ -194,17 +197,17 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
     disconnect(connectButton);
     switch (status) {
         case StatusConnecting:
-            connectButton->setText("Connecting...");
+            connectButton->setText(tr("Connecting..."));
             connectButton->setEnabled(false);
             break;
         case StatusDisconnected:
-            connectButton->setText("Connect");
+            connectButton->setText(tr("Connect"));
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                     &MainWindow::actConnect);
             break;
         case StatusLoggedIn:
-            connectButton->setText("Play");
+            connectButton->setText(tr("Play"));
             connectButton->setEnabled(true);
             connect(connectButton, &QPushButton::clicked, tabSupervisor,
                     &TabSupervisor::switchToFirstAvailableNetworkTab);

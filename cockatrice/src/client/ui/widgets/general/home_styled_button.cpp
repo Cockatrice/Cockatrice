@@ -85,4 +85,3 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::white);
     painter.drawPath(path);
 }
-

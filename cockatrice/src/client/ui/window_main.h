@@ -60,6 +60,7 @@ public slots:
     void actCheckServerUpdates();
     void actCheckClientUpdates();
     void actConnect();
+    void actExit();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
@@ -84,7 +85,6 @@ private slots:
     void actFullScreen(bool checked);
     void actRegister();
     void actSettings();
-    void actExit();
     void actForgotPasswordRequest();
     void actAbout();
     void actTips();
