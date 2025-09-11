@@ -172,7 +172,7 @@ void PlayerActions::actAlwaysRevealTopCard()
 {
     Command_ChangeZoneProperties cmd;
     cmd.set_zone_name("deck");
-    cmd.set_always_reveal_top_card(player->getPlayerMenu()->isAlwaysRevealTopCardChecked());
+    cmd.set_always_reveal_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysRevealTopCardChecked());
 
     sendGameCommand(cmd);
 }
@@ -181,7 +181,7 @@ void PlayerActions::actAlwaysLookAtTopCard()
 {
     Command_ChangeZoneProperties cmd;
     cmd.set_zone_name("deck");
-    cmd.set_always_look_at_top_card(player->getPlayerMenu()->isAlwaysLookAtTopCardChecked());
+    cmd.set_always_look_at_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysLookAtTopCardChecked());
 
     sendGameCommand(cmd);
 }

@@ -1,8 +1,12 @@
 #ifndef COCKATRICE_PLAYER_MENU_H
 #define COCKATRICE_PLAYER_MENU_H
 
-#include "../../client/tearoff_menu.h"
-#include "player.h"
+#include "../../../client/tearoff_menu.h"
+#include "../player.h"
+#include "grave_menu.h"
+#include "hand_menu.h"
+#include "library_menu.h"
+#include "rfg_menu.h"
 
 #include <QMenu>
 #include <QObject>
@@ -15,9 +19,7 @@ signals:
     void cardMenuUpdated(QMenu *cardMenu);
 
 public slots:
-    QMenu *createPtMenu() const;
     QMenu *createMoveMenu() const;
-    void enableOpenInDeckEditorAction() const;
     void populatePredefinedTokensMenu();
     void setMenusForGraphicItems();
 
@@ -28,13 +30,9 @@ private slots:
     void refreshShortcuts();
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
-    void resetTopCardMenuActions();
 
 public:
     PlayerMenu(Player *player);
-    void createDrawActions();
-    void createShuffleActions();
-    void createMoveActions();
     void createViewActions();
     void retranslateUi();
 
@@ -59,16 +57,6 @@ public:
         return predefinedTokens;
     }
 
-    [[nodiscard]] bool isAlwaysRevealTopCardChecked()
-    {
-        return aAlwaysRevealTopCard->isChecked();
-    }
-
-    [[nodiscard]] bool isAlwaysLookAtTopCardChecked()
-    {
-        return aAlwaysLookAtTopCard->isChecked();
-    }
-
     [[nodiscard]] QMenu *getPlayerMenu() const
     {
         return playerMenu;
@@ -77,6 +65,11 @@ public:
     [[nodiscard]] QMenu *getCountersMenu()
     {
         return countersMenu;
+    }
+
+    [[nodiscard]] LibraryMenu *getLibraryMenu() const
+    {
+        return libraryMenu;
     }
 
     bool getShortcutsActive() const
@@ -91,30 +84,23 @@ public:
 
 private:
     Player *player;
-    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mRevealLibrary, *mLendLibrary, *mRevealTopCard,
-        *mRevealHand, *mRevealRandomHandCard, *mRevealRandomGraveyardCard, *mCustomZones, *mCardCounters;
-    TearOffMenu *moveGraveMenu, *moveRfgMenu, *graveMenu, *moveHandMenu, *handMenu, *libraryMenu, *topLibraryMenu,
-        *bottomLibraryMenu, *rfgMenu, *playerMenu;
+    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones,
+        *mCardCounters;
+    HandMenu *handMenu;
+    LibraryMenu *libraryMenu;
+    GraveyardMenu *graveMenu;
+    RfgMenu *rfgMenu;
+    TearOffMenu *playerMenu;
     QList<QMenu *> playerLists;
     QList<QMenu *> singlePlayerLists;
     QList<QAction *> allPlayersActions;
     QList<QPair<QString, int>> playersInfo;
-    QAction *aMoveHandToTopLibrary, *aMoveHandToBottomLibrary, *aMoveHandToGrave, *aMoveHandToRfg,
-        *aMoveGraveToTopLibrary, *aMoveGraveToBottomLibrary, *aMoveGraveToHand, *aMoveGraveToRfg, *aMoveRfgToTopLibrary,
-        *aMoveRfgToBottomLibrary, *aMoveRfgToHand, *aMoveRfgToGrave, *aViewHand, *aViewLibrary, *aViewTopCards,
-        *aViewBottomCards, *aAlwaysRevealTopCard, *aAlwaysLookAtTopCard, *aOpenDeckInDeckEditor,
-        *aMoveTopCardToGraveyard, *aMoveTopCardToExile, *aMoveTopCardsToGraveyard, *aMoveTopCardsToExile,
-        *aMoveTopCardsUntil, *aMoveTopCardToBottom, *aViewGraveyard, *aViewRfg, *aViewSideboard, *aDrawCard,
-        *aDrawCards, *aUndoDraw, *aMulligan, *aShuffle, *aShuffleTopCards, *aShuffleBottomCards, *aMoveTopToPlay,
-        *aMoveTopToPlayFaceDown, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken, *aMoveBottomToPlay,
-        *aMoveBottomToPlayFaceDown, *aMoveBottomCardToTop, *aMoveBottomCardToGraveyard, *aMoveBottomCardToExile,
-        *aMoveBottomCardsToGraveyard, *aMoveBottomCardsToExile, *aDrawBottomCard, *aDrawBottomCards;
+    QAction *aViewSideboard, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
-    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetPT, *aResetPT,
-        *aIncP, *aDecP, *aIncT, *aDecT, *aIncPT, *aDecPT, *aFlowP, *aFlowT, *aSetAnnotation, *aFlip, *aPeek, *aClone,
+    QAction *aPlay, *aPlayFacedown, *aHide, *aTap, *aDoesntUntap, *aAttach, *aUnattach, *aDrawArrow, *aSetAnnotation, *aFlip, *aPeek, *aClone,
         *aMoveToTopLibrary, *aMoveToBottomLibrary, *aMoveToHand, *aMoveToGraveyard, *aMoveToExile,
-        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aSortHand, *aIncrementAllCardCounters;
+        *aMoveToXfromTopOfLibrary, *aSelectAll, *aSelectRow, *aSelectColumn, *aIncrementAllCardCounters;
 
     bool shortcutsActive;
     QStringList predefinedTokens;

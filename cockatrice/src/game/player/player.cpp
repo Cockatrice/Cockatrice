@@ -42,7 +42,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
 
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
 
-    connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::enableOpenInDeckEditorAction);
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::populatePredefinedTokensMenu);
 
     connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);

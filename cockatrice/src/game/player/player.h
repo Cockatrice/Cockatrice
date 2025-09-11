@@ -13,7 +13,7 @@
 #include "player_event_handler.h"
 #include "player_graphics_item.h"
 #include "player_info.h"
-#include "player_menu.h"
+#include "player_menu/player_menu.h"
 
 #include <QInputDialog>
 #include <QLoggingCategory>
