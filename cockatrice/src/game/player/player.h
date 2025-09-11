@@ -69,6 +69,7 @@ signals:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
+    void handVisibleChanged(bool visible);
 
 public slots:
     void setActive(bool _active);
@@ -223,6 +224,17 @@ public:
 
     void setZoneId(int _zoneId);
 
+    void setHandVisible(bool _handVisible)
+    {
+        handVisible = _handVisible;
+        emit handVisibleChanged(handVisible);
+    }
+
+    bool getHandVisible() const
+    {
+        return handVisible;
+    }
+
 private:
     AbstractGame *game;
     PlayerInfo *playerInfo;
@@ -233,6 +245,7 @@ private:
 
     bool active;
     bool conceded;
+    bool handVisible;
 
     DeckLoader *deck;
 

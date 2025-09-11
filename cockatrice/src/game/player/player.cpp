@@ -32,7 +32,7 @@
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), deck(nullptr), zoneId(0), dialogSemaphore(false)
+      conceded(false), handVisible(false), deck(nullptr), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
 
@@ -41,6 +41,7 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
     playerMenu->setMenusForGraphicItems();
 
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
+    connect(this, &Player::handVisibleChanged, getHandZone(), &CardZoneLogic::setGraphicsVisibility);
 
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::enableOpenInDeckEditorAction);
     connect(this, &Player::deckChanged, playerMenu, &PlayerMenu::populatePredefinedTokensMenu);
