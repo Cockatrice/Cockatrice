@@ -198,6 +198,7 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         mCustomZones = nullptr;
         aCreateAnotherToken = nullptr;
         createPredefinedTokenMenu = nullptr;
+        aIncrementAllCardCounters = nullptr;
         mCardCounters = nullptr;
         moveHandMenu = nullptr;
         aMoveHandToTopLibrary = nullptr;
