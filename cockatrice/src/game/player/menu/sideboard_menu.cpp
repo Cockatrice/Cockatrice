@@ -2,7 +2,7 @@
 
 #include "../player.h"
 
-SideboardMenu::SideboardMenu(Player *player, QMenu *playerMenu)
+SideboardMenu::SideboardMenu(Player *player, QMenu *playerMenu) : QMenu(playerMenu)
 {
     aViewSideboard = new QAction(this);
     connect(aViewSideboard, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actViewSideboard);

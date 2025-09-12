@@ -13,7 +13,7 @@
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         connect(player->getGame()->getPlayerManager(), &PlayerManager::playerAdded, this, &PlayerMenu::addPlayer);
         connect(player->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this, &PlayerMenu::removePlayer);
     }
