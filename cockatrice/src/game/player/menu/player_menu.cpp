@@ -23,8 +23,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         addPlayer(playerToAdd);
     }
 
-    PlayerActions *playerActions = player->getPlayerActions();
-
     playerMenu = new TearOffMenu();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
