@@ -6,6 +6,7 @@
 #include "../board/abstract_graphics_item.h"
 #include "../cards/card_info.h"
 #include "../filters/filter_string.h"
+#include "menu/player_menu.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"
 #include "player_actions.h"
@@ -13,7 +14,6 @@
 #include "player_event_handler.h"
 #include "player_graphics_item.h"
 #include "player_info.h"
-#include "player_menu/player_menu.h"
 
 #include <QInputDialog>
 #include <QLoggingCategory>

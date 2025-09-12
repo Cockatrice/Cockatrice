@@ -54,17 +54,16 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
         sbMenu->addAction(aViewSideboard);
 
-        mCustomZones = playerMenu->addMenu(QString());
-        mCustomZones->menuAction()->setVisible(false);
-
+        customZonesMenu = new CustomZoneMenu(player);
         playerMenu->addSeparator();
+
         countersMenu = playerMenu->addMenu(QString());
 
         utilityMenu = new UtilityMenu(player, playerMenu);
     } else {
         countersMenu = nullptr;
         sbMenu = nullptr;
-        mCustomZones = nullptr;
+        customZonesMenu = nullptr;
         aViewSideboard = nullptr;
         utilityMenu = nullptr;
     }
@@ -88,10 +87,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
     refreshShortcuts();
-
-    connect(player, &Player::clearCustomZonesMenu, this, &PlayerMenu::clearCustomZonesMenu);
-    connect(player, &Player::addViewCustomZoneActionToCustomZoneMenu, this,
-            &PlayerMenu::addViewCustomZoneActionToCustomZoneMenu);
 
     retranslateUi();
 }
@@ -213,26 +208,6 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
     return menu;
 }
 
-void PlayerMenu::clearCustomZonesMenu()
-{
-    // Can be null if we are not the local player!
-    if (mCustomZones) {
-        mCustomZones->clear();
-        mCustomZones->menuAction()->setVisible(false);
-    }
-}
-
-void PlayerMenu::addViewCustomZoneActionToCustomZoneMenu(QString zoneName)
-{
-    if (mCustomZones) {
-        mCustomZones->menuAction()->setVisible(true);
-        QAction *aViewZone = mCustomZones->addAction(tr("View custom zone '%1'").arg(zoneName));
-        aViewZone->setData(zoneName);
-        connect(aViewZone, &QAction::triggered, this,
-                [zoneName, this]() { player->getGameScene()->toggleZoneView(player, zoneName, -1); });
-    }
-}
-
 void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
@@ -247,11 +222,7 @@ void PlayerMenu::retranslateUi()
         libraryMenu->retranslateUi();
         utilityMenu->retranslateUi();
         countersMenu->setTitle(tr("&Counters"));
-        mCustomZones->setTitle(tr("C&ustom Zones"));
-
-        for (auto aViewZone : mCustomZones->actions()) {
-            aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));
-        }
+        customZonesMenu->retranslateUi();
 
         for (auto &allPlayersAction : allPlayersActions) {
             allPlayersAction->setText(tr("&All players"));

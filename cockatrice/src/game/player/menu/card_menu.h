@@ -10,9 +10,7 @@ class CardMenu : public QMenu
     Q_OBJECT
 
 public:
-    explicit CardMenu(Player *player,
-                      const CardItem *card,
-                      bool shortcutsActive);
+    explicit CardMenu(Player *player, const CardItem *card, bool shortcutsActive);
     void removePlayer(Player *playerToRemove);
     void createTableMenu();
     void createStackMenu();

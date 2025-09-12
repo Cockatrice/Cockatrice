@@ -3,6 +3,7 @@
 
 #include "../../../client/tearoff_menu.h"
 #include "../player.h"
+#include "custom_zone_menu.h"
 #include "grave_menu.h"
 #include "hand_menu.h"
 #include "library_menu.h"
@@ -13,6 +14,7 @@
 #include <QMenu>
 #include <QObject>
 
+class CardItem;
 class PlayerMenu : public QObject
 {
     Q_OBJECT
@@ -28,8 +30,6 @@ private slots:
     void removePlayer(Player *playerToRemove);
     void playerListActionTriggered();
     void refreshShortcuts();
-    void clearCustomZonesMenu();
-    void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
 
 public:
     PlayerMenu(Player *player);
@@ -73,13 +73,14 @@ public:
 private:
     Player *player;
     TearOffMenu *playerMenu;
-    QMenu *sbMenu, *countersMenu, *mCustomZones;
+    QMenu *sbMenu, *countersMenu;
     HandMenu *handMenu;
     LibraryMenu *libraryMenu;
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
     UtilityMenu *utilityMenu;
     SayMenu *sayMenu;
+    CustomZoneMenu *customZonesMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
     QAction *aViewSideboard;
