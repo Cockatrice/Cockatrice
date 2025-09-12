@@ -56,7 +56,9 @@ void Player::initializeZones()
     addZone(new PileZoneLogic(this, "sb", false, false, false, this));
     addZone(new TableZoneLogic(this, "table", true, false, true, this));
     addZone(new StackZoneLogic(this, "stack", true, false, true, this));
-    addZone(new HandZoneLogic(this, "hand", false, false, true, this));
+    bool visibleHand = playerInfo->getLocalOrJudge() ||
+                       (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
+    addZone(new HandZoneLogic(this, "hand", false, false, visibleHand, this));
 }
 
 Player::~Player()
