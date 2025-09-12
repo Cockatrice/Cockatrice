@@ -838,6 +838,13 @@ QMenu *PlayerMenu::createCardMenu(const CardItem *card)
     return cardMenu;
 }
 
+/**
+ * Creates a card menu from the given card and sets it as the currently active card menu.
+ * Will first check if the card should have a card menu, and no-ops if not.
+ *
+ * @param card The card to create the menu for. Pass nullptr to disable the card menu.
+ * @return The new card menu, or nullptr if failed.
+ */
 QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 {
     if (!card) {
