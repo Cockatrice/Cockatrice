@@ -7,6 +7,8 @@
 #include "hand_menu.h"
 #include "library_menu.h"
 #include "rfg_menu.h"
+#include "say_menu.h"
+#include "utility_menu.h"
 
 #include <QMenu>
 #include <QObject>
@@ -19,7 +21,6 @@ signals:
     void cardMenuUpdated(QMenu *cardMenu);
 
 public slots:
-    void populatePredefinedTokensMenu();
     void setMenusForGraphicItems();
 
 private slots:
@@ -39,22 +40,6 @@ public:
 
     QMenu *updateCardMenu(const CardItem *card);
 
-    [[nodiscard]] bool createAnotherTokenActionExists() const
-    {
-        return aCreateAnotherToken != nullptr;
-    }
-
-    void setAndEnableCreateAnotherTokenAction(QString text)
-    {
-        aCreateAnotherToken->setText(text);
-        aCreateAnotherToken->setEnabled(true);
-    }
-
-    QStringList getPredefinedTokens() const
-    {
-        return predefinedTokens;
-    }
-
     [[nodiscard]] QMenu *getPlayerMenu() const
     {
         return playerMenu;
@@ -70,6 +55,11 @@ public:
         return libraryMenu;
     }
 
+    [[nodiscard]] UtilityMenu *getUtilityMenu() const
+    {
+        return utilityMenu;
+    }
+
     bool getShortcutsActive() const
     {
         return shortcutsActive;
@@ -82,20 +72,19 @@ public:
 
 private:
     Player *player;
-    QMenu *sbMenu, *countersMenu, *sayMenu, *createPredefinedTokenMenu, *mCustomZones;
+    TearOffMenu *playerMenu;
+    QMenu *sbMenu, *countersMenu, *mCustomZones;
     HandMenu *handMenu;
     LibraryMenu *libraryMenu;
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
-    TearOffMenu *playerMenu;
+    UtilityMenu *utilityMenu;
+    SayMenu *sayMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
-    QAction *aViewSideboard, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
-
-    QAction *aIncrementAllCardCounters;
+    QAction *aViewSideboard;
 
     bool shortcutsActive;
-    QStringList predefinedTokens;
 
     void initSayMenu();
 };

@@ -241,6 +241,8 @@ set(cockatrice_SOURCES
     src/game/player/player_menu/player_menu.cpp
     src/game/player/player_menu/pt_menu.cpp
     src/game/player/player_menu/rfg_menu.cpp
+    src/game/player/player_menu/say_menu.cpp
+    src/game/player/player_menu/utility_menu.cpp
     src/game/replay.cpp
     src/game/zones/card_zone.cpp
     src/game/zones/hand_zone.cpp

@@ -57,58 +57,21 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         mCustomZones = playerMenu->addMenu(QString());
         mCustomZones->menuAction()->setVisible(false);
 
-        aUntapAll = new QAction(this);
-        connect(aUntapAll, &QAction::triggered, playerActions, &PlayerActions::actUntapAll);
-
-        aRollDie = new QAction(this);
-        connect(aRollDie, &QAction::triggered, playerActions, &PlayerActions::actRollDie);
-
-        aCreateToken = new QAction(this);
-        connect(aCreateToken, &QAction::triggered, playerActions, &PlayerActions::actCreateToken);
-
-        aCreateAnotherToken = new QAction(this);
-        connect(aCreateAnotherToken, &QAction::triggered, playerActions, &PlayerActions::actCreateAnotherToken);
-        aCreateAnotherToken->setEnabled(false);
-
-        aIncrementAllCardCounters = new QAction(this);
-        connect(aIncrementAllCardCounters, &QAction::triggered, player, &Player::incrementAllCardCounters);
-
-        createPredefinedTokenMenu = new QMenu(QString());
-        createPredefinedTokenMenu->setEnabled(false);
-
         playerMenu->addSeparator();
         countersMenu = playerMenu->addMenu(QString());
-        playerMenu->addAction(aIncrementAllCardCounters);
-        playerMenu->addSeparator();
-        playerMenu->addAction(aUntapAll);
-        playerMenu->addSeparator();
-        playerMenu->addAction(aRollDie);
-        playerMenu->addSeparator();
-        playerMenu->addAction(aCreateToken);
-        playerMenu->addAction(aCreateAnotherToken);
-        playerMenu->addMenu(createPredefinedTokenMenu);
-        playerMenu->addSeparator();
+
+        utilityMenu = new UtilityMenu(player, playerMenu);
     } else {
         countersMenu = nullptr;
         sbMenu = nullptr;
         mCustomZones = nullptr;
-        aCreateToken = nullptr;
-        aCreateAnotherToken = nullptr;
-        createPredefinedTokenMenu = nullptr;
-        aIncrementAllCardCounters = nullptr;
-
         aViewSideboard = nullptr;
-        sbMenu = nullptr;
-
-        aUntapAll = nullptr;
-        aRollDie = nullptr;
+        utilityMenu = nullptr;
     }
 
     if (player->getPlayerInfo()->getLocal()) {
-        sayMenu = playerMenu->addMenu(QString());
-        connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this,
-                &PlayerMenu::initSayMenu);
-        initSayMenu();
+        sayMenu = new SayMenu(player);
+        playerMenu->addMenu(sayMenu);
     }
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
@@ -270,30 +233,6 @@ void PlayerMenu::addViewCustomZoneActionToCustomZoneMenu(QString zoneName)
     }
 }
 
-void PlayerMenu::populatePredefinedTokensMenu()
-{
-    DeckLoader *_deck = player->getDeck();
-    createPredefinedTokenMenu->clear();
-    createPredefinedTokenMenu->setEnabled(false);
-    predefinedTokens.clear();
-    InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(_deck->getRoot()->findChild(DECK_ZONE_TOKENS));
-
-    if (tokenZone) {
-        if (!tokenZone->empty())
-            createPredefinedTokenMenu->setEnabled(true);
-
-        for (int i = 0; i < tokenZone->size(); ++i) {
-            const QString tokenName = tokenZone->at(i)->getName();
-            predefinedTokens.append(tokenName);
-            QAction *a = createPredefinedTokenMenu->addAction(tokenName);
-            if (i < 10) {
-                a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
-            }
-            connect(a, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actCreatePredefinedToken);
-        }
-    }
-}
-
 void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
@@ -306,19 +245,13 @@ void PlayerMenu::retranslateUi()
         handMenu->retranslateUi();
         sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->retranslateUi();
+        utilityMenu->retranslateUi();
         countersMenu->setTitle(tr("&Counters"));
         mCustomZones->setTitle(tr("C&ustom Zones"));
 
         for (auto aViewZone : mCustomZones->actions()) {
             aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));
         }
-
-        aIncrementAllCardCounters->setText(tr("Increment all card counters"));
-        aUntapAll->setText(tr("&Untap all permanents"));
-        aRollDie->setText(tr("R&oll die..."));
-        aCreateToken->setText(tr("&Create token..."));
-        aCreateAnotherToken->setText(tr("C&reate another token"));
-        createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
 
         for (auto &allPlayersAction : allPlayersActions) {
             allPlayersAction->setText(tr("&All players"));
@@ -356,18 +289,16 @@ void PlayerMenu::setShortcutsActive()
         libraryMenu->setShortcutsActive();
     }
     graveMenu->setShortcutsActive();
+    if (utilityMenu) {
+        utilityMenu->setShortcutsActive();
+    }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
     }
 
-    setShortcutIfItExists(aIncrementAllCardCounters, shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
     setShortcutIfItExists(aViewSideboard, shortcuts.getShortcut("Player/aViewSideboard"));
-    setShortcutIfItExists(aUntapAll, shortcuts.getShortcut("Player/aUntapAll"));
-    setShortcutIfItExists(aRollDie, shortcuts.getShortcut("Player/aRollDie"));
-    setShortcutIfItExists(aCreateToken, shortcuts.getShortcut("Player/aCreateToken"));
-    setShortcutIfItExists(aCreateAnotherToken, shortcuts.getShortcut("Player/aCreateAnotherToken"));
 }
 
 void PlayerMenu::setShortcutsInactive()
@@ -375,31 +306,9 @@ void PlayerMenu::setShortcutsInactive()
     shortcutsActive = false;
 
     clearShortcutIfItExists(aViewSideboard);
-    clearShortcutIfItExists(aUntapAll);
-    clearShortcutIfItExists(aRollDie);
-    clearShortcutIfItExists(aCreateToken);
-    clearShortcutIfItExists(aCreateAnotherToken);
-    clearShortcutIfItExists(aIncrementAllCardCounters);
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsInactive();
-    }
-}
-
-void PlayerMenu::initSayMenu()
-{
-    sayMenu->clear();
-
-    int count = SettingsCache::instance().messages().getCount();
-    sayMenu->setEnabled(count > 0);
-
-    for (int i = 0; i < count; ++i) {
-        auto *newAction = new QAction(SettingsCache::instance().messages().getMessageAt(i), sayMenu);
-        if (i < 10) {
-            newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
-        }
-        connect(newAction, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actSayMessage);
-        sayMenu->addAction(newAction);
     }
 }
