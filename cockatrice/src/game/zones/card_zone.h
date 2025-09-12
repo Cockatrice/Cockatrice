@@ -48,6 +48,7 @@ public:
     virtual void
     handleDropEvent(const QList<CardDragItem *> &dragItem, CardZoneLogic *startZone, const QPoint &dropPoint) = 0;
     CardZone(CardZoneLogic *logic, QGraphicsItem *parent = nullptr);
+    void onGraphicsVisibilityChanged(bool _visible);
     void retranslateUi();
 
     CardZoneLogic *getLogic() const

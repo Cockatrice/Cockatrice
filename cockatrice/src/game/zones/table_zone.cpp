@@ -30,7 +30,13 @@ TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    connect(getLogic()->getPlayer(), &Player::handVisibleChanged, this, &TableZone::updateHeight);
+
+    if (getLogic()->getPlayer()->getHandVisible()) {
+        height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    } else {
+        height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT * PADDING_Y;
+    }
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
@@ -41,6 +47,15 @@ TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone
 void TableZone::updateBg()
 {
     update();
+}
+
+void TableZone::updateHeight()
+{
+    if (getLogic()->getPlayer()->getHandVisible()) {
+        height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    } else {
+        height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT * PADDING_Y;
+    }
 }
 
 QRectF TableZone::boundingRect() const

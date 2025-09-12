@@ -11,9 +11,16 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
-    connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
+    connect(logic, &CardZoneLogic::setGraphicsVisibility, this, &CardZone::onGraphicsVisibilityChanged);
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
+}
+
+void CardZone::onGraphicsVisibilityChanged(bool _visible)
+{
+    setVisible(_visible);
+    qInfo() << "Visibility changed to " << _visible;
+    update();
 }
 
 void CardZone::onCardAdded(CardItem *addedCard)

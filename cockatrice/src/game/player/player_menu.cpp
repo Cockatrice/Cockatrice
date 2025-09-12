@@ -267,6 +267,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         libraryMenu = nullptr;
         countersMenu = nullptr;
         mCustomZones = nullptr;
+
+        aUntapAll = nullptr;
     }
 
     aTap = new QAction(this);
