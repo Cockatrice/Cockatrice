@@ -24,9 +24,7 @@ void SideboardMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
-        aViewSideboard->setShortcuts(shortcuts.getShortcut("Player/aViewSideboard"));
-    }
+    aViewSideboard->setShortcuts(shortcuts.getShortcut("Player/aViewSideboard"));
 }
 
 void SideboardMenu::setShortcutsInactive()
