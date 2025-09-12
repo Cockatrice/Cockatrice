@@ -36,6 +36,8 @@ MoveMenu::MoveMenu(Player *player) : QMenu(tr("Move to"))
     addSeparator();
     addAction(aMoveToExile);
 
+    setShortcutsActive();
+
     retranslateUi();
 }
 

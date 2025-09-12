@@ -25,11 +25,9 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
     PlayerActions *playerActions = player->getPlayerActions();
 
-    createViewActions();
-
     playerMenu = new TearOffMenu();
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         handMenu = new HandMenu(player, player->getPlayerActions(), playerMenu);
         playerMenu->addMenu(handMenu);
         /*playerLists.append(mRevealHand = handMenu->addMenu(QString()));
@@ -37,6 +35,9 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
         libraryMenu = new LibraryMenu(player, playerMenu);
         playerMenu->addMenu(libraryMenu);
+    } else {
+        handMenu = nullptr;
+        libraryMenu = nullptr;
     }
 
     graveMenu = new GraveyardMenu(player, playerMenu);
@@ -45,8 +46,12 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     rfgMenu = new RfgMenu(player, playerMenu);
     playerMenu->addMenu(rfgMenu);
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         sbMenu = playerMenu->addMenu(QString());
+
+        aViewSideboard = new QAction(this);
+        connect(aViewSideboard, &QAction::triggered, playerActions, &PlayerActions::actViewSideboard);
+
         sbMenu->addAction(aViewSideboard);
 
         mCustomZones = playerMenu->addMenu(QString());
@@ -83,16 +88,30 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         playerMenu->addAction(aCreateAnotherToken);
         playerMenu->addMenu(createPredefinedTokenMenu);
         playerMenu->addSeparator();
+    } else {
+        countersMenu = nullptr;
+        sbMenu = nullptr;
+        mCustomZones = nullptr;
+        aCreateToken = nullptr;
+        aCreateAnotherToken = nullptr;
+        createPredefinedTokenMenu = nullptr;
+        aIncrementAllCardCounters = nullptr;
+
+        aViewSideboard = nullptr;
+        sbMenu = nullptr;
+
+        aUntapAll = nullptr;
+        aRollDie = nullptr;
     }
 
-    if (player->getPlayerInfo()->local) {
+    if (player->getPlayerInfo()->getLocal()) {
         sayMenu = playerMenu->addMenu(QString());
         connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this,
                 &PlayerMenu::initSayMenu);
         initSayMenu();
     }
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
 
         for (auto &playerList : playerLists) {
             QAction *newAction = playerList->addAction(QString());
@@ -101,25 +120,6 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
             allPlayersActions.append(newAction);
             playerList->addSeparator();
         }
-    }
-
-    // We have to explicitly not-instantiate a bunch of things if we are not local or a judge or else we have to
-    // consider it everywhere instead of just null-checking
-    if (!player->getPlayerInfo()->local && !player->getPlayerInfo()->judge) {
-        countersMenu = nullptr;
-        sbMenu = nullptr;
-        mCustomZones = nullptr;
-        aCreateAnotherToken = nullptr;
-        createPredefinedTokenMenu = nullptr;
-        aIncrementAllCardCounters = nullptr;
-
-        aViewSideboard = nullptr;
-        handMenu = nullptr;
-        sbMenu = nullptr;
-        libraryMenu = nullptr;
-
-        aUntapAll = nullptr;
-        aRollDie = nullptr;
     }
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -136,22 +136,12 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 void PlayerMenu::setMenusForGraphicItems()
 {
     player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
-    // player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, aViewGraveyard);
-    // player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, aViewRfg);
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
+    player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
-        // player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, aDrawCard);
+        player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
         player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sbMenu);
-    }
-}
-
-void PlayerMenu::createViewActions()
-{
-    PlayerActions *playerActions = player->getPlayerActions();
-
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
-        aViewSideboard = new QAction(this);
-        connect(aViewSideboard, &QAction::triggered, playerActions, &PlayerActions::actViewSideboard);
     }
 }
 
@@ -171,11 +161,6 @@ void PlayerMenu::addPlayer(Player *playerToAdd)
     for (auto &playerList : playerLists) {
         addPlayerToList(playerList, playerToAdd);
     }
-    for (auto &playerList : singlePlayerLists) {
-        addPlayerToList(playerList, playerToAdd);
-    }
-
-    playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
 }
 
 void PlayerMenu::addPlayerToList(QMenu *playerList, Player *playerToAdd)
@@ -193,17 +178,6 @@ void PlayerMenu::removePlayer(Player *playerToRemove)
 
     for (auto &playerList : playerLists) {
         removePlayerFromList(playerList, playerToRemove);
-    }
-    for (auto &playerList : singlePlayerLists) {
-        removePlayerFromList(playerList, playerToRemove);
-    }
-
-    for (auto it = playersInfo.begin(); it != playersInfo.end();) {
-        if (it->second == playerToRemove->getPlayerInfo()->getId()) {
-            it = playersInfo.erase(it);
-        } else {
-            ++it;
-        }
     }
 }
 
@@ -270,7 +244,7 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
         return nullptr;
     }
 
-    QMenu *menu = new CardMenu(player, card, playersInfo, shortcutsActive);
+    QMenu *menu = new CardMenu(player, card, shortcutsActive);
     emit cardMenuUpdated(menu);
 
     return menu;
@@ -374,6 +348,14 @@ void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+
+    if (handMenu) {
+        handMenu->setShortcutsActive();
+    }
+    if (libraryMenu) {
+        libraryMenu->setShortcutsActive();
+    }
+    graveMenu->setShortcutsActive();
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {

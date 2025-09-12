@@ -11,13 +11,21 @@
 #include "move_menu.h"
 #include "pt_menu.h"
 
-CardMenu::CardMenu(Player *_player,
-                   const CardItem *_card,
-                   QList<QPair<QString, int>> _playersInfo,
-                   bool _shortcutsActive)
-    : player(_player), card(_card), playersInfo(_playersInfo), shortcutsActive(_shortcutsActive)
+CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
+    : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     auto playerActions = player->getPlayerActions();
+
+    const QList<Player *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
+
+    for (auto playerToAdd : players) {
+        if (playerToAdd == player) {
+            continue;
+        }
+        playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
+    }
+
+    connect(player->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this, &CardMenu::removePlayer);
 
     aTap = new QAction(this);
     aTap->setData(cmTap);
@@ -73,6 +81,8 @@ CardMenu::CardMenu(Player *_player,
         connect(tempSetCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
     }
 
+    setShortcutsActive();
+
     retranslateUi();
 
     if (card == nullptr) {
@@ -123,6 +133,17 @@ CardMenu::CardMenu(Player *_player,
             addAction(aClone);
             addSeparator();
             addAction(aSelectAll);
+        }
+    }
+}
+
+void CardMenu::removePlayer(Player *playerToRemove)
+{
+    for (auto it = playersInfo.begin(); it != playersInfo.end();) {
+        if (it->second == playerToRemove->getPlayerInfo()->getId()) {
+            it = playersInfo.erase(it);
+        } else {
+            ++it;
         }
     }
 }

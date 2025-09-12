@@ -12,8 +12,8 @@ class CardMenu : public QMenu
 public:
     explicit CardMenu(Player *player,
                       const CardItem *card,
-                      QList<QPair<QString, int>> playersInfo,
                       bool shortcutsActive);
+    void removePlayer(Player *playerToRemove);
     void createTableMenu();
     void createStackMenu();
     void createGraveyardOrExileMenu();

@@ -42,6 +42,8 @@ PtMenu::PtMenu(Player *player) : QMenu(tr("Power / toughness"))
     addAction(aSetPT);
     addAction(aResetPT);
 
+    setShortcutsActive();
+
     retranslateUi();
 }
 

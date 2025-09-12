@@ -32,7 +32,6 @@ private slots:
 
 public:
     PlayerMenu(Player *player);
-    void createViewActions();
     void retranslateUi();
 
     void addPlayerToList(QMenu *playerList, Player *playerToAdd);
@@ -90,9 +89,7 @@ private:
     RfgMenu *rfgMenu;
     TearOffMenu *playerMenu;
     QList<QMenu *> playerLists;
-    QList<QMenu *> singlePlayerLists;
     QList<QAction *> allPlayersActions;
-    QList<QPair<QString, int>> playersInfo;
     QAction *aViewSideboard, *aUntapAll, *aRollDie, *aCreateToken, *aCreateAnotherToken;
 
     QAction *aIncrementAllCardCounters;
