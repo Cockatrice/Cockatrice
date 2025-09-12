@@ -86,7 +86,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
 }
 
 /**
- * Like {@link Player::playCard}, but forces the card to be played to the table zone.
+ * Like {@link PlayerActions::playCard}, but forces the card to be played to the table zone.
  * Cards with tablerow 3 (the stack) will be played to tablerow 1 (the noncreatures row).
  */
 void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
