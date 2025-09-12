@@ -28,10 +28,13 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         handMenu = new HandMenu(player, player->getPlayerActions(), playerMenu);
         playerMenu->addMenu(handMenu);
-        /*playerLists.append(mRevealHand = handMenu->addMenu(QString()));
-        playerLists.append(mRevealRandomHandCard = handMenu->addMenu(QString()));*/
+        playerLists.append(handMenu->revealHandMenu());
+        playerLists.append(handMenu->revealRandomHandCardMenu());
 
         libraryMenu = new LibraryMenu(player, playerMenu);
+        playerLists.append(libraryMenu->revealLibrary());
+        playerLists.append(libraryMenu->lendLibraryMenu());
+        playerLists.append(libraryMenu->revealTopCardMenu());
         playerMenu->addMenu(libraryMenu);
     } else {
         handMenu = nullptr;
@@ -39,6 +42,7 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     }
 
     graveMenu = new GraveyardMenu(player, playerMenu);
+    connect(graveMenu, &GraveyardMenu::newPlayerActionCreated, this, &PlayerMenu::onNewPlayerListActionCreated);
     playerMenu->addMenu(graveMenu);
 
     rfgMenu = new RfgMenu(player, playerMenu);
@@ -180,6 +184,11 @@ void PlayerMenu::playerListActionTriggered()
     }
 
     player->getPlayerActions()->sendGameCommand(cmd);
+}
+
+void PlayerMenu::onNewPlayerListActionCreated(QAction *action)
+{
+    allPlayersActions.append(action);
 }
 
 QMenu *PlayerMenu::updateCardMenu(const CardItem *card)

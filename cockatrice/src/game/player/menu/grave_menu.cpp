@@ -16,7 +16,7 @@ GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(par
         newAction->setData(-1);
         connect(newAction, &QAction::triggered, player->getPlayerActions(),
                 &PlayerActions::actRevealRandomGraveyardCard);
-        // allPlayersActions.append(newAction);
+        emit newPlayerActionCreated(newAction);
         mRevealRandomGraveyardCard->addSeparator();
 
         addSeparator();

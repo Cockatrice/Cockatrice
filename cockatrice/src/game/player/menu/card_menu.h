@@ -17,7 +17,7 @@ public:
     void createGraveyardOrExileMenu();
     void createHandOrCustomZoneMenu();
 
-    QMenu *mCardCounters = nullptr;
+    QMenu *mCardCounters;
 
     QAction *aPlay, *aPlayFacedown;
     QAction *aHide;

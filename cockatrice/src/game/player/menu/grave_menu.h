@@ -10,6 +10,9 @@ class Player;
 class GraveyardMenu : public TearOffMenu
 {
     Q_OBJECT
+signals:
+    void newPlayerActionCreated(QAction *action);
+
 public:
     explicit GraveyardMenu(Player *player, QWidget *parent = nullptr);
     void createMoveActions();

@@ -20,11 +20,8 @@ LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent)
     addAction(aViewTopCards);
     addAction(aViewBottomCards);
     addSeparator();
-    // playerLists.append(mRevealLibrary = libraryMenu->addMenu(QString()));
     mRevealLibrary = addMenu(QString());
-    // singlePlayerLists.append(mLendLibrary = libraryMenu->addMenu(QString()));
     mLendLibrary = addMenu(QString());
-    // playerLists.append(mRevealTopCard = libraryMenu->addMenu(QString()));
     mRevealTopCard = addMenu(QString());
     addAction(aAlwaysRevealTopCard);
     addAction(aAlwaysLookAtTopCard);

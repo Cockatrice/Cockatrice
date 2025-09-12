@@ -30,6 +30,7 @@ private slots:
     void addPlayer(Player *playerToAdd);
     void removePlayer(Player *playerToRemove);
     void playerListActionTriggered();
+    void onNewPlayerListActionCreated(QAction *action);
     void refreshShortcuts();
 
 public:
