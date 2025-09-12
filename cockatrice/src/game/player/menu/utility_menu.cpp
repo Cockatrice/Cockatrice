@@ -53,10 +53,15 @@ UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu)
 
 void UtilityMenu::populatePredefinedTokensMenu()
 {
-    DeckLoader *_deck = player->getDeck();
     clear();
     setEnabled(false);
     predefinedTokens.clear();
+    DeckLoader *_deck = player->getDeck();
+
+    if (!_deck) {
+        return;
+    }
+
     InnerDecklistNode *tokenZone = dynamic_cast<InnerDecklistNode *>(_deck->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone) {
