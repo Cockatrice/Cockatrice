@@ -172,7 +172,7 @@ void PlayerActions::actAlwaysRevealTopCard()
 {
     Command_ChangeZoneProperties cmd;
     cmd.set_zone_name("deck");
-    cmd.set_always_reveal_top_card(player->getPlayerMenu()->isAlwaysRevealTopCardChecked());
+    cmd.set_always_reveal_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysRevealTopCardChecked());
 
     sendGameCommand(cmd);
 }
@@ -181,7 +181,7 @@ void PlayerActions::actAlwaysLookAtTopCard()
 {
     Command_ChangeZoneProperties cmd;
     cmd.set_zone_name("deck");
-    cmd.set_always_look_at_top_card(player->getPlayerMenu()->isAlwaysLookAtTopCardChecked());
+    cmd.set_always_look_at_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysLookAtTopCardChecked());
 
     sendGameCommand(cmd);
 }
@@ -833,7 +833,7 @@ void PlayerActions::actRollDie()
 
 void PlayerActions::actCreateToken()
 {
-    DlgCreateToken dlg(player->getPlayerMenu()->getPredefinedTokens(), player->getGame()->getTab());
+    DlgCreateToken dlg(player->getPlayerMenu()->getUtilityMenu()->getPredefinedTokens(), player->getGame()->getTab());
     if (!dlg.exec()) {
         return;
     }
@@ -850,7 +850,7 @@ void PlayerActions::actCreateToken()
         }
     }
 
-    player->getPlayerMenu()->setAndEnableCreateAnotherTokenAction(
+    player->getPlayerMenu()->getUtilityMenu()->setAndEnableCreateAnotherTokenAction(
         tr("C&reate another %1 token").arg(lastTokenInfo.name));
     actCreateAnotherToken();
 }
@@ -878,7 +878,7 @@ void PlayerActions::actCreateAnotherToken()
 
 void PlayerActions::setLastToken(CardInfoPtr cardInfo)
 {
-    if (cardInfo == nullptr || !player->getPlayerMenu()->createAnotherTokenActionExists()) {
+    if (cardInfo == nullptr || !player->getPlayerMenu()->getUtilityMenu()->createAnotherTokenActionExists()) {
         return;
     }
 
@@ -892,7 +892,7 @@ void PlayerActions::setLastToken(CardInfoPtr cardInfo)
 
     lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getTableRow());
 
-    player->getPlayerMenu()->setAndEnableCreateAnotherTokenAction(
+    player->getPlayerMenu()->getUtilityMenu()->setAndEnableCreateAnotherTokenAction(
         tr("C&reate another %1 token").arg(lastTokenInfo.name));
 }
 
