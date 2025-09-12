@@ -47,14 +47,11 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     playerMenu->addMenu(rfgMenu);
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        sbMenu = playerMenu->addMenu(QString());
-
-        aViewSideboard = new QAction(this);
-        connect(aViewSideboard, &QAction::triggered, playerActions, &PlayerActions::actViewSideboard);
-
-        sbMenu->addAction(aViewSideboard);
+        sideboardMenu = new SideboardMenu(player, playerMenu);
+        playerMenu->addMenu(sideboardMenu);
 
         customZonesMenu = new CustomZoneMenu(player);
+        playerMenu->addMenu(customZonesMenu);
         playerMenu->addSeparator();
 
         countersMenu = playerMenu->addMenu(QString());
@@ -62,9 +59,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         utilityMenu = new UtilityMenu(player, playerMenu);
     } else {
         countersMenu = nullptr;
-        sbMenu = nullptr;
+        sideboardMenu = nullptr;
         customZonesMenu = nullptr;
-        aViewSideboard = nullptr;
         utilityMenu = nullptr;
     }
 
@@ -99,7 +95,7 @@ void PlayerMenu::setMenusForGraphicItems()
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
         player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
-        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sbMenu);
+        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
     }
 }
 
@@ -215,11 +211,9 @@ void PlayerMenu::retranslateUi()
     rfgMenu->retranslateUi();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        aViewSideboard->setText(tr("&View sideboard"));
-
         handMenu->retranslateUi();
-        sbMenu->setTitle(tr("&Sideboard"));
         libraryMenu->retranslateUi();
+        sideboardMenu->retranslateUi();
         utilityMenu->retranslateUi();
         countersMenu->setTitle(tr("&Counters"));
         customZonesMenu->retranslateUi();
@@ -234,24 +228,9 @@ void PlayerMenu::retranslateUi()
     }
 }
 
-void PlayerMenu::setShortcutIfItExists(QAction *action, ShortcutKey shortcut)
-{
-    if (action) {
-        action->setShortcuts(shortcut);
-    }
-}
-
-void PlayerMenu::clearShortcutIfItExists(QAction *action)
-{
-    if (action) {
-        action->setShortcut(QKeySequence());
-    }
-}
-
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     if (handMenu) {
         handMenu->setShortcutsActive();
@@ -269,14 +248,11 @@ void PlayerMenu::setShortcutsActive()
         counterIterator.next().value()->setShortcutsActive();
     }
 
-    setShortcutIfItExists(aViewSideboard, shortcuts.getShortcut("Player/aViewSideboard"));
 }
 
 void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
-
-    clearShortcutIfItExists(aViewSideboard);
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {

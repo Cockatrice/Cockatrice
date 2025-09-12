@@ -9,6 +9,7 @@
 #include "library_menu.h"
 #include "rfg_menu.h"
 #include "say_menu.h"
+#include "sideboard_menu.h"
 #include "utility_menu.h"
 
 #include <QMenu>
@@ -66,16 +67,15 @@ public:
     }
 
     void setShortcutsActive();
-    void setShortcutIfItExists(QAction *action, ShortcutKey shortcut);
-    void clearShortcutIfItExists(QAction *action);
     void setShortcutsInactive();
 
 private:
     Player *player;
     TearOffMenu *playerMenu;
-    QMenu *sbMenu, *countersMenu;
+    QMenu *countersMenu;
     HandMenu *handMenu;
     LibraryMenu *libraryMenu;
+    SideboardMenu *sideboardMenu;
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
     UtilityMenu *utilityMenu;
@@ -83,7 +83,6 @@ private:
     CustomZoneMenu *customZonesMenu;
     QList<QMenu *> playerLists;
     QList<QAction *> allPlayersActions;
-    QAction *aViewSideboard;
 
     bool shortcutsActive;
 
