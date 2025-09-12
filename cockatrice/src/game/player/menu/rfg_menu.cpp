@@ -10,7 +10,7 @@ RfgMenu::RfgMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player
 
     addAction(aViewRfg);
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         addSeparator();
         moveRfgMenu = addTearOffMenu(QString());
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
@@ -26,7 +26,7 @@ RfgMenu::RfgMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player
 
 void RfgMenu::createMoveActions()
 {
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getPlayerInfo()->getLocalOrJudge()) {
         auto rfg = player->getRfgZone();
 
         aMoveRfgToTopLibrary = new QAction(this);
