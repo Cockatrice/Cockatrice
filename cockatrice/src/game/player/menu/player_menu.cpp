@@ -245,7 +245,6 @@ void PlayerMenu::setShortcutsActive()
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
     }
-
 }
 
 void PlayerMenu::setShortcutsInactive()
