@@ -69,6 +69,8 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     if (player->getPlayerInfo()->getLocal()) {
         sayMenu = new SayMenu(player);
         playerMenu->addMenu(sayMenu);
+    } else {
+        sayMenu = nullptr;
     }
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
