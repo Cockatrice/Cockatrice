@@ -21,7 +21,6 @@ public:
     explicit CardInfoPictureWidget(QWidget *parent = nullptr,
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
-    ~CardInfoPictureWidget();
     ExactCard getCard()
     {
         return exactCard;
