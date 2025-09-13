@@ -1,0 +1,16 @@
+syntax = "proto2";
+import "game_event.proto";
+import "serverinfo_card.proto";
+
+// Sent out by the server when a new pack is available, implicitly signals the start of the round timer
+message Event_DraftPack {
+    extend GameEvent {
+        optional Event_DraftPack ext = 2022;
+    }
+
+    // Index in the sequence of pick selections made
+    optional sint32 selection_index = 1 [default = -1];
+
+    // sequence of cards in the pack by index
+    repeated ServerInfo_Card cards = 2;
+}

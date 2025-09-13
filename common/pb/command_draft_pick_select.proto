@@ -1,0 +1,19 @@
+syntax = "proto2";
+import "game_commands.proto";
+
+// Confirms the previously sent actions to the server and signals the next pack.
+message Command_DraftPickSelect {
+    extend GameCommand {
+        optional Command_DraftPickSelect ext = 1036;
+    }
+
+    // Index in the sequence of pick selections made, important to keep track of in case the pack is invalidated with a
+    // new one by the server during transit.
+    optional sint32 selection_index = 1 [default = -1];
+
+    // Confirms that the player desires to leave an unexpected amount of cards in the pack
+    optional bool is_overpicking = 2;
+
+    // Confirms that the player desires to place cards into the pack
+    optional bool is_returning = 3;
+}

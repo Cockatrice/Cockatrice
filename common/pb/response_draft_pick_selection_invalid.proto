@@ -1,0 +1,20 @@
+syntax = "proto2";
+import "response.proto";
+
+// Response sent to a draft pick selection command when it isn't following the draft options or didn't confirm it's
+// actions. Clients are already aware of the options so the fields in this message just serve as an additional
+// validation.
+message Response_DraftPickSelectionInvalid {
+    extend Response {
+        optional Response_DraftPickSelectionInvalid ext = 1200;
+    }
+
+    // amount of picks performed that exceed the picks per selection, negative means too few picks were performed
+    optional sint32 too_many_picks = 1;
+
+    // amount of burns performed that exceed the burns per selection, negative means too few burns were performed
+    optional sint32 too_many_burns = 2;
+
+    // amount of cards that were returned to the pack
+    optional sint32 cards_returned_to_pack = 3;
+}

@@ -1,0 +1,66 @@
+syntax = "proto2";
+import "command_deck_select.proto";
+
+// Types of draft gamemodes available
+enum Draft_Type {
+    Booster_Draft = 1;
+    Sealed = 2;
+}
+
+// Container for options related to drafting shared in the game state
+message Draft_Options {
+    // The draft gamemode
+    optional Draft_Type type = 1;
+
+    // The cards to draft from as cockatrice decklist
+    optional string draft_list = 2;
+
+    // The cards to draft from as a decklist stored on the server
+    optional sint32 draft_list_id = 3 [default = -1];
+
+    // The cards that can be freely added to the deck before deck submission as cockatrice decklist
+    optional string addable_card_list = 4;
+
+    // The cards that can be freely added to the deck before deck submission as a decklist stored on the server
+    optional sint32 addable_card_list_id = 5 [default = -1];
+
+    // The amount of cards in each pack when using a cube, for example this is commonly 15 in boosterdrafts
+    optional uint32 cards_per_pack = 6;
+
+    // The amount of packs that will be drafted by each player when using a cube, for example this is commonly 3 in
+    // boosterdrafts
+    optional uint32 packs_per_player = 7;
+
+    // The minimum amount of cards in the mainboard of submitted decklists, often 40, -1 means any size
+    optional sint32 minimum_deck_size = 8 [default = -1];
+
+    // The amount of cards to pick every time a pack is passed, usually 1
+    optional uint32 picks_per_selection = 9 [default = 1];
+
+    // The amount of cards picked for removal every time a pack is passed, usually 0
+    optional uint32 burns_per_selection = 10;
+
+    // Amount of seconds before the server will decide picks automatically, -1 means no limit
+    optional sint32 selection_timer = 11 [default = -1];
+
+    // Amount of pick selections that can be made without having to wait on other players, this means that the slowest
+    // player can never have more than this amount of packs waiting for them and the fastest player can never be more
+    // than this amount of pick selections ahead of the slowest player, -1 means to never wait, 0 means to wait for all
+    // players to confirm their picks before showing the next pack
+    optional sint32 max_selections_ahead = 12 [default = -1];
+
+    // Amount of new packs that can be opened without having to wait on other players, only after all that player's pick
+    // selections in the current round of opened packs are finished can a new pack be opened, -1 means to never wait, 0
+    // means to wait for all players to finish their packs before showing the next pack when the player finished all
+    // picks
+    optional sint32 max_new_packs_ahead = 13 [default = -1];
+
+    // Allow players to interact using normal card actions on a table zone
+    optional bool enable_table = 32;
+
+    // Allow players to take more or less cards from packs with confirmation
+    optional bool enable_overpicking = 33;
+
+    // Allow players to return cards back into a pack with confirmation
+    optional bool enable_returning = 34;
+}
