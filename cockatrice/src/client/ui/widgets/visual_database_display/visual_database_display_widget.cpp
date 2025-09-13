@@ -108,18 +108,51 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
     quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));
 
-    saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     quickFilterNameWidget = new SettingsButtonWidget(this);
     quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/rename"));
-    nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
-    mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
     quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/player"));
-    subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
+
     quickFilterSetWidget = new SettingsButtonWidget(this);
     quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scales"));
-    setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+
     filterContainer->setMaximumHeight(80);
+
+    databaseLoadIndicator = new QLabel(this);
+    databaseLoadIndicator->setAlignment(Qt::AlignCenter);
+
+    mainLayout->addWidget(databaseLoadIndicator);
+
+    if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
+        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+                &VisualDatabaseDisplayWidget::initialize);
+        quickFilterSaveLoadWidget->setVisible(false);
+        quickFilterNameWidget->setVisible(false);
+        quickFilterSubTypeWidget->setVisible(false);
+        quickFilterSetWidget->setVisible(false);
+    } else {
+        initialize();
+        databaseLoadIndicator->setVisible(false);
+    }
+
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayWidget::initialize()
+{
+    databaseLoadIndicator->setVisible(false);
+
+    quickFilterSaveLoadWidget->setVisible(true);
+    quickFilterNameWidget->setVisible(true);
+    quickFilterSubTypeWidget->setVisible(true);
+    quickFilterSetWidget->setVisible(true);
+
+    saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
+    nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
+    mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+    subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
+    setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
 
     quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
     quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
@@ -164,6 +197,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
 void VisualDatabaseDisplayWidget::retranslateUi()
 {
+    databaseLoadIndicator->setText(tr("Loading database ..."));
+
     clearFilterWidget->setToolTip(tr("Clear all filters"));
 
     quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));

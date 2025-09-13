@@ -62,6 +62,7 @@ signals:
     void cardHoveredDatabaseDisplay(const ExactCard &hoveredCard);
 
 protected slots:
+    void initialize();
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
     void onHover(const ExactCard &hoveredCard);
     void addCard(const ExactCard &cardToAdd);
@@ -71,6 +72,7 @@ protected slots:
     void updateSearch(const QString &search) const;
 
 private:
+    QLabel *databaseLoadIndicator;
     QToolButton *clearFilterWidget;
     QWidget *filterContainer;
     QHBoxLayout *filterContainerLayout;
