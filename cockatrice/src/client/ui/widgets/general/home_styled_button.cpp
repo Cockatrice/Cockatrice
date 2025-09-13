@@ -60,17 +60,16 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
                                         stop:0 %8, stop:1 %9);
         }
     )")
-        .arg(base1.name())     // border color
-        .arg(base1.name())     // normal gradient start
-        .arg(base2.name())     // normal gradient end
-        .arg(hover1.name())    // hover start
-        .arg(hover2.name())    // hover end
-        .arg(pressed1.name())  // pressed start
+        .arg(base1.name())      // border color
+        .arg(base1.name())      // normal gradient start
+        .arg(base2.name())      // normal gradient end
+        .arg(hover1.name())     // hover start
+        .arg(hover2.name())     // hover end
+        .arg(pressed1.name())   // pressed start
         .arg(pressed2.name())   // pressed end
         .arg(disabled1.name())  // disabled start
         .arg(disabled2.name()); // disabled end
 }
-
 
 void HomeStyledButton::paintEvent(QPaintEvent *event)
 {
