@@ -196,7 +196,7 @@ QGroupBox *HomeWidget::createButtons()
 
 void HomeWidget::updateConnectButton(const ClientStatus status)
 {
-    connectButton->disconnect();
+    disconnect(connectButton, &QPushButton::clicked, nullptr, nullptr);
     switch (status) {
         case StatusConnecting:
             connectButton->setText(tr("Connecting..."));
