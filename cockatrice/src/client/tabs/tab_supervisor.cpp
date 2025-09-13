@@ -601,6 +601,8 @@ void TabSupervisor::actTabReplays(bool checked)
         setCurrentWidget(tabReplays);
     } else if (!checked && tabReplays) {
         tabReplays->closeRequest();
+    } else if (checked && tabReplays) {
+        setCurrentWidget(tabReplays);
     }
 }
 
