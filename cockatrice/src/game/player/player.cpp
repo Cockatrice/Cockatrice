@@ -43,6 +43,20 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
 
     connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
+
+    forwardActionSignalsToEventHandler();
+}
+
+// Event Handler is the controller i.e. everything hooks up to this to know about player state
+// Player should forward (private) signals to the event handler
+
+void Player::forwardActionSignalsToEventHandler()
+{
+    connect(playerActions, &PlayerActions::logSetTapped, playerEventHandler, &PlayerEventHandler::logSetTapped);
+    connect(playerActions, &PlayerActions::logSetDoesntUntap, playerEventHandler,
+            &PlayerEventHandler::logSetDoesntUntap);
+    connect(playerActions, &PlayerActions::logSetAnnotation, playerEventHandler, &PlayerEventHandler::logSetAnnotation);
+    connect(playerActions, &PlayerActions::logSetPT, playerEventHandler, &PlayerEventHandler::logSetPT);
 }
 
 void Player::initializeZones()
