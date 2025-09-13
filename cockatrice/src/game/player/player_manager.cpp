@@ -39,7 +39,7 @@ Player *PlayerManager::addPlayer(int playerId, const ServerInfo_User &info)
 {
     auto *newPlayer = new Player(info, playerId, isLocalPlayer(playerId) || game->getGameState()->getIsLocalGame(),
                                  isJudge(), getGame());
-    connect(newPlayer, &Player::concededChanged, this, &PlayerManager::playerConceded);
+    connect(newPlayer, &Player::concededChanged, this, &PlayerManager::onPlayerConceded);
     players.insert(playerId, newPlayer);
     emit playerAdded(newPlayer);
     emit playerCountChanged();

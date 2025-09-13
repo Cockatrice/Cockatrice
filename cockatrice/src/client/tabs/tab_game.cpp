@@ -141,6 +141,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 void TabGame::connectToGameState()
 {
     connect(game->getGameState(), &GameState::gameStarted, this, &TabGame::startGame);
+    connect(game->getGameState(), &GameState::gameStopped, this, &TabGame::stopGame);
     connect(game->getGameState(), &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
     connect(game->getGameState(), &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
 }
