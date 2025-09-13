@@ -176,12 +176,6 @@ QGroupBox *HomeWidget::createButtons()
     auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
-    if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
-        connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished,
-                visualDatabaseDisplayButton,
-                [visualDatabaseDisplayButton]() { visualDatabaseDisplayButton->setEnabled(true); });
-        visualDatabaseDisplayButton->setEnabled(false);
-    }
     boxLayout->addWidget(visualDatabaseDisplayButton);
     auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
