@@ -29,6 +29,12 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
     QColor pressed1 = base1.darker(130); // 30% darker
     QColor pressed2 = base2.darker(130);
 
+    // Disabled: more gray, less saturated
+    QColor disabled1 = base1.toHsv();
+    disabled1.setHsv(disabled1.hue(), disabled1.saturation() * 0.2, disabled1.value() * 0.6);
+    QColor disabled2 = base2.toHsv();
+    disabled2.setHsv(disabled2.hue(), disabled2.saturation() * 0.2, disabled2.value() * 0.6);
+
     return QString(R"(
         QPushButton {
             font-size: 34px;
@@ -47,6 +53,12 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                         stop:0 %6, stop:1 %7);
         }
+        QPushButton:disabled {
+            color: #aaaaaa;
+            border: 2px solid #888888;
+            background: qlineargradient(x1:0, y1:1, x2:0, y2:0,
+                                        stop:0 %8, stop:1 %9);
+        }
     )")
         .arg(base1.name())     // border color
         .arg(base1.name())     // normal gradient start
@@ -54,8 +66,11 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
         .arg(hover1.name())    // hover start
         .arg(hover2.name())    // hover end
         .arg(pressed1.name())  // pressed start
-        .arg(pressed2.name()); // pressed end
+        .arg(pressed2.name())   // pressed end
+        .arg(disabled1.name())  // disabled start
+        .arg(disabled2.name()); // disabled end
 }
+
 
 void HomeStyledButton::paintEvent(QPaintEvent *event)
 {
