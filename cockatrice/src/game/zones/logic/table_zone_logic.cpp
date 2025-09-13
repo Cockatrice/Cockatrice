@@ -15,6 +15,9 @@ TableZoneLogic::TableZoneLogic(Player *_player,
 void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
 {
     cards.append(card);
+    if (!card->getFaceDown()) {
+        card->setPT(card->getCardInfo().getPowTough());
+    }
     card->setGridPoint(QPoint(_x, _y));
     card->setVisible(true);
 }
