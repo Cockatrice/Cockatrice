@@ -40,6 +40,7 @@ signals:
     void cardScaleFactorChanged(int _scale);
     void cardChanged(const ExactCard &card);
     void cardClicked();
+    void deleteEnlargedPixmapWidget();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
