@@ -40,8 +40,7 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
 
     enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(this->window());
     enlargedPixmapWidget->hide();
-    connect(this, &CardInfoPictureWidget::deleteEnlargedPixmapWidget, enlargedPixmapWidget,
-            &CardInfoPictureEnlargedWidget::deleteLater);
+    connect(this, &QObject::destroyed, enlargedPixmapWidget, &CardInfoPictureEnlargedWidget::deleteLater);
 
     hoverTimer = new QTimer(this);
     hoverTimer->setSingleShot(true);
@@ -63,11 +62,6 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
 
         update();
     });
-}
-
-CardInfoPictureWidget::~CardInfoPictureWidget()
-{
-    emit deleteEnlargedPixmapWidget();
 }
 
 /**

@@ -21,7 +21,6 @@ public:
     explicit CardInfoPictureWidget(QWidget *parent = nullptr,
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
-    ~CardInfoPictureWidget();
     ExactCard getCard()
     {
         return exactCard;
@@ -40,7 +39,6 @@ signals:
     void cardScaleFactorChanged(int _scale);
     void cardChanged(const ExactCard &card);
     void cardClicked();
-    void deleteEnlargedPixmapWidget();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
