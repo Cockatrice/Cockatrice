@@ -167,7 +167,7 @@ QGroupBox *HomeWidget::createButtons()
 
     auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
-            [this] { tabSupervisor->addVisualDeckEditorTab(nullptr); });
+            [this] { tabSupervisor->openDeckInNewTab(nullptr); });
     boxLayout->addWidget(visualDeckEditorButton);
     auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
