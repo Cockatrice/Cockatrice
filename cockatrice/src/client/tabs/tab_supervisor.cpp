@@ -314,7 +314,6 @@ static void checkAndTrigger(QAction *checkableAction, bool checked)
 void TabSupervisor::initStartupTabs()
 {
     auto homeTab = addHomeTab();
-    addDeckEditorTab(nullptr);
     setCurrentWidget(homeTab);
 
     if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
