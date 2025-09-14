@@ -18,6 +18,7 @@ void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
     if (!card->getFaceDown()) {
         card->setPT(card->getCardInfo().getPowTough());
     }
+    qInfo() << "Triggering a build";
     card->setGridPoint(QPoint(_x, _y));
     card->setVisible(true);
 }
