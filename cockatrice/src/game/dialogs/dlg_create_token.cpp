@@ -199,16 +199,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         annotationEdit->setText("");
     }
 
-    const auto &cardProviderId =
-        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName());
-    if (!cardProviderId.isEmpty()) {
-        CardRef ref;
-        ref.name = cardInfo->getName();
-        ref.providerId = cardProviderId;
-        pic->setCard(CardDatabaseManager::query()->getCard(ref));
-    } else {
-        pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
-    }
+    pic->setCard(CardDatabaseManager::getInstance()->getPreferredCard(cardInfo));
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const
