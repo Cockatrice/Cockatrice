@@ -48,6 +48,7 @@ public:
     }
 
     Player *getActiveLocalPlayer(int activePlayer) const;
+    bool isLocalPlayer(int playerId);
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
