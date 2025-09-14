@@ -35,6 +35,11 @@ Player *PlayerManager::getActiveLocalPlayer(int activePlayer) const
     return nullptr;
 }
 
+bool PlayerManager::isLocalPlayer(int playerId)
+{
+    return game->getGameState()->getIsLocalGame() || playerId == localPlayerId;
+}
+
 Player *PlayerManager::addPlayer(int playerId, const ServerInfo_User &info)
 {
     auto *newPlayer = new Player(info, playerId, isLocalPlayer(playerId) || game->getGameState()->getIsLocalGame(),
@@ -68,13 +73,7 @@ Player *PlayerManager::getPlayer(int playerId) const
 void PlayerManager::onPlayerConceded(int playerId, bool conceded)
 {
     // GameEventHandler cares about this for sending the concede/unconcede commands
-    if (game->getGameState()->getIsLocalGame()) {
-        if (conceded) {
-            emit activeLocalPlayerConceded();
-        } else {
-            emit activeLocalPlayerUnconceded();
-        }
-    } else if (playerId == localPlayerId) {
+    if (isLocalPlayer(playerId)) {
         if (conceded) {
             emit activeLocalPlayerConceded();
         } else {
