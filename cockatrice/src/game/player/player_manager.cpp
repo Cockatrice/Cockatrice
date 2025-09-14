@@ -68,7 +68,13 @@ Player *PlayerManager::getPlayer(int playerId) const
 void PlayerManager::onPlayerConceded(int playerId, bool conceded)
 {
     // GameEventHandler cares about this for sending the concede/unconcede commands
-    if (playerId == getActiveLocalPlayer(playerId)->getPlayerInfo()->getId()) {
+    if (game->getGameState()->getIsLocalGame()) {
+        if (conceded) {
+            emit activeLocalPlayerConceded();
+        } else {
+            emit activeLocalPlayerUnconceded();
+        }
+    } else if (playerId == localPlayerId) {
         if (conceded) {
             emit activeLocalPlayerConceded();
         } else {
