@@ -2,6 +2,6 @@
 
 #include "abstract_game.h"
 
-GameMetaInfo::GameMetaInfo(AbstractGame *_game) : QObject(_game), game(_game)
+GameMetaInfo::GameMetaInfo(QObject *parent) : QObject(parent)
 {
 }

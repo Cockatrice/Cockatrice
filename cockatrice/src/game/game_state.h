@@ -16,7 +16,7 @@ class GameState : public QObject
     Q_OBJECT
 
 public:
-    explicit GameState(AbstractGame *_game,
+    explicit GameState(QObject *parent,
                        int secondsElapsed,
                        int hostId,
                        bool isLocalGame,
@@ -51,7 +51,7 @@ public:
         resuming = _resuming;
     }
 
-    bool isGameStateKnown()
+    bool isGameStateKnown() const
     {
         return gameStateKnown;
     }
@@ -100,16 +100,6 @@ public:
 
     void startGameTimer();
 
-    QMap<int, QString> getRoomGameTypes() const
-    {
-        return roomGameTypes;
-    }
-
-    void setRoomGameTypes(QMap<int, QString> _roomGameTypes)
-    {
-        roomGameTypes = _roomGameTypes;
-    }
-
     void setGameStateKnown(bool known)
     {
         gameStateKnown = known;
@@ -132,16 +122,13 @@ public slots:
     void setGameTime(int _secondsElapsed);
 
 private:
-    AbstractGame *game;
     QTimer *gameTimer;
     int secondsElapsed;
-    QMap<int, QString> roomGameTypes;
     int hostId;
     const bool isLocalGame;
     QList<AbstractClient *> clients;
     bool gameStateKnown;
     bool resuming;
-    QStringList phasesList;
     int currentPhase;
     int activePlayer;
     bool gameClosed;
