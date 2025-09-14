@@ -15,7 +15,7 @@ class GameMetaInfo : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameMetaInfo(QObject *parent);
+    explicit GameMetaInfo(AbstractGame *parent);
 
     QMap<int, QString> roomGameTypes;
 

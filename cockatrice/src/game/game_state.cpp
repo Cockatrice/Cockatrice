@@ -2,7 +2,7 @@
 
 #include "abstract_game.h"
 
-GameState::GameState(QObject *parent,
+GameState::GameState(AbstractGame *parent,
                      int _secondsElapsed,
                      int _hostId,
                      bool _isLocalGame,

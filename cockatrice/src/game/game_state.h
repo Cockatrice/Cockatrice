@@ -16,7 +16,7 @@ class GameState : public QObject
     Q_OBJECT
 
 public:
-    explicit GameState(QObject *parent,
+    explicit GameState(AbstractGame *parent,
                        int secondsElapsed,
                        int hostId,
                        bool isLocalGame,
