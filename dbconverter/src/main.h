@@ -2,11 +2,19 @@
 #define MAIN_H
 
 #include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/interface/noop_card_preference_provider.h">
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 
 class CardDatabaseConverter : public CardDatabase
 {
 public:
+    explicit CardDatabaseConverter()
+    {
+        // Replace querier with one that ignores SettingsCache
+        delete querier;
+        querier = new CardDatabaseQuerier(this, this, QSharedPointer<NoopCardPreferenceProvider>::create());
+    };
+
     LoadStatus loadCardDatabase(const QString &path)
     {
         return loader->loadCardDatabase(path);

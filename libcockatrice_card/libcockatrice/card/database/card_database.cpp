@@ -15,7 +15,8 @@
 #include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
-CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
+CardDatabase::CardDatabase(QObject *parent, QSharedPointer<ICardPreferenceProvider> prefs)
+    : QObject(parent), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
@@ -28,7 +29,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
 
-    querier = new CardDatabaseQuerier(this, this);
+    querier = new CardDatabaseQuerier(this, this, prefs);
 }
 
 CardDatabase::~CardDatabase()

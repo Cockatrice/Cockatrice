@@ -4,10 +4,14 @@
 #include "../printing/exact_card.h"
 #include "../set/card_set_comparator.h"
 #include "card_database.h"
+#include "interface/settings_card_preference_provider.h"
 
 #include <qrandom.h>
 
-CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent, const CardDatabase *_db) : QObject(_parent), db(_db)
+CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
+                                         const CardDatabase *_db,
+                                         const QSharedPointer<ICardPreferenceProvider> &prefs)
+    : QObject(_parent), db(_db), prefs(prefs)
 {
 }
 
@@ -207,6 +211,17 @@ PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const QString &cardName,
 /**
  * Gets the card representing the preferred printing of the cardInfo
  *
+ * @param cardName The cardName to find the preferred card and printing for
+ * @return A specific printing of a card
+ */
+ExactCard CardDatabaseQuerier::getPreferredCard(const QString &cardName) const
+{
+    return getPreferredCard(getCardInfo(cardName));
+}
+
+/**
+ * Gets the card representing the preferred printing of the cardInfo
+ *
  * @param cardInfo The cardInfo to find the preferred printing for
  * @return A specific printing of a card
  */
@@ -234,6 +249,12 @@ PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardIn
 {
     if (!cardInfo) {
         return PrintingInfo(nullptr);
+    }
+
+    const auto &pinnedPrintingProviderId = prefs->getCardPreferenceOverride(cardInfo->getName());
+
+    if (!pinnedPrintingProviderId.isEmpty()) {
+        return getSpecificPrinting({cardInfo->getName(), pinnedPrintingProviderId});
     }
 
     SetToPrintingsMap setMap = cardInfo->getSets();
