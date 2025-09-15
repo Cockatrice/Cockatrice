@@ -185,6 +185,8 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     gridPoint.setX(-1);
     attachedTo = _attachedTo;
     if (attachedTo != nullptr) {
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards
         if (attachedTo->zone == nullptr) {
             deleteLater();
         } else {
@@ -195,7 +197,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
             }
         }
     } else {
-        // If the zone is being torn down, it might already be null by the time a card tries to re-attach all its
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
         // attached cards
         if (zone == nullptr) {
             deleteLater();
