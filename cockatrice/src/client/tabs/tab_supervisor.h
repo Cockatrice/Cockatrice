@@ -90,6 +90,7 @@ private:
     UserListManager *userListManager;
     QList<AbstractClient *> localClients;
     QMenu *tabsMenu;
+    TabHome *tabHome;
     TabDeckStorageVisual *tabVisualDeckStorage;
     TabServer *tabServer;
     TabAccount *tabAccount;
@@ -104,8 +105,8 @@ private:
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabVisualDeckStorage, *aTabVisualDatabaseDisplay,
-        *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
+    QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabVisualDeckStorage,
+        *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -175,6 +176,7 @@ public slots:
 private slots:
     void refreshShortcuts();
 
+    void actTabHome(bool checked);
     void actTabServer(bool checked);
     void actTabAccount(bool checked);
     void actTabDeckStorage(bool checked);
@@ -182,6 +184,7 @@ private slots:
     void actTabLog(bool checked);
 
     void openTabVisualDeckStorage();
+    void openTabHome();
     void openTabServer();
     void openTabAccount();
     void openTabDeckStorage();
@@ -201,7 +204,6 @@ private slots:
     void processUserLeft(const QString &userName);
     void processUserJoined(const ServerInfo_User &userInfo);
     void talkLeft(TabMessage *tab);
-    TabHome *addHomeTab();
     void deckEditorClosed(AbstractTabDeckEditor *tab);
     void tabUserEvent(bool globalEvent);
     void updateTabText(Tab *tab, const QString &newTabText);
