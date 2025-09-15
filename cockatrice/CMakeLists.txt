@@ -192,26 +192,26 @@ set(cockatrice_SOURCES
     src/game/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/counter_general.cpp
-    src/game/cards/card_completer_proxy_model.cpp
-    src/game/cards/card_database.cpp
-    src/game/cards/card_database_manager.cpp
-    src/game/cards/card_database_model.cpp
-    src/game/cards/card_database_parser/card_database_parser.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    src/game/cards/card_info.cpp
-    src/game/cards/card_search_model.cpp
-    src/game/cards/exact_card.cpp
+    src/card/card_completer_proxy_model.cpp
+    src/card/card_database.cpp
+    src/card/card_database_manager.cpp
+    src/card/card_database_model.cpp
+    src/card/card_database_parser/card_database_parser.cpp
+    src/card/card_database_parser/cockatrice_xml_3.cpp
+    src/card/card_database_parser/cockatrice_xml_4.cpp
+    src/card/card_info.cpp
+    src/card/card_search_model.cpp
+    src/card/exact_card.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
     src/game/deckview/tabbed_deck_view_container.cpp
-    src/game/filters/deck_filter_string.cpp
-    src/game/filters/filter_builder.cpp
-    src/game/filters/filter_card.cpp
-    src/game/filters/filter_string.cpp
-    src/game/filters/filter_tree.cpp
-    src/game/filters/filter_tree_model.cpp
-    src/game/filters/syntax_help.cpp
+    src/filters/deck_filter_string.cpp
+    src/filters/filter_builder.cpp
+    src/filters/filter_card.cpp
+    src/filters/filter_string.cpp
+    src/filters/filter_tree.cpp
+    src/filters/filter_tree_model.cpp
+    src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp

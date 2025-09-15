@@ -18,12 +18,12 @@ add_executable(
   carddatabase_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-  ../../cockatrice/src/game/cards/card_database.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-  ../../cockatrice/src/game/cards/card_info.cpp
-  ../../cockatrice/src/game/cards/exact_card.cpp
+  ../../cockatrice/src/card/card_database.cpp
+  ../../cockatrice/src/card/card_database_parser/card_database_parser.cpp
+  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_4.cpp
+  ../../cockatrice/src/card/card_info.cpp
+  ../../cockatrice/src/card/exact_card.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
   carddatabase_test.cpp
   mocks.cpp
@@ -32,16 +32,16 @@ add_executable(
   filter_string_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-  ../../cockatrice/src/game/cards/card_database.cpp
-  ../../cockatrice/src/game/cards/card_database_manager.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-  ../../cockatrice/src/game/cards/card_info.cpp
-  ../../cockatrice/src/game/cards/exact_card.cpp
-  ../../cockatrice/src/game/filters/filter_card.cpp
-  ../../cockatrice/src/game/filters/filter_string.cpp
-  ../../cockatrice/src/game/filters/filter_tree.cpp
+  ../../cockatrice/src/card/card_database.cpp
+  ../../cockatrice/src/card/card_database_manager.cpp
+  ../../cockatrice/src/card/card_database_parser/card_database_parser.cpp
+  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_4.cpp
+  ../../cockatrice/src/card/card_info.cpp
+  ../../cockatrice/src/card/exact_card.cpp
+  ../../cockatrice/src/filters/filter_card.cpp
+  ../../cockatrice/src/filters/filter_string.cpp
+  ../../cockatrice/src/filters/filter_tree.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
   filter_string_test.cpp
   mocks.cpp
