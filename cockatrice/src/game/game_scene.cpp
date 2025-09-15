@@ -85,7 +85,7 @@ void GameScene::rearrange()
         Player *p = playersIter.next()->getPlayer();
         if (p && !p->getConceded()) {
             playersPlaying.append(p);
-            if (!firstPlayerFound && (p->getPlayerInfo()->getLocal())) {
+            if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
                 firstPlayerIndex = playersPlaying.size() - 1;
                 firstPlayerFound = true;
             }
