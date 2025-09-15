@@ -13,7 +13,7 @@ GameState::GameState(AbstractGame *parent,
                      bool _gameClosed)
     : QObject(parent), gameTimer(nullptr), secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame),
       clients(_clients), gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase),
-      activePlayer(0), gameClosed(_gameClosed)
+      activePlayer(-1), gameClosed(_gameClosed)
 {
 }
 
