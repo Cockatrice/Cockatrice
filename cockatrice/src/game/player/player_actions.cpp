@@ -878,7 +878,8 @@ void PlayerActions::actCreateAnotherToken()
 
 void PlayerActions::setLastToken(CardInfoPtr cardInfo)
 {
-    if (cardInfo == nullptr || !player->getPlayerMenu()->getUtilityMenu()->createAnotherTokenActionExists()) {
+    if (cardInfo == nullptr || !player->getPlayerMenu()->getUtilityMenu() ||
+        player->getPlayerMenu()->getUtilityMenu()->createAnotherTokenActionExists()) {
         return;
     }
 
