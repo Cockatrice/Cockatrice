@@ -304,8 +304,11 @@ void GameScene::timerEvent(QTimerEvent * /*event*/)
     QMutableSetIterator<CardItem *> i(cardsToAnimate);
     while (i.hasNext()) {
         i.next();
-        if (!i.value()->animationEvent())
+        if (i.value() == nullptr) {
             i.remove();
+        } else if (!i.value()->animationEvent()) {
+            i.remove();
+        }
     }
     if (cardsToAnimate.isEmpty())
         animationTimer->stop();

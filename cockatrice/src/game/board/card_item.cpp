@@ -54,9 +54,9 @@ void CardItem::prepareDelete()
 
 void CardItem::deleteLater()
 {
-    prepareDelete();
     if (scene())
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+    prepareDelete();
     AbstractCardItem::deleteLater();
 }
 
