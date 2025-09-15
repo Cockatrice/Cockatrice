@@ -390,6 +390,13 @@ PrintingInfo CardDatabase::getPreferredPrinting(const CardInfoPtr &cardInfo) con
         return PrintingInfo(nullptr);
     }
 
+    const auto &pinnedPrintingProviderId =
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName());
+
+    if (!pinnedPrintingProviderId.isEmpty()) {
+        return getSpecificPrinting({cardInfo->getName(), pinnedPrintingProviderId});
+    }
+
     SetToPrintingsMap setMap = cardInfo->getSets();
     if (setMap.empty()) {
         return PrintingInfo(nullptr);
