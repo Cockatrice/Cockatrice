@@ -878,8 +878,12 @@ void PlayerActions::actCreateAnotherToken()
 
 void PlayerActions::setLastToken(CardInfoPtr cardInfo)
 {
-    if (cardInfo == nullptr || !player->getPlayerMenu()->getUtilityMenu() ||
-        player->getPlayerMenu()->getUtilityMenu()->createAnotherTokenActionExists()) {
+    if (cardInfo == nullptr) {
+        return;
+    }
+
+    UtilityMenu *utilityMenu = player->getPlayerMenu()->getUtilityMenu();
+    if (utilityMenu == nullptr || !utilityMenu->createAnotherTokenActionExists()) {
         return;
     }
 
@@ -893,8 +897,7 @@ void PlayerActions::setLastToken(CardInfoPtr cardInfo)
 
     lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getTableRow());
 
-    player->getPlayerMenu()->getUtilityMenu()->setAndEnableCreateAnotherTokenAction(
-        tr("C&reate another %1 token").arg(lastTokenInfo.name));
+    utilityMenu->setAndEnableCreateAnotherTokenAction(tr("C&reate another %1 token").arg(lastTokenInfo.name));
 }
 
 void PlayerActions::actCreatePredefinedToken()
