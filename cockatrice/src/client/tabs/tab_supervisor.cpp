@@ -141,6 +141,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabEdhRec = new QAction(this);
     connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
 
+    aTabHome = new QAction(this);
+    aTabHome->setCheckable(true);
+    connect(aTabHome, &QAction::triggered, this, &TabSupervisor::actTabHome);
+
     aTabVisualDeckStorage = new QAction(this);
     aTabVisualDeckStorage->setCheckable(true);
     connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
@@ -201,6 +205,7 @@ void TabSupervisor::retranslateUi()
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
     aTabEdhRec->setText(tr("EDHRec"));
+    aTabHome->setText(tr("Home"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
     aTabServer->setText(tr("Server"));
@@ -313,8 +318,8 @@ static void checkAndTrigger(QAction *checkableAction, bool checked)
  */
 void TabSupervisor::initStartupTabs()
 {
-    auto homeTab = addHomeTab();
-    setCurrentWidget(homeTab);
+    openTabHome();
+    setCurrentWidget(tabHome);
 
     if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
         openTabVisualDeckStorage();
@@ -381,6 +386,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabVisualDeckEditor);
     tabsMenu->addAction(aTabEdhRec);
     tabsMenu->addSeparator();
+    tabsMenu->addAction(aTabHome);
     tabsMenu->addAction(aTabVisualDeckStorage);
     tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabDeckStorage);
@@ -495,6 +501,27 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = nullptr;
+}
+
+void TabSupervisor::actTabHome(bool checked)
+{
+    if (checked && !tabHome) {
+        openTabHome();
+        setCurrentWidget(tabHome);
+    } else if (!checked && tabHome) {
+        tabHome->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabHome()
+{
+    tabHome = new TabHome(this, client);
+    myAddTab(tabHome, aTabHome);
+    connect(tabHome, &QObject::destroyed, this, [this] {
+        tabHome = nullptr;
+        aTabHome->setChecked(false);
+    });
+    aTabHome->setChecked(true);
 }
 
 void TabSupervisor::actTabVisualDeckStorage(bool checked)
@@ -811,14 +838,6 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
-}
-
-TabHome *TabSupervisor::addHomeTab()
-{
-    auto *tab = new TabHome(this, client);
-    myAddTab(tab);
-    setCurrentWidget(tab);
-    return tab;
 }
 
 /**
