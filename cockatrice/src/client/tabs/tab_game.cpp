@@ -149,6 +149,7 @@ void TabGame::connectToGameState()
 void TabGame::connectToPlayerManager()
 {
     connect(game->getPlayerManager(), &PlayerManager::playerAdded, this, &TabGame::addPlayer);
+    connect(game->getPlayerManager(), &PlayerManager::playerRemoved, this, &TabGame::processPlayerLeave);
     // update menu text when player concedes so that "concede" gets updated to "unconcede"
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, this, &TabGame::retranslateUi);
 }

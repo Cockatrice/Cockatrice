@@ -57,9 +57,9 @@ void PlayerManager::removePlayer(int playerId)
     if (!player) {
         return;
     }
-    players.remove(playerId);
-    emit playerCountChanged();
     emit playerRemoved(player);
+    emit playerCountChanged();
+    players.remove(playerId);
 }
 
 Player *PlayerManager::getPlayer(int playerId) const
