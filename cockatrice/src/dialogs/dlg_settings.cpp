@@ -685,6 +685,7 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
+    homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));

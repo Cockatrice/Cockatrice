@@ -45,6 +45,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
+    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
+            &HomeWidget::onBackgroundShuffleFrequencyChanged);
 }
 
 void HomeWidget::initializeBackgroundFromSource()
@@ -118,6 +120,19 @@ void HomeWidget::updateRandomCard()
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);
     background = backgroundSourceCard->getProcessedBackground(size());
+
+    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
+        cardChangeTimer->stop();
+    }
+}
+
+void HomeWidget::onBackgroundShuffleFrequencyChanged()
+{
+    cardChangeTimer->stop();
+    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
+        return;
+    }
+    cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
 }
 
 void HomeWidget::updateBackgroundProperties()
