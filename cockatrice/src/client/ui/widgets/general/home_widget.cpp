@@ -89,7 +89,8 @@ void HomeWidget::updateRandomCard()
         case BackgroundSources::RandomCardArt:
             do {
                 newCard = CardDatabaseManager::getInstance()->getRandomCard();
-            } while (newCard == backgroundSourceCard->getCard());
+            } while (newCard == backgroundSourceCard->getCard() &&
+                     newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
         case BackgroundSources::DeckFileArt:
             QList<CardRef> cardRefs = backgroundSourceDeck->getCardRefList();
