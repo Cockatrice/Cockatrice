@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <qgraphicseffect.h>
+#include <qstyleoption.h>
 
 HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _gradientColors, QWidget *parent)
     : QPushButton(text, parent), gradientColors(_gradientColors)
@@ -75,14 +76,15 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
 
 void HomeStyledButton::paintEvent(QPaintEvent *event)
 {
-    QString originalText = text();
-    setText(""); // Prevent QPushButton from drawing the text
-
-    QPushButton::paintEvent(event); // Draw background, borders, etc.
-
-    setText(originalText); // Restore text for internal logic
+    Q_UNUSED(event); // Event is just used for update clipping, we redraw the whole widget.
+    QStyleOptionButton opt;
+    initStyleOption(&opt);
+    opt.text.clear(); // prevent style from drawing text
 
     QPainter painter(this);
+    style()->drawControl(QStyle::CE_PushButton, &opt, &painter, this);
+
+    // Draw white text with a black outline
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
 
@@ -91,11 +93,11 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     painter.setFont(font);
 
     QFontMetrics fm(font);
-    QSize textSize = fm.size(Qt::TextSingleLine, originalText);
+    QSize textSize = fm.size(Qt::TextSingleLine, this->text());
     QPointF center((width() - textSize.width()) / 2.0, (height() + textSize.height() / 2.0) / 2.0);
 
     QPainterPath path;
-    path.addText(center, font, originalText);
+    path.addText(center, font, this->text());
 
     painter.setPen(QPen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter.setBrush(Qt::white);
