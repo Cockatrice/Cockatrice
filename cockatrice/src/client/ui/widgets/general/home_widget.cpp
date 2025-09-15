@@ -16,7 +16,6 @@
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
 {
-    setAttribute(Qt::WA_OpaquePaintEvent);
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
