@@ -1,7 +1,7 @@
 #ifndef PICTURELOADER_H
 #define PICTURELOADER_H
 
-#include "../../../game/cards/card_info.h"
+#include "../../../card/card_info.h"
 #include "picture_loader_status_bar.h"
 #include "picture_loader_worker.h"
 

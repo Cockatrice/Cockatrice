@@ -44,7 +44,7 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery, bool isCommander)
     if (isCommander) {
         url = QString("https://json.edhrec.com/pages/commanders/%1.json").arg(formattedName);
     } else {
-        url = QString("https://json.edhrec.com/pages/cards/%1.json").arg(formattedName);
+        url = QString("https://json.edhrec.com/pages/card/%1.json").arg(formattedName);
     }
 
     QNetworkRequest request{QUrl(url)};

@@ -1,6 +1,6 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
+#include "../../../../card/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 
 #include <QComboBox>

@@ -1,12 +1,12 @@
 #include "player_actions.h"
 
 #include "../../../common/pb/context_move_card.pb.h"
+#include "../../card/card_database_manager.h"
 #include "../../client/get_text_with_max.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../dialogs/dlg_move_top_cards_until.h"
 #include "../../dialogs/dlg_roll_dice.h"
 #include "../board/card_item.h"
-#include "../cards/card_database_manager.h"
 #include "../zones/logic/view_zone_logic.h"
 #include "card_menu_action_type.h"
 #include "pb/command_attach_card.pb.h"

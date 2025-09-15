@@ -1,11 +1,11 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
+#include "../../../../card/card_database.h"
+#include "../../../../card/card_database_model.h"
 #include "../../../../deck/custom_line_edit.h"
 #include "../../../../deck/deck_list_model.h"
-#include "../../../../game/cards/card_database.h"
-#include "../../../../game/cards/card_database_model.h"
-#include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../filters/filter_tree_model.h"
 #include "../../../../utility/key_signals.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"

@@ -1,7 +1,7 @@
 #ifndef CARD_INFO_COMPARATOR_H
 #define CARD_INFO_COMPARATOR_H
 
-#include "../game/cards/card_info.h"
+#include "../card/card_info.h"
 
 #include <QStringList>
 #include <QVariant>

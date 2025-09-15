@@ -1,8 +1,8 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
-#include "../../../../game/filters/filter_tree.h"
-#include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../card/card_database_manager.h"
+#include "../../../../filters/filter_tree.h"
+#include "../../../../filters/filter_tree_model.h"
 
 #include <QPushButton>
 #include <QSpinBox>

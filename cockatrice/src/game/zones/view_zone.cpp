@@ -1,9 +1,9 @@
 #include "view_zone.h"
 
+#include "../../card/card_info.h"
 #include "../../server/pending_command.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
-#include "../cards/card_info.h"
 #include "../player/player.h"
 #include "logic/view_zone_logic.h"
 #include "pb/command_dump_zone.pb.h"

@@ -1,7 +1,7 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include "../game/cards/card_database.h"
+#include "../card/card_database.h"
 #include "deck_list.h"
 
 #include <QObject>

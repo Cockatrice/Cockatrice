@@ -1,7 +1,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
 
-#include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QMap>

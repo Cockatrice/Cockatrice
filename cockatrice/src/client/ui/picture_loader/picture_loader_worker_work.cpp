@@ -1,6 +1,6 @@
 #include "picture_loader_worker_work.h"
 
-#include "../../../game/cards/card_database_manager.h"
+#include "../../../card/card_database_manager.h"
 #include "../../../settings/cache_settings.h"
 #include "picture_loader_worker.h"
 

@@ -1,7 +1,7 @@
 #include "card_info_picture_widget.h"
 
+#include "../../../../card/card_database_manager.h"
 #include "../../../../game/board/card_item.h"
-#include "../../../../game/cards/card_database_manager.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../picture_loader/picture_loader.h"

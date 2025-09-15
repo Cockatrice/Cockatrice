@@ -1,7 +1,7 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "../filters/filter_string.h"
+#include "../../filters/filter_string.h"
 #include "logic/view_zone_logic.h"
 #include "select_zone.h"
 

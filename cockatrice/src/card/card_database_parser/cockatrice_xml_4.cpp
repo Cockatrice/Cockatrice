@@ -1,6 +1,6 @@
 #include "cockatrice_xml_4.h"
 
-#include "../../../settings/cache_settings.h"
+#include "../../settings/cache_settings.h"
 
 #include <QCoreApplication>
 #include <QDebug>

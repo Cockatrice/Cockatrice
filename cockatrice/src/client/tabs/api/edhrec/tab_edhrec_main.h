@@ -1,7 +1,7 @@
 #ifndef TAB_EDHREC_MAIN_H
 #define TAB_EDHREC_MAIN_H
 
-#include "../../../../game/cards/card_database.h"
+#include "../../../../card/card_database.h"
 #include "../../../ui/widgets/cards/card_size_widget.h"
 #include "../../../ui/widgets/general/layout_containers/flow_widget.h"
 #include "../../../ui/widgets/quick_settings/settings_button_widget.h"

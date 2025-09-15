@@ -1,7 +1,7 @@
 #ifndef PICTURE_TO_LOAD_H
 #define PICTURE_TO_LOAD_H
 
-#include "../../../game/cards/exact_card.h"
+#include "../../../card/exact_card.h"
 
 #include <QLoggingCategory>
 

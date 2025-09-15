@@ -1,7 +1,7 @@
 #ifndef DECK_FILTER_STRING_H
 #define DECK_FILTER_STRING_H
 
-#include "../../client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.h"
+#include "../client/ui/widgets/visual_deck_storage/deck_preview/deck_preview_widget.h"
 
 #include <QLoggingCategory>
 #include <QMap>

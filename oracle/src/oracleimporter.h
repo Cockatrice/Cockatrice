@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QVariant>
-#include <game/cards/card_info.h>
+#include <card/card_info.h>
 #include <utility>
 
 // many users prefer not to see these sets with non english arts

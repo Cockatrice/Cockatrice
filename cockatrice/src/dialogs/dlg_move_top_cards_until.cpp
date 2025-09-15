@@ -1,8 +1,8 @@
 #include "dlg_move_top_cards_until.h"
 
-#include "../game/cards/card_database.h"
-#include "../game/cards/card_database_manager.h"
-#include "../game/filters/filter_string.h"
+#include "../card/card_database.h"
+#include "../card/card_database_manager.h"
+#include "../filters/filter_string.h"
 
 #include <QDialogButtonBox>
 #include <QLabel>

@@ -1,8 +1,8 @@
 #include "dlg_create_token.h"
 
+#include "../card/card_database_manager.h"
+#include "../card/card_database_model.h"
 #include "../client/ui/widgets/cards/card_info_picture_widget.h"
-#include "../game/cards/card_database_manager.h"
-#include "../game/cards/card_database_model.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "deck_list.h"

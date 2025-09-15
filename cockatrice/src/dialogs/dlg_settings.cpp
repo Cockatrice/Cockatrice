@@ -1,5 +1,7 @@
 #include "dlg_settings.h"
 
+#include "../card/card_database.h"
+#include "../card/card_database_manager.h"
 #include "../client/get_text_with_max.h"
 #include "../client/network/release_channel.h"
 #include "../client/network/spoiler_background_updater.h"
@@ -9,8 +11,6 @@
 #include "../client/ui/theme_manager.h"
 #include "../client/ui/widgets/general/background_sources.h"
 #include "../deck/custom_line_edit.h"
-#include "../game/cards/card_database.h"
-#include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "../settings/card_counter_settings.h"
