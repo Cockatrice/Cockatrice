@@ -191,7 +191,13 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
             attachedTo->getZone()->reorganizeCards();
         }
     } else {
-        emit zone->cardAdded(this);
+        // If the zone is being torn down, it might already be null by the time a card tries to re-attach all its
+        // attached cards
+        if (zone == nullptr) {
+            deleteLater();
+        } else {
+            emit zone->cardAdded(this);
+        }
     }
 
     if (zone != nullptr) {
