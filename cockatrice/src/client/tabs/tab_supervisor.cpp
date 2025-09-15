@@ -255,6 +255,8 @@ void TabSupervisor::refreshShortcuts()
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
     aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
+
+    aTabHome->setShortcuts(shortcuts.getShortcut("Tabs/aTabHome"));
     aTabVisualDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckStorage"));
     aTabServer->setShortcuts(shortcuts.getShortcut("Tabs/aTabServer"));
     aTabAccount->setShortcuts(shortcuts.getShortcut("Tabs/aTabAccount"));

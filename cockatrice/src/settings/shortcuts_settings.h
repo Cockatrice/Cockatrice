@@ -707,6 +707,8 @@ private:
                                                   ShortcutGroup::Replays)},
         {"Tabs/aTabDeckEditor",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Deck Editor"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabHome",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Home"), parseSequenceString(""), ShortcutGroup::Tabs)},
         {"Tabs/aTabVisualDeckStorage", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Visual Deck Storage"),
                                                    parseSequenceString(""),
                                                    ShortcutGroup::Tabs)},
