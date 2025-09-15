@@ -185,13 +185,25 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     gridPoint.setX(-1);
     attachedTo = _attachedTo;
     if (attachedTo != nullptr) {
-        emit attachedTo->zone->cardAdded(this);
-        attachedTo->addAttachedCard(this);
-        if (zone != attachedTo->getZone()) {
-            attachedTo->getZone()->reorganizeCards();
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards
+        if (attachedTo->zone == nullptr) {
+            deleteLater();
+        } else {
+            emit attachedTo->zone->cardAdded(this);
+            attachedTo->addAttachedCard(this);
+            if (zone != attachedTo->getZone()) {
+                attachedTo->getZone()->reorganizeCards();
+            }
         }
     } else {
-        emit zone->cardAdded(this);
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards
+        if (zone == nullptr) {
+            deleteLater();
+        } else {
+            emit zone->cardAdded(this);
+        }
     }
 
     if (zone != nullptr) {
