@@ -2,7 +2,7 @@
 
 #include "abstract_game.h"
 
-GameState::GameState(AbstractGame *_game,
+GameState::GameState(AbstractGame *parent,
                      int _secondsElapsed,
                      int _hostId,
                      bool _isLocalGame,
@@ -11,9 +11,9 @@ GameState::GameState(AbstractGame *_game,
                      bool _resuming,
                      int _currentPhase,
                      bool _gameClosed)
-    : QObject(_game), game(_game), secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame),
+    : QObject(parent), gameTimer(nullptr), secondsElapsed(_secondsElapsed), hostId(_hostId), isLocalGame(_isLocalGame),
       clients(_clients), gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase),
-      gameClosed(_gameClosed)
+      activePlayer(-1), gameClosed(_gameClosed)
 {
 }
 

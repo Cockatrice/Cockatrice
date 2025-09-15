@@ -15,7 +15,7 @@ class GameMetaInfo : public QObject
 {
     Q_OBJECT
 public:
-    explicit GameMetaInfo(AbstractGame *_game);
+    explicit GameMetaInfo(AbstractGame *parent);
 
     QMap<int, QString> roomGameTypes;
 
@@ -79,11 +79,6 @@ public:
         return roomGameTypes.find(gameInfo_.game_types(index)).value();
     }
 
-    AbstractGame *getGame() const
-    {
-        return game;
-    }
-
 public slots:
     void setStarted(bool s)
     {
@@ -105,7 +100,6 @@ signals:
     void spectatorsOmniscienceChanged(bool omniscient);
 
 private:
-    AbstractGame *game;
     ServerInfo_Game gameInfo_;
 };
 
