@@ -22,6 +22,7 @@ public:
 public slots:
     void paintEvent(QPaintEvent *event) override;
     void initializeBackgroundFromSource();
+    void onBackgroundShuffleFrequencyChanged();
     void updateBackgroundProperties();
     void updateButtonsToBackgroundColor();
     QGroupBox *createButtons();
