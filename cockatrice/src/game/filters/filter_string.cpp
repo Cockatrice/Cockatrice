@@ -389,6 +389,15 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
+void FilterString::logger(size_t ln, size_t col, const std::string &msg) {
+    if(ln == 0) {
+        _error = tr("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
+    }else{
+        _error = tr("Error at line %1, position %2: %3").arg(ln).arg(col).arg(QString::fromStdString(msg));
+    }
+    }
+
+
 FilterString::FilterString(const QString &expr)
 {
     QByteArray ba = expr.simplified().toUtf8();
@@ -402,9 +411,7 @@ FilterString::FilterString(const QString &expr)
         return;
     }
 
-    search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
-        _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
-    });
+    search.set_logger([this](size_t ln, size_t col, const std::string &msg){logger(ln, col, msg);});
 
     if (!search.parse(ba.data(), result)) {
         qCInfo(FilterStringLog).nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
