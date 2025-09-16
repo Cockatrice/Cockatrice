@@ -1,6 +1,6 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
-#include "../../../../card/card_database_manager.h"
+#include "../../../../database/card_database_manager.h"
 #include "../../../../filters/filter_tree.h"
 #include "../../../../filters/filter_tree_model.h"
 

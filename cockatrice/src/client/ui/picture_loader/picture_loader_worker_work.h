@@ -1,7 +1,7 @@
 #ifndef PICTURE_LOADER_WORKER_WORK_H
 #define PICTURE_LOADER_WORKER_WORK_H
 
-#include "../../../card/card_database.h"
+#include "../../../database/card_database.h"
 #include "picture_loader_worker.h"
 #include "picture_to_load.h"
 

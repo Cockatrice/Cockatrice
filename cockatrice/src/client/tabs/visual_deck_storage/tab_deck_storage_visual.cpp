@@ -1,6 +1,6 @@
 #include "tab_deck_storage_visual.h"
 
-#include "../../../card/card_database_model.h"
+#include "../../../database/card_database_model.h"
 #include "../../ui/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "../tab_supervisor.h"

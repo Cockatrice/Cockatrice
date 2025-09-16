@@ -1,4 +1,4 @@
-#include "../../cockatrice/src/card/card_database_manager.h"
+#include "../../cockatrice/src/database/card_database_manager.h"
 #include "../../cockatrice/src/filters/filter_string.h"
 #include "mocks.h"
 

@@ -1,8 +1,8 @@
 #include "tab_game.h"
 
-#include "../../card/card_database.h"
-#include "../../card/card_database_manager.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../dialogs/dlg_create_game.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/board/card_item.h"

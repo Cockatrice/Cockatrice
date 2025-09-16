@@ -1,9 +1,9 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../../card/card_database_manager.h"
-#include "../../card/card_database_model.h"
 #include "../../client/tapped_out_interface.h"
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
+#include "../../database/card_database_manager.h"
+#include "../../database/card_database_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"

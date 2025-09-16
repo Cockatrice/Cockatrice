@@ -1,8 +1,8 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
-#include "../../../card/card_database.h"
 #include "../../../card/card_info.h"
+#include "../../../database/card_database.h"
 #include "picture_loader_local.h"
 #include "picture_loader_worker_work.h"
 #include "picture_to_load.h"

@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "window_main.h"
 
-#include "../../card/card_database.h"
-#include "../../card/card_database_manager.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../dialogs/dlg_connect.h"
 #include "../../dialogs/dlg_edit_tokens.h"
 #include "../../dialogs/dlg_forgot_password_challenge.h"

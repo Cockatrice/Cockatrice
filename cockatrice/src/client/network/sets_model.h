@@ -1,7 +1,7 @@
 #ifndef SETSMODEL_H
 #define SETSMODEL_H
 
-#include "../../card/card_database.h"
+#include "../../database/card_database.h"
 
 #include <QAbstractTableModel>
 #include <QMimeData>

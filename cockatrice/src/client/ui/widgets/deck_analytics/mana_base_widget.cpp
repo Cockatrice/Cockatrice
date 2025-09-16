@@ -1,7 +1,7 @@
 #include "mana_base_widget.h"
 
-#include "../../../../card/card_database.h"
-#include "../../../../card/card_database_manager.h"
+#include "../../../../database/card_database.h"
+#include "../../../../database/card_database_manager.h"
 #include "../../../../deck/deck_loader.h"
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"

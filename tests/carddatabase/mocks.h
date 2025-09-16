@@ -10,7 +10,7 @@
 
 #define PICTURELOADER_H
 
-#include "../../cockatrice/src/card/card_database.h"
+#include "../../cockatrice/src/database/card_database.h"
 #include "../../cockatrice/src/settings/cache_settings.h"
 #include "../../cockatrice/src/utility/macros.h"
 

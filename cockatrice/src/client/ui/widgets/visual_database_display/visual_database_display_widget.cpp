@@ -1,7 +1,7 @@
 #include "visual_database_display_widget.h"
 
-#include "../../../../card/card_database.h"
-#include "../../../../card/card_database_manager.h"
+#include "../../../../database/card_database.h"
+#include "../../../../database/card_database_manager.h"
 #include "../../../../deck/custom_line_edit.h"
 #include "../../../../filters/filter_tree_model.h"
 #include "../../../../filters/syntax_help.h"

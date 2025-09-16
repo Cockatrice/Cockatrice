@@ -1,7 +1,7 @@
 #include "card_menu.h"
 
-#include "../../../card/card_database_manager.h"
 #include "../../../client/tabs/tab_game.h"
+#include "../../../database/card_database_manager.h"
 #include "../../../settings/card_counter_settings.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"

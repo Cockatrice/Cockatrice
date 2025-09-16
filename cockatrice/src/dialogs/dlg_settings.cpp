@@ -1,7 +1,5 @@
 #include "dlg_settings.h"
 
-#include "../card/card_database.h"
-#include "../card/card_database_manager.h"
 #include "../client/get_text_with_max.h"
 #include "../client/network/release_channel.h"
 #include "../client/network/spoiler_background_updater.h"
@@ -10,6 +8,8 @@
 #include "../client/ui/picture_loader/picture_loader.h"
 #include "../client/ui/theme_manager.h"
 #include "../client/ui/widgets/general/background_sources.h"
+#include "../database/card_database.h"
+#include "../database/card_database_manager.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"

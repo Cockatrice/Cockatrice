@@ -1,8 +1,8 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../../card/card_database.h"
-#include "../../../../card/card_database_model.h"
+#include "../../../../database/card_database.h"
+#include "../../../../database/card_database_model.h"
 #include "../../../../deck/custom_line_edit.h"
 #include "../../../../deck/deck_list_model.h"
 #include "../../../../filters/filter_tree_model.h"

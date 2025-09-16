@@ -1,6 +1,6 @@
 #include "deck_editor_database_display_widget.h"
 
-#include "../../../../card/card_database_manager.h"
+#include "../../../../database/card_database_manager.h"
 #include "../../../../filters/syntax_help.h"
 #include "../../../../settings/cache_settings.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"

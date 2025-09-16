@@ -1,9 +1,9 @@
 #include "deck_view_container.h"
 
-#include "../../card/card_database.h"
-#include "../../card/card_database_manager.h"
 #include "../../client/tabs/tab_game.h"
 #include "../../client/ui/picture_loader/picture_loader.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"

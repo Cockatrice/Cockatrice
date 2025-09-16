@@ -1,6 +1,6 @@
 #include "card_info_display_widget.h"
 
-#include "../../../../card/card_database_manager.h"
+#include "../../../../database/card_database_manager.h"
 #include "../../../../game/board/card_item.h"
 #include "../../../../main.h"
 #include "card_info_picture_widget.h"
