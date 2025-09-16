@@ -1,8 +1,8 @@
 #ifndef DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 
+#include "../../../../database/card_database_model.h"
 #include "../../../../deck/custom_line_edit.h"
-#include "../../../../game/cards/card_database_model.h"
 #include "../../../../utility/key_signals.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 

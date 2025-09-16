@@ -1,6 +1,6 @@
 #include "deck_filter_string.h"
 
-#include "../cards/card_database_manager.h"
+#include "../database/card_database_manager.h"
 #include "filter_string.h"
 #include "lib/peglib.h"
 

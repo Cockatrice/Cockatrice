@@ -5,12 +5,12 @@ project(Dbconverter VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.$
 set(dbconverter_SOURCES
     src/main.cpp
     src/mocks.cpp
-    ../cockatrice/src/game/cards/card_database.cpp
-    ../cockatrice/src/game/cards/card_database_parser/card_database_parser.cpp
-    ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-    ../cockatrice/src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    ../cockatrice/src/game/cards/card_info.cpp
-    ../cockatrice/src/game/cards/exact_card.cpp
+    ../cockatrice/src/card/card_info.cpp
+    ../cockatrice/src/card/exact_card.cpp
+    ../cockatrice/src/database/card_database.cpp
+    ../cockatrice/src/database/parser/card_database_parser.cpp
+    ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
+    ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
     ../cockatrice/src/settings/settings_manager.cpp
     ${VERSION_STRING_CPP}
 )

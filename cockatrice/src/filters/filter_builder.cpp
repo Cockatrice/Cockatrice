@@ -1,6 +1,6 @@
 #include "filter_builder.h"
 
-#include "../../deck/custom_line_edit.h"
+#include "../deck/custom_line_edit.h"
 #include "filter_card.h"
 
 #include <QComboBox>

@@ -1,9 +1,9 @@
 #include "abstract_card_item.h"
 
 #include "../../client/ui/picture_loader/picture_loader.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../settings/cache_settings.h"
-#include "../cards/card_database.h"
-#include "../cards/card_database_manager.h"
 #include "../game_scene.h"
 
 #include <QCursor>

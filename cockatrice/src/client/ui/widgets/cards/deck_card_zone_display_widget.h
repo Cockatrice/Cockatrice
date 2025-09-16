@@ -1,8 +1,8 @@
 #ifndef DECK_CARD_ZONE_DISPLAY_WIDGET_H
 #define DECK_CARD_ZONE_DISPLAY_WIDGET_H
 
+#include "../../../../card/card_info.h"
 #include "../../../../deck/deck_list_model.h"
-#include "../../../../game/cards/card_info.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
 #include "../visual_deck_editor/visual_deck_editor_widget.h"

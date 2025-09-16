@@ -1,9 +1,9 @@
 #include "tab_deck_editor_visual.h"
 
+#include "../../../database/card_database_model.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_stats_interface.h"
-#include "../../../game/cards/card_database_model.h"
-#include "../../../game/filters/filter_builder.h"
+#include "../../../filters/filter_builder.h"
 #include "../../../server/pending_command.h"
 #include "../../../settings/cache_settings.h"
 #include "../../ui/pixel_map_generator.h"

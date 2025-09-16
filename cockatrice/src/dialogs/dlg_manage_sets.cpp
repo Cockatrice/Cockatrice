@@ -2,8 +2,8 @@
 
 #include "../client/network/sets_model.h"
 #include "../client/ui/picture_loader/picture_loader.h"
+#include "../database/card_database_manager.h"
 #include "../deck/custom_line_edit.h"
-#include "../game/cards/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 

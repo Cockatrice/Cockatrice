@@ -1,11 +1,11 @@
 #include "tab_game.h"
 
 #include "../../client/ui/widgets/cards/card_info_frame_widget.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../dialogs/dlg_create_game.h"
 #include "../../game/board/arrow_item.h"
 #include "../../game/board/card_item.h"
-#include "../../game/cards/card_database.h"
-#include "../../game/cards/card_database_manager.h"
 #include "../../game/deckview/deck_view_container.h"
 #include "../../game/deckview/tabbed_deck_view_container.h"
 #include "../../game/game.h"

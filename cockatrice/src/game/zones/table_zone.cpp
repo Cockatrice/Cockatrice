@@ -1,11 +1,11 @@
 #include "table_zone.h"
 
+#include "../../card/card_info.h"
 #include "../../client/ui/theme_manager.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
-#include "../cards/card_info.h"
 #include "../player/player.h"
 #include "logic/table_zone_logic.h"
 #include "pb/command_move_card.pb.h"

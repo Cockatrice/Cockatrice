@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../dialogs/dlg_connect.h"
 #include "../../dialogs/dlg_edit_tokens.h"
 #include "../../dialogs/dlg_forgot_password_challenge.h"
@@ -31,8 +33,6 @@
 #include "../../dialogs/dlg_tip_of_the_day.h"
 #include "../../dialogs/dlg_update.h"
 #include "../../dialogs/dlg_view_log.h"
-#include "../../game/cards/card_database.h"
-#include "../../game/cards/card_database_manager.h"
 #include "../../main.h"
 #include "../../server/local_client.h"
 #include "../../server/local_server.h"

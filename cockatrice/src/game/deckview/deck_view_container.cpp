@@ -2,6 +2,8 @@
 
 #include "../../client/tabs/tab_game.h"
 #include "../../client/ui/picture_loader/picture_loader.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
@@ -9,8 +11,6 @@
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../server/pending_command.h"
 #include "../../settings/cache_settings.h"
-#include "../cards/card_database.h"
-#include "../cards/card_database_manager.h"
 #include "../game_scene.h"
 #include "deck_view.h"
 #include "pb/command_deck_select.pb.h"

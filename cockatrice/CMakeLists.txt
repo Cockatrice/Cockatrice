@@ -7,6 +7,8 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
+    src/card/card_info.cpp
+    src/card/exact_card.cpp
     src/client/get_text_with_max.cpp
     src/client/menus/deck_editor/deck_editor_menu.cpp
     src/client/network/client_update_checker.cpp
@@ -151,6 +153,14 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/client/ui/window_main.cpp
     src/client/update_downloader.cpp
+    src/database/card_completer_proxy_model.cpp
+    src/database/card_database.cpp
+    src/database/card_database_manager.cpp
+    src/database/card_database_model.cpp
+    src/database/card_search_model.cpp
+    src/database/parser/card_database_parser.cpp
+    src/database/parser/cockatrice_xml_3.cpp
+    src/database/parser/cockatrice_xml_4.cpp
     src/deck/custom_line_edit.cpp
     src/deck/deck_list_model.cpp
     src/deck/deck_loader.cpp
@@ -182,6 +192,13 @@ set(cockatrice_SOURCES
     src/dialogs/dlg_tip_of_the_day.cpp
     src/dialogs/dlg_update.cpp
     src/dialogs/dlg_view_log.cpp
+    src/filters/deck_filter_string.cpp
+    src/filters/filter_builder.cpp
+    src/filters/filter_card.cpp
+    src/filters/filter_string.cpp
+    src/filters/filter_tree.cpp
+    src/filters/filter_tree_model.cpp
+    src/filters/syntax_help.cpp
     src/game/board/abstract_card_drag_item.cpp
     src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
@@ -192,26 +209,9 @@ set(cockatrice_SOURCES
     src/game/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/counter_general.cpp
-    src/game/cards/card_completer_proxy_model.cpp
-    src/game/cards/card_database.cpp
-    src/game/cards/card_database_manager.cpp
-    src/game/cards/card_database_model.cpp
-    src/game/cards/card_database_parser/card_database_parser.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_3.cpp
-    src/game/cards/card_database_parser/cockatrice_xml_4.cpp
-    src/game/cards/card_info.cpp
-    src/game/cards/card_search_model.cpp
-    src/game/cards/exact_card.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
     src/game/deckview/tabbed_deck_view_container.cpp
-    src/game/filters/deck_filter_string.cpp
-    src/game/filters/filter_builder.cpp
-    src/game/filters/filter_card.cpp
-    src/game/filters/filter_string.cpp
-    src/game/filters/filter_tree.cpp
-    src/game/filters/filter_tree_model.cpp
-    src/game/filters/syntax_help.cpp
     src/game/abstract_game.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp

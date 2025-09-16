@@ -1,7 +1,7 @@
 #include "card_zone_logic.h"
 
+#include "../../../database/card_database_manager.h"
 #include "../../board/card_item.h"
-#include "../../cards/card_database_manager.h"
 #include "../../player/player.h"
 #include "../pile_zone.h"
 #include "../view_zone.h"

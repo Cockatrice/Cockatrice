@@ -1,8 +1,8 @@
 #include "tab_edhrec_main.h"
 
-#include "../../../../game/cards/card_completer_proxy_model.h"
-#include "../../../../game/cards/card_database_manager.h"
-#include "../../../../game/cards/card_search_model.h"
+#include "../../../../database/card_completer_proxy_model.h"
+#include "../../../../database/card_database_manager.h"
+#include "../../../../database/card_search_model.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"

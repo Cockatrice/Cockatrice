@@ -1,7 +1,7 @@
 #include "deck_view.h"
 
+#include "../../card/card_info.h"
 #include "../../client/ui/theme_manager.h"
-#include "../../game/cards/card_info.h"
 #include "../../settings/cache_settings.h"
 #include "deck_list.h"
 #include "deck_list_card_node.h"

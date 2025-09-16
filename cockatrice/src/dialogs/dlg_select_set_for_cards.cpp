@@ -2,8 +2,8 @@
 
 #include "../client/ui/widgets/cards/card_info_picture_widget.h"
 #include "../client/ui/widgets/general/layout_containers/flow_widget.h"
+#include "../database/card_database_manager.h"
 #include "../deck/deck_loader.h"
-#include "../game/cards/card_database_manager.h"
 #include "dlg_select_set_for_cards.h"
 
 #include <QCheckBox>

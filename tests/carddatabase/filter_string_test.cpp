@@ -1,5 +1,5 @@
-#include "../../cockatrice/src/game/cards/card_database_manager.h"
-#include "../../cockatrice/src/game/filters/filter_string.h"
+#include "../../cockatrice/src/database/card_database_manager.h"
+#include "../../cockatrice/src/filters/filter_string.h"
 #include "mocks.h"
 
 #include "gtest/gtest.h"

@@ -2,8 +2,8 @@
 
 #include "../../../client/tabs/tab_game.h"
 #include "../../../common/pb/command_reveal_cards.pb.h"
+#include "../../../database/card_database_manager.h"
 #include "../../board/card_item.h"
-#include "../../cards/card_database_manager.h"
 #include "../../zones/hand_zone.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"

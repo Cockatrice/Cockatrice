@@ -1,6 +1,6 @@
 #include "visual_database_display_color_filter_widget.h"
 
-#include "../../../../game/filters/filter_tree.h"
+#include "../../../../filters/filter_tree.h"
 #include "../cards/additional_info/mana_symbol_widget.h"
 
 #include <QSet>

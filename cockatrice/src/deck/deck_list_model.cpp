@@ -1,6 +1,6 @@
 #include "deck_list_model.h"
 
-#include "../game/cards/card_database_manager.h"
+#include "../database/card_database_manager.h"
 #include "../main.h"
 #include "../settings/cache_settings.h"
 #include "deck_loader.h"

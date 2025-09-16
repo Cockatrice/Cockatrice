@@ -1,7 +1,7 @@
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
 
-#include "../cards/card_database.h"
+#include "../database/card_database.h"
 #include "filter_card.h"
 
 #include <QList>

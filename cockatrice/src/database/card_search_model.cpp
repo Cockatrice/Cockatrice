@@ -1,6 +1,6 @@
 #include "card_search_model.h"
 
-#include "../../utility/levenshtein.h"
+#include "../utility/levenshtein.h"
 
 #include <algorithm>
 

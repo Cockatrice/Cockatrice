@@ -1,8 +1,8 @@
 #include "visual_database_display_set_filter_widget.h"
 
-#include "../../../../game/cards/card_database_manager.h"
-#include "../../../../game/filters/filter_tree.h"
-#include "../../../../game/filters/filter_tree_model.h"
+#include "../../../../database/card_database_manager.h"
+#include "../../../../filters/filter_tree.h"
+#include "../../../../filters/filter_tree_model.h"
 #include "../../../../settings/cache_settings.h"
 
 #include <QLineEdit>

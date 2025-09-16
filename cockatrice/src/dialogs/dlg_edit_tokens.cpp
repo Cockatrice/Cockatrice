@@ -1,9 +1,9 @@
 #include "dlg_edit_tokens.h"
 
 #include "../client/get_text_with_max.h"
-#include "../game/cards/card_database.h"
-#include "../game/cards/card_database_manager.h"
-#include "../game/cards/card_database_model.h"
+#include "../database/card_database.h"
+#include "../database/card_database_manager.h"
+#include "../database/card_database_model.h"
 #include "../main.h"
 #include "trice_limits.h"
 
