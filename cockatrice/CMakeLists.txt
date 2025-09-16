@@ -7,15 +7,7 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/card/card_completer_proxy_model.cpp
-    src/card/card_database.cpp
-    src/card/card_database_manager.cpp
-    src/card/card_database_model.cpp
-    src/card/card_database_parser/card_database_parser.cpp
-    src/card/card_database_parser/cockatrice_xml_3.cpp
-    src/card/card_database_parser/cockatrice_xml_4.cpp
     src/card/card_info.cpp
-    src/card/card_search_model.cpp
     src/card/exact_card.cpp
     src/client/get_text_with_max.cpp
     src/client/menus/deck_editor/deck_editor_menu.cpp
@@ -161,6 +153,14 @@ set(cockatrice_SOURCES
     src/client/ui/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/client/ui/window_main.cpp
     src/client/update_downloader.cpp
+    src/database/card_completer_proxy_model.cpp
+    src/database/card_database.cpp
+    src/database/card_database_manager.cpp
+    src/database/card_database_model.cpp
+    src/database/card_search_model.cpp
+    src/database/parser/card_database_parser.cpp
+    src/database/parser/cockatrice_xml_3.cpp
+    src/database/parser/cockatrice_xml_4.cpp
     src/deck/custom_line_edit.cpp
     src/deck/deck_list_model.cpp
     src/deck/deck_loader.cpp

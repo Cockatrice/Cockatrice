@@ -3,8 +3,8 @@
 #include "../client/ui/picture_loader/picture_loader.h"
 #include "../settings/cache_settings.h"
 #include "../utility/card_set_comparator.h"
-#include "./card_database_parser/cockatrice_xml_3.h"
-#include "./card_database_parser/cockatrice_xml_4.h"
+#include "./parser/cockatrice_xml_3.h"
+#include "./parser/cockatrice_xml_4.h"
 
 #include <QCryptographicHash>
 #include <QDebug>

@@ -17,12 +17,12 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/qt-json/json.cpp
-    ../cockatrice/src/card/card_database_parser/card_database_parser.cpp
-    ../cockatrice/src/card/card_database_parser/cockatrice_xml_3.cpp
-    ../cockatrice/src/card/card_database_parser/cockatrice_xml_4.cpp
     ../cockatrice/src/card/card_info.cpp
     ../cockatrice/src/client/ui/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/client/ui/widgets/quick_settings/settings_popup_widget.cpp
+    ../cockatrice/src/database/parser/card_database_parser.cpp
+    ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
+    ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
     ../cockatrice/src/settings/cache_settings.cpp
     ../cockatrice/src/settings/shortcuts_settings.cpp
     ../cockatrice/src/settings/card_counter_settings.cpp

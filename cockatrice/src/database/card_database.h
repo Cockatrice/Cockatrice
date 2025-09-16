@@ -1,8 +1,8 @@
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
+#include "../card/exact_card.h"
 #include "../common/card_ref.h"
-#include "exact_card.h"
 
 #include <QBasicMutex>
 #include <QDate>

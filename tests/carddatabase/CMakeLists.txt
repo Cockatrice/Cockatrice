@@ -18,12 +18,12 @@ add_executable(
   carddatabase_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-  ../../cockatrice/src/card/card_database.cpp
-  ../../cockatrice/src/card/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/card/card_info.cpp
   ../../cockatrice/src/card/exact_card.cpp
+  ../../cockatrice/src/database/card_database.cpp
+  ../../cockatrice/src/database/parser/card_database_parser.cpp
+  ../../cockatrice/src/database/parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/database/parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
   carddatabase_test.cpp
   mocks.cpp
@@ -32,13 +32,13 @@ add_executable(
   filter_string_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-  ../../cockatrice/src/card/card_database.cpp
-  ../../cockatrice/src/card/card_database_manager.cpp
-  ../../cockatrice/src/card/card_database_parser/card_database_parser.cpp
-  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_3.cpp
-  ../../cockatrice/src/card/card_database_parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/card/card_info.cpp
   ../../cockatrice/src/card/exact_card.cpp
+  ../../cockatrice/src/database/card_database.cpp
+  ../../cockatrice/src/database/card_database_manager.cpp
+  ../../cockatrice/src/database/parser/card_database_parser.cpp
+  ../../cockatrice/src/database/parser/cockatrice_xml_3.cpp
+  ../../cockatrice/src/database/parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/filters/filter_card.cpp
   ../../cockatrice/src/filters/filter_string.cpp
   ../../cockatrice/src/filters/filter_tree.cpp
