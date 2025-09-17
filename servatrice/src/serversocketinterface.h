@@ -20,7 +20,7 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include "server_protocolhandler.h"
+#include "server/server_protocolhandler.h"
 
 #include <QHostAddress>
 #include <QMutex>

@@ -17,20 +17,20 @@ set(common_SOURCES
     passwordhasher.cpp
     rng_abstract.cpp
     rng_sfmt.cpp
-    server.cpp
-    server_abstractuserinterface.cpp
-    server_arrow.cpp
-    server_arrowtarget.h
-    server_card.cpp
-    server_cardzone.cpp
-    server_counter.cpp
-    server_database_interface.cpp
-    server_game.cpp
-    server_player.cpp
-    server_protocolhandler.cpp
-    server_remoteuserinterface.cpp
-    server_response_containers.cpp
-    server_room.cpp
+    server/game/server_arrow.cpp
+    server/game/server_arrowtarget.cpp
+    server/game/server_card.cpp
+    server/game/server_cardzone.cpp
+    server/game/server_counter.cpp
+    server/game/server_game.cpp
+    server/game/server_player.cpp
+    server/server.cpp
+    server/server_abstractuserinterface.cpp
+    server/server_database_interface.cpp
+    server/server_protocolhandler.cpp
+    server/server_remoteuserinterface.cpp
+    server/server_response_containers.cpp
+    server/server_room.cpp
     serverinfo_user_container.cpp
     sfmt/SFMT.c
 )

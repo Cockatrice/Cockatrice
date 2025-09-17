@@ -1,9 +1,9 @@
 #ifndef SERVER_ROOM_H
 #define SERVER_ROOM_H
 
+#include "../serverinfo_user_container.h"
 #include "pb/response.pb.h"
 #include "pb/serverinfo_chat_message.pb.h"
-#include "serverinfo_user_container.h"
 
 #include <QList>
 #include <QMap>

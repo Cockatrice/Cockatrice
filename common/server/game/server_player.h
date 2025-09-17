@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../../serverinfo_user_container.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/response.pb.h"
 #include "server_arrowtarget.h"
-#include "serverinfo_user_container.h"
 
 #include <QList>
 #include <QMap>

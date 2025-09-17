@@ -1,8 +1,11 @@
 #include "server_protocolhandler.h"
 
-#include "debug_pb_message.h"
-#include "featureset.h"
-#include "get_pb_extension.h"
+#include "../debug_pb_message.h"
+#include "../featureset.h"
+#include "../get_pb_extension.h"
+#include "../trice_limits.h"
+#include "game/server_game.h"
+#include "game/server_player.h"
 #include "pb/commands.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -18,10 +21,7 @@
 #include "pb/response_login.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "server_database_interface.h"
-#include "server_game.h"
-#include "server_player.h"
 #include "server_room.h"
-#include "trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>
