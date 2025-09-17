@@ -19,7 +19,11 @@
  ***************************************************************************/
 #include "server_game.h"
 
-#include "deck_list.h"
+#include "../../deck_list.h"
+#include "../server.h"
+#include "../server_database_interface.h"
+#include "../server_protocolhandler.h"
+#include "../server_room.h"
 #include "pb/context_connection_state_changed.pb.h"
 #include "pb/context_deck_select.pb.h"
 #include "pb/context_ping_changed.pb.h"
@@ -37,14 +41,10 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
-#include "server.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
-#include "server_database_interface.h"
 #include "server_player.h"
-#include "server_protocolhandler.h"
-#include "server_room.h"
 
 #include <QDebug>
 #include <QTimer>

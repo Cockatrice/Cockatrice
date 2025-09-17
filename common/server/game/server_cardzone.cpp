@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "server_cardzone.h"
 
+#include "../rng_abstract.h"
 #include "pb/command_move_card.pb.h"
-#include "rng_abstract.h"
 #include "server_card.h"
 #include "server_player.h"
 

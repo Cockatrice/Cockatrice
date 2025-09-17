@@ -1,10 +1,10 @@
 #include "server_abstractuserinterface.h"
 
+#include "game/server_game.h"
+#include "game/server_player.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_game_state_changed.pb.h"
 #include "server.h"
-#include "server_game.h"
-#include "server_player.h"
 #include "server_player_reference.h"
 #include "server_response_containers.h"
 #include "server_room.h"

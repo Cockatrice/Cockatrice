@@ -20,7 +20,7 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
-#include "server.h"
+#include "server/server.h"
 
 #include <QHostAddress>
 #include <QMetaType>

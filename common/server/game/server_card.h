@@ -20,7 +20,7 @@
 #ifndef SERVER_CARD_H
 #define SERVER_CARD_H
 
-#include "card_ref.h"
+#include "../../card_ref.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/serverinfo_card.pb.h"
 #include "server_arrowtarget.h"

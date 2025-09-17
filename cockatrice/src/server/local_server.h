@@ -1,8 +1,8 @@
 #ifndef LOCALSERVER_H
 #define LOCALSERVER_H
 
-#include "server.h"
-#include "server_database_interface.h"
+#include "server/server.h"
+#include "server/server_database_interface.h"
 
 class LocalServerInterface;
 

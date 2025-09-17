@@ -14,9 +14,9 @@
 #include "pb/event_user_left.pb.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/isl_message.pb.h"
+#include "server/server_protocolhandler.h"
+#include "server/server_room.h"
 #include "server_logger.h"
-#include "server_protocolhandler.h"
-#include "server_room.h"
 
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
