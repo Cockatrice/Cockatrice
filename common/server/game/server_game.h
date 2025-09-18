@@ -37,6 +37,7 @@ class GameEventContainer;
 class GameReplay;
 class Server_Room;
 class Server_Player;
+class Server_AbstractParticipant;
 class ServerInfo_User;
 class ServerInfo_Player;
 class ServerInfo_Game;
@@ -51,7 +52,7 @@ private:
     int nextPlayerId;
     int hostId;
     ServerInfo_User *creatorInfo;
-    QMap<int, Server_Player *> players;
+    QMap<int, Server_AbstractParticipant *> participants;
     QSet<QString> allPlayersEver, allSpectatorsEver;
     bool gameStarted;
     bool gameClosed;
@@ -78,7 +79,7 @@ private:
     GameReplay *currentReplay;
 
     void createGameStateChangedEvent(Event_GameStateChanged *event,
-                                     Server_Player *playerWhosAsking,
+                                     Server_AbstractParticipant *recipient,
                                      bool omniscient,
                                      bool withUserInfo);
     void storeGameInformation();
@@ -130,9 +131,11 @@ public:
     }
     int getPlayerCount() const;
     int getSpectatorCount() const;
-    const QMap<int, Server_Player *> &getPlayers() const
+    QMap<int, Server_Player *> getPlayers() const;
+    Server_Player *getPlayer(int id) const;
+    const QMap<int, Server_AbstractParticipant *> &getParticipants() const
     {
-        return players;
+        return participants;
     }
     int getGameId() const
     {
@@ -182,10 +185,10 @@ public:
                    bool spectator,
                    bool judge,
                    bool broadcastUpdate = true);
-    void removePlayer(Server_Player *player, Event_Leave::LeaveReason reason);
+    void removeParticipant(Server_AbstractParticipant *participant, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
     void unattachCards(GameEventStorage &ges, Server_Player *player);
-    bool kickPlayer(int playerId);
+    bool kickParticipant(int playerId);
     void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
     int getActivePlayer() const
@@ -208,7 +211,7 @@ public:
         return turnOrderReversed = !turnOrderReversed;
     }
 
-    void createGameJoinedEvent(Server_Player *player, ResponseContainer &rc, bool resuming);
+    void createGameJoinedEvent(Server_AbstractParticipant *participant, ResponseContainer &rc, bool resuming);
 
     GameEventContainer *
     prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);

@@ -29,6 +29,7 @@
 
 class Server_Card;
 class Server_Player;
+class Server_AbstractParticipant;
 class Server_Game;
 class GameEventStorage;
 
@@ -87,7 +88,7 @@ public:
     {
         return player;
     }
-    void getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAsking, bool omniscient);
+    void getInfo(ServerInfo_Zone *info, Server_AbstractParticipant *recipient, bool omniscient);
 
     int getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const;
     bool isColumnEmpty(int x, int y) const;
