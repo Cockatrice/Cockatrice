@@ -73,7 +73,10 @@ public:
                                bool _judge,
                                Server_AbstractUserInterface *_handler);
     ~Server_AbstractParticipant() override;
-    virtual void prepareDestroy();
+    virtual void prepareDestroy()
+    {
+        removeFromGame();
+    };
     void removeFromGame();
     Server_AbstractUserInterface *getUserInterface() const
     {
