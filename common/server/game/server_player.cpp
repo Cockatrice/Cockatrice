@@ -108,13 +108,12 @@ struct MoveCardStruct
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
                              const ServerInfo_User &_userInfo,
-                             bool _spectator,
                              bool _judge,
                              Server_AbstractUserInterface *_userInterface)
-    : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), deck(nullptr), pingTime(0),
-      playerId(_playerId), spectator(_spectator), judge(_judge), nextCardId(0), readyStart(false), conceded(false),
-      sideboardLocked(true)
+    : Server_AbstractParticipant(_game, _playerId, _userInfo, _judge, _userInterface), deck(nullptr), nextCardId(0),
+      readyStart(false), conceded(false), sideboardLocked(true)
 {
+    spectator = false;
 }
 
 Server_Player::~Server_Player() = default;
@@ -124,12 +123,7 @@ void Server_Player::prepareDestroy()
     delete deck;
     deck = nullptr;
 
-    playerMutex.lock();
-    if (userInterface) {
-        userInterface->playerRemovedFromGame(game);
-    }
-    playerMutex.unlock();
-
+    removeFromGame();
     clearZones();
 
     deleteLater();
@@ -267,25 +261,6 @@ void Server_Player::clearZones()
     arrows.clear();
 
     lastDrawList.clear();
-}
-
-void Server_Player::getProperties(ServerInfo_PlayerProperties &result, bool withUserInfo)
-{
-    result.set_player_id(playerId);
-    if (withUserInfo) {
-        copyUserInfo(*(result.mutable_user_info()), true);
-    }
-    result.set_spectator(spectator);
-    if (!spectator) {
-        result.set_conceded(conceded);
-        result.set_sideboard_locked(sideboardLocked);
-        result.set_ready_start(readyStart);
-    }
-    result.set_judge(judge);
-    if (deck) {
-        result.set_deck_hash(deck->getDeckHash().toStdString());
-    }
-    result.set_ping_seconds(pingTime);
 }
 
 void Server_Player::addZone(Server_CardZone *zone)
@@ -541,8 +516,7 @@ Response::ResponseCode Server_Player::moveCard(GameEventStorage &ges,
 
         if (startzone != targetzone) {
             // Delete all arrows from and to the card
-            const QList<Server_Player *> &players = game->getPlayers().values();
-            for (auto player : players) {
+            for (auto *player : game->getPlayers().values()) {
                 QList<int> arrowsToDelete;
                 for (Server_Arrow *arrow : player->getArrows()) {
                     if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
@@ -782,33 +756,8 @@ Response::ResponseCode Server_Player::setCardAttrHelper(GameEventStorage &ges,
 }
 
 Response::ResponseCode
-Server_Player::cmdLeaveGame(const Command_LeaveGame & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
-{
-    game->removePlayer(this, Event_Leave::USER_LEFT);
-    return Response::RespOk;
-}
-
-Response::ResponseCode
-Server_Player::cmdKickFromGame(const Command_KickFromGame &cmd, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
-{
-    if ((game->getHostId() != playerId) && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
-        return Response::RespFunctionNotAllowed;
-    }
-
-    if (!game->kickPlayer(cmd.player_id())) {
-        return Response::RespNameNotFound;
-    }
-
-    return Response::RespOk;
-}
-
-Response::ResponseCode
 Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &rc, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     DeckList *newDeck;
     if (cmd.has_deck_id()) {
         try {
@@ -853,9 +802,6 @@ Response::ResponseCode Server_Player::cmdSetSideboardPlan(const Command_SetSideb
                                                           ResponseContainer & /*rc*/,
                                                           GameEventStorage & /*ges*/)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
     if (readyStart) {
         return Response::RespContextError;
     }
@@ -879,9 +825,6 @@ Response::ResponseCode Server_Player::cmdSetSideboardLock(const Command_SetSideb
                                                           ResponseContainer & /*rc*/,
                                                           GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
     if (readyStart) {
         return Response::RespContextError;
     }
@@ -908,9 +851,6 @@ Response::ResponseCode Server_Player::cmdSetSideboardLock(const Command_SetSideb
 Response::ResponseCode
 Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -939,7 +879,7 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
         CardToMove cardToMove;
         cardToMove.set_card_id(card->getId());
 
-        for (const auto &player : game->getPlayers()) {
+        for (const auto *player : game->getPlayers()) {
             if (player == nullptr || player->getUserInfo() == nullptr) {
                 continue;
             }
@@ -984,9 +924,6 @@ Server_Player::cmdConcede(const Command_Concede & /*cmd*/, ResponseContainer & /
 Response::ResponseCode
 Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1008,31 +945,9 @@ Server_Player::cmdUnconcede(const Command_Unconcede & /*cmd*/, ResponseContainer
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_Player::cmdJudge(const Command_Judge &cmd, ResponseContainer &rc, GameEventStorage &ges)
-{
-    if (!judge)
-        return Response::RespFunctionNotAllowed;
-
-    Server_Player *player = this->game->getPlayers().value(cmd.target_id());
-
-    ges.setForcedByJudge(playerId);
-    if (player == nullptr)
-        return Response::RespContextError;
-
-    for (int i = 0; i < cmd.game_command_size(); ++i) {
-        player->processGameCommand(cmd.game_command(i), rc, ges);
-    }
-
-    return Response::RespOk;
-}
-
 Response::ResponseCode
 Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!deck || game->getGameStarted()) {
         return Response::RespContextError;
     }
@@ -1061,42 +976,8 @@ Server_Player::cmdReadyStart(const Command_ReadyStart &cmd, ResponseContainer & 
 }
 
 Response::ResponseCode
-Server_Player::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
-{
-    if (spectator) {
-        /* Spectators can only talk if:
-         * (a) the game creator allows it
-         * (b) the spectator is a moderator/administrator
-         * (c) the spectator is a judge
-         */
-        bool isModOrJudge = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge));
-        if (!isModOrJudge && !game->getSpectatorsCanTalk()) {
-            return Response::RespFunctionNotAllowed;
-        }
-    }
-
-    if (!userInterface->addSaidMessageSize(static_cast<int>(cmd.message().size()))) {
-        return Response::RespChatFlood;
-    }
-    Event_GameSay event;
-    event.set_message(cmd.message());
-    ges.enqueueGameEvent(event, playerId);
-
-    game->getRoom()->getServer()->getDatabaseInterface()->logMessage(
-        userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()),
-        textFromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetGame, game->getGameId(),
-        game->getDescription());
-
-    return Response::RespOk;
-}
-
-Response::ResponseCode
 Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1129,10 +1010,6 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
 Response::ResponseCode
 Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1170,9 +1047,6 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
 Response::ResponseCode
 Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges) const
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
     if (conceded) {
         return Response::RespContextError;
     }
@@ -1199,10 +1073,6 @@ Server_Player::cmdRollDie(const Command_RollDie &cmd, ResponseContainer & /*rc*/
 Response::ResponseCode
 Server_Player::cmdDrawCards(const Command_DrawCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1216,10 +1086,6 @@ Server_Player::cmdDrawCards(const Command_DrawCards &cmd, ResponseContainer & /*
 Response::ResponseCode
 Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1244,10 +1110,6 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
 Response::ResponseCode
 Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1255,7 +1117,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespContextError;
     }
 
-    Server_Player *startPlayer = game->getPlayers().value(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
+    Server_Player *startPlayer = game->getPlayer(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
     if (!startPlayer) {
         return Response::RespNameNotFound;
     }
@@ -1268,7 +1130,7 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
         return Response::RespContextError;
     }
 
-    Server_Player *targetPlayer = game->getPlayers().value(cmd.target_player_id());
+    Server_Player *targetPlayer = game->getPlayer(cmd.target_player_id());
     if (!targetPlayer) {
         return Response::RespNameNotFound;
     }
@@ -1292,10 +1154,6 @@ Server_Player::cmdMoveCard(const Command_MoveCard &cmd, ResponseContainer & /*rc
 Response::ResponseCode
 Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1344,10 +1202,6 @@ Server_Player::cmdFlipCard(const Command_FlipCard &cmd, ResponseContainer & /*rc
 Response::ResponseCode
 Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1370,7 +1224,7 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
     Server_Card *targetCard = nullptr;
 
     if (cmd.has_target_player_id()) {
-        targetPlayer = game->getPlayers().value(cmd.target_player_id());
+        targetPlayer = game->getPlayer(cmd.target_player_id());
         if (!targetPlayer) {
             return Response::RespNameNotFound;
         }
@@ -1404,10 +1258,8 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    QMapIterator<int, Server_Player *> playerIterator(game->getPlayers());
-    while (playerIterator.hasNext()) {
-        Server_Player *p = playerIterator.next().value();
-        QList<Server_Arrow *> _arrows = p->getArrows().values();
+    for (auto *player : game->getPlayers()) {
+        QList<Server_Arrow *> _arrows = player->getArrows().values();
         QList<Server_Arrow *> toDelete;
         for (auto a : _arrows) {
             auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
@@ -1418,8 +1270,8 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
         for (auto &i : toDelete) {
             Event_DeleteArrow event;
             event.set_arrow_id(i->getId());
-            ges.enqueueGameEvent(event, p->getPlayerId());
-            p->deleteArrow(i->getId());
+            ges.enqueueGameEvent(event, player->getPlayerId());
+            player->deleteArrow(i->getId());
         }
     }
 
@@ -1458,10 +1310,6 @@ Server_Player::cmdAttachCard(const Command_AttachCard &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer &rc, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1609,8 +1457,7 @@ Server_Player::cmdCreateToken(const Command_CreateToken &cmd, ResponseContainer 
             }
 
             // Copy Arrows
-            const QList<Server_Player *> &players = game->getPlayers().values();
-            for (auto player : players) {
+            for (auto *player : game->getPlayers().values()) {
                 QList<int> changedArrowIds;
                 for (Server_Arrow *arrow : player->getArrows()) {
                     bool sendGameEvent = false;
@@ -1698,10 +1545,6 @@ void Server_Player::sendCreateTokenEvents(Server_CardZone *zone,
 Response::ResponseCode
 Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1709,8 +1552,8 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
         return Response::RespContextError;
     }
 
-    Server_Player *startPlayer = game->getPlayers().value(cmd.start_player_id());
-    Server_Player *targetPlayer = game->getPlayers().value(cmd.target_player_id());
+    Server_Player *startPlayer = game->getPlayer(cmd.start_player_id());
+    Server_Player *targetPlayer = game->getPlayer(cmd.target_player_id());
     if (!startPlayer || !targetPlayer) {
         return Response::RespNameNotFound;
     }
@@ -1778,10 +1621,6 @@ Server_Player::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseContainer 
 Response::ResponseCode
 Server_Player::cmdDeleteArrow(const Command_DeleteArrow &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1803,10 +1642,6 @@ Server_Player::cmdDeleteArrow(const Command_DeleteArrow &cmd, ResponseContainer 
 Response::ResponseCode
 Server_Player::cmdSetCardAttr(const Command_SetCardAttr &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1821,10 +1656,6 @@ Server_Player::cmdSetCardAttr(const Command_SetCardAttr &cmd, ResponseContainer 
 Response::ResponseCode
 Server_Player::cmdSetCardCounter(const Command_SetCardCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1857,10 +1688,6 @@ Server_Player::cmdSetCardCounter(const Command_SetCardCounter &cmd, ResponseCont
 Response::ResponseCode
 Server_Player::cmdIncCardCounter(const Command_IncCardCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1897,10 +1724,6 @@ Server_Player::cmdIncCardCounter(const Command_IncCardCounter &cmd, ResponseCont
 Response::ResponseCode
 Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1926,10 +1749,6 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1956,10 +1775,6 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
 Response::ResponseCode
 Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -1985,10 +1800,6 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
 Response::ResponseCode
 Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -2017,14 +1828,8 @@ Server_Player::cmdNextTurn(const Command_NextTurn & /*cmd*/, ResponseContainer &
         return Response::RespGameNotStarted;
     }
 
-    if (!judge) {
-        if (spectator) {
-            return Response::RespFunctionNotAllowed;
-        }
-
-        if (conceded) {
-            return Response::RespContextError;
-        }
+    if (conceded && !judge) {
+        return Response::RespContextError;
     }
 
     game->nextTurn();
@@ -2040,10 +1845,6 @@ Response::ResponseCode Server_Player::cmdSetActivePhase(const Command_SetActiveP
     }
 
     if (!judge) {
-        if (spectator) {
-            return Response::RespFunctionNotAllowed;
-        }
-
         if (conceded) {
             return Response::RespContextError;
         }
@@ -2065,7 +1866,7 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
         return Response::RespGameNotStarted;
     }
 
-    Server_Player *otherPlayer = game->getPlayers().value(cmd.player_id());
+    Server_Player *otherPlayer = game->getPlayer(cmd.player_id());
     if (!otherPlayer) {
         return Response::RespNameNotFound;
     }
@@ -2141,10 +1942,6 @@ Server_Player::cmdDumpZone(const Command_DumpZone &cmd, ResponseContainer &rc, G
 Response::ResponseCode
 Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
-
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -2153,7 +1950,7 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
     }
 
     if (cmd.has_player_id()) {
-        Server_Player *otherPlayer = game->getPlayers().value(cmd.player_id());
+        Server_Player *otherPlayer = game->getPlayer(cmd.player_id());
         if (!otherPlayer)
             return Response::RespNameNotFound;
     }
@@ -2252,9 +2049,9 @@ Server_Player::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer 
         ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
     } else {
         if (cmd.grant_write_access()) {
-            const QList<int> &playerIds = game->getPlayers().keys();
-            for (int _playerId : playerIds) {
-                zone->addWritePermission(_playerId);
+            const QList<int> &participantIds = game->getParticipants().keys();
+            for (int anyParticipantId : participantIds) {
+                zone->addWritePermission(anyParticipantId);
             }
         }
 
@@ -2304,182 +2101,22 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
 }
 
 Response::ResponseCode
-Server_Player::cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::cmdReverseTurn(const Command_ReverseTurn &cmd, ResponseContainer &rc, GameEventStorage &ges)
 {
-    if (spectator) {
-        return Response::RespFunctionNotAllowed;
-    }
 
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-
-    if (conceded) {
+    if (!judge && conceded) {
         return Response::RespContextError;
     }
-
-    bool reversedTurn = game->reverseTurnOrder();
-
-    Event_ReverseTurn event;
-    event.set_reversed(reversedTurn);
-    ges.enqueueGameEvent(event, playerId);
-
-    return Response::RespOk;
-}
-
-Response::ResponseCode
-Server_Player::processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges)
-{
-    switch ((GameCommand::GameCommandType)getPbExtension(command)) {
-        case GameCommand::KICK_FROM_GAME:
-            return cmdKickFromGame(command.GetExtension(Command_KickFromGame::ext), rc, ges);
-            break;
-        case GameCommand::LEAVE_GAME:
-            return cmdLeaveGame(command.GetExtension(Command_LeaveGame::ext), rc, ges);
-            break;
-        case GameCommand::GAME_SAY:
-            return cmdGameSay(command.GetExtension(Command_GameSay::ext), rc, ges);
-            break;
-        case GameCommand::SHUFFLE:
-            return cmdShuffle(command.GetExtension(Command_Shuffle::ext), rc, ges);
-            break;
-        case GameCommand::MULLIGAN:
-            return cmdMulligan(command.GetExtension(Command_Mulligan::ext), rc, ges);
-            break;
-        case GameCommand::ROLL_DIE:
-            return cmdRollDie(command.GetExtension(Command_RollDie::ext), rc, ges);
-            break;
-        case GameCommand::DRAW_CARDS:
-            return cmdDrawCards(command.GetExtension(Command_DrawCards::ext), rc, ges);
-            break;
-        case GameCommand::UNDO_DRAW:
-            return cmdUndoDraw(command.GetExtension(Command_UndoDraw::ext), rc, ges);
-            break;
-        case GameCommand::FLIP_CARD:
-            return cmdFlipCard(command.GetExtension(Command_FlipCard::ext), rc, ges);
-            break;
-        case GameCommand::ATTACH_CARD:
-            return cmdAttachCard(command.GetExtension(Command_AttachCard::ext), rc, ges);
-            break;
-        case GameCommand::CREATE_TOKEN:
-            return cmdCreateToken(command.GetExtension(Command_CreateToken::ext), rc, ges);
-            break;
-        case GameCommand::CREATE_ARROW:
-            return cmdCreateArrow(command.GetExtension(Command_CreateArrow::ext), rc, ges);
-            break;
-        case GameCommand::DELETE_ARROW:
-            return cmdDeleteArrow(command.GetExtension(Command_DeleteArrow::ext), rc, ges);
-            break;
-        case GameCommand::SET_CARD_ATTR:
-            return cmdSetCardAttr(command.GetExtension(Command_SetCardAttr::ext), rc, ges);
-            break;
-        case GameCommand::SET_CARD_COUNTER:
-            return cmdSetCardCounter(command.GetExtension(Command_SetCardCounter::ext), rc, ges);
-            break;
-        case GameCommand::INC_CARD_COUNTER:
-            return cmdIncCardCounter(command.GetExtension(Command_IncCardCounter::ext), rc, ges);
-            break;
-        case GameCommand::READY_START:
-            return cmdReadyStart(command.GetExtension(Command_ReadyStart::ext), rc, ges);
-            break;
-        case GameCommand::CONCEDE:
-            return cmdConcede(command.GetExtension(Command_Concede::ext), rc, ges);
-            break;
-        case GameCommand::INC_COUNTER:
-            return cmdIncCounter(command.GetExtension(Command_IncCounter::ext), rc, ges);
-            break;
-        case GameCommand::CREATE_COUNTER:
-            return cmdCreateCounter(command.GetExtension(Command_CreateCounter::ext), rc, ges);
-            break;
-        case GameCommand::SET_COUNTER:
-            return cmdSetCounter(command.GetExtension(Command_SetCounter::ext), rc, ges);
-            break;
-        case GameCommand::DEL_COUNTER:
-            return cmdDelCounter(command.GetExtension(Command_DelCounter::ext), rc, ges);
-            break;
-        case GameCommand::NEXT_TURN:
-            return cmdNextTurn(command.GetExtension(Command_NextTurn::ext), rc, ges);
-            break;
-        case GameCommand::SET_ACTIVE_PHASE:
-            return cmdSetActivePhase(command.GetExtension(Command_SetActivePhase::ext), rc, ges);
-            break;
-        case GameCommand::DUMP_ZONE:
-            return cmdDumpZone(command.GetExtension(Command_DumpZone::ext), rc, ges);
-            break;
-        case GameCommand::REVEAL_CARDS:
-            return cmdRevealCards(command.GetExtension(Command_RevealCards::ext), rc, ges);
-            break;
-        case GameCommand::MOVE_CARD:
-            return cmdMoveCard(command.GetExtension(Command_MoveCard::ext), rc, ges);
-            break;
-        case GameCommand::SET_SIDEBOARD_PLAN:
-            return cmdSetSideboardPlan(command.GetExtension(Command_SetSideboardPlan::ext), rc, ges);
-            break;
-        case GameCommand::DECK_SELECT:
-            return cmdDeckSelect(command.GetExtension(Command_DeckSelect::ext), rc, ges);
-            break;
-        case GameCommand::SET_SIDEBOARD_LOCK:
-            return cmdSetSideboardLock(command.GetExtension(Command_SetSideboardLock::ext), rc, ges);
-            break;
-        case GameCommand::CHANGE_ZONE_PROPERTIES:
-            return cmdChangeZoneProperties(command.GetExtension(Command_ChangeZoneProperties::ext), rc, ges);
-            break;
-        case GameCommand::UNCONCEDE:
-            return cmdUnconcede(command.GetExtension(Command_Unconcede::ext), rc, ges);
-            break;
-        case GameCommand::JUDGE:
-            return cmdJudge(command.GetExtension(Command_Judge::ext), rc, ges);
-            break;
-        case GameCommand::REVERSE_TURN:
-            return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
-            break;
-        default:
-            return Response::RespInvalidCommand;
-    }
-}
-
-void Server_Player::sendGameEvent(const GameEventContainer &cont)
-{
-    QMutexLocker locker(&playerMutex);
-
-    if (userInterface) {
-        userInterface->sendProtocolItem(cont);
-    }
-}
-
-void Server_Player::setUserInterface(Server_AbstractUserInterface *_userInterface)
-{
-    playerMutex.lock();
-    userInterface = _userInterface;
-    playerMutex.unlock();
-
-    pingTime = _userInterface ? 0 : -1;
-
-    Event_PlayerPropertiesChanged event;
-    event.mutable_player_properties()->set_ping_seconds(pingTime);
-
-    GameEventStorage ges;
-    ges.setGameEventContext(Context_ConnectionStateChanged());
-    ges.enqueueGameEvent(event, playerId);
-    ges.sendToGame(game);
-}
-
-void Server_Player::disconnectClient()
-{
-    if (!(userInfo->user_level() & ServerInfo_User::IsRegistered) || spectator) {
-        game->removePlayer(this, Event_Leave::USER_DISCONNECTED);
-    } else {
-        setUserInterface(nullptr);
-    }
+    return Server_AbstractParticipant::cmdReverseTurn(cmd, rc, ges);
 }
 
 void Server_Player::getInfo(ServerInfo_Player *info,
-                            Server_Player *playerWhosAsking,
+                            Server_AbstractParticipant *recipient,
                             bool omniscient,
                             bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
-    if (playerWhosAsking == this) {
+    if (recipient == this) {
         if (deck) {
             info->set_deck_list(deck->writeToString_Native().toStdString());
         }
@@ -2494,6 +2131,16 @@ void Server_Player::getInfo(ServerInfo_Player *info,
     }
 
     for (Server_CardZone *zone : zones) {
-        zone->getInfo(info->add_zone_list(), playerWhosAsking, omniscient);
+        zone->getInfo(info->add_zone_list(), recipient, omniscient);
+    }
+}
+
+void Server_Player::getPlayerProperties(ServerInfo_PlayerProperties &result)
+{
+    result.set_conceded(conceded);
+    result.set_sideboard_locked(sideboardLocked);
+    result.set_ready_start(readyStart);
+    if (deck) {
+        result.set_deck_hash(deck->getDeckHash().toStdString());
     }
 }

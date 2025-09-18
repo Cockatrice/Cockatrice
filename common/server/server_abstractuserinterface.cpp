@@ -103,14 +103,14 @@ void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
             continue;
         QMutexLocker gameLocker(&game->gameMutex);
 
-        Server_Player *player = game->getPlayers().value(pr.getPlayerId());
-        if (!player)
+        auto *participant = game->getParticipants().value(pr.getPlayerId());
+        if (!participant)
             continue;
 
-        player->setUserInterface(this);
-        playerAddedToGame(game->getGameId(), room->getId(), player->getPlayerId());
+        participant->setUserInterface(this);
+        playerAddedToGame(game->getGameId(), room->getId(), participant->getPlayerId());
 
-        game->createGameJoinedEvent(player, rc, true);
+        game->createGameJoinedEvent(participant, rc, true);
     }
     server->roomsLock.unlock();
 }
