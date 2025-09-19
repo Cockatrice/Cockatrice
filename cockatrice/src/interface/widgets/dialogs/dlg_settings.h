@@ -163,6 +163,7 @@ private:
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
+    QCheckBox doNotDeleteArrowsInSubPhasesCheckBox;
     QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox focusCardViewSearchBarCheckBox;
     QCheckBox annotateTokensCheckBox;
