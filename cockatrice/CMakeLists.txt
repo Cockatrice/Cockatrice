@@ -222,6 +222,7 @@ set(cockatrice_SOURCES
     src/game/game_view.cpp
     src/game/games_model.cpp
     src/game/hand_counter.cpp
+    src/game/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game/player/event_processing_options.h
     src/game/player/player.cpp
@@ -267,7 +268,6 @@ set(cockatrice_SOURCES
     src/server/local_client.cpp
     src/server/local_server.cpp
     src/server/local_server_interface.cpp
-    src/server/message_log_widget.cpp
     src/server/pending_command.cpp
     src/server/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp

@@ -2,10 +2,10 @@
 
 #include "../client/tabs/tab_game.h"
 #include "../server/abstract_client.h"
-#include "../server/message_log_widget.h"
 #include "../server/pending_command.h"
 #include "abstract_game.h"
 #include "get_pb_extension.h"
+#include "log/message_log_widget.h"
 #include "pb/command_concede.pb.h"
 #include "pb/command_delete_arrow.pb.h"
 #include "pb/command_game_say.pb.h"
