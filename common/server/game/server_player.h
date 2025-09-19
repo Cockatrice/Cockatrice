@@ -41,7 +41,7 @@ private:
     bool sideboardLocked;
     void revealTopCardIfNeeded(Server_CardZone *zone, GameEventStorage &ges);
     void sendCreateTokenEvents(Server_CardZone *zone, Server_Card *card, int xCoord, int yCoord, GameEventStorage &ges);
-    void getPlayerProperties(ServerInfo_PlayerProperties &result);
+    void getPlayerProperties(ServerInfo_PlayerProperties &result) override;
 
 public:
     Server_Player(Server_Game *_game,
