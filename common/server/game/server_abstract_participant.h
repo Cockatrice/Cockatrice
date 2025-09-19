@@ -63,7 +63,7 @@ protected:
     int playerId;
     bool spectator;
     bool judge;
-    void getPlayerProperties(ServerInfo_PlayerProperties &result);
+    virtual void getPlayerProperties(ServerInfo_PlayerProperties &result);
     mutable QMutex playerMutex;
 
 public:

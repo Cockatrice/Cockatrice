@@ -73,14 +73,14 @@ void Server_ProtocolHandler::prepareDestroy()
             continue;
         }
         game->gameMutex.lock();
-        Server_Player *p = game->getPlayer(gameIterator.value().second);
-        if (!p) {
+        auto *participant = game->getParticipants().value(gameIterator.value().second);
+        if (!participant) {
             game->gameMutex.unlock();
             room->gamesLock.unlock();
             continue;
         }
 
-        p->disconnectClient();
+        participant->disconnectClient();
 
         game->gameMutex.unlock();
         room->gamesLock.unlock();
