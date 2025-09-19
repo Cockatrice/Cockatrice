@@ -14,9 +14,15 @@ private:
     Server_Card *startCard;
     Server_ArrowTarget *targetItem;
     color arrowColor;
+    int phaseCreated, phaseDeleted;
 
 public:
-    Server_Arrow(int _id, Server_Card *_startCard, Server_ArrowTarget *_targetItem, const color &_arrowColor);
+    Server_Arrow(int _id,
+                 Server_Card *_startCard,
+                 Server_ArrowTarget *_targetItem,
+                 const color &_arrowColor,
+                 int _phaseCreated,
+                 int _phaseDeleted);
     int getId() const
     {
         return id;
@@ -44,6 +50,10 @@ public:
     const color &getColor() const
     {
         return arrowColor;
+    }
+    bool checkPhaseDeletion(int phase) const // returns true if the arrow should be deleted in this phase
+    {
+        return phase < phaseCreated || phase >= phaseDeleted;
     }
 
     void getInfo(ServerInfo_Arrow *info);

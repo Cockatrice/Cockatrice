@@ -1210,7 +1210,9 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
         }
     }
 
-    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color());
+    int currentPhase = game->getActivePhase();
+    int deletionPhase = cmd.has_delete_in_phase() ? cmd.delete_in_phase() : currentPhase;
+    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
     addArrow(arrow);
 
     Event_CreateArrow event;
