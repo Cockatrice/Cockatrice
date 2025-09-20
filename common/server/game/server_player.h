@@ -9,21 +9,11 @@
 #include <QString>
 
 class DeckList;
-class Server_Game;
 class Server_CardZone;
 class Server_Counter;
 class Server_Arrow;
 class Server_Card;
-class Server_AbstractUserInterface;
-class ServerInfo_User;
-class ServerInfo_Player;
-class ServerInfo_PlayerProperties;
-class CommandContainer;
 class CardToMove;
-class GameEventContainer;
-class GameEventStorage;
-class ResponseContainer;
-class GameCommand;
 
 class Server_Player : public Server_AbstractParticipant
 {
