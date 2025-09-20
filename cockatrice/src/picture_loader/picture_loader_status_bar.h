@@ -1,7 +1,7 @@
 #ifndef PICTURE_LOADER_STATUS_BAR_H
 #define PICTURE_LOADER_STATUS_BAR_H
 
-#include "../widgets/quick_settings/settings_button_widget.h"
+#include "../interface/widgets/quick_settings/settings_button_widget.h"
 #include "picture_loader_worker_work.h"
 
 #include <QHBoxLayout>

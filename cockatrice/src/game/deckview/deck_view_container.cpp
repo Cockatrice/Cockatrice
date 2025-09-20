@@ -1,7 +1,7 @@
 #include "deck_view_container.h"
 
-#include "../../client/tabs/tab_game.h"
-#include "../../client/ui/picture_loader/picture_loader.h"
+#include "../../tabs/tab_game.h"
+#include "../../picture_loader/picture_loader.h"
 #include "../../database/card_database.h"
 #include "../../database/card_database_manager.h"
 #include "../../deck/deck_loader.h"

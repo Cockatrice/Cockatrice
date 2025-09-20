@@ -1,8 +1,8 @@
 #ifndef PRINTING_SELECTOR_CARD_DISPLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_DISPLAY_WIDGET_H
 
-#include "../../../../card/card_info.h"
-#include "../../../../deck/deck_list_model.h"
+#include "../../../card/card_info.h"
+#include "../../../deck/deck_list_model.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"

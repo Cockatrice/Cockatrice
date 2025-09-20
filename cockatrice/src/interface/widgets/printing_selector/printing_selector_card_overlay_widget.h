@@ -1,9 +1,9 @@
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
-#include "../../../../card/card_info.h"
-#include "../../../../client/ui/widgets/cards/card_info_picture_widget.h"
-#include "../../../../deck/deck_list_model.h"
+#include "../../../card/card_info.h"
+#include "../cards/card_info_picture_widget.h"
+#include "../../../deck/deck_list_model.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
 #include "card_amount_widget.h"

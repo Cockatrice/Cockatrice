@@ -4,7 +4,7 @@
 #include "../../database/card_database_manager.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
-#include "../ui/window_main.h"
+#include "../../interface/window_main.h"
 
 #include <QApplication>
 #include <QCryptographicHash>

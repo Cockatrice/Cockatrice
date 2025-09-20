@@ -1,7 +1,7 @@
 #include "printing_selector_card_overlay_widget.h"
 
-#include "../../../../database/card_database_manager.h"
-#include "../../../../settings/cache_settings.h"
+#include "../../../database/card_database_manager.h"
+#include "../../../settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
 
 #include <QMenu>

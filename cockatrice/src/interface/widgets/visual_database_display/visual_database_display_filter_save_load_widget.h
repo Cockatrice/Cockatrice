@@ -1,7 +1,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 
-#include "../../../../filters/filter_tree_model.h"
+#include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QDir>

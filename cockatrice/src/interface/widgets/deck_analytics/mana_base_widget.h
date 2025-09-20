@@ -1,7 +1,7 @@
 #ifndef MANA_BASE_WIDGET_H
 #define MANA_BASE_WIDGET_H
 
-#include "../../../../deck/deck_list_model.h"
+#include "../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 
 #include <QHBoxLayout>

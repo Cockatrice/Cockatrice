@@ -1,6 +1,6 @@
 #include "color_identity_widget.h"
 
-#include "../../../../../settings/cache_settings.h"
+#include "../../../../settings/cache_settings.h"
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>

@@ -1,7 +1,7 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include "../../client/tearoff_menu.h"
+#include "../../interface/tearoff_menu.h"
 
 #include <QGraphicsItem>
 #include <QInputDialog>

@@ -1,6 +1,6 @@
 #include "banner_widget.h"
 
-#include "../../../../../client/ui/pixel_map_generator.h"
+#include "../../../pixel_map_generator.h"
 
 #include <QLinearGradient>
 #include <QMouseEvent>

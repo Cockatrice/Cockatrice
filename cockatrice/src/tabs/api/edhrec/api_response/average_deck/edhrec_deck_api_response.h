@@ -1,7 +1,7 @@
 #ifndef EDHREC_DECK_API_RESPONSE_H
 #define EDHREC_DECK_API_RESPONSE_H
 
-#include "../../../../../../deck/deck_loader.h"
+#include "../../../../../deck/deck_loader.h"
 
 #include <QDebug>
 #include <QJsonArray>

@@ -1,8 +1,8 @@
 #include "visual_deck_editor_sample_hand_widget.h"
 
-#include "../../../../database/card_database_manager.h"
-#include "../../../../deck/deck_loader.h"
-#include "../../../../settings/cache_settings.h"
+#include "../../../database/card_database_manager.h"
+#include "../../../deck/deck_loader.h"
+#include "../../../settings/cache_settings.h"
 #include "../cards/card_info_picture_widget.h"
 
 #include <random>

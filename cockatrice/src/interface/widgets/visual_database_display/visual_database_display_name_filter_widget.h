@@ -1,7 +1,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_NAME_FILTER_WIDGET_H
 
-#include "../../../../filters/filter_tree_model.h"
+#include "../../../filters/filter_tree_model.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../general/layout_containers/flow_widget.h"
 

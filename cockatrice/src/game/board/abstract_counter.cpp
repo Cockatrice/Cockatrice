@@ -1,7 +1,7 @@
 #include "abstract_counter.h"
 
-#include "../../client/tabs/tab_game.h"
-#include "../../client/translate_counter_name.h"
+#include "../../tabs/tab_game.h"
+#include "translate_counter_name.h"
 #include "../../settings/cache_settings.h"
 #include "../player/player.h"
 #include "expression.h"

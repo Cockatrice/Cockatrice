@@ -1,8 +1,8 @@
 #include "chat_view.h"
 
 #include "../../client/sound_engine.h"
-#include "../../client/tabs/tab_account.h"
-#include "../../client/ui/pixel_map_generator.h"
+#include "../../tabs/tab_account.h"
+#include "../../interface/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../user/user_context_menu.h"
 #include "../user/user_list_manager.h"

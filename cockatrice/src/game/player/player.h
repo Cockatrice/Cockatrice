@@ -2,8 +2,8 @@
 #define PLAYER_H
 
 #include "../../card/card_info.h"
-#include "../../client/tearoff_menu.h"
-#include "../../dialogs/dlg_create_token.h"
+#include "../../interface/tearoff_menu.h"
+#include "../dialogs/dlg_create_token.h"
 #include "../../filters/filter_string.h"
 #include "../board/abstract_graphics_item.h"
 #include "menu/player_menu.h"

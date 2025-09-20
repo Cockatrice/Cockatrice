@@ -1,7 +1,7 @@
 #include "picture_loader_worker.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
+#include "../database/card_database_manager.h"
+#include "../settings/cache_settings.h"
 #include "picture_loader_local.h"
 #include "picture_loader_worker_work.h"
 

@@ -1,6 +1,6 @@
 #include "player_target.h"
 
-#include "../../client/ui/pixel_map_generator.h"
+#include "../../interface/pixel_map_generator.h"
 #include "pb/serverinfo_user.pb.h"
 #include "player.h"
 

@@ -1,7 +1,7 @@
 #include "picture_loader_local.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
+#include "../database/card_database_manager.h"
+#include "../settings/cache_settings.h"
 #include "picture_to_load.h"
 
 #include <QDirIterator>

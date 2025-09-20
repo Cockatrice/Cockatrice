@@ -2,10 +2,10 @@
 
 #include "../../../common/pb/context_move_card.pb.h"
 #include "../../client/get_text_with_max.h"
-#include "../../client/tabs/tab_game.h"
+#include "../../tabs/tab_game.h"
 #include "../../database/card_database_manager.h"
-#include "../../dialogs/dlg_move_top_cards_until.h"
-#include "../../dialogs/dlg_roll_dice.h"
+#include "../dialogs/dlg_move_top_cards_until.h"
+#include "../dialogs/dlg_roll_dice.h"
 #include "../board/card_item.h"
 #include "../zones/logic/view_zone_logic.h"
 #include "card_menu_action_type.h"

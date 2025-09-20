@@ -1,6 +1,6 @@
 #include "card_info.h"
 
-#include "../client/ui/picture_loader/picture_loader.h"
+#include "../picture_loader/picture_loader.h"
 #include "../settings/cache_settings.h"
 #include "game_specific_terms.h"
 

@@ -1,8 +1,8 @@
 #include "dlg_move_top_cards_until.h"
 
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
-#include "../filters/filter_string.h"
+#include "../../database/card_database.h"
+#include "../../database/card_database_manager.h"
+#include "../../filters/filter_string.h"
 
 #include <QDialogButtonBox>
 #include <QLabel>

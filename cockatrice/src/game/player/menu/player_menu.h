@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_PLAYER_MENU_H
 #define COCKATRICE_PLAYER_MENU_H
 
-#include "../../../client/tearoff_menu.h"
+#include "../../../interface/tearoff_menu.h"
 #include "../player.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"

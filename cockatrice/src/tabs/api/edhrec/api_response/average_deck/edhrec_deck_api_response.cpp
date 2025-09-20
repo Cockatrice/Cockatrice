@@ -1,6 +1,6 @@
 #include "edhrec_deck_api_response.h"
 
-#include "../../../../../../deck/deck_loader.h"
+#include "../../../../../deck/deck_loader.h"
 
 #include <QApplication>
 #include <QDebug>

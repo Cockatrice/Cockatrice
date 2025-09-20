@@ -1,6 +1,6 @@
 #include "player_event_handler.h"
 
-#include "../../client/tabs/tab_game.h"
+#include "../../tabs/tab_game.h"
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"

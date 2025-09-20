@@ -1,7 +1,7 @@
 #ifndef DECK_EDITOR_FILTER_DOCK_WIDGET_H
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
-#include "../../../../utility/key_signals.h"
+#include "../../../utility/key_signals.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 
 #include <QDockWidget>

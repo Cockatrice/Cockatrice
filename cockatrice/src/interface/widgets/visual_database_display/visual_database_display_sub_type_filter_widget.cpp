@@ -1,8 +1,8 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
-#include "../../../../database/card_database_manager.h"
-#include "../../../../filters/filter_tree.h"
-#include "../../../../filters/filter_tree_model.h"
+#include "../../../database/card_database_manager.h"
+#include "../../../filters/filter_tree.h"
+#include "../../../filters/filter_tree_model.h"
 
 #include <QLineEdit>
 #include <QPushButton>

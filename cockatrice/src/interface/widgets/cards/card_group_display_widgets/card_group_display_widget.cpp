@@ -1,9 +1,9 @@
 #include "card_group_display_widget.h"
 
-#include "../../../../../database/card_database_manager.h"
-#include "../../../../../deck/deck_list_model.h"
-#include "../../../../../utility/card_info_comparator.h"
-#include "../../../../../utility/deck_list_sort_filter_proxy_model.h"
+#include "../../../../database/card_database_manager.h"
+#include "../../../../deck/deck_list_model.h"
+#include "../../../../utility/card_info_comparator.h"
+#include "../../../../utility/deck_list_sort_filter_proxy_model.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>

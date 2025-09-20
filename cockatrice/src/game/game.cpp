@@ -1,6 +1,6 @@
 #include "game.h"
 
-#include "../client/tabs/tab_game.h"
+#include "../tabs/tab_game.h"
 #include "pb/event_game_joined.pb.h"
 
 Game::Game(TabGame *_tab,

@@ -1,6 +1,6 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
-#include "../../../../settings/cache_settings.h"
+#include "../../../settings/cache_settings.h"
 #include "deck_preview/deck_preview_widget.h"
 
 #include <QDirIterator>

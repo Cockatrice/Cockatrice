@@ -1,7 +1,7 @@
 #ifndef TAB_VISUAL_DATABASE_DISPLAY_H
 #define TAB_VISUAL_DATABASE_DISPLAY_H
 
-#include "../ui/widgets/visual_database_display/visual_database_display_widget.h"
+#include "../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "tab.h"
 
 #include <QVBoxLayout>

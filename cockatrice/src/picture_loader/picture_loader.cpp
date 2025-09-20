@@ -1,6 +1,6 @@
 #include "picture_loader.h"
 
-#include "../../../settings/cache_settings.h"
+#include "../settings/cache_settings.h"
 
 #include <QApplication>
 #include <QBuffer>

@@ -1,8 +1,8 @@
 #include "visual_deck_storage_search_widget.h"
 
-#include "../../../../filters/deck_filter_string.h"
-#include "../../../../filters/syntax_help.h"
-#include "../../../../settings/cache_settings.h"
+#include "../../../filters/deck_filter_string.h"
+#include "../../../filters/syntax_help.h"
+#include "../../../settings/cache_settings.h"
 #include "../../pixel_map_generator.h"
 
 #include <QAction>

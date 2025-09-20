@@ -1,7 +1,7 @@
 #ifndef ALL_ZONES_CARD_AMOUNT_WIDGET_H
 #define ALL_ZONES_CARD_AMOUNT_WIDGET_H
-#include "../../../../deck/deck_list_model.h"
-#include "../../../../deck/deck_loader.h"
+#include "../../../deck/deck_list_model.h"
+#include "../../../deck/deck_loader.h"
 #include "card_amount_widget.h"
 
 #include <QVBoxLayout>

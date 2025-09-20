@@ -1,7 +1,7 @@
 #ifndef EDHREC_API_RESPONSE_CARD_SYNERGY_DISPLAY_WIDGET_H
 #define EDHREC_API_RESPONSE_CARD_SYNERGY_DISPLAY_WIDGET_H
 
-#include "../../../../../ui/widgets/general/display/percent_bar_widget.h"
+#include "../../../../../interface/widgets/general/display/percent_bar_widget.h"
 #include "../../api_response/cards/edhrec_api_response_card_details.h"
 
 #include <QLabel>

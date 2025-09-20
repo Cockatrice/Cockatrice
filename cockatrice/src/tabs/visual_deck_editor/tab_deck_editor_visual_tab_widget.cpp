@@ -1,6 +1,6 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
-#include "../../ui/widgets/visual_database_display/visual_database_display_widget.h"
+#include "../../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "../abstract_tab_deck_editor.h"
 
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,

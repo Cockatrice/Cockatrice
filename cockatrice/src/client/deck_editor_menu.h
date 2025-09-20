@@ -1,7 +1,7 @@
 #ifndef DECK_EDITOR_MENU_H
 #define DECK_EDITOR_MENU_H
 
-#include "../../tabs/abstract_tab_deck_editor.h"
+#include "../tabs/abstract_tab_deck_editor.h"
 
 #include <QMenu>
 

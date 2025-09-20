@@ -1,7 +1,7 @@
 #ifndef DLG_SELECT_SET_FOR_CARDS_H
 #define DLG_SELECT_SET_FOR_CARDS_H
 
-#include "../client/ui/widgets/general/layout_containers/flow_widget.h"
+#include "../interface/widgets/general/layout_containers/flow_widget.h"
 #include "../deck/deck_list_model.h"
 
 #include <QCheckBox>

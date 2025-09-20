@@ -1,6 +1,6 @@
 #include "visual_database_filter_display_widget.h"
 
-#include "../../../../settings/cache_settings.h"
+#include "../../../settings/cache_settings.h"
 
 #include <QDir>
 #include <QFile>

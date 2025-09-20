@@ -1,7 +1,7 @@
 #include "picture_to_load.h"
 
-#include "../../../settings/cache_settings.h"
-#include "../../../utility/card_set_comparator.h"
+#include "../settings/cache_settings.h"
+#include "../utility/card_set_comparator.h"
 
 #include <QCoreApplication>
 #include <QDate>

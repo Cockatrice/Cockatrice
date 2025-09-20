@@ -1,6 +1,6 @@
 #include "dlg_create_game.h"
 
-#include "../client/tabs/tab_room.h"
+#include "../tabs/tab_room.h"
 #include "../server/pending_command.h"
 #include "../settings/cache_settings.h"
 #include "pb/serverinfo_game.pb.h"

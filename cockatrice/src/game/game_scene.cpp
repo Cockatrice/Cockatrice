@@ -1,6 +1,6 @@
 #include "game_scene.h"
 
-#include "../client/ui/phases_toolbar.h"
+#include "phases_toolbar.h"
 #include "../settings/cache_settings.h"
 #include "board/card_item.h"
 #include "player/player.h"

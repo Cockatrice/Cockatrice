@@ -1,10 +1,10 @@
 #include "dlg_create_token.h"
 
-#include "../client/ui/widgets/cards/card_info_picture_widget.h"
-#include "../database/card_database_manager.h"
-#include "../database/card_database_model.h"
-#include "../main.h"
-#include "../settings/cache_settings.h"
+#include "../../interface/widgets/cards/card_info_picture_widget.h"
+#include "../../database/card_database_manager.h"
+#include "../../database/card_database_model.h"
+#include "../../main.h"
+#include "../../settings/cache_settings.h"
 #include "deck_list.h"
 #include "trice_limits.h"
 

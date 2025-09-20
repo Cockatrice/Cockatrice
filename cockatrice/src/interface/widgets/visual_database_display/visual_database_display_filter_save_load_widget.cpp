@@ -1,7 +1,7 @@
 #include "visual_database_display_filter_save_load_widget.h"
 
-#include "../../../../filters/filter_tree.h"
-#include "../../../../settings/cache_settings.h"
+#include "../../../filters/filter_tree.h"
+#include "../../../settings/cache_settings.h"
 #include "visual_database_filter_display_widget.h"
 
 #include <QHBoxLayout>

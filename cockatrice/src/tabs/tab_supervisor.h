@@ -1,8 +1,8 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../../deck/deck_loader.h"
-#include "../../server/user/user_list_proxy.h"
+#include "../deck/deck_loader.h"
+#include "../server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"

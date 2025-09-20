@@ -1,6 +1,6 @@
 #include "card_info_picture_art_crop_widget.h"
 
-#include "../../picture_loader/picture_loader.h"
+#include "../../../picture_loader/picture_loader.h"
 
 CardInfoPictureArtCropWidget::CardInfoPictureArtCropWidget(QWidget *parent)
     : CardInfoPictureWidget(parent, false, false)

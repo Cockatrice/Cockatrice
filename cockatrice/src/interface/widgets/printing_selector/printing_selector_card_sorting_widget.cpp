@@ -1,7 +1,7 @@
 #include "printing_selector_card_sorting_widget.h"
 
-#include "../../../../settings/cache_settings.h"
-#include "../../../../utility/card_set_comparator.h"
+#include "../../../settings/cache_settings.h"
+#include "../../../utility/card_set_comparator.h"
 
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");

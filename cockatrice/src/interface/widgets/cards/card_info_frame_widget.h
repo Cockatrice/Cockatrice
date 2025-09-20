@@ -1,7 +1,7 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include "../../../../card/exact_card.h"
+#include "../../../card/exact_card.h"
 #include "card_ref.h"
 
 #include <QPushButton>

@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_RFG_MENU_H
 #define COCKATRICE_RFG_MENU_H
 
-#include "../../../client/tearoff_menu.h"
+#include "../../../interface/tearoff_menu.h"
 
 #include <QAction>
 #include <QMenu>

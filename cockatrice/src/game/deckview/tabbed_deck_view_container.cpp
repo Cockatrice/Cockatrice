@@ -1,6 +1,6 @@
 #include "tabbed_deck_view_container.h"
 
-#include "../../client/tabs/tab_game.h"
+#include "../../tabs/tab_game.h"
 #include "deck_view.h"
 
 TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)

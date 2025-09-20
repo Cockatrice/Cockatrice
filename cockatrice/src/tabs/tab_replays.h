@@ -1,7 +1,7 @@
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 
-#include "../../server/abstract_client.h"
+#include "../server/abstract_client.h"
 #include "tab.h"
 
 class ServerInfo_User;

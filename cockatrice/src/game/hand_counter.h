@@ -1,7 +1,7 @@
 #ifndef HANDCOUNTER_H
 #define HANDCOUNTER_H
 
-#include "../game/board/abstract_graphics_item.h"
+#include "board/abstract_graphics_item.h"
 #include "board/graphics_item_type.h"
 
 #include <QString>

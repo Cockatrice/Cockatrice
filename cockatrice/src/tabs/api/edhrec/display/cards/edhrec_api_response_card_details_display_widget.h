@@ -1,7 +1,7 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H
 
-#include "../../../../../ui/widgets/cards/card_info_picture_widget.h"
+#include "../../../../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../api_response/cards/edhrec_api_response_card_details.h"
 #include "edhrec_api_response_card_inclusion_display_widget.h"
 #include "edhrec_api_response_card_synergy_display_widget.h"

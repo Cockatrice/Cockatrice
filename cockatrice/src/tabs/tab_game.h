@@ -1,12 +1,12 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../../client/tearoff_menu.h"
-#include "../../game/abstract_game.h"
-#include "../../game/log/message_log_widget.h"
-#include "../../game/player/player.h"
-#include "../replay_manager.h"
-#include "../ui/widgets/visual_deck_storage/visual_deck_storage_widget.h"
+#include "../interface/tearoff_menu.h"
+#include "../game/abstract_game.h"
+#include "../game/log/message_log_widget.h"
+#include "../game/player/player.h"
+#include "../client/replay_manager.h"
+#include "../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "pb/event_leave.pb.h"
 #include "tab.h"
 

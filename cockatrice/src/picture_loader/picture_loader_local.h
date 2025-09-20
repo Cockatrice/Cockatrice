@@ -1,7 +1,7 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include "../../../card/exact_card.h"
+#include "../card/exact_card.h"
 
 #include <QLoggingCategory>
 #include <QObject>

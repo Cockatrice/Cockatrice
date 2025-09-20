@@ -1,6 +1,6 @@
 #include "player_menu.h"
 
-#include "../../../client/tabs/tab_game.h"
+#include "../../../tabs/tab_game.h"
 #include "../../../common/pb/command_reveal_cards.pb.h"
 #include "../../../database/card_database_manager.h"
 #include "../../board/card_item.h"

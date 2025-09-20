@@ -1,7 +1,7 @@
 #include "card_item.h"
 
 #include "../../card/card_info.h"
-#include "../../client/tabs/tab_game.h"
+#include "../../tabs/tab_game.h"
 #include "../../settings/cache_settings.h"
 #include "../../settings/card_counter_settings.h"
 #include "../game_scene.h"

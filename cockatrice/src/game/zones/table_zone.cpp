@@ -1,7 +1,7 @@
 #include "table_zone.h"
 
 #include "../../card/card_info.h"
-#include "../../client/ui/theme_manager.h"
+#include "../../interface/theme_manager.h"
 #include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"

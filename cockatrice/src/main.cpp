@@ -18,19 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "main.h"
+#include "../main.h"
 
 #include "QtNetwork/QNetworkInterface"
-#include "client/network/spoiler_background_updater.h"
-#include "client/sound_engine.h"
-#include "client/ui/pixel_map_generator.h"
-#include "client/ui/theme_manager.h"
-#include "client/ui/window_main.h"
-#include "dialogs/dlg_settings.h"
+#include "../client/network/spoiler_background_updater.h"
+#include "../client/sound_engine.h"
+#include "../interface/pixel_map_generator.h"
+#include "../interface/theme_manager.h"
+#include "../interface/window_main.h"
+#include "../dialogs/dlg_settings.h"
 #include "featureset.h"
 #include "rng_sfmt.h"
-#include "settings/cache_settings.h"
-#include "utility/logger.h"
+#include "../settings/cache_settings.h"
+#include "../utility/logger.h"
 #include "version_string.h"
 
 #include <QApplication>

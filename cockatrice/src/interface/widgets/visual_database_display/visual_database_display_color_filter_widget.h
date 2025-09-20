@@ -1,7 +1,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 
-#include "../../../../filters/filter_tree_model.h"
+#include "../../../filters/filter_tree_model.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>

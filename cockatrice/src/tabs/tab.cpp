@@ -1,7 +1,7 @@
 #include "tab.h"
 
-#include "../ui/widgets/cards/card_info_display_widget.h"
-#include "./tab_supervisor.h"
+#include "../interface/widgets/cards/card_info_display_widget.h"
+#include "tab_supervisor.h"
 
 #include <QApplication>
 #include <QCloseEvent>

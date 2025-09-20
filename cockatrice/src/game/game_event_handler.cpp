@@ -1,6 +1,6 @@
 #include "game_event_handler.h"
 
-#include "../client/tabs/tab_game.h"
+#include "../tabs/tab_game.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "abstract_game.h"
