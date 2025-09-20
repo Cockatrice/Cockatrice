@@ -1,5 +1,6 @@
 #include "tab_message.h"
 
+#include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
 #include "../server/abstract_client.h"
@@ -7,7 +8,6 @@
 #include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"
 #include "../settings/cache_settings.h"
-#include "../client/sound_engine.h"
 #include "pb/event_user_message.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"

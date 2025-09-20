@@ -1,8 +1,8 @@
 #ifndef TAB_HOME_H
 #define TAB_HOME_H
 
-#include "../server/abstract_client.h"
 #include "../interface/widgets/general/home_widget.h"
+#include "../server/abstract_client.h"
 #include "tab.h"
 
 #include <QHBoxLayout>

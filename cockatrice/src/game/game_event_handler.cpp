@@ -1,8 +1,8 @@
 #include "game_event_handler.h"
 
-#include "../tabs/tab_game.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
+#include "../tabs/tab_game.h"
 #include "abstract_game.h"
 #include "get_pb_extension.h"
 #include "log/message_log_widget.h"

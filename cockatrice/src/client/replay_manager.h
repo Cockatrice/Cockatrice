@@ -4,8 +4,8 @@
 #include "network/replay_timeline_widget.h"
 #include "pb/game_replay.pb.h"
 
-#include <QWidget>
 #include <QToolButton>
+#include <QWidget>
 
 class TabGame;
 

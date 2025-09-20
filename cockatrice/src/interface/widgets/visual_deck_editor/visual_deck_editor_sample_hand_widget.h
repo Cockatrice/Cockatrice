@@ -1,8 +1,8 @@
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 #define VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 
-#include "../cards/card_size_widget.h"
 #include "../../../deck/deck_list_model.h"
+#include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QPushButton>

@@ -2,8 +2,8 @@
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
 #include "../../../deck/deck_list_model.h"
-#include "../general/layout_containers/flow_widget.h"
 #include "../cards/card_size_widget.h"
+#include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"

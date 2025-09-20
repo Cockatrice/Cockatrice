@@ -1,19 +1,19 @@
 #include "game_selector.h"
 
 #include "../client/get_text_with_max.h"
+#include "../dialogs/dlg_create_game.h"
+#include "../dialogs/dlg_filter_games.h"
 #include "../tabs/tab_account.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_room.h"
 #include "../tabs/tab_supervisor.h"
-#include "../dialogs/dlg_create_game.h"
-#include "../dialogs/dlg_filter_games.h"
 #include "abstract_client.h"
-#include "pending_command.h"
-#include "user/user_list_manager.h"
 #include "games_model.h"
 #include "pb/response.pb.h"
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_game.pb.h"
+#include "pending_command.h"
+#include "user/user_list_manager.h"
 
 #include <QApplication>
 #include <QCheckBox>

@@ -2,8 +2,8 @@
 #define WINDOW_DECKEDITOR_H
 
 #include "../card/card_info.h"
-#include "../utility/key_signals.h"
 #include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "../utility/key_signals.h"
 #include "abstract_tab_deck_editor.h"
 
 class CardDatabaseModel;

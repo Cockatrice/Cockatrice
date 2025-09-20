@@ -2,9 +2,9 @@
 
 #include "../../../database/card_database_manager.h"
 #include "../../../game/board/card_item.h"
+#include "../../../picture_loader/picture_loader.h"
 #include "../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
-#include "../../../picture_loader/picture_loader.h"
 #include "../../window_main.h"
 
 #include <QMenu>

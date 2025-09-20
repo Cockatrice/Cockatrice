@@ -19,6 +19,9 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/get_text_with_max.h"
+#include "../client/network/client_update_checker.h"
+#include "../client/network/release_channel.h"
 #include "../database/card_database.h"
 #include "../database/card_database_manager.h"
 #include "../dialogs/dlg_connect.h"
@@ -39,12 +42,9 @@
 #include "../server/local_server_interface.h"
 #include "../server/remote/remote_client.h"
 #include "../settings/cache_settings.h"
-#include "../utility/logger.h"
-#include "../client/get_text_with_max.h"
-#include "../client/network/client_update_checker.h"
-#include "../client/network/release_channel.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
+#include "../utility/logger.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_server_shutdown.pb.h"
 #include "pb/game_replay.pb.h"

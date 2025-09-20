@@ -1,12 +1,12 @@
 #include "abstract_counter.h"
 
-#include "../../tabs/tab_game.h"
-#include "translate_counter_name.h"
 #include "../../settings/cache_settings.h"
+#include "../../tabs/tab_game.h"
 #include "../player/player.h"
 #include "expression.h"
 #include "pb/command_inc_counter.pb.h"
 #include "pb/command_set_counter.pb.h"
+#include "translate_counter_name.h"
 
 #include <QAction>
 #include <QApplication>
