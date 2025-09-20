@@ -291,6 +291,7 @@ set(cockatrice_SOURCES
     src/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/utility/card_info_comparator.cpp
+    src/utility/deck_list_sort_filter_proxy_model.cpp
     src/utility/key_signals.cpp
     src/utility/levenshtein.cpp
     src/utility/logger.cpp
