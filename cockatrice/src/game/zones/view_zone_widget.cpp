@@ -1,7 +1,7 @@
 #include "view_zone_widget.h"
 
-#include "../../client/ui/pixel_map_generator.h"
 #include "../../filters/syntax_help.h"
+#include "../../interface/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"

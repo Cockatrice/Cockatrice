@@ -1,11 +1,10 @@
 #include "user_list_widget.h"
 
-#include "../../client/tabs/tab_account.h"
-#include "../../client/tabs/tab_supervisor.h"
-#include "../../client/ui/pixel_map_generator.h"
-#include "../../game/game_selector.h"
-#include "../../server/user/user_list_manager.h"
+#include "../../interface/pixel_map_generator.h"
+#include "../../tabs/tab_account.h"
+#include "../../tabs/tab_supervisor.h"
 #include "../abstract_client.h"
+#include "../game_selector.h"
 #include "../pending_command.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_get_games_of_user.pb.h"
@@ -13,6 +12,7 @@
 #include "pb/session_commands.pb.h"
 #include "trice_limits.h"
 #include "user_context_menu.h"
+#include "user_list_manager.h"
 
 #include <QApplication>
 #include <QCheckBox>

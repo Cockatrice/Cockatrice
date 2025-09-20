@@ -1,7 +1,7 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../client/tabs/tab_supervisor.h"
+#include "../../tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
 #include "room_message_type.h"
 #include "user_level.h"

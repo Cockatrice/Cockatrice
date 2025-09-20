@@ -1,7 +1,7 @@
 #include "player.h"
 
-#include "../../client/tabs/tab_game.h"
-#include "../../client/ui/theme_manager.h"
+#include "../../interface/theme_manager.h"
+#include "../../tabs/tab_game.h"
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"

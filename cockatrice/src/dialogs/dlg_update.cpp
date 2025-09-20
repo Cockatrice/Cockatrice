@@ -2,7 +2,7 @@
 
 #include "../client/network/client_update_checker.h"
 #include "../client/network/release_channel.h"
-#include "../client/ui/window_main.h"
+#include "../interface/window_main.h"
 #include "../settings/cache_settings.h"
 
 #include <QApplication>

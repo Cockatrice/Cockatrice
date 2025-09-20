@@ -18,26 +18,26 @@ set(oracle_SOURCES
     src/parsehelpers.cpp
     src/qt-json/json.cpp
     ../cockatrice/src/card/card_info.cpp
-    ../cockatrice/src/client/ui/widgets/quick_settings/settings_button_widget.cpp
-    ../cockatrice/src/client/ui/widgets/quick_settings/settings_popup_widget.cpp
+    ../cockatrice/src/client/network/release_channel.cpp
     ../cockatrice/src/database/parser/card_database_parser.cpp
     ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
     ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
+    ../cockatrice/src/interface/theme_manager.cpp
+    ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
+    ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
     ../cockatrice/src/settings/cache_settings.cpp
-    ../cockatrice/src/settings/shortcuts_settings.cpp
     ../cockatrice/src/settings/card_counter_settings.cpp
     ../cockatrice/src/settings/card_database_settings.cpp
-    ../cockatrice/src/settings/servers_settings.cpp
-    ../cockatrice/src/settings/settings_manager.cpp
-    ../cockatrice/src/settings/message_settings.cpp
-    ../cockatrice/src/settings/recents_settings.cpp
-    ../cockatrice/src/settings/game_filters_settings.cpp
-    ../cockatrice/src/settings/layouts_settings.cpp
-    ../cockatrice/src/settings/download_settings.cpp
     ../cockatrice/src/settings/card_override_settings.cpp
     ../cockatrice/src/settings/debug_settings.cpp
-    ../cockatrice/src/client/ui/theme_manager.cpp
-    ../cockatrice/src/client/network/release_channel.cpp
+    ../cockatrice/src/settings/download_settings.cpp
+    ../cockatrice/src/settings/game_filters_settings.cpp
+    ../cockatrice/src/settings/layouts_settings.cpp
+    ../cockatrice/src/settings/message_settings.cpp
+    ../cockatrice/src/settings/recents_settings.cpp
+    ../cockatrice/src/settings/servers_settings.cpp
+    ../cockatrice/src/settings/settings_manager.cpp
+    ../cockatrice/src/settings/shortcuts_settings.cpp
     ${VERSION_STRING_CPP}
 )
 

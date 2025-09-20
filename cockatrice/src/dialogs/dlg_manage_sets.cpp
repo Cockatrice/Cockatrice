@@ -1,10 +1,10 @@
 #include "dlg_manage_sets.h"
 
 #include "../client/network/sets_model.h"
-#include "../client/ui/picture_loader/picture_loader.h"
 #include "../database/card_database_manager.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
+#include "../picture_loader/picture_loader.h"
 #include "../settings/cache_settings.h"
 
 #include <QAction>

@@ -1,6 +1,6 @@
 #include "player_area.h"
 
-#include "../../client/ui/theme_manager.h"
+#include "../../interface/theme_manager.h"
 
 #include <QPainter>
 

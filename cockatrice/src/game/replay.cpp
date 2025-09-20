@@ -1,6 +1,6 @@
 #include "replay.h"
 
-#include "../client/tabs/tab_game.h"
+#include "../tabs/tab_game.h"
 
 Replay::Replay(TabGame *_tab, GameReplay *_replay) : AbstractGame(_tab)
 {
