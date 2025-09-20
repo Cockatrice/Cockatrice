@@ -19,18 +19,17 @@
  ***************************************************************************/
 #include "server.h"
 
-#include "debug_pb_message.h"
-#include "featureset.h"
+#include "../debug_pb_message.h"
+#include "../featureset.h"
+#include "game/server_game.h"
+#include "game/server_player.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/isl_message.pb.h"
 #include "pb/session_event.pb.h"
-#include "server_counter.h"
 #include "server_database_interface.h"
-#include "server_game.h"
-#include "server_player.h"
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
 #include "server_room.h"
@@ -330,11 +329,11 @@ void Server::externalUserLeft(const QString &userName)
             continue;
 
         QMutexLocker gameLocker(&game->gameMutex);
-        Server_Player *player = game->getPlayers().value(userGamesIterator.value().second);
-        if (!player)
+        auto *participant = game->getParticipants().value(userGamesIterator.value().second);
+        if (!participant)
             continue;
 
-        player->disconnectClient();
+        participant->disconnectClient();
     }
     roomsLock.unlock();
 
@@ -481,8 +480,8 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
         }
 
         QMutexLocker gameLocker(&game->gameMutex);
-        Server_Player *player = game->getPlayers().value(playerId);
-        if (!player) {
+        auto *participant = game->getParticipants().value(playerId);
+        if (!participant) {
             qDebug() << "externalGameCommandContainerReceived: player id=" << playerId << "not found";
             throw Response::RespNotInRoom;
         }
@@ -492,7 +491,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
             const GameCommand &sc = cont.game_command(i);
             qDebug() << "[ISL]" << getSafeDebugString(sc);
 
-            Response::ResponseCode resp = player->processGameCommand(sc, responseContainer, ges);
+            Response::ResponseCode resp = participant->processGameCommand(sc, responseContainer, ges);
 
             if (resp != Response::RespOk)
                 finalResponseCode = resp;
@@ -500,9 +499,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
         ges.sendToGame(game);
 
         if (finalResponseCode != Response::RespNothing) {
-            player->playerMutex.lock();
-            player->getUserInterface()->sendResponseContainer(responseContainer, finalResponseCode);
-            player->playerMutex.unlock();
+            participant->getUserInterface()->sendResponseContainer(responseContainer, finalResponseCode);
         }
     } catch (Response::ResponseCode code) {
         Response response;

@@ -1,6 +1,6 @@
 #include "server_response_containers.h"
 
-#include "server_game.h"
+#include "game/server_game.h"
 
 #include <google/protobuf/descriptor.h>
 

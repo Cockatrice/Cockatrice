@@ -1,9 +1,9 @@
 #ifndef SERVER_ABSTRACTUSERINTERFACE
 #define SERVER_ABSTRACTUSERINTERFACE
 
+#include "../serverinfo_user_container.h"
 #include "pb/response.pb.h"
 #include "pb/server_message.pb.h"
-#include "serverinfo_user_container.h"
 
 #include <QMap>
 #include <QMutex>

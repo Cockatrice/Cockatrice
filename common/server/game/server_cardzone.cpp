@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "server_cardzone.h"
 
+#include "../rng_abstract.h"
 #include "pb/command_move_card.pb.h"
-#include "rng_abstract.h"
 #include "server_card.h"
 #include "server_player.h"
 
@@ -318,7 +318,7 @@ void Server_CardZone::addWritePermission(int playerId)
     playersWithWritePermission.insert(playerId);
 }
 
-void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAsking, bool omniscient)
+void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_AbstractParticipant *recipient, bool omniscient)
 {
     info->set_name(name.toStdString());
     info->set_type(type);
@@ -327,10 +327,10 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_Player *playerWhosAs
     info->set_always_reveal_top_card(alwaysRevealTopCard);
     info->set_always_look_at_top_card(alwaysLookAtTopCard);
 
-    const auto selfPlayerAsking = playerWhosAsking == player || omniscient;
-    const auto zonesSelfCanSee = type != ServerInfo_Zone::HiddenZone;
-    const auto otherPlayerAsking = playerWhosAsking != player;
-    const auto zonesOthersCanSee = type == ServerInfo_Zone::PublicZone;
+    const bool selfPlayerAsking = recipient == player || omniscient;
+    const bool zonesSelfCanSee = type != ServerInfo_Zone::HiddenZone;
+    const bool otherPlayerAsking = recipient != player;
+    const bool zonesOthersCanSee = type == ServerInfo_Zone::PublicZone;
     if ((selfPlayerAsking && zonesSelfCanSee) || (otherPlayerAsking && zonesOthersCanSee)) {
         QListIterator<Server_Card *> cardIterator(cards);
         while (cardIterator.hasNext())

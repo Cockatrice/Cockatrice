@@ -1,8 +1,11 @@
 #include "server_protocolhandler.h"
 
-#include "debug_pb_message.h"
-#include "featureset.h"
-#include "get_pb_extension.h"
+#include "../debug_pb_message.h"
+#include "../featureset.h"
+#include "../get_pb_extension.h"
+#include "../trice_limits.h"
+#include "game/server_game.h"
+#include "game/server_player.h"
 #include "pb/commands.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -18,10 +21,7 @@
 #include "pb/response_login.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "server_database_interface.h"
-#include "server_game.h"
-#include "server_player.h"
 #include "server_room.h"
-#include "trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -73,14 +73,14 @@ void Server_ProtocolHandler::prepareDestroy()
             continue;
         }
         game->gameMutex.lock();
-        Server_Player *p = game->getPlayers().value(gameIterator.value().second);
-        if (!p) {
+        auto *participant = game->getParticipants().value(gameIterator.value().second);
+        if (!participant) {
             game->gameMutex.unlock();
             room->gamesLock.unlock();
             continue;
         }
 
-        p->disconnectClient();
+        participant->disconnectClient();
 
         game->gameMutex.unlock();
         room->gamesLock.unlock();
@@ -257,8 +257,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
     }
 
     QMutexLocker gameLocker(&game->gameMutex);
-    Server_Player *player = game->getPlayers().value(roomIdAndPlayerId.second);
-    if (!player)
+    auto *participant = game->getParticipants().value(roomIdAndPlayerId.second);
+    if (!participant)
         return Response::RespNotInRoom;
 
     resetIdleTimer();
@@ -289,7 +289,7 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             }
         }
 
-        Response::ResponseCode resp = player->processGameCommand(sc, rc, ges);
+        Response::ResponseCode resp = participant->processGameCommand(sc, rc, ges);
 
         if (resp != Response::RespOk)
             finalResponseCode = resp;

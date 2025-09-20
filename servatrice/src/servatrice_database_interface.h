@@ -1,8 +1,8 @@
 #ifndef SERVATRICE_DATABASE_INTERFACE_H
 #define SERVATRICE_DATABASE_INTERFACE_H
 
-#include "server.h"
-#include "server_database_interface.h"
+#include "server/server.h"
+#include "server/server_database_interface.h"
 
 #include <QChar>
 #include <QHash>
