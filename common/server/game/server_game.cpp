@@ -45,6 +45,7 @@
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_player.h"
+#include "server_spectator.h"
 
 #include <QDebug>
 #include <QTimer>

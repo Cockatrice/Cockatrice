@@ -39,7 +39,6 @@ class Server_Room;
 class Server_Player;
 class Server_AbstractParticipant;
 class ServerInfo_User;
-class ServerInfo_Player;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
 class Event_GameStateChanged;
