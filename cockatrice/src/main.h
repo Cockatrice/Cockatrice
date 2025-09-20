@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "../utility/macros.h"
+#include "utility/macros.h"
 
 #include <QLoggingCategory>
 
