@@ -25,6 +25,7 @@ set(common_SOURCES
     server/game/server_counter.cpp
     server/game/server_game.cpp
     server/game/server_player.cpp
+    server/game/server_spectator.cpp
     server/server.cpp
     server/server_abstractuserinterface.cpp
     server/server_database_interface.cpp
