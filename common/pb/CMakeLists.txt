@@ -12,8 +12,8 @@ set(PROTO_FILES
     command_create_arrow.proto
     command_create_counter.proto
     command_create_token.proto
-    command_deck_del_dir.proto
     command_deck_del.proto
+    command_deck_del_dir.proto
     command_deck_download.proto
     command_deck_list.proto
     command_deck_new_dir.proto
@@ -34,10 +34,10 @@ set(PROTO_FILES
     command_next_turn.proto
     command_ready_start.proto
     command_replay_delete_match.proto
-    command_replay_list.proto
     command_replay_download.proto
-    command_replay_modify_match.proto
     command_replay_get_code.proto
+    command_replay_list.proto
+    command_replay_modify_match.proto
     command_replay_submit_code.proto
     command_reveal_cards.proto
     command_reverse_turn.proto
@@ -46,11 +46,11 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
-    command_set_sideboard_plan.proto
     command_set_sideboard_lock.proto
+    command_set_sideboard_plan.proto
     command_shuffle.proto
-    commands.proto
     command_undo_draw.proto
+    commands.proto
     context_concede.proto
     context_connection_state_changed.proto
     context_deck_select.proto
@@ -78,6 +78,7 @@ set(PROTO_FILES
     event_game_joined.proto
     event_game_say.proto
     event_game_state_changed.proto
+    event_game_state_changed.proto
     event_join.proto
     event_join_room.proto
     event_kicked.proto
@@ -86,14 +87,15 @@ set(PROTO_FILES
     event_list_games.proto
     event_list_rooms.proto
     event_move_card.proto
+    event_notify_user.proto
     event_player_properties_changed.proto
     event_remove_from_list.proto
+    event_remove_messages.proto
     event_replay_added.proto
     event_reveal_cards.proto
     event_reverse_turn.proto
     event_roll_die.proto
     event_room_say.proto
-    event_remove_messages.proto
     event_server_complete_list.proto
     event_server_identification.proto
     event_server_message.proto
@@ -107,15 +109,15 @@ set(PROTO_FILES
     event_user_joined.proto
     event_user_left.proto
     event_user_message.proto
-    event_notify_user.proto
     game_commands.proto
+    game_event.proto
     game_event_container.proto
     game_event_context.proto
-    game_event.proto
     game_replay.proto
     isl_message.proto
     moderator_commands.proto
     move_card_to_zone.proto
+    response.proto
     response_activate.proto
     response_adjust_mod.proto
     response_ban_history.proto
@@ -124,6 +126,7 @@ set(PROTO_FILES
     response_deck_upload.proto
     response_dump_zone.proto
     response_forgotpasswordrequest.proto
+    response_get_admin_notes.proto
     response_get_games_of_user.proto
     response_get_user_info.proto
     response_join_room.proto
@@ -137,29 +140,27 @@ set(PROTO_FILES
     response_viewlog_history.proto
     response_warn_history.proto
     response_warn_list.proto
-    response_get_admin_notes.proto
-    response.proto
     room_commands.proto
     room_event.proto
+    server_message.proto
     serverinfo_arrow.proto
     serverinfo_ban.proto
-    serverinfo_cardcounter.proto
     serverinfo_card.proto
+    serverinfo_cardcounter.proto
     serverinfo_chat_message.proto
     serverinfo_counter.proto
     serverinfo_deckstorage.proto
     serverinfo_game.proto
     serverinfo_gametype.proto
+    serverinfo_player.proto
     serverinfo_playerping.proto
     serverinfo_playerproperties.proto
-    serverinfo_player.proto
     serverinfo_replay.proto
     serverinfo_replay_match.proto
     serverinfo_room.proto
     serverinfo_user.proto
     serverinfo_warning.proto
     serverinfo_zone.proto
-    server_message.proto
     session_commands.proto
     session_event.proto
 )

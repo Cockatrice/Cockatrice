@@ -1,4 +1,6 @@
 syntax = "proto2";
+
+// Sent immediately after a command with the same cmd_id, connecting it to the command sent to the server
 message Response {
     enum ResponseCode {
         RespNotConnected = -1;
