@@ -271,12 +271,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
-      - name: Install ccache using Homebrew # (TODO: install it either via GHA or via vcpkg)
+      - name: Install ccache and Ninja using Homebrew # (TODO: install them either via GHA or via vcpkg)
         shell: bash
         run: |
           brew update
-          brew install ccache
+          brew install ccache ninja
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
