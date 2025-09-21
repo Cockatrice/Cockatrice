@@ -272,6 +272,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Install ccache using Homebrew # (TODO: install it either via GHA or via vcpkg)
+        shell: bash
+        run: |
+          brew update
+          brew install ccache
+
       - name: Setup vcpkg cache
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
