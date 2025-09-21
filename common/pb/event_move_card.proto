@@ -19,8 +19,9 @@ message Event_MoveCard {
     // The original zone
     optional string start_zone = 4;
 
-    // The original position that the card was at, this corresponds with the previous x coordinate of the card in zones
-    // without y coordinate, in zones with a y coordinate this value is not used
+    // The original position that the card was at.
+    // In zones without y coordinate, this corresponds with the previous x coordinate of the card.
+    // In zones with y coordinate, this value is not used.
     optional sint32 position = 5 [default = -1];
 
     // The player who owns the new zone the card is in
@@ -41,7 +42,7 @@ message Event_MoveCard {
     // If the card is face down, face down cards will not show their name
     optional bool face_down = 11;
 
-    // The provider id of the card in case it was not known yet, extends the name to supply a specific version of that
-    // type of card
+    // The provider id of the card in case it was not known yet.
+    // Extends the name to supply a specific printing of that type of card.
     optional string new_card_provider_id = 12;
 }

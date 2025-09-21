@@ -31,7 +31,7 @@ message Command_CreateGame {
     // game description shown in game list
     optional string description = 1;
 
-    // password users will have to provide to joing the game
+    // password users will have to provide to join the game
     optional string password = 2;
 
     // amount of players needed to play

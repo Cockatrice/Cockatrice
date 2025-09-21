@@ -51,6 +51,6 @@ message ServerInfo_Card {
     // the unique id of the card in that zone
     optional sint32 attach_card_id = 16 [default = -1];
 
-    // unique id of this kind of card, extends the name to specify a specific version of a type of card
+    // unique id of this kind of card, extends the name to specify a specific printing of a card
     optional string provider_id = 17;
 }

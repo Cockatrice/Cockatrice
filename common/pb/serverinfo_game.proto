@@ -60,6 +60,6 @@ message ServerInfo_Game {
     // time that the game started at
     optional uint32 start_time = 51;
 
-    // whether the game is closed, closed games are finished and can't be interacted with
+    // whether the game is closed. Closed games are finished and can't be interacted with
     optional bool closed = 52;
 }
