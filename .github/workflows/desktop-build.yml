@@ -272,15 +272,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install dependencies using Homebrew
-        shell: bash
-        # CMake cannot find the MySQL connector
-        # Neither of these works: mariadb-connector-c mysql-connector-c++
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-        run: |
-          brew update
-          brew install ccache protobuf qt --force-bottle
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
@@ -304,6 +300,8 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
@@ -423,16 +421,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
-
-      - name: Install Qt ${{matrix.qt_version}}
-        uses: jurplel/install-qt-action@v4
-        with:
-          cache: true
-          setup-python: true
-          version: ${{matrix.qt_version}}
-          arch: win64_${{matrix.qt_arch}}
-          tools: ${{matrix.qt_tools}}
-          modules: ${{matrix.qt_modules}}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
