@@ -236,6 +236,8 @@ jobs:
             xcode: "14.3.1"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 14
             soc: Apple
@@ -243,6 +245,9 @@ jobs:
             xcode: "15.4"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 15
             soc: Apple
@@ -250,12 +255,18 @@ jobs:
             xcode: "16.2"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 15
             soc: Apple
             os: macos-15
             xcode: "16.2"
             type: Debug
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -271,16 +282,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
-      - name: Install dependencies using Homebrew
-        shell: bash
-        # CMake cannot find the MySQL connector
-        # Neither of these works: mariadb-connector-c mysql-connector-c++
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-        run: |
-          brew update
-          brew install ccache protobuf qt --force-bottle
+      - name: Setup Ccache
+        uses: jianmingyong/ccache-action@v1
+        with:
+          install: true
+          install-type: "binary"
+
+      - name: Install Qt ${{matrix.qt_version}}
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: true
+          setup-python: true
+          version: ${{matrix.qt_version}}
+          arch: ${{matrix.qt_arch}}
+          tools: ${{matrix.qt_tools}}
+          modules: ${{matrix.qt_modules}}
+
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
@@ -304,6 +329,8 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
       - name: Save compiler cache (ccache)
