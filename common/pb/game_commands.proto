@@ -1,4 +1,6 @@
 syntax = "proto2";
+
+// Commands that are sent during a game to change the game state
 message GameCommand {
     enum GameCommandType {
         KICK_FROM_GAME = 1000;
@@ -40,10 +42,15 @@ message GameCommand {
     extensions 100 to max;
 }
 
+// A wrapper around a normal game command that allows a privileged user to send a command on behalf of another player
 message Command_Judge {
     extend GameCommand {
         optional Command_Judge ext = 1033;
     }
+
+    // The player on whose behalf this command is sent
     optional sint32 target_id = 1 [default = -1];
+
+    // The wrapped game command
     repeated GameCommand game_command = 2;
 }

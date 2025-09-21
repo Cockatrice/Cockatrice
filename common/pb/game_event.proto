@@ -1,4 +1,6 @@
 syntax = "proto2";
+
+// Sent every time something happens in the game to update the client's state
 message GameEvent {
     enum GameEventType {
         JOIN = 1000;
