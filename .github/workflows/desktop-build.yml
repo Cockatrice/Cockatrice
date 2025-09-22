@@ -289,7 +289,7 @@ jobs:
         shell: bash
         run: |
           brew update
-          brew install autoconf autoconf-archive automake libtool ccache ninja
+          brew install ccache
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
