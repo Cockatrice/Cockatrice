@@ -233,7 +233,7 @@ jobs:
           - target: 14
             soc: Intel
             os: macos-14
-            xcode: "14.3.1"
+            xcode: "15.4"
             type: Release
             make_package: 1
 
