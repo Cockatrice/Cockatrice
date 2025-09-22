@@ -276,7 +276,7 @@ jobs:
         if: ${{matrix.soc == 'Intel'}}
         shell: bash
         run: |
-          softwareupdate --install-rosetta
+          softwareupdate --install-rosetta --force
           arch --x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           echo "alias brew='arch --x86_64 /usr/local/Homebrew/bin/brew'" >> aliases.sh
 
@@ -287,7 +287,7 @@ jobs:
         env:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
-          src aliases.sh
+          source aliases.sh
           brew update
           brew install ccache protobuf qt --force-bottle
 
