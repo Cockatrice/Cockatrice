@@ -132,6 +132,11 @@ function ccachestatsverbose() {
 
 # Compile
 if [[ $RUNNER_OS == macOS ]]; then
+  # enable cross-compiling for intel mac
+  if [[ "$ARCHTYPE" == 'Intel' ]]; then
+    flags+=('-DCMAKE_OSX_ARCHITECTURES="x86_64"')
+  fi
+
   echo "::group::Signing Certificate"
   if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
     echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12

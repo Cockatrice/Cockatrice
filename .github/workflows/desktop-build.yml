@@ -230,9 +230,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 13
+          - target: 14
             soc: Intel
-            os: macos-13
+            os: macos-14
             xcode: "14.3.1"
             type: Release
             make_package: 1
@@ -297,6 +297,7 @@ jobs:
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
+          ARCHTYPE: '${{matrix.soc}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
