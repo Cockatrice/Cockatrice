@@ -6,7 +6,6 @@
     "openssl",
     "protobuf",
     "pthreads",
-    "qt",
     "zlib"
   ]
 }

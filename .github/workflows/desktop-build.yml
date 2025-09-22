@@ -236,6 +236,8 @@ jobs:
             xcode: "14.3.1"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 14
             soc: Apple
@@ -243,6 +245,9 @@ jobs:
             xcode: "15.4"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 15
             soc: Apple
@@ -250,12 +255,18 @@ jobs:
             xcode: "16.2"
             type: Release
             make_package: 1
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
           - target: 15
             soc: Apple
             os: macos-15
             xcode: "16.2"
             type: Debug
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -279,6 +290,16 @@ jobs:
         run: |
           brew update
           brew install autoconf autoconf-archive automake libtool ccache ninja
+
+      - name: Install Qt ${{matrix.qt_version}}
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: true
+          setup-python: true
+          version: ${{matrix.qt_version}}
+          arch: ${{matrix.qt_arch}}
+          tools: ${{matrix.qt_tools}}
+          modules: ${{matrix.qt_modules}}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
@@ -429,6 +450,16 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
+
+      - name: Install Qt ${{matrix.qt_version}}
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: true
+          setup-python: true
+          version: ${{matrix.qt_version}}
+          arch: win64_${{matrix.qt_arch}}
+          tools: ${{matrix.qt_tools}}
+          modules: ${{matrix.qt_modules}}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
