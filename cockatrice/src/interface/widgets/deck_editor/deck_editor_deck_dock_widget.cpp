@@ -80,6 +80,12 @@ void DeckEditorDeckDockWidget::createDeckDock()
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
     quickSettingsWidget->addSettingsWidget(showTagsWidgetCheckBox);
 
+    formatLabel = new QLabel(this);
+
+    formatComboBox = new QComboBox(this);
+    formatComboBox->addItem(tr("Loading Database..."));
+    formatComboBox->setEnabled(false); // Disable until loaded
+
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
@@ -118,12 +124,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
         deckView->expandAll();
     });
 
-    formatLabel = new QLabel(this);
-
-    formatComboBox = new QComboBox(this);
-    formatComboBox->addItem(tr("Loading Database..."));
-    formatComboBox->setEnabled(false); // Disable until loaded
-
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
     connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -156,19 +156,19 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(nameEdit, 0, 1);
     upperLayout->addWidget(quickSettingsWidget, 0, 2);
 
-    upperLayout->addWidget(commentsLabel, 1, 0);
-    upperLayout->addWidget(commentsEdit, 1, 1);
+    upperLayout->addWidget(formatLabel, 1, 0);
+    upperLayout->addWidget(formatComboBox, 1, 1);
 
-    upperLayout->addWidget(bannerCardLabel, 2, 0);
-    upperLayout->addWidget(bannerCardComboBox, 2, 1);
+    upperLayout->addWidget(commentsLabel, 2, 0);
+    upperLayout->addWidget(commentsEdit, 2, 1);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
+    upperLayout->addWidget(bannerCardLabel, 3, 0);
+    upperLayout->addWidget(bannerCardComboBox, 3, 1);
 
-    upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
-    upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
+    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
 
-    upperLayout->addWidget(formatLabel, 5, 0);
-    upperLayout->addWidget(formatComboBox, 5, 1);
+    upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
