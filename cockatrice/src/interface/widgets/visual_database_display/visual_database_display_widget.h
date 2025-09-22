@@ -15,6 +15,7 @@
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
+#include "visual_database_display_format_legality_filter_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
@@ -81,6 +82,7 @@ private:
     SettingsButtonWidget *quickFilterNameWidget;
     VisualDatabaseDisplayNameFilterWidget *nameFilterWidget;
     VisualDatabaseDisplayMainTypeFilterWidget *mainTypeFilterWidget;
+    VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
     SettingsButtonWidget *quickFilterSubTypeWidget;
     VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
     SettingsButtonWidget *quickFilterSetWidget;

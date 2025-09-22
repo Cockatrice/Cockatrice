@@ -151,6 +151,7 @@ void VisualDatabaseDisplayWidget::initialize()
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
     mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+    formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
 
@@ -164,6 +165,7 @@ void VisualDatabaseDisplayWidget::initialize()
     filterContainerLayout->addWidget(quickFilterSubTypeWidget);
     filterContainerLayout->addWidget(quickFilterSetWidget);
     filterContainerLayout->addWidget(mainTypeFilterWidget);
+    filterContainerLayout->addWidget(formatLegalityWidget);
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);
