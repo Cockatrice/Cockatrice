@@ -432,7 +432,8 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Determine the correct index
         int insertRow = findSortedInsertRow(groupNode, cardInfo);
 
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName, printingInfo.getProperty("num"),
+        auto *decklistCard =
+            deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName, printingInfo.getProperty("num"),
                               printingInfo.getProperty("uuid"), isCardLegalForCurrentFormat(cardInfo));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
