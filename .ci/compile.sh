@@ -161,6 +161,7 @@ fi
 
 echo "::group::Configure cmake"
 cmake --version
+echo "Running cmake with flags:" "${flags[@]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
