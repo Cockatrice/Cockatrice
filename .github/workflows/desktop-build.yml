@@ -37,7 +37,7 @@ jobs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
 
-    steps:  
+    steps:
       - name: Configure
         id: configure
         shell: bash
@@ -272,6 +272,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Install x86_64 Homebrew
+        if: ${{matrix.soc == 'Intel'}}
+        shell: bash
+        run: |
+          softwareupdate --install-rosetta
+          arch --x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "alias brew='arch --x86_64 /usr/local/Homebrew/bin/brew'" >> aliases.sh
+
       - name: Install dependencies using Homebrew
         shell: bash
         # CMake cannot find the MySQL connector
@@ -279,6 +287,7 @@ jobs:
         env:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
+          src aliases.sh
           brew update
           brew install ccache protobuf qt --force-bottle
 
