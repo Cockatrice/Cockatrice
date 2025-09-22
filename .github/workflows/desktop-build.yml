@@ -276,7 +276,7 @@ jobs:
         if: ${{matrix.soc == 'Intel'}}
         shell: bash
         run: |
-          softwareupdate --install-rosetta --force
+          softwareupdate --install-rosetta --agree-to-license
           arch --x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           echo "alias brew='arch --x86_64 /usr/local/Homebrew/bin/brew'" >> aliases.sh
 
