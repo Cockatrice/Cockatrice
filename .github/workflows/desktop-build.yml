@@ -278,7 +278,7 @@ jobs:
         shell: bash
         run: |
           brew update
-          brew install ccache ninja
+          brew install autoconf ccache ninja
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
