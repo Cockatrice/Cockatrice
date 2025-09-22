@@ -285,11 +285,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install ccache and Ninja using Homebrew # (TODO: install them either via GHA or via vcpkg)
-        shell: bash
-        run: |
-          brew update
-          brew install ccache
+      - name: Setup Ccache
+        uses: jianmingyong/ccache-action@v1
+        with:
+          install: true
+          install-type: "binary"
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
