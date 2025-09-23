@@ -15,7 +15,7 @@ Available pre-compiled binaries for installation:
   <b>macOS</b>
    • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Apple M</sub>
    • <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub> <sub>Apple M</sub>
-   • <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub> <sub>Intel</sub>
+   • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Intel</sub>
 
   <b>Linux</b>
    • <kbd>Ubuntu 24.04 LTS</kbd> <sub><i>Noble Numbat</i></sub>
