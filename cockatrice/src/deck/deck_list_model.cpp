@@ -675,7 +675,7 @@ bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
 
 bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
 {
-    if (cardInfo->getMainCardType() == "Basic Land") {
+    if (cardInfo->getCardType().contains("Basic Land")) {
         return true;
     }
     if (cardInfo->getText().contains("A deck can have any number")) {
