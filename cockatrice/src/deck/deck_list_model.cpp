@@ -665,10 +665,34 @@ bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
 {
     if (!deckList->getGameFormat().isEmpty()) {
         if (cardInfo->getProperties().contains("format-" + deckList->getGameFormat())) {
-            return cardInfo->getProperty("format-" + deckList->getGameFormat()) == "legal";
-        } else {
+            QString formatLegality = cardInfo->getProperty("format-" + deckList->getGameFormat());
+            return formatLegality == "legal" || formatLegality == "restricted";
+        }
+        return false;
+    }
+    return true;
+}
+
+bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
+{
+    if (cardInfo->getMainCardType() == "Basic Land") {
+        return true;
+    }
+    if (cardInfo->getText().contains("A deck can have any number")) {
+        return true;
+    }
+    if (!deckList->getGameFormat().isEmpty()) {
+        if (cardInfo->getProperties().contains("format-" + deckList->getGameFormat())) {
+            QString formatLegality = cardInfo->getProperty("format-" + deckList->getGameFormat());
+            if (formatLegality == "legal" && quantity <= 4) {
+                return true;
+            }
+            if (formatLegality == "restricted" && quantity <= 1) {
+                return true;
+            }
             return false;
         }
+        return false;
     }
     return true;
 }
@@ -678,9 +702,9 @@ void DeckListModel::refreshCardFormatLegalities()
     InnerDecklistNode *listRoot = deckList->getRoot();
 
     for (int i = 0; i < listRoot->size(); i++) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        auto *currentZone = static_cast<InnerDecklistNode *>(listRoot->at(i));
         for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            auto *currentCard = static_cast<DecklistCardNode *>(currentZone->at(j));
 
             // TODO: better sanity checking
             if (currentCard == nullptr) {
@@ -692,7 +716,13 @@ void DeckListModel::refreshCardFormatLegalities()
                 continue;
             }
 
-            currentCard->setFormatLegality(isCardLegalForCurrentFormat(exactCard.getCardPtr()));
+            bool legal = isCardLegalForCurrentFormat(exactCard.getCardPtr());
+
+            if (legal) {
+                legal = isCardQuantityLegalForCurrentFormat(exactCard.getCardPtr(), currentCard->getNumber());
+            }
+
+            currentCard->setFormatLegality(legal);
         }
     }
 }
