@@ -230,7 +230,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 13
+          - target: 15
             soc: Intel
             os: macos-15-intel
             xcode: "16.2"
