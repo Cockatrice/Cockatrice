@@ -274,21 +274,8 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
 
 void VisualDatabaseDisplayWidget::populateCards()
 {
-    int rowCount = databaseDisplayModel->rowCount();
     cards->clear();
-
-    // Calculate the start and end indices for the current page
-    int start = currentPage * cardsPerPage;
-    int end = qMin(start + cardsPerPage, rowCount);
-
-    qCDebug(VisualDatabaseDisplayLog) << "Fetching from " << start << " to " << end << " cards";
-    // Load more cards if we are at the end of the current list and can fetch more
-    if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
-        qCDebug(VisualDatabaseDisplayLog) << "We gotta load more";
-        databaseDisplayModel->fetchMore(QModelIndex());
-    }
-
-    loadPage(start, end);
+    loadNextPage();
 }
 
 void VisualDatabaseDisplayWidget::loadNextPage()
@@ -359,18 +346,18 @@ void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft
 
 void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
 {
-    int totalRows = databaseDisplayModel->rowCount(); // Total number of cards
-    int nextPageStartIndex = (currentPage + 1) * cardsPerPage;
+    int totalCards = databaseDisplayModel->rowCount(); // Total number of cards
+    int loadedCards = currentPage * cardsPerPage;
 
     // Handle scrolling down
     if (event->angleDelta().y() < 0) {
         // Check if the next page has any cards to load
-        if (nextPageStartIndex < totalRows) {
+        if (loadedCards < totalCards) {
             loadCurrentPage(); // Load the next page
             event->accept();   // Accept the event as valid
             return;
         }
-        qCDebug(VisualDatabaseDisplayLog) << nextPageStartIndex << ":" << totalRows;
+        qCDebug(VisualDatabaseDisplayLog) << loadedCards << ":" << totalCards;
     }
 
     // Prevent overscrolling when there's no more data to load
