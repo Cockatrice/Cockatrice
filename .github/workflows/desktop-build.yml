@@ -229,10 +229,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Common parameters for all macOS builds
-        qt_version: [6.6.*]
-        qt_arch: [clang_64]
-        qt_modules: ["qtimageformats qtmultimedia qtwebsockets"]
         include:
           - target: 13
             soc: Intel
@@ -266,6 +262,11 @@ jobs:
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
+      # Common parameters for all macOS builds
+      QT_VERSION: 6.6.*
+      QT_ARCH: clang_64
+      QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
+      # Build-specific environment variables
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
       CCACHE_SIZE: 500M
       DEVELOPER_DIR:
@@ -284,14 +285,14 @@ jobs:
           install: true
           install-type: "binary"
 
-      - name: Install Qt ${{matrix.qt_version}}
+      - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
           cache: true
           setup-python: true
-          version: ${{matrix.qt_version}}
-          arch: ${{matrix.qt_arch}}
-          modules: ${{matrix.qt_modules}}
+          version: ${{env.QT_VERSION}}
+          arch: ${{env.QT_ARCH}}
+          modules: ${{env.QT_MODULES}}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
