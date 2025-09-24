@@ -230,9 +230,9 @@ jobs:
       fail-fast: false
       matrix:
         # Common parameters for all macOS builds
-        qt_version: 6.6.*
-        qt_arch: clang_64
-        qt_modules: "qtimageformats qtmultimedia qtwebsockets"
+        qt_version: [6.6.*]
+        qt_arch: [clang_64]
+        qt_modules: ["qtimageformats qtmultimedia qtwebsockets"]
         include:
           - target: 13
             soc: Intel
