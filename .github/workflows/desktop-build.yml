@@ -285,7 +285,7 @@ jobs:
         uses: jianmingyong/ccache-action@v1
         with:
           install-type: "binary"
-          ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.target}}-${{matrix.soc}}-${{matrix.type}}
+          ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.soc}}-${{matrix.type}}
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # qt build using vcpkg either just fails or takes too long to build
