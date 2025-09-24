@@ -291,7 +291,6 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           cache: true
-          setup-python: true
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
