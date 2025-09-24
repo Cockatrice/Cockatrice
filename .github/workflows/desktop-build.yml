@@ -287,6 +287,8 @@ jobs:
           install: true
           install-type: "binary"
 
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
