@@ -453,7 +453,6 @@ jobs:
           setup-python: true
           version: ${{matrix.qt_version}}
           arch: win64_${{matrix.qt_arch}}
-          tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
       - name: Setup vcpkg cache
