@@ -279,6 +279,8 @@ jobs:
         with:
           submodules: recursive
 
+      # Using jianmingyong/ccache-action to setup ccache without using brew
+      # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
       - name: Setup Ccache
         uses: jianmingyong/ccache-action@v1
         with:
