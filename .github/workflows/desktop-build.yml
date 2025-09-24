@@ -286,6 +286,7 @@ jobs:
         with:
           install-type: "binary"
           ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.soc}}-${{matrix.type}}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # qt build using vcpkg either just fails or takes too long to build
