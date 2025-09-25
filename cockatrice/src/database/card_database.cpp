@@ -334,14 +334,10 @@ ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const Printi
 
     // The source card does have a printing defined, which means we can attempt to get a card from the same set.
     PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
-    ExactCard relatedCard = ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+    ExactCard relatedCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
 
-    // We didn't find a card from the same set, just try to find any card with the same name.
-    if (!relatedCard) {
-        return getCard({cardName});
-    }
-
-    return relatedCard;
+    // If we didn't find a card from the same set, just try to find any card with the same name.
+    return relatedCard ? relatedCard : getCard({cardName});
 }
 
 CardSetPtr CardDatabase::getSet(const QString &setName)
