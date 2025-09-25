@@ -428,7 +428,7 @@ PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
 
     for (const auto &printings : setMap) {
         for (auto &cardInfoForSet : printings) {
-            if (collectorNumber != nullptr) {
+            if (!collectorNumber.isEmpty()) {
                 if (cardInfoForSet.getSet()->getShortName() == setShortName &&
                     cardInfoForSet.getProperty("num") == collectorNumber) {
                     return cardInfoForSet;
