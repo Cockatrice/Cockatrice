@@ -22,17 +22,13 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
-    // add new parsers here
-    availableParsers << new CockatriceXml4Parser;
-    availableParsers << new CockatriceXml3Parser;
-
-    for (auto &parser : availableParsers) {
-        connect(parser, &ICardDatabaseParser::addCard, this, &CardDatabase::addCard, Qt::DirectConnection);
-        connect(parser, &ICardDatabaseParser::addSet, this, &CardDatabase::addSet, Qt::DirectConnection);
-    }
-
-    connect(&SettingsCache::instance(), &SettingsCache::cardDatabasePathChanged, this,
-            &CardDatabase::loadCardDatabases);
+    // create loader and wire it up
+    loader = new CardDatabaseLoader(this, this);
+    // re-emit loader signals (so other code doesn't need to know about internals)
+    connect(loader, &CardDatabaseLoader::loadingFinished, this, &CardDatabase::cardDatabaseLoadingFinished);
+    connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
+    connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
+    connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
 }
 
 CardDatabase::~CardDatabase()
@@ -60,90 +56,14 @@ void CardDatabase::clear()
     loadStatus = NotLoaded;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName)
+void CardDatabase::loadCardDatabases()
 {
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    if (!file.isOpen()) {
-        return FileError;
-    }
-
-    for (auto parser : availableParsers) {
-        file.reset();
-        if (parser->getCanParseFile(fileName, file)) {
-            file.reset();
-            parser->parseFile(file);
-            return Ok;
-        }
-    }
-
-    return Invalid;
+    loadStatus = loader->loadCardDatabases();
 }
 
-LoadStatus CardDatabase::loadCardDatabase(const QString &path)
+bool CardDatabase::saveCustomTokensToFile()
 {
-    auto startTime = QTime::currentTime();
-    LoadStatus tempLoadStatus = NotLoaded;
-    if (!path.isEmpty()) {
-        QMutexLocker locker(loadFromFileMutex);
-        tempLoadStatus = loadFromFile(path);
-    }
-
-    int msecs = startTime.msecsTo(QTime::currentTime());
-    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
-                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
-                                   << QString("%1ms").arg(msecs);
-
-    return tempLoadStatus;
-}
-
-LoadStatus CardDatabase::loadCardDatabases()
-{
-    QMutexLocker locker(reloadDatabaseMutex);
-    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
-
-    clear(); // remove old db
-
-    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
-    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
-    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
-
-    // find all custom card databases, recursively & following symlinks
-    // then load them alphabetically
-    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
-        const auto &path = collectCustomDatabasePaths().at(i);
-        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
-        loadCardDatabase(path);
-    }
-
-    // AFTER all the cards have been loaded
-
-    // resolve the reverse-related tags
-
-    refreshCachedReverseRelatedCards();
-
-    if (loadStatus == Ok) {
-        checkUnknownSets(); // update deck editors, etc
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
-        emit cardDatabaseLoadingFinished();
-    } else {
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
-        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
-    }
-
-    return loadStatus;
-}
-
-QStringList CardDatabase::collectCustomDatabasePaths()
-{
-    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
-                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-
-    QStringList paths;
-    while (it.hasNext())
-        paths << it.next();
-    paths.sort();
-    return paths;
+    return loader->saveCustomTokensToFile();
 }
 
 void CardDatabase::refreshCachedReverseRelatedCards()
@@ -364,8 +284,6 @@ SetList CardDatabase::getSetList() const
     }
     return result;
 }
-
-
 
 /**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
@@ -592,23 +510,4 @@ void CardDatabase::notifyEnabledSetsChanged()
 
     // inform the carddatabasemodels that they need to re-check their list of cards
     emit cardDatabaseEnabledSetsChanged();
-}
-
-bool CardDatabase::saveCustomTokensToFile()
-{
-    QString fileName = SettingsCache::instance().getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
-
-    SetNameMap tmpSets;
-    CardSetPtr customTokensSet = getSet(CardSet::TOKENS_SETNAME);
-    tmpSets.insert(CardSet::TOKENS_SETNAME, customTokensSet);
-
-    CardNameMap tmpCards;
-    for (const CardInfoPtr &card : cards) {
-        if (card->getSets().contains(CardSet::TOKENS_SETNAME)) {
-            tmpCards.insert(card->getName(), card);
-        }
-    }
-
-    availableParsers.first()->saveToFile(tmpSets, tmpCards, fileName);
-    return true;
 }
