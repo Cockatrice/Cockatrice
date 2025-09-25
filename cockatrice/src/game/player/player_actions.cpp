@@ -928,7 +928,8 @@ void PlayerActions::actCreateRelatedCard()
      * then let's allow it to be created via "create another token"
      */
     if (createRelatedFromRelation(sourceCard, cardRelation) && cardRelation->getCanCreateAnother()) {
-        ExactCard relatedCard = CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(), sourceCard->getCard().getPrinting());
+        ExactCard relatedCard = CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(),
+                                                                                 sourceCard->getCard().getPrinting());
         setLastToken(relatedCard.getCardPtr());
     }
 }
