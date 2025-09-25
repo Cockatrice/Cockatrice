@@ -9,7 +9,7 @@ class CardDatabaseConverter : public CardDatabase
 public:
     LoadStatus loadCardDatabase(const QString &path)
     {
-        return CardDatabase::loadCardDatabase(path);
+        return loader->loadCardDatabase(path);
     }
 
     bool saveCardDatabase(const QString &fileName)
