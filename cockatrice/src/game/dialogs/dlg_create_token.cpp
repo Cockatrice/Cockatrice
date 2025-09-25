@@ -1,7 +1,8 @@
 #include "dlg_create_token.h"
 
 #include "../../database/card_database_manager.h"
-#include "../../database/card_database_model.h"
+#include "../../database/model/database/card_database_model.h"
+#include "../../database/model/token/token_display_model.h"
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../main.h"
 #include "../../settings/cache_settings.h"
