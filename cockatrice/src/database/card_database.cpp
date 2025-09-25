@@ -148,24 +148,17 @@ QStringList CardDatabase::collectCustomDatabasePaths()
 
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
-    for (const CardInfoPtr &card : cards)
+    for (const auto &card : cards) {
         card->resetReverseRelatedCards2Me();
+    }
 
-    for (const CardInfoPtr &card : cards) {
-        if (card->getReverseRelatedCards().isEmpty()) {
-            continue;
-        }
-
-        for (CardRelation *cardRelation : card->getReverseRelatedCards()) {
-            const QString &targetCard = cardRelation->getName();
-            if (!cards.contains(targetCard)) {
-                continue;
+    for (const auto &card : cards) {
+        for (auto *rel : card->getReverseRelatedCards()) {
+            if (auto target = cards.value(rel->getName())) {
+                auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
+                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent());
+                target->addReverseRelatedCards2Me(newRel);
             }
-
-            auto *newCardRelation = new CardRelation(
-                card->getName(), cardRelation->getAttachType(), cardRelation->getIsCreateAllExclusion(),
-                cardRelation->getIsVariable(), cardRelation->getDefaultCount(), cardRelation->getIsPersistent());
-            cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
         }
     }
 }
