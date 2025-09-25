@@ -3,7 +3,7 @@
 #include "../client/deck_editor_menu.h"
 #include "../client/tapped_out_interface.h"
 #include "../database/card_database_manager.h"
-#include "../database/card_database_model.h"
+#include "../database/model/card_database_model.h"
 #include "../dialogs/dlg_load_deck.h"
 #include "../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../filters/filter_builder.h"

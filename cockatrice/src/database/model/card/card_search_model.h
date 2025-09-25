@@ -1,7 +1,7 @@
 #ifndef CARD_SEARCH_MODEL_H
 #define CARD_SEARCH_MODEL_H
 
-#include "card_database_model.h"
+#include "../card_database_display_model.h"
 
 #include <QAbstractListModel>
 

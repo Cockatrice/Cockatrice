@@ -1,9 +1,10 @@
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 
-#include "../../../database/card_completer_proxy_model.h"
 #include "../../../database/card_database.h"
-#include "../../../database/card_database_model.h"
+#include "../../../database/model/card/card_completer_proxy_model.h"
+#include "../../../database/model/card_database_display_model.h"
+#include "../../../database/model/card_database_model.h"
 #include "../../../deck/deck_list_model.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"

@@ -3,7 +3,8 @@
 #include "../client/get_text_with_max.h"
 #include "../database/card_database.h"
 #include "../database/card_database_manager.h"
-#include "../database/card_database_model.h"
+#include "../database/model/card_database_model.h"
+#include "../database/model/token/token_edit_model.h"
 #include "../main.h"
 #include "trice_limits.h"
 

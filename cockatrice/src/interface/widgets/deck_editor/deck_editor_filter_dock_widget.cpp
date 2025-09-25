@@ -1,6 +1,6 @@
 #include "deck_editor_filter_dock_widget.h"
 
-#include "../../../database/card_database_model.h"
+#include "../../../database/model/card_database_model.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../../settings/cache_settings.h"
