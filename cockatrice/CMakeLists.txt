@@ -21,11 +21,14 @@ set(cockatrice_SOURCES
     src/client/sound_engine.cpp
     src/client/tapped_out_interface.cpp
     src/client/update_downloader.cpp
-    src/database/card_completer_proxy_model.cpp
     src/database/card_database.cpp
     src/database/card_database_manager.cpp
-    src/database/card_database_model.cpp
-    src/database/card_search_model.cpp
+    src/database/model/card_database_model.cpp
+    src/database/model/card_database_display_model.cpp
+    src/database/model/card/card_completer_proxy_model.cpp
+    src/database/model/card/card_search_model.cpp
+    src/database/model/token/token_display_model.cpp
+    src/database/model/token/token_edit_model.cpp
     src/database/parser/card_database_parser.cpp
     src/database/parser/cockatrice_xml_3.cpp
     src/database/parser/cockatrice_xml_4.cpp
