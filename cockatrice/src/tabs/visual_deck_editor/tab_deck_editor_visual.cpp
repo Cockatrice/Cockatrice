@@ -1,6 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
-#include "../../database/model/database/card_database_model.h"
+#include "../../database/model/card_database_model.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"

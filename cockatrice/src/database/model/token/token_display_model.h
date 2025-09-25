@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_TOKEN_DISPLAY_MODEL_H
 #define COCKATRICE_TOKEN_DISPLAY_MODEL_H
 
-#include "../database/card_database_display_model.h"
+#include "../card_database_display_model.h"
 
 class TokenDisplayModel : public CardDatabaseDisplayModel
 {

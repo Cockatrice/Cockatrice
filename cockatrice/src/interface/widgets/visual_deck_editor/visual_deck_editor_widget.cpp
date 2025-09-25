@@ -4,7 +4,7 @@
 #include "../../../database/card_database_manager.h"
 #include "../../../database/model/card/card_completer_proxy_model.h"
 #include "../../../database/model/card/card_search_model.h"
-#include "../../../database/model/database/card_database_model.h"
+#include "../../../database/model/card_database_model.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_loader.h"
 #include "../../../main.h"

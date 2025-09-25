@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 #define COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 
-#include "../../../filters/filter_string.h"
+#include "../../filters/filter_string.h"
 
 #include <QList>
 #include <QSet>

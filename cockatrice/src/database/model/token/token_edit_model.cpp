@@ -1,6 +1,6 @@
 #include "token_edit_model.h"
 
-#include "../database/card_database_model.h"
+#include "../card_database_model.h"
 
 TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {

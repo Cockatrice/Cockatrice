@@ -1,6 +1,6 @@
 #include "token_display_model.h"
 
-#include "../database/card_database_model.h"
+#include "../card_database_model.h"
 
 TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {
