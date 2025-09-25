@@ -69,21 +69,21 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
-    // if card already exists just add the new set property
-    if (cards.contains(card->getName())) {
-        CardInfoPtr sameCard = cards[card->getName()];
-        for (const auto &printings : card->getSets()) {
-            for (const PrintingInfo &printing : printings) {
-                sameCard->addToSet(printing.getSet(), printing);
-            }
-        }
+
+    auto name = card->getName();
+
+    // If a card already exists, just add the new set property.
+    if (auto existing = cards.value(name)) {
+        for (const auto &printings : card->getSets())
+            for (const auto &printing : printings)
+                existing->addToSet(printing.getSet(), printing);
         return;
     }
 
-    addCardMutex->lock();
-    cards.insert(card->getName(), card);
+    QMutexLocker locker(addCardMutex);
+    cards.insert(name, card);
     simpleNameCards.insert(card->getSimpleName(), card);
-    addCardMutex->unlock();
+
     emit cardAdded(card);
 }
 
