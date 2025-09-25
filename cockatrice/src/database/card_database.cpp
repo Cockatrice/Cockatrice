@@ -110,9 +110,8 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // find all custom card databases, recursively & following symlinks
     // then load them alphabetically
-    auto customPaths = collectCustomDatabasePaths();
-    for (int i = 0, n = customPaths.size(); i < n; ++i) {
-        const auto &path = customPaths.at(i);
+    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
+        const auto &path = collectCustomDatabasePaths().at(i);
         qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
         loadCardDatabase(path);
     }
@@ -365,6 +364,8 @@ SetList CardDatabase::getSetList() const
     }
     return result;
 }
+
+
 
 /**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
