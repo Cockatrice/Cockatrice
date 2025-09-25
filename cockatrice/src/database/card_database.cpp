@@ -110,8 +110,9 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // find all custom card databases, recursively & following symlinks
     // then load them alphabetically
-    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
-        const auto &path = collectCustomDatabasePaths().at(i);
+    auto customPaths = collectCustomDatabasePaths();
+    for (int i = 0, n = customPaths.size(); i < n; ++i) {
+        const auto &path = customPaths.at(i);
         qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
         loadCardDatabase(path);
     }
