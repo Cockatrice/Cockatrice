@@ -43,7 +43,7 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
-    clearDatabaseMutex->lock();
+    QMutexLocker locker(clearDatabaseMutex);
 
     for (const auto &card : cards.values()) {
         if (card) {
@@ -58,8 +58,6 @@ void CardDatabase::clear()
     ICardDatabaseParser::clearSetlist();
 
     loadStatus = NotLoaded;
-
-    clearDatabaseMutex->unlock();
 }
 
 void CardDatabase::addCard(CardInfoPtr card)
@@ -102,10 +100,9 @@ void CardDatabase::removeCard(CardInfoPtr card)
     for (auto *cardRelation : card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
-    removeCardMutex->lock();
+    QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
-    removeCardMutex->unlock();
     emit cardRemoved(card);
 }
 
@@ -275,9 +272,8 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
     auto startTime = QTime::currentTime();
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty()) {
-        loadFromFileMutex->lock();
+        QMutexLocker locker(loadFromFileMutex);
         tempLoadStatus = loadFromFile(path);
-        loadFromFileMutex->unlock();
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
