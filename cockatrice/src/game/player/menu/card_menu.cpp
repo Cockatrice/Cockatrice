@@ -322,7 +322,7 @@ void CardMenu::addRelatedCardView()
     bool atLeastOneGoodRelationFound = false;
     QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
     for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName());
+        CardInfoPtr relatedCard = CardDatabaseManager::query()->getCardInfo(cardRelation->getName());
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -366,10 +366,10 @@ void CardMenu::addRelatedCardActions()
     int index = 0;
     QAction *createRelatedCards = nullptr;
     for (const CardRelation *cardRelation : relatedCards) {
-        ExactCard relatedCard = CardDatabaseManager::getInstance()->getCardFromSameSet(cardRelation->getName(),
-                                                                                       card->getCard().getPrinting());
+        ExactCard relatedCard =
+            CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(), card->getCard().getPrinting());
         if (!relatedCard) {
-            relatedCard = CardDatabaseManager::getInstance()->getCard({cardRelation->getName()});
+            relatedCard = CardDatabaseManager::query()->getCard({cardRelation->getName()});
         }
         if (!relatedCard) {
             continue;

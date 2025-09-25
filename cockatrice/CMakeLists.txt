@@ -24,6 +24,7 @@ set(cockatrice_SOURCES
     src/database/card_database.cpp
     src/database/card_database_loader.cpp
     src/database/card_database_manager.cpp
+    src/database/card_database_queries.cpp
     src/database/model/card_database_model.cpp
     src/database/model/card_database_display_model.cpp
     src/database/model/card/card_completer_proxy_model.cpp

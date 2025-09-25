@@ -182,11 +182,11 @@ ExactCard DeckEditorDatabaseDisplayWidget::getCardOrPinnedPrinting(QString cardN
 {
     const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
 
-    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
+    ExactCard card = CardDatabaseManager::query()->getCard({cardName});
 
     if (cardProviderId != "") {
         return ExactCard(card.getCardPtr(),
-                         CardDatabaseManager::getInstance()->getSpecificPrinting({cardName, cardProviderId}));
+                         CardDatabaseManager::query()->getSpecificPrinting({cardName, cardProviderId}));
     }
 
     return card;

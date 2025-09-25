@@ -5,3 +5,8 @@ CardDatabase *CardDatabaseManager::getInstance()
     static CardDatabase instance; // Created only once, on first access
     return &instance;
 }
+
+CardDatabaseQueries *CardDatabaseManager::query()
+{
+    return getInstance()->query();
+}

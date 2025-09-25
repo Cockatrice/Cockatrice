@@ -4,6 +4,7 @@
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
 #include "card_database_loader.h"
+#include "card_database_queries.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -40,7 +41,7 @@ protected:
 
     LoadStatus loadStatus;
 
-    QVector<ICardDatabaseParser *> availableParsers;
+    CardDatabaseQueries *queries;
 
 private:
     void checkUnknownSets();
@@ -56,48 +57,19 @@ public:
     void removeCard(CardInfoPtr card);
     void clear();
 
-    [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
-    [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
-
-    [[nodiscard]] ExactCard getCard(const CardRef &cardRef) const;
-    [[nodiscard]] QList<ExactCard> getCards(const QList<CardRef> &cardRefs) const;
-
-    [[nodiscard]] ExactCard getPreferredCard(const CardInfoPtr &cardInfo) const;
-    [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
-    [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
-    QString getPreferredPrintingProviderId(const QString &cardName) const;
-    bool isPreferredPrinting(const CardRef &cardRef) const;
-
-    static PrintingInfo findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId);
-    [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
-    PrintingInfo
-    getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
-
-    ExactCard getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const;
-
-    [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
-    [[nodiscard]] ExactCard getRandomCard();
-
-    /*
-     * Get a card by its simple name. The name will be simplified in this
-     * function, so you don't need to simplify it beforehand.
-     */
-    [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
-    CardInfoPtr lookupCardByName(const QString &name) const;
-
-    CardSetPtr getSet(const QString &setName);
     const CardNameMap &getCardList() const
     {
         return cards;
     }
+    CardSetPtr getSet(const QString &setName);
     SetList getSetList() const;
-    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
-    QStringList getAllMainCardTypes() const;
-    QMap<QString, int> getAllMainCardTypesWithCount() const;
-    QMap<QString, int> getAllSubCardTypesWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;
+    }
+    CardDatabaseQueries *query() const
+    {
+        return queries;
     }
     void enableAllUnknownSets();
     void markAllSetsAsKnown();
@@ -118,6 +90,7 @@ signals:
     void cardRemoved(CardInfoPtr card);
 
     friend class CardDatabaseLoader;
+    friend class CardDatabaseQueries;
 };
 
 #endif

@@ -12,7 +12,7 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
                                                                                      FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
-    allMainCardTypesWithCount = CardDatabaseManager::getInstance()->getAllMainCardTypesWithCount();
+    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
     // Get all main card types with their count
 
     setMaximumHeight(75);

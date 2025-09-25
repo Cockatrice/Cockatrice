@@ -57,7 +57,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::refreshCardInfo()
 {
-    exactCard = CardDatabaseManager::getInstance()->getCard(cardRef);
+    exactCard = CardDatabaseManager::query()->getCard(cardRef);
 
     if (!exactCard && !cardRef.name.isEmpty()) {
         auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, false, false, -1, false);

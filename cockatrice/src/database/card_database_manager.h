@@ -14,6 +14,7 @@ public:
 
     // Static method to access the singleton instance
     static CardDatabase *getInstance();
+    static CardDatabaseQueries *query();
 
 private:
     CardDatabaseManager() = default; // Private constructor

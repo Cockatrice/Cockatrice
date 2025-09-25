@@ -15,7 +15,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     setLayout(layout);
 
     commanderPicture = new CardInfoPictureWidget(this);
-    commanderPicture->setCard(CardDatabaseManager::getInstance()->getCard({commanderDetails.getName()}));
+    commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
 
     QWidget *currentParent = parentWidget();
     TabEdhRecMain *parentTab = nullptr;
