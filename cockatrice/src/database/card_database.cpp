@@ -69,7 +69,6 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
-
     auto name = card->getName();
 
     // If a card already exists, just add the new set property.
@@ -187,6 +186,15 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return simpleNameCards.value(CardInfo::simplifyName(cardName));
 }
 
+CardInfoPtr CardDatabase::lookupCardByName(const QString &name) const
+{
+    if (auto info = getCardInfo(name))
+        return info;
+    if (auto info = getCardBySimpleName(name))
+        return info;
+    return getCardBySimpleName(CardInfo::simplifyName(name));
+}
+
 /**
  * Looks up the card by CardRef, simplifying the name if required.
  * If the providerId is empty, will default to the preferred printing.
@@ -197,21 +205,11 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
  */
 ExactCard CardDatabase::guessCard(const CardRef &cardRef) const
 {
-    CardInfoPtr temp = getCardInfo(cardRef.name);
+    auto card = lookupCardByName(cardRef.name);
+    auto printing =
+        cardRef.providerId.isEmpty() ? getPreferredPrinting(card) : findPrintingWithId(card, cardRef.providerId);
 
-    if (temp == nullptr) { // get card by simple name instead
-        temp = getCardBySimpleName(cardRef.name);
-        if (temp == nullptr) { // still could not find the card, so simplify the cardName too
-            const auto &simpleCardName = CardInfo::simplifyName(cardRef.name);
-            temp = getCardBySimpleName(simpleCardName);
-        }
-    }
-
-    if (cardRef.providerId.isEmpty() || cardRef.providerId.isNull()) {
-        return ExactCard(temp, getPreferredPrinting(temp));
-    }
-
-    return ExactCard(temp, findPrintingWithId(temp, cardRef.providerId));
+    return ExactCard(card, printing);
 }
 
 ExactCard CardDatabase::getRandomCard()

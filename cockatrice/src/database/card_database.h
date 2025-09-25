@@ -92,6 +92,7 @@ public:
      * function, so you don't need to simplify it beforehand.
      */
     [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
+    CardInfoPtr lookupCardByName(const QString &name) const;
 
     CardSetPtr getSet(const QString &setName);
     const CardNameMap &getCardList() const
