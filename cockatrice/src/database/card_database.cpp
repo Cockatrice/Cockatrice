@@ -43,7 +43,7 @@ CardDatabase::~CardDatabase()
 
 void CardDatabase::clear()
 {
-    clearDatabaseMutex->lock();
+    QMutexLocker locker(clearDatabaseMutex);
 
     for (const auto &card : cards.values()) {
         if (card) {
@@ -58,8 +58,110 @@ void CardDatabase::clear()
     ICardDatabaseParser::clearSetlist();
 
     loadStatus = NotLoaded;
+}
 
-    clearDatabaseMutex->unlock();
+LoadStatus CardDatabase::loadFromFile(const QString &fileName)
+{
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+    if (!file.isOpen()) {
+        return FileError;
+    }
+
+    for (auto parser : availableParsers) {
+        file.reset();
+        if (parser->getCanParseFile(fileName, file)) {
+            file.reset();
+            parser->parseFile(file);
+            return Ok;
+        }
+    }
+
+    return Invalid;
+}
+
+LoadStatus CardDatabase::loadCardDatabase(const QString &path)
+{
+    auto startTime = QTime::currentTime();
+    LoadStatus tempLoadStatus = NotLoaded;
+    if (!path.isEmpty()) {
+        QMutexLocker locker(loadFromFileMutex);
+        tempLoadStatus = loadFromFile(path);
+    }
+
+    int msecs = startTime.msecsTo(QTime::currentTime());
+    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
+                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
+                                   << QString("%1ms").arg(msecs);
+
+    return tempLoadStatus;
+}
+
+LoadStatus CardDatabase::loadCardDatabases()
+{
+    QMutexLocker locker(reloadDatabaseMutex);
+    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
+
+    clear(); // remove old db
+
+    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
+    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
+    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
+
+    // find all custom card databases, recursively & following symlinks
+    // then load them alphabetically
+    auto customPaths = collectCustomDatabasePaths();
+    for (int i = 0, n = customPaths.size(); i < n; ++i) {
+        const auto &path = customPaths.at(i);
+        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
+        loadCardDatabase(path);
+    }
+
+    // AFTER all the cards have been loaded
+
+    // resolve the reverse-related tags
+
+    refreshCachedReverseRelatedCards();
+
+    if (loadStatus == Ok) {
+        checkUnknownSets(); // update deck editors, etc
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
+        emit cardDatabaseLoadingFinished();
+    } else {
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
+        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
+    }
+
+    return loadStatus;
+}
+
+QStringList CardDatabase::collectCustomDatabasePaths()
+{
+    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
+                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+
+    QStringList paths;
+    while (it.hasNext())
+        paths << it.next();
+    paths.sort();
+    return paths;
+}
+
+void CardDatabase::refreshCachedReverseRelatedCards()
+{
+    for (const auto &card : cards) {
+        card->resetReverseRelatedCards2Me();
+    }
+
+    for (const auto &card : cards) {
+        for (auto *rel : card->getReverseRelatedCards()) {
+            if (auto target = cards.value(rel->getName())) {
+                auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
+                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent());
+                target->addReverseRelatedCards2Me(newRel);
+            }
+        }
+    }
 }
 
 void CardDatabase::addCard(CardInfoPtr card)
@@ -69,21 +171,20 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
-    // if card already exists just add the new set property
-    if (cards.contains(card->getName())) {
-        CardInfoPtr sameCard = cards[card->getName()];
-        for (const auto &printings : card->getSets()) {
-            for (const PrintingInfo &printing : printings) {
-                sameCard->addToSet(printing.getSet(), printing);
-            }
-        }
+    auto name = card->getName();
+
+    // If a card already exists, just add the new set property.
+    if (auto existing = cards.value(name)) {
+        for (const auto &printings : card->getSets())
+            for (const auto &printing : printings)
+                existing->addToSet(printing.getSet(), printing);
         return;
     }
 
-    addCardMutex->lock();
-    cards.insert(card->getName(), card);
+    QMutexLocker locker(addCardMutex);
+    cards.insert(name, card);
     simpleNameCards.insert(card->getSimpleName(), card);
-    addCardMutex->unlock();
+
     emit cardAdded(card);
 }
 
@@ -103,10 +204,9 @@ void CardDatabase::removeCard(CardInfoPtr card)
     for (auto *cardRelation : card->getReverseRelatedCards2Me())
         cardRelation->deleteLater();
 
-    removeCardMutex->lock();
+    QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
-    removeCardMutex->unlock();
     emit cardRemoved(card);
 }
 
@@ -187,6 +287,15 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
     return simpleNameCards.value(CardInfo::simplifyName(cardName));
 }
 
+CardInfoPtr CardDatabase::lookupCardByName(const QString &name) const
+{
+    if (auto info = getCardInfo(name))
+        return info;
+    if (auto info = getCardBySimpleName(name))
+        return info;
+    return getCardBySimpleName(CardInfo::simplifyName(name));
+}
+
 /**
  * Looks up the card by CardRef, simplifying the name if required.
  * If the providerId is empty, will default to the preferred printing.
@@ -197,21 +306,11 @@ CardInfoPtr CardDatabase::getCardBySimpleName(const QString &cardName) const
  */
 ExactCard CardDatabase::guessCard(const CardRef &cardRef) const
 {
-    CardInfoPtr temp = getCardInfo(cardRef.name);
+    auto card = lookupCardByName(cardRef.name);
+    auto printing =
+        cardRef.providerId.isEmpty() ? getPreferredPrinting(card) : findPrintingWithId(card, cardRef.providerId);
 
-    if (temp == nullptr) { // get card by simple name instead
-        temp = getCardBySimpleName(cardRef.name);
-        if (temp == nullptr) { // still could not find the card, so simplify the cardName too
-            const auto &simpleCardName = CardInfo::simplifyName(cardRef.name);
-            temp = getCardBySimpleName(simpleCardName);
-        }
-    }
-
-    if (cardRef.providerId.isEmpty() || cardRef.providerId.isNull()) {
-        return ExactCard(temp, getPreferredPrinting(temp));
-    }
-
-    return ExactCard(temp, findPrintingWithId(temp, cardRef.providerId));
+    return ExactCard(card, printing);
 }
 
 ExactCard CardDatabase::getRandomCard()
@@ -225,6 +324,21 @@ ExactCard CardDatabase::getRandomCard()
     CardInfoPtr randomCard = getCardInfo(randomKey);
 
     return ExactCard{randomCard, getPreferredPrinting(randomCard)};
+}
+
+ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
+{
+    // The source card does not have a printing defined, which means we can't get a card from the same set.
+    if (otherPrinting == PrintingInfo()) {
+        return getCard({cardName});
+    }
+
+    // The source card does have a printing defined, which means we can attempt to get a card from the same set.
+    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
+    ExactCard relatedCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+
+    // If we didn't find a card from the same set, just try to find any card with the same name.
+    return relatedCard ? relatedCard : getCard({cardName});
 }
 
 CardSetPtr CardDatabase::getSet(const QString &setName)
@@ -252,112 +366,6 @@ SetList CardDatabase::getSetList() const
     return result;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName)
-{
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    if (!file.isOpen()) {
-        return FileError;
-    }
-
-    for (auto parser : availableParsers) {
-        file.reset();
-        if (parser->getCanParseFile(fileName, file)) {
-            file.reset();
-            parser->parseFile(file);
-            return Ok;
-        }
-    }
-
-    return Invalid;
-}
-
-LoadStatus CardDatabase::loadCardDatabase(const QString &path)
-{
-    auto startTime = QTime::currentTime();
-    LoadStatus tempLoadStatus = NotLoaded;
-    if (!path.isEmpty()) {
-        loadFromFileMutex->lock();
-        tempLoadStatus = loadFromFile(path);
-        loadFromFileMutex->unlock();
-    }
-
-    int msecs = startTime.msecsTo(QTime::currentTime());
-    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
-                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
-                                   << QString("%1ms").arg(msecs);
-
-    return tempLoadStatus;
-}
-
-LoadStatus CardDatabase::loadCardDatabases()
-{
-    reloadDatabaseMutex->lock();
-
-    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
-
-    clear(); // remove old db
-
-    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
-    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
-    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
-
-    // find all custom card databases, recursively & following symlinks
-    // then load them alphabetically
-    QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
-                                        QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    QStringList databasePaths;
-    while (customDatabaseIterator.hasNext()) {
-        customDatabaseIterator.next();
-        databasePaths.push_back(customDatabaseIterator.filePath());
-    }
-    databasePaths.sort();
-
-    for (auto i = 0; i < databasePaths.size(); ++i) {
-        const auto &databasePath = databasePaths.at(i);
-        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << databasePath << ")";
-        loadCardDatabase(databasePath);
-    }
-
-    // AFTER all the cards have been loaded
-
-    // resolve the reverse-related tags
-    refreshCachedReverseRelatedCards();
-
-    if (loadStatus == Ok) {
-        checkUnknownSets(); // update deck editors, etc
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
-        emit cardDatabaseLoadingFinished();
-    } else {
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
-        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
-    }
-
-    reloadDatabaseMutex->unlock();
-    return loadStatus;
-}
-
-/**
- * Gets the card representing the preferred printing of the cardInfo
- *
- * @param cardInfo The cardInfo to find the preferred printing for
- * @return A specific printing of a card
- */
-ExactCard CardDatabase::getPreferredCard(const CardInfoPtr &cardInfo) const
-{
-    return ExactCard(cardInfo, getPreferredPrinting(cardInfo));
-}
-
-PrintingInfo CardDatabase::getSpecificPrinting(const CardRef &cardRef) const
-{
-    CardInfoPtr cardInfo = getCardInfo(cardRef.name);
-    if (!cardInfo) {
-        return PrintingInfo(nullptr);
-    }
-
-    return findPrintingWithId(cardInfo, cardRef.providerId);
-}
-
 /**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
  *
@@ -376,6 +384,68 @@ PrintingInfo CardDatabase::findPrintingWithId(const CardInfoPtr &cardInfo, const
     }
 
     return PrintingInfo();
+}
+
+PrintingInfo CardDatabase::getSpecificPrinting(const CardRef &cardRef) const
+{
+    CardInfoPtr cardInfo = getCardInfo(cardRef.name);
+    if (!cardInfo) {
+        return PrintingInfo(nullptr);
+    }
+
+    return findPrintingWithId(cardInfo, cardRef.providerId);
+}
+
+PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
+                                               const QString &setShortName,
+                                               const QString &collectorNumber) const
+{
+    CardInfoPtr cardInfo = getCardInfo(cardName);
+    if (!cardInfo) {
+        return PrintingInfo(nullptr);
+    }
+
+    SetToPrintingsMap setMap = cardInfo->getSets();
+    if (setMap.empty()) {
+        return PrintingInfo(nullptr);
+    }
+
+    for (const auto &printings : setMap) {
+        for (auto &cardInfoForSet : printings) {
+            if (!collectorNumber.isEmpty()) {
+                if (cardInfoForSet.getSet()->getShortName() == setShortName &&
+                    cardInfoForSet.getProperty("num") == collectorNumber) {
+                    return cardInfoForSet;
+                }
+            } else {
+                if (cardInfoForSet.getSet()->getShortName() == setShortName) {
+                    return cardInfoForSet;
+                }
+            }
+        }
+    }
+
+    return PrintingInfo(nullptr);
+}
+
+/**
+ * Gets the card representing the preferred printing of the cardInfo
+ *
+ * @param cardInfo The cardInfo to find the preferred printing for
+ * @return A specific printing of a card
+ */
+ExactCard CardDatabase::getPreferredCard(const CardInfoPtr &cardInfo) const
+{
+    return ExactCard(cardInfo, getPreferredPrinting(cardInfo));
+}
+
+bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
+{
+    if (cardRef.providerId.startsWith("card_")) {
+        return cardRef.providerId ==
+               QLatin1String("card_") + cardRef.name + QString("_") + getPreferredPrintingProviderId(cardRef.name);
+    }
+    return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
 }
 
 PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
@@ -416,38 +486,6 @@ PrintingInfo CardDatabase::getPreferredPrinting(const CardInfoPtr &cardInfo) con
     return PrintingInfo(nullptr);
 }
 
-PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
-                                               const QString &setShortName,
-                                               const QString &collectorNumber) const
-{
-    CardInfoPtr cardInfo = getCardInfo(cardName);
-    if (!cardInfo) {
-        return PrintingInfo(nullptr);
-    }
-
-    SetToPrintingsMap setMap = cardInfo->getSets();
-    if (setMap.empty()) {
-        return PrintingInfo(nullptr);
-    }
-
-    for (const auto &printings : setMap) {
-        for (auto &cardInfoForSet : printings) {
-            if (collectorNumber != nullptr) {
-                if (cardInfoForSet.getSet()->getShortName() == setShortName &&
-                    cardInfoForSet.getProperty("num") == collectorNumber) {
-                    return cardInfoForSet;
-                }
-            } else {
-                if (cardInfoForSet.getSet()->getShortName() == setShortName) {
-                    return cardInfoForSet;
-                }
-            }
-        }
-    }
-
-    return PrintingInfo(nullptr);
-}
-
 QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) const
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
@@ -461,58 +499,6 @@ QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) co
         return cardName;
     }
     return defaultCardInfo->getName();
-}
-
-bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
-{
-    if (cardRef.providerId.startsWith("card_")) {
-        return cardRef.providerId ==
-               QLatin1String("card_") + cardRef.name + QString("_") + getPreferredPrintingProviderId(cardRef.name);
-    }
-    return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
-}
-
-ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
-{
-    // The source card does not have a printing defined, which means we can't get a card from the same set.
-    if (otherPrinting == PrintingInfo()) {
-        return getCard({cardName});
-    }
-
-    // The source card does have a printing defined, which means we can attempt to get a card from the same set.
-    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
-    ExactCard relatedCard = ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
-
-    // We didn't find a card from the same set, just try to find any card with the same name.
-    if (!relatedCard) {
-        return getCard({cardName});
-    }
-
-    return relatedCard;
-}
-
-void CardDatabase::refreshCachedReverseRelatedCards()
-{
-    for (const CardInfoPtr &card : cards)
-        card->resetReverseRelatedCards2Me();
-
-    for (const CardInfoPtr &card : cards) {
-        if (card->getReverseRelatedCards().isEmpty()) {
-            continue;
-        }
-
-        for (CardRelation *cardRelation : card->getReverseRelatedCards()) {
-            const QString &targetCard = cardRelation->getName();
-            if (!cards.contains(targetCard)) {
-                continue;
-            }
-
-            auto *newCardRelation = new CardRelation(
-                card->getName(), cardRelation->getAttachType(), cardRelation->getIsCreateAllExclusion(),
-                cardRelation->getIsVariable(), cardRelation->getDefaultCount(), cardRelation->getIsPersistent());
-            cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
-        }
-    }
 }
 
 QStringList CardDatabase::getAllMainCardTypes() const
