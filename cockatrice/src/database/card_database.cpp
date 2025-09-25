@@ -222,6 +222,25 @@ ExactCard CardDatabase::getRandomCard()
     return ExactCard{randomCard, getPreferredPrinting(randomCard)};
 }
 
+ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
+{
+    // The source card does not have a printing defined, which means we can't get a card from the same set.
+    if (otherPrinting == PrintingInfo()) {
+        return getCard({cardName});
+    }
+
+    // The source card does have a printing defined, which means we can attempt to get a card from the same set.
+    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
+    ExactCard relatedCard = ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
+
+    // We didn't find a card from the same set, just try to find any card with the same name.
+    if (!relatedCard) {
+        return getCard({cardName});
+    }
+
+    return relatedCard;
+}
+
 CardSetPtr CardDatabase::getSet(const QString &setName)
 {
     if (sets.contains(setName)) {
@@ -334,27 +353,6 @@ QStringList CardDatabase::collectCustomDatabasePaths()
 }
 
 /**
- * Gets the card representing the preferred printing of the cardInfo
- *
- * @param cardInfo The cardInfo to find the preferred printing for
- * @return A specific printing of a card
- */
-ExactCard CardDatabase::getPreferredCard(const CardInfoPtr &cardInfo) const
-{
-    return ExactCard(cardInfo, getPreferredPrinting(cardInfo));
-}
-
-PrintingInfo CardDatabase::getSpecificPrinting(const CardRef &cardRef) const
-{
-    CardInfoPtr cardInfo = getCardInfo(cardRef.name);
-    if (!cardInfo) {
-        return PrintingInfo(nullptr);
-    }
-
-    return findPrintingWithId(cardInfo, cardRef.providerId);
-}
-
-/**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
  *
  * @param cardInfo The CardInfo to search
@@ -372,6 +370,68 @@ PrintingInfo CardDatabase::findPrintingWithId(const CardInfoPtr &cardInfo, const
     }
 
     return PrintingInfo();
+}
+
+PrintingInfo CardDatabase::getSpecificPrinting(const CardRef &cardRef) const
+{
+    CardInfoPtr cardInfo = getCardInfo(cardRef.name);
+    if (!cardInfo) {
+        return PrintingInfo(nullptr);
+    }
+
+    return findPrintingWithId(cardInfo, cardRef.providerId);
+}
+
+PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
+                                               const QString &setShortName,
+                                               const QString &collectorNumber) const
+{
+    CardInfoPtr cardInfo = getCardInfo(cardName);
+    if (!cardInfo) {
+        return PrintingInfo(nullptr);
+    }
+
+    SetToPrintingsMap setMap = cardInfo->getSets();
+    if (setMap.empty()) {
+        return PrintingInfo(nullptr);
+    }
+
+    for (const auto &printings : setMap) {
+        for (auto &cardInfoForSet : printings) {
+            if (!collectorNumber.isEmpty()) {
+                if (cardInfoForSet.getSet()->getShortName() == setShortName &&
+                    cardInfoForSet.getProperty("num") == collectorNumber) {
+                    return cardInfoForSet;
+                }
+            } else {
+                if (cardInfoForSet.getSet()->getShortName() == setShortName) {
+                    return cardInfoForSet;
+                }
+            }
+        }
+    }
+
+    return PrintingInfo(nullptr);
+}
+
+/**
+ * Gets the card representing the preferred printing of the cardInfo
+ *
+ * @param cardInfo The cardInfo to find the preferred printing for
+ * @return A specific printing of a card
+ */
+ExactCard CardDatabase::getPreferredCard(const CardInfoPtr &cardInfo) const
+{
+    return ExactCard(cardInfo, getPreferredPrinting(cardInfo));
+}
+
+bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
+{
+    if (cardRef.providerId.startsWith("card_")) {
+        return cardRef.providerId ==
+               QLatin1String("card_") + cardRef.name + QString("_") + getPreferredPrintingProviderId(cardRef.name);
+    }
+    return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
 }
 
 PrintingInfo CardDatabase::getPreferredPrinting(const QString &cardName) const
@@ -412,38 +472,6 @@ PrintingInfo CardDatabase::getPreferredPrinting(const CardInfoPtr &cardInfo) con
     return PrintingInfo(nullptr);
 }
 
-PrintingInfo CardDatabase::getSpecificPrinting(const QString &cardName,
-                                               const QString &setShortName,
-                                               const QString &collectorNumber) const
-{
-    CardInfoPtr cardInfo = getCardInfo(cardName);
-    if (!cardInfo) {
-        return PrintingInfo(nullptr);
-    }
-
-    SetToPrintingsMap setMap = cardInfo->getSets();
-    if (setMap.empty()) {
-        return PrintingInfo(nullptr);
-    }
-
-    for (const auto &printings : setMap) {
-        for (auto &cardInfoForSet : printings) {
-            if (!collectorNumber.isEmpty()) {
-                if (cardInfoForSet.getSet()->getShortName() == setShortName &&
-                    cardInfoForSet.getProperty("num") == collectorNumber) {
-                    return cardInfoForSet;
-                }
-            } else {
-                if (cardInfoForSet.getSet()->getShortName() == setShortName) {
-                    return cardInfoForSet;
-                }
-            }
-        }
-    }
-
-    return PrintingInfo(nullptr);
-}
-
 QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) const
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
@@ -457,34 +485,6 @@ QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) co
         return cardName;
     }
     return defaultCardInfo->getName();
-}
-
-bool CardDatabase::isPreferredPrinting(const CardRef &cardRef) const
-{
-    if (cardRef.providerId.startsWith("card_")) {
-        return cardRef.providerId ==
-               QLatin1String("card_") + cardRef.name + QString("_") + getPreferredPrintingProviderId(cardRef.name);
-    }
-    return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
-}
-
-ExactCard CardDatabase::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
-{
-    // The source card does not have a printing defined, which means we can't get a card from the same set.
-    if (otherPrinting == PrintingInfo()) {
-        return getCard({cardName});
-    }
-
-    // The source card does have a printing defined, which means we can attempt to get a card from the same set.
-    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
-    ExactCard relatedCard = ExactCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
-
-    // We didn't find a card from the same set, just try to find any card with the same name.
-    if (!relatedCard) {
-        return getCard({cardName});
-    }
-
-    return relatedCard;
 }
 
 void CardDatabase::refreshCachedReverseRelatedCards()
