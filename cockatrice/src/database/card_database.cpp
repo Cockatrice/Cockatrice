@@ -290,8 +290,7 @@ LoadStatus CardDatabase::loadCardDatabase(const QString &path)
 
 LoadStatus CardDatabase::loadCardDatabases()
 {
-    reloadDatabaseMutex->lock();
-
+    QMutexLocker locker(reloadDatabaseMutex);
     qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
 
     clear(); // remove old db
@@ -302,24 +301,16 @@ LoadStatus CardDatabase::loadCardDatabases()
 
     // find all custom card databases, recursively & following symlinks
     // then load them alphabetically
-    QDirIterator customDatabaseIterator(SettingsCache::instance().getCustomCardDatabasePath(), QStringList() << "*.xml",
-                                        QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    QStringList databasePaths;
-    while (customDatabaseIterator.hasNext()) {
-        customDatabaseIterator.next();
-        databasePaths.push_back(customDatabaseIterator.filePath());
-    }
-    databasePaths.sort();
-
-    for (auto i = 0; i < databasePaths.size(); ++i) {
-        const auto &databasePath = databasePaths.at(i);
-        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << databasePath << ")";
-        loadCardDatabase(databasePath);
+    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
+        const auto &path = collectCustomDatabasePaths().at(i);
+        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
+        loadCardDatabase(path);
     }
 
     // AFTER all the cards have been loaded
 
     // resolve the reverse-related tags
+
     refreshCachedReverseRelatedCards();
 
     if (loadStatus == Ok) {
@@ -331,8 +322,19 @@ LoadStatus CardDatabase::loadCardDatabases()
         emit cardDatabaseLoadingFailed(); // bring up the settings dialog
     }
 
-    reloadDatabaseMutex->unlock();
     return loadStatus;
+}
+
+QStringList CardDatabase::collectCustomDatabasePaths()
+{
+    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
+                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+
+    QStringList paths;
+    while (it.hasNext())
+        paths << it.next();
+    paths.sort();
+    return paths;
 }
 
 /**

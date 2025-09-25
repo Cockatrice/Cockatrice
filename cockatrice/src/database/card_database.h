@@ -113,6 +113,7 @@ public:
     void enableAllUnknownSets();
     void markAllSetsAsKnown();
     void notifyEnabledSetsChanged();
+    static QStringList collectCustomDatabasePaths();
 
 public slots:
     LoadStatus loadCardDatabases();
