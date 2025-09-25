@@ -135,7 +135,6 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
@@ -145,15 +144,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Restore compiler cache (ccache)
-        id: ccache_restore
-        uses: actions/cache/restore@v4
+      - name: Setup ccache
+        uses: jianmingyong/ccache-action@v1
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+          install-type: "binary"
+          ccache-key-prefix: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
@@ -182,13 +180,6 @@ jobs:
           RUN --server --release --package "$package" --dir "$BUILD_DIR" \
                   --ccache "$CCACHE_SIZE"
           .ci/name_build.sh
-
-      - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v4
-        with:
-          path: ${{env.CACHE}}
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Upload artifact
         id: upload_artifact
