@@ -293,7 +293,7 @@ jobs:
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
-          cache: true
+          cache: false # qt caches take too much space for macOS (1.1Gi)
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
