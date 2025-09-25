@@ -60,6 +60,116 @@ void CardDatabase::clear()
     loadStatus = NotLoaded;
 }
 
+LoadStatus CardDatabase::loadFromFile(const QString &fileName)
+{
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+    if (!file.isOpen()) {
+        return FileError;
+    }
+
+    for (auto parser : availableParsers) {
+        file.reset();
+        if (parser->getCanParseFile(fileName, file)) {
+            file.reset();
+            parser->parseFile(file);
+            return Ok;
+        }
+    }
+
+    return Invalid;
+}
+
+LoadStatus CardDatabase::loadCardDatabase(const QString &path)
+{
+    auto startTime = QTime::currentTime();
+    LoadStatus tempLoadStatus = NotLoaded;
+    if (!path.isEmpty()) {
+        QMutexLocker locker(loadFromFileMutex);
+        tempLoadStatus = loadFromFile(path);
+    }
+
+    int msecs = startTime.msecsTo(QTime::currentTime());
+    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
+                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
+                                   << QString("%1ms").arg(msecs);
+
+    return tempLoadStatus;
+}
+
+LoadStatus CardDatabase::loadCardDatabases()
+{
+    QMutexLocker locker(reloadDatabaseMutex);
+    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
+
+    clear(); // remove old db
+
+    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
+    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
+    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
+
+    // find all custom card databases, recursively & following symlinks
+    // then load them alphabetically
+    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
+        const auto &path = collectCustomDatabasePaths().at(i);
+        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
+        loadCardDatabase(path);
+    }
+
+    // AFTER all the cards have been loaded
+
+    // resolve the reverse-related tags
+
+    refreshCachedReverseRelatedCards();
+
+    if (loadStatus == Ok) {
+        checkUnknownSets(); // update deck editors, etc
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
+        emit cardDatabaseLoadingFinished();
+    } else {
+        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
+        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
+    }
+
+    return loadStatus;
+}
+
+QStringList CardDatabase::collectCustomDatabasePaths()
+{
+    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
+                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+
+    QStringList paths;
+    while (it.hasNext())
+        paths << it.next();
+    paths.sort();
+    return paths;
+}
+
+void CardDatabase::refreshCachedReverseRelatedCards()
+{
+    for (const CardInfoPtr &card : cards)
+        card->resetReverseRelatedCards2Me();
+
+    for (const CardInfoPtr &card : cards) {
+        if (card->getReverseRelatedCards().isEmpty()) {
+            continue;
+        }
+
+        for (CardRelation *cardRelation : card->getReverseRelatedCards()) {
+            const QString &targetCard = cardRelation->getName();
+            if (!cards.contains(targetCard)) {
+                continue;
+            }
+
+            auto *newCardRelation = new CardRelation(
+                card->getName(), cardRelation->getAttachType(), cardRelation->getIsCreateAllExclusion(),
+                cardRelation->getIsVariable(), cardRelation->getDefaultCount(), cardRelation->getIsPersistent());
+            cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
+        }
+    }
+}
+
 void CardDatabase::addCard(CardInfoPtr card)
 {
     if (card == nullptr) {
@@ -266,91 +376,7 @@ SetList CardDatabase::getSetList() const
     return result;
 }
 
-LoadStatus CardDatabase::loadFromFile(const QString &fileName)
-{
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    if (!file.isOpen()) {
-        return FileError;
-    }
 
-    for (auto parser : availableParsers) {
-        file.reset();
-        if (parser->getCanParseFile(fileName, file)) {
-            file.reset();
-            parser->parseFile(file);
-            return Ok;
-        }
-    }
-
-    return Invalid;
-}
-
-LoadStatus CardDatabase::loadCardDatabase(const QString &path)
-{
-    auto startTime = QTime::currentTime();
-    LoadStatus tempLoadStatus = NotLoaded;
-    if (!path.isEmpty()) {
-        QMutexLocker locker(loadFromFileMutex);
-        tempLoadStatus = loadFromFile(path);
-    }
-
-    int msecs = startTime.msecsTo(QTime::currentTime());
-    qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
-                                   << "Cards =" << cards.size() << "Sets =" << sets.size()
-                                   << QString("%1ms").arg(msecs);
-
-    return tempLoadStatus;
-}
-
-LoadStatus CardDatabase::loadCardDatabases()
-{
-    QMutexLocker locker(reloadDatabaseMutex);
-    qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
-
-    clear(); // remove old db
-
-    loadStatus = loadCardDatabase(SettingsCache::instance().getCardDatabasePath()); // load main card database
-    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());             // load tokens database
-    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath());       // load spoilers database
-
-    // find all custom card databases, recursively & following symlinks
-    // then load them alphabetically
-    for (int i = 0, n = collectCustomDatabasePaths().size(); i < n; ++i) {
-        const auto &path = collectCustomDatabasePaths().at(i);
-        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << path << ")";
-        loadCardDatabase(path);
-    }
-
-    // AFTER all the cards have been loaded
-
-    // resolve the reverse-related tags
-
-    refreshCachedReverseRelatedCards();
-
-    if (loadStatus == Ok) {
-        checkUnknownSets(); // update deck editors, etc
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
-        emit cardDatabaseLoadingFinished();
-    } else {
-        qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
-        emit cardDatabaseLoadingFailed(); // bring up the settings dialog
-    }
-
-    return loadStatus;
-}
-
-QStringList CardDatabase::collectCustomDatabasePaths()
-{
-    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
-                    QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-
-    QStringList paths;
-    while (it.hasNext())
-        paths << it.next();
-    paths.sort();
-    return paths;
-}
 
 /**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
@@ -485,30 +511,6 @@ QString CardDatabase::getPreferredPrintingProviderId(const QString &cardName) co
         return cardName;
     }
     return defaultCardInfo->getName();
-}
-
-void CardDatabase::refreshCachedReverseRelatedCards()
-{
-    for (const CardInfoPtr &card : cards)
-        card->resetReverseRelatedCards2Me();
-
-    for (const CardInfoPtr &card : cards) {
-        if (card->getReverseRelatedCards().isEmpty()) {
-            continue;
-        }
-
-        for (CardRelation *cardRelation : card->getReverseRelatedCards()) {
-            const QString &targetCard = cardRelation->getName();
-            if (!cards.contains(targetCard)) {
-                continue;
-            }
-
-            auto *newCardRelation = new CardRelation(
-                card->getName(), cardRelation->getAttachType(), cardRelation->getIsCreateAllExclusion(),
-                cardRelation->getIsVariable(), cardRelation->getDefaultCount(), cardRelation->getIsPersistent());
-            cards.value(targetCard)->addReverseRelatedCards2Me(newCardRelation);
-        }
-    }
 }
 
 QStringList CardDatabase::getAllMainCardTypes() const
