@@ -365,8 +365,6 @@ SetList CardDatabase::getSetList() const
     return result;
 }
 
-
-
 /**
  * Finds the PrintingInfo in the cardInfo that has the given uuid field.
  *
