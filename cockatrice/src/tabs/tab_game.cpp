@@ -78,7 +78,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connectToGameEventHandler();
     connectPlayerListToGameEventHandler();
     connectMessageLogToGameEventHandler();
-    connectMessageLogToPlayerHandler();
 
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -124,7 +123,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     connectToGameEventHandler();
     connectPlayerListToGameEventHandler();
     connectMessageLogToGameEventHandler();
-    connectMessageLogToPlayerHandler();
 
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -206,14 +204,11 @@ void TabGame::connectMessageLogToGameEventHandler()
     connect(game->getGameEventHandler(), &GameEventHandler::logTurnReversed, messageLog,
             &MessageLogWidget::logReverseTurn);
 
+    connect(game->getGameEventHandler(), &GameEventHandler::logConcede, messageLog, &MessageLogWidget::logConcede);
+    connect(game->getGameEventHandler(), &GameEventHandler::logUnconcede, messageLog, &MessageLogWidget::logUnconcede);
+
     connect(game->getGameEventHandler(), &GameEventHandler::logGameClosed, messageLog,
             &MessageLogWidget::logGameClosed);
-}
-
-void TabGame::connectMessageLogToPlayerHandler()
-{
-    connect(game->getPlayerManager(), &PlayerManager::playerConceded, messageLog, &MessageLogWidget::logConcede);
-    connect(game->getPlayerManager(), &PlayerManager::playerUnconceded, messageLog, &MessageLogWidget::logUnconcede);
 }
 
 void TabGame::connectPlayerListToGameEventHandler()
