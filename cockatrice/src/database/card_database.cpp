@@ -28,7 +28,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
 
-    queries = new CardDatabaseQueries(this);
+    querier = new CardDatabaseQuerier(this, this);
 }
 
 CardDatabase::~CardDatabase()

@@ -1,14 +1,18 @@
-#ifndef COCKATRICE_CARD_DATABASE_QUERIES_H
-#define COCKATRICE_CARD_DATABASE_QUERIES_H
+#ifndef COCKATRICE_CARD_DATABASE_QUERIER_H
+#define COCKATRICE_CARD_DATABASE_QUERIER_H
 
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
 
+#include <QObject>
+
 class CardDatabase;
-class CardDatabaseQueries
+class CardDatabaseQuerier : public QObject
 {
+    Q_OBJECT
+
 public:
-    explicit CardDatabaseQueries(const CardDatabase *db);
+    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db);
 
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
@@ -47,4 +51,4 @@ private:
     CardInfoPtr lookupCardByName(const QString &name) const;
 };
 
-#endif // COCKATRICE_CARD_DATABASE_QUERIES_H
+#endif // COCKATRICE_CARD_DATABASE_QUERIER_H

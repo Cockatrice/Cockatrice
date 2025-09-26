@@ -1,4 +1,3 @@
-
 #ifndef CARD_DATABASE_ACCESSOR_H
 #define CARD_DATABASE_ACCESSOR_H
 
@@ -14,7 +13,7 @@ public:
 
     // Static method to access the singleton instance
     static CardDatabase *getInstance();
-    static CardDatabaseQueries *query();
+    static CardDatabaseQuerier *query();
 
 private:
     CardDatabaseManager() = default; // Private constructor

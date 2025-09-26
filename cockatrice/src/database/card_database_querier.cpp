@@ -1,11 +1,11 @@
-#include "card_database_queries.h"
+#include "card_database_querier.h"
 
 #include "../utility/card_set_comparator.h"
 #include "card_database.h"
 
 #include <qrandom.h>
 
-CardDatabaseQueries::CardDatabaseQueries(const CardDatabase *_db) : db(_db)
+CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent, const CardDatabase *_db) : QObject(_parent), db(_db)
 {
 }
 
@@ -15,7 +15,7 @@ CardDatabaseQueries::CardDatabaseQueries(const CardDatabase *_db) : db(_db)
  * @param cardName The card name to look up
  * @return A CardInfoPtr, or null if not corresponding CardInfo is found.
  */
-CardInfoPtr CardDatabaseQueries::getCardInfo(const QString &cardName) const
+CardInfoPtr CardDatabaseQuerier::getCardInfo(const QString &cardName) const
 {
     return db->cards.value(cardName);
 }
@@ -26,7 +26,7 @@ CardInfoPtr CardDatabaseQueries::getCardInfo(const QString &cardName) const
  * @param cardNames The card names to look up
  * @return A List of CardInfoPtr. Any failed lookups will be ignored and dropped from the resulting list
  */
-QList<CardInfoPtr> CardDatabaseQueries::getCardInfos(const QStringList &cardNames) const
+QList<CardInfoPtr> CardDatabaseQuerier::getCardInfos(const QStringList &cardNames) const
 {
     QList<CardInfoPtr> cardInfos;
     for (const QString &cardName : cardNames) {
@@ -38,12 +38,12 @@ QList<CardInfoPtr> CardDatabaseQueries::getCardInfos(const QStringList &cardName
     return cardInfos;
 }
 
-CardInfoPtr CardDatabaseQueries::getCardBySimpleName(const QString &cardName) const
+CardInfoPtr CardDatabaseQuerier::getCardBySimpleName(const QString &cardName) const
 {
     return db->simpleNameCards.value(CardInfo::simplifyName(cardName));
 }
 
-CardInfoPtr CardDatabaseQueries::lookupCardByName(const QString &name) const
+CardInfoPtr CardDatabaseQuerier::lookupCardByName(const QString &name) const
 {
     if (auto info = getCardInfo(name))
         return info;
@@ -61,7 +61,7 @@ CardInfoPtr CardDatabaseQueries::lookupCardByName(const QString &name) const
  * that entry. If providerId is given but not found, the PrintingInfo will be empty for that entry.
  * @return A list of cards. Any failed lookups will be ignored and dropped from the resulting list.
  */
-QList<ExactCard> CardDatabaseQueries::getCards(const QList<CardRef> &cardRefs) const
+QList<ExactCard> CardDatabaseQuerier::getCards(const QList<CardRef> &cardRefs) const
 {
     QList<ExactCard> cards;
     for (const auto &cardRef : cardRefs) {
@@ -81,7 +81,7 @@ QList<ExactCard> CardDatabaseQueries::getCards(const QList<CardRef> &cardRefs) c
  * @param cardRef The card to look up.
  * @return A specific printing of a card, or empty if not found.
  */
-ExactCard CardDatabaseQueries::getCard(const CardRef &cardRef) const
+ExactCard CardDatabaseQuerier::getCard(const CardRef &cardRef) const
 {
     auto info = getCardInfo(cardRef.name);
     if (info.isNull()) {
@@ -103,7 +103,7 @@ ExactCard CardDatabaseQueries::getCard(const CardRef &cardRef) const
  * @param cardRef The card to look up.
  * @return A specific printing of a card, or empty if not found.
  */
-ExactCard CardDatabaseQueries::guessCard(const CardRef &cardRef) const
+ExactCard CardDatabaseQuerier::guessCard(const CardRef &cardRef) const
 {
     auto card = lookupCardByName(cardRef.name);
     auto printing =
@@ -112,7 +112,7 @@ ExactCard CardDatabaseQueries::guessCard(const CardRef &cardRef) const
     return ExactCard(card, printing);
 }
 
-ExactCard CardDatabaseQueries::getRandomCard() const
+ExactCard CardDatabaseQuerier::getRandomCard() const
 {
     if (db->cards.isEmpty())
         return {};
@@ -125,7 +125,7 @@ ExactCard CardDatabaseQueries::getRandomCard() const
     return ExactCard{randomCard, getPreferredPrinting(randomCard)};
 }
 
-ExactCard CardDatabaseQueries::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
+ExactCard CardDatabaseQuerier::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
 {
     // The source card does not have a printing defined, which means we can't get a card from the same set.
     if (otherPrinting == PrintingInfo()) {
@@ -147,7 +147,7 @@ ExactCard CardDatabaseQueries::getCardFromSameSet(const QString &cardName, const
  * @param providerId The uuid to look for
  * @return The PrintingInfo, or a default-constructed PrintingInfo if not found.
  */
-PrintingInfo CardDatabaseQueries::findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId) const
+PrintingInfo CardDatabaseQuerier::findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId) const
 {
     for (const auto &printings : cardInfo->getSets()) {
         for (const auto &printing : printings) {
@@ -160,7 +160,7 @@ PrintingInfo CardDatabaseQueries::findPrintingWithId(const CardInfoPtr &cardInfo
     return PrintingInfo();
 }
 
-PrintingInfo CardDatabaseQueries::getSpecificPrinting(const CardRef &cardRef) const
+PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const CardRef &cardRef) const
 {
     CardInfoPtr cardInfo = getCardInfo(cardRef.name);
     if (!cardInfo) {
@@ -170,7 +170,7 @@ PrintingInfo CardDatabaseQueries::getSpecificPrinting(const CardRef &cardRef) co
     return findPrintingWithId(cardInfo, cardRef.providerId);
 }
 
-PrintingInfo CardDatabaseQueries::getSpecificPrinting(const QString &cardName,
+PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const QString &cardName,
                                                       const QString &setShortName,
                                                       const QString &collectorNumber) const
 {
@@ -208,12 +208,12 @@ PrintingInfo CardDatabaseQueries::getSpecificPrinting(const QString &cardName,
  * @param cardInfo The cardInfo to find the preferred printing for
  * @return A specific printing of a card
  */
-ExactCard CardDatabaseQueries::getPreferredCard(const CardInfoPtr &cardInfo) const
+ExactCard CardDatabaseQuerier::getPreferredCard(const CardInfoPtr &cardInfo) const
 {
     return ExactCard(cardInfo, getPreferredPrinting(cardInfo));
 }
 
-bool CardDatabaseQueries::isPreferredPrinting(const CardRef &cardRef) const
+bool CardDatabaseQuerier::isPreferredPrinting(const CardRef &cardRef) const
 {
     if (cardRef.providerId.startsWith("card_")) {
         return cardRef.providerId ==
@@ -222,13 +222,13 @@ bool CardDatabaseQueries::isPreferredPrinting(const CardRef &cardRef) const
     return cardRef.providerId == getPreferredPrintingProviderId(cardRef.name);
 }
 
-PrintingInfo CardDatabaseQueries::getPreferredPrinting(const QString &cardName) const
+PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const QString &cardName) const
 {
     CardInfoPtr cardInfo = getCardInfo(cardName);
     return getPreferredPrinting(cardInfo);
 }
 
-PrintingInfo CardDatabaseQueries::getPreferredPrinting(const CardInfoPtr &cardInfo) const
+PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardInfo) const
 {
     if (!cardInfo) {
         return PrintingInfo(nullptr);
@@ -260,7 +260,7 @@ PrintingInfo CardDatabaseQueries::getPreferredPrinting(const CardInfoPtr &cardIn
     return PrintingInfo(nullptr);
 }
 
-QString CardDatabaseQueries::getPreferredPrintingProviderId(const QString &cardName) const
+QString CardDatabaseQuerier::getPreferredPrintingProviderId(const QString &cardName) const
 {
     PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
     QString uuid = preferredPrinting.getUuid();
@@ -275,7 +275,7 @@ QString CardDatabaseQueries::getPreferredPrintingProviderId(const QString &cardN
     return defaultCardInfo->getName();
 }
 
-QStringList CardDatabaseQueries::getAllMainCardTypes() const
+QStringList CardDatabaseQuerier::getAllMainCardTypes() const
 {
     QSet<QString> types;
     for (const auto &card : db->cards.values()) {
@@ -284,7 +284,7 @@ QStringList CardDatabaseQueries::getAllMainCardTypes() const
     return types.values();
 }
 
-QMap<QString, int> CardDatabaseQueries::getAllMainCardTypesWithCount() const
+QMap<QString, int> CardDatabaseQuerier::getAllMainCardTypesWithCount() const
 {
     QMap<QString, int> typeCounts;
 
@@ -296,7 +296,7 @@ QMap<QString, int> CardDatabaseQueries::getAllMainCardTypesWithCount() const
     return typeCounts;
 }
 
-QMap<QString, int> CardDatabaseQueries::getAllSubCardTypesWithCount() const
+QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
 {
     QMap<QString, int> typeCounts;
 

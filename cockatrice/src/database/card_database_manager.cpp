@@ -6,7 +6,7 @@ CardDatabase *CardDatabaseManager::getInstance()
     return &instance;
 }
 
-CardDatabaseQueries *CardDatabaseManager::query()
+CardDatabaseQuerier *CardDatabaseManager::query()
 {
     return getInstance()->query();
 }

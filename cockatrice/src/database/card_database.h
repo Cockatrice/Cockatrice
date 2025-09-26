@@ -4,7 +4,7 @@
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
 #include "card_database_loader.h"
-#include "card_database_queries.h"
+#include "card_database_querier.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -41,7 +41,7 @@ protected:
 
     LoadStatus loadStatus;
 
-    CardDatabaseQueries *queries;
+    CardDatabaseQuerier *querier;
 
 private:
     void checkUnknownSets();
@@ -67,9 +67,9 @@ public:
     {
         return loadStatus;
     }
-    CardDatabaseQueries *query() const
+    CardDatabaseQuerier *query() const
     {
-        return queries;
+        return querier;
     }
     void enableAllUnknownSets();
     void markAllSetsAsKnown();
@@ -90,7 +90,7 @@ signals:
     void cardRemoved(CardInfoPtr card);
 
     friend class CardDatabaseLoader;
-    friend class CardDatabaseQueries;
+    friend class CardDatabaseQuerier;
 };
 
 #endif
