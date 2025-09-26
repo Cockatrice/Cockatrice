@@ -114,13 +114,24 @@ void DlgCreateGame::sharedCtor()
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"));
     gameSetupOptionsGroupBox->setLayout(gameSetupOptionsLayout);
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
+
+    // Top row
     grid->addWidget(generalGroupBox, 0, 0);
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
+
+    // Middle row: left column
     grid->addWidget(gameTypeGroupBox, 1, 0);
-    grid->addWidget(spectatorsGroupBox, 1, 1, Qt::AlignTop);
-    grid->addWidget(gameSetupOptionsGroupBox, 1, 1, Qt::AlignBottom);
-    grid->addWidget(rememberGameSettings, 3, 0);
+
+    // Middle row: right column (game setup + spectators)
+    auto *rightLayout = new QVBoxLayout;
+    rightLayout->addWidget(spectatorsGroupBox, Qt::AlignTop); // top
+    rightLayout->addWidget(gameSetupOptionsGroupBox);         // bottom
+
+    grid->addLayout(rightLayout, 1, 1);
+
+    // Bottom row
+    grid->addWidget(rememberGameSettings, 3, 0, 1, 2); // span both columns if needed
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateGame::reject);
