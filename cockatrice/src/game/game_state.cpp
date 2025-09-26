@@ -15,6 +15,9 @@ GameState::GameState(AbstractGame *parent,
       clients(_clients), gameStateKnown(_gameStateKnown), resuming(_resuming), currentPhase(_currentPhase),
       activePlayer(-1), gameClosed(_gameClosed)
 {
+    gameTimer = new QTimer(this);
+    gameTimer->setInterval(1000);
+    connect(gameTimer, &QTimer::timeout, this, &GameState::incrementGameTime);
 }
 
 void GameState::incrementGameTime()
@@ -24,6 +27,7 @@ void GameState::incrementGameTime()
 
 void GameState::setGameTime(int _secondsElapsed)
 {
+    secondsElapsed = _secondsElapsed;
     int seconds = _secondsElapsed;
     int minutes = seconds / 60;
     seconds -= minutes * 60;
@@ -37,8 +41,10 @@ void GameState::setGameTime(int _secondsElapsed)
 
 void GameState::startGameTimer()
 {
-    gameTimer = new QTimer(this);
-    gameTimer->setInterval(1000);
-    connect(gameTimer, &QTimer::timeout, this, &GameState::incrementGameTime);
     gameTimer->start();
+}
+
+void GameState::stopGameTimer()
+{
+    gameTimer->stop();
 }
