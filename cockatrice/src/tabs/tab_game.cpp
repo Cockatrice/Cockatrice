@@ -1282,7 +1282,6 @@ void TabGame::createMessageDock(bool bReplay)
         timeElapsedLabel = new QLabel;
         timeElapsedLabel->setAlignment(Qt::AlignCenter);
         connect(game->getGameState(), &GameState::updateTimeElapsedLabel, this, &TabGame::updateTimeElapsedLabel);
-        game->getGameState()->startGameTimer();
 
         messageLogLayout->addWidget(timeElapsedLabel);
     }
