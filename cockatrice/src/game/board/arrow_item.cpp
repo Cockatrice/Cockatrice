@@ -151,8 +151,8 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color)
-    : ArrowItem(_owner, -1, _startItem, 0, _color)
+ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
+    : ArrowItem(_owner, -1, _startItem, 0, _color), deleteInPhase(_deleteInPhase)
 {
 }
 
@@ -244,6 +244,9 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 cmd.set_start_zone("stack");
             else
                 cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
+        }
+        if (deleteInPhase != 0) {
+            cmd.set_delete_in_phase(deleteInPhase);
         }
         player->getPlayerActions()->sendGameCommand(cmd);
     }

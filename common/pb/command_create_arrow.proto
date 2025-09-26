@@ -27,4 +27,8 @@ message Command_CreateArrow {
 
     // the color of the arrow
     optional color arrow_color = 7;
+
+    // the phase that this arrow is deleted in, arrows will also be deleted in later phases or phases before the current
+    // one
+    optional sint32 delete_in_phase = 8;
 }
