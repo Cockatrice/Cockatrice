@@ -27,6 +27,7 @@ add_executable(
   ../../cockatrice/src/database/parser/cockatrice_xml_3.cpp
   ../../cockatrice/src/database/parser/cockatrice_xml_4.cpp
   ../../cockatrice/src/settings/settings_manager.cpp
+    ../../cockatrice/src/settings/card_override_settings.cpp
   carddatabase_test.cpp
   mocks.cpp
 )
