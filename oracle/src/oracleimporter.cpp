@@ -173,12 +173,12 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // DETECT CARD POSITIONING INFO
 
-    // cards that enter the field tapped
-    bool cipt = parseCipt(name, text);
-
     bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
                                 properties.value("layout").toString() == "split" ||
                                 properties.value("layout").toString() == "planar";
+
+    // cards that enter the field tapped
+    bool cipt = parseCipt(name, text) || landscapeOrientation;
 
     // table row
     int tableRow = 1;
