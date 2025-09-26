@@ -26,7 +26,7 @@ public slots:
     void updateBackgroundProperties();
     void updateButtonsToBackgroundColor();
     QGroupBox *createButtons();
-    void updateConnectButton(const ClientStatus status);
+    void updateConnectionStatus(const ClientStatus status);
 
 private:
     QGridLayout *layout;
@@ -38,6 +38,7 @@ private:
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
+    HomeStyledButton *localGameButton;
 };
 
 #endif // HOME_WIDGET_H

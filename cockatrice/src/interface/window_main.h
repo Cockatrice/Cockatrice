@@ -60,6 +60,7 @@ public slots:
     void actCheckServerUpdates();
     void actCheckClientUpdates();
     void actConnect();
+    void actSinglePlayer();
     void actExit();
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
@@ -80,7 +81,6 @@ private slots:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void notifyUserAboutUpdate();
     void actDisconnect();
-    void actSinglePlayer();
     void actWatchReplay();
     void actFullScreen(bool checked);
     void actRegister();
