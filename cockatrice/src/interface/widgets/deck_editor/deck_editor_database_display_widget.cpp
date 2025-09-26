@@ -142,7 +142,7 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        emit cardChanged(getCardOrPinnedPrinting(cardName));
+        emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
     }
 }
 
