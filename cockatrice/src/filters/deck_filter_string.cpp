@@ -118,7 +118,7 @@ static void setupParserRules()
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
             deck->deckLoader->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
-                auto cardInfoPtr = CardDatabaseManager::getInstance()->getCardInfo(node->getName());
+                auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }

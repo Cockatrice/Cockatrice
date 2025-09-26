@@ -18,10 +18,10 @@ class CardQuery : public ::testing::Test
 protected:
     void SetUp() override
     {
-        cat = CardDatabaseManager::getInstance()->getCardBySimpleName("Cat");
-        notDeadAfterAll = CardDatabaseManager::getInstance()->getCardBySimpleName("Not Dead");
-        truth = CardDatabaseManager::getInstance()->getCardBySimpleName("Truth");
-        doctor = CardDatabaseManager::getInstance()->getCardBySimpleName("Doctor");
+        cat = CardDatabaseManager::query()->getCardBySimpleName("Cat");
+        notDeadAfterAll = CardDatabaseManager::query()->getCardBySimpleName("Not Dead");
+        truth = CardDatabaseManager::query()->getCardBySimpleName("Truth");
+        doctor = CardDatabaseManager::query()->getCardBySimpleName("Doctor");
     }
     // void TearDown() override {}
 

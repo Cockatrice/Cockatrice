@@ -196,7 +196,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             const QString &relatedCardName = rel->getName();
             QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
-                deckEditor->updateCard(CardDatabaseManager::getInstance()->getCard({relatedCardName}));
+                deckEditor->updateCard(CardDatabaseManager::query()->getCard({relatedCardName}));
                 deckEditor->showPrintingSelector();
             });
         }

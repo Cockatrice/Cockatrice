@@ -3,6 +3,8 @@
 
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
+#include "card_database_loader.h"
+#include "card_database_querier.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -14,20 +16,6 @@
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLog, "card_database");
-inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
-inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");
-
-class ICardDatabaseParser;
-
-enum LoadStatus
-{
-    Ok,
-    VersionTooOld,
-    Invalid,
-    NotLoaded,
-    FileError,
-    NoCards
-};
 
 class CardDatabase : public QObject
 {
@@ -48,79 +36,50 @@ protected:
      */
     SetNameMap sets;
 
+    // loader responsible for file discovery & parsing
+    CardDatabaseLoader *loader;
+
     LoadStatus loadStatus;
 
-    QVector<ICardDatabaseParser *> availableParsers;
+    CardDatabaseQuerier *querier;
 
 private:
     void checkUnknownSets();
     void refreshCachedReverseRelatedCards();
 
-    QBasicMutex *reloadDatabaseMutex = new QBasicMutex(), *clearDatabaseMutex = new QBasicMutex(),
-                *loadFromFileMutex = new QBasicMutex(), *addCardMutex = new QBasicMutex(),
+    QBasicMutex *clearDatabaseMutex = new QBasicMutex(), *addCardMutex = new QBasicMutex(),
                 *removeCardMutex = new QBasicMutex();
 
 public:
     explicit CardDatabase(QObject *parent = nullptr);
     ~CardDatabase() override;
-    void clear();
+
     void removeCard(CardInfoPtr card);
+    void clear();
 
-    [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
-    [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
-
-    QList<ExactCard> getCards(const QList<CardRef> &cardRefs) const;
-    [[nodiscard]] ExactCard getCard(const CardRef &cardRef) const;
-
-    [[nodiscard]] ExactCard getPreferredCard(const CardInfoPtr &cardInfo) const;
-
-    static PrintingInfo findPrintingWithId(const CardInfoPtr &cardInfo, const QString &providerId);
-    [[nodiscard]] PrintingInfo getPreferredPrinting(const QString &cardName) const;
-    [[nodiscard]] PrintingInfo getPreferredPrinting(const CardInfoPtr &cardInfo) const;
-    [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
-    PrintingInfo
-    getSpecificPrinting(const QString &cardName, const QString &setShortName, const QString &collectorNumber) const;
-    QString getPreferredPrintingProviderId(const QString &cardName) const;
-    bool isPreferredPrinting(const CardRef &cardRef) const;
-    ExactCard getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const;
-
-    [[nodiscard]] ExactCard guessCard(const CardRef &cardRef) const;
-    [[nodiscard]] ExactCard getRandomCard();
-
-    /*
-     * Get a card by its simple name. The name will be simplified in this
-     * function, so you don't need to simplify it beforehand.
-     */
-    [[nodiscard]] CardInfoPtr getCardBySimpleName(const QString &cardName) const;
-    CardInfoPtr lookupCardByName(const QString &name) const;
-
-    CardSetPtr getSet(const QString &setName);
     const CardNameMap &getCardList() const
     {
         return cards;
     }
+    CardSetPtr getSet(const QString &setName);
     SetList getSetList() const;
-    CardInfoPtr getCardFromMap(const CardNameMap &cardMap, const QString &cardName) const;
-    LoadStatus loadFromFile(const QString &fileName);
-    bool saveCustomTokensToFile();
-    QStringList getAllMainCardTypes() const;
-    QMap<QString, int> getAllMainCardTypesWithCount() const;
-    QMap<QString, int> getAllSubCardTypesWithCount() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;
     }
+    CardDatabaseQuerier *query() const
+    {
+        return querier;
+    }
     void enableAllUnknownSets();
     void markAllSetsAsKnown();
     void notifyEnabledSetsChanged();
-    static QStringList collectCustomDatabasePaths();
 
 public slots:
-    LoadStatus loadCardDatabases();
     void addCard(CardInfoPtr card);
     void addSet(CardSetPtr set);
-protected slots:
-    LoadStatus loadCardDatabase(const QString &path);
+    void loadCardDatabases();
+    bool saveCustomTokensToFile();
 signals:
     void cardDatabaseLoadingFinished();
     void cardDatabaseLoadingFailed();
@@ -129,6 +88,9 @@ signals:
     void cardDatabaseEnabledSetsChanged();
     void cardAdded(CardInfoPtr card);
     void cardRemoved(CardInfoPtr card);
+
+    friend class CardDatabaseLoader;
+    friend class CardDatabaseQuerier;
 };
 
 #endif

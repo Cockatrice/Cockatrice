@@ -227,7 +227,7 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
         QString cardName = current.sibling(current.row(), 1).data().toString();
         QString providerId = current.sibling(current.row(), 4).data().toString();
-        if (ExactCard selectedCard = CardDatabaseManager::getInstance()->getCard({cardName, providerId})) {
+        if (ExactCard selectedCard = CardDatabaseManager::query()->getCard({cardName, providerId})) {
             return selectedCard;
         }
     }
@@ -286,7 +286,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                if (CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef())) {
+                if (CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
                     bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
                 }
             }
@@ -486,7 +486,7 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
-    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName, cardProviderID});
+    ExactCard card = CardDatabaseManager::query()->getCard({cardName, cardProviderID});
     QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
                                     // Third argument (true) says create the card no matter what, even if not in DB
                                     : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);

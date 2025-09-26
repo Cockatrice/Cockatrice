@@ -368,7 +368,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
 
     auto relatedCardExists = [](const CardRelation *cardRelation) {
-        return CardDatabaseManager::getInstance()->getCardInfo(cardRelation->getName()) != nullptr;
+        return CardDatabaseManager::query()->getCardInfo(cardRelation->getName()) != nullptr;
     };
 
     bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
@@ -383,7 +383,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
             emit cardChanged(
-                CardDatabaseManager::getInstance()->getCard({relatedCardName, exactCard.getPrinting().getUuid()}));
+                CardDatabaseManager::query()->getCard({relatedCardName, exactCard.getPrinting().getUuid()}));
         });
         viewRelatedCards->addAction(viewCard);
     }

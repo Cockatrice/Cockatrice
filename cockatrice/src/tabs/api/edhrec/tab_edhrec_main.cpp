@@ -136,7 +136,7 @@ void TabEdhRecMain::retranslateUi()
 
 void TabEdhRecMain::doSearch()
 {
-    CardInfoPtr searchedCard = CardDatabaseManager::getInstance()->getCardInfo(searchBar->text());
+    CardInfoPtr searchedCard = CardDatabaseManager::query()->getCardInfo(searchBar->text());
     if (!searchedCard) {
         return;
     }

@@ -96,7 +96,7 @@ void TappedOutInterface::analyzeDeck(DeckList *deck)
 void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.getCardInfo(card->getName());
+        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
         if (!dbCard || dbCard->getIsToken())
             return;
 

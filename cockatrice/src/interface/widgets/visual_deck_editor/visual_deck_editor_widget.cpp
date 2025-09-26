@@ -42,7 +42,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
         if (!searchBar->hasFocus())
             return;
 
-        ExactCard card = CardDatabaseManager::getInstance()->getCard({searchBar->text()});
+        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
@@ -103,7 +103,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     // Search button functionality
     searchPushButton = new QPushButton(this);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
-        ExactCard card = CardDatabaseManager::getInstance()->getCard({searchBar->text()});
+        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }

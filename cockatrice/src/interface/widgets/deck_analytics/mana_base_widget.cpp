@@ -87,7 +87,7 @@ QHash<QString, int> ManaBaseWidget::analyzeManaBase()
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
+                CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
                 if (info) {
                     auto devotion = determineManaProduction(info->getText());
                     mergeManaCounts(manaBaseMap, devotion);

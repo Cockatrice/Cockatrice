@@ -205,9 +205,9 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         CardRef ref;
         ref.name = cardInfo->getName();
         ref.providerId = cardProviderId;
-        pic->setCard(CardDatabaseManager::getInstance()->getCard(ref));
+        pic->setCard(CardDatabaseManager::query()->getCard(ref));
     } else {
-        pic->setCard(CardDatabaseManager::getInstance()->getPreferredCard(cardInfo));
+        pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
     }
 }
 

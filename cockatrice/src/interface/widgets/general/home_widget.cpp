@@ -89,7 +89,7 @@ void HomeWidget::updateRandomCard()
             break;
         case BackgroundSources::RandomCardArt:
             do {
-                newCard = CardDatabaseManager::getInstance()->getRandomCard();
+                newCard = CardDatabaseManager::query()->getRandomCard();
             } while (newCard == backgroundSourceCard->getCard() &&
                      newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
@@ -99,17 +99,17 @@ void HomeWidget::updateRandomCard()
 
             if (!cardRefs.empty()) {
                 if (cardRefs.size() == 1) {
-                    newCard = CardDatabaseManager::getInstance()->getCard(cardRefs.first());
+                    newCard = CardDatabaseManager::query()->getCard(cardRefs.first());
                 } else {
                     // Keep picking until different
                     do {
                         int idx = QRandomGenerator::global()->bounded(cardRefs.size());
-                        newCard = CardDatabaseManager::getInstance()->getCard(cardRefs.at(idx));
+                        newCard = CardDatabaseManager::query()->getCard(cardRefs.at(idx));
                     } while (newCard == oldCard);
                 }
             } else {
                 do {
-                    newCard = CardDatabaseManager::getInstance()->getRandomCard();
+                    newCard = CardDatabaseManager::query()->getRandomCard();
                 } while (newCard == oldCard);
             }
             break;

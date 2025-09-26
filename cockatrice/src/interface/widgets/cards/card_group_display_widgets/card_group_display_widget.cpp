@@ -55,7 +55,7 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
-    widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, cardProviderId}));
+    widget->setCard(CardDatabaseManager::query()->getCard({cardName, cardProviderId}));
 
     connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &CardGroupDisplayWidget::onClick);
     connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::onHover);

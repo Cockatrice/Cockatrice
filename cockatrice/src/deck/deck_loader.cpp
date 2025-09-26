@@ -282,7 +282,7 @@ QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
     // Set up the function to call
     auto formatDeckListForExport = [&mainBoardCards, &sideBoardCards](const auto *node, const auto *card) {
         // Get the card name
-        CardInfoPtr dbCard = CardDatabaseManager::getInstance()->getCardInfo(card->getName());
+        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
         if (!dbCard || dbCard->getIsToken()) {
             // If it's a token, we don't care about the card.
             return;
@@ -325,7 +325,7 @@ struct SetProviderIdToPreferred
     void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
     {
         Q_UNUSED(node);
-        PrintingInfo preferredPrinting = CardDatabaseManager::getInstance()->getPreferredPrinting(card->getName());
+        PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
         QString providerId = preferredPrinting.getUuid();
         QString setShortName = preferredPrinting.getSet()->getShortName();
         QString collectorNumber = preferredPrinting.getProperty("num");
@@ -359,6 +359,7 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
         // Retrieve the providerId based on setName and collectorNumber
         QString providerId =
             CardDatabaseManager::getInstance()
+                ->query()
                 ->getSpecificPrinting(card->getName(), card->getCardSetShortName(), card->getCardCollectorNumber())
                 .getUuid();
 
@@ -468,7 +469,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
     for (int j = 0; j < zoneNode->size(); j++) {
         auto *card = dynamic_cast<DecklistCardNode *>(zoneNode->at(j));
 
-        CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(card->getName());
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
         QString cardType = info ? info->getMainCardType() : "unknown";
 
         cardsByType.insert(cardType, card);
@@ -584,7 +585,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
 
 QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneName)
 {
-    CardInfoPtr card = CardDatabaseManager::getInstance()->getCardInfo(cardName);
+    CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
 
     if (card && card->getIsToken()) {
         return DECK_ZONE_TOKENS;
@@ -596,7 +597,7 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
 QString DeckLoader::getCompleteCardName(const QString &cardName) const
 {
     if (CardDatabaseManager::getInstance()) {
-        ExactCard temp = CardDatabaseManager::getInstance()->guessCard({cardName});
+        ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
         if (temp) {
             return temp.getName();
         }

@@ -152,8 +152,8 @@ void DlgSelectSetForCards::actOK()
                 continue;
             }
             model->removeRow(find_card.row(), find_card.parent());
-            CardInfoPtr cardInfo = CardDatabaseManager::getInstance()->getCardInfo(card);
-            PrintingInfo printing = CardDatabaseManager::getInstance()->getSpecificPrinting(card, modifiedSet, "");
+            CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(card);
+            PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(card, modifiedSet, "");
             model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
         }
     }
@@ -223,7 +223,7 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
             if (!currentCard)
                 continue;
 
-            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
+            CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             if (!infoPtr)
                 continue;
 
@@ -291,13 +291,14 @@ void DlgSelectSetForCards::updateCardLists()
 
             if (!found) {
                 // The card was not in any selected set
-                ExactCard card = CardDatabaseManager::getInstance()->getCard({currentCard->getName()});
+                ExactCard card = CardDatabaseManager::query()->getCard({currentCard->getName()});
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
                 picture_widget->setCard(card);
                 uneditedCardsFlowWidget->addWidget(picture_widget);
             } else {
-                ExactCard card = CardDatabaseManager::getInstance()->getCard(
+                ExactCard card = CardDatabaseManager::query()->getCard(
                     {currentCard->getName(), CardDatabaseManager::getInstance()
+                                                 ->query()
                                                  ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
                                                  .getUuid()});
                 CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
@@ -377,7 +378,7 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
             if (!currentCard)
                 continue;
 
-            CardInfoPtr infoPtr = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
+            CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             if (!infoPtr)
                 continue;
 
@@ -627,17 +628,15 @@ void SetEntryWidget::updateCardDisplayWidgets()
 
     for (const QString &cardName : possibleCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
-        QString providerId =
-            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, providerId}));
+        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
         cardListContainer->addWidget(picture_widget);
     }
 
     for (const QString &cardName : unusedCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
-        QString providerId =
-            CardDatabaseManager::getInstance()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
-        picture_widget->setCard(CardDatabaseManager::getInstance()->getCard({cardName, providerId}));
+        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }
 }

@@ -160,12 +160,12 @@ void CardInfoFrameWidget::setCard(const ExactCard &card)
 
 void CardInfoFrameWidget::setCard(const QString &cardName)
 {
-    setCard(CardDatabaseManager::getInstance()->guessCard({cardName}));
+    setCard(CardDatabaseManager::query()->guessCard({cardName}));
 }
 
 void CardInfoFrameWidget::setCard(const CardRef &cardRef)
 {
-    setCard(CardDatabaseManager::getInstance()->getCard(cardRef));
+    setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)

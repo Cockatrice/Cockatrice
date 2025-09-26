@@ -71,7 +71,7 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
 void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
 {
     auto copyIfNotAToken = [this, &destination](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.getCardInfo(card->getName());
+        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
         if (dbCard && !dbCard->getIsToken()) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());

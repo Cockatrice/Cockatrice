@@ -66,7 +66,7 @@ void DeckListModel::rebuildTree()
                 continue;
             }
 
-            CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(currentCard->getName());
+            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             QString groupCriteria = getGroupCriteriaForCard(info);
 
             auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
@@ -341,7 +341,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
         return nullptr;
     }
 
-    CardInfoPtr info = CardDatabaseManager::getInstance()->getCardInfo(cardName);
+    CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(cardName);
     if (!info) {
         return nullptr;
     }
@@ -371,7 +371,7 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
 
 QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    ExactCard card = CardDatabaseManager::getInstance()->getCard({cardName});
+    ExactCard card = CardDatabaseManager::query()->getCard({cardName});
 
     if (!card) {
         if (abAddAnyway) {
@@ -566,7 +566,7 @@ QList<ExactCard> DeckListModel::getCards() const
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
                 if (card) {
                     cards.append(card);
                 } else {
@@ -599,7 +599,7 @@ QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
                 if (!currentCard)
                     continue;
                 for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                    ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
                     if (card) {
                         cards.append(card);
                     } else {

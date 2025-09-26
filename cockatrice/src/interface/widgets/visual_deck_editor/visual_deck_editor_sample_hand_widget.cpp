@@ -101,7 +101,7 @@ QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGe
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                ExactCard card = CardDatabaseManager::getInstance()->getCard(currentCard->toCardRef());
+                ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
                 if (card) {
                     mainDeckCards.append(card);
                 }

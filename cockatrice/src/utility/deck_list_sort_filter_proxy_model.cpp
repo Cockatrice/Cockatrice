@@ -20,8 +20,8 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
     auto *lNode = static_cast<DecklistModelCardNode *>(left.internalPointer());
     auto *rNode = static_cast<DecklistModelCardNode *>(right.internalPointer());
 
-    CardInfoPtr lInfo = CardDatabaseManager::getInstance()->guessCard({lNode->getName()}).getCardPtr();
-    CardInfoPtr rInfo = CardDatabaseManager::getInstance()->guessCard({rNode->getName()}).getCardPtr();
+    CardInfoPtr lInfo = CardDatabaseManager::query()->guessCard({lNode->getName()}).getCardPtr();
+    CardInfoPtr rInfo = CardDatabaseManager::query()->guessCard({rNode->getName()}).getCardPtr();
 
     // Example: multiple tie-break criteria (colors > cmc > name)
     for (const QString &crit : sortCriteria) {

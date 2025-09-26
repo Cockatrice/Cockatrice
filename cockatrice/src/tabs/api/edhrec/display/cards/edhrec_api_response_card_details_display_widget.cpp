@@ -12,7 +12,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     setLayout(layout);
 
     cardPictureWidget = new CardInfoPictureWidget(this);
-    cardPictureWidget->setCard(CardDatabaseManager::getInstance()->guessCard({toDisplay.sanitized}));
+    cardPictureWidget->setCard(CardDatabaseManager::query()->guessCard({toDisplay.sanitized}));
 
     nameLabel = new QLabel(this);
     nameLabel->setText(toDisplay.name);

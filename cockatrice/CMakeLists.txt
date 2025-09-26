@@ -22,7 +22,9 @@ set(cockatrice_SOURCES
     src/client/tapped_out_interface.cpp
     src/client/update_downloader.cpp
     src/database/card_database.cpp
+    src/database/card_database_loader.cpp
     src/database/card_database_manager.cpp
+    src/database/card_database_querier.cpp
     src/database/model/card_database_model.cpp
     src/database/model/card_database_display_model.cpp
     src/database/model/card/card_completer_proxy_model.cpp
