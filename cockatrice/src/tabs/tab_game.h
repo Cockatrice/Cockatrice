@@ -168,7 +168,6 @@ public:
     void connectToPlayerManager();
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
-    void connectMessageLogToPlayerHandler();
     void connectPlayerListToGameEventHandler();
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;

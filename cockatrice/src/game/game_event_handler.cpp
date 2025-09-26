@@ -340,6 +340,8 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             while (playerIterator.hasNext())
                 playerIterator.next().value()->updateZones();
 
+            emit logConcede(eventPlayerId);
+
             break;
         }
         case GameEventContext::UNCONCEDE: {
@@ -348,6 +350,8 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
             while (playerIterator.hasNext())
                 playerIterator.next().value()->updateZones();
+
+            emit logUnconcede(eventPlayerId);
 
             break;
         }

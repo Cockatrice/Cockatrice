@@ -78,7 +78,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connectToGameEventHandler();
     connectPlayerListToGameEventHandler();
     connectMessageLogToGameEventHandler();
-    connectMessageLogToPlayerHandler();
 
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -124,7 +123,6 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     connectToGameEventHandler();
     connectPlayerListToGameEventHandler();
     connectMessageLogToGameEventHandler();
-    connectMessageLogToPlayerHandler();
 
     retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -152,6 +150,7 @@ void TabGame::connectToPlayerManager()
     connect(game->getPlayerManager(), &PlayerManager::playerRemoved, this, &TabGame::processPlayerLeave);
     // update menu text when player concedes so that "concede" gets updated to "unconcede"
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, this, &TabGame::retranslateUi);
+    connect(game->getPlayerManager(), &PlayerManager::playerUnconceded, this, &TabGame::retranslateUi);
 }
 
 void TabGame::connectToGameEventHandler()
@@ -206,14 +205,11 @@ void TabGame::connectMessageLogToGameEventHandler()
     connect(game->getGameEventHandler(), &GameEventHandler::logTurnReversed, messageLog,
             &MessageLogWidget::logReverseTurn);
 
+    connect(game->getGameEventHandler(), &GameEventHandler::logConcede, messageLog, &MessageLogWidget::logConcede);
+    connect(game->getGameEventHandler(), &GameEventHandler::logUnconcede, messageLog, &MessageLogWidget::logUnconcede);
+
     connect(game->getGameEventHandler(), &GameEventHandler::logGameClosed, messageLog,
             &MessageLogWidget::logGameClosed);
-}
-
-void TabGame::connectMessageLogToPlayerHandler()
-{
-    connect(game->getPlayerManager(), &PlayerManager::playerConceded, messageLog, &MessageLogWidget::logConcede);
-    connect(game->getPlayerManager(), &PlayerManager::playerUnconceded, messageLog, &MessageLogWidget::logUnconcede);
 }
 
 void TabGame::connectPlayerListToGameEventHandler()
@@ -497,13 +493,14 @@ void TabGame::actConcede()
         if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
+        emit game->getPlayerManager()->activeLocalPlayerConceded();
         player->setConceded(true);
     } else {
         if (QMessageBox::question(this, tr("Unconcede"),
                                   tr("You have already conceded.  Do you want to return to this game?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
-
+        emit game->getPlayerManager()->activeLocalPlayerUnconceded();
         player->setConceded(false);
     }
 }
@@ -805,6 +802,9 @@ void TabGame::startGame(bool _resuming)
     playerListWidget->setGameStarted(true, game->getGameState()->isResuming());
     game->getGameMetaInfo()->setStarted(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
+
+    aConcede->setText(tr("&Concede"));
+    aConcede->setEnabled(true);
 }
 
 void TabGame::stopGame()
@@ -821,6 +821,9 @@ void TabGame::stopGame()
     playerListWidget->setGameStarted(false, false);
 
     scene->clearViews();
+
+    aConcede->setText(tr("&Concede"));
+    aConcede->setEnabled(false);
 }
 
 void TabGame::closeGame()
@@ -940,6 +943,9 @@ void TabGame::createMenuItems()
     connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
+    if (!game->getGameMetaInfo()->started()) {
+        aConcede->setEnabled(false);
+    }
     connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerConceded, game->getGameEventHandler(),
             &GameEventHandler::handleActiveLocalPlayerConceded);
     connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerUnconceded, game->getGameEventHandler(),
@@ -1282,7 +1288,6 @@ void TabGame::createMessageDock(bool bReplay)
         timeElapsedLabel = new QLabel;
         timeElapsedLabel->setAlignment(Qt::AlignCenter);
         connect(game->getGameState(), &GameState::updateTimeElapsedLabel, this, &TabGame::updateTimeElapsedLabel);
-        game->getGameState()->startGameTimer();
 
         messageLogLayout->addWidget(timeElapsedLabel);
     }
