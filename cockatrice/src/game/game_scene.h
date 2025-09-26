@@ -161,6 +161,9 @@ public:
 
     /** Unregisters a card from animation updates. */
     void unregisterAnimationItem(AbstractCardItem *card);
+    void startRubberBand(const QPointF &selectionOrigin);
+    void resizeRubberBand(const QPointF &cursorPoint);
+    void stopRubberBand();
 
 public slots:
     /** Toggles a zone view for a player. */
@@ -180,6 +183,8 @@ public slots:
 
     /** Closes the most recently added zone view. */
     void closeMostRecentZoneView();
+    QTransform getViewTransform() const;
+    QTransform getViewportTransform() const;
 
 protected:
     /** Handles hover updates. */
