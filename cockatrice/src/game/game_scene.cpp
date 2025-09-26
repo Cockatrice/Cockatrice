@@ -15,7 +15,17 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
+#include <numeric>
 
+/**
+ * @brief Constructs the GameScene.
+ * @param _phasesToolbar Toolbar widget for phases.
+ * @param parent Optional parent QObject.
+ *
+ * Initializes the animation timer, adds the phases toolbar to the scene,
+ * and connects to settings changes for multi-column layout.
+ * Finally, calls rearrange() to layout players initially.
+ */
 GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
     : QGraphicsScene(parent), phasesToolbar(_phasesToolbar), viewSize(QSize()), playerRotation(0)
 {
@@ -39,23 +49,40 @@ GameScene::~GameScene()
     }
 }
 
+/**
+ * @brief Updates localized text in all zone views.
+ */
 void GameScene::retranslateUi()
 {
-    for (int i = 0; i < zoneViews.size(); ++i)
-        zoneViews[i]->retranslateUi();
+    for (ZoneViewWidget *view : zoneViews)
+        view->retranslateUi();
 }
 
+/**
+ * @brief Adds a player to the scene and stores their graphics item.
+ * @param player Player to add.
+ *
+ * Connects to the player's sizeChanged signal to recompute layout on resize.
+ */
 void GameScene::addPlayer(Player *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
+
     players << player->getGraphicsItem();
     addItem(player->getGraphicsItem());
     connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
 }
 
+/**
+ * @brief Removes a player from the scene.
+ * @param player Player to remove.
+ *
+ * Closes any zone views associated with the player and recomputes layout.
+ */
 void GameScene::removePlayer(Player *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
+
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();
@@ -66,90 +93,307 @@ void GameScene::removePlayer(Player *player)
     rearrange();
 }
 
+/**
+ * @brief Adjusts the global rotation offset for player layout.
+ * @param rotationAdjustment Number of positions to rotate.
+ *
+ * Recomputes player layout after applying rotation.
+ */
 void GameScene::adjustPlayerRotation(int rotationAdjustment)
 {
     playerRotation += rotationAdjustment;
     rearrange();
 }
 
+/**
+ * @brief Recomputes the layout of players and the scene size.
+ *
+ * Steps:
+ * 1. Collect active players who haven't conceded.
+ * 2. Rotate player list based on first local player and rotation offset.
+ * 3. Determine number of columns.
+ * 4. Compute scene size and layout.
+ * 5. Update toolbar height and scene rectangle.
+ * 6. Adjust columns and player positions to match view size.
+ */
 void GameScene::rearrange()
 {
-    playersByColumn.clear();
-
-    // Create the list of players playing, noting the first player's index.
-    QList<Player *> playersPlaying;
     int firstPlayerIndex = 0;
+    auto playersPlaying = collectActivePlayers(firstPlayerIndex);
+    playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
+
+    int columns = determineColumnCount(playersPlaying.size());
+    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+
+    phasesToolbar->setHeight(sceneSize.height());
+    setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+
+    processViewSizeChange(viewSize);
+}
+
+// ---------- View Size ----------
+
+/**
+ * @brief Handles view resize and redistributes player positions.
+ * @param newSize New view size.
+ *
+ * Steps:
+ * 1. Compute minimum width per column from player items.
+ * 2. Determine new scene width respecting aspect ratio.
+ * 3. Resize columns and reposition players proportionally.
+ */
+void GameScene::processViewSizeChange(const QSize &newSize)
+{
+    viewSize = newSize;
+
+    QList<qreal> minWidthByColumn = calculateMinWidthByColumn();
+    qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
+
+    qreal newWidth = calculateNewSceneWidth(newSize, minWidth);
+    setSceneRect(0, 0, newWidth, sceneRect().height());
+
+    resizeColumnsAndPlayers(minWidthByColumn, newWidth);
+}
+
+// ---------- Player Layout Helpers ----------
+
+/**
+ * @brief Collects all active (non-conceded) players.
+ * @param firstPlayerIndex Output index of first local player.
+ * @return List of active players.
+ *
+ * Used to determine rotation and layout order.
+ */
+QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
+{
+    QList<Player *> activePlayers;
+    firstPlayerIndex = 0;
     bool firstPlayerFound = false;
-    QListIterator<PlayerGraphicsItem *> playersIter(players);
-    while (playersIter.hasNext()) {
-        Player *p = playersIter.next()->getPlayer();
+
+    for (auto *pgItem : players) {
+        Player *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
-            playersPlaying.append(p);
+            activePlayers.append(p);
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
-                firstPlayerIndex = playersPlaying.size() - 1;
+                firstPlayerIndex = activePlayers.size() - 1;
                 firstPlayerFound = true;
             }
         }
     }
+    return activePlayers;
+}
 
-    // Rotate the players playing list so that first player is first, then
-    // adjust by the additional rotation setting.
-    if (!playersPlaying.isEmpty()) {
+/**
+ * @brief Rotates the list of players for layout.
+ * @param players Original list of players.
+ * @param firstPlayerIndex Index of first local player.
+ * @return Rotated list.
+ *
+ * Applies rotation offset and ensures the list wraps correctly.
+ */
+QList<Player *> GameScene::rotatePlayers(const QList<Player *> &activePlayers, int firstPlayerIndex) const
+{
+    QList<Player *> rotated = activePlayers;
+    if (!rotated.isEmpty()) {
         int totalRotation = firstPlayerIndex + playerRotation;
         while (totalRotation < 0)
-            totalRotation += playersPlaying.size();
-        for (int i = 0; i < totalRotation; ++i) {
-            playersPlaying.append(playersPlaying.takeFirst());
-        }
+            totalRotation += rotated.size();
+        for (int i = 0; i < totalRotation; ++i)
+            rotated.append(rotated.takeFirst());
     }
+    return rotated;
+}
 
-    const int playersCount = playersPlaying.size();
-    const int columns = playersCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
-    const int rows = qCeil((qreal)playersCount / columns);
+int GameScene::determineColumnCount(int playerCount)
+{
+    return playerCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+}
+
+/**
+ * @brief Computes layout positions and scene size based on players and columns.
+ * @param playersPlaying List of active players.
+ * @param columns Number of columns to split into.
+ * @return Calculated scene size.
+ *
+ * Logic:
+ * - Determine rows per column (rounding up).
+ * - Calculate column widths based on widest player item.
+ * - Accumulate scene width and height.
+ * - Position players in columns with spacing.
+ * - Mirror graphics for visual balance.
+ */
+QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns)
+{
+    playersByColumn.clear();
+
+    int rows = qCeil((qreal)playersPlaying.size() / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
-    QListIterator<Player *> playersPlayingIter(playersPlaying);
+    QListIterator<Player *> playersIter(playersPlaying);
     for (int col = 0; col < columns; ++col) {
         playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
         qreal thisColumnHeight = -playerAreaSpacing;
-        const int rowsInColumn = rows - (playersCount % columns) * col; // only correct for max. 2 cols
+        int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
+
         for (int j = 0; j < rowsInColumn; ++j) {
-            Player *player = playersPlayingIter.next();
+            Player *player = playersIter.next();
             if (col == 0)
                 playersByColumn[col].prepend(player->getGraphicsItem());
             else
                 playersByColumn[col].append(player->getGraphicsItem());
-            thisColumnHeight += player->getGraphicsItem()->boundingRect().height() + playerAreaSpacing;
-            if (player->getGraphicsItem()->boundingRect().width() > columnWidth[col])
-                columnWidth[col] = player->getGraphicsItem()->boundingRect().width();
+
+            auto *pgItem = player->getGraphicsItem();
+            thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
+            columnWidth[col] = std::max(columnWidth[col], (int)pgItem->boundingRect().width());
         }
-        if (thisColumnHeight > sceneHeight)
-            sceneHeight = thisColumnHeight;
+
+        sceneHeight = std::max(sceneHeight, thisColumnHeight);
         sceneWidth += columnWidth[col] + playerAreaSpacing;
     }
 
-    phasesToolbar->setHeight(sceneHeight);
     qreal phasesWidth = phasesToolbar->getWidth();
     sceneWidth += phasesWidth;
 
+    // Position players horizontally and vertically
     qreal x = phasesWidth;
     for (int col = 0; col < columns; ++col) {
         qreal y = 0;
         for (int row = 0; row < playersByColumn[col].size(); ++row) {
             PlayerGraphicsItem *player = playersByColumn[col][row];
             player->setPos(x, y);
-            player->setMirrored(row != rows - 1);
+            player->setMirrored(row != rows - 1); // Mirror all except bottom-most
             y += player->boundingRect().height() + playerAreaSpacing;
         }
         x += columnWidth[col] + playerAreaSpacing;
     }
 
-    setSceneRect(sceneRect().x(), sceneRect().y(), sceneWidth, sceneHeight);
-    processViewSizeChange(viewSize);
+    return QSizeF(sceneWidth, sceneHeight);
 }
 
+/**
+ * @brief Computes the minimum width for each column based on player minimum widths.
+ * @return List of minimum widths per column.
+ */
+QList<qreal> GameScene::calculateMinWidthByColumn() const
+{
+    QList<qreal> minWidthByColumn;
+    for (const auto &col : playersByColumn) {
+        qreal maxWidth = 0;
+        for (PlayerGraphicsItem *player : col)
+            maxWidth = std::max(maxWidth, player->getMinimumWidth());
+        minWidthByColumn.append(maxWidth);
+    }
+    return minWidthByColumn;
+}
+
+/**
+ * @brief Calculates new scene width considering window aspect ratio.
+ * @param newSize View size.
+ * @param minWidth Minimum width needed to fit all players.
+ * @return Scene width respecting window and content.
+ */
+qreal GameScene::calculateNewSceneWidth(const QSize &newSize, qreal minWidth) const
+{
+    qreal newRatio = (qreal)newSize.width() / newSize.height();
+    qreal minRatio = minWidth / sceneRect().height();
+
+    if (minRatio > newRatio) {
+        return minWidth; // Table dominates width
+    } else {
+        return newRatio * sceneRect().height(); // Window ratio dominates
+    }
+}
+
+/**
+ * @brief Resizes columns and distributes extra width to players.
+ * @param minWidthByColumn Minimum widths per column.
+ * @param newWidth Total scene width.
+ *
+ * Extra width is distributed evenly across columns. Each player item is
+ * notified to adjust internal layout for the new column width.
+ */
+void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qreal newWidth)
+{
+    qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
+
+    qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
+    qreal newx = phasesToolbar->getWidth();
+
+    for (int col = 0; col < playersByColumn.size(); ++col) {
+        for (PlayerGraphicsItem *player : playersByColumn[col]) {
+            player->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
+            player->setPos(newx, player->y());
+        }
+        newx += minWidthByColumn[col] + extraWidthPerColumn;
+    }
+}
+
+// ---------- Hover Handling ----------
+
+void GameScene::updateHover(const QPointF &scenePos)
+{
+    auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
+
+    CardZone *zone = findTopmostZone(itemList);
+    CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
+    updateHoveredCard(topCard);
+}
+
+void GameScene::updateHoveredCard(CardItem *newCard)
+{
+    if (hoveredCard && (newCard != hoveredCard))
+        hoveredCard->setHovered(false);
+    if (newCard && (newCard != hoveredCard))
+        newCard->setHovered(true);
+    hoveredCard = newCard;
+}
+
+CardZone *GameScene::findTopmostZone(const QList<QGraphicsItem *> &items)
+{
+    for (QGraphicsItem *item : items)
+        if (auto *zone = qgraphicsitem_cast<CardZone *>(item))
+            return zone;
+    return nullptr;
+}
+
+CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, CardZone *zone)
+{
+    CardItem *maxZCard = nullptr;
+    qreal maxZ = -1;
+
+    for (QGraphicsItem *item : items) {
+        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card)
+            continue;
+
+        if (card->getAttachedTo()) {
+            if (card->getAttachedTo()->getZone() != zone->getLogic())
+                continue;
+        } else if (card->getZone() != zone->getLogic())
+            continue;
+
+        if (card->getRealZValue() > maxZ) {
+            maxZ = card->getRealZValue();
+            maxZCard = card;
+        }
+    }
+    return maxZCard;
+}
+
+// ---------- Zone Views ----------
+
+/**
+ * @brief Toggles a zone view for a player.
+ * @param player Player owning the zone.
+ * @param zoneName Name of the zone.
+ * @param numberCards Number of cards visible in the view.
+ * @param isReversed Whether the zone view is reversed.
+ *
+ * If an identical view exists, it is closed. Otherwise, a new ZoneViewWidget is created
+ * and positioned based on zone type.
+ */
 void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
 {
     for (auto &view : zoneViews) {
@@ -162,18 +406,26 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
 
     ZoneViewWidget *item =
         new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
+
     zoneViews.append(item);
     connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
-    if (zoneName == "grave") {
+
+    if (zoneName == "grave")
         item->setPos(360, 100);
-    } else if (zoneName == "rfg") {
+    else if (zoneName == "rfg")
         item->setPos(380, 120);
-    } else {
+    else
         item->setPos(340, 80);
-    }
 }
 
+/**
+ * @brief Adds a revealed zone view (for shown cards).
+ * @param player Owning player.
+ * @param zone Zone logic.
+ * @param cardList List of cards to show.
+ * @param withWritePermission Whether edits are allowed.
+ */
 void GameScene::addRevealedZoneView(Player *player,
                                     CardZoneLogic *zone,
                                     const QList<const ServerInfo_Card *> &cardList,
@@ -186,23 +438,35 @@ void GameScene::addRevealedZoneView(Player *player,
     item->setPos(600, 80);
 }
 
+/**
+ * @brief Removes a zone view widget from the scene.
+ * @param item Zone view to remove.
+ */
 void GameScene::removeZoneView(ZoneViewWidget *item)
 {
     zoneViews.removeOne(item);
     removeItem(item);
 }
 
+/**
+ * @brief Closes all zone views.
+ */
 void GameScene::clearViews()
 {
     while (!zoneViews.isEmpty())
         zoneViews.first()->close();
 }
 
+/**
+ * @brief Closes the most recently added zone view.
+ */
 void GameScene::closeMostRecentZoneView()
 {
     if (!zoneViews.isEmpty())
         zoneViews.last()->close();
 }
+
+// ---------- View Transforms ----------
 
 QTransform GameScene::getViewTransform() const
 {
@@ -214,82 +478,7 @@ QTransform GameScene::getViewportTransform() const
     return views().at(0)->viewportTransform();
 }
 
-void GameScene::processViewSizeChange(const QSize &newSize)
-{
-    viewSize = newSize;
-
-    qreal newRatio = ((qreal)newSize.width()) / newSize.height();
-    qreal minWidth = 0;
-    QList<qreal> minWidthByColumn;
-    for (int col = 0; col < playersByColumn.size(); ++col) {
-        minWidthByColumn.append(0);
-        for (int row = 0; row < playersByColumn[col].size(); ++row) {
-            qreal w = playersByColumn[col][row]->getMinimumWidth();
-            if (w > minWidthByColumn[col])
-                minWidthByColumn[col] = w;
-        }
-        minWidth += minWidthByColumn[col];
-    }
-    minWidth += phasesToolbar->getWidth();
-
-    qreal minRatio = minWidth / sceneRect().height();
-    qreal newWidth;
-    if (minRatio > newRatio) {
-        // Aspect ratio is dominated by table width.
-        newWidth = minWidth;
-    } else {
-        // Aspect ratio is dominated by window dimensions.
-        newWidth = newRatio * sceneRect().height();
-    }
-    setSceneRect(0, 0, newWidth, sceneRect().height());
-
-    qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
-    qreal newx = phasesToolbar->getWidth();
-    for (int col = 0; col < playersByColumn.size(); ++col) {
-        for (int row = 0; row < playersByColumn[col].size(); ++row) {
-            playersByColumn[col][row]->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
-            playersByColumn[col][row]->setPos(newx, playersByColumn[col][row]->y());
-        }
-        newx += minWidthByColumn[col] + extraWidthPerColumn;
-    }
-}
-
-void GameScene::updateHover(const QPointF &scenePos)
-{
-    QList<QGraphicsItem *> itemList =
-        items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
-
-    // Search for the topmost zone and ignore all cards not belonging to that zone.
-    CardZone *zone = 0;
-    for (int i = 0; i < itemList.size(); ++i)
-        if ((zone = qgraphicsitem_cast<CardZone *>(itemList[i])))
-            break;
-
-    CardItem *maxZCard = 0;
-    if (zone) {
-        qreal maxZ = -1;
-        for (int i = 0; i < itemList.size(); ++i) {
-            CardItem *card = qgraphicsitem_cast<CardItem *>(itemList[i]);
-            if (!card)
-                continue;
-            if (card->getAttachedTo()) {
-                if (card->getAttachedTo()->getZone() != zone->getLogic())
-                    continue;
-            } else if (card->getZone() != zone->getLogic())
-                continue;
-
-            if (card->getRealZValue() > maxZ) {
-                maxZ = card->getRealZValue();
-                maxZCard = card;
-            }
-        }
-    }
-    if (hoveredCard && (maxZCard != hoveredCard))
-        hoveredCard->setHovered(false);
-    if (maxZCard && (maxZCard != hoveredCard))
-        maxZCard->setHovered(true);
-    hoveredCard = maxZCard;
-}
+// ---------- Event Handling ----------
 
 bool GameScene::event(QEvent *event)
 {
@@ -324,6 +513,8 @@ void GameScene::unregisterAnimationItem(AbstractCardItem *card)
     if (cardsToAnimate.isEmpty())
         animationTimer->stop();
 }
+
+// ---------- Rubber Band ----------
 
 void GameScene::startRubberBand(const QPointF &selectionOrigin)
 {
