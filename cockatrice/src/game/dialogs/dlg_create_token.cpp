@@ -199,7 +199,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         annotationEdit->setText("");
     }
 
-    pic->setCard(CardDatabaseManager::getInstance()->getPreferredCard(cardInfo));
+    pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const

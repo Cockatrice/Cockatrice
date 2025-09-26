@@ -1,5 +1,6 @@
 #include "card_database_querier.h"
 
+#include "../settings/cache_settings.h"
 #include "../utility/card_set_comparator.h"
 #include "card_database.h"
 
@@ -205,6 +206,17 @@ PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const QString &cardName,
 /**
  * Gets the card representing the preferred printing of the cardInfo
  *
+ * @param cardName The cardName to find the preferred card and printing for
+ * @return A specific printing of a card
+ */
+ExactCard CardDatabaseQuerier::getPreferredCard(const QString &cardName) const
+{
+    return getPreferredCard(getCardInfo(cardName));
+}
+
+/**
+ * Gets the card representing the preferred printing of the cardInfo
+ *
  * @param cardInfo The cardInfo to find the preferred printing for
  * @return A specific printing of a card
  */
@@ -232,6 +244,13 @@ PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardIn
 {
     if (!cardInfo) {
         return PrintingInfo(nullptr);
+    }
+
+    const auto &pinnedPrintingProviderId =
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName());
+
+    if (!pinnedPrintingProviderId.isEmpty()) {
+        return getSpecificPrinting({cardInfo->getName(), pinnedPrintingProviderId});
     }
 
     SetToPrintingsMap setMap = cardInfo->getSets();

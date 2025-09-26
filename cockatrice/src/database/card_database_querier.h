@@ -39,6 +39,7 @@ public:
     [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
     [[nodiscard]] PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setCode, const QString &collectorNumber) const;
+    ExactCard getPreferredCard(const QString &cardName) const;
     [[nodiscard]] PrintingInfo findPrintingWithId(const CardInfoPtr &card, const QString &providerId) const;
 
     [[nodiscard]] QStringList getAllMainCardTypes() const;
