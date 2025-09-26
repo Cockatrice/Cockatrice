@@ -1,11 +1,3 @@
-/**
- * @file game_scene.h
- * @brief Represents the main game scene, managing players, zones, animations, and layout.
- *
- * The GameScene handles the graphical arrangement of players, cards, and zones.
- * It calculates positions based on the number of players, columns, and rotations.
- */
-
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
@@ -64,44 +56,58 @@ private:
     void updateHover(const QPointF &scenePos);
 
 public:
+    /**
+     * @brief Constructs the GameScene.
+     * @param _phasesToolbar Toolbar widget for phases.
+     * @param parent Optional parent QObject.
+     */
     explicit GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
+
+    /** Destructor, cleans up timer and zone views. */
     ~GameScene() override;
 
     /** Updates UI text for all zone views. */
     void retranslateUi();
 
-    /** Processes changes in the view size and adjusts layout accordingly. */
-    void processViewSizeChange(const QSize &newSize);
-
-    /** Returns the current transform of the main view. */
-    QTransform getViewTransform() const;
-
-    /** Returns the viewport transform of the main view. */
-    QTransform getViewportTransform() const;
-
-    /** Starts a selection rubber band. */
-    void startRubberBand(const QPointF &selectionOrigin);
-
-    /** Resizes the rubber band to follow the cursor. */
-    void resizeRubberBand(const QPointF &cursorPoint);
-
-    /** Stops the rubber band selection. */
-    void stopRubberBand();
+    /**
+     * @brief Adds a player to the scene and stores their graphics item.
+     * @param player Player to add.
+     */
+    void addPlayer(Player *player);
 
     /**
-     * @brief Collects active players who have not conceded.
-     * @param firstPlayerIndex Output parameter indicating the first local player index.
+     * @brief Removes a player from the scene.
+     * @param player Player to remove.
+     */
+    void removePlayer(Player *player);
+
+    /**
+     * @brief Adjusts the global rotation offset for player layout.
+     * @param rotationAdjustment Number of positions to rotate.
+     */
+    void adjustPlayerRotation(int rotationAdjustment);
+
+    /** Recomputes the layout of players and the scene size. */
+    void rearrange();
+
+    /**
+     * @brief Handles view resize and redistributes player positions.
+     * @param newSize New view size.
+     */
+    void processViewSizeChange(const QSize &newSize);
+
+    /**
+     * @brief Collects all active (non-conceded) players.
+     * @param firstPlayerIndex Output index of first local player.
      * @return List of active players.
-     *
-     * This is used to determine player order and layout.
      */
     QList<Player *> collectActivePlayers(int &firstPlayerIndex) const;
 
     /**
-     * @brief Rotates the list of players based on first player and rotation offset.
+     * @brief Rotates the list of players for layout.
      * @param players Original list of players.
-     * @param firstPlayerIndex Index of the first local player.
-     * @return Rotated list of players.
+     * @param firstPlayerIndex Index of first local player.
+     * @return Rotated list.
      */
     QList<Player *> rotatePlayers(const QList<Player *> &players, int firstPlayerIndex) const;
 
@@ -113,36 +119,31 @@ public:
     static int determineColumnCount(int playerCount);
 
     /**
-     * @brief Computes the total scene size and arranges players.
+     * @brief Computes layout positions and scene size based on players and columns.
      * @param playersPlaying List of active players.
-     * @param columns Number of columns to arrange players into.
+     * @param columns Number of columns to split into.
      * @return Calculated scene size.
-     *
-     * This function:
-     * - Splits players into columns and rows.
-     * - Calculates maximum column width and scene height.
-     * - Positions players within columns with spacing.
-     * - Mirrors player graphics when appropriate.
      */
     QSizeF computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns);
 
-    /** Calculates minimum width required for each column based on player minimum widths. */
+    /**
+     * @brief Computes the minimum width for each column based on player minimum widths.
+     * @return List of minimum widths per column.
+     */
     QList<qreal> calculateMinWidthByColumn() const;
 
     /**
-     * @brief Calculates the new scene width based on window size and minimum required width.
-     * @param newSize New view size.
-     * @param minWidth Minimum scene width needed to fit all players.
-     * @return New scene width after layout calculations.
+     * @brief Calculates new scene width considering window aspect ratio.
+     * @param newSize View size.
+     * @param minWidth Minimum width needed to fit all players.
+     * @return Scene width respecting window and content.
      */
     qreal calculateNewSceneWidth(const QSize &newSize, qreal minWidth) const;
 
     /**
-     * @brief Resizes columns and positions players horizontally within the scene.
-     * @param minWidthByColumn Minimum width of each column.
-     * @param newWidth Total scene width to distribute.
-     *
-     * Extra width is evenly distributed across columns to fill available space.
+     * @brief Resizes columns and distributes extra width to players.
+     * @param minWidthByColumn Minimum widths per column.
+     * @param newWidth Total scene width.
      */
     void resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qreal newWidth);
 
@@ -156,16 +157,16 @@ public:
     void updateHoveredCard(CardItem *newCard);
 
     /** Registers a card for animation updates. */
-    void registerAnimationItem(AbstractCardItem *item);
+    void registerAnimationItem(AbstractCardItem *card);
 
     /** Unregisters a card from animation updates. */
     void unregisterAnimationItem(AbstractCardItem *card);
 
 public slots:
-    /** Toggles the display of a player's zone view. */
+    /** Toggles a zone view for a player. */
     void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
 
-    /** Adds a zone view showing revealed cards. */
+    /** Adds a revealed zone view (for shown cards). */
     void addRevealedZoneView(Player *player,
                              CardZoneLogic *zone,
                              const QList<const ServerInfo_Card *> &cardList,
@@ -174,27 +175,18 @@ public slots:
     /** Removes a zone view widget from the scene. */
     void removeZoneView(ZoneViewWidget *item);
 
-    /** Adds a player to the scene and connects signals for layout updates. */
-    void addPlayer(Player *player);
-
-    /** Removes a player from the scene and updates layout. */
-    void removePlayer(Player *player);
-
-    /** Closes all active zone views. */
+    /** Closes all zone views. */
     void clearViews();
 
-    /** Closes the most recently opened zone view. */
+    /** Closes the most recently added zone view. */
     void closeMostRecentZoneView();
 
-    /** Adjusts player layout rotation and recomputes positions. */
-    void adjustPlayerRotation(int rotationAdjustment);
-
-    /** Recomputes the scene layout. */
-    void rearrange();
-
 protected:
-    bool event(QEvent *event) override; ///< Handles hover updates.
-    void timerEvent(QTimerEvent *event) override; ///< Handles animations.
+    /** Handles hover updates. */
+    bool event(QEvent *event) override;
+
+    /** Handles animation timer updates. */
+    void timerEvent(QTimerEvent *event) override;
 
 signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);

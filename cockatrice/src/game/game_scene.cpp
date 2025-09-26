@@ -129,102 +129,6 @@ void GameScene::rearrange()
     processViewSizeChange(viewSize);
 }
 
-// ---------- Zone Views ----------
-
-/**
- * @brief Toggles a zone view for a player.
- * @param player Player owning the zone.
- * @param zoneName Name of the zone.
- * @param numberCards Number of cards visible in the view.
- * @param isReversed Whether the zone view is reversed.
- *
- * If an identical view exists, it is closed. Otherwise, a new ZoneViewWidget is created
- * and positioned based on zone type.
- */
-void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
-{
-    for (auto &view : zoneViews) {
-        ZoneViewZone *temp = view->getZone();
-        if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
-            qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
-            view->close();
-        }
-    }
-
-    ZoneViewWidget *item =
-        new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
-
-    zoneViews.append(item);
-    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
-    addItem(item);
-
-    if (zoneName == "grave")
-        item->setPos(360, 100);
-    else if (zoneName == "rfg")
-        item->setPos(380, 120);
-    else
-        item->setPos(340, 80);
-}
-
-/**
- * @brief Adds a revealed zone view (for shown cards).
- * @param player Owning player.
- * @param zone Zone logic.
- * @param cardList List of cards to show.
- * @param withWritePermission Whether edits are allowed.
- */
-void GameScene::addRevealedZoneView(Player *player,
-                                    CardZoneLogic *zone,
-                                    const QList<const ServerInfo_Card *> &cardList,
-                                    bool withWritePermission)
-{
-    ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
-    zoneViews.append(item);
-    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
-    addItem(item);
-    item->setPos(600, 80);
-}
-
-/**
- * @brief Removes a zone view widget from the scene.
- * @param item Zone view to remove.
- */
-void GameScene::removeZoneView(ZoneViewWidget *item)
-{
-    zoneViews.removeOne(item);
-    removeItem(item);
-}
-
-/**
- * @brief Closes all zone views.
- */
-void GameScene::clearViews()
-{
-    while (!zoneViews.isEmpty())
-        zoneViews.first()->close();
-}
-
-/**
- * @brief Closes the most recently added zone view.
- */
-void GameScene::closeMostRecentZoneView()
-{
-    if (!zoneViews.isEmpty())
-        zoneViews.last()->close();
-}
-
-// ---------- View Transforms ----------
-
-QTransform GameScene::getViewTransform() const
-{
-    return views().at(0)->transform();
-}
-
-QTransform GameScene::getViewportTransform() const
-{
-    return views().at(0)->viewportTransform();
-}
-
 // ---------- View Size ----------
 
 /**
@@ -247,70 +151,6 @@ void GameScene::processViewSizeChange(const QSize &newSize)
     setSceneRect(0, 0, newWidth, sceneRect().height());
 
     resizeColumnsAndPlayers(minWidthByColumn, newWidth);
-}
-
-// ---------- Hover Handling ----------
-
-void GameScene::updateHover(const QPointF &scenePos)
-{
-    auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
-
-    CardZone *zone = findTopmostZone(itemList);
-    CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
-    updateHoveredCard(topCard);
-}
-
-// ---------- Event Handling ----------
-
-bool GameScene::event(QEvent *event)
-{
-    if (event->type() == QEvent::GraphicsSceneMouseMove)
-        updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
-
-    return QGraphicsScene::event(event);
-}
-
-void GameScene::timerEvent(QTimerEvent * /*event*/)
-{
-    QMutableSetIterator<CardItem *> i(cardsToAnimate);
-    while (i.hasNext()) {
-        i.next();
-        if (!i.value()->animationEvent())
-            i.remove();
-    }
-    if (cardsToAnimate.isEmpty())
-        animationTimer->stop();
-}
-
-void GameScene::registerAnimationItem(AbstractCardItem *card)
-{
-    cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive())
-        animationTimer->start(10, this);
-}
-
-void GameScene::unregisterAnimationItem(AbstractCardItem *card)
-{
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty())
-        animationTimer->stop();
-}
-
-// ---------- Rubber Band ----------
-
-void GameScene::startRubberBand(const QPointF &selectionOrigin)
-{
-    emit sigStartRubberBand(selectionOrigin);
-}
-
-void GameScene::resizeRubberBand(const QPointF &cursorPoint)
-{
-    emit sigResizeRubberBand(cursorPoint);
-}
-
-void GameScene::stopRubberBand()
-{
-    emit sigStopRubberBand();
 }
 
 // ---------- Player Layout Helpers ----------
@@ -488,6 +328,26 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     }
 }
 
+// ---------- Hover Handling ----------
+
+void GameScene::updateHover(const QPointF &scenePos)
+{
+    auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
+
+    CardZone *zone = findTopmostZone(itemList);
+    CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
+    updateHoveredCard(topCard);
+}
+
+void GameScene::updateHoveredCard(CardItem *newCard)
+{
+    if (hoveredCard && (newCard != hoveredCard))
+        hoveredCard->setHovered(false);
+    if (newCard && (newCard != hoveredCard))
+        newCard->setHovered(true);
+    hoveredCard = newCard;
+}
+
 CardZone *GameScene::findTopmostZone(const QList<QGraphicsItem *> &items)
 {
     for (QGraphicsItem *item : items)
@@ -520,11 +380,151 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
     return maxZCard;
 }
 
-void GameScene::updateHoveredCard(CardItem *newCard)
+// ---------- Zone Views ----------
+
+/**
+ * @brief Toggles a zone view for a player.
+ * @param player Player owning the zone.
+ * @param zoneName Name of the zone.
+ * @param numberCards Number of cards visible in the view.
+ * @param isReversed Whether the zone view is reversed.
+ *
+ * If an identical view exists, it is closed. Otherwise, a new ZoneViewWidget is created
+ * and positioned based on zone type.
+ */
+void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
 {
-    if (hoveredCard && (newCard != hoveredCard))
-        hoveredCard->setHovered(false);
-    if (newCard && (newCard != hoveredCard))
-        newCard->setHovered(true);
-    hoveredCard = newCard;
+    for (auto &view : zoneViews) {
+        ZoneViewZone *temp = view->getZone();
+        if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
+            qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
+            view->close();
+        }
+    }
+
+    ZoneViewWidget *item =
+        new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
+
+    zoneViews.append(item);
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
+    addItem(item);
+
+    if (zoneName == "grave")
+        item->setPos(360, 100);
+    else if (zoneName == "rfg")
+        item->setPos(380, 120);
+    else
+        item->setPos(340, 80);
+}
+
+/**
+ * @brief Adds a revealed zone view (for shown cards).
+ * @param player Owning player.
+ * @param zone Zone logic.
+ * @param cardList List of cards to show.
+ * @param withWritePermission Whether edits are allowed.
+ */
+void GameScene::addRevealedZoneView(Player *player,
+                                    CardZoneLogic *zone,
+                                    const QList<const ServerInfo_Card *> &cardList,
+                                    bool withWritePermission)
+{
+    ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
+    zoneViews.append(item);
+    connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
+    addItem(item);
+    item->setPos(600, 80);
+}
+
+/**
+ * @brief Removes a zone view widget from the scene.
+ * @param item Zone view to remove.
+ */
+void GameScene::removeZoneView(ZoneViewWidget *item)
+{
+    zoneViews.removeOne(item);
+    removeItem(item);
+}
+
+/**
+ * @brief Closes all zone views.
+ */
+void GameScene::clearViews()
+{
+    while (!zoneViews.isEmpty())
+        zoneViews.first()->close();
+}
+
+/**
+ * @brief Closes the most recently added zone view.
+ */
+void GameScene::closeMostRecentZoneView()
+{
+    if (!zoneViews.isEmpty())
+        zoneViews.last()->close();
+}
+
+// ---------- View Transforms ----------
+
+QTransform GameScene::getViewTransform() const
+{
+    return views().at(0)->transform();
+}
+
+QTransform GameScene::getViewportTransform() const
+{
+    return views().at(0)->viewportTransform();
+}
+
+// ---------- Event Handling ----------
+
+bool GameScene::event(QEvent *event)
+{
+    if (event->type() == QEvent::GraphicsSceneMouseMove)
+        updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
+
+    return QGraphicsScene::event(event);
+}
+
+void GameScene::timerEvent(QTimerEvent * /*event*/)
+{
+    QMutableSetIterator<CardItem *> i(cardsToAnimate);
+    while (i.hasNext()) {
+        i.next();
+        if (!i.value()->animationEvent())
+            i.remove();
+    }
+    if (cardsToAnimate.isEmpty())
+        animationTimer->stop();
+}
+
+void GameScene::registerAnimationItem(AbstractCardItem *card)
+{
+    cardsToAnimate.insert(static_cast<CardItem *>(card));
+    if (!animationTimer->isActive())
+        animationTimer->start(10, this);
+}
+
+void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+{
+    cardsToAnimate.remove(static_cast<CardItem *>(card));
+    if (cardsToAnimate.isEmpty())
+        animationTimer->stop();
+}
+
+// ---------- Rubber Band ----------
+
+void GameScene::startRubberBand(const QPointF &selectionOrigin)
+{
+    emit sigStartRubberBand(selectionOrigin);
+}
+
+void GameScene::resizeRubberBand(const QPointF &cursorPoint)
+{
+    emit sigResizeRubberBand(cursorPoint);
+}
+
+void GameScene::stopRubberBand()
+{
+    emit sigStopRubberBand();
 }
