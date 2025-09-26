@@ -41,7 +41,9 @@ GameScene::~GameScene()
 {
     delete animationTimer;
 
-    // Zone views are deleted asynchronously.
+    // DO NOT call clearViews() here
+    // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
+    // deleteLater() deletes the zoneView without allowing it to send signals
     for (const auto &zoneView : zoneViews) {
         zoneView->deleteLater();
     }
