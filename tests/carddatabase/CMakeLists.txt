@@ -22,7 +22,7 @@ add_executable(
   ../../cockatrice/src/card/exact_card.cpp
   ../../cockatrice/src/database/card_database.cpp
   ../../cockatrice/src/database/card_database_loader.cpp
-    ../../cockatrice/src/database/card_database_querier.cpp
+  ../../cockatrice/src/database/card_database_querier.cpp
   ../../cockatrice/src/database/parser/card_database_parser.cpp
   ../../cockatrice/src/database/parser/cockatrice_xml_3.cpp
   ../../cockatrice/src/database/parser/cockatrice_xml_4.cpp
@@ -38,7 +38,7 @@ add_executable(
   ../../cockatrice/src/card/exact_card.cpp
   ../../cockatrice/src/database/card_database.cpp
   ../../cockatrice/src/database/card_database_loader.cpp
-    ../../cockatrice/src/database/card_database_querier.cpp
+  ../../cockatrice/src/database/card_database_querier.cpp
   ../../cockatrice/src/database/card_database_manager.cpp
   ../../cockatrice/src/database/parser/card_database_parser.cpp
   ../../cockatrice/src/database/parser/cockatrice_xml_3.cpp
