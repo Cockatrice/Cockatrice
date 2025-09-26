@@ -37,7 +37,7 @@ jobs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
 
-    steps:  
+    steps:
       - name: Configure
         id: configure
         shell: bash
@@ -230,10 +230,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: 13
+          - target: 14
             soc: Intel
-            os: macos-13
-            xcode: "14.3.1"
+            os: macos-14
+            xcode: "15.4"
             type: Release
             make_package: 1
 
@@ -272,6 +272,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Install x86_64 Homebrew
+        if: ${{matrix.soc == 'Intel'}}
+        shell: bash
+        run: |
+          softwareupdate --install-rosetta --agree-to-license
+          arch --x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "alias brew='arch --x86_64 /usr/local/Homebrew/bin/brew'" >> aliases.sh
+
       - name: Install dependencies using Homebrew
         shell: bash
         # CMake cannot find the MySQL connector
@@ -279,6 +287,8 @@ jobs:
         env:
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
         run: |
+          touch aliases.sh
+          source aliases.sh
           brew update
           brew install ccache protobuf qt --force-bottle
 
@@ -297,6 +307,7 @@ jobs:
         id: build
         env:
           BUILDTYPE: '${{matrix.type}}'
+          ARCHTYPE: '${{matrix.soc}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
