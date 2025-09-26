@@ -91,16 +91,11 @@ public:
     void onStartedChanged(bool _started)
     {
         if (_started) {
-            startGameTimer();
             emit gameStarted(_started);
         } else {
-            stopGameTimer();
             emit gameStopped();
         }
     }
-
-    void startGameTimer();
-    void stopGameTimer();
 
     void setGameStateKnown(bool known)
     {

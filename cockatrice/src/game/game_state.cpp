@@ -18,6 +18,7 @@ GameState::GameState(AbstractGame *parent,
     gameTimer = new QTimer(this);
     gameTimer->setInterval(1000);
     connect(gameTimer, &QTimer::timeout, this, &GameState::incrementGameTime);
+    gameTimer->start();
 }
 
 void GameState::incrementGameTime()
@@ -37,14 +38,4 @@ void GameState::setGameTime(int _secondsElapsed)
     emit updateTimeElapsedLabel(QString::number(hours).rightJustified(2, '0') + ":" +
                                 QString::number(minutes).rightJustified(2, '0') + ":" +
                                 QString::number(seconds).rightJustified(2, '0'));
-}
-
-void GameState::startGameTimer()
-{
-    gameTimer->start();
-}
-
-void GameState::stopGameTimer()
-{
-    gameTimer->stop();
 }
