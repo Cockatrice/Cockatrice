@@ -165,6 +165,10 @@ void TabGame::connectToGameEventHandler()
             &TabGame::processLocalPlayerSideboardLocked);
     connect(game->getGameEventHandler(), &GameEventHandler::localPlayerDeckSelected, this,
             &TabGame::processLocalPlayerDeckSelect);
+    connect(game->getGameEventHandler(), &GameEventHandler::remotePlayerDeckSelected, this,
+            &TabGame::processRemotePlayerDeckSelect);
+    connect(game->getGameEventHandler(), &GameEventHandler::remotePlayersDecksSelected, this,
+            &TabGame::processMultipleRemotePlayerDeckSelect);
 }
 
 void TabGame::connectMessageLogToGameEventHandler()
