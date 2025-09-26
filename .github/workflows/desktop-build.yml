@@ -262,6 +262,11 @@ jobs:
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
+      # Common parameters for all macOS builds
+      QT_VERSION: 6.6.*
+      QT_ARCH: clang_64
+      QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
+      # Build-specific environment variables
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
       CCACHE_SIZE: 500M
       DEVELOPER_DIR:
@@ -271,26 +276,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Install dependencies using Homebrew
-        shell: bash
-        # CMake cannot find the MySQL connector
-        # Neither of these works: mariadb-connector-c mysql-connector-c++
-        env:
-          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-        run: |
-          brew update
-          brew install ccache protobuf qt --force-bottle
-
-      - name: Restore compiler cache (ccache)
-        id: ccache_restore
-        uses: actions/cache/restore@v4
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.os}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.os}}-${{matrix.type}}-
+          submodules: recursive
+
+      # Using jianmingyong/ccache-action to setup ccache without using brew
+      # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
+      - name: Setup ccache
+        uses: jianmingyong/ccache-action@v1
+        with:
+          install-type: "binary"
+          ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.soc}}-${{matrix.type}}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
+      - name: Install Qt ${{env.QT_VERSION}}
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false # qt caches take too much space for macOS (1.1Gi)
+          version: ${{env.QT_VERSION}}
+          arch: ${{env.QT_ARCH}}
+          modules: ${{env.QT_MODULES}}
+
+      - name: Setup vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build on Xcode ${{matrix.xcode}}
         shell: bash
@@ -304,14 +316,9 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
-
-      - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v4
-        with:
-          path: ${{env.CCACHE_DIR}}
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
@@ -431,7 +438,6 @@ jobs:
           setup-python: true
           version: ${{matrix.qt_version}}
           arch: win64_${{matrix.qt_arch}}
-          tools: ${{matrix.qt_tools}}
           modules: ${{matrix.qt_modules}}
 
       - name: Setup vcpkg cache

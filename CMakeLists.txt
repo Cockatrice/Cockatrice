@@ -48,8 +48,8 @@ if(USE_CCACHE)
   endif()
 endif()
 
-if(WIN32)
-  # Use vcpkg toolchain on Windows
+if(WIN32 OR APPLE)
+  # Use vcpkg toolchain on Windows and macOS
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
       CACHE STRING "Vcpkg toolchain file"
