@@ -13,6 +13,7 @@ set(dbconverter_SOURCES
     ../cockatrice/src/database/parser/card_database_parser.cpp
     ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
     ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
+    ../cockatrice/src/settings/card_override_settings.cpp
     ../cockatrice/src/settings/settings_manager.cpp
     ${VERSION_STRING_CPP}
 )

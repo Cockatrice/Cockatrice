@@ -4,7 +4,6 @@
 #include "../../cockatrice/src/database/card_database.h"
 #include "../../cockatrice/src/database/parser/cockatrice_xml_4.h"
 
-class CardDatabaseQuerier;
 class CardDatabaseConverter : public CardDatabase
 {
 public:
