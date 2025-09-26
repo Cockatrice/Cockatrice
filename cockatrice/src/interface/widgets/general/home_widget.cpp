@@ -180,11 +180,8 @@ QGroupBox *HomeWidget::createButtons()
     connectButton = new HomeStyledButton(tr("Connect/Play"), gradientColors);
     boxLayout->addWidget(connectButton, 1);
 
-    localGameButton = new HomeStyledButton(tr("Start Local Game"), gradientColors);
-    boxLayout->addWidget(localGameButton);
-    if (auto mainWindow = qobject_cast<MainWindow *>(tabSupervisor->parent())) {
-        connect(localGameButton, &QPushButton::clicked, mainWindow, &MainWindow::actSinglePlayer);
-    }
+    localGameOrDisconnectButton = new HomeStyledButton(tr("Start Local Game"), gradientColors);
+    boxLayout->addWidget(localGameOrDisconnectButton);
 
     auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
@@ -218,6 +215,7 @@ QGroupBox *HomeWidget::createButtons()
 void HomeWidget::updateConnectionStatus(const ClientStatus status)
 {
     disconnect(connectButton, &QPushButton::clicked, nullptr, nullptr);
+    disconnect(localGameOrDisconnectButton, &QPushButton::clicked, nullptr, nullptr);
     switch (status) {
         case StatusDisconnected:
             connectButton->setText(tr("Connect"));
@@ -225,14 +223,17 @@ void HomeWidget::updateConnectionStatus(const ClientStatus status)
             connect(connectButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                     &MainWindow::actConnect);
 
-            localGameButton->setEnabled(true);
-            localGameButton->setVisible(true);
+            localGameOrDisconnectButton->setText(tr("Start Local Game"));
+            localGameOrDisconnectButton->setEnabled(true);
+            if (auto mainWindow = qobject_cast<MainWindow *>(tabSupervisor->parent())) {
+                connect(localGameOrDisconnectButton, &QPushButton::clicked, mainWindow, &MainWindow::actSinglePlayer);
+            }
             break;
         case StatusConnecting:
             connectButton->setText(tr("Connecting..."));
             connectButton->setEnabled(false);
 
-            localGameButton->setEnabled(false);
+            localGameOrDisconnectButton->setEnabled(false);
             break;
         case StatusLoggedIn:
             connectButton->setText(tr("Play"));
@@ -240,7 +241,11 @@ void HomeWidget::updateConnectionStatus(const ClientStatus status)
             connect(connectButton, &QPushButton::clicked, tabSupervisor,
                     &TabSupervisor::switchToFirstAvailableNetworkTab);
 
-            localGameButton->setVisible(false);
+            localGameOrDisconnectButton->setEnabled(true);
+            localGameOrDisconnectButton->setText(tr("Disconnect"));
+            if (auto mainWindow = qobject_cast<MainWindow *>(tabSupervisor->parent())) {
+                connect(localGameOrDisconnectButton, &QPushButton::clicked, mainWindow, &MainWindow::actDisconnect);
+            }
             break;
         default:
             break;

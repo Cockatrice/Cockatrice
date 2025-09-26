@@ -38,7 +38,7 @@ private:
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
-    HomeStyledButton *localGameButton;
+    HomeStyledButton *localGameOrDisconnectButton;
 };
 
 #endif // HOME_WIDGET_H
