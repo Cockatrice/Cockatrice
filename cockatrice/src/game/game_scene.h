@@ -50,6 +50,16 @@ public:
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint);
     void stopRubberBand();
+    QList<Player *> collectActivePlayers(int &firstPlayerIndex) const;
+    QList<Player *> rotatePlayers(const QList<Player *> &players, int firstPlayerIndex) const;
+    int determineColumnCount(int playerCount) const;
+    QSizeF computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns);
+    QList<qreal> calculateMinWidthByColumn() const;
+    qreal calculateNewSceneWidth(const QSize &newSize, qreal minWidth) const;
+    void resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qreal newWidth);
+    CardZone *findTopmostZone(const QList<QGraphicsItem *> &items) const;
+    CardItem *findTopmostCardInZone(const QList<QGraphicsItem *> &items, CardZone *zone) const;
+    void updateHoveredCard(CardItem *newCard);
 
     void registerAnimationItem(AbstractCardItem *item);
     void unregisterAnimationItem(AbstractCardItem *card);
