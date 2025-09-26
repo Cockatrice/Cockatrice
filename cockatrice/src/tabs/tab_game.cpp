@@ -807,6 +807,9 @@ void TabGame::startGame(bool _resuming)
     playerListWidget->setGameStarted(true, game->getGameState()->isResuming());
     game->getGameMetaInfo()->setStarted(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
+
+    aConcede->setText(tr("&Concede"));
+    aConcede->setEnabled(true);
 }
 
 void TabGame::stopGame()
@@ -824,7 +827,8 @@ void TabGame::stopGame()
 
     scene->clearViews();
 
-    retranslateUi();
+    aConcede->setText(tr("&Concede"));
+    aConcede->setEnabled(false);
 }
 
 void TabGame::closeGame()
@@ -944,6 +948,9 @@ void TabGame::createMenuItems()
     connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
+    if (!game->getGameMetaInfo()->started()) {
+        aConcede->setEnabled(false);
+    }
     connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerConceded, game->getGameEventHandler(),
             &GameEventHandler::handleActiveLocalPlayerConceded);
     connect(game->getPlayerManager(), &PlayerManager::activeLocalPlayerUnconceded, game->getGameEventHandler(),
