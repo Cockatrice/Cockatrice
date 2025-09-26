@@ -175,21 +175,7 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return getCardOrPinnedPrinting(cardName);
-}
-
-ExactCard DeckEditorDatabaseDisplayWidget::getCardOrPinnedPrinting(QString cardName) const
-{
-    const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
-
-    ExactCard card = CardDatabaseManager::query()->getCard({cardName});
-
-    if (cardProviderId != "") {
-        return ExactCard(card.getCardPtr(),
-                         CardDatabaseManager::query()->getSpecificPrinting({cardName, cardProviderId}));
-    }
-
-    return card;
+    return CardDatabaseManager::query()->getPreferredCard(cardName);
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
