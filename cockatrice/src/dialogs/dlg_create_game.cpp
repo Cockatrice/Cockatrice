@@ -119,7 +119,7 @@ void DlgCreateGame::sharedCtor()
     grid->addWidget(joinRestrictionsGroupBox, 0, 1);
     grid->addWidget(gameTypeGroupBox, 1, 0);
     grid->addWidget(spectatorsGroupBox, 1, 1, Qt::AlignTop);
-    grid->addWidget(gameSetupOptionsGroupBox, 2, 0);
+    grid->addWidget(gameSetupOptionsGroupBox, 1, 1, Qt::AlignBottom);
     grid->addWidget(rememberGameSettings, 3, 0);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
