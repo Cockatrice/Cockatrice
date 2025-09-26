@@ -122,6 +122,8 @@ signals:
     void logGameClosed();
     void logActivePlayer(Player *activePlayer);
     void logActivePhaseChanged(int activePhase);
+    void logConcede(int playerId);
+    void logUnconcede(int playerId);
 };
 
 #endif // COCKATRICE_GAME_EVENT_HANDLER_H
