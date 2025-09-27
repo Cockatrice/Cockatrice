@@ -27,5 +27,5 @@ jobs:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: main
-          publish_dir: ./html
+          publish_dir: ./docs/html
           destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
