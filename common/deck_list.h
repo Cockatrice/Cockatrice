@@ -243,6 +243,11 @@ public:
     }
     ///@}
 
+    bool isUnmodified() const
+    {
+        return name.isEmpty() && comments.isEmpty() && getCardList().size() == 0;
+    }
+
     /// @name Sideboard plans
     ///@{
     QList<MoveCard_ToZone> getCurrentSideboardPlan();

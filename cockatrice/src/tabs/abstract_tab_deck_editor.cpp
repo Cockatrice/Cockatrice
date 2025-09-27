@@ -186,7 +186,7 @@ void AbstractTabDeckEditor::setModified(bool _modified)
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
     DeckLoader *deck = getDeckList();
-    return !modified && deck->hasNotBeenLoaded();
+    return !modified && deck->isUnmodified() && deck->hasNotBeenLoaded();
 }
 
 void AbstractTabDeckEditor::actNewDeck()
