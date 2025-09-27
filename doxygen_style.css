@@ -1,0 +1,45 @@
+/* === Accent Tuning for Doxygen Dark Mode === */
+
+/* Main accent color */
+:root {
+    --main-accent: #33a946;
+}
+
+/* Links */
+a, a:visited {
+    color: var(--main-accent) !important;
+}
+
+a:hover {
+    color: #4fd467 !important; /* lighter green */
+}
+
+/* Project title */
+#projectname {
+    color: var(--main-accent) !important;
+}
+
+/* Current sidebar item */
+#side-nav .selected {
+    border-left: 3px solid var(--main-accent) !important;
+}
+
+/* Tabs */
+.tablist li.current {
+    background: var(--main-accent) !important;
+    color: #fff !important;
+}
+
+/* Search box focus */
+#MSearchField:focus {
+    outline: 1px solid var(--main-accent) !important;
+}
+
+/* Code block border highlight */
+pre, code {
+    border: 1px solid #333;
+}
+
+pre.fragment {
+    border-color: var(--main-accent) !important;
+}
