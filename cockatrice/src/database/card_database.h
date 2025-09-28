@@ -5,6 +5,7 @@
 #include "../common/card_ref.h"
 #include "card_database_loader.h"
 #include "card_database_querier.h"
+#include "interface/noop_card_preference_provider.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -51,7 +52,7 @@ private:
                 *removeCardMutex = new QBasicMutex();
 
 public:
-    explicit CardDatabase(QObject *parent = nullptr);
+    explicit CardDatabase(QObject *parent = nullptr, std::shared_ptr<ICardPreferenceProvider> prefs = nullptr);
     ~CardDatabase() override;
 
     void removeCard(CardInfoPtr card);

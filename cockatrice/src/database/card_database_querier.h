@@ -3,6 +3,8 @@
 
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
+#include "interface/interface_card_preference_provider.h"
+#include "interface/settings_card_preference_provider.h"
 
 #include <QObject>
 
@@ -12,7 +14,7 @@ class CardDatabaseQuerier : public QObject
     Q_OBJECT
 
 public:
-    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db);
+    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, std::shared_ptr<ICardPreferenceProvider> prefs);
 
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
@@ -48,6 +50,8 @@ public:
 
 private:
     const CardDatabase *db;
+
+    std::shared_ptr<ICardPreferenceProvider> prefs;
 
     CardInfoPtr lookupCardByName(const QString &name) const;
 };

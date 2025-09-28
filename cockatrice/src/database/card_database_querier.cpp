@@ -3,10 +3,11 @@
 #include "../settings/cache_settings.h"
 #include "../utility/card_set_comparator.h"
 #include "card_database.h"
+#include "interface/settings_card_preference_provider.h"
 
 #include <qrandom.h>
 
-CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent, const CardDatabase *_db) : QObject(_parent), db(_db)
+CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent, const CardDatabase *_db, std::shared_ptr<ICardPreferenceProvider> prefs) : QObject(_parent), db(_db), prefs(std::move(prefs))
 {
 }
 
@@ -246,8 +247,7 @@ PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardIn
         return PrintingInfo(nullptr);
     }
 
-    const auto &pinnedPrintingProviderId =
-        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName());
+    const auto &pinnedPrintingProviderId = prefs->getCardPreferenceOverride(cardInfo->getName());
 
     if (!pinnedPrintingProviderId.isEmpty()) {
         return getSpecificPrinting({cardInfo->getName(), pinnedPrintingProviderId});

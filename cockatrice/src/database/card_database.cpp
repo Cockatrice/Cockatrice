@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <utility>
 
-CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
+CardDatabase::CardDatabase(QObject *parent, std::shared_ptr<ICardPreferenceProvider> prefs) : QObject(parent), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
@@ -28,7 +28,7 @@ CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoa
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
 
-    querier = new CardDatabaseQuerier(this, this);
+    querier = new CardDatabaseQuerier(this, this, prefs);
 }
 
 CardDatabase::~CardDatabase()
