@@ -1,4 +1,4 @@
-\mainpage Cockatrice Documentation
+@mainpage Cockatrice Documentation
 
 # Welcome
 

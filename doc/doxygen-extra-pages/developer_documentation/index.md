@@ -1,3 +1,3 @@
-\page developer_reference Developer Reference
+@page developer_reference Developer Reference
 
 - [Contributing](@subpage contributing)
