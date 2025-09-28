@@ -251,7 +251,11 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
         QString playerName = "@" + QString::fromStdString(prop.user_info().name());
         emit addPlayerToAutoCompleteList(playerName);
         if (prop.spectator()) {
-            game->getPlayerManager()->addSpectator(playerId, prop);
+            if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
+                game->getPlayerManager()->addSpectator(playerId, prop);
+                emit spectatorJoined(prop);
+                emit logJoinSpectator(playerName);
+            }
         } else {
             Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
             if (!player) {
