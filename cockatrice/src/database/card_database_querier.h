@@ -14,7 +14,9 @@ class CardDatabaseQuerier : public QObject
     Q_OBJECT
 
 public:
-    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, std::shared_ptr<ICardPreferenceProvider> prefs);
+    explicit CardDatabaseQuerier(QObject *parent,
+                                 const CardDatabase *db,
+                                 std::shared_ptr<ICardPreferenceProvider> prefs);
 
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;

@@ -2,7 +2,8 @@
 
 CardDatabase *CardDatabaseManager::getInstance()
 {
-    static CardDatabase instance(nullptr, std::make_shared<SettingsCardPreferenceProvider>()); // Created only once, on first access
+    static CardDatabase instance(
+        nullptr, std::make_shared<SettingsCardPreferenceProvider>()); // Created only once, on first access
     return &instance;
 }
 
