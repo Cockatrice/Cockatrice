@@ -3,7 +3,7 @@
 CardDatabase *CardDatabaseManager::getInstance()
 {
     static CardDatabase instance(
-        nullptr, std::make_shared<SettingsCardPreferenceProvider>()); // Created only once, on first access
+        nullptr, QSharedPointer<SettingsCardPreferenceProvider>::create()); // Created only once, on first access
     return &instance;
 }
 

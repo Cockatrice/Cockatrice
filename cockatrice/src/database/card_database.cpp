@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <utility>
 
-CardDatabase::CardDatabase(QObject *parent, std::shared_ptr<ICardPreferenceProvider> prefs)
+CardDatabase::CardDatabase(QObject *parent, QSharedPointer<ICardPreferenceProvider> prefs)
     : QObject(parent), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");

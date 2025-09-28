@@ -52,7 +52,7 @@ private:
                 *removeCardMutex = new QBasicMutex();
 
 public:
-    explicit CardDatabase(QObject *parent = nullptr, std::shared_ptr<ICardPreferenceProvider> prefs = nullptr);
+    explicit CardDatabase(QObject *parent = nullptr, QSharedPointer<ICardPreferenceProvider> prefs = nullptr);
     ~CardDatabase() override;
 
     void removeCard(CardInfoPtr card);
