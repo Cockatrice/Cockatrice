@@ -1,4 +1,4 @@
-name: Generate Documentation
+name: Generate Docs
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/documentation-build.yml'
+      - 'Doxyfile'
+      - 'doxygen_style.css'
   workflow_dispatch:
 
 jobs:
