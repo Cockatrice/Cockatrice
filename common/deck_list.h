@@ -243,9 +243,9 @@ public:
     }
     ///@}
 
-    bool isUnmodified() const
+    bool isBlankDeck() const
     {
-        return name.isEmpty() && comments.isEmpty() && getCardList().size() == 0;
+        return name.isEmpty() && comments.isEmpty() && getCardList().isEmpty();
     }
 
     /// @name Sideboard plans
