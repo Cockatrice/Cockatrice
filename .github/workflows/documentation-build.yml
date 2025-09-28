@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - '*'   # Only re-generate docs when a new tagged version is pushed
+  pull_request:
+    paths:
+      - '.github/workflows/documentation-build.yml'
   workflow_dispatch:
 
 jobs:
@@ -22,6 +25,7 @@ jobs:
         run: doxygen Doxyfile
 
       - name: Deploy to cockatrice.github.io
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
