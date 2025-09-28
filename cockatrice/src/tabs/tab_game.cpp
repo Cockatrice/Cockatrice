@@ -807,8 +807,10 @@ void TabGame::startGame(bool _resuming)
     game->getGameMetaInfo()->setStarted(true);
     static_cast<GameScene *>(gameView->scene())->rearrange();
 
-    aConcede->setText(tr("&Concede"));
-    aConcede->setEnabled(true);
+    if (aConcede != nullptr) {
+        aConcede->setText(tr("&Concede"));
+        aConcede->setEnabled(true);
+    }
 }
 
 void TabGame::stopGame()
@@ -826,8 +828,10 @@ void TabGame::stopGame()
 
     scene->clearViews();
 
-    aConcede->setText(tr("&Concede"));
-    aConcede->setEnabled(false);
+    if (aConcede != nullptr) {
+        aConcede->setText(tr("&Concede"));
+        aConcede->setEnabled(false);
+    }
 }
 
 void TabGame::closeGame()
