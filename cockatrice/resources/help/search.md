@@ -1,4 +1,4 @@
-\page search_syntax_help Search Syntax Help
+@page search_syntax_help Search Syntax Help
 
 ## Search Syntax Help
 -----
