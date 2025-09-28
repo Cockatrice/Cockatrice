@@ -11,12 +11,6 @@ on:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
-      - 'CMakeLists.txt'
-      - 'Dockerfile'
-      - 'servatrice/**'
-      - 'common/**'
-      - 'cmake/**'
-      - '!**.md'
 
 jobs:
   docker:
