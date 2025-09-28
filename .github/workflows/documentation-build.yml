@@ -1,12 +1,19 @@
-name: Generate and Deploy Doxygen Docs
+name: Generate Docs
 
 on:
   push:
     tags:
-      - '*' # Only re-generate docs when a new version is pushed
+      - '*'   # Only re-generate docs when a new tagged version is pushed
+  pull_request:
+    paths:
+      - '.github/workflows/documentation-build.yml'
+      - 'Doxyfile'
+      - 'doxygen_style.css'
+  workflow_dispatch:
 
 jobs:
   docs:
+    name: Doxygen
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +27,11 @@ jobs:
         run: doxygen Doxyfile
 
       - name: Deploy to cockatrice.github.io
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
-          publish_branch: main
+          publish_branch: master
           publish_dir: ./docs/html
           destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
