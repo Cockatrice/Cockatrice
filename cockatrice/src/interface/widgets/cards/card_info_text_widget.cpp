@@ -5,32 +5,58 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QSizePolicy>
 #include <QTextEdit>
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
 {
-    nameLabel = new QLabel;
-    nameLabel->setOpenExternalLinks(false);
-    nameLabel->setWordWrap(true);
-    connect(nameLabel, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
+    propsLabel = new QLabel;
+    propsLabel->setOpenExternalLinks(false);
+    propsLabel->setWordWrap(true);
+    connect(propsLabel, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
 
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
+    textLabel->setMinimumSize(35, 35);
+
+    propsScroll = new QScrollArea(this);
+    propsScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    propsScroll->setWidgetResizable(true);
+    propsScroll->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    propsScroll->setContentsMargins(0, 0, 0, 0);
+    propsScroll->setFrameStyle(QFrame::NoFrame);
+    propsScroll->setWidget(propsLabel);
+
+    // blend into normal background color, note that themes may override this!
+    propsScroll->viewport()->setStyleSheet("QWidget{background: transparent}");
 
     auto *grid = new QGridLayout(this);
-    grid->addWidget(nameLabel, 0, 0);
-    grid->addWidget(textLabel, 1, 0, -1, 2);
+    grid->addWidget(propsScroll, 0, 0);
+    grid->addWidget(textLabel, 1, 0);
+    grid->setRowStretch(0, 2);
     grid->setRowStretch(1, 1);
-    grid->setColumnStretch(1, 1);
 
     retranslateUi();
+
+    connect(this, &CardInfoTextWidget::resizeEvent, this,
+            [this]() { propsScroll->setMaximumHeight(propsLabel->sizeHint().height()); });
+}
+
+void CardInfoTextWidget::setTexts(const QString &propsText, const QString &textText)
+{
+    propsScroll->setMaximumHeight(0); // reset the max height, otherwise the scrollbar will blink in and out sometimes
+    propsLabel->setText(propsText);
+    propsScroll->setMinimumWidth(propsLabel->minimumWidth() + propsScroll->verticalScrollBar()->width());
+    propsScroll->setMaximumHeight(propsLabel->sizeHint().height());
+    textLabel->setText(textText);
 }
 
 void CardInfoTextWidget::setCard(CardInfoPtr card)
 {
     if (card == nullptr) {
-        nameLabel->setText("");
-        textLabel->setText("");
+        setTexts("", "");
         return;
     }
 
@@ -60,14 +86,12 @@ void CardInfoTextWidget::setCard(CardInfoPtr card)
     }
 
     text += "</table>";
-    nameLabel->setText(text);
-    textLabel->setText(card->getText());
+    setTexts(text, card->getText());
 }
 
 void CardInfoTextWidget::setInvalidCardName(const QString &cardName)
 {
-    nameLabel->setText(tr("Unknown card:") + " " + cardName);
-    textLabel->setText("");
+    setTexts(tr("Unknown card:") + " " + cardName, "");
 }
 
 void CardInfoTextWidget::retranslateUi()
@@ -76,5 +100,5 @@ void CardInfoTextWidget::retranslateUi()
      * There's no way we can really translate the text currently being rendered.
      * The best we can do is invalidate the current text.
      */
-    setInvalidCardName("");
+    setTexts("", "");
 }
