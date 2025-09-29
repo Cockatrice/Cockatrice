@@ -1,3 +1,9 @@
+/**
+ * @file tab_deck_storage_visual.h
+ * @ingroup Tabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_DECK_STORAGE_VISUAL_H
 #define TAB_DECK_STORAGE_VISUAL_H
 
@@ -21,7 +27,7 @@ class TabDeckStorageVisual final : public Tab
     Q_OBJECT
 public:
     explicit TabDeckStorageVisual(TabSupervisor *_tabSupervisor);
-    void retranslateUi() override{};
+    void retranslateUi() override {};
     [[nodiscard]] QString getTabText() const override
     {
         return tr("Visual Deck Storage");

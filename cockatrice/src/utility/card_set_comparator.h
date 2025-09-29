@@ -1,3 +1,9 @@
+/**
+ * @file card_set_comparator.h
+ * @ingroup Cards
+ * @brief TODO: Document this.
+ */
+
 #ifndef SET_PRIORITY_COMPARATOR_H
 #define SET_PRIORITY_COMPARATOR_H
 

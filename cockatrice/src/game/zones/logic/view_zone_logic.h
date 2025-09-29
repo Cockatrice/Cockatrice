@@ -1,3 +1,9 @@
+/**
+ * @file view_zone_logic.h
+ * @ingroup GameLogicZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_VIEW_ZONE_LOGIC_H
 #define COCKATRICE_VIEW_ZONE_LOGIC_H
 #include "card_zone_logic.h"

@@ -1,3 +1,9 @@
+/**
+ * @file card_database_manager.h
+ * @ingroup CardDatabase
+ * @brief The CardDatabaseManager is responsible for managing the global database singleton.
+ */
+
 #ifndef CARD_DATABASE_ACCESSOR_H
 #define CARD_DATABASE_ACCESSOR_H
 

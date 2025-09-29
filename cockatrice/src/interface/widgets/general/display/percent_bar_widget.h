@@ -1,3 +1,10 @@
+/**
+ * @file percent_bar_widget.h
+ * @ingroup Widgets
+ * @ingroup DeckEditorAnalyticsWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PERCENT_BAR_WIDGET_H
 #define PERCENT_BAR_WIDGET_H
 

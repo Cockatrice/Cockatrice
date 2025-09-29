@@ -1,3 +1,9 @@
+/**
+ * @file flow_widget.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef FLOW_WIDGET_H
 #define FLOW_WIDGET_H
 #include "../../../layouts/flow_layout.h"

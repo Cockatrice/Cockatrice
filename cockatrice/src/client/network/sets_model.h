@@ -1,3 +1,9 @@
+/**
+ * @file sets_model.h
+ * @ingroup CardDatabaseModels
+ * @brief TODO: Document this.
+ */
+
 #ifndef SETSMODEL_H
 #define SETSMODEL_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file overlapped_card_group_display_widget.h
+ * @ingroup DeckEditorCardGroupWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 #define OVERLAPPED_CARD_GROUP_DISPLAY_WIDGET_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file settings_manager.h
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H
 

@@ -6,7 +6,11 @@
 #include <QString>
 #include <QVector>
 
-// Represents a single Archidekt entry
+/**
+ * @class EdhrecApiResponseArchidektLink
+ * @ingroup ApiResponses
+ * @brief Represents a single Archidekt entry
+ */
 class EdhrecApiResponseArchidektLink
 {
 public:
@@ -19,7 +23,11 @@ public:
     void debugPrint() const;
 };
 
-// Represents the Archidekt section as a list of entries
+/**
+ * @class EdhrecCommanderApiResponseArchidektLinks
+ * @ingroup ApiResponses
+ * @brief Represents the Archidekt section as a list of entries
+ */
 class EdhrecCommanderApiResponseArchidektLinks
 {
 public:

@@ -28,6 +28,7 @@ class InnerDecklistNode;
 
 /**
  * @class SideboardPlan
+* @ingroup Decks
  * @brief Represents a predefined sideboarding strategy for a deck.
  *
  * Sideboard plans store a named list of card movements that should be applied
@@ -88,6 +89,7 @@ public:
 
 /**
  * @class DeckList
+* @ingroup Decks
  * @brief Represents a complete deck, including metadata, zones, cards,
  *        and sideboard plans.
  *

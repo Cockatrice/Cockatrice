@@ -1,3 +1,11 @@
+/**
+ * @file banner_widget.h
+ * @ingroup Widgets
+ * @ingroup DeckEditorCardGroupWidgets
+ * @ingroup DeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef BANNER_WIDGET_H
 #define BANNER_WIDGET_H
 

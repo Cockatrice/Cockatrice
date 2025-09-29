@@ -1,3 +1,9 @@
+/**
+ * @file dlg_forgot_password_reset.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_FORGOTPASSWORDRESET_H
 #define DLG_FORGOTPASSWORDRESET_H
 

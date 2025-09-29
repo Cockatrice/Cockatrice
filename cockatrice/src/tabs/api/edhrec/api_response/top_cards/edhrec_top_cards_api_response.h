@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_top_cards_api_response.h
+ * @ingroup ApiResponses
+ * @brief TODO: Document this.
+ */
+
 #ifndef EDHREC_TOP_CARDS_API_RESPONSE_H
 #define EDHREC_TOP_CARDS_API_RESPONSE_H
 

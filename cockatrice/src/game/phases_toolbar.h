@@ -1,3 +1,10 @@
+/**
+ * @file phases_toolbar.h
+ * @ingroup GameGraphics
+ * @ingroup GameWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PHASESTOOLBAR_H
 #define PHASESTOOLBAR_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file dlg_edit user.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_EDITUSER_H
 #define DLG_EDITUSER_H
 

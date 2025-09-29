@@ -1,3 +1,9 @@
+/**
+ * @file local_client.h
+ * @ingroup Client
+ * @brief TODO: Document this.
+ */
+
 #ifndef LOCALCLIENT_H
 #define LOCALCLIENT_H
 

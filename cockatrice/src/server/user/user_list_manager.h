@@ -1,3 +1,10 @@
+/**
+ * @file user_list_manager.h
+ * @ingroup Network
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_USER_LIST_MANAGER_H
 #define COCKATRICE_USER_LIST_MANAGER_H
 

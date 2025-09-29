@@ -1,3 +1,9 @@
+/**
+ * @file layouts_settings.h
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef LAYOUTSSETTINGS_H
 #define LAYOUTSSETTINGS_H
 

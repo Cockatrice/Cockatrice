@@ -1,3 +1,9 @@
+/**
+ * @file cockatrice_xml_3.h
+ * @ingroup CardDatabaseParsers
+ * @brief The CockatriceXml3Parser is capable of parsing version 3 of the Cockatrice XML Schema.
+ */
+
 #ifndef COCKATRICE_XML3_H
 #define COCKATRICE_XML3_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file visual_deck_storage_folder_display_widget.h
+ * @ingroup VisualDeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 #define VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 

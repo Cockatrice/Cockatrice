@@ -1,3 +1,10 @@
+/**
+ * @file dlg_load_deck.h
+ * @ingroup Dialogs
+ * @ingroup ImportExport
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
 
 #ifndef DLG_LOAD_DECK_H
 #define DLG_LOAD_DECK_H

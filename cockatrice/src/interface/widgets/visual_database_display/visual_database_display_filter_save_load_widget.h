@@ -1,3 +1,9 @@
+/**
+ * @file visual_database_display_filter_save_load_widget.h
+ * @ingroup VisualCardDatabaseWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 

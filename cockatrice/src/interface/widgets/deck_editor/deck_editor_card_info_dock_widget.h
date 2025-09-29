@@ -1,3 +1,10 @@
+/**
+ * @file deck_editor_card_info_dock_widget.h
+ * @ingroup DeckEditorWidgets
+ * @brief A Deck Editor DockWidget that displays a CardInfoFrameWidget, which shows detailed information about a card,
+ * such as the picture or various attributes.
+ */
+
 #ifndef DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H
 #define DECK_EDITOR_CARD_INFO_DOCK_WIDGET_H
 

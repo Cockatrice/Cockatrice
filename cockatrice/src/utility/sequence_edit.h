@@ -1,3 +1,9 @@
+/**
+ * @file sequence_edit.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef SEQUENCEEDIT_H
 #define SEQUENCEEDIT_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file game_meta_info.h
+ * @ingroup GameLogic
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAME_META_INFO_H
 #define GAME_META_INFO_H
 

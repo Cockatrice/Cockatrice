@@ -1,3 +1,9 @@
+/**
+ * @file card_database_loader.h
+ * @ingroup CardDatabase
+ * @brief The CardDatabaseLoader is responsible for populating the card database from files on disk.
+ */
+
 #ifndef COCKATRICE_CARD_DATABASE_LOADER_H
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 

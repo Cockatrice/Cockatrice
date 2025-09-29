@@ -1,0 +1,553 @@
+/** @file doc_groups.dox
+ *  @brief Doxygen group definitions for Cockatrice.
+ *
+ *  This file defines the documentation groups and hierarchy used
+ *  throughout the Cockatrice codebase. Reference these groups with @ingroup.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Core                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Core Core
+ * @brief Core utilities, shared types, and infrastructure.
+ *
+ * Provides the foundational building blocks used throughout Cockatrice.
+ * This includes logging facilities, settings management, serialization helpers,
+ * common enumerations, and general-purpose utility classes and functions.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Networking                                                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Network Networking
+ * @brief Networking components for client/server communication.
+ *
+ * Contains all systems related to communication between client and server.
+ * This includes lobby and room management, server interaction logic, and
+ * message handling infrastructure based on protobuf.
+ */
+
+/**
+ * @defgroup ApiResponses API Responses
+ * @ingroup Network
+ * @brief Structures representing API responses.
+ *
+ * Encapsulates the data models for networking API responses,
+ * providing consistent interfaces for parsing and handling results.
+ */
+
+/**
+ * @defgroup ApiResponseDisplayWidgets API Response Display Widgets
+ * @ingroup ApiResponses
+ * @brief Qt widgets for displaying API responses.
+ *
+ * Provides user interface components that render and present API response
+ * data to the user in a structured and interactive way.
+ */
+
+/**
+ * @defgroup Messages Protocol Messages
+ * @ingroup Network
+ * @brief Protocol message definitions and handlers.
+ *
+ * Contains the generated protobuf messages and supporting code used
+ * to encode, decode, and process communication between client and server.
+ */
+
+/**
+ * @defgroup Client Client
+ * @ingroup Network
+ * @brief The Cockatrice client application.
+ *
+ * Handles all client-side communication with the server.
+ */
+
+/**
+ * @defgroup ClientUpdates Client Updates
+ * @ingroup Client
+ * @brief Client updates.
+ */
+
+/**
+ * @defgroup Server Server
+ * @ingroup Network
+ * @brief The Cockatrice server application.
+ *
+ * Provides the authoritative game backend, handling authentication,
+ * lobbies, game rooms, and relaying state between connected clients.
+ */
+
+/**
+ * @defgroup Lobby Lobby & Rooms
+ * @ingroup Network
+ * @brief Multiplayer lobby and room management.
+ *
+ * Manages creation and interaction of game lobbies and room state synchronization with the server.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Game                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Game Game
+ * @brief Core game framework.
+ *
+ * Responsible for the main game loop, state management,
+ * zone handling, and resolution of in-game actions.
+ */
+
+/**
+ * @defgroup GameUi User Interface
+ * @ingroup Game
+ * @brief Graphical components for in-game interaction.
+ *
+ * Provides Qt-based widgets, dialogs, and menus used during a game,
+ * supporting both visual presentation and interaction logic.
+ */
+
+/**
+ * @defgroup GameLobby Lobby
+ * @ingroup GameUi
+ * @brief User interface for the multiplayer lobby.
+ *
+ * Contains widgets, dialogs, and models used to interact with the
+ * lobby within the game UI layer.
+ */
+
+/**
+ * @defgroup GameWidgets Game Widgets
+ * @ingroup GameUi
+ * @brief Widgets specific to the in-game interface.
+ *
+ * Provides reusable visual components that represent elements
+ * of the ongoing game, such as table or zone views or card panels.
+ */
+
+/**
+ * @defgroup GameDialogs Dialogs
+ * @ingroup GameUi
+ * @brief In-game dialogs.
+ *
+ * Modal and non-modal dialogs for player interaction during games,
+ * including prompts, confirmations, and detailed views.
+ */
+
+/**
+ * @defgroup GameMenus Menus
+ * @ingroup GameUi
+ * @brief In-game menu structures.
+ *
+ * Provides menu bars, context menus, and hierarchical options
+ * available to the player during a game session.
+ */
+
+/**
+ * @defgroup GameMenusPlayers Player
+ * @ingroup GameMenus
+ * @brief Menus specific to player actions.
+ *
+ * Defines context menus and options relating to player state and actions.
+ */
+
+/**
+ * @defgroup GameMenusZones Zones
+ * @ingroup GameMenus
+ * @brief Menus for interacting with zones.
+ *
+ * Provides contextual options for zones such as the hand,
+ * library, graveyard, and battlefield.
+ */
+
+/**
+ * @defgroup GameMenusCards Cards
+ * @ingroup GameMenus
+ * @brief Menus for card interactions.
+ *
+ * Defines right-click menus and contextual options available
+ * when interacting with individual cards.
+ */
+
+/**
+ * @defgroup GameGraphics Graphics
+ * @ingroup GameUi
+ * @brief Visual graphics for game elements.
+ *
+ * Provides rendering and layout for core game objects such as
+ * players, zones, and cards in the interface.
+ */
+
+/**
+ * @defgroup GameGraphicsPlayers Players
+ * @ingroup GameGraphics
+ * @brief Player-specific graphical elements.
+ *
+ * Defines visual representations of players, their states,
+ * and associated on-screen information.
+ */
+
+/**
+ * @defgroup GameGraphicsZones Zones
+ * @ingroup GameGraphics
+ * @brief Graphical representations of zones.
+ *
+ * Provides layout, visuals, and animations for zones like hand,
+ * library, battlefield, and graveyard.
+ */
+
+/**
+ * @defgroup GameGraphicsCards Cards
+ * @ingroup GameGraphics
+ * @brief Graphical representation of cards.
+ *
+ * Manages the visual look and behavior of cards when displayed
+ * in the game interface.
+ */
+
+/**
+ * @defgroup GameLogic Logic
+ * @ingroup Game
+ * @brief Game logic and rules framework.
+ *
+ * Implements resolution of actions and logical
+ * state management for ongoing games.
+ */
+
+/**
+ * @defgroup GameLogicPlayers Players
+ * @ingroup GameLogic
+ * @brief Logic related to player state.
+ *
+ * Handles player attributes, actions, resources, and their impact
+ * on game state.
+ */
+
+/**
+ * @defgroup GameLogicZones Zones
+ * @ingroup GameLogic
+ * @brief Logical handling of game zones.
+ *
+ * Defines the rules and behaviors of zones such as the hand,
+ * battlefield, library, and graveyard.
+ */
+
+/**
+ * @defgroup GameLogicActions Actions
+ * @ingroup GameLogic
+ * @brief Actions, events, and their resolution.
+ *
+ * Encapsulates how actions are created, queued, and resolved,
+ * including event handling and triggered effects.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Decks                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Decks Deck Management
+ * @brief Deck handling, persistence, and tooling.
+ *
+ * Covers the lifecycle of decks: loading, saving, editing, import/export,
+ * and long-term persistence, including both textual and visual editors.
+ */
+
+/**
+ * @defgroup DeckModels Deck Models
+ * @ingroup Decks
+ * @brief Qt Models relating to DeckList.
+ */
+
+/**
+ * @defgroup DeckEditors Deck Editors
+ * @ingroup Decks
+ * @brief Editors for creating and modifying decks.
+ *
+ * Provides visual and textual editors for building, modifying,
+ * and analyzing decks. Includes support for card search,
+ * sorting, and filtering of deck contents.
+ */
+
+/**
+ * @defgroup DeckEditorWidgets Deck Editor Widgets
+ * @ingroup DeckEditors
+ * @brief Supporting widgets for deck editors.
+ *
+ * Contains specialized UI components that extend deck editors with
+ * interactive functionality, data views, and user interaction tools.
+ */
+
+/**
+ * @defgroup DeckEditorAnalyticsWidgets Deck Editor Analytics Widgets
+ * @ingroup DeckEditorWidgets
+ * @brief Widgets for analyzing deck contents.
+ *
+ * Provides visualization and statistical tools for analyzing decks.
+ */
+
+/**
+ * @defgroup DeckEditorCardGroupWidgets Card Group Display Widgets
+ * @ingroup DeckEditorWidgets
+ * @brief Widgets for displaying groups of cards.
+ *
+ * Provides interactive views that organize and display cards in groups,
+ * enabling filtering, sorting, and direct manipulation of deck sections.
+ */
+
+/**
+ * @defgroup PrintingWidgets Printing Widgets
+ * @ingroup DeckEditorWidgets
+ * @brief Widgets for handling printing information.
+ *
+ * Manages the display and editing of card printing information within a deck,
+ * including editions, variations, and preferences.
+ */
+
+/**
+ * @defgroup DeckStorage Deck Storage
+ * @ingroup Decks
+ * @brief Systems for storing decks.
+ *
+ * Handles the persistence of decks, providing file-based storage,
+ * metadata tracking, and tagging functionality.
+ */
+
+/**
+ * @defgroup DeckStorageWidgets Deck Storage Widgets
+ * @ingroup DeckStorage
+ * @brief Widgets for browsing and managing stored decks.
+ *
+ * Provides list and tree-based views for exploring stored decks,
+ * including tagging, searching, and preview functionality.
+ */
+
+/**
+ * @defgroup VisualDeckStorageWidgets Visual Deck Storage Widgets
+ * @ingroup DeckStorageWidgets
+ * @brief Visual widgets for deck storage.
+ *
+ * Offers graphical interfaces for browsing and interacting with stored
+ * decks and tags, focusing on a more visual browsing experience.
+ */
+
+/**
+ * @defgroup VisualDeckPreviewWidgets Visual Deck Preview Widgets
+ * @ingroup VisualDeckStorageWidgets
+ * @brief Widgets for visually previewing decks.
+ *
+ * Provides visual previews of decks, allowing users
+ * to inspect the deck name, color identity, and banner card at a glance.
+ */
+
+/**
+ * @defgroup ImportExport Import/Export
+ * @ingroup DeckStorage
+ * @brief Deck import, export, and conversion.
+ *
+ * Supports importing and exporting decks across formats, including
+ * text, Cockatrice-native formats, and third-party platforms.
+ */
+
+/**
+ * @defgroup Parsing Parsing
+ * @ingroup DeckStorage
+ * @brief Deck parsing and external API integration.
+ *
+ * Contains parsers for deck URLs and APIs (e.g., TappedOut, Archidekt,
+ * Moxfield, Deckstats), allowing seamless import and synchronization.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Cards                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Cards Cards
+ * @brief Representation of individual cards and their state.
+ *
+ * Defines card objects, attributes, metadata, and runtime state within
+ * both the database and the game engine.
+ */
+
+/**
+ * @defgroup CardSets Card Sets
+ * @ingroup Cards
+ * @brief Card sets.
+ */
+
+/**
+ * @defgroup CardPrintings Card Printings
+ * @ingroup Cards
+ * @brief Information about specific printings of cards.
+ */
+
+/**
+ * @defgroup CardWidgets Card Widgets
+ * @ingroup Cards
+ * @brief Widgets for card display and interaction.
+ *
+ * Provides UI components that render individual cards, handle
+ * interactions, and display card details within the application.
+ */
+
+/**
+ * @defgroup CardExtraInfoWidgets Card Extra Info Widgets
+ * @ingroup CardWidgets
+ * @brief Widgets for extended card information.
+ *
+ * Displays additional data associated with cards or data in a different form.
+ */
+
+/**
+ * @defgroup CardDatabase Card Database
+ * @ingroup Cards
+ * @brief Core card database and loaders.
+ *
+ * Provides the underlying data models for cards, including loading,
+ * parsing, and managing the complete card database used in the application.
+ */
+
+/**
+ * @defgroup CardDatabaseModels Models
+ * @ingroup CardDatabase
+ * @brief Qt models for card database access.
+ *
+ * Supplies Qt model abstractions for presenting card data in views,
+ * supporting filtering, sorting, and data binding to widgets.
+ */
+
+/**
+ * @defgroup CardDatabaseModelFilters Filters
+ * @ingroup CardDatabaseModels
+ * @brief Filters for card database models.
+ *
+ * Provides reusable filtering components for Qt models, enabling
+ * refined queries and customized card data views.
+ */
+
+/**
+ * @defgroup CardDatabaseParsers Parsers
+ * @ingroup CardDatabase
+ * @brief Parsers for card data.
+ *
+ * Implements parsers for card database structures, handling the
+ * transformation of raw data into structured objects and models.
+ */
+
+/**
+ * @defgroup CardDatabaseWidgets Card Database Widgets
+ * @ingroup CardDatabase
+ * @brief Widgets for browsing and selecting cards.
+ *
+ * Provides UI components for interacting with the card database,
+ * including search, filtering, and browsing in tabular or list views.
+ */
+
+/**
+ * @defgroup VisualCardDatabaseWidgets Visual Card Database Widgets
+ * @ingroup CardDatabaseWidgets
+ * @brief Visual card database widgets.
+ *
+ * Enhances card browsing with graphical interfaces, offering
+ * image-based and grid-based views for selecting cards.
+ */
+
+/* ------------------------------------------------------------------ */
+/* UI                                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup UI User Interface
+ * @brief Graphical interface components built with Qt.
+ *
+ * Includes high-level widgets, dialogs, models, and editors that form
+ * the interactive frontend of Cockatrice.
+ */
+
+/**
+ * @defgroup Widgets Widgets
+ * @ingroup UI
+ * @brief General-purpose Qt widgets.
+ *
+ * A collection of reusable widgets used throughout the application,
+ * such as CardInfoPictureFoilWidget, DeckAnalyticsWidget, and others.
+ */
+
+/**
+ * @defgroup Tabs Tabs
+ * @ingroup Widgets
+ * @brief Tabbed UI components.
+ *
+ * Provides tab-based interfaces for organizing and navigating
+ * between multiple views in the application.
+ */
+
+/**
+ * @defgroup DeckEditorTabs Deck Editor Tabs
+ * @ingroup Tabs
+ * @ingroup DeckEditors
+ * @brief Tabs for the Deck Editors
+ */
+
+/**
+ * @defgroup NetworkingTabs Networking Tabs
+ * @ingroup Tabs
+ * @ingroup Network
+ */
+
+/**
+ * @defgroup Dialogs Dialogs
+ * @ingroup UI
+ * @brief Application dialogs.
+ *
+ * Includes dialogs for card prices, deck import/export,
+ * settings, and other modal user interactions.
+ */
+
+/**
+ * @defgroup NetworkDialogs Networking Dialogs
+ * @ingroup Dialogs
+ * @ingroup Network
+ * @brief Dialogs related to interacting with a remote server.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Replay                                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Replay Replays
+ * @brief Replay recording and playback.
+ *
+ * Provides mechanisms for capturing game sessions, storing them in
+ * replay files, and replaying them for review or analysis.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Settings                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Settings Settings
+ * @brief Application settings and configuration.
+ *
+ * Centralizes the configuration system, providing persistence and
+ * runtime access to user preferences and application options.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Tests                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * @defgroup Tests Tests
+ * @brief Automated testing framework.
+ *
+ * Provides unit tests, integration tests, and regression checks
+ * to ensure stability and correctness of the Cockatrice codebase.
+ */
+

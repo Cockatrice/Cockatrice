@@ -1,3 +1,10 @@
+/**
+ * @file tab_room.h
+ * @ingroup NetworkingTabs
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H
 

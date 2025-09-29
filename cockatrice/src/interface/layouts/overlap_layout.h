@@ -1,3 +1,9 @@
+/**
+ * @file overlap_layout.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef OVERLAP_LAYOUT_H
 #define OVERLAP_LAYOUT_H
 

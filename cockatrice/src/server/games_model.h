@@ -1,3 +1,10 @@
+/**
+ * @file games_model.h
+ * @ingroup Lobby
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 

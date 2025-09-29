@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_api_response_card_prices_display_widget.h
+ * @ingroup ApiResponseDisplayWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef EDHREC_API_RESPONSE_CARD_PRICES_DISPLAY_WIDGET_H
 #define EDHREC_API_RESPONSE_CARD_PRICES_DISPLAY_WIDGET_H
 

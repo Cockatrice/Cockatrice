@@ -1,3 +1,9 @@
+/**
+ * @file card_list.h
+ * @ingroup GameLogicCards
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDLIST_H
 #define CARDLIST_H
 

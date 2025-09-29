@@ -1,3 +1,10 @@
+/**
+ * @file recents_settings.h
+ * @ingroup DeckStorage
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef RECENTS_SETTINGS_H
 #define RECENTS_SETTINGS_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file player.h
+ * @ingroup GameLogicPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef PLAYER_H
 #define PLAYER_H
 

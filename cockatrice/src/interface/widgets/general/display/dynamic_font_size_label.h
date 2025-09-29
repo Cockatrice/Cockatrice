@@ -1,3 +1,9 @@
+/**
+ * @file dynamic_font_size_label.h
+ * @ingroup Widgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DYNAMICFONTSIZELABEL_H
 #define DYNAMICFONTSIZELABEL_H
 

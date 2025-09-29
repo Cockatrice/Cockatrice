@@ -1,3 +1,10 @@
+/**
+ * @file download_settings.h
+ * @ingroup Network
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_DOWNLOADSETTINGS_H
 #define COCKATRICE_DOWNLOADSETTINGS_H
 

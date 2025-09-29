@@ -1,3 +1,10 @@
+/**
+ * @file user_info_box.h
+ * @ingroup Network
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef USERINFOBOX_H
 #define USERINFOBOX_H
 

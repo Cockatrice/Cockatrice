@@ -1,3 +1,9 @@
+/**
+ * @file abstract_counter.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COUNTER_H
 #define COUNTER_H
 

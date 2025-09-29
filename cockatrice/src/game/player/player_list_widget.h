@@ -1,3 +1,9 @@
+/**
+ * @file player_list_widget.h
+ * @ingroup GameWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 

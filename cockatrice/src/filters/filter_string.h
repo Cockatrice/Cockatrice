@@ -1,3 +1,9 @@
+/**
+ * @file filter_string.h
+ * @ingroup CardDatabaseModelFilters
+ * @brief TODO: Document this.
+ */
+
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 

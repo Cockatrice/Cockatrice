@@ -1,3 +1,9 @@
+/**
+ * @file printing_selector_card_search_widget.h
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PRINTING_SELECTOR_CARD_SEARCH_WIDGET_H
 #define PRINTING_SELECTOR_CARD_SEARCH_WIDGET_H
 

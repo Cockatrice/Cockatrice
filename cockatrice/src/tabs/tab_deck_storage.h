@@ -1,3 +1,10 @@
+/**
+ * @file tab_deck_storage.h
+ * @ingroup DeckStorageWidgets
+ * @ingroup Tabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 

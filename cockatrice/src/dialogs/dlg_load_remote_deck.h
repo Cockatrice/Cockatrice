@@ -1,3 +1,11 @@
+/**
+ * @file dlg_load_remote_deck.h
+ * @ingroup Dialogs
+ * @ingroup ImportExport
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_STARTGAME_H
 #define DLG_STARTGAME_H
 

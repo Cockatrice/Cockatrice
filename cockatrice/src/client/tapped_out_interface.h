@@ -1,3 +1,11 @@
+/**
+ * @file tapped_out_interface.h
+ * @ingroup ImportExport
+ * @ingroup Parsing
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAPPEDOUT_INTERFACE_H
 #define TAPPEDOUT_INTERFACE_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file mana_symbol_widget.h
+ * @ingroup CardExtraInfoWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef MANA_SYMBOL_WIDGET_H
 #define MANA_SYMBOL_WIDGET_H
 

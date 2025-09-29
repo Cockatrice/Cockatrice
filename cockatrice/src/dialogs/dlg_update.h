@@ -1,3 +1,9 @@
+/**
+ * @file dlg_update.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 

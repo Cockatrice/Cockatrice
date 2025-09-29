@@ -1,3 +1,9 @@
+/**
+ * @file deck_card_zone_display_widget.h
+ * @ingroup DeckEditorWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_CARD_ZONE_DISPLAY_WIDGET_H
 #define DECK_CARD_ZONE_DISPLAY_WIDGET_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_api_response_card_list.h
+ * @ingroup ApiResponses
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_LIST_H
 #define CARD_LIST_H
 

@@ -1,3 +1,11 @@
+/**
+ * @file visual_deck_storage_quick_settings_widget.h
+ * @ingroup VisualDeckStorageWidgets
+ * @brief The VDS's quick settings menu.
+ * Manages the widgets in the quick settings menu dropdown, as well as syncing their values with SettingsCache.
+ * The current values of the settings are exposed through getters and signals.
+ */
+
 #ifndef VISUAL_DECK_STORAGE_QUICK_SETTINGS_WIDGET_H
 #define VISUAL_DECK_STORAGE_QUICK_SETTINGS_WIDGET_H
 
@@ -9,11 +17,6 @@ class QSpinBox;
 class QCheckBox;
 class QComboBox;
 
-/**
- * The VDS's quick settings menu.
- * Manages the widgets in the quick settings menu dropdown, as well as syncing their values with SettingsCache.
- * The current values of the settings are exposed through getters and signals.
- */
 class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
 {
     Q_OBJECT

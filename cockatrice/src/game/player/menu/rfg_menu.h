@@ -1,3 +1,9 @@
+/**
+ * @file rfg_menu.h
+ * @ingroup GameMenusZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_RFG_MENU_H
 #define COCKATRICE_RFG_MENU_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file tab_account.h
+ * @ingroup NetworkingTabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_ACCOUNT_H
 #define TAB_ACCOUNT_H
 

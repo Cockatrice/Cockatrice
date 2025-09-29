@@ -1,3 +1,9 @@
+/**
+ * @file cockatrice_xml_4.h
+ * @ingroup CardDatabaseParsers
+ * @brief The CockatriceXml4Parser is capable of parsing version 4 of the Cockatrice XML Schema.
+ */
+
 #ifndef COCKATRICE_XML4_H
 #define COCKATRICE_XML4_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_deck_api_response.h
+ * @ingroup ApiResponses
+ * @brief TODO: Document this.
+ */
+
 #ifndef EDHREC_DECK_API_RESPONSE_H
 #define EDHREC_DECK_API_RESPONSE_H
 

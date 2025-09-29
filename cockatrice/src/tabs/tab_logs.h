@@ -1,3 +1,9 @@
+/**
+ * @file tab_logs.h
+ * @ingroup NetworkingTabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_LOG_H
 #define TAB_LOG_H
 

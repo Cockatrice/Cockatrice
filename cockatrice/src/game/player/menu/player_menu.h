@@ -1,3 +1,9 @@
+/**
+ * @file player_menu.h
+ * @ingroup GameMenusPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_MENU_H
 #define COCKATRICE_PLAYER_MENU_H
 

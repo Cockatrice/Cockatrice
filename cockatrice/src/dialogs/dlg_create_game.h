@@ -1,3 +1,10 @@
+/**
+ * @file dlg_create_game.h
+ * @ingroup NetworkDialogs
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H
 

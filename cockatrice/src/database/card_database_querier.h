@@ -1,3 +1,9 @@
+/**
+ * @file card_database_querier.h
+ * @ingroup CardDatabase
+ * @brief The CardDatabaseQuerier is responsible for querying the database and returning data.
+ */
+
 #ifndef COCKATRICE_CARD_DATABASE_QUERIER_H
 #define COCKATRICE_CARD_DATABASE_QUERIER_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file tearoff_menu.h
+ * @ingroup GameMenus
+ * @brief TODO: Document this.
+ */
+
 #pragma once
 
 #include "../settings/cache_settings.h"

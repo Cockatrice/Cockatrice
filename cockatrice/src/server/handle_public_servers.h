@@ -1,3 +1,9 @@
+/**
+ * @file handle_public_servers.h
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 #define COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 

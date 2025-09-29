@@ -1,3 +1,9 @@
+/**
+ * @file abstract_game.h
+ * @ingroup GameLogic
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_ABSTRACT_GAME_H
 #define COCKATRICE_ABSTRACT_GAME_H
 

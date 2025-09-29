@@ -1,3 +1,9 @@
+/**
+ * @file pending_command.h
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef PENDING_COMMAND_H
 #define PENDING_COMMAND_H
 

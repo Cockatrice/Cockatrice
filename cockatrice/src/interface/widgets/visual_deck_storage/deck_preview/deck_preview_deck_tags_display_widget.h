@@ -1,3 +1,9 @@
+/**
+ * @file deck_preview_deck_tags_display_widget.h
+ * @ingroup VisualDeckPreviewWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 

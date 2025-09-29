@@ -1,3 +1,9 @@
+/**
+ * @file filter_card.h
+ * @ingroup CardDatabaseModelFilters
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDFILTER_H
 #define CARDFILTER_H
 
@@ -46,7 +52,7 @@ private:
     enum Attr a;
 
 public:
-    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr){};
+    CardFilter(QString &term, Type type, Attr attr) : trm(term), t(type), a(attr) {};
 
     Type type() const
     {

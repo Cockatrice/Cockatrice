@@ -1,3 +1,9 @@
+/**
+ * @file select_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef SELECTZONE_H
 #define SELECTZONE_H
 

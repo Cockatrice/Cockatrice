@@ -1,3 +1,9 @@
+/**
+ * @file card_search_model.h
+ * @ingroup CardDatabaseModels
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_SEARCH_MODEL_H
 #define CARD_SEARCH_MODEL_H
 

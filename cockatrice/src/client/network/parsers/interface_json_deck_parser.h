@@ -1,3 +1,9 @@
+/**
+ * @file interface_json_deck_parser.h
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
 #include "../../../deck/deck_loader.h"

@@ -1,3 +1,9 @@
+/**
+ * @file event_processing_options.h
+ * @ingroup GameLogicPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_EVENT_PROCESSING_OPTIONS_H
 #define COCKATRICE_EVENT_PROCESSING_OPTIONS_H
 

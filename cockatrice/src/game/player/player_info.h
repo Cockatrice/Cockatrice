@@ -1,3 +1,9 @@
+/**
+ * @file player_info.h
+ * @ingroup GameLogicPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 

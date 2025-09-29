@@ -1,3 +1,9 @@
+/**
+ * @file dlg_startup_card_check.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_STARTUP_CARD_CHECK_H
 #define DLG_STARTUP_CARD_CHECK_H
 

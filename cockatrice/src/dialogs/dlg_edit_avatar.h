@@ -1,3 +1,9 @@
+/**
+ * @file dlg_edit_avatar.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_EDITAVATAR_H
 #define DLG_EDITAVATAR_H
 

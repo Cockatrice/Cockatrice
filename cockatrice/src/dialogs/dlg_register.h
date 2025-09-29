@@ -1,3 +1,9 @@
+/**
+ * @file dlg_register.h
+* @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_REGISTER_H
 #define DLG_REGISTER_H
 

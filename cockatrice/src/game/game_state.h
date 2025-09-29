@@ -1,3 +1,9 @@
+/**
+ * @file game_state.h
+ * @ingroup GameLogic
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_GAME_STATE_H
 #define COCKATRICE_GAME_STATE_H
 

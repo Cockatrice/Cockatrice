@@ -1,3 +1,9 @@
+/**
+ * @file card_database_parser.h
+ * @ingroup CardDatabaseParsers
+ * @brief The ICardDatabaseParser defines the base interface for parser sub-classes.
+ */
+
 #ifndef CARDDATABASE_PARSER_H
 #define CARDDATABASE_PARSER_H
 

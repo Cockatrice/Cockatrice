@@ -1,3 +1,10 @@
+/**
+ * @file set_name_and_collectors_number_display_widget.h
+ * @ingroup CardExtraInfoWidgets
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H
 #define SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H
 

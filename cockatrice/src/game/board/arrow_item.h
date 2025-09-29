@@ -1,3 +1,9 @@
+/**
+ * @file arrow_item.h
+ * @ingroup GameGraphics
+ * @brief TODO: Document this.
+ */
+
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 

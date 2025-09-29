@@ -1,6 +1,8 @@
-//
-// Created by ascor on 6/15/25.
-//
+/**
+ * @file home_styled_button.h
+ * @ingroup Widgets
+ * @brief TODO: Document this.
+ */
 
 #ifndef HOME_STYLED_BUTTON_H
 #define HOME_STYLED_BUTTON_H

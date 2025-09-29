@@ -1,3 +1,9 @@
+/**
+ * @file spoiler_background_updater.h
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_SPOILER_DOWNLOADER_H
 #define COCKATRICE_SPOILER_DOWNLOADER_H
 

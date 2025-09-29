@@ -1,4 +1,9 @@
-// custom QInputDialog::getText implementation that allows configuration of the max length
+/**
+ * @file get_text_with_max.h
+ * @ingroup UI
+ * @brief Custom QInputDialog::getText implementation that allows configuration of the max length
+ */
+
 #ifndef GETTEXTWITHMAX_H
 #define GETTEXTWITHMAX_H
 

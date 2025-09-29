@@ -1,3 +1,9 @@
+/**
+ * @file card_info_frame_widget.h
+ * @ingroup CardWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 

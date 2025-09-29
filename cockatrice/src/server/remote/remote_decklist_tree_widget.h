@@ -1,3 +1,10 @@
+/**
+ * @file remote_decklist_tree_widget.h
+ * @ingroup Client
+ * @ingroup DeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H
 

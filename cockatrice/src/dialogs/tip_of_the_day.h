@@ -1,3 +1,9 @@
+/**
+ * @file tip_of_the_day.h
+ * @ingroup Dialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TIP_OF_DAY_H
 #define TIP_OF_DAY_H
 

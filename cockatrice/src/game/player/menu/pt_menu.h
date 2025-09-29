@@ -1,3 +1,9 @@
+/**
+ * @file pt_menu.h
+ * @ingroup GameMenusCards
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PT_MENU_H
 #define COCKATRICE_PT_MENU_H
 #include <QMenu>

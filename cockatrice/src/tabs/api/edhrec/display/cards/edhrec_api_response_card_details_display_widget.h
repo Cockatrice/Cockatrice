@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_api_response_card_details_display_widget.h
+ * @ingroup ApiResponseDisplayWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_CARD_DETAILS_DISPLAY_WIDGET_H
 

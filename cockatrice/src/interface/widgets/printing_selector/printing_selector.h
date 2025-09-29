@@ -1,3 +1,9 @@
+/**
+ * @file printing_selector.h
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PRINTING_SELECTOR_H
 #define PRINTING_SELECTOR_H
 

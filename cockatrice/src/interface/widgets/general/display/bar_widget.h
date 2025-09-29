@@ -1,3 +1,10 @@
+/**
+ * @file bar_widget.h
+ * @ingroup Widgets
+ * @ingroup DeckEditorAnalyticsWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef BAR_WIDGET_H
 #define BAR_WIDGET_H
 

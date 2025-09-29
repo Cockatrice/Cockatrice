@@ -3,7 +3,11 @@
 
 #include <QJsonObject>
 
-// Represents the typical deck statistics (collapsed section)
+/**
+ * @struct EdhrecCommanderApiResponseAverageDeckStatistics
+ * @ingroup ApiResponses
+ * @brief Represents the typical deck statistics (collapsed section)
+ */
 struct EdhrecCommanderApiResponseAverageDeckStatistics
 {
     int creature = 0;

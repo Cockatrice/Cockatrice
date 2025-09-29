@@ -1,3 +1,9 @@
+/**
+ * @file player_graphics_item.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #include "../game_scene.h"

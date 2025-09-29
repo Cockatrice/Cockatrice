@@ -1,3 +1,9 @@
+/**
+ * @file abstract_card_item.h
+ * @ingroup GameGraphicsCards
+ * @brief TODO: Document this.
+ */
+
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 

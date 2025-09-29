@@ -1,3 +1,9 @@
+/**
+ * @file visual_deck_editor_widget.h
+ * @ingroup DeckEditors
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 

@@ -1,3 +1,11 @@
+/**
+ * @file card_size_widget.h
+ * @ingroup CardWidgets
+ * @ingroup DeckEditorWidgets
+ * @ingroup DeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_SIZE_WIDGET_H
 #define CARD_SIZE_WIDGET_H
 

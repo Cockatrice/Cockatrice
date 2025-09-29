@@ -1,3 +1,9 @@
+/**
+ * @file dlg_forgot_password_challenge.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_FORGOTPASSWORDCHALLENGE_H
 #define DLG_FORGOTPASSWORDCHALLENGE_H
 

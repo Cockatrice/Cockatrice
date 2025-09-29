@@ -1,3 +1,10 @@
+/**
+ * @file dlg_default_tags_editor.h
+ * @ingroup Dialogs
+ * @ingroup DeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_DEFAULT_TAGS_EDITOR_H
 #define DLG_DEFAULT_TAGS_EDITOR_H
 

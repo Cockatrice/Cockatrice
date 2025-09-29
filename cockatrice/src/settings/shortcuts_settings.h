@@ -1,3 +1,9 @@
+/**
+ * @file shortcuts_settings.h
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SHORTCUTSSETTINGS_H
 #define SHORTCUTSSETTINGS_H
 

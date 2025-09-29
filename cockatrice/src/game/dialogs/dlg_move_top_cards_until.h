@@ -1,3 +1,9 @@
+/**
+ * @file dlg_move_top_cards_until.h
+ * @ingroup GameDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_MOVE_TOP_CARDS_UNTIL_H
 #define DLG_MOVE_TOP_CARDS_UNTIL_H
 

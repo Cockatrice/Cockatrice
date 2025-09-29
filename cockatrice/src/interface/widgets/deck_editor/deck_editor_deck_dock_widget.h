@@ -1,3 +1,10 @@
+/**
+ * @file deck_editor_deck_dock_widget.h
+ * @ingroup DeckEditorWidgets
+ * @brief A Deck Editor DockWidget that displays several Qt Editors to modify various deck attributes as well as a
+ * QTreeView of the DeckListModel.
+ */
+
 #ifndef DECK_EDITOR_DECK_DOCK_WIDGET_H
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
