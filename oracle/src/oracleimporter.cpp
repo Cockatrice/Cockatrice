@@ -1,6 +1,5 @@
 #include "oracleimporter.h"
 
-#include <card/card_relation.h>
 #include "database/parser/cockatrice_xml_4.h"
 #include "parsehelpers.h"
 #include "qt-json/json.h"
