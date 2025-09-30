@@ -1,9 +1,10 @@
 #ifndef COCKATRICE_CARD_RELATION_H
 #define COCKATRICE_CARD_RELATION_H
 
+#include "card_relation_type.h"
+
 #include <QObject>
 #include <QString>
-#include "card_relation_type.h"
 
 class CardRelation : public QObject
 {
@@ -25,19 +26,48 @@ public:
                           int _defaultCount = 1,
                           bool _isPersistent = false);
 
-    const QString &getName() const { return name; }
-    CardRelationType getAttachType() const { return attachType; }
-    bool getDoesAttach() const { return attachType != CardRelationType::DoesNotAttach; }
-    bool getDoesTransform() const { return attachType == CardRelationType::TransformInto; }
+    const QString &getName() const
+    {
+        return name;
+    }
+    CardRelationType getAttachType() const
+    {
+        return attachType;
+    }
+    bool getDoesAttach() const
+    {
+        return attachType != CardRelationType::DoesNotAttach;
+    }
+    bool getDoesTransform() const
+    {
+        return attachType == CardRelationType::TransformInto;
+    }
 
-    QString getAttachTypeAsString() const { return cardAttachTypeToString(attachType); }
+    QString getAttachTypeAsString() const
+    {
+        return cardAttachTypeToString(attachType);
+    }
 
-    bool getCanCreateAnother() const { return !getDoesAttach(); }
-    bool getIsCreateAllExclusion() const { return isCreateAllExclusion; }
-    bool getIsVariable() const { return isVariableCount; }
-    int getDefaultCount() const { return defaultCount; }
-    bool getIsPersistent() const { return isPersistent; }
+    bool getCanCreateAnother() const
+    {
+        return !getDoesAttach();
+    }
+    bool getIsCreateAllExclusion() const
+    {
+        return isCreateAllExclusion;
+    }
+    bool getIsVariable() const
+    {
+        return isVariableCount;
+    }
+    int getDefaultCount() const
+    {
+        return defaultCount;
+    }
+    bool getIsPersistent() const
+    {
+        return isPersistent;
+    }
 };
 
 #endif // COCKATRICE_CARD_RELATION_H
-

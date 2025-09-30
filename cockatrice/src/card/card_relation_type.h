@@ -6,20 +6,24 @@
 /**
  * Represents how a card relates to another (attach, transform, etc.).
  */
-enum class CardRelationType {
+enum class CardRelationType
+{
     DoesNotAttach = 0,
     AttachTo = 1,
     TransformInto = 2,
 };
 
 // Optional helper
-inline QString cardAttachTypeToString(CardRelationType type) {
+inline QString cardAttachTypeToString(CardRelationType type)
+{
     switch (type) {
-        case CardRelationType::AttachTo: return "attach";
-        case CardRelationType::TransformInto: return "transform";
-        default: return "";
+        case CardRelationType::AttachTo:
+            return "attach";
+        case CardRelationType::TransformInto:
+            return "transform";
+        default:
+            return "";
     }
 }
-
 
 #endif // COCKATRICE_CARD_RELATION_TYPE_H

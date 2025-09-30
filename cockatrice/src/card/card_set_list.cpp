@@ -6,7 +6,7 @@ public:
     inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
     {
         if (a.isNull() || b.isNull()) {
-            //qCWarning(CardInfoLog) << "SetList::KeyCompareFunctor a or b is null";
+            // qCWarning(CardInfoLog) << "SetList::KeyCompareFunctor a or b is null";
             return false;
         }
 
@@ -74,7 +74,7 @@ void CardSetList::enableAll()
         CardSetPtr set = at(i);
 
         if (set == nullptr) {
-            //qCWarning(CardInfoLog) << "enabledAll has null";
+            // qCWarning(CardInfoLog) << "enabledAll has null";
             continue;
         }
 
@@ -105,7 +105,7 @@ void CardSetList::guessSortKeys()
     for (int i = 0; i < size(); ++i) {
         CardSetPtr set = at(i);
         if (set.isNull()) {
-            //qCWarning(CardInfoLog) << "guessSortKeys set is null";
+            // qCWarning(CardInfoLog) << "guessSortKeys set is null";
             continue;
         }
         set->setSortKey(i);

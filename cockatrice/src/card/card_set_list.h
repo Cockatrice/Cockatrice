@@ -2,6 +2,7 @@
 #define COCKATRICE_CARD_SET_LIST_H
 
 #include "card_set.h"
+
 #include <QList>
 #include <QStringList>
 
@@ -21,6 +22,5 @@ public:
     QStringList getUnknownSetsNames();
     void defaultSort();
 };
-
 
 #endif // COCKATRICE_CARD_SET_LIST_H

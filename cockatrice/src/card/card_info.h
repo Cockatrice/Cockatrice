@@ -36,7 +36,6 @@ typedef QHash<QString, CardSetPtr> SetNameMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
-
 class CardInfo : public QObject
 {
     Q_OBJECT

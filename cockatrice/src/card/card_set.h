@@ -3,8 +3,8 @@
 
 #include <QDate>
 #include <QList>
-#include <QString>
 #include <QSharedPointer>
+#include <QString>
 
 class CardInfo;
 using CardInfoPtr = QSharedPointer<CardInfo>;
@@ -15,7 +15,8 @@ using CardSetPtr = QSharedPointer<CardSet>;
 class CardSet : public QList<CardInfoPtr>
 {
 public:
-    enum Priority {
+    enum Priority
+    {
         PriorityFallback = 0,
         PriorityPrimary = 10,
         PrioritySecondary = 20,
@@ -33,6 +34,7 @@ private:
     QString setType;
     Priority priority;
     bool enabled, isknown;
+
 public:
     explicit CardSet(const QString &_shortName = QString(),
                      const QString &_longName = QString(),
@@ -48,28 +50,65 @@ public:
 
     QString getCorrectedShortName() const;
 
-    QString getShortName() const { return shortName; }
-    QString getLongName() const { return longName; }
-    QString getSetType() const { return setType; }
-    QDate getReleaseDate() const { return releaseDate; }
-    Priority getPriority() const { return priority; }
+    QString getShortName() const
+    {
+        return shortName;
+    }
+    QString getLongName() const
+    {
+        return longName;
+    }
+    QString getSetType() const
+    {
+        return setType;
+    }
+    QDate getReleaseDate() const
+    {
+        return releaseDate;
+    }
+    Priority getPriority() const
+    {
+        return priority;
+    }
 
-    void setLongName(const QString &_longName) { longName = _longName; }
-    void setSetType(const QString &_setType) { setType = _setType; }
-    void setReleaseDate(const QDate &_releaseDate) { releaseDate = _releaseDate; }
-    void setPriority(const Priority _priority) { priority = _priority; }
+    void setLongName(const QString &_longName)
+    {
+        longName = _longName;
+    }
+    void setSetType(const QString &_setType)
+    {
+        setType = _setType;
+    }
+    void setReleaseDate(const QDate &_releaseDate)
+    {
+        releaseDate = _releaseDate;
+    }
+    void setPriority(const Priority _priority)
+    {
+        priority = _priority;
+    }
 
     void loadSetOptions();
-    int getSortKey() const { return sortKey; }
+    int getSortKey() const
+    {
+        return sortKey;
+    }
     void setSortKey(unsigned int _sortKey);
 
-    bool getEnabled() const { return enabled; }
+    bool getEnabled() const
+    {
+        return enabled;
+    }
     void setEnabled(bool _enabled);
 
-    bool getIsKnown() const { return isknown; }
+    bool getIsKnown() const
+    {
+        return isknown;
+    }
     void setIsKnown(bool _isknown);
 
-    bool getIsKnownIgnored() const {
+    bool getIsKnownIgnored() const
+    {
         return longName.length() + setType.length() + releaseDate.toString().length() == 0;
     }
 };
