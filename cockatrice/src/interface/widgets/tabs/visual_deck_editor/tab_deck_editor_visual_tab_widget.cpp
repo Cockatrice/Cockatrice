@@ -3,6 +3,17 @@
 #include "../../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "../abstract_tab_deck_editor.h"
 
+/**
+ * @brief Constructs the TabDeckEditorVisualTabWidget.
+ * @param parent The parent QWidget.
+ * @param _deckEditor Pointer to the associated deck editor.
+ * @param _deckModel Pointer to the deck list model.
+ * @param _cardDatabaseModel Pointer to the card database model.
+ * @param _cardDatabaseDisplayModel Pointer to the card database display model.
+ *
+ * Initializes all sub-widgets (visual deck view, database display, deck analytics,
+ * sample hand) and sets up the tab layout and signal connections.
+ */
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
                                                            AbstractTabDeckEditor *_deckEditor,
                                                            DeckListModel *_deckModel,
@@ -14,7 +25,6 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     this->setTabsClosable(true); // Enable tab closing
     connect(this, &QTabWidget::tabCloseRequested, this, &TabDeckEditorVisualTabWidget::handleTabClose);
 
-    // Set up the layout and add tab widget
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
@@ -46,16 +56,30 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     this->addNewTab(sampleHandWidget, tr("Sample Hand"));
 }
 
+/**
+ * @brief Emits the cardChanged signal when a card is activated in the visual deck view.
+ * @param activeCard The card that was activated.
+ */
 void TabDeckEditorVisualTabWidget::onCardChanged(const ExactCard &activeCard)
 {
     emit cardChanged(activeCard);
 }
 
+/**
+ * @brief Emits the cardChangedDatabaseDisplay signal when a card is hovered in the database display.
+ * @param activeCard The card that was hovered.
+ */
 void TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay(const ExactCard &activeCard)
 {
     emit cardChangedDatabaseDisplay(activeCard);
 }
 
+/**
+ * @brief Emits the cardClicked signal when a card is clicked in the visual deck view.
+ * @param event The mouse event.
+ * @param instance The widget instance of the clicked card.
+ * @param zoneName The zone of the deck where the card is located.
+ */
 void TabDeckEditorVisualTabWidget::onCardClickedDeckEditor(QMouseEvent *event,
                                                            CardInfoPictureWithTextOverlayWidget *instance,
                                                            QString zoneName)
@@ -63,51 +87,77 @@ void TabDeckEditorVisualTabWidget::onCardClickedDeckEditor(QMouseEvent *event,
     emit cardClicked(event, instance, zoneName);
 }
 
+/**
+ * @brief Emits the cardClickedDatabaseDisplay signal when a card is clicked in the database display.
+ * @param event The mouse event.
+ * @param instance The widget instance of the clicked card.
+ */
 void TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay(QMouseEvent *event,
                                                                 CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit cardClickedDatabaseDisplay(event, instance);
 }
 
+/**
+ * @brief Adds a new tab with the given widget and title.
+ * @param widget The widget to add.
+ * @param title The title of the tab.
+ */
 void TabDeckEditorVisualTabWidget::addNewTab(QWidget *widget, const QString &title)
 {
-    // Add new tab to the tab widget
     this->addTab(widget, title);
 }
 
+/**
+ * @brief Removes the currently selected tab.
+ */
 void TabDeckEditorVisualTabWidget::removeCurrentTab()
 {
-    // Remove the currently selected tab
     int currentIndex = this->currentIndex();
     if (currentIndex != -1) {
         this->removeTab(currentIndex);
     }
 }
 
+/**
+ * @brief Sets the title of a tab at a given index.
+ * @param index The index of the tab.
+ * @param title The new title.
+ */
 void TabDeckEditorVisualTabWidget::setTabTitle(int index, const QString &title)
 {
-    // Set the title of the tab at the given index
     if (index >= 0 && index < this->count()) {
         this->setTabText(index, title);
     }
 }
 
+/**
+ * @brief Returns the currently selected tab widget.
+ * @return Pointer to the current tab widget.
+ */
 QWidget *TabDeckEditorVisualTabWidget::getCurrentTab() const
 {
-    // Return the currently selected tab widget
     return this->currentWidget();
 }
 
+/**
+ * @brief Returns the number of tabs in the tab widget.
+ * @return Number of tabs.
+ */
 int TabDeckEditorVisualTabWidget::getTabCount() const
 {
-    // Return the number of tabs
     return this->count();
 }
 
+/**
+ * @brief Handles the closing of a tab.
+ * @param index The index of the tab to close.
+ *
+ * Removes the tab and deletes the widget to free memory.
+ */
 void TabDeckEditorVisualTabWidget::handleTabClose(int index)
 {
-    // Handle closing of the tab at the given index
     QWidget *tab = this->widget(index);
     this->removeTab(index);
-    delete tab; // Delete the tab's widget to free memory
+    delete tab;
 }
