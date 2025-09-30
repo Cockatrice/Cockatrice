@@ -86,7 +86,7 @@
  * @ingroup Network
  * @brief Multiplayer lobby and room management.
  *
- * Manages creation and interaction of game lobbies and room state synchronization with the server.
+ * Manages creation and interaction of Game lobbies and room state synchronization with the server.
  */
 
 /* ------------------------------------------------------------------ */
@@ -97,8 +97,8 @@
  * @defgroup Game Game
  * @brief Core game framework.
  *
- * Responsible for the main game loop, state management,
- * zone handling, and resolution of in-game actions.
+ * Responsible for the main Game loop, GameState management,
+ * CardZone handling, and resolution of in-game actions.
  */
 
 /**
@@ -106,7 +106,7 @@
  * @ingroup Game
  * @brief Graphical components for in-game interaction.
  *
- * Provides Qt-based widgets, dialogs, and menus used during a game,
+ * Provides Qt-based widgets, dialogs, and menus used during a Game,
  * supporting both visual presentation and interaction logic.
  */
 
@@ -116,7 +116,7 @@
  * @brief User interface for the multiplayer lobby.
  *
  * Contains widgets, dialogs, and models used to interact with the
- * lobby within the game UI layer.
+ * lobby within the Game UI layer.
  */
 
 /**
@@ -125,7 +125,7 @@
  * @brief Widgets specific to the in-game interface.
  *
  * Provides reusable visual components that represent elements
- * of the ongoing game, such as table or zone views or card panels.
+ * of the ongoing Game, such as a PlayerGraphicsItem or CardZone views.
  */
 
 /**
@@ -133,7 +133,7 @@
  * @ingroup GameUi
  * @brief In-game dialogs.
  *
- * Modal and non-modal dialogs for player interaction during games,
+ * Modal and non-modal dialogs for Player interaction during a Game,
  * including prompts, confirmations, and detailed views.
  */
 
@@ -143,7 +143,7 @@
  * @brief In-game menu structures.
  *
  * Provides menu bars, context menus, and hierarchical options
- * available to the player during a game session.
+ * available to the Player during a Game session.
  */
 
 /**
@@ -151,7 +151,7 @@
  * @ingroup GameMenus
  * @brief Menus specific to player actions.
  *
- * Defines context menus and options relating to player state and actions.
+ * Defines context menus and options relating to Player state and PlayerActions.
  */
 
 /**
@@ -159,7 +159,7 @@
  * @ingroup GameMenus
  * @brief Menus for interacting with zones.
  *
- * Provides contextual options for zones such as the hand,
+ * Provides contextual options for a CardZone such as the hand,
  * library, graveyard, and battlefield.
  */
 
@@ -169,7 +169,7 @@
  * @brief Menus for card interactions.
  *
  * Defines right-click menus and contextual options available
- * when interacting with individual cards.
+ * when interacting with an individual CardItem.
  */
 
 /**
@@ -177,8 +177,8 @@
  * @ingroup GameUi
  * @brief Visual graphics for game elements.
  *
- * Provides rendering and layout for core game objects such as
- * players, zones, and cards in the interface.
+ * Provides rendering and layout for core game objects such as a
+ * Player, CardZone, or CardItem in the interface.
  */
 
 /**
@@ -186,7 +186,7 @@
  * @ingroup GameGraphics
  * @brief Player-specific graphical elements.
  *
- * Defines visual representations of players, their states,
+ * Defines visual representations of a Player, their states,
  * and associated on-screen information.
  */
 
@@ -195,7 +195,7 @@
  * @ingroup GameGraphics
  * @brief Graphical representations of zones.
  *
- * Provides layout, visuals, and animations for zones like hand,
+ * Provides layout, visuals, and animations for a CardZone like the hand,
  * library, battlefield, and graveyard.
  */
 
@@ -204,7 +204,7 @@
  * @ingroup GameGraphics
  * @brief Graphical representation of cards.
  *
- * Manages the visual look and behavior of cards when displayed
+ * Manages the visual look and behavior of a CardItem when displayed
  * in the game interface.
  */
 
@@ -214,7 +214,7 @@
  * @brief Game logic and rules framework.
  *
  * Implements resolution of actions and logical
- * state management for ongoing games.
+ * state management for an ongoing Game.
  */
 
 /**
@@ -222,14 +222,14 @@
  * @ingroup GameLogic
  * @brief Logic related to player state.
  *
- * Handles player attributes, actions, resources, and their impact
- * on game state.
+ * Handles Player attributes, PlayerActions, resources, and their impact
+ * on GameState.
  */
 
 /**
  * @defgroup GameLogicZones Zones
  * @ingroup GameLogic
- * @brief Logical handling of game zones.
+ * @brief Logical handling of CardZones during a Game.
  *
  * Defines the rules and behaviors of zones such as the hand,
  * battlefield, library, and graveyard.
@@ -250,7 +250,7 @@
 
 /**
  * @defgroup Decks Deck Management
- * @brief Deck handling, persistence, and tooling.
+ * @brief DeckList handling, persistence, and tooling.
  *
  * Covers the lifecycle of decks: loading, saving, editing, import/export,
  * and long-term persistence, including both textual and visual editors.
@@ -265,7 +265,7 @@
 /**
  * @defgroup DeckEditors Deck Editors
  * @ingroup Decks
- * @brief Editors for creating and modifying decks.
+ * @brief Editors for creating and modifying a DeckList.
  *
  * Provides visual and textual editors for building, modifying,
  * and analyzing decks. Includes support for card search,
@@ -284,7 +284,7 @@
 /**
  * @defgroup DeckEditorAnalyticsWidgets Deck Editor Analytics Widgets
  * @ingroup DeckEditorWidgets
- * @brief Widgets for analyzing deck contents.
+ * @brief Widgets for analyzing a DeckList.
  *
  * Provides visualization and statistical tools for analyzing decks.
  */
@@ -301,54 +301,54 @@
 /**
  * @defgroup PrintingWidgets Printing Widgets
  * @ingroup DeckEditorWidgets
- * @brief Widgets for handling printing information.
+ * @brief Widgets for handling PrintingInfo of cards in a DeckList.
  *
- * Manages the display and editing of card printing information within a deck,
+ * Manages the display and editing of card printing information within a DeckList,
  * including editions, variations, and preferences.
  */
 
 /**
  * @defgroup DeckStorage Deck Storage
  * @ingroup Decks
- * @brief Systems for storing decks.
+ * @brief Systems for storing a DeckList.
  *
- * Handles the persistence of decks, providing file-based storage,
+ * Handles the persistence of a DeckList, providing file-based storage,
  * metadata tracking, and tagging functionality.
  */
 
 /**
  * @defgroup DeckStorageWidgets Deck Storage Widgets
  * @ingroup DeckStorage
- * @brief Widgets for browsing and managing stored decks.
+ * @brief Widgets for browsing and managing stored DeckLists.
  *
- * Provides list and tree-based views for exploring stored decks,
+ * Provides list and tree-based views for exploring stored DeckLists,
  * including tagging, searching, and preview functionality.
  */
 
 /**
  * @defgroup VisualDeckStorageWidgets Visual Deck Storage Widgets
  * @ingroup DeckStorageWidgets
- * @brief Visual widgets for deck storage.
+ * @brief Visual widgets for DeckList storage.
  *
- * Offers graphical interfaces for browsing and interacting with stored
- * decks and tags, focusing on a more visual browsing experience.
+ * Offers graphical interfaces for browsing and interacting with a stored
+ * DeckList and tags, focusing on a more visual browsing experience.
  */
 
 /**
  * @defgroup VisualDeckPreviewWidgets Visual Deck Preview Widgets
  * @ingroup VisualDeckStorageWidgets
- * @brief Widgets for visually previewing decks.
+ * @brief Widgets for visually previewing a DeckList.
  *
- * Provides visual previews of decks, allowing users
+ * Provides visual previews of a DeckList, allowing users
  * to inspect the deck name, color identity, and banner card at a glance.
  */
 
 /**
  * @defgroup ImportExport Import/Export
  * @ingroup DeckStorage
- * @brief Deck import, export, and conversion.
+ * @brief DeckList import, export, and conversion.
  *
- * Supports importing and exporting decks across formats, including
+ * Supports importing and exporting a DeckList across formats, including
  * text, Cockatrice-native formats, and third-party platforms.
  */
 
@@ -450,7 +450,7 @@
 /**
  * @defgroup VisualCardDatabaseWidgets Visual Card Database Widgets
  * @ingroup CardDatabaseWidgets
- * @brief Visual card database widgets.
+ * @brief VisualDatabaseDisplayWidget and related helper classes.
  *
  * Enhances card browsing with graphical interfaces, offering
  * image-based and grid-based views for selecting cards.
