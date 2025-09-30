@@ -7,6 +7,8 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
+#include "printing_info.h"
+
 #include <QDate>
 #include <QHash>
 #include <QList>
@@ -21,7 +23,6 @@
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 
 class CardInfo;
-class PrintingInfo;
 class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
@@ -35,158 +36,6 @@ typedef QHash<QString, CardSetPtr> SetNameMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
-class CardSet : public QList<CardInfoPtr>
-{
-public:
-    enum Priority
-    {
-        PriorityFallback = 0,
-        PriorityPrimary = 10,
-        PrioritySecondary = 20,
-        PriorityReprint = 30,
-        PriorityOther = 40,
-        PriorityLowest = 100,
-    };
-
-    static const char *TOKENS_SETNAME;
-
-private:
-    QString shortName, longName;
-    unsigned int sortKey;
-    QDate releaseDate;
-    QString setType;
-    Priority priority;
-    bool enabled, isknown;
-
-public:
-    explicit CardSet(const QString &_shortName = QString(),
-                     const QString &_longName = QString(),
-                     const QString &_setType = QString(),
-                     const QDate &_releaseDate = QDate(),
-                     const Priority _priority = PriorityFallback);
-    static CardSetPtr newInstance(const QString &_shortName = QString(),
-                                  const QString &_longName = QString(),
-                                  const QString &_setType = QString(),
-                                  const QDate &_releaseDate = QDate(),
-                                  const Priority _priority = PriorityFallback);
-    QString getCorrectedShortName() const;
-    QString getShortName() const
-    {
-        return shortName;
-    }
-    QString getLongName() const
-    {
-        return longName;
-    }
-    QString getSetType() const
-    {
-        return setType;
-    }
-    QDate getReleaseDate() const
-    {
-        return releaseDate;
-    }
-    Priority getPriority() const
-    {
-        return priority;
-    }
-    void setLongName(const QString &_longName)
-    {
-        longName = _longName;
-    }
-    void setSetType(const QString &_setType)
-    {
-        setType = _setType;
-    }
-    void setReleaseDate(const QDate &_releaseDate)
-    {
-        releaseDate = _releaseDate;
-    }
-    void setPriority(const Priority _priority)
-    {
-        priority = _priority;
-    }
-
-    void loadSetOptions();
-    int getSortKey() const
-    {
-        return sortKey;
-    }
-    void setSortKey(unsigned int _sortKey);
-    bool getEnabled() const
-    {
-        return enabled;
-    }
-    void setEnabled(bool _enabled);
-    bool getIsKnown() const
-    {
-        return isknown;
-    }
-    void setIsKnown(bool _isknown);
-
-    // Determine incomplete sets.
-    bool getIsKnownIgnored() const
-    {
-        return longName.length() + setType.length() + releaseDate.toString().length() == 0;
-    }
-};
-
-class SetList : public QList<CardSetPtr>
-{
-private:
-    class KeyCompareFunctor;
-
-public:
-    void sortByKey();
-    void guessSortKeys();
-    void enableAllUnknown();
-    void enableAll();
-    void markAllAsKnown();
-    int getEnabledSetsNum();
-    int getUnknownSetsNum();
-    QStringList getUnknownSetsNames();
-    void defaultSort();
-};
-
-/**
- * Info relating to a specific printing for a card.
- */
-class PrintingInfo
-{
-public:
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
-    ~PrintingInfo() = default;
-
-    bool operator==(const PrintingInfo &other) const
-    {
-        return this->set == other.set && this->properties == other.properties;
-    }
-
-private:
-    CardSetPtr set;
-    // per-printing card properties;
-    QVariantHash properties;
-
-public:
-    CardSetPtr getSet() const
-    {
-        return set;
-    }
-    QStringList getProperties() const
-    {
-        return properties.keys();
-    }
-    QString getProperty(const QString &propertyName) const
-    {
-        return properties.value(propertyName).toString();
-    }
-    void setProperty(const QString &_name, const QString &_value)
-    {
-        properties.insert(_name, _value);
-    }
-
-    QString getUuid() const;
-};
 
 class CardInfo : public QObject
 {
@@ -396,81 +245,5 @@ signals:
      */
     void pixmapUpdated(const PrintingInfo &printing);
     void cardInfoChanged(CardInfoPtr card);
-};
-
-class CardRelation : public QObject
-{
-    Q_OBJECT
-public:
-    enum AttachType
-    {
-        DoesNotAttach = 0,
-        AttachTo = 1,
-        TransformInto = 2,
-    };
-
-private:
-    QString name;
-    AttachType attachType;
-    bool isCreateAllExclusion;
-    bool isVariableCount;
-    int defaultCount;
-    bool isPersistent;
-
-public:
-    explicit CardRelation(const QString &_name = QString(),
-                          AttachType _attachType = DoesNotAttach,
-                          bool _isCreateAllExclusion = false,
-                          bool _isVariableCount = false,
-                          int _defaultCount = 1,
-                          bool _isPersistent = false);
-
-    inline const QString &getName() const
-    {
-        return name;
-    }
-    AttachType getAttachType() const
-    {
-        return attachType;
-    }
-    bool getDoesAttach() const
-    {
-        return attachType != DoesNotAttach;
-    }
-    bool getDoesTransform() const
-    {
-        return attachType == TransformInto;
-    }
-    QString getAttachTypeAsString() const
-    {
-        switch (attachType) {
-            case AttachTo:
-                return "attach";
-            case TransformInto:
-                return "transform";
-            default:
-                return "";
-        }
-    }
-    bool getCanCreateAnother() const
-    {
-        return !getDoesAttach();
-    }
-    bool getIsCreateAllExclusion() const
-    {
-        return isCreateAllExclusion;
-    }
-    bool getIsVariable() const
-    {
-        return isVariableCount;
-    }
-    int getDefaultCount() const
-    {
-        return defaultCount;
-    }
-    bool getIsPersistent() const
-    {
-        return isPersistent;
-    }
 };
 #endif

@@ -2,230 +2,23 @@
 
 #include "../picture_loader/picture_loader.h"
 #include "../settings/cache_settings.h"
+#include "card_relation.h"
 #include "game_specific_terms.h"
+#include "printing_info.h"
 
-#include <QDebug>
 #include <QDir>
-#include <QMessageBox>
 #include <QRegularExpression>
+#include <QSharedPointer>
+#include <QString>
+#include <QVariant>
 #include <algorithm>
 #include <utility>
 
-const char *CardSet::TOKENS_SETNAME = "TK";
+class CardRelation;
+class CardSet;
+class CardInfo;
 
-CardSet::CardSet(const QString &_shortName,
-                 const QString &_longName,
-                 const QString &_setType,
-                 const QDate &_releaseDate,
-                 const CardSet::Priority _priority)
-    : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType), priority(_priority)
-{
-    loadSetOptions();
-}
-
-CardSetPtr CardSet::newInstance(const QString &_shortName,
-                                const QString &_longName,
-                                const QString &_setType,
-                                const QDate &_releaseDate,
-                                const Priority _priority)
-{
-    CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate, _priority));
-    // ptr->setSmartPointer(ptr);
-    return ptr;
-}
-
-QString CardSet::getCorrectedShortName() const
-{
-    // For Windows machines.
-    QSet<QString> invalidFileNames;
-    invalidFileNames << "CON"
-                     << "PRN"
-                     << "AUX"
-                     << "NUL"
-                     << "COM1"
-                     << "COM2"
-                     << "COM3"
-                     << "COM4"
-                     << "COM5"
-                     << "COM6"
-                     << "COM7"
-                     << "COM8"
-                     << "COM9"
-                     << "LPT1"
-                     << "LPT2"
-                     << "LPT3"
-                     << "LPT4"
-                     << "LPT5"
-                     << "LPT6"
-                     << "LPT7"
-                     << "LPT8"
-                     << "LPT9";
-
-    return invalidFileNames.contains(shortName) ? shortName + "_" : shortName;
-}
-
-void CardSet::loadSetOptions()
-{
-    sortKey = SettingsCache::instance().cardDatabase().getSortKey(shortName);
-    enabled = SettingsCache::instance().cardDatabase().isEnabled(shortName);
-    isknown = SettingsCache::instance().cardDatabase().isKnown(shortName);
-}
-
-void CardSet::setSortKey(unsigned int _sortKey)
-{
-    sortKey = _sortKey;
-    SettingsCache::instance().cardDatabase().setSortKey(shortName, _sortKey);
-}
-
-void CardSet::setEnabled(bool _enabled)
-{
-    enabled = _enabled;
-    SettingsCache::instance().cardDatabase().setEnabled(shortName, _enabled);
-}
-
-void CardSet::setIsKnown(bool _isknown)
-{
-    isknown = _isknown;
-    SettingsCache::instance().cardDatabase().setIsKnown(shortName, _isknown);
-}
-
-class SetList::KeyCompareFunctor
-{
-public:
-    inline bool operator()(const CardSetPtr &a, const CardSetPtr &b) const
-    {
-        if (a.isNull() || b.isNull()) {
-            qCWarning(CardInfoLog) << "SetList::KeyCompareFunctor a or b is null";
-            return false;
-        }
-
-        return a->getSortKey() < b->getSortKey();
-    }
-};
-
-void SetList::sortByKey()
-{
-    std::sort(begin(), end(), KeyCompareFunctor());
-}
-
-int SetList::getEnabledSetsNum()
-{
-    int num = 0;
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && set->getEnabled()) {
-            ++num;
-        }
-    }
-    return num;
-}
-
-int SetList::getUnknownSetsNum()
-{
-    int num = 0;
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            ++num;
-        }
-    }
-    return num;
-}
-
-QStringList SetList::getUnknownSetsNames()
-{
-    QStringList sets = QStringList();
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            sets << set->getShortName();
-        }
-    }
-    return sets;
-}
-
-void SetList::enableAllUnknown()
-{
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
-            set->setEnabled(true);
-        } else if (set && set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabled(true);
-        }
-    }
-}
-
-void SetList::enableAll()
-{
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-
-        if (set == nullptr) {
-            qCWarning(CardInfoLog) << "enabledAll has null";
-            continue;
-        }
-
-        if (!set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
-        }
-
-        set->setEnabled(true);
-    }
-}
-
-void SetList::markAllAsKnown()
-{
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
-            set->setIsKnown(true);
-            set->setEnabled(false);
-        } else if (set && set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabled(true);
-        }
-    }
-}
-
-void SetList::guessSortKeys()
-{
-    defaultSort();
-    for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
-        if (set.isNull()) {
-            qCWarning(CardInfoLog) << "guessSortKeys set is null";
-            continue;
-        }
-        set->setSortKey(i);
-    }
-}
-
-void SetList::defaultSort()
-{
-    std::sort(begin(), end(), [](const CardSetPtr &a, const CardSetPtr &b) {
-        // Sort by priority, then by release date, then by short name
-        if (a->getPriority() != b->getPriority()) {
-            return a->getPriority() < b->getPriority(); // lowest first
-        } else if (a->getReleaseDate() != b->getReleaseDate()) {
-            return a->getReleaseDate() > b->getReleaseDate(); // most recent first
-        } else {
-            return a->getShortName() < b->getShortName(); // alphabetically
-        }
-    });
-}
-
-PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
-{
-}
-
-/**
- * Gets the uuid property of the printing, or an empty string if the property isn't present
- */
-QString PrintingInfo::getUuid() const
-{
-    return properties.value("uuid").toString();
-}
+using CardInfoPtr = QSharedPointer<CardInfo>;
 
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
@@ -362,17 +155,6 @@ const QChar CardInfo::getColorChar() const
         default:
             return QChar('m');
     }
-}
-
-CardRelation::CardRelation(const QString &_name,
-                           AttachType _attachType,
-                           bool _isCreateAllExclusion,
-                           bool _isVariableCount,
-                           int _defaultCount,
-                           bool _isPersistent)
-    : name(_name), attachType(_attachType), isCreateAllExclusion(_isCreateAllExclusion),
-      isVariableCount(_isVariableCount), defaultCount(_defaultCount), isPersistent(_isPersistent)
-{
 }
 
 void CardInfo::resetReverseRelatedCards2Me()

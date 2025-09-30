@@ -1,5 +1,6 @@
 #include "card_database.h"
 
+#include "../card/card_relation.h"
 #include "../picture_loader/picture_loader.h"
 #include "../settings/cache_settings.h"
 #include "parser/cockatrice_xml_3.h"
@@ -144,9 +145,9 @@ CardSetPtr CardDatabase::getSet(const QString &setName)
     }
 }
 
-SetList CardDatabase::getSetList() const
+CardSetList CardDatabase::getSetList() const
 {
-    SetList result;
+    CardSetList result;
     for (auto set : sets.values()) {
         result << set;
     }

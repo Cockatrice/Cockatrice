@@ -87,7 +87,7 @@ void VisualDatabaseDisplaySetFilterWidget::retranslateUi()
 
 void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 {
-    SetList allSets = CardDatabaseManager::getInstance()->getSetList();
+    CardSetList allSets = CardDatabaseManager::getInstance()->getSetList();
 
     // Sort by release date
     std::sort(allSets.begin(), allSets.end(),
@@ -120,7 +120,7 @@ void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
             activeSets[set] = false;
         }
 
-        SetList allSets = CardDatabaseManager::getInstance()->getSetList();
+        CardSetList allSets = CardDatabaseManager::getInstance()->getSetList();
 
         // Sort by release date
         std::sort(allSets.begin(), allSets.end(),

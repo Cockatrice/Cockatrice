@@ -1,5 +1,6 @@
 #include "card_menu.h"
 
+#include "../../../card/card_relation.h"
 #include "../../../database/card_database_manager.h"
 #include "../../../settings/card_counter_settings.h"
 #include "../../../tabs/tab_game.h"

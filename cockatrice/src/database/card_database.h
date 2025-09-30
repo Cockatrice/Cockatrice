@@ -7,6 +7,7 @@
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
+#include "../card/card_set_list.h"
 #include "../card/exact_card.h"
 #include "../common/card_ref.h"
 #include "card_database_loader.h"
@@ -68,7 +69,7 @@ public:
         return cards;
     }
     CardSetPtr getSet(const QString &setName);
-    SetList getSetList() const;
+    CardSetList getSetList() const;
     LoadStatus getLoadStatus() const
     {
         return loadStatus;

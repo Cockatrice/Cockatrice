@@ -1,5 +1,6 @@
 #include "card_info_frame_widget.h"
 
+#include "../../../card/card_relation.h"
 #include "../../../database/card_database_manager.h"
 #include "../../../game/board/card_item.h"
 #include "../../../settings/cache_settings.h"

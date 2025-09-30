@@ -7,6 +7,7 @@
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
+#include "../../card/card_relation_type.h"
 #include "event_processing_options.h"
 #include "player.h"
 
@@ -170,7 +171,7 @@ private:
 
     void createCard(const CardItem *sourceCard,
                     const QString &dbCardName,
-                    CardRelation::AttachType attach = CardRelation::DoesNotAttach,
+                    CardRelationType attach = CardRelationType::DoesNotAttach,
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
 
