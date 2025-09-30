@@ -18,6 +18,7 @@ set(oracle_SOURCES
     src/parsehelpers.cpp
     src/qt-json/json.cpp
     ../cockatrice/src/card/card_info.cpp
+    ../cockatrice/src/card/card_relation.cpp
     ../cockatrice/src/client/network/release_channel.cpp
     ../cockatrice/src/database/parser/card_database_parser.cpp
     ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
