@@ -1,9 +1,3 @@
-/**
- * @file game_scene.h
- * @ingroup GameGraphics
- * @brief TODO: Document this.
- */
-
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
@@ -30,6 +24,7 @@ class QBasicTimer;
 
 /**
  * @class GameScene
+ * @ingroup GameGraphics
  * @brief Manages the game board display including players, zones, cards, and animations.
  *
  * GameScene handles:
