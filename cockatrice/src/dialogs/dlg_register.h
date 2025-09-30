@@ -1,6 +1,6 @@
 /**
  * @file dlg_register.h
-* @ingroup NetworkDialogs
+ * @ingroup NetworkDialogs
  * @brief TODO: Document this.
  */
 

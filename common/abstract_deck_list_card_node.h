@@ -15,7 +15,7 @@
 
 /**
  * @class AbstractDecklistCardNode
-* @ingroup DeckModels
+ * @ingroup DeckModels
  * @brief Abstract base class for all deck list nodes that represent
  *        actual card entries.
  *

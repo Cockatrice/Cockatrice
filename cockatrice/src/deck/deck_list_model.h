@@ -26,7 +26,7 @@ enum DeckListModelGroupCriteria
 
 /**
  * @class DecklistModelCardNode
-* @ingroup DeckModels
+ * @ingroup DeckModels
  * @brief Adapter node that wraps a DecklistCardNode for use in the DeckListModel tree.
  *
  * This class forwards all property accessors (name, number, provider ID, set info, etc.)
@@ -106,7 +106,7 @@ public:
 
 /**
  * @class DeckListModel
-* @ingroup DeckModels
+ * @ingroup DeckModels
  * @brief Qt model representing a decklist for use in views (tree/table).
  *
  * DeckListModel is a QAbstractItemModel that exposes the structure of a deck

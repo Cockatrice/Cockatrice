@@ -17,7 +17,7 @@
 
 /**
  * @class DecklistCardNode
-* @ingroup DeckModels
+ * @ingroup DeckModels
  * @brief Concrete node type representing an actual card entry in the deck.
  *
  * This class extends AbstractDecklistCardNode to hold all information
