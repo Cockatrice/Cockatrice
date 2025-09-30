@@ -1,3 +1,9 @@
+/**
+ * @file card_database.h
+ * @ingroup CardDatabase
+ * @brief The CardDatabase is responsible for holding the card and set maps.
+ */
+
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 

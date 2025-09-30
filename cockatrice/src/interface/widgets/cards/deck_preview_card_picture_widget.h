@@ -1,3 +1,10 @@
+/**
+ * @file deck_preview_card_picture_widget.h
+ * @ingroup CardWidgets
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_PREVIEW_CARD_PICTURE_WIDGET_H
 #define DECK_PREVIEW_CARD_PICTURE_WIDGET_H
 

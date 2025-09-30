@@ -1,3 +1,10 @@
+/**
+ * @file settings_popup_widget.h
+ * @ingroup Widgets
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SETTINGS_POPUP_WIDGET_H
 #define SETTINGS_POPUP_WIDGET_H
 

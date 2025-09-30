@@ -1,3 +1,9 @@
+/**
+ * @file release_channel.h
+ * @ingroup ClientUpdate
+ * @brief TODO: Document this.
+ */
+
 #ifndef RELEASECHANNEL_H
 #define RELEASECHANNEL_H
 

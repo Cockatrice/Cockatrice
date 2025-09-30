@@ -1,3 +1,10 @@
+/**
+ * @file theme_manager.h
+ * @ingroup Core
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef THEMEMANAGER_H
 #define THEMEMANAGER_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file dlg_edit_tokens.h
+ * @ingroup GameDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H
 

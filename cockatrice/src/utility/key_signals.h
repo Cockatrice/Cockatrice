@@ -1,3 +1,10 @@
+/**
+ * @file key_signals.h
+ * @ingroup Core
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef KEYSIGNALS_H
 #define KEYSIGNALS_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file shortcut_treeview.h
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SHORTCUT_TREEVIEW_H
 #define SHORTCUT_TREEVIEW_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file line_edit_completer.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef LINEEDITCOMPLETER_H
 #define LINEEDITCOMPLETER_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file overlap_control_widget.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef OVERLAP_CONTROL_WIDGET_H
 #define OVERLAP_CONTROL_WIDGET_H
 #include "../display/labeled_input.h"

@@ -1,3 +1,10 @@
+/**
+ * @file card_database_settings.h
+ * @ingroup CardDatabase
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDDATABASESETTINGS_H
 #define CARDDATABASESETTINGS_H
 

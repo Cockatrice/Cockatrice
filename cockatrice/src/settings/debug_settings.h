@@ -1,3 +1,10 @@
+/**
+ * @file debug_settings.h
+ * @ingroup Core
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef DEBUG_SETTINGS_H
 #define DEBUG_SETTINGS_H
 #include "settings_manager.h"

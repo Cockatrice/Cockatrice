@@ -1,3 +1,9 @@
+/**
+ * @file token_edit_model.h
+ * @ingroup CardDatabaseModels
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_TOKEN_EDIT_MODEL_H
 #define COCKATRICE_TOKEN_EDIT_MODEL_H
 

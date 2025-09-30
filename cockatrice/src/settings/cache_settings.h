@@ -1,3 +1,10 @@
+/**
+ * @file cache_settings.h
+ * @ingroup Network
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 

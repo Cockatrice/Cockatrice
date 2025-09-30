@@ -1,3 +1,10 @@
+/**
+ * @file card_info_picture_with_text_overlay_widget.h
+ * @ingroup CardWidgets
+ * @ingroup DeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_PICTURE_WITH_TEXT_OVERLAY_H
 #define CARD_PICTURE_WITH_TEXT_OVERLAY_H
 

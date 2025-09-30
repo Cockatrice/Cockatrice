@@ -1,3 +1,10 @@
+/**
+ * @file tab_supervisor.h
+ * @ingroup Core
+ * @ingroup Tabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 

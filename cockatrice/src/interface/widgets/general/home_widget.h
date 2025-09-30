@@ -1,3 +1,10 @@
+/**
+ * @file home_widget.h
+ * @ingroup Core
+ * @ingroup Widgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
 #include "../../../server/abstract_client.h"

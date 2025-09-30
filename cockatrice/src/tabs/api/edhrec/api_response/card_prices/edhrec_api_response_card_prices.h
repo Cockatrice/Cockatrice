@@ -1,3 +1,9 @@
+/**
+ * @file edhrec_api_response_card_prices.h
+ * @ingroup ApiResponses
+ * @brief TODO: Document this.
+ */
+
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_PRICES_H
 #define EDHREC_COMMANDER_API_RESPONSE_CARD_PRICES_H
 

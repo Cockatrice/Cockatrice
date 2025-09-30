@@ -1,3 +1,10 @@
+/**
+ * @file tab_replays.h
+ * @ingroup Replays
+ * @ingroup Tabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 

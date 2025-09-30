@@ -1,3 +1,11 @@
+/**
+ * @file deck_stats_interface.h
+ * @ingroup ImportExport
+ * @ingroup Parsing
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 

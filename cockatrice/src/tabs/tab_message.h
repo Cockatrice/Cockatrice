@@ -1,3 +1,9 @@
+/**
+ * @file tab_message.h
+ * @ingroup NetworkingTabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_MESSAGE_H
 #define TAB_MESSAGE_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file card_info_comparator.h
+ * @ingroup Cards
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_INFO_COMPARATOR_H
 #define CARD_INFO_COMPARATOR_H
 

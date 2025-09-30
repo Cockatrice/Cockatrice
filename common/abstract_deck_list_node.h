@@ -22,6 +22,7 @@
 
 /**
  * @enum DeckSortMethod
+ * @ingroup DeckModels
  * @brief Defines the different sort strategies a node may use
  *        to order its children.
  *
@@ -43,6 +44,7 @@ class InnerDecklistNode;
 
 /**
  * @class AbstractDecklistNode
+ * @ingroup DeckModels
  * @brief Base class for all nodes in the deck list tree.
  *
  * This class defines the common interface for every node in the

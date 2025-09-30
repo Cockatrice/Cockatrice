@@ -1,3 +1,9 @@
+/**
+ * @file translate_counter_name.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef TRANSLATECOUNTERNAME_H
 #define TRANSLATECOUNTERNAME_H
 

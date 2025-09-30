@@ -1,3 +1,9 @@
+/**
+ * @file hand_zone_logic.h
+ * @ingroup GameLogicZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_HAND_ZONE_LOGIC_H
 #define COCKATRICE_HAND_ZONE_LOGIC_H
 #include "card_zone_logic.h"

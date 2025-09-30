@@ -1,3 +1,10 @@
+/**
+ * @file settings_button_widget.h
+ * @ingroup Widgets
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef SETTINGS_BUTTON_WIDGET_H
 #define SETTINGS_BUTTON_WIDGET_H
 

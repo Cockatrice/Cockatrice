@@ -1,3 +1,9 @@
+/**
+ * @file game_scene.h
+ * @ingroup GameGraphics
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 

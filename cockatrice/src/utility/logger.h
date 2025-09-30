@@ -1,3 +1,9 @@
+/**
+ * @file logger.h
+ * @ingroup Core
+ * @brief TODO: Document this.
+ */
+
 #ifndef LOGGER_H
 #define LOGGER_H
 

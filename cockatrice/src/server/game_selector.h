@@ -1,3 +1,9 @@
+/**
+ * @file game_selector.h
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAMESELECTOR_H
 #define GAMESELECTOR_H
 

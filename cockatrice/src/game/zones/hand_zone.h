@@ -1,3 +1,9 @@
+/**
+ * @file hand_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef HANDZONE_H
 #define HANDZONE_H
 

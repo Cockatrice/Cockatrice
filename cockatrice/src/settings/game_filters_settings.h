@@ -1,3 +1,10 @@
+/**
+ * @file game_filters_settings.h
+ * @ingroup Lobby
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAMEFILTERSSETTINGS_H
 #define GAMEFILTERSSETTINGS_H
 

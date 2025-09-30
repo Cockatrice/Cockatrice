@@ -1,3 +1,9 @@
+/**
+ * @file deck_view_container.h
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 

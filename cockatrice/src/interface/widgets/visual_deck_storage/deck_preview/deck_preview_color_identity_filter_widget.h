@@ -1,3 +1,9 @@
+/**
+ * @file deck_preview_color_identity_filter_widget.h
+ * @ingroup VisualDeckPreviewWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 #define DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 

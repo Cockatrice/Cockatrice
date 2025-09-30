@@ -1,3 +1,9 @@
+/**
+ * @file view_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 

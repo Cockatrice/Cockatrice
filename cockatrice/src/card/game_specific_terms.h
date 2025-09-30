@@ -1,3 +1,9 @@
+/**
+ * @file game_specific_terms.h
+ * @ingroup Cards
+ * @brief TODO: Document this.
+ */
+
 #ifndef GAME_SPECIFIC_TERMS_H
 #define GAME_SPECIFIC_TERMS_H
 

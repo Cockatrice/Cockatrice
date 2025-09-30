@@ -1,3 +1,9 @@
+/**
+ * @file pixel_map_generator.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 

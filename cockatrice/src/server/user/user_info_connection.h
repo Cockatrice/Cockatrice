@@ -1,3 +1,9 @@
+/**
+ * @file user_info_connection.h
+ * @ingroup Network
+ * @brief TODO: Document this.
+ */
+
 #ifndef USERCONNECTION_INFORMATION_H
 #define USERCONNECTION_INFORMATION_H
 

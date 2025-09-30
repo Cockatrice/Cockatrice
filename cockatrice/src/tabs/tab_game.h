@@ -1,3 +1,11 @@
+/**
+ * @file tab_game.h
+ * @ingroup Tabs
+ * @ingroup GameWidgets
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 

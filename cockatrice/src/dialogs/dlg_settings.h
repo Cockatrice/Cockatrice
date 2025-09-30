@@ -1,3 +1,9 @@
+/**
+ * @file dlg_settings.h
+ * @ingroup Dialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 

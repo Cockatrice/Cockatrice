@@ -1,3 +1,9 @@
+/**
+ * @file table_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 

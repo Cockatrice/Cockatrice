@@ -1,3 +1,9 @@
+/**
+ * @file card_counter_settings.h
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_COUNTER_SETTINGS_H
 #define CARD_COUNTER_SETTINGS_H
 

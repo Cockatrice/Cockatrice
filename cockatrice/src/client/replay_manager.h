@@ -1,3 +1,10 @@
+/**
+ * @file replay_manager.h
+ * @ingroup Core
+ * @ingroup Replay
+ * @brief TODO: Document this.
+ */
+
 #ifndef REPLAY_MANAGER_H
 #define REPLAY_MANAGER_H
 

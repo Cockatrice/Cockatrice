@@ -1,3 +1,10 @@
+/**
+ * @file deck_editor_database_display_widget.h
+ * @ingroup DeckEditorWidgets
+ * @ingroup CardDatabaseWidgets
+ * @brief A Deck Editor Widget that displays a QTreeView of a CardDatabaseModel.
+ */
+
 #ifndef DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 

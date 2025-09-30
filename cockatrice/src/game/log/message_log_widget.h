@@ -1,3 +1,9 @@
+/**
+ * @file message_log_widget.h
+ * @ingroup GameWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 

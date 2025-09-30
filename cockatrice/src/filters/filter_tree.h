@@ -1,3 +1,9 @@
+/**
+ * @file filter_tree.h
+ * @ingroup CardDatabaseModelFilters
+ * @brief TODO: Document this.
+ */
+
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
 

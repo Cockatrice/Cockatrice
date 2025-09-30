@@ -1,3 +1,9 @@
+/**
+ * @file dlg_edit_password.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_EDITPASSWORD_H
 #define DLG_EDITPASSWORD_H
 

@@ -1,3 +1,9 @@
+/**
+ * @file flat_card_group_display_widget.h
+ * @ingroup DeckEditorCardGroupWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef FLAT_CARD_GROUP_DISPLAY_WIDGET_H
 #define FLAT_CARD_GROUP_DISPLAY_WIDGET_H
 

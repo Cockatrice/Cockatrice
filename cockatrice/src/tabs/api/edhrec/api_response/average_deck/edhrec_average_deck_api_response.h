@@ -10,7 +10,11 @@
 #include <QJsonObject>
 #include <QString>
 
-// Represents the main structure of the JSON
+/**
+ * @class EdhrecAverageDeckApiResponse
+ * @ingroup ApiResponses
+ * @brief Represents the main structure of the JSON
+ */
 class EdhrecAverageDeckApiResponse
 {
 public:

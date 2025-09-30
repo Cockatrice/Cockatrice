@@ -1,3 +1,9 @@
+/**
+ * @file deck_editor_printing_selector_dock_widget.h
+ * @ingroup DeckEditorWidgets
+ * @brief A Deck Editor DockWidget that displays a PrintingSelector, which allows choosing different printings.
+ */
+
 #ifndef DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 #define DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 

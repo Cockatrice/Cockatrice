@@ -1,3 +1,9 @@
+/**
+ * @file visual_database_display_main_type_filter_widget.h
+ * @ingroup VisualCardDatabaseWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
 

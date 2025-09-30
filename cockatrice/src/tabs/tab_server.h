@@ -1,3 +1,9 @@
+/**
+ * @file tab_server.h
+ * @ingroup NetworkingTabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_SERVER_H
 #define TAB_SERVER_H
 

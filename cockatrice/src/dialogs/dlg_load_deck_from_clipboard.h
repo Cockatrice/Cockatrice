@@ -1,3 +1,11 @@
+/**
+ * @file dlg_load_deck_from_clipboard.h
+ * @ingroup Dialogs
+ * @ingroup ImportExport
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_LOAD_DECK_FROM_CLIPBOARD_H
 #define DLG_LOAD_DECK_FROM_CLIPBOARD_H
 

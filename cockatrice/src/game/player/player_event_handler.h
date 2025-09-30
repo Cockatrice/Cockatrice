@@ -1,3 +1,9 @@
+/**
+ * @file player_event_handler.h
+ * @ingroup GameLogicPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_EVENT_HANDLER_H
 #define COCKATRICE_PLAYER_EVENT_HANDLER_H
 #include "event_processing_options.h"

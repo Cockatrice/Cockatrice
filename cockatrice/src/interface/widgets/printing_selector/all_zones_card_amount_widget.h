@@ -1,3 +1,10 @@
+/**
+ * @file all_zones_card_amount_widget.h
+ * @ingroup CardExtraInfoWidgets
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef ALL_ZONES_CARD_AMOUNT_WIDGET_H
 #define ALL_ZONES_CARD_AMOUNT_WIDGET_H
 #include "../../../deck/deck_list_model.h"

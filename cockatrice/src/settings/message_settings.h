@@ -1,3 +1,10 @@
+/**
+ * @file message_settings.h
+ * @ingroup Network
+ * @ingroup Settings
+ * @brief TODO: Document this.
+ */
+
 #ifndef MESSAGESETTINGS_H
 #define MESSAGESETTINGS_H
 

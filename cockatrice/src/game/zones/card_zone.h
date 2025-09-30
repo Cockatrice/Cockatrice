@@ -1,3 +1,9 @@
+/**
+ * @file card_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDZONE_H
 #define CARDZONE_H
 

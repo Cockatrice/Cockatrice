@@ -1,3 +1,9 @@
+/**
+ * @file dynamic_font_size_push_button.h
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DYNAMICFONTSIZEPUSHBUTTON_H
 #define DYNAMICFONTSIZEPUSHBUTTON_H
 

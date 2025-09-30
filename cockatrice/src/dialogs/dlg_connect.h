@@ -1,3 +1,9 @@
+/**
+ * @file dlg_connect.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H
 

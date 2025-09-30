@@ -1,3 +1,9 @@
+/**
+ * @file mana_curve_widget.h
+ * @ingroup DeckEditorAnalyticsWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef MANA_CURVE_WIDGET_H
 #define MANA_CURVE_WIDGET_H
 

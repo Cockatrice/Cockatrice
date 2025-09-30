@@ -1,3 +1,9 @@
+/**
+ * @file dlg_view_log.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_VIEWLOG_H
 #define DLG_VIEWLOG_H
 

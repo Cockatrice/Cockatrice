@@ -1,3 +1,9 @@
+/**
+ * @file player_area.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_AREA_H
 #define COCKATRICE_PLAYER_AREA_H
 

@@ -1,6 +1,8 @@
-//
-// Created by miguel on 28/12/15.
-//
+/**
+ * @file update_downloader.h
+ * @ingroup ClientUpdate
+ * @brief TODO: Document this.
+ */
 
 #ifndef COCKATRICE_UPDATEDOWNLOADER_H
 #define COCKATRICE_UPDATEDOWNLOADER_H

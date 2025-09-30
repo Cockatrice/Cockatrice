@@ -1,3 +1,9 @@
+/**
+ * @file visual_deck_storage_sort_widget.h
+ * @ingroup VisualDeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DECK_STORAGE_SORT_WIDGET_H
 #define VISUAL_DECK_STORAGE_SORT_WIDGET_H
 

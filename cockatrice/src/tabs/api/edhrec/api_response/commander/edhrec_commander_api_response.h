@@ -9,7 +9,11 @@
 #include <QJsonObject>
 #include <QString>
 
-// Represents the main structure of the JSON
+/**
+ * @class EdhrecCommanderApiResponse
+ * @ingroup ApiResponses
+ * @brief Represents the main structure of the JSON
+ */
 class EdhrecCommanderApiResponse
 {
 public:

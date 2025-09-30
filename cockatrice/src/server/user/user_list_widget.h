@@ -1,3 +1,10 @@
+/**
+ * @file user_list_widget.h
+ * @ingroup Network
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef USERLIST_H
 #define USERLIST_H
 

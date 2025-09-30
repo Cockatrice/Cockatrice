@@ -1,3 +1,9 @@
+/**
+ * @file visual_deck_storage_search_widget.h
+ * @ingroup VisualDeckStorageWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 #define VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 

@@ -1,3 +1,10 @@
+/**
+ * @file card_database_display_model.h
+ * @ingroup CardDatabaseModels
+ * @brief The CardDatabaseDisplayModel is a QSortFilterProxyModel that allows applying filters and sorting to a
+ * CardDatabaseModel.
+ */
+
 #ifndef COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 #define COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 

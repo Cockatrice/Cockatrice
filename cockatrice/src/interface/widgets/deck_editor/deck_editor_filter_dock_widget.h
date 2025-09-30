@@ -1,3 +1,10 @@
+/**
+ * @file deck_editor_filter_dock_widget.h
+ * @ingroup DeckEditorWidgets
+ * @ingroup CardDatabaseWidgets
+ * @brief A Deck Editor DockWidget that displays and allows modifying filters applied to the CardDatabaseDisplayModel.
+ */
+
 #ifndef DECK_EDITOR_FILTER_DOCK_WIDGET_H
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 

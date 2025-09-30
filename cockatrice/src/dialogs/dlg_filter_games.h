@@ -1,3 +1,10 @@
+/**
+ * @file dlg_filter_games.h
+ * @ingroup Lobby
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_FILTER_GAMES_H
 #define DLG_FILTER_GAMES_H
 

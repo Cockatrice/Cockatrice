@@ -1,3 +1,9 @@
+/**
+ * @file labeled_input.h
+ * @ingroup DeckEditorCardGroupWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef LABELED_INPUT_H
 #define LABELED_INPUT_H
 

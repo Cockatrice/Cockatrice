@@ -1,3 +1,9 @@
+/**
+ * @file filter_builder.h
+ * @ingroup CardDatabaseModelFilters
+ * @brief TODO: Document this.
+ */
+
 #ifndef FILTERBUILDER_H
 #define FILTERBUILDER_H
 

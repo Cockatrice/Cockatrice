@@ -1,3 +1,9 @@
+/**
+ * @file client_update_checker.h
+ * @ingroup ClientUpdate
+ * @brief TODO: Document this.
+ */
+
 #ifndef CLIENT_UPDATE_CHECKER_H
 #define CLIENT_UPDATE_CHECKER_H
 #include <QObject>

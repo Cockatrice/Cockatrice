@@ -4,7 +4,9 @@
 #include "card_info.h"
 
 /**
- * Identifies the card along with its exact printing
+ * @class ExactCard
+ * @ingroup Cards
+ * @brief Identifies the card by its CardInfoPtr along with its exact printing by its PrintingInfo.
  */
 class ExactCard
 {

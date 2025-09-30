@@ -1,3 +1,9 @@
+/**
+ * @file deck_analytics_widget.h
+ * @ingroup DeckEditorAnalyticsWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 

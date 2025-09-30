@@ -1,3 +1,9 @@
+/**
+ * @file color_identity_widget.h
+ * @ingroup CardExtraInfoWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef COLOR_IDENTITY_WIDGET_H
 #define COLOR_IDENTITY_WIDGET_H
 

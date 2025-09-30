@@ -1,3 +1,9 @@
+/**
+ * @file overlap_widget.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef OVERLAP_WIDGET_H
 #define OVERLAP_WIDGET_H
 

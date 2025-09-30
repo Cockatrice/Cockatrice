@@ -1,3 +1,9 @@
+/**
+ * @file dlg_roll_dice.h
+ * @ingroup GameDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_ROLL_DICE_H
 #define DLG_ROLL_DICE_H
 

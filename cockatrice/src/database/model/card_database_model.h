@@ -1,3 +1,9 @@
+/**
+ * @file card_database_model.h
+ * @ingroup CardDatabaseModels
+ * @brief The CardDatabaseModel maps the cardList contained in the CardDatabase as a QAbstractListModel.
+ */
+
 #ifndef CARDDATABASEMODEL_H
 #define CARDDATABASEMODEL_H
 

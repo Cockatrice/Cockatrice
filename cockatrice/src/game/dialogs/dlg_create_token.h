@@ -1,3 +1,9 @@
+/**
+ * @file dlg_create_token.h
+ * @ingroup GameDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_CREATETOKEN_H
 #define DLG_CREATETOKEN_H
 

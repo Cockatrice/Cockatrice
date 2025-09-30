@@ -1,3 +1,9 @@
+/**
+ * @file tabbed_deck_view_container.h
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef TABBED_DECK_VIEW_CONTAINER_H
 #define TABBED_DECK_VIEW_CONTAINER_H
 #include "deck_view_container.h"

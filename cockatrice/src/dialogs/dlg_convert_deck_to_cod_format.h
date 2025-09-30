@@ -1,3 +1,11 @@
+/**
+ * @file dlg_convert_deck_to_cod_format.h
+ * @ingroup Dialogs
+ * @ingroup DeckStorageWidgets
+ * @ingroup ImportExport
+ * @brief TODO: Document this.
+ */
+
 #ifndef DIALOG_CONVERT_DECK_TO_COD_FORMAT_H
 #define DIALOG_CONVERT_DECK_TO_COD_FORMAT_H
 

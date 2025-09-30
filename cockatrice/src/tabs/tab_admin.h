@@ -1,3 +1,9 @@
+/**
+ * @file tab_admin.h
+ * @ingroup NetworkingTabs
+ * @brief TODO: Document this.
+ */
+
 #ifndef TAB_ADMIN_H
 #define TAB_ADMIN_H
 

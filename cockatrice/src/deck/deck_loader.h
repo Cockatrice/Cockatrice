@@ -1,3 +1,9 @@
+/**
+ * @file deck_loader.h
+ * @ingroup ImportExport
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 

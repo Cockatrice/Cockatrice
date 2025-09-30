@@ -1,3 +1,9 @@
+/**
+ * @file stack_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef STACKZONE_H
 #define STACKZONE_H
 

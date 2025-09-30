@@ -1,3 +1,9 @@
+/**
+ * @file dlg_select_set_for_cards.h
+ * @ingroup Dialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_SELECT_SET_FOR_CARDS_H
 #define DLG_SELECT_SET_FOR_CARDS_H
 

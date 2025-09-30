@@ -1,3 +1,10 @@
+/**
+ * @file player_actions.h
+ *  @ingroup GameLogicActions
+ * @ingroup GameLogicPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
 #include "event_processing_options.h"

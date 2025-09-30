@@ -1,3 +1,9 @@
+/**
+ * @file card_info_picture_widget.h
+ * @ingroup CardWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 

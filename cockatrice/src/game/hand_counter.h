@@ -1,3 +1,9 @@
+/**
+ * @file hand_counter.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef HANDCOUNTER_H
 #define HANDCOUNTER_H
 

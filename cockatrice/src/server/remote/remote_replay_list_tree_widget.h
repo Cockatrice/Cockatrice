@@ -1,3 +1,11 @@
+/**
+ * @file remote_replay_list_tree_widget.h
+ * @ingroup DeckStorageWidgets
+ * @ingroup Replays
+ * @ingroup Client
+ * @brief TODO: Document this.
+ */
+
 #ifndef REMOTEREPLAYLIST_TREEWIDGET_H
 #define REMOTEREPLAYLIST_TREEWIDGET_H
 

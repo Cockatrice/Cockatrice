@@ -1,3 +1,8 @@
+/**
+ * @file custom_line_edit.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
 
 #ifndef CUSTOMLINEEDIT_H
 #define CUSTOMLINEEDIT_H

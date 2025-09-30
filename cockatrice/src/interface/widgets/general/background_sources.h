@@ -1,3 +1,9 @@
+/**
+ * @file background_sources.h
+ * @ingroup UI
+ * @brief TODO: Document this.
+ */
+
 #ifndef COCKATRICE_BACKGROUND_SOURCES_H
 #define COCKATRICE_BACKGROUND_SOURCES_H
 

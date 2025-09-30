@@ -1,3 +1,9 @@
+/**
+ * @file dlg_forgot_password_request.h
+ * @ingroup NetworkDialogs
+ * @brief TODO: Document this.
+ */
+
 #ifndef DLG_FORGOTPASSWORDREQUEST_H
 #define DLG_FORGOTPASSWORDREQUEST_H
 
