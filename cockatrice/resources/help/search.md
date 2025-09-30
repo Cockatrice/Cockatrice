@@ -1,3 +1,5 @@
+@page search_syntax_help Search Syntax Help
+
 ## Search Syntax Help
 -----
 The search bar recognizes a set of special commands similar to some other card databases.<br>

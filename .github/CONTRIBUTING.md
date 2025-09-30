@@ -1,3 +1,5 @@
+<!--! @page contributing Contributing -->
+
 &nbsp; [Introduction](#contributing-to-cockatrice) | [Code Style Guide](
 #code-style-guide) | [Translations](#translations) | [Release Management](
 #release-management)

@@ -1,3 +1,5 @@
+@page deck_search_syntax_help Deck Search Syntax Help
+
 ## Deck Search Syntax Help
 -----
 The search bar recognizes a set of special commands.<br>

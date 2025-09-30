@@ -22,8 +22,11 @@ static QTextBrowser *createBrowser(const QString &helpFile)
     QString text = in.readAll();
     file.close();
 
-    // Poor Markdown Converter
+    // --- Remove @page declarations at the top of the file ---
     auto opts = QRegularExpression::MultilineOption;
+    text = text.replace(QRegularExpression(R"(^\s*@page[^\n]*\n)", opts), "");
+
+    // Poor Markdown Converter
     text = text.replace(QRegularExpression("^(###)(.*)", opts), "<h3>\\2</h3>")
                .replace(QRegularExpression("^(##)(.*)", opts), "<h2>\\2</h2>")
                .replace(QRegularExpression("^(#)(.*)", opts), "<h1>\\2</h1>")
