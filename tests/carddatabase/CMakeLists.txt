@@ -38,12 +38,12 @@ add_executable(
   filter_string_test
   ${MOCKS_SOURCES}
   ${VERSION_STRING_CPP}
-    ../../cockatrice/src/card/card_info.cpp
-    ../../cockatrice/src/card/card_relation.cpp
-    ../../cockatrice/src/card/card_set.cpp
-    ../../cockatrice/src/card/card_set_list.cpp
-    ../../cockatrice/src/card/exact_card.cpp
-    ../../cockatrice/src/card/printing_info.cpp
+  ../../cockatrice/src/card/card_info.cpp
+  ../../cockatrice/src/card/card_relation.cpp
+  ../../cockatrice/src/card/card_set.cpp
+  ../../cockatrice/src/card/card_set_list.cpp
+  ../../cockatrice/src/card/exact_card.cpp
+  ../../cockatrice/src/card/printing_info.cpp
   ../../cockatrice/src/database/card_database.cpp
   ../../cockatrice/src/database/card_database_loader.cpp
   ../../cockatrice/src/database/card_database_querier.cpp
