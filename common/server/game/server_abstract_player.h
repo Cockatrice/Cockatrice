@@ -10,11 +10,11 @@
 
 class CardToMove;
 class DeckList;
-class MoveCardStruct;
 class Server_Arrow;
 class Server_Card;
 class Server_CardZone;
 class Server_Counter;
+struct MoveCardStruct;
 
 class Server_AbstractPlayer : public Server_AbstractParticipant
 {
