@@ -1,6 +1,6 @@
 /**
  * @file spoiler_background_updater.h
- * @ingroup Network
+ * @ingroup Client
  * @brief TODO: Document this.
  */
 

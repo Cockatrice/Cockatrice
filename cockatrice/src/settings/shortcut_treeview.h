@@ -1,6 +1,6 @@
 /**
  * @file shortcut_treeview.h
- * @ingroup Settings
+ * @ingroup CoreSettings
  * @brief TODO: Document this.
  */
 

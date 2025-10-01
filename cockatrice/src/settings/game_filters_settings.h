@@ -1,7 +1,7 @@
 /**
  * @file game_filters_settings.h
  * @ingroup Lobby
- * @ingroup Settings
+ * @ingroup GameSettings
  * @brief TODO: Document this.
  */
 

@@ -1,6 +1,6 @@
 /**
  * @file tab_room.h
- * @ingroup NetworkingTabs
+ * @ingroup RoomTabs
  * @ingroup Lobby
  * @brief TODO: Document this.
  */

@@ -1,6 +1,6 @@
 /**
  * @file handle_public_servers.h
- * @ingroup Network
+ * @ingroup Server
  * @brief TODO: Document this.
  */
 

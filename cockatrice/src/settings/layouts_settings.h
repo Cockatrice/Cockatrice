@@ -1,6 +1,6 @@
 /**
  * @file layouts_settings.h
- * @ingroup Settings
+ * @ingroup CoreSettings
  * @brief TODO: Document this.
  */
 

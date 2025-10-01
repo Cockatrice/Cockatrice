@@ -1,6 +1,6 @@
 /**
  * @file tab_message.h
- * @ingroup NetworkingTabs
+ * @ingroup MessagingTabs
  * @brief TODO: Document this.
  */
 

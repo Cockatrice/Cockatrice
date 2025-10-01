@@ -32,16 +32,25 @@
  */
 
 /**
- * @defgroup ApiResponses API Responses
- * @ingroup Network
- * @brief Structures representing API responses.
- *
- * Encapsulates the data models for networking API responses,
- * providing consistent interfaces for parsing and handling results.
+ * @defgroup ApiInterfaces API Interfaces
+ * @ingroup Client
+ * @ingroup Parsing
+ * @ingroup ImportExport
+ * @brief Interfaces for interacting with various APIs
  */
+
+ /**
+  * @defgroup ApiResponses API Responses
+  * @ingroup ApiInterfaces
+  * @brief Structures representing API responses.
+  *
+  * Encapsulates the data models for networking API responses,
+  * providing consistent interfaces for parsing and handling results.
+  */
 
 /**
  * @defgroup ApiResponseDisplayWidgets API Response Display Widgets
+ * @ingroup Widgets
  * @ingroup ApiResponses
  * @brief Qt widgets for displaying API responses.
  *
@@ -67,6 +76,13 @@
  */
 
 /**
+ * @defgroup NetworkingWidgets Networking Widgets
+ * @ingroup Widgets
+ * @ingroup Client
+ * @brief Widgets related to a RemoteClient interacting with a RemoteServer.
+ */
+
+/**
  * @defgroup ClientUpdates Client Updates
  * @ingroup Client
  * @brief Client updates.
@@ -82,9 +98,10 @@
  */
 
 /**
- * @defgroup Lobby Lobby & Rooms
- * @ingroup Network
- * @brief Multiplayer lobby and room management.
+ * @defgroup RoomWidgets Room Widgets
+ * @ingroup Widgets
+ * @ingroup Client
+ * @brief Server room management.
  *
  * Manages creation and interaction of Game lobbies and room state synchronization with the server.
  */
@@ -121,6 +138,7 @@
 
 /**
  * @defgroup GameWidgets Game Widgets
+ * @ingroup Widgets
  * @ingroup GameUi
  * @brief Widgets specific to the in-game interface.
  *
@@ -274,6 +292,7 @@
 
 /**
  * @defgroup DeckEditorWidgets Deck Editor Widgets
+ * @ingroup Widgets
  * @ingroup DeckEditors
  * @brief Supporting widgets for deck editors.
  *
@@ -301,6 +320,7 @@
 /**
  * @defgroup PrintingWidgets Printing Widgets
  * @ingroup DeckEditorWidgets
+ * @ingroup Widgets
  * @brief Widgets for handling PrintingInfo of cards in a DeckList.
  *
  * Manages the display and editing of card printing information within a DeckList,
@@ -310,24 +330,39 @@
 /**
  * @defgroup DeckStorage Deck Storage
  * @ingroup Decks
- * @brief Systems for storing a DeckList.
+ * @brief Systems for storing a DeckList on a local file system or remote service.
+ */
+
+/**
+ * @defgroup LocalDeckStorage Local Deck Storage
+ * @ingroup DeckStorage
+ * @brief Systems for storing a DeckList on a local file system.
  *
  * Handles the persistence of a DeckList, providing file-based storage,
  * metadata tracking, and tagging functionality.
  */
 
 /**
- * @defgroup DeckStorageWidgets Deck Storage Widgets
- * @ingroup DeckStorage
+ * @defgroup LocalDeckStorageWidgets Local Deck Storage Widgets
+ * @ingroup Widgets
+ * @ingroup LocalDeckStorage
  * @brief Widgets for browsing and managing stored DeckLists.
  *
  * Provides list and tree-based views for exploring stored DeckLists,
  * including tagging, searching, and preview functionality.
  */
 
+ /**
+  * @defgroup LocalDeckStorageDialogs Local Deck Storage Dialogs
+  * @ingroup LocalDeckStorageWidgets
+  * @ingroup ImportExport
+  * @ingroup Lobby
+  * @brief Dialogs related to interacting with decks on a filesystem or in a remote location.
+  */
+
 /**
  * @defgroup VisualDeckStorageWidgets Visual Deck Storage Widgets
- * @ingroup DeckStorageWidgets
+ * @ingroup LocalDeckStorageWidgets
  * @brief Visual widgets for DeckList storage.
  *
  * Offers graphical interfaces for browsing and interacting with a stored
@@ -341,6 +376,27 @@
  *
  * Provides visual previews of a DeckList, allowing users
  * to inspect the deck name, color identity, and banner card at a glance.
+ */
+
+/**
+ * @defgroup RemoteDeckStorage Remote Deck Storage
+ * @ingroup DeckStorage
+ * @brief Systems for storing a DeckList on a remote service.
+ */
+
+/**
+ * @defgroup RemoteDeckStorageWidgets Remote Deck Storage Widgets
+ * @ingroup Widgets
+ * @ingroup RemoteDeckStorage
+ * @ingroup ImportExport
+ * @ingroup Lobby
+ * @brief Widgets related to interacting with decks on a filesystem or in a remote location.
+ */
+
+/**
+ * @defgroup RemoteDeckStorageDialogs Remote Deck Storage Dialogs
+ * @ingroup RemoteDeckStorageWidgets
+ * @brief Dialogs related to interacting with decks on a filesystem or in a remote location.
  */
 
 /**
@@ -387,6 +443,7 @@
 
 /**
  * @defgroup CardWidgets Card Widgets
+ * @ingroup Widgets
  * @ingroup Cards
  * @brief Widgets for card display and interaction.
  *
@@ -440,6 +497,7 @@
 
 /**
  * @defgroup CardDatabaseWidgets Card Database Widgets
+ * @ingroup Widgets
  * @ingroup CardDatabase
  * @brief Widgets for browsing and selecting cards.
  *
@@ -496,7 +554,32 @@
 /**
  * @defgroup NetworkingTabs Networking Tabs
  * @ingroup Tabs
- * @ingroup Network
+ * @ingroup NetworkingWidgets
+ * @brief Tabs related to a RemoteClient interacting with a RemoteServer.
+ */
+
+/**
+ * @defgroup ServerTabs Server Tabs
+ * @ingroup NetworkingTabs
+ * @brief Tabs related to a RemoteServer.
+ */
+
+/**
+ * @defgroup AccountTabs Account Tabs
+ * @ingroup NetworkingTabs
+ * @brief Tabs related to user account information.
+ */
+
+/**
+ * @defgroup RoomTabs Room Tabs
+ * @ingroup RoomWidgets
+ * @brief Tabs related to a Room on a RemoteServer.
+ */
+
+/**
+ * @defgroup MessagingTabs Message Tabs
+ * @ingroup NetworkingTabs
+ * @brief Tabs related to users sending messages to each other.
  */
 
 /**
@@ -511,8 +594,45 @@
 /**
  * @defgroup NetworkDialogs Networking Dialogs
  * @ingroup Dialogs
- * @ingroup Network
- * @brief Dialogs related to interacting with a remote server.
+ * @ingroup NetworkingWidgets
+ * @brief Dialogs related to a RemoteClient interacting with a RemoteServer.
+ */
+
+/**
+ * @defgroup ClientUpdateDialogs Client Update Dialogs
+ * @ingroup NetworkDialogs
+ * @brief Dialogs relating to the client updating.
+ */
+
+/**
+ * @defgroup CardDatabaseUpdateDialogs Card Database Update Dialogs
+ * @ingroup NetworkDialogs
+ * @ingroup CardDatabaseWidgets
+ * @brief Dialogs relating to the CardDatabase updating.
+ */
+
+/**
+ * @defgroup ConnectionDialogs Connection Dialogs
+ * @ingroup NetworkDialogs
+ * @brief Dialogs relating to the RemoteClient%s connection to a RemoteServer.
+ */
+
+/**
+ * @defgroup AccountDialogs Account Dialogs
+ * @ingroup NetworkDialogs
+ * @brief Dialogs relating to account information on a RemoteServer.
+ */
+
+/**
+ * @defgroup RoomDialogs
+ * @ingroup NetworkDialogs
+ * @brief Dialogs relating to a RemoteClient interacting with a Room on a RemoteServer.
+ */
+
+/**
+ * @defgroup ServerLogDialogs Server Log Dialogs
+ * @ingroup NetworkDialogs
+ * @brief Dialogs relating to a RemoteClient interacting a RemoteServer%'s logs.
  */
 
 /**
@@ -546,6 +666,43 @@
  * runtime access to user preferences and application options.
  */
 
+/**
+ * @defgroup SettingsWidgets Settings Widgets
+ * @ingroup Widgets
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
+/**
+ * @defgroup CoreSettings Core Settings
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
+/**
+ * @defgroup NetworkSettings Network Settings
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
+/**
+ * @defgroup GameSettings Game Settings
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
+/**
+ * @defgroup CardSettings Card Settings
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
+/**
+ * @defgroup DeckSettings Deck Settings
+ * @ingroup Settings
+ * @brief TODO: Document this
+ */
+
 /* ------------------------------------------------------------------ */
 /* Tests                                                              */
 /* ------------------------------------------------------------------ */
@@ -557,4 +714,3 @@
  * Provides unit tests, integration tests, and regression checks
  * to ensure stability and correctness of the Cockatrice codebase.
  */
-

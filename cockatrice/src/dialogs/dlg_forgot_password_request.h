@@ -1,6 +1,6 @@
 /**
  * @file dlg_forgot_password_request.h
- * @ingroup NetworkDialogs
+ * @ingroup AccountDialogs
  * @brief TODO: Document this.
  */
 

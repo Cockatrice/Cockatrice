@@ -1,6 +1,6 @@
 /**
  * @file card_counter_settings.h
- * @ingroup Settings
+ * @ingroup GameSettings
  * @brief TODO: Document this.
  */
 

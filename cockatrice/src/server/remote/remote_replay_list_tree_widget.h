@@ -2,7 +2,7 @@
  * @file remote_replay_list_tree_widget.h
  * @ingroup DeckStorageWidgets
  * @ingroup Replays
- * @ingroup Client
+ * @ingroup NetworkingWidgets
  * @brief TODO: Document this.
  */
 

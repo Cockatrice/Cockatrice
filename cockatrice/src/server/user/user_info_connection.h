@@ -1,6 +1,6 @@
 /**
  * @file user_info_connection.h
- * @ingroup Network
+ * @ingroup Client
  * @brief TODO: Document this.
  */
 

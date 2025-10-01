@@ -1,7 +1,6 @@
 /**
  * @file dlg_create_game.h
- * @ingroup NetworkDialogs
- * @ingroup Lobby
+ * @ingroup RoomDialogs
  * @brief TODO: Document this.
  */
 

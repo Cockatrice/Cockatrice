@@ -1,6 +1,6 @@
 /**
  * @file deck_link_to_api_transformer.h
- * @ingroup Network
+ * @ingroup ApiInterfaces
  * @brief TODO: Document this.
  */
 

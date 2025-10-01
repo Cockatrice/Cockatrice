@@ -1,6 +1,6 @@
 /**
  * @file dlg_view_log.h
- * @ingroup NetworkDialogs
+ * @ingroup ServerLogDialogs
  * @brief TODO: Document this.
  */
 

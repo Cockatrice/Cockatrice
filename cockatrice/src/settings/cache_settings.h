@@ -1,6 +1,5 @@
 /**
  * @file cache_settings.h
- * @ingroup Network
  * @ingroup Settings
  * @brief TODO: Document this.
  */
