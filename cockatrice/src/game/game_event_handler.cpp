@@ -240,6 +240,11 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                                              int /*eventPlayerId*/,
                                              const GameEventContext & /*context*/)
 {
+    // Early check here since this is important for the emission of the join log signals.
+    if (event.game_started() && !game->getGameMetaInfo()->started()) {
+        game->getGameState()->setResuming(!game->getGameState()->isGameStateKnown());
+    }
+
     const int playerListSize = event.player_list_size();
 
     QVector<QPair<int, QPair<QString, QString>>> opponentDecksToDisplay;
@@ -254,14 +259,20 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
             if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
                 game->getPlayerManager()->addSpectator(playerId, prop);
                 emit spectatorJoined(prop);
-                emit logJoinSpectator(playerName);
+                // If the game is resuming, everyone else has already enjoyed. The local spectator always joins.
+                if (!game->getGameState()->isResuming() || playerId == game->getPlayerManager()->getLocalPlayerId()) {
+                    emit logJoinSpectator(playerName);
+                }
             }
         } else {
             Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
             if (!player) {
                 player = game->getPlayerManager()->addPlayer(playerId, prop.user_info());
                 emit playerJoined(prop);
-                emit logJoinPlayer(player);
+                // If the game is resuming, everyone else has already enjoyed. The local player always joins.
+                if (!game->getGameState()->isResuming() || playerId == game->getPlayerManager()->getLocalPlayerId()) {
+                    emit logJoinPlayer(player);
+                }
             }
             player->processPlayerInfo(playerInfo);
             if (player->getPlayerInfo()->getLocal()) {
@@ -284,7 +295,6 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
     game->getGameState()->setGameTime(event.seconds_elapsed());
 
     if (event.game_started() && !game->getGameMetaInfo()->started()) {
-        game->getGameState()->setResuming(!game->getGameState()->isGameStateKnown());
         game->getGameMetaInfo()->setStarted(event.game_started());
         if (game->getGameState()->isGameStateKnown())
             emit logGameStart();
