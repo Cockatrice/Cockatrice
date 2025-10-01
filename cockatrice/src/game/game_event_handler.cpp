@@ -254,14 +254,12 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
             if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
                 game->getPlayerManager()->addSpectator(playerId, prop);
                 emit spectatorJoined(prop);
-                emit logJoinSpectator(playerName);
             }
         } else {
             Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
             if (!player) {
                 player = game->getPlayerManager()->addPlayer(playerId, prop.user_info());
                 emit playerJoined(prop);
-                emit logJoinPlayer(player);
             }
             player->processPlayerInfo(playerInfo);
             if (player->getPlayerInfo()->getLocal()) {
