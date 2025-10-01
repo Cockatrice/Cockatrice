@@ -43,7 +43,7 @@ class SetsModel : public QAbstractTableModel
 
 private:
     static const int NUM_COLS = 7;
-    SetList sets;
+    CardSetList sets;
     QSet<CardSetPtr> enabledSets;
 
 public:

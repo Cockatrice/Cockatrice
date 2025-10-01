@@ -1,5 +1,8 @@
 #include "cockatrice_xml_3.h"
 
+#include "../../card/card_relation.h"
+#include "../../card/card_relation_type.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -232,7 +235,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     _sets[setName].append(setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    CardRelation::AttachType attach = CardRelation::DoesNotAttach;
+                    CardRelationType attach = CardRelationType::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     int count = 1;
@@ -254,7 +257,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attach = CardRelation::AttachTo;
+                        attach = CardRelationType::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {

@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
+#include <card/card_relation.h>
 #include <climits>
 
 SplitCardPart::SplitCardPart(const QString &_name,
@@ -379,12 +380,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
-                        relatedCards.append(new CardRelation(additionalName, CardRelation::TransformInto));
+                        relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
                     }
                 } else {
                     for (const QString &additionalName : name.split(" // ")) {
                         if (additionalName != faceName) {
-                            relatedCards.append(new CardRelation(additionalName, CardRelation::TransformInto));
+                            relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
                         }
                     }
                 }
@@ -399,7 +400,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                     auto spbk = givenRelated.value("spellbook").toStringList();
                     for (const QString &spbkName : spbk) {
                         relatedCards.append(
-                            new CardRelation(spbkName, CardRelation::DoesNotAttach, false, false, 1, true));
+                            new CardRelation(spbkName, CardRelationType::DoesNotAttach, false, false, 1, true));
                     }
                 }
             }

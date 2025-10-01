@@ -8,7 +8,11 @@ set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
     src/card/card_info.cpp
+    src/card/card_relation.cpp
+    src/card/card_set.cpp
+    src/card/card_set_list.cpp
     src/card/exact_card.cpp
+    src/card/printing_info.cpp
     src/client/deck_editor_menu.cpp
     src/client/get_text_with_max.cpp
     src/client/network/client_update_checker.cpp

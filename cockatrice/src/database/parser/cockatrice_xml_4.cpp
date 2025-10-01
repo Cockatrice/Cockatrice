@@ -1,5 +1,6 @@
 #include "cockatrice_xml_4.h"
 
+#include "../../card/card_relation.h"
 #include "../../settings/cache_settings.h"
 
 #include <QCoreApplication>
@@ -205,7 +206,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    CardRelation::AttachType attachType = CardRelation::DoesNotAttach;
+                    CardRelationType attachType = CardRelationType::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;
@@ -228,8 +229,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
 
                     if (attrs.hasAttribute("attach")) {
-                        attachType = attrs.value("attach").toString() == "transform" ? CardRelation::TransformInto
-                                                                                     : CardRelation::AttachTo;
+                        attachType = attrs.value("attach").toString() == "transform" ? CardRelationType::TransformInto
+                                                                                     : CardRelationType::AttachTo;
                     }
 
                     if (attrs.hasAttribute("exclude")) {

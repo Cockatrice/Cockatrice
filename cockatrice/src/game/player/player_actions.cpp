@@ -1,6 +1,7 @@
 #include "player_actions.h"
 
 #include "../../../common/pb/context_move_card.pb.h"
+#include "../../card/card_relation.h"
 #include "../../client/get_text_with_max.h"
 #include "../../database/card_database_manager.h"
 #include "../../tabs/tab_game.h"
@@ -977,7 +978,7 @@ void PlayerActions::actCreateAllRelatedCards()
                         dbName = cardRelationAll->getName();
                         bool persistent = cardRelationAll->getIsPersistent();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -992,7 +993,7 @@ void PlayerActions::actCreateAllRelatedCards()
                         dbName = cardRelationNotExcluded->getName();
                         bool persistent = cardRelationNotExcluded->getIsPersistent();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1031,18 +1032,18 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
             return false;
         }
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
         }
     } else if (cardRelation->getDefaultCount() > 1) {
         for (int i = 0; i < cardRelation->getDefaultCount(); ++i) {
-            createCard(sourceCard, dbName, CardRelation::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
         }
     } else {
         auto attachType = cardRelation->getAttachType();
 
         // move card onto table first if attaching from some other zone
         // we only do this for AttachTo because cross-zone TransformInto is already handled server-side
-        if (attachType == CardRelation::AttachTo && sourceCard->getZone()->getName() != "table") {
+        if (attachType == CardRelationType::AttachTo && sourceCard->getZone()->getName() != "table") {
             playCardToTable(sourceCard, false);
         }
 
@@ -1053,7 +1054,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
 
 void PlayerActions::createCard(const CardItem *sourceCard,
                                const QString &dbCardName,
-                               CardRelation::AttachType attachType,
+                               CardRelationType attachType,
                                bool persistent)
 {
     CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(dbCardName);
@@ -1096,19 +1097,19 @@ void PlayerActions::createCard(const CardItem *sourceCard,
         CardDatabaseManager::query()->getCardFromSameSet(cardInfo->getName(), sourceCard->getCard().getPrinting());
 
     switch (attachType) {
-        case CardRelation::DoesNotAttach:
+        case CardRelationType::DoesNotAttach:
             cmd.set_target_zone("table");
             cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             break;
 
-        case CardRelation::AttachTo:
+        case CardRelationType::AttachTo:
             cmd.set_target_zone("table"); // We currently only support creating tokens on the table
             cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
             break;
 
-        case CardRelation::TransformInto:
+        case CardRelationType::TransformInto:
             // allow cards to directly transform on stack
             cmd.set_zone(sourceCard->getZone()->getName() == "stack" ? "stack" : "table");
             // Transform card zone changes are handled server-side

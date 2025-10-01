@@ -7,6 +7,8 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
+#include "printing_info.h"
+
 #include <QDate>
 #include <QHash>
 #include <QList>
@@ -21,7 +23,6 @@
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 
 class CardInfo;
-class PrintingInfo;
 class CardSet;
 class CardRelation;
 class ICardDatabaseParser;
@@ -35,191 +36,56 @@ typedef QHash<QString, CardSetPtr> SetNameMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
-class CardSet : public QList<CardInfoPtr>
-{
-public:
-    enum Priority
-    {
-        PriorityFallback = 0,
-        PriorityPrimary = 10,
-        PrioritySecondary = 20,
-        PriorityReprint = 30,
-        PriorityOther = 40,
-        PriorityLowest = 100,
-    };
-
-    static const char *TOKENS_SETNAME;
-
-private:
-    QString shortName, longName;
-    unsigned int sortKey;
-    QDate releaseDate;
-    QString setType;
-    Priority priority;
-    bool enabled, isknown;
-
-public:
-    explicit CardSet(const QString &_shortName = QString(),
-                     const QString &_longName = QString(),
-                     const QString &_setType = QString(),
-                     const QDate &_releaseDate = QDate(),
-                     const Priority _priority = PriorityFallback);
-    static CardSetPtr newInstance(const QString &_shortName = QString(),
-                                  const QString &_longName = QString(),
-                                  const QString &_setType = QString(),
-                                  const QDate &_releaseDate = QDate(),
-                                  const Priority _priority = PriorityFallback);
-    QString getCorrectedShortName() const;
-    QString getShortName() const
-    {
-        return shortName;
-    }
-    QString getLongName() const
-    {
-        return longName;
-    }
-    QString getSetType() const
-    {
-        return setType;
-    }
-    QDate getReleaseDate() const
-    {
-        return releaseDate;
-    }
-    Priority getPriority() const
-    {
-        return priority;
-    }
-    void setLongName(const QString &_longName)
-    {
-        longName = _longName;
-    }
-    void setSetType(const QString &_setType)
-    {
-        setType = _setType;
-    }
-    void setReleaseDate(const QDate &_releaseDate)
-    {
-        releaseDate = _releaseDate;
-    }
-    void setPriority(const Priority _priority)
-    {
-        priority = _priority;
-    }
-
-    void loadSetOptions();
-    int getSortKey() const
-    {
-        return sortKey;
-    }
-    void setSortKey(unsigned int _sortKey);
-    bool getEnabled() const
-    {
-        return enabled;
-    }
-    void setEnabled(bool _enabled);
-    bool getIsKnown() const
-    {
-        return isknown;
-    }
-    void setIsKnown(bool _isknown);
-
-    // Determine incomplete sets.
-    bool getIsKnownIgnored() const
-    {
-        return longName.length() + setType.length() + releaseDate.toString().length() == 0;
-    }
-};
-
-class SetList : public QList<CardSetPtr>
-{
-private:
-    class KeyCompareFunctor;
-
-public:
-    void sortByKey();
-    void guessSortKeys();
-    void enableAllUnknown();
-    void enableAll();
-    void markAllAsKnown();
-    int getEnabledSetsNum();
-    int getUnknownSetsNum();
-    QStringList getUnknownSetsNames();
-    void defaultSort();
-};
-
 /**
- * Info relating to a specific printing for a card.
+ * @class CardInfo
+ * @ingroup Cards
+ *
+ * @brief Represents a card and its associated metadata, properties, and relationships.
+ *
+ * CardInfo holds both static information (name, text, flags) and dynamic data
+ * (properties, set memberships, relationships). It also integrates with
+ * signals/slots, allowing observers to react to property or visual updates.
+ *
+ * Each CardInfo may belong to multiple sets through its printings, and can
+ * be related to other cards through defined relationships.
  */
-class PrintingInfo
-{
-public:
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
-    ~PrintingInfo() = default;
-
-    bool operator==(const PrintingInfo &other) const
-    {
-        return this->set == other.set && this->properties == other.properties;
-    }
-
-private:
-    CardSetPtr set;
-    // per-printing card properties;
-    QVariantHash properties;
-
-public:
-    CardSetPtr getSet() const
-    {
-        return set;
-    }
-    QStringList getProperties() const
-    {
-        return properties.keys();
-    }
-    QString getProperty(const QString &propertyName) const
-    {
-        return properties.value(propertyName).toString();
-    }
-    void setProperty(const QString &_name, const QString &_value)
-    {
-        properties.insert(_name, _value);
-    }
-
-    QString getUuid() const;
-};
-
 class CardInfo : public QObject
 {
     Q_OBJECT
+
 private:
-    CardInfoPtr smartThis;
-    // The card name
-    QString name;
-    // The name without punctuation or capitalization, for better card name recognition.
-    QString simpleName;
-    // card text
-    QString text;
-    // whether this is not a "real" card but a token
-    bool isToken;
-    // basic card properties; common for all the sets
-    QVariantHash properties;
-    // the cards i'm related to
-    QList<CardRelation *> relatedCards;
-    // the card i'm reverse-related to
-    QList<CardRelation *> reverseRelatedCards;
-    // the cards thare are reverse-related to me
-    QList<CardRelation *> reverseRelatedCardsToMe;
-    // card sets
-    SetToPrintingsMap setsToPrintings;
-    // cached set names
-    QString setsNames;
-    // positioning properties; used by UI
-    bool cipt;
-    bool landscapeOrientation;
-    int tableRow;
-    bool upsideDownArt;
+    CardInfoPtr smartThis;                         ///< Smart pointer to self for safe cross-references.
+    QString name;                                  ///< Full name of the card.
+    QString simpleName;                            ///< Simplified name for fuzzy matching.
+    QString text;                                  ///< Text description or rules text of the card.
+    bool isToken;                                  ///< Whether this card is a token or not.
+    QVariantHash properties;                       ///< Key-value store of dynamic card properties.
+    QList<CardRelation *> relatedCards;            ///< Forward references to related cards.
+    QList<CardRelation *> reverseRelatedCards;     ///< Cards that refer back to this card.
+    QList<CardRelation *> reverseRelatedCardsToMe; ///< Cards that consider this card as related.
+    SetToPrintingsMap setsToPrintings;             ///< Mapping from set names to printing variations.
+    QString setsNames;                             ///< Cached, human-readable list of set names.
+    bool cipt;                                     ///< Positioning flag used by UI.
+    bool landscapeOrientation;                     ///< Orientation flag for rendering.
+    int tableRow;                                  ///< Row index in a table or visual representation.
+    bool upsideDownArt;                            ///< Whether artwork is flipped for visual purposes.
 
 public:
+    /**
+     * @brief Constructs a CardInfo with full initialization.
+     *
+     * @param _name The name of the card.
+     * @param _text Rules text or description of the card.
+     * @param _isToken Flag indicating whether the card is a token.
+     * @param _properties Arbitrary key-value properties.
+     * @param _relatedCards Forward references to related cards.
+     * @param _reverseRelatedCards Backward references to related cards.
+     * @param _sets Map of set names to printing information.
+     * @param _cipt UI positioning flag.
+     * @param _landscapeOrientation UI rendering orientation.
+     * @param _tableRow Row index for table placement.
+     * @param _upsideDownArt Whether the artwork should be displayed upside down.
+     */
     explicit CardInfo(const QString &_name,
                       const QString &_text,
                       bool _isToken,
@@ -231,6 +97,14 @@ public:
                       bool _landscapeOrientation,
                       int _tableRow,
                       bool _upsideDownArt);
+
+    /**
+     * @brief Copy constructor for CardInfo.
+     *
+     * Performs a deep copy of properties, sets, and related card lists.
+     *
+     * @param other Another CardInfo to copy.
+     */
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
           isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
@@ -240,8 +114,32 @@ public:
     {
     }
 
+    /**
+     * @brief Creates a new instance with only the card name.
+     *
+     * All other fields are set to defaults.
+     *
+     * @param _name The card name.
+     * @return Shared pointer to the new CardInfo instance.
+     */
     static CardInfoPtr newInstance(const QString &_name);
 
+    /**
+     * @brief Creates a new instance with full initialization.
+     *
+     * @param _name Name of the card.
+     * @param _text Rules text or description.
+     * @param _isToken Token flag.
+     * @param _properties Arbitrary properties.
+     * @param _relatedCards Forward relationships.
+     * @param _reverseRelatedCards Reverse relationships.
+     * @param _sets Printing information per set.
+     * @param _cipt UI positioning flag.
+     * @param _landscapeOrientation UI rendering orientation.
+     * @param _tableRow Row index for table placement.
+     * @param _upsideDownArt Artwork orientation flag.
+     * @return Shared pointer to the new CardInfo instance.
+     */
     static CardInfoPtr newInstance(const QString &_name,
                                    const QString &_text,
                                    bool _isToken,
@@ -254,20 +152,33 @@ public:
                                    int _tableRow,
                                    bool _upsideDownArt);
 
+    /**
+     * @brief Clones the current CardInfo instance.
+     *
+     * Uses the copy constructor and ensures the smart pointer is properly set.
+     *
+     * @return Shared pointer to the cloned CardInfo.
+     */
     CardInfoPtr clone() const
     {
-        // Use the copy constructor to create a new instance
         CardInfoPtr newCardInfo = CardInfoPtr(new CardInfo(*this));
         newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
         return newCardInfo;
     }
 
+    /**
+     * @brief Sets the internal smart pointer to self.
+     *
+     * Used internally to allow safe cross-references among CardInfo and CardSet.
+     *
+     * @param _ptr Shared pointer pointing to this instance.
+     */
     void setSmartPointer(CardInfoPtr _ptr)
     {
         smartThis = std::move(_ptr);
     }
 
-    // basic properties
+    /** @name Basic Properties Accessors */ //@{
     inline const QString &getName() const
     {
         return name;
@@ -276,7 +187,6 @@ public:
     {
         return simpleName;
     }
-
     const QString &getText() const
     {
         return text;
@@ -286,7 +196,6 @@ public:
         text = _text;
         emit cardInfoChanged(smartThis);
     }
-
     bool getIsToken() const
     {
         return isToken;
@@ -316,8 +225,9 @@ public:
     {
         return setsNames;
     }
+    //@}
 
-    // related cards
+    /** @name Related Cards Accessors */ //@{
     const QList<CardRelation *> &getRelatedCards() const
     {
         return relatedCards;
@@ -342,8 +252,9 @@ public:
     {
         reverseRelatedCardsToMe.append(cardRelation);
     }
+    //@}
 
-    // positioning
+    /** @name UI Positioning */ //@{
     bool getCipt() const
     {
         return cipt;
@@ -365,8 +276,9 @@ public:
         return upsideDownArt;
     }
     const QChar getColorChar() const;
+    //@}
 
-    // Back-compatibility methods. Remove ASAP
+    /** @name Legacy/Convenience Property Accessors */ //@{
     const QString getCardType() const;
     void setCardType(const QString &value);
     const QString getCmc() const;
@@ -377,100 +289,66 @@ public:
     const QString getManaCost() const;
     const QString getPowTough() const;
     void setPowTough(const QString &value);
+    //@}
 
+    /**
+     * @brief Returns a version of the card name safe for file storage or fuzzy matching.
+     *
+     * Removes invalid characters, replaces spacing markers, and normalizes diacritics.
+     *
+     * @return Corrected card name as a QString.
+     */
     QString getCorrectedName() const;
+
+    /**
+     * @brief Adds a printing to a specific set.
+     *
+     * Updates the mapping and refreshes the cached list of set names.
+     *
+     * @param _set The set to which the card should be added.
+     * @param _info Optional printing information.
+     */
     void addToSet(const CardSetPtr &_set, PrintingInfo _info = PrintingInfo());
+
+    /**
+     * @brief Combines legality properties from a provided map.
+     *
+     * Useful for merging format legality flags from multiple sources.
+     *
+     * @param props Key-value mapping of format legalities.
+     */
     void combineLegalities(const QVariantHash &props);
+
+    /**
+     * @brief Refreshes the cached, human-readable list of set names.
+     *
+     * Typically called after adding or modifying set memberships.
+     */
     void refreshCachedSetNames();
 
     /**
-     * Simplify a name to have no punctuation and lowercase all letters, for
-     * less strict name-matching.
+     * @brief Simplifies a name for fuzzy matching.
+     *
+     * Converts to lowercase, removes punctuation/spacing.
+     *
+     * @param name Original name string.
+     * @return Simplified name string.
      */
     static QString simplifyName(const QString &name);
 
 signals:
     /**
-     * Emit this when a pixmap for this card finishes loading.
-     * @param printing The specific printing the pixmap is for.
+     * @brief Emitted when a pixmap for this card has been updated or finished loading.
+     *
+     * @param printing Specific printing for which the pixmap has updated.
      */
     void pixmapUpdated(const PrintingInfo &printing);
+
+    /**
+     * @brief Emitted when card properties or state have changed.
+     *
+     * @param card Shared pointer to the CardInfo instance that changed.
+     */
     void cardInfoChanged(CardInfoPtr card);
-};
-
-class CardRelation : public QObject
-{
-    Q_OBJECT
-public:
-    enum AttachType
-    {
-        DoesNotAttach = 0,
-        AttachTo = 1,
-        TransformInto = 2,
-    };
-
-private:
-    QString name;
-    AttachType attachType;
-    bool isCreateAllExclusion;
-    bool isVariableCount;
-    int defaultCount;
-    bool isPersistent;
-
-public:
-    explicit CardRelation(const QString &_name = QString(),
-                          AttachType _attachType = DoesNotAttach,
-                          bool _isCreateAllExclusion = false,
-                          bool _isVariableCount = false,
-                          int _defaultCount = 1,
-                          bool _isPersistent = false);
-
-    inline const QString &getName() const
-    {
-        return name;
-    }
-    AttachType getAttachType() const
-    {
-        return attachType;
-    }
-    bool getDoesAttach() const
-    {
-        return attachType != DoesNotAttach;
-    }
-    bool getDoesTransform() const
-    {
-        return attachType == TransformInto;
-    }
-    QString getAttachTypeAsString() const
-    {
-        switch (attachType) {
-            case AttachTo:
-                return "attach";
-            case TransformInto:
-                return "transform";
-            default:
-                return "";
-        }
-    }
-    bool getCanCreateAnother() const
-    {
-        return !getDoesAttach();
-    }
-    bool getIsCreateAllExclusion() const
-    {
-        return isCreateAllExclusion;
-    }
-    bool getIsVariable() const
-    {
-        return isVariableCount;
-    }
-    int getDefaultCount() const
-    {
-        return defaultCount;
-    }
-    bool getIsPersistent() const
-    {
-        return isPersistent;
-    }
 };
 #endif
