@@ -52,7 +52,7 @@
  * @defgroup NetworkDialogs Networking Dialogs
  * @ingroup Dialogs
  * @ingroup NetworkingWidgets
- * @brief Dialogs related to a RemoteClient interacting with a RemoteServer.
+ * @brief Dialogs related to a RemoteClient interacting with a Server.
  */
 
 /**
@@ -71,25 +71,25 @@
 /**
  * @defgroup ConnectionDialogs Connection Dialogs
  * @ingroup NetworkDialogs
- * @brief Dialogs relating to the RemoteClient%s connection to a RemoteServer.
+ * @brief Dialogs relating to the RemoteClient%s connection to a Server.
  */
 
 /**
  * @defgroup AccountDialogs Account Dialogs
  * @ingroup NetworkDialogs
- * @brief Dialogs relating to account information on a RemoteServer.
+ * @brief Dialogs relating to account information on a Server.
  */
 
 /**
  * @defgroup RoomDialogs
  * @ingroup NetworkDialogs
- * @brief Dialogs relating to a RemoteClient interacting with a Room on a RemoteServer.
+ * @brief Dialogs relating to a RemoteClient interacting with a Room on a Server.
  */
 
 /**
  * @defgroup ServerLogDialogs Server Log Dialogs
  * @ingroup NetworkDialogs
- * @brief Dialogs relating to a RemoteClient interacting a RemoteServer%'s logs.
+ * @brief Dialogs relating to a RemoteClient interacting a Server%'s logs.
  */
 
 /**
@@ -112,13 +112,13 @@
  * @defgroup NetworkingTabs Networking Tabs
  * @ingroup Tabs
  * @ingroup NetworkingWidgets
- * @brief Tabs related to a RemoteClient interacting with a RemoteServer.
+ * @brief Tabs related to a RemoteClient interacting with a Server.
  */
 
 /**
  * @defgroup ServerTabs Server Tabs
  * @ingroup NetworkingTabs
- * @brief Tabs related to a RemoteServer.
+ * @brief Tabs related to a Server.
  */
 
 /**
@@ -131,7 +131,7 @@
  * @defgroup RoomTabs Room Tabs
  * @ingroup NetworkingTabs
  * @ingroup RoomWidgets
- * @brief Tabs related to a Room on a RemoteServer.
+ * @brief Tabs related to a Room on a Server.
  */
 
 /**
@@ -192,16 +192,16 @@
 /**
  * @defgroup CardDatabase Card Database
  * @ingroup Cards
- * @brief Core card database and loaders.
+ * @brief Core CardDatabase and loaders.
  *
  * Provides the underlying data models for cards, including loading,
- * parsing, and managing the complete card database used in the application.
+ * parsing, and managing the complete CardDatabase used in the application.
  */
 
 /**
  * @defgroup CardDatabaseModels Models
  * @ingroup CardDatabase
- * @brief Qt models for card database access.
+ * @brief Qt models for CardDatabase access.
  *
  * Supplies Qt model abstractions for presenting card data in views,
  * supporting filtering, sorting, and data binding to widgets.
@@ -210,7 +210,7 @@
 /**
  * @defgroup CardDatabaseModelFilters Filters
  * @ingroup CardDatabaseModels
- * @brief Filters for card database models.
+ * @brief Filters for CardDatabase models.
  *
  * Provides reusable filtering components for Qt models, enabling
  * refined queries and customized card data views.
@@ -221,7 +221,7 @@
  * @ingroup CardDatabase
  * @brief Parsers for card data.
  *
- * Implements parsers for card database structures, handling the
+ * Implements parsers for CardDatabase structures, handling the
  * transformation of raw data into structured objects and models.
  */
 
@@ -252,7 +252,7 @@
  * @defgroup Decks Deck Management
  * @brief DeckList handling, persistence, and tooling.
  *
- * Covers the lifecycle of decks: loading, saving, editing, import/export,
+ * Covers the lifecycle of DeckList%s: loading, saving, editing, import/export,
  * and long-term persistence, including both textual and visual editors.
  */
 
@@ -268,7 +268,7 @@
  * @brief Editors for creating and modifying a DeckList.
  *
  * Provides visual and textual editors for building, modifying,
- * and analyzing decks. Includes support for card search,
+ * and analyzing DeckList%s. Includes support for card search,
  * sorting, and filtering of deck contents.
  */
 
@@ -293,7 +293,7 @@
  * @ingroup DeckEditorWidgets
  * @brief Widgets for analyzing a DeckList.
  *
- * Provides visualization and statistical tools for analyzing decks.
+ * Provides visualization and statistical tools for analyzing DeckList%s.
  */
 
 /**
@@ -345,7 +345,7 @@
   * @ingroup LocalDeckStorageWidgets
   * @ingroup ImportExport
   * @ingroup Lobby
-  * @brief Dialogs related to interacting with decks on a filesystem or in a remote location.
+  * @brief Dialogs related to interacting with DeckList%s on a filesystem or in a remote location.
   */
 
 /**
@@ -378,13 +378,13 @@
  * @ingroup RemoteDeckStorage
  * @ingroup ImportExport
  * @ingroup Lobby
- * @brief Widgets related to interacting with decks on a filesystem or in a remote location.
+ * @brief Widgets related to interacting with DeckList%s on a filesystem or in a remote location.
  */
 
 /**
  * @defgroup RemoteDeckStorageDialogs Remote Deck Storage Dialogs
  * @ingroup RemoteDeckStorageWidgets
- * @brief Dialogs related to interacting with decks on a filesystem or in a remote location.
+ * @brief Dialogs related to interacting with DeckList%s on a filesystem or in a remote location.
  */
 
 /**
@@ -596,7 +596,7 @@
  * @defgroup ApiResponseDisplayWidgets API Response Display Widgets
  * @ingroup Widgets
  * @ingroup ApiResponses
- * @brief Qt widgets for displaying API responses.
+ * @brief Widgets for displaying API responses.
  *
  * Provides user interface components that render and present API response
  * data to the user in a structured and interactive way.
@@ -623,7 +623,7 @@
  * @defgroup NetworkingWidgets Networking Widgets
  * @ingroup Widgets
  * @ingroup Client
- * @brief Widgets related to a RemoteClient interacting with a RemoteServer.
+ * @brief Widgets related to a RemoteClient interacting with a Server.
  */
 
 /**
