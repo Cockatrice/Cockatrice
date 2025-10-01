@@ -1,3 +1,9 @@
+/**
+* @file picture_loader_status_bar.h
+ * @ingroup PictureLoader
+ * @brief TODO: Document this.
+ */
+
 #ifndef PICTURE_LOADER_STATUS_BAR_H
 #define PICTURE_LOADER_STATUS_BAR_H
 
