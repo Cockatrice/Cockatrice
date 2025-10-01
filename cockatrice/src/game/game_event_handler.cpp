@@ -248,8 +248,8 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
         const ServerInfo_Player &playerInfo = event.player_list(i);
         const ServerInfo_PlayerProperties &prop = playerInfo.properties();
         const int playerId = prop.player_id();
-        QString playerName = "@" + QString::fromStdString(prop.user_info().name());
-        emit addPlayerToAutoCompleteList(playerName);
+        QString playerName = QString::fromStdString(prop.user_info().name());
+        emit addPlayerToAutoCompleteList("@" + playerName);
         if (prop.spectator()) {
             if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
                 game->getPlayerManager()->addSpectator(playerId, prop);
