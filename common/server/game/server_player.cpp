@@ -427,6 +427,31 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
 }
 
 Response::ResponseCode
+Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    if (!game->getGameStarted()) {
+        return Response::RespGameNotStarted;
+    }
+    if (conceded) {
+        return Response::RespContextError;
+    }
+
+    Server_Counter *c = counters.value(cmd.counter_id(), 0);
+    if (!c) {
+        return Response::RespNameNotFound;
+    }
+
+    c->setCount(c->getCount() + cmd.delta());
+
+    Event_SetCounter event;
+    event.set_counter_id(c->getId());
+    event.set_value(c->getCount());
+    ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
 Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (!game->getGameStarted()) {
@@ -447,31 +472,6 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
     counterInfo->mutable_counter_color()->CopyFrom(cmd.counter_color());
     counterInfo->set_radius(c->getRadius());
     counterInfo->set_count(c->getCount());
-    ges.enqueueGameEvent(event, playerId);
-
-    return Response::RespOk;
-}
-
-Response::ResponseCode
-Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
-{
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
-    Server_Counter *c = counters.value(cmd.counter_id(), 0);
-    if (!c) {
-        return Response::RespNameNotFound;
-    }
-
-    c->setCount(c->getCount() + cmd.delta());
-
-    Event_SetCounter event;
-    event.set_counter_id(c->getId());
-    event.set_value(c->getCount());
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;
@@ -526,21 +526,6 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
     return Response::RespOk;
 }
 
-Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
-                                                              ResponseContainer &rc,
-                                                              GameEventStorage &ges)
-{
-    auto ret = Server_AbstractPlayer::cmdChangeZoneProperties(cmd, rc, ges);
-
-    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
-    if (!zone) {
-        return Response::RespNameNotFound;
-    }
-
-    revealTopCardIfNeeded(zone, ges);
-    return ret;
-}
-
 Response::ResponseCode
 Server_Player::cmdNextTurn(const Command_NextTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage & /*ges*/)
 {
@@ -577,6 +562,21 @@ Response::ResponseCode Server_Player::cmdSetActivePhase(const Command_SetActiveP
     game->setActivePhase(cmd.phase());
 
     return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
+                                                              ResponseContainer &rc,
+                                                              GameEventStorage &ges)
+{
+    auto ret = Server_AbstractPlayer::cmdChangeZoneProperties(cmd, rc, ges);
+
+    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
+    if (!zone) {
+        return Response::RespNameNotFound;
+    }
+
+    revealTopCardIfNeeded(zone, ges);
+    return ret;
 }
 
 Response::ResponseCode

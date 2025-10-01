@@ -56,15 +56,15 @@ public:
     cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
-    Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
-                                                   ResponseContainer &rc,
-                                                   GameEventStorage &ges) override;
     Response::ResponseCode
     cmdNextTurn(const Command_NextTurn &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdSetActivePhase(const Command_SetActivePhase &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges) override;
+    Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
+                                                   ResponseContainer &rc,
+                                                   GameEventStorage &ges) override;
 
     void getInfo(ServerInfo_Player *info,
                  Server_AbstractParticipant *playerWhosAsking,
