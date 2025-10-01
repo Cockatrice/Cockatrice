@@ -1,5 +1,5 @@
 /**
-* @file picture_loader_request_status_display_widget.h
+ * @file picture_loader_request_status_display_widget.h
  * @ingroup PictureLoader
  * @brief TODO: Document this.
  */

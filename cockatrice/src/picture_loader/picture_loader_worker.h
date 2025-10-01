@@ -1,5 +1,5 @@
 /**
-* @file picture_loader_worker.h
+ * @file picture_loader_worker.h
  * @ingroup PictureLoader
  * @brief TODO: Document this.
  */
