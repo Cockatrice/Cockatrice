@@ -1,3 +1,9 @@
+/**
+ * @file picture_loader_request_status_display_widget.h
+ * @ingroup PictureLoader
+ * @brief TODO: Document this.
+ */
+
 #ifndef PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 #define PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 #include "picture_loader_worker_work.h"

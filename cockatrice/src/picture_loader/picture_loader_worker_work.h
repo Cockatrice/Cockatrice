@@ -1,3 +1,9 @@
+/**
+ * @file picture_loader_worker_work.h
+ * @ingroup PictureLoader
+ * @brief TODO: Document this.
+ */
+
 #ifndef PICTURE_LOADER_WORKER_WORK_H
 #define PICTURE_LOADER_WORKER_WORK_H
 

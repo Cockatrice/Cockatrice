@@ -515,6 +515,13 @@
  * @brief Dialogs related to interacting with a remote server.
  */
 
+/**
+ * @defgroup PictureLoader Card Picture Loader
+ * @ingroup UI
+ * @ingroup Cards
+ * @brief The PictureLoader for CardInfoPictureWidget%s and CardItem%s
+ */
+
 /* ------------------------------------------------------------------ */
 /* Replay                                                             */
 /* ------------------------------------------------------------------ */
