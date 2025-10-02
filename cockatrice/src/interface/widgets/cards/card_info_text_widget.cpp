@@ -39,9 +39,6 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(n
     grid->setRowStretch(1, 1);
 
     retranslateUi();
-
-    connect(this, &CardInfoTextWidget::resizeEvent, this,
-            [this]() { propsScroll->setMaximumHeight(propsLabel->sizeHint().height()); });
 }
 
 void CardInfoTextWidget::setTexts(const QString &propsText, const QString &textText)
