@@ -1,8 +1,6 @@
 #include "home_widget.h"
 
-#include "../../../database/card_database_manager.h"
 #include "../../../server/remote/remote_client.h"
-#include "../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../window_main.h"
 #include "background_sources.h"
@@ -12,6 +10,8 @@
 #include <QPainterPath>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")

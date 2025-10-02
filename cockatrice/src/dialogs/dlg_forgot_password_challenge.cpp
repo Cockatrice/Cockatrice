@@ -1,8 +1,5 @@
 #include "dlg_forgot_password_challenge.h"
 
-#include "../settings/cache_settings.h"
-#include "trice_limits.h"
-
 #include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -10,6 +7,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialog(parent)
 {

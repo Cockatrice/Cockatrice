@@ -7,16 +7,6 @@
 #include "../chat_view/chat_view.h"
 #include "../game_selector.h"
 #include "../pending_command.h"
-#include "pb/command_kick_from_game.pb.h"
-#include "pb/commands.pb.h"
-#include "pb/moderator_commands.pb.h"
-#include "pb/response_ban_history.pb.h"
-#include "pb/response_get_admin_notes.pb.h"
-#include "pb/response_get_games_of_user.pb.h"
-#include "pb/response_get_user_info.pb.h"
-#include "pb/response_warn_history.pb.h"
-#include "pb/response_warn_list.pb.h"
-#include "pb/session_commands.pb.h"
 #include "user_info_box.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"
@@ -28,6 +18,16 @@
 #include <QSignalMapper>
 #include <QtGui>
 #include <QtWidgets>
+#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/moderator_commands.pb.h>
+#include <libcockatrice/protocol/pb/response_ban_history.pb.h>
+#include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
+#include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
+#include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
+#include <libcockatrice/protocol/pb/response_warn_history.pb.h>
+#include <libcockatrice/protocol/pb/response_warn_list.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
 
 UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, AbstractGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),

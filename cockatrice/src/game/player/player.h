@@ -7,14 +7,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../card/card_info.h"
 #include "../../filters/filter_string.h"
 #include "../../interface/tearoff_menu.h"
 #include "../board/abstract_graphics_item.h"
 #include "../dialogs/dlg_create_token.h"
 #include "menu/player_menu.h"
-#include "pb/card_attributes.pb.h"
-#include "pb/game_event.pb.h"
 #include "player_actions.h"
 #include "player_area.h"
 #include "player_event_handler.h"
@@ -26,6 +23,9 @@
 #include <QMap>
 #include <QPoint>
 #include <QTimer>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/protocol/pb/card_attributes.pb.h>
+#include <libcockatrice/protocol/pb/game_event.pb.h>
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
 

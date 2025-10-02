@@ -7,9 +7,8 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
-#include "deck_list.h"
-
 #include <QLoggingCategory>
+#include <libcockatrice/deck_list/deck_list.h>
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 

@@ -9,9 +9,6 @@
 #include "../tabs/tab_supervisor.h"
 #include "abstract_client.h"
 #include "games_model.h"
-#include "pb/response.pb.h"
-#include "pb/room_commands.pb.h"
-#include "pb/serverinfo_game.pb.h"
 #include "pending_command.h"
 #include "user/user_list_manager.h"
 
@@ -26,6 +23,9 @@
 #include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,

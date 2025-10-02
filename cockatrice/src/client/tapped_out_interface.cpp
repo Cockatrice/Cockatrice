@@ -1,8 +1,5 @@
 #include "tapped_out_interface.h"
 
-#include "deck_list.h"
-#include "deck_list_card_node.h"
-
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -10,6 +7,8 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_card_node.h>
 
 TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)

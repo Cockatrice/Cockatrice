@@ -7,12 +7,11 @@
 #ifndef ABSTRACTCLIENT_H
 #define ABSTRACTCLIENT_H
 
-#include "pb/response.pb.h"
-#include "pb/serverinfo_user.pb.h"
-
 #include <QMutex>
 #include <QObject>
 #include <QVariant>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class PendingCommand;
 class CommandContainer;

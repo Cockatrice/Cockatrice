@@ -1,8 +1,5 @@
 #include "card_menu.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/card_counter_settings.h"
 #include "../../../tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
@@ -11,6 +8,10 @@
 #include "../player_actions.h"
 #include "move_menu.h"
 #include "pt_menu.h"
+
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/settings/card_counter_settings.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)

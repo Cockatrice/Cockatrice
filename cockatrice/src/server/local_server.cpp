@@ -1,7 +1,8 @@
 #include "local_server.h"
 
 #include "local_server_interface.h"
-#include "server/server_room.h"
+
+#include <libcockatrice/server/server_room.h>
 
 LocalServer::LocalServer(QObject *parent) : Server(parent)
 {

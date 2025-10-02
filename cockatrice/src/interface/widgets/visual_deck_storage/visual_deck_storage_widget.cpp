@@ -1,7 +1,5 @@
 #include "visual_deck_storage_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
@@ -14,6 +12,8 @@
 #include <QMouseEvent>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {

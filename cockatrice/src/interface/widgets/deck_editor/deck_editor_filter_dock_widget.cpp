@@ -1,13 +1,13 @@
 #include "deck_editor_filter_dock_widget.h"
 
-#include "../../../database/model/card_database_model.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
-#include "../../../settings/cache_settings.h"
 
 #include <QGridLayout>
 #include <QMenu>
 #include <QToolButton>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

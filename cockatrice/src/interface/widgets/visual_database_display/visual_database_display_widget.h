@@ -7,13 +7,10 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../database/card_database.h"
-#include "../../../database/model/card_database_model.h"
 #include "../../../deck/custom_line_edit.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../utility/key_signals.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
@@ -31,6 +28,9 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/utility/key_signals.h>
 #include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");

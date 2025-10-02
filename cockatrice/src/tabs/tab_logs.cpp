@@ -4,9 +4,6 @@
 #include "../dialogs/dlg_manage_sets.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
-#include "pb/moderator_commands.pb.h"
-#include "pb/response_viewlog_history.pb.h"
-#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -20,6 +17,9 @@
 #include <QTabWidget>
 #include <QtGui>
 #include <QtWidgets>
+#include <libcockatrice/protocol/pb/moderator_commands.pb.h>
+#include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
 {

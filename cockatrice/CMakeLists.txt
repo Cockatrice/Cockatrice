@@ -7,12 +7,6 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/card/card_info.cpp
-    src/card/card_relation.cpp
-    src/card/card_set.cpp
-    src/card/card_set_list.cpp
-    src/card/exact_card.cpp
-    src/card/printing_info.cpp
     src/client/deck_editor_menu.cpp
     src/client/get_text_with_max.cpp
     src/client/network/client_update_checker.cpp
@@ -25,19 +19,6 @@ set(cockatrice_SOURCES
     src/client/sound_engine.cpp
     src/client/tapped_out_interface.cpp
     src/client/update_downloader.cpp
-    src/database/card_database.cpp
-    src/database/card_database_loader.cpp
-    src/database/card_database_manager.cpp
-    src/database/card_database_querier.cpp
-    src/database/model/card_database_model.cpp
-    src/database/model/card_database_display_model.cpp
-    src/database/model/card/card_completer_proxy_model.cpp
-    src/database/model/card/card_search_model.cpp
-    src/database/model/token/token_display_model.cpp
-    src/database/model/token/token_edit_model.cpp
-    src/database/parser/card_database_parser.cpp
-    src/database/parser/cockatrice_xml_3.cpp
-    src/database/parser/cockatrice_xml_4.cpp
     src/deck/custom_line_edit.cpp
     src/deck/deck_list_model.cpp
     src/deck/deck_loader.cpp
@@ -138,6 +119,13 @@ set(cockatrice_SOURCES
     src/game/zones/table_zone.cpp
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader.cpp
+    src/interface/card_picture_loader/card_picture_loader_local.cpp
+    src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader_status_bar.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
+    src/interface/card_picture_loader/card_picture_to_load.cpp
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
     src/interface/line_edit_completer.cpp
@@ -217,13 +205,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    src/picture_loader/picture_loader.cpp
-    src/picture_loader/picture_loader_local.cpp
-    src/picture_loader/picture_loader_request_status_display_widget.cpp
-    src/picture_loader/picture_loader_status_bar.cpp
-    src/picture_loader/picture_loader_worker.cpp
-    src/picture_loader/picture_loader_worker_work.cpp
-    src/picture_loader/picture_to_load.cpp
     src/server/abstract_client.cpp
     src/server/chat_view/chat_view.cpp
     src/server/game_selector.cpp
@@ -241,20 +222,6 @@ set(cockatrice_SOURCES
     src/server/user/user_info_connection.cpp
     src/server/user/user_list_manager.cpp
     src/server/user/user_list_widget.cpp
-    src/settings/cache_settings.cpp
-    src/settings/card_counter_settings.cpp
-    src/settings/card_database_settings.cpp
-    src/settings/card_override_settings.cpp
-    src/settings/debug_settings.cpp
-    src/settings/download_settings.cpp
-    src/settings/game_filters_settings.cpp
-    src/settings/layouts_settings.cpp
-    src/settings/message_settings.cpp
-    src/settings/recents_settings.cpp
-    src/settings/servers_settings.cpp
-    src/settings/settings_manager.cpp
-    src/settings/shortcut_treeview.cpp
-    src/settings/shortcuts_settings.cpp
     src/tabs/abstract_tab_deck_editor.cpp
     src/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
@@ -299,12 +266,8 @@ set(cockatrice_SOURCES
     src/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
-    src/utility/card_info_comparator.cpp
-    src/utility/deck_list_sort_filter_proxy_model.cpp
-    src/utility/key_signals.cpp
-    src/utility/levenshtein.cpp
-    src/utility/logger.cpp
-    src/utility/sequence_edit.cpp
+    src/interface/utility/deck_list_sort_filter_proxy_model.cpp
+    src/interface/utility/sequence_edit.cpp
 )
 
 add_subdirectory(sounds)
@@ -399,9 +362,20 @@ elseif(Qt5_FOUND)
 endif()
 
 if(Qt5_FOUND)
-  target_link_libraries(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice
+    libcockatrice_card
+    libcockatrice_deck_list
+    libcockatrice_utility
+    libcockatrice_server
+    libcockatrice_rng
+    ${COCKATRICE_QT_MODULES}
+  )
 else()
-  target_link_libraries(cockatrice PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_server
+                      libcockatrice_rng ${COCKATRICE_QT_MODULES}
+  )
 endif()
 
 if(UNIX)

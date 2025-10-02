@@ -1,8 +1,9 @@
 #include "local_client.h"
 
-#include "debug_pb_message.h"
 #include "local_server_interface.h"
-#include "pb/session_commands.pb.h"
+
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/server/debug_pb_message.h>
 
 LocalClient::LocalClient(LocalServerInterface *_lsi,
                          const QString &_playerName,

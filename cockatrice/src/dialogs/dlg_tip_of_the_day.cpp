@@ -1,6 +1,5 @@
 #include "dlg_tip_of_the_day.h"
 
-#include "../settings/cache_settings.h"
 #include "tip_of_the_day.h"
 
 #include <QCheckBox>
@@ -10,6 +9,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <libcockatrice/settings/cache_settings.h>
 
 #define MIN_TIP_IMAGE_HEIGHT 200
 #define MIN_TIP_IMAGE_WIDTH 200

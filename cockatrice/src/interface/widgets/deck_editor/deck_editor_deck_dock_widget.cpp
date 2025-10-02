@@ -1,15 +1,14 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
-
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
 #include <QSplitter>
 #include <QTextEdit>
-#include <trice_limits.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

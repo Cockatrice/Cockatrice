@@ -1,14 +1,8 @@
 #include "visual_deck_editor_widget.h"
 
-#include "../../../database/card_database.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../database/model/card/card_completer_proxy_model.h"
-#include "../../../database/model/card/card_search_model.h"
-#include "../../../database/model/card_database_model.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_loader.h"
 #include "../../../main.h"
-#include "../../../utility/card_info_comparator.h"
 #include "../../layouts/overlap_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
@@ -21,6 +15,12 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/card_database/model/card/card_search_model.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/card_info_comparator.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)

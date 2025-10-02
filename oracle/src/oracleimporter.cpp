@@ -1,14 +1,14 @@
 #include "oracleimporter.h"
 
-#include "database/parser/cockatrice_xml_4.h"
 #include "parsehelpers.h"
 #include "qt-json/json.h"
 
 #include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
-#include <card/card_relation.h>
 #include <climits>
+#include <libcockatrice/card/card_database/parser/cockatrice_xml_4.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
 
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,

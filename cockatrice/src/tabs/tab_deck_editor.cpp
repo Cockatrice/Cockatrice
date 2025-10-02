@@ -2,8 +2,6 @@
 
 #include "../client/deck_editor_menu.h"
 #include "../client/tapped_out_interface.h"
-#include "../database/card_database_manager.h"
-#include "../database/model/card_database_model.h"
 #include "../dialogs/dlg_load_deck.h"
 #include "../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../filters/filter_builder.h"
@@ -13,9 +11,7 @@
 #include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
-#include "../settings/cache_settings.h"
 #include "tab_supervisor.h"
-#include "trice_limits.h"
 
 #include <QAction>
 #include <QApplication>
@@ -38,6 +34,10 @@
 #include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : AbstractTabDeckEditor(_tabSupervisor)
 {

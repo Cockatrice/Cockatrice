@@ -9,8 +9,8 @@
 #include "event_processing_options.h"
 
 #include <QObject>
-#include <pb/game_event.pb.h>
-#include <pb/game_event_context.pb.h>
+#include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <libcockatrice/protocol/pb/game_event_context.pb.h>
 
 class CardItem;
 class CardZoneLogic;

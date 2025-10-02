@@ -1,6 +1,5 @@
 #include "color_identity_widget.h"
 
-#include "../../../../settings/cache_settings.h"
 #include "mana_symbol_widget.h"
 
 #include <QHBoxLayout>
@@ -9,6 +8,7 @@
 #include <QRegularExpression>
 #include <QResizeEvent>
 #include <QSize>
+#include <libcockatrice/settings/cache_settings.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
 {

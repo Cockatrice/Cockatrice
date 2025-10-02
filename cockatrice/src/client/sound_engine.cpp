@@ -1,9 +1,8 @@
 #include "sound_engine.h"
 
-#include "../settings/cache_settings.h"
-
 #include <QDir>
 #include <QMediaPlayer>
+#include <libcockatrice/settings/cache_settings.h>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #include <QAudioOutput>

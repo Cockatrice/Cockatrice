@@ -1,13 +1,13 @@
 #include "printing_selector_card_overlay_widget.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
 
 #include <QMenu>
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**

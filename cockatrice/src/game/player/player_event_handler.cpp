@@ -5,29 +5,30 @@
 #include "../board/card_item.h"
 #include "../board/card_list.h"
 #include "../zones/view_zone.h"
-#include "pb/command_set_card_attr.pb.h"
-#include "pb/context_move_card.pb.h"
-#include "pb/context_undo_draw.pb.h"
-#include "pb/event_attach_card.pb.h"
-#include "pb/event_change_zone_properties.pb.h"
-#include "pb/event_create_arrow.pb.h"
-#include "pb/event_create_counter.pb.h"
-#include "pb/event_create_token.pb.h"
-#include "pb/event_del_counter.pb.h"
-#include "pb/event_delete_arrow.pb.h"
-#include "pb/event_destroy_card.pb.h"
-#include "pb/event_draw_cards.pb.h"
-#include "pb/event_dump_zone.pb.h"
-#include "pb/event_flip_card.pb.h"
-#include "pb/event_game_say.pb.h"
-#include "pb/event_move_card.pb.h"
-#include "pb/event_reveal_cards.pb.h"
-#include "pb/event_roll_die.pb.h"
-#include "pb/event_set_card_attr.pb.h"
-#include "pb/event_set_card_counter.pb.h"
-#include "pb/event_set_counter.pb.h"
-#include "pb/event_shuffle.pb.h"
 #include "player.h"
+
+#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/protocol/pb/context_undo_draw.pb.h>
+#include <libcockatrice/protocol/pb/event_attach_card.pb.h>
+#include <libcockatrice/protocol/pb/event_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
+#include <libcockatrice/protocol/pb/event_create_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_create_token.pb.h>
+#include <libcockatrice/protocol/pb/event_del_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_delete_arrow.pb.h>
+#include <libcockatrice/protocol/pb/event_destroy_card.pb.h>
+#include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
+#include <libcockatrice/protocol/pb/event_dump_zone.pb.h>
+#include <libcockatrice/protocol/pb/event_flip_card.pb.h>
+#include <libcockatrice/protocol/pb/event_game_say.pb.h>
+#include <libcockatrice/protocol/pb/event_move_card.pb.h>
+#include <libcockatrice/protocol/pb/event_reveal_cards.pb.h>
+#include <libcockatrice/protocol/pb/event_roll_die.pb.h>
+#include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
+#include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 
 PlayerEventHandler::PlayerEventHandler(Player *_player) : player(_player)
 {

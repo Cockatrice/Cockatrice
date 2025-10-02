@@ -7,9 +7,8 @@
 #ifndef TAB_H
 #define TAB_H
 
-#include "card_ref.h"
-
 #include <QMainWindow>
+#include <libcockatrice/utility/card_ref.h>
 
 class QMenu;
 class TabSupervisor;

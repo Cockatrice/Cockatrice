@@ -8,7 +8,6 @@
 #define GAMESMODEL_H
 
 #include "game_type_map.h"
-#include "pb/serverinfo_game.pb.h"
 
 #include <QAbstractTableModel>
 #include <QList>
@@ -16,6 +15,7 @@
 #include <QSortFilterProxyModel>
 #include <QStringList>
 #include <QTime>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 class UserListProxy;
 

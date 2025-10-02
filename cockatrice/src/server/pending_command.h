@@ -7,10 +7,9 @@
 #ifndef PENDING_COMMAND_H
 #define PENDING_COMMAND_H
 
-#include "pb/commands.pb.h"
-#include "pb/response.pb.h"
-
 #include <QVariant>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
 
 class PendingCommand : public QObject
 {

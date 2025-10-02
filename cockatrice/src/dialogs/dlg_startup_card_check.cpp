@@ -1,8 +1,7 @@
 #include "dlg_startup_card_check.h"
 
-#include "../settings/cache_settings.h"
-
 #include <QDate>
+#include <libcockatrice/settings/cache_settings.h>
 
 DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 {

@@ -1,14 +1,14 @@
 #include "visual_database_display_set_filter_widget.h"
 
-#include "../../../database/card_database_manager.h"
 #include "../../../filters/filter_tree.h"
 #include "../../../filters/filter_tree_model.h"
-#include "../../../settings/cache_settings.h"
 
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
 #include <algorithm>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentSetFilterSettingsWidget(QWidget *parent)
     : QWidget(parent)

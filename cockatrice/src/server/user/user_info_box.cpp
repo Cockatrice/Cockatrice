@@ -7,10 +7,6 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../abstract_client.h"
 #include "../pending_command.h"
-#include "passwordhasher.h"
-#include "pb/response_get_user_info.pb.h"
-#include "pb/serverinfo_user.pb.h"
-#include "pb/session_commands.pb.h"
 
 #include <QDateTime>
 #include <QGridLayout>
@@ -18,6 +14,10 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)

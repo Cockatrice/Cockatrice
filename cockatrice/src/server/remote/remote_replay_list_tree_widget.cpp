@@ -2,13 +2,13 @@
 
 #include "../abstract_client.h"
 #include "../pending_command.h"
-#include "pb/command_replay_list.pb.h"
-#include "pb/response_replay_list.pb.h"
-#include "pb/serverinfo_replay.pb.h"
 
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
+#include <libcockatrice/protocol/pb/command_replay_list.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_list.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 
 const int RemoteReplayList_TreeModel::numberOfColumns = 6;
 

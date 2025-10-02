@@ -7,7 +7,7 @@
 #ifndef LOCALSERVERINTERFACE_H
 #define LOCALSERVERINTERFACE_H
 
-#include "server/server_protocolhandler.h"
+#include <libcockatrice/server/server_protocolhandler.h>
 
 class LocalServer;
 

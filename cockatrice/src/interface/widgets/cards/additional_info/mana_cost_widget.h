@@ -7,10 +7,9 @@
 #ifndef MANA_COST_WIDGET_H
 #define MANA_COST_WIDGET_H
 
-#include "../../../../card/card_info.h"
-
 #include <QHBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 class ManaCostWidget : public QWidget
 {

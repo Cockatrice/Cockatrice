@@ -7,11 +7,11 @@
 #ifndef COCKATRICE_USER_LIST_MANAGER_H
 #define COCKATRICE_USER_LIST_MANAGER_H
 
-#include "pb/serverinfo_user.pb.h"
 #include "user_list_proxy.h"
 
 #include <QMap>
 #include <QWidget>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class AbstractClient;
 class Event_AddToList;

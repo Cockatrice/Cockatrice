@@ -1,8 +1,5 @@
 #include "dlg_connect.h"
 
-#include "../settings/cache_settings.h"
-#include "trice_limits.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
@@ -15,6 +12,8 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {

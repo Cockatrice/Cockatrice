@@ -1,11 +1,11 @@
 #include "deck_card_zone_display_widget.h"
 
 #include "../../../deck/deck_list_model.h"
-#include "../../../utility/card_info_comparator.h"
 #include "card_group_display_widgets/flat_card_group_display_widget.h"
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
 
 #include <QResizeEvent>
+#include <libcockatrice/card/card_info_comparator.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,

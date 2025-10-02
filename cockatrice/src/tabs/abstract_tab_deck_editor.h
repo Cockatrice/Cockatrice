@@ -1,7 +1,6 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
-#include "../card/card_info.h"
 #include "../client/deck_editor_menu.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
@@ -24,6 +23,7 @@ class DeckEditorFilterDockWidget;
 class DeckEditorPrintingSelectorDockWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 class Response;
+class FilterTree;
 class FilterTreeModel;
 class FilterBuilder;
 

@@ -1,10 +1,7 @@
 #include "dlg_create_game.h"
 
 #include "../server/pending_command.h"
-#include "../settings/cache_settings.h"
 #include "../tabs/tab_room.h"
-#include "pb/serverinfo_game.pb.h"
-#include "trice_limits.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -19,6 +16,9 @@
 #include <QSet>
 #include <QSpinBox>
 #include <QWizard>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 void DlgCreateGame::sharedCtor()
 {
