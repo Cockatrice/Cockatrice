@@ -232,8 +232,8 @@ jobs:
         include:
           - target: 13
             soc: Intel
-            os: macos-13
-            xcode: "14.3.1"
+            os: macos-15-intel
+            xcode: "16.4"
             type: Release
             make_package: 1
 
@@ -272,6 +272,15 @@ jobs:
       DEVELOPER_DIR:
         /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
+      BUILDTYPE: '${{matrix.type}}'
+      MAKE_PACKAGE: '${{matrix.make_package}}'
+      PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
+      MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+      MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+      MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+      VCPKG_DISABLE_METRICS: 1
+      VCPKG_BUILD_TYPE: 'release'
 
     steps:
       - name: Checkout
@@ -293,7 +302,7 @@ jobs:
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
-          cache: false # qt caches take too much space for macOS (1.1Gi)
+          cache: true # qt caches take too much space for macOS (1.1Gi)
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
@@ -308,17 +317,9 @@ jobs:
         shell: bash
         id: build
         env:
-          BUILDTYPE: '${{matrix.type}}'
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '-macOS${{matrix.target}}_${{matrix.soc}}'
-          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
-          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+          VCPKG_OSX_DEPLOYMENT_TARGET: ${{ matrix.soc == 'Intel' && '13.0' || '' }}
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --x86-macos ${{ matrix.soc == 'Intel' }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
@@ -455,6 +456,7 @@ jobs:
           CMAKE_GENERATOR_PLATFORM: 'x64'
           QTDIR: '${{github.workspace}}\Qt\${{matrix.qt_version}}\win64_${{matrix.qt_arch}}'
           VCPKG_DISABLE_METRICS: 1
+          VCPKG_BUILD_TYPE: 'release'
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
         # No need for --parallel flag, MTT is added in the compile script to let cmake/msbuild manage core count,
         # project and process parallelism: https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
