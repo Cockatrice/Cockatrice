@@ -319,7 +319,7 @@ jobs:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_OSX_DEPLOYMENT_TARGET: ${{ matrix.soc == 'Intel' && '13.0' || '' }}
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --x86-macos ${{ matrix.soc == 'Intel' }}
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" ${{ matrix.soc == 'Intel' && '--x86-macos' || '' }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)

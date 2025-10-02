@@ -11,7 +11,7 @@
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
-# --x86-macos
+# --x86-macos sets the min os version to 13.0 - only used for Intel builds
 # uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
@@ -78,11 +78,7 @@ while [[ $# != 0 ]]; do
       ;;
     '--x86-macos')
       shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--x86-macos expects an argument"
-        exit 3
-      fi
-      x86_MACOS="$1"
+      X86_MACOS=1
       shift
       ;;
     *)
@@ -126,7 +122,7 @@ fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
-if [[ $x86_MACOS == true ]]; then
+if [[ $X86_MACOS ]]; then
   flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0")
   flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-13")
   flags+=("-DVCPKG_OVERLAY_TRIPLETS=../cmake/triplets")
