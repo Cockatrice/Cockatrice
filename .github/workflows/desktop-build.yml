@@ -247,14 +247,14 @@ jobs:
           - target: 15
             soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.4"
             type: Release
             make_package: 1
 
           - target: 15
             soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.4"
             type: Debug
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
