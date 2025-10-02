@@ -2,11 +2,11 @@
 
 #include "../../filters/syntax_help.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../../settings/cache_settings.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"
 #include "../player/player.h"
 #include "pb/command_shuffle.pb.h"
+#include "settings/cache_settings.h"
 #include "view_zone.h"
 
 #include <QCheckBox>

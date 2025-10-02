@@ -1,5 +1,5 @@
-#include "../../cockatrice/src/database/card_database_manager.h"
 #include "../../cockatrice/src/filters/filter_string.h"
+#include "card/card_database/card_database_manager.h"
 #include "mocks.h"
 
 #include "gtest/gtest.h"

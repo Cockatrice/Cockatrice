@@ -1,6 +1,6 @@
 #include "dlg_connect.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

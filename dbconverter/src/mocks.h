@@ -10,13 +10,13 @@
 
 #define PICTURELOADER_H
 
-#include "../../cockatrice/src/database/card_database.h"
-#include "../../cockatrice/src/settings/cache_settings.h"
-#include "../../cockatrice/src/utility/macros.h"
+#include "card/card_database/card_database.h"
+#include "settings/cache_settings.h"
+#include "utility/macros.h"
 
 extern SettingsCache *settingsCache;
 
-class PictureLoader
+class CardPictureLoader
 {
 public:
     static void clearPixmapCache(CardInfoPtr card);

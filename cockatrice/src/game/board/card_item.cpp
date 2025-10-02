@@ -1,8 +1,5 @@
 #include "card_item.h"
 
-#include "../../card/card_info.h"
-#include "../../settings/cache_settings.h"
-#include "../../settings/card_counter_settings.h"
 #include "../../tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../player/player.h"
@@ -11,8 +8,11 @@
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
 #include "arrow_item.h"
+#include "card/card_info.h"
 #include "card_drag_item.h"
 #include "pb/serverinfo_card.pb.h"
+#include "settings/cache_settings.h"
+#include "settings/card_counter_settings.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>

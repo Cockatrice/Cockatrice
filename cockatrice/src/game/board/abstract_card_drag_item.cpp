@@ -1,6 +1,6 @@
 #include "abstract_card_drag_item.h"
 
-#include "../../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QCursor>
 #include <QDebug>

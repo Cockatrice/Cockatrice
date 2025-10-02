@@ -7,11 +7,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../card/card_info.h"
 #include "../../filters/filter_string.h"
 #include "../../interface/tearoff_menu.h"
 #include "../board/abstract_graphics_item.h"
 #include "../dialogs/dlg_create_token.h"
+#include "card/card_info.h"
 #include "menu/player_menu.h"
 #include "pb/card_attributes.pb.h"
 #include "pb/game_event.pb.h"

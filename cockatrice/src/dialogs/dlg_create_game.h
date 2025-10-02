@@ -7,7 +7,7 @@
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H
 
-#include "../utility/macros.h"
+#include "utility/macros.h"
 
 #include <QDialog>
 #include <QMap>

@@ -1,6 +1,6 @@
 #include "deck_preview_card_picture_widget.h"
 
-#include "../../../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QFileInfo>

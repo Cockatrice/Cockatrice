@@ -1,7 +1,7 @@
 #include "dlg_register.h"
 
-#include "../settings/cache_settings.h"
 #include "pb/serverinfo_user.pb.h"
+#include "settings/cache_settings.h"
 #include "trice_limits.h"
 
 #include <QCheckBox>

@@ -7,7 +7,7 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
-#include "../utility/macros.h"
+#include "utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>

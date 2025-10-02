@@ -1,11 +1,11 @@
 #include "hand_zone.h"
 
 #include "../../interface/theme_manager.h"
-#include "../../settings/cache_settings.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
 #include "pb/command_move_card.pb.h"
+#include "settings/cache_settings.h"
 
 #include <QPainter>
 

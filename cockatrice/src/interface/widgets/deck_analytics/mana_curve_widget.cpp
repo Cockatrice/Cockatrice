@@ -1,11 +1,11 @@
 #include "mana_curve_widget.h"
 
-#include "../../../database/card_database.h"
-#include "../../../database/card_database_manager.h"
 #include "../../../deck/deck_loader.h"
 #include "../../../main.h"
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
 
 #include <deck_list.h>
 #include <unordered_map>

@@ -9,7 +9,7 @@
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
 #include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../utility/key_signals.h"
+#include "utility/key_signals.h"
 
 #include <QDockWidget>
 #include <QTreeView>

@@ -4,7 +4,6 @@
 #include "../deck/deck_loader.h"
 #include "../server/pending_command.h"
 #include "../server/remote/remote_decklist_tree_widget.h"
-#include "../settings/cache_settings.h"
 #include "deck_list.h"
 #include "pb/command_deck_del.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
@@ -14,6 +13,7 @@
 #include "pb/response.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "pb/response_deck_upload.pb.h"
+#include "settings/cache_settings.h"
 
 #include <QAction>
 #include <QApplication>

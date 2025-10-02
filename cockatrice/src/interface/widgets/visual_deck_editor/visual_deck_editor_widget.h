@@ -7,16 +7,16 @@
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 
-#include "../../../database/card_database.h"
-#include "../../../database/model/card/card_completer_proxy_model.h"
-#include "../../../database/model/card_database_display_model.h"
-#include "../../../database/model/card_database_model.h"
 #include "../../../deck/deck_list_model.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/model/card/card_completer_proxy_model.h"
+#include "card/card_database/model/card_database_display_model.h"
+#include "card/card_database/model/card_database_model.h"
 
 #include <QCheckBox>
 #include <QListWidget>

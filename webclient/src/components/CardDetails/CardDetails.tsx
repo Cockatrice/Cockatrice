@@ -1,9 +1,9 @@
 // eslint-disable-next-line
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 
-import { CardDTO } from 'services';
+import {CardDTO} from 'services';
 
-import Card from '../Card/Card';
+import Card from 'card/Card';
 
 import './CardDetails.css';
 

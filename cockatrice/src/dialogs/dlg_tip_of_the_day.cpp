@@ -1,6 +1,6 @@
 #include "dlg_tip_of_the_day.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 #include "tip_of_the_day.h"
 
 #include <QCheckBox>

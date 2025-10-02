@@ -1,10 +1,10 @@
 #include "spoiler_background_updater.h"
 
-#include "../../database/card_database.h"
-#include "../../database/card_database_manager.h"
 #include "../../interface/window_main.h"
 #include "../../main.h"
-#include "../../settings/cache_settings.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
+#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QCryptographicHash>

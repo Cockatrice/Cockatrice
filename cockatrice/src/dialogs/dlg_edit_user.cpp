@@ -1,6 +1,6 @@
 #include "dlg_edit_user.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 #include "trice_limits.h"
 
 #include <QDebug>

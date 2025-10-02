@@ -1,16 +1,16 @@
 #define _USE_MATH_DEFINES
 #include "arrow_item.h"
 
-#include "../../card/card_info.h"
-#include "../../settings/cache_settings.h"
 #include "../player/player.h"
 #include "../player/player_target.h"
 #include "../zones/card_zone.h"
+#include "card/card_info.h"
 #include "card_item.h"
 #include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"
 #include "pb/command_delete_arrow.pb.h"
+#include "settings/cache_settings.h"
 
 #include <QDebug>
 #include <QGraphicsScene>

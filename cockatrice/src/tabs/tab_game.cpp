@@ -1,8 +1,6 @@
 #include "tab_game.h"
 
 #include "../client/network/replay_timeline_widget.h"
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
 #include "../game/board/card_item.h"
@@ -17,18 +15,20 @@
 #include "../game/player/player_list_widget.h"
 #include "../game/replay.h"
 #include "../game/zones/card_zone.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/line_edit_completer.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/window_main.h"
 #include "../main.h"
-#include "../picture_loader/picture_loader.h"
 #include "../server/abstract_client.h"
 #include "../server/user/user_list_manager.h"
-#include "../settings/cache_settings.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/serverinfo_player.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "settings/cache_settings.h"
 #include "tab_supervisor.h"
 #include "trice_limits.h"
 
@@ -740,7 +740,7 @@ void TabGame::loadDeckForLocalPlayer(Player *localPlayer, int playerId, ServerIn
     TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
     if (playerInfo.has_deck_list()) {
         DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-        PictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
+        CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
         deckViewContainer->playerDeckView->setDeck(newDeck);
         localPlayer->setDeck(newDeck);
     }

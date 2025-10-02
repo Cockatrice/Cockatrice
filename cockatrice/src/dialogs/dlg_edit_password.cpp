@@ -1,6 +1,6 @@
 #include "dlg_edit_password.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 #include "trice_limits.h"
 
 #include <QDialogButtonBox>

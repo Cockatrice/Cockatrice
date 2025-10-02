@@ -7,8 +7,8 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include "../../utility/macros.h"
 #include "logic/card_zone_logic.h"
+#include "utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>

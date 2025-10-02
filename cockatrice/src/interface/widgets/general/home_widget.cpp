@@ -1,12 +1,12 @@
 #include "home_widget.h"
 
-#include "../../../database/card_database_manager.h"
 #include "../../../server/remote/remote_client.h"
-#include "../../../settings/cache_settings.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../window_main.h"
 #include "background_sources.h"
+#include "card/card_database/card_database_manager.h"
 #include "home_styled_button.h"
+#include "settings/cache_settings.h"
 
 #include <QPainter>
 #include <QPainterPath>

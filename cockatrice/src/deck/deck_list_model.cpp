@@ -1,9 +1,9 @@
 #include "deck_list_model.h"
 
-#include "../database/card_database_manager.h"
 #include "../main.h"
-#include "../settings/cache_settings.h"
+#include "card/card_database/card_database_manager.h"
 #include "deck_loader.h"
+#include "settings/cache_settings.h"
 
 #include <QBrush>
 #include <QFont>

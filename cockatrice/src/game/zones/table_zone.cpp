@@ -1,15 +1,15 @@
 #include "table_zone.h"
 
-#include "../../card/card_info.h"
 #include "../../interface/theme_manager.h"
-#include "../../settings/cache_settings.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "card/card_info.h"
 #include "logic/table_zone_logic.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/command_set_card_attr.pb.h"
+#include "settings/cache_settings.h"
 
 #include <QGraphicsScene>
 #include <QPainter>

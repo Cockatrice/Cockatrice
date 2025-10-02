@@ -1,23 +1,23 @@
 #include "deck_view_container.h"
 
-#include "../../database/card_database.h"
-#include "../../database/card_database_manager.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../dialogs/dlg_load_deck_from_website.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
-#include "../../picture_loader/picture_loader.h"
+#include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../server/pending_command.h"
-#include "../../settings/cache_settings.h"
 #include "../../tabs/tab_game.h"
 #include "../game_scene.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
 #include "deck_view.h"
 #include "pb/command_deck_select.pb.h"
 #include "pb/command_ready_start.pb.h"
 #include "pb/command_set_sideboard_lock.pb.h"
 #include "pb/command_set_sideboard_plan.pb.h"
 #include "pb/response_deck_download.pb.h"
+#include "settings/cache_settings.h"
 #include "trice_limits.h"
 
 #include <QMessageBox>
@@ -332,7 +332,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }

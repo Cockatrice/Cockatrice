@@ -1,7 +1,7 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
+#include "card/card_database/card_database_manager.h"
+#include "settings/cache_settings.h"
 
 #include <QComboBox>
 #include <QDockWidget>

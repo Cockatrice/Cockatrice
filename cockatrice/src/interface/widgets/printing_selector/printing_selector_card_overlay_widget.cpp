@@ -1,9 +1,9 @@
 #include "printing_selector_card_overlay_widget.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
+#include "card/card_database/card_database_manager.h"
+#include "card/card_relation/card_relation.h"
 #include "printing_selector_card_display_widget.h"
+#include "settings/cache_settings.h"
 
 #include <QMenu>
 #include <QMouseEvent>

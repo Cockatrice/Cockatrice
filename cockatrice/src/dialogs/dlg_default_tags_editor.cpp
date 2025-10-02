@@ -1,6 +1,6 @@
 #include "dlg_default_tags_editor.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QMessageBox>
 #include <QVBoxLayout>

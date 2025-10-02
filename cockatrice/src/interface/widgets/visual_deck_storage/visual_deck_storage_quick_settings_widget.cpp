@@ -1,6 +1,6 @@
 #include "visual_deck_storage_quick_settings_widget.h"
 
-#include "../../../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 #include "visual_deck_storage_widget.h"
 
 #include <QCheckBox>

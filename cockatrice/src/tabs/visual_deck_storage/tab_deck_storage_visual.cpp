@@ -1,9 +1,9 @@
 #include "tab_deck_storage_visual.h"
 
-#include "../../database/model/card_database_model.h"
 #include "../../interface/widgets/cards/deck_preview_card_picture_widget.h"
 #include "../../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "../tab_supervisor.h"
+#include "card/card_database/model/card_database_model.h"
 #include "pb/command_deck_del.pb.h"
 
 #include <QMessageBox>

@@ -1,6 +1,6 @@
 #include "theme_manager.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QColor>

@@ -448,7 +448,7 @@ void SettingsCache::setRoundCardCorners(bool /* _roundCardCorners */)
 {
 }
 
-void PictureLoader::clearPixmapCache(CardInfoPtr /* card */)
+void CardPictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 {
 }
 

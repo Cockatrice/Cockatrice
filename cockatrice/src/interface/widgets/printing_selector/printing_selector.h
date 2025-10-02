@@ -7,11 +7,11 @@
 #ifndef PRINTING_SELECTOR_H
 #define PRINTING_SELECTOR_H
 
-#include "../../../card/card_info.h"
 #include "../../../deck/deck_list_model.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "card/card_info.h"
 
 #include <QCheckBox>
 #include <QLabel>

@@ -7,7 +7,7 @@
 #ifndef CARDINFOTEXT_H
 #define CARDINFOTEXT_H
 
-#include "../../../card/card_info.h"
+#include "card/card_info.h"
 
 #include <QFrame>
 class QLabel;

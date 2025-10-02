@@ -4,18 +4,18 @@
 #include "../client/network/release_channel.h"
 #include "../client/network/spoiler_background_updater.h"
 #include "../client/sound_engine.h"
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
 #include "../deck/custom_line_edit.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/theme_manager.h"
+#include "../interface/utility/sequence_edit.h"
 #include "../interface/widgets/general/background_sources.h"
 #include "../main.h"
-#include "../picture_loader/picture_loader.h"
-#include "../settings/cache_settings.h"
-#include "../settings/card_counter_settings.h"
-#include "../settings/shortcut_treeview.h"
 #include "../tabs/tab_supervisor.h"
-#include "../utility/sequence_edit.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
+#include "settings/cache_settings.h"
+#include "settings/card_counter_settings.h"
+#include "settings/shortcut_treeview.h"
 
 #include <QAbstractButton>
 #include <QAbstractListModel>
@@ -1086,7 +1086,7 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
-    PictureLoader::clearNetworkCache();
+    CardPictureLoader::clearNetworkCache();
 
     // These are not used anymore, but we don't delete them automatically, so
     // we should do it here lest we leave pictures hanging around on users'

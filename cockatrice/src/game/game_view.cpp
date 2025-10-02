@@ -1,7 +1,7 @@
 #include "game_view.h"
 
-#include "../settings/cache_settings.h"
 #include "game_scene.h"
+#include "settings/cache_settings.h"
 
 #include <QAction>
 #include <QResizeEvent>

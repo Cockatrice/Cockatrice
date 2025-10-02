@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "../../cockatrice/src/database/card_database.h"
-#include "../../cockatrice/src/database/parser/cockatrice_xml_4.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/parser/cockatrice_xml_4.h"
 
 class CardDatabaseConverter : public CardDatabase
 {

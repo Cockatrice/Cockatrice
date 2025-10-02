@@ -7,7 +7,7 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../card/exact_card.h"
+#include "card/card_printing/exact_card.h"
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QPropertyAnimation>

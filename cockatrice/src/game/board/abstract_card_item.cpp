@@ -1,10 +1,10 @@
 #include "abstract_card_item.h"
 
-#include "../../database/card_database.h"
-#include "../../database/card_database_manager.h"
-#include "../../picture_loader/picture_loader.h"
-#include "../../settings/cache_settings.h"
+#include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../game_scene.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
+#include "settings/cache_settings.h"
 
 #include <QCursor>
 #include <QGraphicsScene>
@@ -119,11 +119,11 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
 
     if (facedown || cardRef.name.isEmpty()) {
         // never reveal card color, always paint the card back
-        PictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
+        CardPictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if (translatedSize.width() > 10) {
-            PictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
+            CardPictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
             if (translatedPixmap.isNull())
                 paintImage = false;
         } else {

@@ -1,10 +1,10 @@
 #include "card_zone_logic.h"
 
-#include "../../../database/card_database_manager.h"
 #include "../../board/card_item.h"
 #include "../../player/player.h"
 #include "../pile_zone.h"
 #include "../view_zone.h"
+#include "card/card_database/card_database_manager.h"
 #include "pb/command_move_card.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "view_zone_logic.h"

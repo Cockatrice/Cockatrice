@@ -1,9 +1,9 @@
 #include "edhrec_api_response_commander_details_display_widget.h"
 
-#include "../../../../../database/card_database_manager.h"
 #include "../../../../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../tab_edhrec_main.h"
 #include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
+#include "card/card_database/card_database_manager.h"
 
 EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCommanderDetailsDisplayWidget(
     QWidget *parent,

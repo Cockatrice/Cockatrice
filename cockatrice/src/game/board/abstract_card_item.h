@@ -7,8 +7,8 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "../../card/exact_card.h"
 #include "arrow_target.h"
+#include "card/card_printing/exact_card.h"
 #include "card_ref.h"
 #include "graphics_item_type.h"
 

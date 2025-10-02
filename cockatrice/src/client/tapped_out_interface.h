@@ -7,7 +7,7 @@
 #ifndef TAPPEDOUT_INTERFACE_H
 #define TAPPEDOUT_INTERFACE_H
 
-#include "../database/card_database.h"
+#include "card/card_database/card_database.h"
 #include "deck_list.h"
 
 #include <QLoggingCategory>

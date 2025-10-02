@@ -1,7 +1,7 @@
 #include "view_zone_logic.h"
 
-#include "../../../settings/cache_settings.h"
 #include "../../board/card_item.h"
+#include "settings/cache_settings.h"
 
 /**
  * @param _player the player that the cards are revealed to.

@@ -7,7 +7,7 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "../../../card/exact_card.h"
+#include "card/card_printing/exact_card.h"
 #include "card_ref.h"
 
 #include <QComboBox>

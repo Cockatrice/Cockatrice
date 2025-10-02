@@ -1,6 +1,6 @@
 #include "dlg_startup_card_check.h"
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QDate>
 

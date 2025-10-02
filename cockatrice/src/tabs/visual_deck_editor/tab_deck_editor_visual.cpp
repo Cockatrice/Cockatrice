@@ -1,6 +1,5 @@
 #include "tab_deck_editor_visual.h"
 
-#include "../../database/model/card_database_model.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
@@ -9,10 +8,11 @@
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../../server/pending_command.h"
-#include "../../settings/cache_settings.h"
 #include "../tab_deck_editor.h"
 #include "../tab_supervisor.h"
+#include "card/card_database/model/card_database_model.h"
 #include "pb/command_deck_upload.pb.h"
+#include "settings/cache_settings.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 #include "trice_limits.h"
 

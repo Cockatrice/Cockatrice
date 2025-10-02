@@ -1,10 +1,10 @@
 #include "deck_view.h"
 
-#include "../../card/card_info.h"
 #include "../../interface/theme_manager.h"
-#include "../../settings/cache_settings.h"
+#include "card/card_info.h"
 #include "deck_list.h"
 #include "deck_list_card_node.h"
+#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>

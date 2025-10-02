@@ -1,6 +1,6 @@
 #include "card_list.h"
 
-#include "../../card/card_info.h"
+#include "card/card_info.h"
 #include "card_item.h"
 
 #include <QDebug>

@@ -1,12 +1,12 @@
 #include "printing_selector.h"
 
 #include "../../../dialogs/dlg_select_set_for_cards.h"
-#include "../../../picture_loader/picture_loader.h"
-#include "../../../settings/cache_settings.h"
+#include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
+#include "settings/cache_settings.h"
 
 #include <QFrame>
 #include <QScrollBar>

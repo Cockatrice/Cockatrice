@@ -1,7 +1,7 @@
 #include "dlg_view_log.h"
 
-#include "../settings/cache_settings.h"
-#include "../utility/logger.h"
+#include "settings/cache_settings.h"
+#include "utility/logger.h"
 
 #include <QClipboard>
 #include <QPlainTextEdit>

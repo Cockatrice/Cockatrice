@@ -8,11 +8,11 @@
 #ifndef CARD_AMOUNT_WIDGET_H
 #define CARD_AMOUNT_WIDGET_H
 
-#include "../../../card/card_info.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_loader.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
+#include "card/card_info.h"
 
 #include <QHBoxLayout>
 #include <QLabel>

@@ -1,8 +1,8 @@
 #include "deck_loader.h"
 
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
 #include "../main.h"
+#include "card/card_database/card_database.h"
+#include "card/card_database/card_database_manager.h"
 #include "deck_list.h"
 #include "deck_list_card_node.h"
 

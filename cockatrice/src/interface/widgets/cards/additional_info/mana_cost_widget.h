@@ -7,7 +7,7 @@
 #ifndef MANA_COST_WIDGET_H
 #define MANA_COST_WIDGET_H
 
-#include "../../../../card/card_info.h"
+#include "card/card_info.h"
 
 #include <QHBoxLayout>
 #include <QWidget>

@@ -1,10 +1,10 @@
 #include "deck_preview_widget.h"
 
-#include "../../../../database/card_database_manager.h"
-#include "../../../../settings/cache_settings.h"
 #include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
+#include "card/card_database/card_database_manager.h"
 #include "deck_preview_deck_tags_display_widget.h"
+#include "settings/cache_settings.h"
 
 #include <QClipboard>
 #include <QFileInfo>

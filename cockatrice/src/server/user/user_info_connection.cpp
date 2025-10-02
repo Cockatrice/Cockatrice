@@ -1,6 +1,6 @@
 #include "user_info_connection.h"
 
-#include "../../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QDebug>
 #include <utility>

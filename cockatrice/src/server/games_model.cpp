@@ -1,9 +1,9 @@
 #include "games_model.h"
 
 #include "../interface/pixel_map_generator.h"
-#include "../settings/cache_settings.h"
 #include "../tabs/tab_account.h"
 #include "pb/serverinfo_game.pb.h"
+#include "settings/cache_settings.h"
 #include "user/user_list_manager.h"
 #include "user/user_list_widget.h"
 

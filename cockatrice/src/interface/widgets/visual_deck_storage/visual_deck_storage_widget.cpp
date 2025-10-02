@@ -1,9 +1,9 @@
 #include "visual_deck_storage_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "card/card_database/card_database_manager.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "settings/cache_settings.h"
 #include "visual_deck_storage_folder_display_widget.h"
 #include "visual_deck_storage_search_widget.h"
 #include "visual_deck_storage_sort_widget.h"

@@ -3,7 +3,6 @@
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/remote/remote_replay_list_tree_widget.h"
-#include "../settings/cache_settings.h"
 #include "pb/command_replay_delete_match.pb.h"
 #include "pb/command_replay_download.pb.h"
 #include "pb/command_replay_get_code.pb.h"
@@ -14,6 +13,7 @@
 #include "pb/response.pb.h"
 #include "pb/response_replay_download.pb.h"
 #include "pb/response_replay_get_code.pb.h"
+#include "settings/cache_settings.h"
 #include "tab_game.h"
 
 #include <QAction>

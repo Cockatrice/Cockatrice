@@ -1,8 +1,8 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../deck/deck_loader.h"
-#include "../settings/cache_settings.h"
 #include "dlg_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>

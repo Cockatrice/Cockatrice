@@ -1,7 +1,7 @@
 #include "custom_line_edit.h"
 
-#include "../settings/cache_settings.h"
-#include "../settings/shortcuts_settings.h"
+#include "settings/cache_settings.h"
+#include "settings/shortcuts_settings.h"
 
 #include <QKeyEvent>
 #include <QLineEdit>

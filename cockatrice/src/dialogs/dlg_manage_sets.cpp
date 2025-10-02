@@ -1,11 +1,11 @@
 #include "dlg_manage_sets.h"
 
 #include "../client/network/sets_model.h"
-#include "../database/card_database_manager.h"
 #include "../deck/custom_line_edit.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../main.h"
-#include "../picture_loader/picture_loader.h"
-#include "../settings/cache_settings.h"
+#include "card/card_database/card_database_manager.h"
+#include "settings/cache_settings.h"
 
 #include <QAction>
 #include <QCheckBox>
@@ -251,7 +251,7 @@ void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
     SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
-    PictureLoader::clearPixmapCache();
+    CardPictureLoader::clearPixmapCache();
     close();
 }
 

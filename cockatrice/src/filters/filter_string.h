@@ -7,7 +7,7 @@
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 
-#include "../card/card_info.h"
+#include "card/card_info.h"
 #include "filter_tree.h"
 
 #include <QLoggingCategory>

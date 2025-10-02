@@ -1,10 +1,10 @@
 #include "view_zone.h"
 
-#include "../../card/card_info.h"
 #include "../../server/pending_command.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "card/card_info.h"
 #include "logic/view_zone_logic.h"
 #include "pb/command_dump_zone.pb.h"
 #include "pb/command_move_card.pb.h"
@@ -112,7 +112,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
     qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
     reorganizeCards();
-    emit getLogic()->cardCountChanged();
+    emit getLogic() -> cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.

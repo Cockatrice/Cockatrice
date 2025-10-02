@@ -1,8 +1,8 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "../card/exact_card.h"
 #include "abstract_deck_list_card_node.h"
+#include "card/card_printing/exact_card.h"
 #include "deck_list.h"
 #include "deck_list_card_node.h"
 

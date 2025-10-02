@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../settings/cache_settings.h"
+#include "settings/cache_settings.h"
 
 #include <QMenu>
 
