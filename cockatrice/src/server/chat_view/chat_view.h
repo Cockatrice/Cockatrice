@@ -1,8 +1,7 @@
 /**
  * @file chat_view.h
- * @ingroup Network
+ * @ingroup NetworkingWidgets
  * @ingroup Lobby
- * @ingroup Widgets
  * @brief TODO: Document this.
  */
 

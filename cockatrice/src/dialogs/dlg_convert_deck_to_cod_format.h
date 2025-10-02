@@ -1,8 +1,7 @@
 /**
  * @file dlg_convert_deck_to_cod_format.h
- * @ingroup Dialogs
- * @ingroup DeckStorageWidgets
- * @ingroup ImportExport
+ * @ingroup LocalDeckStorageDialogs
+ * @ingroup Lobby
  * @brief TODO: Document this.
  */
 

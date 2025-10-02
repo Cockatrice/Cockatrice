@@ -1,7 +1,6 @@
 /**
  * @file recents_settings.h
- * @ingroup DeckStorage
- * @ingroup Settings
+ * @ingroup DeckSettings
  * @brief TODO: Document this.
  */
 

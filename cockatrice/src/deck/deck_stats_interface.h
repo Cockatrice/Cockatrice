@@ -1,8 +1,6 @@
 /**
  * @file deck_stats_interface.h
- * @ingroup ImportExport
- * @ingroup Parsing
- * @ingroup Network
+ * @ingroup ApiInterfaces
  * @brief TODO: Document this.
  */
 

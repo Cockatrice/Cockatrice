@@ -1,6 +1,6 @@
 /**
  * @file tab_account.h
- * @ingroup NetworkingTabs
+ * @ingroup AccountTabs
  * @brief TODO: Document this.
  */
 

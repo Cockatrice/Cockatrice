@@ -1,7 +1,6 @@
 /**
  * @file dlg_filter_games.h
- * @ingroup Lobby
- * @ingroup NetworkDialogs
+ * @ingroup RoomDialogs
  * @brief TODO: Document this.
  */
 

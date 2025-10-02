@@ -1,6 +1,6 @@
 /**
  * @file remote_decklist_tree_widget.h
- * @ingroup Client
+ * @ingroup NetworkingWidgets
  * @ingroup DeckStorageWidgets
  * @brief TODO: Document this.
  */

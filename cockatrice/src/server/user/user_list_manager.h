@@ -1,6 +1,5 @@
 /**
  * @file user_list_manager.h
- * @ingroup Network
  * @ingroup Lobby
  * @brief TODO: Document this.
  */

@@ -1,6 +1,6 @@
 /**
  * @file card_override_settings.h
- * @ingroup Settings
+ * @ingroup CardSettings
  * @brief TODO: Document this.
  */
 

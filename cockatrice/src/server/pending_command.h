@@ -1,6 +1,6 @@
 /**
  * @file pending_command.h
- * @ingroup Network
+ * @ingroup Messages
  * @brief TODO: Document this.
  */
 

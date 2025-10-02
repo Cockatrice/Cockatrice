@@ -1,6 +1,5 @@
 /**
  * @file user_info_box.h
- * @ingroup Network
  * @ingroup Lobby
  * @brief TODO: Document this.
  */

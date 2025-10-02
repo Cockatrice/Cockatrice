@@ -1,7 +1,6 @@
 /**
  * @file dlg_load_remote_deck.h
- * @ingroup Dialogs
- * @ingroup ImportExport
+ * @ingroup RemoteDeckStorageDialogs
  * @ingroup Lobby
  * @brief TODO: Document this.
  */

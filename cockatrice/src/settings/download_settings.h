@@ -1,7 +1,6 @@
 /**
  * @file download_settings.h
- * @ingroup Network
- * @ingroup Settings
+ * @ingroup NetworkSettings
  * @brief TODO: Document this.
  */
 

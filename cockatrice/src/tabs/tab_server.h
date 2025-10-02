@@ -1,6 +1,6 @@
 /**
  * @file tab_server.h
- * @ingroup NetworkingTabs
+ * @ingroup ServerTabs
  * @brief TODO: Document this.
  */
 

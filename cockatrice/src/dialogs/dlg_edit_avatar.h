@@ -1,6 +1,6 @@
 /**
  * @file dlg_edit_avatar.h
- * @ingroup NetworkDialogs
+ * @ingroup AccountDialogs
  * @brief TODO: Document this.
  */
 

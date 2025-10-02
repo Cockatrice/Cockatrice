@@ -1,6 +1,6 @@
 /**
  * @file dlg_update.h
- * @ingroup NetworkDialogs
+ * @ingroup ClientUpdateDialogs
  * @brief TODO: Document this.
  */
 

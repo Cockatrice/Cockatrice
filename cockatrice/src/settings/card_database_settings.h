@@ -1,7 +1,7 @@
 /**
  * @file card_database_settings.h
  * @ingroup CardDatabase
- * @ingroup Settings
+ * @ingroup CardSettings
  * @brief TODO: Document this.
  */
 

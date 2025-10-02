@@ -1,7 +1,6 @@
 /**
  * @file debug_settings.h
- * @ingroup Core
- * @ingroup Settings
+ * @ingroup CoreSettings
  * @brief TODO: Document this.
  */
 

@@ -1,6 +1,6 @@
 /**
  * @file dlg_startup_card_check.h
- * @ingroup NetworkDialogs
+ * @ingroup CardDatabaseUpdateDialogs
  * @brief TODO: Document this.
  */
 

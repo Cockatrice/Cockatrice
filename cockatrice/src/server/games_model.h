@@ -1,7 +1,6 @@
 /**
  * @file games_model.h
  * @ingroup Lobby
- * @ingroup Network
  * @brief TODO: Document this.
  */
 

@@ -1,7 +1,6 @@
 /**
  * @file dlg_load_deck_from_clipboard.h
- * @ingroup Dialogs
- * @ingroup ImportExport
+ * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
  * @brief TODO: Document this.
  */

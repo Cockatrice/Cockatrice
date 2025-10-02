@@ -1,7 +1,6 @@
 /**
  * @file theme_manager.h
- * @ingroup Core
- * @ingroup Settings
+ * @ingroup CoreSettings
  * @brief TODO: Document this.
  */
 
