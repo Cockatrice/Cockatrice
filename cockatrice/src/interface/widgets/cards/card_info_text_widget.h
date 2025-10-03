@@ -11,6 +11,7 @@
 
 #include <QFrame>
 class QLabel;
+class QScrollArea;
 class QTextEdit;
 
 class CardInfoTextWidget : public QFrame
@@ -18,9 +19,11 @@ class CardInfoTextWidget : public QFrame
     Q_OBJECT
 
 private:
-    QLabel *nameLabel;
+    QLabel *propsLabel;
+    QScrollArea *propsScroll;
     QTextEdit *textLabel;
     CardInfoPtr info;
+    void setTexts(const QString &propsText, const QString &textText);
 
 public:
     explicit CardInfoTextWidget(QWidget *parent = nullptr);
