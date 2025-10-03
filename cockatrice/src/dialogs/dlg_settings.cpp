@@ -678,7 +678,9 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
 
     if (result == QMessageBox::Yes) {
         SettingsCache::instance().setOverrideAllCardArtWithPersonalPreference(value);
-        PictureLoader::clearNetworkCache(); // PixmapCache is no longer valid.
+        // Caches are now invalid.
+        PictureLoader::clearPixmapCache();
+        PictureLoader::clearNetworkCache();
     } else {
         // If user cancels, revert the checkbox/state back
         QTimer::singleShot(0, this, [this, enable]() {
