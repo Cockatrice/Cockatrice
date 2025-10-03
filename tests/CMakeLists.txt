@@ -5,6 +5,7 @@ add_test(NAME expression_test COMMAND expression_test)
 add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
 add_test(NAME deck_hash_test COMMAND deck_hash_test)
+set_tests_properties(deck_hash_test PROPERTIES TIMEOUT 5)
 
 # Find GTest
 
