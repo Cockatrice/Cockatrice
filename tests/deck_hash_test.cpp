@@ -10,7 +10,8 @@ TEST(DeckHashTest, RepeatTest)
     DeckList decklist(
         R"(<?xml version="1.0"?><cockatrice_deck version="1"><deckname></deckname><comments></comments><zone name="main"><card number="1" name="Mountain"/><card number="2" name="Island"/></zone><zone name="side"><card number="3" name="Forest"/></zone></cockatrice_deck>)");
     for (int i = 0; i < 1e6; ++i) { // repeat hashing a million times
-        decklist.updateDeckHash();
+        decklist.getDeckHash();
+        decklist.refreshDeckHash();
     }
     auto hash = decklist.getDeckHash().toStdString();
     ASSERT_EQ(hash, "5cac19qm") << "The hash matches";
