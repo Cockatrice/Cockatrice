@@ -126,6 +126,13 @@ void TabDeckEditorVisual::createMenus()
     aPrintingSelectorDockFloating->setCheckable(true);
     connect(aPrintingSelectorDockFloating, SIGNAL(triggered()), this, SLOT(dockFloatingTriggered()));
 
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        printingSelectorDockMenu->setEnabled(false);
+    }
+
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+            [this](bool enabled) { printingSelectorDockMenu->setEnabled(!enabled); });
+
     viewMenu->addSeparator();
 
     aResetLayout = viewMenu->addAction(QString());
@@ -236,6 +243,13 @@ void TabDeckEditorVisual::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        if (!printingSelectorDockWidget->isHidden()) {
+            printingSelectorDockWidget->setHidden(true);
+            aPrintingSelectorDockVisible->setChecked(false);
+        }
+    }
+
     aCardInfoDockVisible->setChecked(!cardInfoDockWidget->isHidden());
     aFilterDockVisible->setChecked(!filterDockWidget->isHidden());
     aDeckDockVisible->setChecked(!deckDockWidget->isHidden());
@@ -271,7 +285,7 @@ void TabDeckEditorVisual::restartLayout()
     aCardInfoDockVisible->setChecked(true);
     aDeckDockVisible->setChecked(true);
     aFilterDockVisible->setChecked(false);
-    aPrintingSelectorDockVisible->setChecked(true);
+    aPrintingSelectorDockVisible->setChecked(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     aCardInfoDockFloating->setChecked(false);
     aDeckDockFloating->setChecked(false);
@@ -279,21 +293,20 @@ void TabDeckEditorVisual::restartLayout()
     aPrintingSelectorDockFloating->setChecked(false);
 
     setCentralWidget(centralWidget);
-
     addDockWidget(Qt::RightDockWidgetArea, deckDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, filterDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, printingSelectorDockWidget);
 
+    deckDockWidget->setVisible(true);
+    cardInfoDockWidget->setVisible(true);
+    filterDockWidget->setVisible(false);
+    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+
     deckDockWidget->setFloating(false);
     cardInfoDockWidget->setFloating(false);
     filterDockWidget->setFloating(false);
     printingSelectorDockWidget->setFloating(false);
-
-    deckDockWidget->setVisible(true);
-    cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(false);
-    printingSelectorDockWidget->setVisible(true);
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Vertical);
     splitDockWidget(cardInfoDockWidget, deckDockWidget, Qt::Horizontal);

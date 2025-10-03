@@ -37,12 +37,14 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->sortByColumn(1, Qt::AscendingOrder);
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
-    deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
     connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapCard);
-    connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
+    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        deckView->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
+    }
     connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapCard);
     connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
     connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -579,9 +581,10 @@ void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
     QMenu menu;
 
-    QAction *selectPrinting = menu.addAction(tr("Select Printing"));
-
-    connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
+    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+        connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
+    }
 
     menu.exec(deckView->mapToGlobal(point));
 }
