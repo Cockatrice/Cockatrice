@@ -11,12 +11,18 @@ on:
       - 'doxygen_style.css'
   workflow_dispatch:
 
+env:
+  COCKATRICE_REF: ${{ github.ref_name }}    # Gives tag name if the commit is tagged, otherwise branch name
+
 jobs:
   docs:
     name: Doxygen
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print environment variable
+        run: echo $COCKATRICE_REF
+
       - name: Checkout code
         uses: actions/checkout@v5
 
