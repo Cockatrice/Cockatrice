@@ -1021,6 +1021,13 @@ MainWindow::~MainWindow()
         trayIcon->deleteLater();
     }
 
+    if (cardUpdateProcess) {
+        cardUpdateProcess->disconnect(this);
+        cardUpdateProcess->terminate();
+        cardUpdateProcess->waitForFinished(1000);
+        cardUpdateProcess = nullptr;
+    }
+
     client->deleteLater();
     clientThread->wait();
 }
