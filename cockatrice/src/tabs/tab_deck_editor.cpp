@@ -203,20 +203,10 @@ void TabDeckEditor::loadLayout()
 
 void TabDeckEditor::restartLayout()
 {
-    deckDockWidget->setVisible(true);
-    cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(true);
-    printingSelectorDockWidget->setVisible(false);
-
-    deckDockWidget->setFloating(false);
-    cardInfoDockWidget->setFloating(false);
-    filterDockWidget->setFloating(false);
-    printingSelectorDockWidget->setFloating(false);
-
     aCardInfoDockVisible->setChecked(true);
     aDeckDockVisible->setChecked(true);
     aFilterDockVisible->setChecked(true);
-    aPrintingSelectorDockVisible->setChecked(false);
+    aPrintingSelectorDockVisible->setChecked(true);
 
     aCardInfoDockFloating->setChecked(false);
     aDeckDockFloating->setChecked(false);
@@ -224,10 +214,20 @@ void TabDeckEditor::restartLayout()
     aPrintingSelectorDockFloating->setChecked(false);
 
     setCentralWidget(databaseDisplayDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), deckDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), cardInfoDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), filterDockWidget);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), printingSelectorDockWidget);
+    addDockWidget(Qt::RightDockWidgetArea, deckDockWidget);
+    addDockWidget(Qt::RightDockWidgetArea, cardInfoDockWidget);
+    addDockWidget(Qt::RightDockWidgetArea, filterDockWidget);
+    addDockWidget(Qt::RightDockWidgetArea, printingSelectorDockWidget);
+
+    deckDockWidget->setFloating(false);
+    cardInfoDockWidget->setFloating(false);
+    filterDockWidget->setFloating(false);
+    printingSelectorDockWidget->setFloating(false);
+
+    deckDockWidget->setVisible(true);
+    cardInfoDockWidget->setVisible(true);
+    filterDockWidget->setVisible(true);
+    printingSelectorDockWidget->setVisible(true);
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);
