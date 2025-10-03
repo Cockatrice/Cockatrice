@@ -23,6 +23,8 @@ public:
     explicit GraveyardMenu(Player *player, QWidget *parent = nullptr);
     void createMoveActions();
     void createViewActions();
+    void populateRevealRandomMenuWithActivePlayers();
+    void onRevealRandomTriggered();
     void retranslateUi();
     void setShortcutsActive();
     void setShortcutsInactive();

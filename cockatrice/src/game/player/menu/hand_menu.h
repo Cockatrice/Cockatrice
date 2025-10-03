@@ -18,13 +18,10 @@ class PlayerActions;
 class HandMenu : public TearOffMenu
 {
     Q_OBJECT
-public:
-    explicit HandMenu(Player *player, PlayerActions *actions, QWidget *parent = nullptr);
-    void retranslateUi();
-    void setShortcutsActive();
-    void setShortcutsInactive();
 
-    // expose useful actions/menus if PlayerMenu needs them
+public:
+    HandMenu(Player *player, PlayerActions *actions, QWidget *parent = nullptr);
+
     QMenu *revealHandMenu() const
     {
         return mRevealHand;
@@ -33,10 +30,16 @@ public:
     {
         return mRevealRandomHandCard;
     }
-    QMenu *moveHandMenu() const
-    {
-        return mMoveHandMenu;
-    }
+
+    void retranslateUi();
+    void setShortcutsActive();
+    void setShortcutsInactive();
+
+private slots:
+    void populateRevealHandMenuWithActivePlayers();
+    void populateRevealRandomHandCardMenuWithActivePlayers();
+    void onRevealHandTriggered();
+    void onRevealRandomHandCardTriggered();
 
 private:
     Player *player;
@@ -47,8 +50,8 @@ private:
 
     QMenu *mRevealHand = nullptr;
     QMenu *mRevealRandomHandCard = nullptr;
-    QMenu *mMoveHandMenu = nullptr;
 
+    QMenu *mMoveHandMenu = nullptr;
     QAction *aMoveHandToTopLibrary = nullptr;
     QAction *aMoveHandToBottomLibrary = nullptr;
     QAction *aMoveHandToGrave = nullptr;

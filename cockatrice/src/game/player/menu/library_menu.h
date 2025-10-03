@@ -29,6 +29,12 @@ public:
     void createMoveActions();
     void createViewActions();
     void retranslateUi();
+    void populateRevealLibraryMenuWithActivePlayers();
+    void populateLendLibraryMenuWithActivePlayers();
+    void populateRevealTopCardMenuWithActivePlayers();
+    void onRevealLibraryTriggered();
+    void onLendLibraryTriggered();
+    void onRevealTopCardTriggered();
     void setShortcutsActive();
     void setShortcutsInactive();
 
@@ -96,6 +102,8 @@ public:
     QAction *aMoveBottomCardsToGraveyard = nullptr;
     QAction *aMoveBottomCardsToExile = nullptr;
     QAction *aShuffleBottomCards = nullptr;
+
+    int defaultNumberTopCards = 1;
 
 private:
     Player *player;
