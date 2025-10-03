@@ -22,7 +22,6 @@ void testEmpty(const QString &clipboard)
 void testHash(const QString &clipboard, const std::string &hash)
 {
     DeckList deckList = getDeckList(clipboard);
-    std::cout << deckList.writeToString_Native().toStdString() << std::endl;
 
     ASSERT_EQ(deckList.getDeckHash().toStdString(), hash);
 }
