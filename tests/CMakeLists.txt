@@ -1,9 +1,10 @@
 enable_testing()
+
 add_test(NAME dummy_test COMMAND dummy_test)
 add_test(NAME expression_test COMMAND expression_test)
-
 add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
+
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
 
@@ -32,9 +33,7 @@ if(NOT GTEST_FOUND)
   endif()
 
   # Add gtest directly to our build
-  add_subdirectory(
-    ${CMAKE_BINARY_DIR}/gtest-src ${CMAKE_BINARY_DIR}/gtest-build EXCLUDE_FROM_ALL
-  )
+  add_subdirectory(${CMAKE_BINARY_DIR}/gtest-src ${CMAKE_BINARY_DIR}/gtest-build EXCLUDE_FROM_ALL)
 
   # Add the gtest include directory, since gtest
   # doesn't add that dependency to its gtest target
