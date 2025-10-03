@@ -128,14 +128,16 @@ if [[ $PACKAGE_TYPE ]]; then
 fi
   if [[ $TARGET_MACOS_VERSION ]]; then
   mkdir -p ../cmake/triplets
-  cp ../vcpkg/triplets/x64-osx.cmake ../cmake/triplets/x64-osx-${TARGET_MACOS_VERSION}.cmake
-  echo "set(VCPKG_CMAKE_SYSTEM_VERSION ${TARGET_MACOS_VERSION})" >> ../cmake/triplets/x64-osx-${TARGET_MACOS_VERSION}.cmake
-  echo "set(VCPKG_OSX_DEPLOYMENT_TARGET ${TARGET_MACOS_VERSION})" >> ../cmake/triplets/x64-osx-${TARGET_MACOS_VERSION}.cmake
+  # Replace dots with hyphens in triplet name for vcpkg compatibility
+  TRIPLET_VERSION=$(echo "${TARGET_MACOS_VERSION}" | sed 's/\./-/g')
+  cp ../vcpkg/triplets/x64-osx.cmake ../cmake/triplets/x64-osx-${TRIPLET_VERSION}.cmake
+  echo "set(VCPKG_CMAKE_SYSTEM_VERSION ${TARGET_MACOS_VERSION})" >> ../cmake/triplets/x64-osx-${TRIPLET_VERSION}.cmake
+  echo "set(VCPKG_OSX_DEPLOYMENT_TARGET ${TARGET_MACOS_VERSION})" >> ../cmake/triplets/x64-osx-${TRIPLET_VERSION}.cmake
   flags+=("-DVCPKG_OVERLAY_TRIPLETS=../cmake/triplets")
-  flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-${TARGET_MACOS_VERSION}")
+  flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-${TRIPLET_VERSION}")
   flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=${TARGET_MACOS_VERSION}")
   echo "::group::Show generated triplet"
-  cat ../cmake/triplets/x64-osx-${TARGET_MACOS_VERSION}.cmake
+  cat ../cmake/triplets/x64-osx-${TRIPLET_VERSION}.cmake
   echo "::endgroup::"
 fi
 
