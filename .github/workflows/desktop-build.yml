@@ -318,7 +318,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" ${{ matrix.soc == 'Intel' && '--target-macos-version 13.0' || '' }}
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" ${{ matrix.soc == 'Intel' && format('--target-macos-version {0}', matrix.target) || '' }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
