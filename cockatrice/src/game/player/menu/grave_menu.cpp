@@ -51,9 +51,9 @@ void GraveyardMenu::createMoveActions()
         aMoveGraveToRfg = new QAction(this);
         aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        connect(aMoveGraveToTopLibrary,    &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
         connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-        connect(aMoveGraveToHand,          &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToHand, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
         connect(aMoveGraveToRfg, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
     }
 }
@@ -63,8 +63,7 @@ void GraveyardMenu::createViewActions()
     PlayerActions *playerActions = player->getPlayerActions();
 
     aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, &QAction::triggered,
-            playerActions, &PlayerActions::actViewGraveyard);
+    connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
 }
 
 void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
