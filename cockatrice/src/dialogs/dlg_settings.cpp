@@ -681,9 +681,11 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
         PictureLoader::clearNetworkCache(); // PixmapCache is no longer valid.
     } else {
         // If user cancels, revert the checkbox/state back
-        overrideAllCardArtWithPersonalPreferenceCheckBox.blockSignals(true);
-        overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(!enable);
-        overrideAllCardArtWithPersonalPreferenceCheckBox.blockSignals(false);
+        QTimer::singleShot(0, this, [this, enable]() {
+            overrideAllCardArtWithPersonalPreferenceCheckBox.blockSignals(true);
+            overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(!enable);
+            overrideAllCardArtWithPersonalPreferenceCheckBox.blockSignals(false);
+        });
     }
 }
 
