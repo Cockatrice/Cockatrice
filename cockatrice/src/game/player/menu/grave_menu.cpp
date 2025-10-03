@@ -1,7 +1,12 @@
 #include "grave_menu.h"
 
+#include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"
+#include "grave_menu.h"
+
+#include <QAction>
+#include <QMenu>
 
 GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -12,14 +17,11 @@ GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(par
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         mRevealRandomGraveyardCard = addMenu(QString());
-        QAction *newAction = mRevealRandomGraveyardCard->addAction(QString());
-        newAction->setData(-1);
-        connect(newAction, &QAction::triggered, player->getPlayerActions(),
-                &PlayerActions::actRevealRandomGraveyardCard);
-        emit newPlayerActionCreated(newAction);
-        mRevealRandomGraveyardCard->addSeparator();
+        connect(mRevealRandomGraveyardCard, &QMenu::aboutToShow, this,
+                &GraveyardMenu::populateRevealRandomMenuWithActivePlayers);
 
         addSeparator();
+
         moveGraveMenu = addTearOffMenu(QString());
         moveGraveMenu->addAction(aMoveGraveToTopLibrary);
         moveGraveMenu->addAction(aMoveGraveToBottomLibrary);
@@ -39,16 +41,19 @@ void GraveyardMenu::createMoveActions()
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         aMoveGraveToTopLibrary = new QAction(this);
         aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+
         aMoveGraveToBottomLibrary = new QAction(this);
         aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+
         aMoveGraveToHand = new QAction(this);
         aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
+
         aMoveGraveToRfg = new QAction(this);
         aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToTopLibrary,    &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
         connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
-        connect(aMoveGraveToHand, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
+        connect(aMoveGraveToHand,          &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
         connect(aMoveGraveToRfg, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
     }
 }
@@ -58,7 +63,35 @@ void GraveyardMenu::createViewActions()
     PlayerActions *playerActions = player->getPlayerActions();
 
     aViewGraveyard = new QAction(this);
-    connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
+    connect(aViewGraveyard, &QAction::triggered,
+            playerActions, &PlayerActions::actViewGraveyard);
+}
+
+void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
+{
+    mRevealRandomGraveyardCard->clear();
+
+    QAction *allPlayers = mRevealRandomGraveyardCard->addAction(tr("&All players"));
+    allPlayers->setData(-1);
+    connect(allPlayers, &QAction::triggered, this, &GraveyardMenu::onRevealRandomTriggered);
+
+    mRevealRandomGraveyardCard->addSeparator();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mRevealRandomGraveyardCard->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &GraveyardMenu::onRevealRandomTriggered);
+    }
+}
+
+void GraveyardMenu::onRevealRandomTriggered()
+{
+    if (auto *a = qobject_cast<QAction *>(sender())) {
+        player->getPlayerActions()->actRevealRandomGraveyardCard(a->data().toInt());
+    }
 }
 
 void GraveyardMenu::retranslateUi()
@@ -73,6 +106,7 @@ void GraveyardMenu::retranslateUi()
         aMoveGraveToBottomLibrary->setText(tr("&Bottom of library"));
         aMoveGraveToHand->setText(tr("&Hand"));
         aMoveGraveToRfg->setText(tr("&Exile"));
+
         mRevealRandomGraveyardCard->setTitle(tr("Reveal random card to..."));
     }
 }
@@ -80,7 +114,6 @@ void GraveyardMenu::retranslateUi()
 void GraveyardMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-
     aViewGraveyard->setShortcuts(shortcuts.getShortcut("Player/aViewGraveyard"));
 }
 

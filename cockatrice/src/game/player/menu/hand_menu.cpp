@@ -1,7 +1,14 @@
 #include "hand_menu.h"
 
+#include "../../../settings/cache_settings.h"
+#include "../../../settings/shortcuts_settings.h"
+#include "../../abstract_game.h"
+#include "../../zones/hand_zone.h"
 #include "../player.h"
 #include "../player_actions.h"
+
+#include <QAction>
+#include <QMenu>
 
 HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -16,7 +23,12 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
     }
 
     mRevealHand = addMenu(QString());
+    connect(mRevealHand, &QMenu::aboutToShow, this, &HandMenu::populateRevealHandMenuWithActivePlayers);
+
     mRevealRandomHandCard = addMenu(QString());
+    connect(mRevealRandomHandCard, &QMenu::aboutToShow, this,
+            &HandMenu::populateRevealRandomHandCardMenuWithActivePlayers);
+
     addSeparator();
 
     aMulligan = new QAction(this);
@@ -78,7 +90,6 @@ void HandMenu::retranslateUi()
 void HandMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
-
     aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
     aSortHand->setShortcuts(shortcuts.getShortcut("Player/aSortHand"));
     aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));
@@ -89,4 +100,72 @@ void HandMenu::setShortcutsInactive()
     aViewHand->setShortcut(QKeySequence());
     aSortHand->setShortcut(QKeySequence());
     aMulligan->setShortcut(QKeySequence());
+}
+
+// -------------------------
+// Dynamic menu population
+// -------------------------
+
+void HandMenu::populateRevealHandMenuWithActivePlayers()
+{
+    mRevealHand->clear();
+
+    QAction *allPlayers = mRevealHand->addAction(tr("&All players"));
+    allPlayers->setData(-1);
+    connect(allPlayers, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
+
+    mRevealHand->addSeparator();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mRevealHand->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
+    }
+}
+
+void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
+{
+    mRevealRandomHandCard->clear();
+
+    QAction *allPlayers = mRevealRandomHandCard->addAction(tr("&All players"));
+    allPlayers->setData(-1);
+    connect(allPlayers, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+
+    mRevealRandomHandCard->addSeparator();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+    }
+}
+
+// -------------------------
+// Action handlers
+// -------------------------
+
+void HandMenu::onRevealHandTriggered()
+{
+    auto *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
+
+    const int targetId = action->data().toInt();
+    player->getPlayerActions()->actRevealHand(targetId);
+}
+
+void HandMenu::onRevealRandomHandCardTriggered()
+{
+    auto *action = qobject_cast<QAction *>(sender());
+    if (!action)
+        return;
+
+    const int targetId = action->data().toInt();
+    player->getPlayerActions()->actRevealRandomHandCard(targetId);
 }

@@ -33,18 +33,11 @@ public slots:
     void setMenusForGraphicItems();
 
 private slots:
-    void addPlayer(Player *playerToAdd);
-    void removePlayer(Player *playerToRemove);
-    void playerListActionTriggered();
-    void onNewPlayerListActionCreated(QAction *action);
     void refreshShortcuts();
 
 public:
     PlayerMenu(Player *player);
     void retranslateUi();
-
-    void addPlayerToList(QMenu *playerList, Player *playerToAdd);
-    static void removePlayerFromList(QMenu *playerList, Player *player);
 
     QMenu *updateCardMenu(const CardItem *card);
 
@@ -88,8 +81,6 @@ private:
     UtilityMenu *utilityMenu;
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
-    QList<QMenu *> playerLists;
-    QList<QAction *> allPlayersActions;
 
     bool shortcutsActive;
 

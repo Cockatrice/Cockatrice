@@ -1,7 +1,14 @@
 #include "library_menu.h"
 
+#include "../../../settings/cache_settings.h"
+#include "../../../settings/shortcuts_settings.h"
+#include "../../../tabs/tab_game.h"
+#include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"
+
+#include <QAction>
+#include <QMenu>
 
 LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -20,9 +27,16 @@ LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent)
     addAction(aViewTopCards);
     addAction(aViewBottomCards);
     addSeparator();
+
     mRevealLibrary = addMenu(QString());
+    connect(mRevealLibrary, &QMenu::aboutToShow, this, &LibraryMenu::populateRevealLibraryMenuWithActivePlayers);
+
     mLendLibrary = addMenu(QString());
+    connect(mLendLibrary, &QMenu::aboutToShow, this, &LibraryMenu::populateLendLibraryMenuWithActivePlayers);
+
     mRevealTopCard = addMenu(QString());
+    connect(mRevealTopCard, &QMenu::aboutToShow, this, &LibraryMenu::populateRevealTopCardMenuWithActivePlayers);
+
     addAction(aAlwaysRevealTopCard);
     addAction(aAlwaysLookAtTopCard);
     addSeparator();
@@ -30,6 +44,7 @@ LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent)
     bottomLibraryMenu = addTearOffMenu(QString());
     addSeparator();
     addAction(aOpenDeckInDeckEditor);
+
     topLibraryMenu->addAction(aMoveTopToPlay);
     topLibraryMenu->addAction(aMoveTopToPlayFaceDown);
     topLibraryMenu->addAction(aMoveTopCardToBottom);
@@ -215,6 +230,89 @@ void LibraryMenu::retranslateUi()
         aMoveBottomCardsToExile->setText(tr("Move bottom cards to &exile..."));
         aMoveBottomCardToTop->setText(tr("Put bottom card on &top"));
         aShuffleBottomCards->setText(tr("Shuffle bottom cards..."));
+    }
+}
+
+void LibraryMenu::populateRevealLibraryMenuWithActivePlayers()
+{
+    mRevealLibrary->clear();
+
+    QAction *allPlayers = mRevealLibrary->addAction(tr("&All players"));
+    allPlayers->setData(-1);
+    connect(allPlayers, &QAction::triggered, this, &LibraryMenu::onRevealLibraryTriggered);
+
+    mRevealLibrary->addSeparator();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mRevealLibrary->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &LibraryMenu::onRevealLibraryTriggered);
+    }
+}
+
+void LibraryMenu::populateLendLibraryMenuWithActivePlayers()
+{
+    mLendLibrary->clear();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mLendLibrary->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &LibraryMenu::onLendLibraryTriggered);
+    }
+}
+
+void LibraryMenu::populateRevealTopCardMenuWithActivePlayers()
+{
+    mRevealTopCard->clear();
+
+    QAction *allPlayers = mRevealTopCard->addAction(tr("&All players"));
+    allPlayers->setData(-1);
+    connect(allPlayers, &QAction::triggered, this, &LibraryMenu::onRevealTopCardTriggered);
+
+    mRevealTopCard->addSeparator();
+
+    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    for (auto *other : players) {
+        if (other == player)
+            continue;
+        QAction *a = mRevealTopCard->addAction(other->getPlayerInfo()->getName());
+        a->setData(other->getPlayerInfo()->getId());
+        connect(a, &QAction::triggered, this, &LibraryMenu::onRevealTopCardTriggered);
+    }
+}
+
+void LibraryMenu::onRevealLibraryTriggered()
+{
+    if (auto *a = qobject_cast<QAction *>(sender())) {
+        player->getPlayerActions()->actRevealLibrary(a->data().toInt());
+    }
+}
+
+void LibraryMenu::onLendLibraryTriggered()
+{
+    if (auto *a = qobject_cast<QAction *>(sender())) {
+        player->getPlayerActions()->actLendLibrary(a->data().toInt());
+    }
+}
+
+void LibraryMenu::onRevealTopCardTriggered()
+{
+    if (auto *a = qobject_cast<QAction *>(sender())) {
+        int deckSize = player->getDeckZone()->getCards().size();
+        bool ok;
+        int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Reveal top cards of library"),
+                                          tr("Number of cards: (max. %1)").arg(deckSize), defaultNumberTopCards, 1,
+                                          deckSize, 1, &ok);
+        if (ok) {
+            player->getPlayerActions()->actRevealTopCards(a->data().toInt(), number);
+            defaultNumberTopCards = number;
+        }
     }
 }
 

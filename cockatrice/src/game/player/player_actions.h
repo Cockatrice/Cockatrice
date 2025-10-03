@@ -116,7 +116,9 @@ public slots:
     void actAlwaysRevealTopCard();
     void actAlwaysLookAtTopCard();
     void actViewGraveyard();
-    void actRevealRandomGraveyardCard();
+    void actLendLibrary(int lendToPlayerId);
+    void actRevealTopCards(int revealToPlayerId, int amount);
+    void actRevealRandomGraveyardCard(int revealToPlayerId);
     void actViewRfg();
     void actViewSideboard();
 
@@ -145,6 +147,9 @@ public slots:
     void actFlowT();
     void actSetAnnotation();
     void actReveal(QAction *action);
+    void actRevealHand(int revealToPlayerId);
+    void actRevealRandomHandCard(int revealToPlayerId);
+    void actRevealLibrary(int revealToPlayerId);
 
     void actSortHand();
 

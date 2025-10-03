@@ -197,19 +197,6 @@ void PlayerActions::actViewGraveyard()
     player->getGameScene()->toggleZoneView(player, "grave", -1);
 }
 
-void PlayerActions::actRevealRandomGraveyardCard()
-{
-    Command_RevealCards cmd;
-    auto *action = dynamic_cast<QAction *>(sender());
-    const int otherPlayerId = action->data().toInt();
-    if (otherPlayerId != -1) {
-        cmd.set_player_id(otherPlayerId);
-    }
-    cmd.set_zone_name("grave");
-    cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
-    sendGameCommand(cmd);
-}
-
 void PlayerActions::actViewRfg()
 {
     player->getGameScene()->toggleZoneView(player, "rfg", -1);
@@ -1659,6 +1646,78 @@ void PlayerActions::actReveal(QAction *action)
         cmd.add_card_id(card->getId());
     }
 
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actRevealHand(int revealToPlayerId)
+{
+    Command_RevealCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+    cmd.set_zone_name("hand");
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actRevealRandomHandCard(int revealToPlayerId)
+{
+    Command_RevealCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+    cmd.set_zone_name("hand");
+    cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actRevealLibrary(int revealToPlayerId)
+{
+    Command_RevealCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+    cmd.set_zone_name("deck");
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actLendLibrary(int lendToPlayerId)
+{
+    Command_RevealCards cmd;
+    if (lendToPlayerId != -1) {
+        cmd.set_player_id(lendToPlayerId);
+    }
+    cmd.set_zone_name("deck");
+    cmd.set_grant_write_access(true);
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actRevealTopCards(int revealToPlayerId, int amount)
+{
+    Command_RevealCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+
+    cmd.set_zone_name("deck");
+    cmd.set_top_cards(amount);
+    // backward compatibility: servers before #1051 only permits to reveal the first card
+    cmd.add_card_id(0);
+
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actRevealRandomGraveyardCard(int revealToPlayerId)
+{
+    Command_RevealCards cmd;
+    if (revealToPlayerId != -1) {
+        cmd.set_player_id(revealToPlayerId);
+    }
+    cmd.set_zone_name("grave");
+    cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     sendGameCommand(cmd);
 }
 
