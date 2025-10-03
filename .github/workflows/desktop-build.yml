@@ -293,7 +293,7 @@ jobs:
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
-          cache: true # qt caches take too much space for macOS (1.1Gi)
+          cache: false # qt caches take too much space for macOS (1.1Gi)
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
@@ -318,7 +318,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" ${{ matrix.soc == 'Intel' && '--x86-macos' || '' }}
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" ${{ matrix.soc == 'Intel' && '--target-x86-macos' || '' }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
