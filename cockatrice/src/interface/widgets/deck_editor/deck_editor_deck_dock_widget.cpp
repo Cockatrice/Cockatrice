@@ -41,10 +41,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
     connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapCard);
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-        deckView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
-    }
+    deckView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
     connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapCard);
     connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
     connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -579,14 +577,14 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
-    QMenu menu;
-
     if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        QMenu menu;
+
         QAction *selectPrinting = menu.addAction(tr("Select Printing"));
         connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
-    }
 
-    menu.exec(deckView->mapToGlobal(point));
+        menu.exec(deckView->mapToGlobal(point));
+    }
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()
