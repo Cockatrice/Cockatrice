@@ -12,7 +12,7 @@ add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
 add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
-add_executable(deck_hash_test ../common/decklist.cpp deck_hash_test.cpp)
+add_executable(deck_hash_test ../common/deck_list.cpp deck_hash_test.cpp)
 
 find_package(GTest)
 
