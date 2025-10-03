@@ -60,6 +60,7 @@ void PlayerManager::removePlayer(int playerId)
     emit playerRemoved(player);
     emit playerCountChanged();
     players.remove(playerId);
+    player->deleteLater();
 }
 
 Player *PlayerManager::getPlayer(int playerId) const
