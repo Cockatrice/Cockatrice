@@ -731,8 +731,7 @@ void AppearanceSettingsPage::retranslateUi()
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
     autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
-        tr("Override all card art with personal set preference (Pre-ProviderID change behavior) [Requires Client "
-           "restart]"));
+        tr("Override all card art with personal set preference (Pre-ProviderID change behavior)"));
     bumpSetsWithCardsInDeckToTopCheckBox.setText(
         tr("Bump sets that the deck contains cards from to the top in the printing selector"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
