@@ -712,7 +712,7 @@ void TabGame::processPlayerLeave(Player *leavingPlayer)
         QMenu *menu = leavingPlayer->getPlayerMenu()->getPlayerMenu();
         if (menu) {
             // Find and remove the QAction pointing to this menu
-            QList<QAction*> actions = gameMenu->actions();
+            QList<QAction *> actions = gameMenu->actions();
             for (QAction *act : actions) {
                 if (act->menu() == menu) {
                     gameMenu->removeAction(act);
