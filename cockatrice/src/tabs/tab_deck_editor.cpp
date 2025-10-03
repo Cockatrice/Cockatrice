@@ -244,7 +244,6 @@ void TabDeckEditor::restartLayout()
     filterDockWidget->setVisible(true);
     printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
-
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
