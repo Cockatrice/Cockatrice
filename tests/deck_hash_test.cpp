@@ -1,4 +1,4 @@
-#include "../../common/decklist.h"
+#include "../common/deck_list.h"
 
 #include "gtest/gtest.h"
 #include <QDebug>
