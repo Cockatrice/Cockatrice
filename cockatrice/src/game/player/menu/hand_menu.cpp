@@ -102,10 +102,6 @@ void HandMenu::setShortcutsInactive()
     aMulligan->setShortcut(QKeySequence());
 }
 
-// -------------------------
-// Dynamic menu population
-// -------------------------
-
 void HandMenu::populateRevealHandMenuWithActivePlayers()
 {
     mRevealHand->clear();
@@ -145,10 +141,6 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
         connect(a, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
     }
 }
-
-// -------------------------
-// Action handlers
-// -------------------------
 
 void HandMenu::onRevealHandTriggered()
 {
