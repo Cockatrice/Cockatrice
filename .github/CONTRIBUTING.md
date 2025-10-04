@@ -1,4 +1,4 @@
-<!--! @page contributing Contributing -->
+<!-- @page contributing Contributing -->
 
 &nbsp; [Introduction](#contributing-to-cockatrice) | [Code Style Guide](
 #code-style-guide) | [Translations](#translations) | [Release Management](
