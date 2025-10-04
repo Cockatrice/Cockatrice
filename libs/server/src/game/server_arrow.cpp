@@ -1,8 +1,8 @@
-#include "../../include/game/server_arrow.h"
+#include "../../include/server/game/server_arrow.h"
 
-#include "../../include/game/server_card.h"
-#include "../../include/game/server_cardzone.h"
-#include "../../include/game/server_player.h"
+#include "../../include/server/game/server_card.h"
+#include "../../include/server/game/server_cardzone.h"
+#include "../../include/server/game/server_player.h"
 #include "pb/serverinfo_arrow.pb.h"
 
 Server_Arrow::Server_Arrow(int _id, Server_Card *_startCard, Server_ArrowTarget *_targetItem, const color &_arrowColor)

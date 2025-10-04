@@ -1,4 +1,4 @@
-#include "../../include/game/server_counter.h"
+#include "../../include/server/game/server_counter.h"
 
 #include "pb/serverinfo_counter.pb.h"
 

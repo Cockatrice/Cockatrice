@@ -7,8 +7,8 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include "../../../libs/deck/deck_list.h"
 #include "card/card_database/card_database.h"
+#include "deck_list/deck_list.h"
 
 #include <QObject>
 

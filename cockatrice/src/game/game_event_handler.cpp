@@ -1,6 +1,6 @@
 #include "game_event_handler.h"
 
-#include "../../../libs/server/get_pb_extension.h"
+#include "../../../libs/server/include/server/get_pb_extension.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../tabs/tab_game.h"

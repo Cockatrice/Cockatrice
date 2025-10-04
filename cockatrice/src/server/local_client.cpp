@@ -1,6 +1,6 @@
 #include "local_client.h"
 
-#include "../../../libs/server/debug_pb_message.h"
+#include "../../../libs/server/include/server/debug_pb_message.h"
 #include "local_server_interface.h"
 #include "pb/session_commands.pb.h"
 

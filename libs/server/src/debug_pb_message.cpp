@@ -1,6 +1,6 @@
-#include "../../common/debug_pb_message.h"
+#include "../include/server/debug_pb_message.h"
 
-#include "../utility/include/utility/trice_limits.h"
+#include "utility/trice_limits.h"
 
 #include <QList>
 #include <QString>

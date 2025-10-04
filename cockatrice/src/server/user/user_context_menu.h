@@ -7,7 +7,7 @@
 #ifndef USER_CONTEXT_MENU_H
 #define USER_CONTEXT_MENU_H
 
-#include "../../../../libs/server/include/user_level.h"
+#include "../../../../libs/server/include/server/user_level.h"
 
 #include <QObject>
 

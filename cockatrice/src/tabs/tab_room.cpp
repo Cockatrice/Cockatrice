@@ -1,6 +1,6 @@
 #include "tab_room.h"
 
-#include "../../../libs/server/get_pb_extension.h"
+#include "../../../libs/server/include/server/get_pb_extension.h"
 #include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../dialogs/dlg_settings.h"
 #include "../main.h"

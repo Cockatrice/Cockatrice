@@ -1,13 +1,11 @@
-#include "../include/server_protocolhandler.h"
+#include "../include/server/server_protocolhandler.h"
 
-#include "../debug_pb_message.h"
-#include "../featureset.h"
-#include "../get_pb_extension.h"
-#include "../include/game/server_game.h"
-#include "../include/game/server_player.h"
-#include "../include/server_database_interface.h"
-#include "../include/server_room.h"
-#include "../trice_limits.h"
+#include "../include/server/debug_pb_message.h"
+#include "../include/server/game/server_game.h"
+#include "../include/server/game/server_player.h"
+#include "../include/server/get_pb_extension.h"
+#include "../include/server/server_database_interface.h"
+#include "../include/server/server_room.h"
 #include "pb/commands.pb.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_list_rooms.pb.h"
@@ -22,6 +20,8 @@
 #include "pb/response_list_users.pb.h"
 #include "pb/response_login.pb.h"
 #include "pb/serverinfo_user.pb.h"
+#include "utility/featureset.h"
+#include "utility/trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>

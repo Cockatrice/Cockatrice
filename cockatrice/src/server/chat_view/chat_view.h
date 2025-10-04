@@ -8,8 +8,8 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../../../libs/server/include/room_message_type.h"
-#include "../../../../libs/server/include/user_level.h"
+#include "../../../../libs/server/include/server/room_message_type.h"
+#include "../../../../libs/server/include/server/user_level.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
 

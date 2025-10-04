@@ -13,11 +13,11 @@
 #include "mana_curve_widget.h"
 #include "mana_devotion_widget.h"
 
-#include <../../../../../libs/deck/deck_list.h>
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <deck_list/deck_list.h>
 
 class DeckAnalyticsWidget : public QWidget
 {

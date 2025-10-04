@@ -1,6 +1,6 @@
-#include "../include/server_remoteuserinterface.h"
+#include "../include/server/server_remoteuserinterface.h"
 
-#include "../include/server.h"
+#include "../include/server/server.h"
 #include "pb/serverinfo_user.pb.h"
 
 void Server_RemoteUserInterface::sendProtocolItem(const Response &item)

@@ -1,7 +1,5 @@
 #include "remote_client.h"
 
-#include "../../../../libs/server/debug_pb_message.h"
-#include "../../../../libs/utility/passwordhasher.h"
 #include "../../main.h"
 #include "../pending_command.h"
 #include "pb/event_server_identification.pb.h"
@@ -12,7 +10,9 @@
 #include "pb/response_register.pb.h"
 #include "pb/server_message.pb.h"
 #include "pb/session_commands.pb.h"
+#include "server/debug_pb_message.h"
 #include "settings/cache_settings.h"
+#include "utility/passwordhasher.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>

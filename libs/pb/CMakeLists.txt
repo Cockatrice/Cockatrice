@@ -190,8 +190,8 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
 else()
   add_library(cockatrice_protocol ${PROTO_FILES})
   target_link_libraries(cockatrice_protocol PUBLIC protobuf::libprotobuf)
-  set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-  target_include_directories(cockatrice_protocol PUBLIC "${PROTOBUF_INCLUDE_DIRS}")
+  set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/pb")
+  target_include_directories(cockatrice_protocol PUBLIC "${PROTOBUF_INCLUDE_DIRS}" PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
   protobuf_generate(
     TARGET cockatrice_protocol IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}" PROTOC_OUT_DIR "${PROTO_BINARY_DIR}"

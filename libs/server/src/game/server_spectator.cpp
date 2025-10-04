@@ -1,4 +1,4 @@
-#include "../../include/game/server_spectator.h"
+#include "../../include/server/game/server_spectator.h"
 
 Server_Spectator::Server_Spectator(Server_Game *_game,
                                    int _playerId,

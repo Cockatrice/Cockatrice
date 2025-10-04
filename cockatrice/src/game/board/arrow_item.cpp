@@ -6,11 +6,11 @@
 #include "../zones/card_zone.h"
 #include "card/card_info.h"
 #include "card_item.h"
-#include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_create_arrow.pb.h"
 #include "pb/command_delete_arrow.pb.h"
 #include "settings/cache_settings.h"
+#include "utility/color.h"
 
 #include <QDebug>
 #include <QGraphicsScene>

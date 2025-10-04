@@ -16,7 +16,7 @@ elseif (Qt5_FOUND)
     qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif ()
 
-qt_add_library(cardlib STATIC
+qt_add_library(cockatrice_deck_list STATIC
     src/abstract_deck_list_card_node.cpp
     src/abstract_deck_list_node.cpp
     src/deck_list.cpp
@@ -25,12 +25,11 @@ qt_add_library(cardlib STATIC
     ${MOC_SOURCES}
 )
 
-target_include_directories(deck_list
+target_include_directories(cockatrice_deck_list
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/libs/utility/include
 )
 
-target_link_libraries(deck_list
-    utility
-    PUBLIC ${COCKATRICE_QT_MODULES}
+target_link_libraries(cockatrice_deck_list
+    PUBLIC utility ${COCKATRICE_QT_MODULES}
 )

@@ -1,8 +1,7 @@
-#include "../include/server_room.h"
+#include "../include/server/server_room.h"
 
-#include "../include/game/server_game.h"
-#include "../include/server_protocolhandler.h"
-#include "../trice_limits.h"
+#include "../include/server/game/server_game.h"
+#include "../include/server/server_protocolhandler.h"
 #include "pb/commands.pb.h"
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
@@ -12,6 +11,7 @@
 #include "pb/room_commands.pb.h"
 #include "pb/serverinfo_chat_message.pb.h"
 #include "pb/serverinfo_room.pb.h"
+#include "utility/trice_limits.h"
 
 #include <QDateTime>
 #include <QDebug>

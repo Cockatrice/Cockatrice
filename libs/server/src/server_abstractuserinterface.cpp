@@ -1,11 +1,11 @@
-#include "../include/server_abstractuserinterface.h"
+#include "../include/server/server_abstractuserinterface.h"
 
-#include "../include/game/server_game.h"
-#include "../include/game/server_player.h"
-#include "../include/server.h"
-#include "../include/server_player_reference.h"
-#include "../include/server_response_containers.h"
-#include "../include/server_room.h"
+#include "../include/server/game/server_game.h"
+#include "../include/server/game/server_player.h"
+#include "../include/server/server.h"
+#include "../include/server/server_player_reference.h"
+#include "../include/server/server_response_containers.h"
+#include "../include/server/server_room.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_game_state_changed.pb.h"
 

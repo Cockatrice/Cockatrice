@@ -1,4 +1,4 @@
-#include "get_pb_extension.h"
+#include "../include/server/get_pb_extension.h"
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>

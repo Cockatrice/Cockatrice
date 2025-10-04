@@ -7,7 +7,7 @@
 #include "card/card_database/card_database.h"
 #include "card/card_database/card_database_manager.h"
 
-#include <../../../../../libs/deck/deck_list.h>
+#include <deck_list/deck_list.h>
 #include <unordered_map>
 
 ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)

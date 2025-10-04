@@ -20,8 +20,8 @@
 
 #include "serversocketinterface.h"
 
-#include "../../libs/deck/deck_list.h"
 #include "../../libs/utility/include/utility/trice_limits.h"
+#include "deck_list/deck_list.h"
 #include "email_parser.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"

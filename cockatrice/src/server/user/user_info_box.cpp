@@ -1,6 +1,5 @@
 #include "user_info_box.h"
 
-#include "../../../../libs/utility/passwordhasher.h"
 #include "../../client/get_text_with_max.h"
 #include "../../dialogs/dlg_edit_avatar.h"
 #include "../../dialogs/dlg_edit_password.h"
@@ -11,6 +10,7 @@
 #include "pb/response_get_user_info.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"
+#include "utility/passwordhasher.h"
 
 #include <QDateTime>
 #include <QGridLayout>

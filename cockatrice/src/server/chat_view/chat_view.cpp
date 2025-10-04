@@ -1,6 +1,6 @@
 #include "chat_view.h"
 
-#include "../../../../libs/server/include/user_level.h"
+#include "../../../../libs/server/include/server/user_level.h"
 #include "../../client/sound_engine.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"

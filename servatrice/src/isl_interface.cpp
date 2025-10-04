@@ -1,7 +1,7 @@
 #include "isl_interface.h"
 
-#include "../../libs/server/debug_pb_message.h"
-#include "../../libs/server/get_pb_extension.h"
+#include "../../libs/server/include/server/debug_pb_message.h"
+#include "../../libs/server/include/server/get_pb_extension.h"
 #include "main.h"
 #include "pb/event_game_joined.pb.h"
 #include "pb/event_join_room.pb.h"

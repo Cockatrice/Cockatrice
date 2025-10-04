@@ -1,4 +1,4 @@
-#include "../../common/serverinfo_user_container.h"
+#include "../include/server/serverinfo_user_container.h"
 
 #include "pb/serverinfo_user.pb.h"
 

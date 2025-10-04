@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "servatrice.h"
 
-#include "../../libs/deck/deck_list.h"
 #include "../../libs/utility/include/utility/featureset.h"
+#include "deck_list/deck_list.h"
 #include "email_parser.h"
 #include "isl_interface.h"
 #include "main.h"

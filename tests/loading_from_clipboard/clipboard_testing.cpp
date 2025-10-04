@@ -1,6 +1,6 @@
 #include "clipboard_testing.h"
 
-#include "../../libs/deck/deck_list_card_node.h"
+#include "deck_list/deck_list_card_node.h"
 
 #include <QTextStream>
 

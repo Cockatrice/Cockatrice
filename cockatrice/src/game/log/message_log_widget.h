@@ -7,7 +7,7 @@
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H
 
-#include "../../../../libs/server/include/user_level.h"
+#include "../../../../libs/server/include/server/user_level.h"
 #include "../../client/translation.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../zones/logic/card_zone_logic.h"

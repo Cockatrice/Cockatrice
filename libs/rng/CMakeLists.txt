@@ -25,3 +25,6 @@ target_include_directories(cockatrice_rng
     PUBLIC include
     PUBLIC include/sfmt
 )
+
+target_link_libraries(cockatrice_rng PUBLIC ${COCKATRICE_QT_MODULES}
+)

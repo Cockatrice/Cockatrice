@@ -12,7 +12,6 @@
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
-#include "color.h"
 #include "pb/command_attach_card.pb.h"
 #include "pb/command_set_card_counter.pb.h"
 #include "pb/event_create_arrow.pb.h"
@@ -22,6 +21,7 @@
 #include "pb/serverinfo_user.pb.h"
 #include "pb/serverinfo_zone.pb.h"
 #include "player_target.h"
+#include "utility/color.h"
 
 #include <QDebug>
 #include <QMenu>

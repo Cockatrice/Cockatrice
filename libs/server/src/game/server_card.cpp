@@ -17,10 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "../../include/game/server_card.h"
+#include "../../include/server/game/server_card.h"
 
-#include "../../include/game/server_cardzone.h"
-#include "../../include/game/server_player.h"
+#include "../../include/server/game/server_cardzone.h"
+#include "../../include/server/game/server_player.h"
 #include "pb/event_set_card_attr.pb.h"
 #include "pb/event_set_card_counter.pb.h"
 #include "pb/serverinfo_card.pb.h"

@@ -7,7 +7,7 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
-#include "../../../../libs/server/include/user_level.h"
+#include "../../../../libs/server/include/server/user_level.h"
 #include "pb/moderator_commands.pb.h"
 
 #include <QComboBox>

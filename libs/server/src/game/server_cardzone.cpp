@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "../../include/game/server_cardzone.h"
+#include "../../include/server/game/server_cardzone.h"
 
-#include "../../include/game/server_card.h"
-#include "../../include/game/server_player.h"
-#include "../rng_abstract.h"
+#include "../../include/server/game/server_card.h"
+#include "../../include/server/game/server_player.h"
 #include "pb/command_move_card.pb.h"
+#include "rng/rng_abstract.h"
 
 #include <QDebug>
 #include <QSet>

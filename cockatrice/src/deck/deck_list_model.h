@@ -1,10 +1,10 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "../../../libs/deck/abstract_deck_list_card_node.h"
-#include "../../../libs/deck/deck_list.h"
-#include "../../../libs/deck/deck_list_card_node.h"
 #include "card/card_printing/exact_card.h"
+#include "deck_list/abstract_deck_list_card_node.h"
+#include "deck_list/deck_list.h"
+#include "deck_list/deck_list_card_node.h"
 
 #include <QAbstractItemModel>
 #include <QList>

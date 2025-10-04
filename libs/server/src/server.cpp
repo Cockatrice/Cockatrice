@@ -17,22 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "../include/server.h"
+#include "../include/server/server.h"
 
-#include "../debug_pb_message.h"
-#include "../featureset.h"
-#include "../include/game/server_game.h"
-#include "../include/game/server_player.h"
-#include "../include/server_database_interface.h"
-#include "../include/server_protocolhandler.h"
-#include "../include/server_remoteuserinterface.h"
-#include "../include/server_room.h"
+#include "../include/server/debug_pb_message.h"
+#include "../include/server/game/server_game.h"
+#include "../include/server/game/server_player.h"
+#include "../include/server/server_database_interface.h"
+#include "../include/server/server_protocolhandler.h"
+#include "../include/server/server_remoteuserinterface.h"
+#include "../include/server/server_room.h"
 #include "pb/event_connection_closed.pb.h"
 #include "pb/event_list_rooms.pb.h"
 #include "pb/event_user_joined.pb.h"
 #include "pb/event_user_left.pb.h"
 #include "pb/isl_message.pb.h"
 #include "pb/session_event.pb.h"
+#include "utility/featureset.h"
 
 #include <QCoreApplication>
 #include <QDebug>
