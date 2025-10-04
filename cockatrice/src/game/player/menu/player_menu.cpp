@@ -1,6 +1,5 @@
 #include "player_menu.h"
 
-#include "pb/command_reveal_cards.pb.h"
 #include "../../../tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/hand_zone.h"
@@ -9,6 +8,7 @@
 #include "card/card_database/card_database_manager.h"
 #include "card_menu.h"
 #include "hand_menu.h"
+#include "pb/command_reveal_cards.pb.h"
 
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {

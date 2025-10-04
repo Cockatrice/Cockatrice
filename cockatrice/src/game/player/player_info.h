@@ -7,12 +7,12 @@
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 
-#include "pb/serverinfo_user.pb.h"
 #include "../../deck/deck_loader.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
+#include "pb/serverinfo_user.pb.h"
 #include "player_target.h"
 
 #include <QObject>
