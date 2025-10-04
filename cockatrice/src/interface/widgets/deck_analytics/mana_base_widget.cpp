@@ -6,9 +6,9 @@
 #include "card/card_database/card_database.h"
 #include "card/card_database/card_database_manager.h"
 
+#include <../../../../../libs/deck/deck_list.h>
 #include <QHash>
 #include <QRegularExpression>
-#include <deck_list.h>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)

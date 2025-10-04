@@ -1,13 +1,13 @@
 #include "dlg_create_token.h"
 
+#include "../../../../libs/deck/deck_list.h"
+#include "../../../../libs/utility/include/utility/trice_limits.h"
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../main.h"
 #include "card/card_database/card_database_manager.h"
 #include "card/card_database/model/card_database_model.h"
 #include "card/card_database/model/token/token_display_model.h"
-#include "deck_list.h"
 #include "settings/cache_settings.h"
-#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QCloseEvent>

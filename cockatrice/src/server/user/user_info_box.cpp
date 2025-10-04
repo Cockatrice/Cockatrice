@@ -1,5 +1,6 @@
 #include "user_info_box.h"
 
+#include "../../../../libs/utility/passwordhasher.h"
 #include "../../client/get_text_with_max.h"
 #include "../../dialogs/dlg_edit_avatar.h"
 #include "../../dialogs/dlg_edit_password.h"
@@ -7,7 +8,6 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../abstract_client.h"
 #include "../pending_command.h"
-#include "passwordhasher.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/serverinfo_user.pb.h"
 #include "pb/session_commands.pb.h"

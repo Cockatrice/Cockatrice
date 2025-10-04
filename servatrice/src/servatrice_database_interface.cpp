@@ -1,7 +1,7 @@
 #include "servatrice_database_interface.h"
 
-#include "deck_list.h"
-#include "passwordhasher.h"
+#include "../../libs/deck/deck_list.h"
+#include "../../libs/utility/passwordhasher.h"
 #include "pb/game_replay.pb.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"

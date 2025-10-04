@@ -1,5 +1,6 @@
 #include "tab_game.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/network/replay_timeline_widget.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
@@ -30,7 +31,6 @@
 #include "pb/serverinfo_user.pb.h"
 #include "settings/cache_settings.h"
 #include "tab_supervisor.h"
-#include "trice_limits.h"
 
 #include <QAction>
 #include <QCompleter>

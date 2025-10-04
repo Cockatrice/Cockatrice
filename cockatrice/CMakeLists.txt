@@ -270,9 +270,11 @@ set(cockatrice_SOURCES
     src/interface/utility/sequence_edit.cpp
 )
 
-add_subdirectory(libs/settings)
-add_subdirectory(libs/card)
-add_subdirectory(libs/utility)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/pb ${CMAKE_BINARY_DIR}/libs/pb)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/server ${CMAKE_BINARY_DIR}/libs/server)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/settings ${CMAKE_BINARY_DIR}/libs/settings)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/card ${CMAKE_BINARY_DIR}/libs/card)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/utility ${CMAKE_BINARY_DIR}/libs/utility)
 add_subdirectory(sounds)
 add_subdirectory(themes)
 configure_file(
@@ -365,9 +367,9 @@ elseif(Qt5_FOUND)
 endif()
 
 if(Qt5_FOUND)
-  target_link_libraries(cockatrice cardlib utility cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(cockatrice cardlib utility serverlib cockatrice_common ${COCKATRICE_QT_MODULES})
 else()
-  target_link_libraries(cockatrice PUBLIC cardlib utility cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(cockatrice PUBLIC cardlib utility serverlib cockatrice_common ${COCKATRICE_QT_MODULES})
 endif()
 
 if(UNIX)

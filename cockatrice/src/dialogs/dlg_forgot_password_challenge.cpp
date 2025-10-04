@@ -1,7 +1,7 @@
 #include "dlg_forgot_password_challenge.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "settings/cache_settings.h"
-#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QDebug>

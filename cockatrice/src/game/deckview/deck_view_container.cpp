@@ -1,5 +1,6 @@
 #include "deck_view_container.h"
 
+#include "../../../../libs/utility/include/utility/trice_limits.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
@@ -18,7 +19,6 @@
 #include "pb/command_set_sideboard_plan.pb.h"
 #include "pb/response_deck_download.pb.h"
 #include "settings/cache_settings.h"
-#include "trice_limits.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>

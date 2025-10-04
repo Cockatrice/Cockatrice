@@ -1,6 +1,6 @@
-#include "../common/passwordhasher.h"
-#include "../common/rng_abstract.h"
-#include "../common/rng_sfmt.h"
+#include "../libs/rng/include/rng/rng_abstract.h"
+#include "../libs/rng/include/rng/rng_sfmt.h"
+#include "../libs/utility/include/utility/passwordhasher.h"
 
 #include "gtest/gtest.h"
 

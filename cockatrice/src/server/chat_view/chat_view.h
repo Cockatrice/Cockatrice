@@ -8,10 +8,10 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
+#include "../../../../libs/server/include/room_message_type.h"
+#include "../../../../libs/server/include/user_level.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
-#include "room_message_type.h"
-#include "user_level.h"
 
 #include <QAction>
 #include <QColor>

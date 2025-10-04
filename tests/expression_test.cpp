@@ -1,4 +1,4 @@
-#include "../common/expression.h"
+#include "../libs/utility/include/utility/expression.h"
 
 #include "gtest/gtest.h"
 #include <QtMath>

@@ -1,12 +1,12 @@
 #include "tab_logs.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../deck/custom_line_edit.h"
 #include "../dialogs/dlg_manage_sets.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "pb/moderator_commands.pb.h"
 #include "pb/response_viewlog_history.pb.h"
-#include "trice_limits.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>

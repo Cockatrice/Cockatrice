@@ -1,7 +1,7 @@
 #include "dlg_edit_user.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "settings/cache_settings.h"
-#include "trice_limits.h"
 
 #include <QDebug>
 #include <QDialogButtonBox>

@@ -1,11 +1,11 @@
 #include "hand_menu.h"
 
-#include "../../../settings/cache_settings.h"
-#include "../../../settings/shortcuts_settings.h"
 #include "../../abstract_game.h"
 #include "../../zones/hand_zone.h"
 #include "../player.h"
 #include "../player_actions.h"
+#include "settings/cache_settings.h"
+#include "settings/shortcuts_settings.h"
 
 #include <QAction>
 #include <QMenu>

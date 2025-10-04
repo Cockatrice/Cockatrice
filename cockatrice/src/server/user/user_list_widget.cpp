@@ -1,5 +1,6 @@
 #include "user_list_widget.h"
 
+#include "../../../../libs/utility/include/utility/trice_limits.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_supervisor.h"
@@ -10,7 +11,6 @@
 #include "pb/response_get_games_of_user.pb.h"
 #include "pb/response_get_user_info.pb.h"
 #include "pb/session_commands.pb.h"
-#include "trice_limits.h"
 #include "user_context_menu.h"
 #include "user_list_manager.h"
 

@@ -1,10 +1,10 @@
 #include "tab_deck_storage.h"
 
+#include "../../../libs/deck/deck_list.h"
 #include "../client/get_text_with_max.h"
 #include "../deck/deck_loader.h"
 #include "../server/pending_command.h"
 #include "../server/remote/remote_decklist_tree_widget.h"
-#include "deck_list.h"
 #include "pb/command_deck_del.pb.h"
 #include "pb/command_deck_del_dir.pb.h"
 #include "pb/command_deck_download.pb.h"

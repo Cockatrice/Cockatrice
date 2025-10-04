@@ -1,5 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
+#include "../../../../libs/utility/include/utility/trice_limits.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
@@ -14,7 +15,6 @@
 #include "pb/command_deck_upload.pb.h"
 #include "settings/cache_settings.h"
 #include "tab_deck_editor_visual_tab_widget.h"
-#include "trice_limits.h"
 
 #include <QAction>
 #include <QApplication>

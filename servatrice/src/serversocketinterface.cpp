@@ -20,7 +20,8 @@
 
 #include "serversocketinterface.h"
 
-#include "deck_list.h"
+#include "../../libs/deck/deck_list.h"
+#include "../../libs/utility/include/utility/trice_limits.h"
 #include "email_parser.h"
 #include "main.h"
 #include "pb/command_deck_del.pb.h"
@@ -70,7 +71,6 @@
 #include "server/server_room.h"
 #include "server_logger.h"
 #include "settingscache.h"
-#include "trice_limits.h"
 #include "version_string.h"
 
 #include <QDateTime>

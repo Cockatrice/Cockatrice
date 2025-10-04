@@ -1,9 +1,9 @@
 #include "remote_client.h"
 
+#include "../../../../libs/server/debug_pb_message.h"
+#include "../../../../libs/utility/passwordhasher.h"
 #include "../../main.h"
 #include "../pending_command.h"
-#include "debug_pb_message.h"
-#include "passwordhasher.h"
 #include "pb/event_server_identification.pb.h"
 #include "pb/response_activate.pb.h"
 #include "pb/response_forgotpasswordrequest.pb.h"

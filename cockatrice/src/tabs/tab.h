@@ -7,7 +7,7 @@
 #ifndef TAB_H
 #define TAB_H
 
-#include "card_ref.h"
+#include "../../../libs/utility/include/utility/card_ref.h"
 
 #include <QMainWindow>
 

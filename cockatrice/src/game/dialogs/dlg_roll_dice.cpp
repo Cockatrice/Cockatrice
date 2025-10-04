@@ -1,6 +1,6 @@
 #include "dlg_roll_dice.h"
 
-#include "trice_limits.h"
+#include "../../../../libs/utility/include/utility/trice_limits.h"
 
 #include <QDialogButtonBox>
 #include <QLabel>

@@ -7,7 +7,7 @@
 #ifndef GETTEXTWITHMAX_H
 #define GETTEXTWITHMAX_H
 
-#include "trice_limits.h"
+#include "../../../libs/utility/include/utility/trice_limits.h"
 
 #include <QInputDialog>
 

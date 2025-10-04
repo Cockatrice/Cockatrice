@@ -1,5 +1,7 @@
 #include "tab_room.h"
 
+#include "../../../libs/server/get_pb_extension.h"
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../dialogs/dlg_settings.h"
 #include "../main.h"
 #include "../server/abstract_client.h"
@@ -8,7 +10,6 @@
 #include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
-#include "get_pb_extension.h"
 #include "pb/event_join_room.pb.h"
 #include "pb/event_leave_room.pb.h"
 #include "pb/event_list_games.pb.h"
@@ -19,7 +20,6 @@
 #include "settings/cache_settings.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
-#include "trice_limits.h"
 
 #include <QApplication>
 #include <QCompleter>

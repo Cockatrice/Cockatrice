@@ -7,8 +7,8 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
+#include "../../../../../libs/utility/include/utility/card_ref.h"
 #include "card/card_printing/exact_card.h"
-#include "card_ref.h"
 
 #include <QPushButton>
 #include <QTabWidget>

@@ -10,9 +10,9 @@
 #include "../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 
+#include <../../../../../libs/deck/deck_list.h>
 #include <QHBoxLayout>
 #include <QWidget>
-#include <deck_list.h>
 #include <utility>
 
 class ManaDevotionWidget : public QWidget

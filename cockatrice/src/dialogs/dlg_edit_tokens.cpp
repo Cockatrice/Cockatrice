@@ -1,12 +1,12 @@
 #include "dlg_edit_tokens.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/get_text_with_max.h"
 #include "../main.h"
 #include "card/card_database/card_database.h"
 #include "card/card_database/card_database_manager.h"
 #include "card/card_database/model/card_database_model.h"
 #include "card/card_database/model/token/token_edit_model.h"
-#include "trice_limits.h"
 
 #include <QAction>
 #include <QComboBox>

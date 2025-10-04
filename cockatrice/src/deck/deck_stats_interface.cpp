@@ -1,7 +1,7 @@
 #include "deck_stats_interface.h"
 
-#include "deck_list.h"
-#include "deck_list_card_node.h"
+#include "../../../libs/deck/deck_list.h"
+#include "../../../libs/deck/deck_list_card_node.h"
 
 #include <QDesktopServices>
 #include <QMessageBox>

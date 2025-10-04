@@ -1,11 +1,11 @@
 #include "library_menu.h"
 
-#include "../../../settings/cache_settings.h"
-#include "../../../settings/shortcuts_settings.h"
 #include "../../../tabs/tab_game.h"
 #include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"
+#include "settings/cache_settings.h"
+#include "settings/shortcuts_settings.h"
 
 #include <QAction>
 #include <QMenu>

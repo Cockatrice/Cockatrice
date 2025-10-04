@@ -19,9 +19,9 @@
  ***************************************************************************/
 #include "servatrice.h"
 
-#include "deck_list.h"
+#include "../../libs/deck/deck_list.h"
+#include "../../libs/utility/include/utility/featureset.h"
 #include "email_parser.h"
-#include "featureset.h"
 #include "isl_interface.h"
 #include "main.h"
 #include "pb/event_connection_closed.pb.h"

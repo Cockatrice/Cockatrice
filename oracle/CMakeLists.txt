@@ -45,8 +45,8 @@ endif()
 # Include directories
 # ------------------------
 include_directories(
-    ../cockatrice/libs/card/include
-    ../cockatrice/libs/settings/include
+    ../libs/card/include
+    ../libs/settings/include
     ../cockatrice/src
     ../common
 )

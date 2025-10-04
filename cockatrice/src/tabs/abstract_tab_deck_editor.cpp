@@ -1,5 +1,6 @@
 #include "abstract_tab_deck_editor.h"
 
+#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/tapped_out_interface.h"
 #include "../deck/deck_stats_interface.h"
 #include "../dialogs/dlg_load_deck.h"
@@ -16,7 +17,6 @@
 #include "pb/response.pb.h"
 #include "settings/cache_settings.h"
 #include "tab_supervisor.h"
-#include "trice_limits.h"
 
 #include <QAction>
 #include <QApplication>

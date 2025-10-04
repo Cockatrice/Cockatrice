@@ -7,7 +7,7 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
-#include "user_level.h"
+#include "../../../libs/server/include/user_level.h"
 
 #include <QIcon>
 #include <QLoggingCategory>
