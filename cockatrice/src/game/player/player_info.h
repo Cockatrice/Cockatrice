@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 
-#include "../../../common/pb/serverinfo_user.pb.h"
+#include "pb/serverinfo_user.pb.h"
 #include "../../deck/deck_loader.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"

@@ -1,7 +1,7 @@
 #include "player_actions.h"
 
-#include "../../../../libs/utility/include/utility/trice_limits.h"
-#include "../../../common/pb/context_move_card.pb.h"
+#include "utility/trice_limits.h"
+#include "pb/context_move_card.pb.h"
 #include "../../client/get_text_with_max.h"
 #include "../../tabs/tab_game.h"
 #include "../board/card_item.h"

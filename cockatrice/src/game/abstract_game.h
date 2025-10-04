@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_ABSTRACT_GAME_H
 #define COCKATRICE_ABSTRACT_GAME_H
 
-#include "../../../common/pb/game_replay.pb.h"
+#include "pb/game_replay.pb.h"
 #include "game_event_handler.h"
 #include "game_meta_info.h"
 #include "game_state.h"

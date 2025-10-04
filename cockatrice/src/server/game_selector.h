@@ -10,8 +10,8 @@
 #include "game_type_map.h"
 
 #include <QGroupBox>
-#include <common/pb/event_add_to_list.pb.h>
-#include <common/pb/event_remove_from_list.pb.h>
+#include <pb/event_add_to_list.pb.h>
+#include <pb/event_remove_from_list.pb.h>
 #include <pb/commands.pb.h>
 
 class QTreeView;
