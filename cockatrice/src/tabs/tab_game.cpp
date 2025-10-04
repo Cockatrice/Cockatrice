@@ -650,14 +650,6 @@ void TabGame::notifyPlayerKicked()
     msgBox.exec();
 }
 
-void TabGame::processPlayerLeave(Player *leavingPlayer)
-{
-    QString playerName = "@" + leavingPlayer->getPlayerInfo()->getName();
-    removePlayerFromAutoCompleteList(playerName);
-
-    scene->removePlayer(leavingPlayer);
-}
-
 Player *TabGame::addPlayer(Player *newPlayer)
 {
     QString newPlayerName = "@" + newPlayer->getPlayerInfo()->getName();
@@ -704,6 +696,31 @@ void TabGame::addLocalPlayer(Player *newPlayer, int playerId)
             deckView->playerDeckView->loadDeckFromFile(deckPath);
             deckView->playerDeckView->readyAndUpdate();
         });
+    }
+}
+
+void TabGame::processPlayerLeave(Player *leavingPlayer)
+{
+    QString playerName = "@" + leavingPlayer->getPlayerInfo()->getName();
+    removePlayerFromAutoCompleteList(playerName);
+
+    scene->removePlayer(leavingPlayer);
+
+    // When we inserted the playerMenu into the gameMenu earlier, Qt wrapped the playerMenu into a QAction*, which lives
+    // independently and does not get cleaned up when the source menu gets destroyed. We have to manually clean here.
+    if (leavingPlayer->getPlayerMenu()) {
+        QMenu *menu = leavingPlayer->getPlayerMenu()->getPlayerMenu();
+        if (menu) {
+            // Find and remove the QAction pointing to this menu
+            QList<QAction *> actions = gameMenu->actions();
+            for (QAction *act : actions) {
+                if (act->menu() == menu) {
+                    gameMenu->removeAction(act);
+                    delete act; // deletes the QAction wrapper around the submenu
+                    break;
+                }
+            }
+        }
     }
 }
 
