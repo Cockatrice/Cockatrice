@@ -27,7 +27,6 @@ add_library(cockatrice_deck_list STATIC
 
 target_include_directories(cockatrice_deck_list
     PUBLIC include
-    PUBLIC ${CMAKE_BINARY_DIR}/libs/pb
 )
 
 target_link_libraries(cockatrice_deck_list
