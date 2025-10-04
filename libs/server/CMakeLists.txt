@@ -30,7 +30,7 @@ elseif (Qt5_FOUND)
     qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif ()
 
-add_library(serverlib STATIC
+add_library(cockatrice_server STATIC
     src/game/server_abstract_participant.cpp
     src/game/server_arrow.cpp
     src/game/server_arrowtarget.cpp
@@ -53,7 +53,7 @@ add_library(serverlib STATIC
     ${MOC_SOURCES}
 )
 
-target_include_directories(serverlib
+target_include_directories(cockatrice_server
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
     PUBLIC ${CMAKE_SOURCE_DIR}/libs/pb
@@ -61,7 +61,7 @@ target_include_directories(serverlib
     PUBLIC ${CMAKE_BINARY_DIR}/libs/pb
 )
 
-# Make serverlib depend on cockatrice_protocol
-target_link_libraries(serverlib
+# Make cockatrice_server depend on cockatrice_protocol
+target_link_libraries(cockatrice_server
     PUBLIC cockatrice_common cockatrice_protocol utility cockatrice_rng cockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )

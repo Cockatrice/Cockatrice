@@ -27,8 +27,8 @@ add_executable(carddatabase_test
 )
 
 target_link_libraries(carddatabase_test
-    PRIVATE cardlib
-    PRIVATE settingslib
+    PRIVATE cockatrice_card
+    PRIVATE cockatrice_settings
     PRIVATE cockatrice_common
     PRIVATE Threads::Threads
     PRIVATE ${GTEST_BOTH_LIBRARIES}
@@ -51,8 +51,8 @@ add_executable(filter_string_test
 )
 
 target_link_libraries(filter_string_test
-    PRIVATE cardlib
-    PRIVATE settingslib
+    PRIVATE cockatrice_card
+    PRIVATE cockatrice_settings
     PRIVATE cockatrice_common
     PRIVATE Threads::Threads
     PRIVATE ${GTEST_BOTH_LIBRARIES}

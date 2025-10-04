@@ -30,7 +30,7 @@ elseif (Qt5_FOUND)
     qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif ()
 
-qt_add_library(cardlib STATIC
+qt_add_library(cockatrice_card STATIC
     src/card_info.cpp
     src/card_info_comparator.cpp
     src/card_database/card_database.cpp
@@ -54,14 +54,14 @@ qt_add_library(cardlib STATIC
     ${MOC_SOURCES}
 )
 
-target_include_directories(cardlib
+target_include_directories(cockatrice_card
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
     PUBLIC ${CMAKE_SOURCE_DIR}/libs/settings/include
     PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/filters
 )
 
-target_link_libraries(cardlib
-    PUBLIC settingslib
+target_link_libraries(cockatrice_card
+    PUBLIC cockatrice_settings
     PUBLIC ${COCKATRICE_QT_MODULES}
 )

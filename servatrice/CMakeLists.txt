@@ -106,9 +106,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
-  target_link_libraries(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
+  target_link_libraries(servatrice cockatrice_common cockatrice_deck_list cockatrice_server Threads::Threads ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
 else()
-  target_link_libraries(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES})
+  target_link_libraries(servatrice cockatrice_common cockatrice_deck_list cockatrice_server Threads::Threads ${SERVATRICE_QT_MODULES})
 endif()
 
 # install rules

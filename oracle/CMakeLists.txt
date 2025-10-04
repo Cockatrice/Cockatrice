@@ -104,8 +104,8 @@ endif()
 # Link libraries
 # ------------------------
 target_link_libraries(oracle
-    PRIVATE cardlib
-    PRIVATE settingslib
+    PRIVATE cockatrice_card
+    PRIVATE cockatrice_settings
     PRIVATE ${ORACLE_QT_MODULES}
 )
 
