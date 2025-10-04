@@ -11,18 +11,23 @@ on:
       - master
     paths-ignore:
       - '**.md'
+      - 'doc/**'
       - 'webclient/**'
-      - '.github/workflows/web-*.yml'
+      - '.github/workflows/docker-*.yml'
+      - '.github/workflows/documentation-*.yml'
       - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+      - '.github/workflows/web-*.yml'
     tags:
       - '*'
   pull_request:
     paths-ignore:
       - '**.md'
+      - 'doc/**'
       - 'webclient/**'
-      - '.github/workflows/web-*.yml'
+      - '.github/workflows/docker-*.yml'
+      - '.github/workflows/documentation-*.yml'
       - '.github/workflows/translations-*.yml'
+      - '.github/workflows/web-*.yml'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:

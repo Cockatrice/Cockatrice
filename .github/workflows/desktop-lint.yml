@@ -4,10 +4,12 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
+      - 'doc/**'
       - 'webclient/**'
-      - '.github/workflows/web-*.yml'
+      - '.github/workflows/docker-*.yml'
+      - '.github/workflows/documentation-*.yml'
       - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+      - '.github/workflows/web-*.yml'
 
 jobs:
   format:
