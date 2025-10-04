@@ -46,10 +46,9 @@ add_library(cockatrice_settings STATIC
 target_include_directories(cockatrice_settings
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
-    PUBLIC ${CMAKE_SOURCE_DIR}/libs/utility/include
     PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network
 )
 
 target_link_libraries(cockatrice_settings
-    PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES}
+    PUBLIC cockatrice_common utility ${COCKATRICE_QT_MODULES}
 )

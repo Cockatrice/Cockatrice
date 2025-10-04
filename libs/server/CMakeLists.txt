@@ -56,8 +56,6 @@ add_library(cockatrice_server STATIC
 target_include_directories(cockatrice_server
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
-    PUBLIC ${CMAKE_SOURCE_DIR}/libs/pb
-    PUBLIC ${CMAKE_SOURCE_DIR}/libs/utility
     PUBLIC ${CMAKE_BINARY_DIR}/libs/pb
 )
 

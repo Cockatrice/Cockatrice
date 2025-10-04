@@ -57,7 +57,6 @@ add_library(cockatrice_card STATIC
 target_include_directories(cockatrice_card
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
-    PUBLIC ${CMAKE_SOURCE_DIR}/libs/settings/include
     PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/filters
 )
 

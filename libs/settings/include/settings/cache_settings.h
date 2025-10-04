@@ -17,13 +17,13 @@
 #include "recents_settings.h"
 #include "servers_settings.h"
 #include "shortcuts_settings.h"
+#include "utility/macros.h"
 
 #include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
 #include <QSize>
 #include <QStringList>
-#include <utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
