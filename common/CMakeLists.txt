@@ -2,8 +2,7 @@
 #
 # provides the common library
 
-set(common_SOURCES
-)
+set(common_SOURCES)
 
 set(ORACLE_LIBS)
 

@@ -44,12 +44,7 @@ endif()
 # ------------------------
 # Include directories
 # ------------------------
-include_directories(
-    ../libs/card/include
-    ../libs/settings/include
-    ../cockatrice/src
-    ../common
-)
+include_directories(../libs/card/include ../libs/settings/include ../cockatrice/src ../common)
 
 # ------------------------
 # Optional libraries
@@ -79,13 +74,13 @@ endif()
 # ------------------------
 if(Qt6_FOUND)
   qt6_add_executable(
-      oracle
-      WIN32
-      MACOSX_BUNDLE
-      ${oracle_SOURCES}
-      ${oracle_RESOURCES_RCC}
-      ${oracle_MOC_SRCS}
-      MANUAL_FINALIZATION
+    oracle
+    WIN32
+    MACOSX_BUNDLE
+    ${oracle_SOURCES}
+    ${oracle_RESOURCES_RCC}
+    ${oracle_MOC_SRCS}
+    MANUAL_FINALIZATION
   )
 elseif(Qt5_FOUND)
   if(Qt5LinguistTools_FOUND)
@@ -103,10 +98,11 @@ endif()
 # ------------------------
 # Link libraries
 # ------------------------
-target_link_libraries(oracle
-    PRIVATE cockatrice_card
-    PRIVATE cockatrice_settings
-    PRIVATE ${ORACLE_QT_MODULES}
+target_link_libraries(
+  oracle
+  PRIVATE cockatrice_card
+  PRIVATE cockatrice_settings
+  PRIVATE ${ORACLE_QT_MODULES}
 )
 
 if(ZLIB_FOUND)
@@ -135,7 +131,7 @@ endif()
 
 if(NOT WIN32 AND NOT APPLE)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
-endif ()
+endif()
 
 # ------------------------
 # Qt plugin handling
@@ -145,36 +141,36 @@ if(APPLE)
   set(qtconf_dest_dir oracle.app/Contents/Resources)
 
   install(
-      DIRECTORY "${QT_PLUGINS_DIR}/"
-      DESTINATION ${plugin_dest_dir}
-      COMPONENT Runtime
-      FILES_MATCHING
-      PATTERN "*.dSYM" EXCLUDE
-      PATTERN "*_debug.dylib" EXCLUDE
-      PATTERN "iconengines/*.dylib"
-      PATTERN "platforms/*.dylib"
-      PATTERN "styles/*.dylib"
-      PATTERN "tls/*.dylib"
+    DIRECTORY "${QT_PLUGINS_DIR}/"
+    DESTINATION ${plugin_dest_dir}
+    COMPONENT Runtime
+    FILES_MATCHING
+    PATTERN "*.dSYM" EXCLUDE
+    PATTERN "*_debug.dylib" EXCLUDE
+    PATTERN "iconengines/*.dylib"
+    PATTERN "platforms/*.dylib"
+    PATTERN "styles/*.dylib"
+    PATTERN "tls/*.dylib"
   )
 
   install(
-      CODE "
+    CODE "
     file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
     "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 
   install(
-      CODE "
+    CODE "
     file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
     "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 endif()
 
@@ -184,49 +180,49 @@ if(WIN32)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
   install(
-      DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
-      DESTINATION ./
-      FILES_MATCHING
-      PATTERN "*.dll"
+    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.dll"
   )
 
   install(
-      DIRECTORY "${QT_PLUGINS_DIR}/"
-      DESTINATION ${plugin_dest_dir}
-      COMPONENT Runtime
-      FILES_MATCHING
-      PATTERN "iconengines/qsvgicon.dll"
-      PATTERN "platforms/qdirect2d.dll"
-      PATTERN "platforms/qminimal.dll"
-      PATTERN "platforms/qoffscreen.dll"
-      PATTERN "platforms/qwindows.dll"
-      PATTERN "styles/qcertonlybackend.dll"
-      PATTERN "styles/qopensslbackend.dll"
-      PATTERN "styles/qschannelbackend.dll"
-      PATTERN "styles/qwindowsvistastyle.dll"
-      PATTERN "tls/qcertonlybackend.dll"
-      PATTERN "tls/qopensslbackend.dll"
-      PATTERN "tls/qschannelbackend.dll"
+    DIRECTORY "${QT_PLUGINS_DIR}/"
+    DESTINATION ${plugin_dest_dir}
+    COMPONENT Runtime
+    FILES_MATCHING
+    PATTERN "iconengines/qsvgicon.dll"
+    PATTERN "platforms/qdirect2d.dll"
+    PATTERN "platforms/qminimal.dll"
+    PATTERN "platforms/qoffscreen.dll"
+    PATTERN "platforms/qwindows.dll"
+    PATTERN "styles/qcertonlybackend.dll"
+    PATTERN "styles/qopensslbackend.dll"
+    PATTERN "styles/qschannelbackend.dll"
+    PATTERN "styles/qwindowsvistastyle.dll"
+    PATTERN "tls/qcertonlybackend.dll"
+    PATTERN "tls/qopensslbackend.dll"
+    PATTERN "tls/qschannelbackend.dll"
   )
 
   install(
-      CODE "
+    CODE "
     file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
     "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 
   install(
-      CODE "
+    CODE "
     file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
     set(BU_CHMOD_BUNDLE_ITEMS ON)
     include(BundleUtilities)
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
     "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 endif()
 
@@ -237,10 +233,13 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   if(UPDATE_TRANSLATIONS)
     file(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
     qt6_add_translations(
-        oracle
-        TS_FILES ${oracle_TS}
-        SOURCES ${translate_oracle_SRCS}
-        QM_FILES_OUTPUT_VARIABLE oracle_QM
+      oracle
+      TS_FILES
+      ${oracle_TS}
+      SOURCES
+      ${translate_oracle_SRCS}
+      QM_FILES_OUTPUT_VARIABLE
+      oracle_QM
     )
   else()
     qt6_add_translations(oracle TS_FILES ${oracle_TS} QM_FILES_OUTPUT_VARIABLE oracle_QM)

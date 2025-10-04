@@ -19,36 +19,36 @@ set(HEADERS
     include/settings/shortcuts_settings.h
 )
 
-if (Qt6_FOUND)
-    qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif (Qt5_FOUND)
-    qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif ()
+if(Qt6_FOUND)
+  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
+elseif(Qt5_FOUND)
+  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+endif()
 
-add_library(cockatrice_settings STATIC
-    src/cache_settings.cpp
-    src/card_counter_settings.cpp
-    src/card_database_settings.cpp
-    src/card_override_settings.cpp
-    src/debug_settings.cpp
-    src/download_settings.cpp
-    src/game_filters_settings.cpp
-    src/layouts_settings.cpp
-    src/message_settings.cpp
-    src/recents_settings.cpp
-    src/servers_settings.cpp
-    src/settings_manager.cpp
-    src/shortcut_treeview.cpp
-    src/shortcuts_settings.cpp
-    ${MOC_SOURCES}
+add_library(
+  cockatrice_settings STATIC
+  ${MOC_SOURCES}
+  src/cache_settings.cpp
+  src/card_counter_settings.cpp
+  src/card_database_settings.cpp
+  src/card_override_settings.cpp
+  src/debug_settings.cpp
+  src/download_settings.cpp
+  src/game_filters_settings.cpp
+  src/layouts_settings.cpp
+  src/message_settings.cpp
+  src/recents_settings.cpp
+  src/servers_settings.cpp
+  src/settings_manager.cpp
+  src/shortcut_treeview.cpp
+  src/shortcuts_settings.cpp
 )
 
-target_include_directories(cockatrice_settings
-    PUBLIC include
-    PUBLIC ${CMAKE_SOURCE_DIR}/common
-    PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network
+target_include_directories(
+  cockatrice_settings
+  PUBLIC include
+  PUBLIC ${CMAKE_SOURCE_DIR}/common
+  PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network
 )
 
-target_link_libraries(cockatrice_settings
-    PUBLIC cockatrice_common utility ${COCKATRICE_QT_MODULES}
-)
+target_link_libraries(cockatrice_settings PUBLIC cockatrice_common utility ${COCKATRICE_QT_MODULES})

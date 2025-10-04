@@ -5,13 +5,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(UTILITY_SOURCES
-    src/expression.cpp
-    src/featureset.cpp
-    src/key_signals.cpp
-    src/levenshtein.cpp
-    src/logger.cpp
-    src/passwordhasher.cpp
+set(UTILITY_SOURCES src/expression.cpp src/featureset.cpp src/key_signals.cpp src/levenshtein.cpp src/logger.cpp
+                    src/passwordhasher.cpp
 )
 
 set(UTILITY_HEADERS
@@ -26,18 +21,11 @@ set(UTILITY_HEADERS
     include/utility/trice_limits.h
 )
 
-add_library(utility STATIC
-    ${UTILITY_SOURCES}
-    ${UTILITY_HEADERS}
-)
+add_library(utility STATIC ${UTILITY_SOURCES} ${UTILITY_HEADERS})
 
-target_include_directories(utility
-    PUBLIC include
-)
+target_include_directories(utility PUBLIC include)
 
-target_link_libraries(utility
-    PUBLIC ${COCKATRICE_QT_MODULES}
-)
+target_link_libraries(utility PUBLIC ${COCKATRICE_QT_MODULES})
 
 set(ORACLE_LIBS)
 

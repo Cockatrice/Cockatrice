@@ -362,9 +362,27 @@ elseif(Qt5_FOUND)
 endif()
 
 if(Qt5_FOUND)
-  target_link_libraries(cockatrice cockatrice_card cockatrice_deck_list utility cockatrice_server cockatrice_rng cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice
+    cockatrice_card
+    cockatrice_deck_list
+    utility
+    cockatrice_server
+    cockatrice_rng
+    cockatrice_common
+    ${COCKATRICE_QT_MODULES}
+  )
 else()
-  target_link_libraries(cockatrice PUBLIC cockatrice_card cockatrice_deck_list utility cockatrice_server cockatrice_rng cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice
+    PUBLIC cockatrice_card
+           cockatrice_deck_list
+           utility
+           cockatrice_server
+           cockatrice_rng
+           cockatrice_common
+           ${COCKATRICE_QT_MODULES}
+  )
 endif()
 
 if(UNIX)

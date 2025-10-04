@@ -4,11 +4,7 @@ project(Dbconverter VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.$
 # ------------------------
 # Sources
 # ------------------------
-set(dbconverter_SOURCES
-    src/main.cpp
-    src/mocks.cpp
-    ${VERSION_STRING_CPP}
-)
+set(dbconverter_SOURCES src/main.cpp src/mocks.cpp ${VERSION_STRING_CPP})
 
 # ------------------------
 # Qt configuration
@@ -26,18 +22,20 @@ add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES})
 # ------------------------
 # Include directories
 # ------------------------
-target_include_directories(dbconverter
-    PRIVATE ../common          # shared common headers
-    PRIVATE ../libs/card/include  # cockatrice_card public headers
+target_include_directories(
+  dbconverter
+  PRIVATE ../common # shared common headers
+  PRIVATE ../libs/card/include # cockatrice_card public headers
 )
 
 # ------------------------
 # Link libraries
 # ------------------------
-target_link_libraries(dbconverter
-    PRIVATE cockatrice_card
-    PRIVATE cockatrice_settings
-    PRIVATE ${DB_CONVERTER_QT_MODULES}
+target_link_libraries(
+  dbconverter
+  PRIVATE cockatrice_card
+  PRIVATE cockatrice_settings
+  PRIVATE ${DB_CONVERTER_QT_MODULES}
 )
 
 # ------------------------
@@ -69,33 +67,33 @@ if(APPLE)
   set(qtconf_dest_dir dbconverter.app/Contents/Resources)
 
   install(
-      DIRECTORY "${QT_PLUGINS_DIR}/"
-      DESTINATION ${plugin_dest_dir}
-      COMPONENT Runtime
-      FILES_MATCHING
-      PATTERN "*.dSYM" EXCLUDE
-      PATTERN "*_debug.dylib" EXCLUDE
-      PATTERN "platforms/*.dylib"
+    DIRECTORY "${QT_PLUGINS_DIR}/"
+    DESTINATION ${plugin_dest_dir}
+    COMPONENT Runtime
+    FILES_MATCHING
+    PATTERN "*.dSYM" EXCLUDE
+    PATTERN "*_debug.dylib" EXCLUDE
+    PATTERN "platforms/*.dylib"
   )
 
   install(
-      CODE "
+    CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
         "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 
   install(
-      CODE "
+    CODE "
         file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
         "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 endif()
 
@@ -104,40 +102,40 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-      DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
-      DESTINATION ./
-      FILES_MATCHING
-      PATTERN "*.dll"
+    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DESTINATION ./
+    FILES_MATCHING
+    PATTERN "*.dll"
   )
 
   install(
-      DIRECTORY "${QT_PLUGINS_DIR}/"
-      DESTINATION ${plugin_dest_dir}
-      COMPONENT Runtime
-      FILES_MATCHING
-      PATTERN "platforms/qdirect2d.dll"
-      PATTERN "platforms/qminimal.dll"
-      PATTERN "platforms/qoffscreen.dll"
-      PATTERN "platforms/qwindows.dll"
+    DIRECTORY "${QT_PLUGINS_DIR}/"
+    DESTINATION ${plugin_dest_dir}
+    COMPONENT Runtime
+    FILES_MATCHING
+    PATTERN "platforms/qdirect2d.dll"
+    PATTERN "platforms/qminimal.dll"
+    PATTERN "platforms/qoffscreen.dll"
+    PATTERN "platforms/qwindows.dll"
   )
 
   install(
-      CODE "
+    CODE "
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
         "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 
   install(
-      CODE "
+    CODE "
         file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
         set(BU_CHMOD_BUNDLE_ITEMS ON)
         include(BundleUtilities)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
         "
-      COMPONENT Runtime
+    COMPONENT Runtime
   )
 endif()
