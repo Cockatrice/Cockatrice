@@ -30,7 +30,7 @@ elseif (Qt5_FOUND)
     qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif ()
 
-qt_add_library(cockatrice_card STATIC
+add_library(cockatrice_card STATIC
     src/card_info.cpp
     src/card_info_comparator.cpp
     src/card_database/card_database.cpp

@@ -26,7 +26,7 @@ set(UTILITY_HEADERS
     include/utility/trice_limits.h
 )
 
-qt_add_library(utility STATIC
+add_library(utility STATIC
     ${UTILITY_SOURCES}
     ${UTILITY_HEADERS}
 )
