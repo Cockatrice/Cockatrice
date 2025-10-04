@@ -127,14 +127,15 @@ if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
   if [[ $TARGET_MACOS_VERSION ]]; then
-  mkdir -p ../cmake/triplets
+  TRIPLETS_DIR="../cmake/triplets"
+  mkdir -p "$TRIPLETS_DIR"
   # Replace dots with hyphens in triplet name for vcpkg compatibility
   TRIPLET_VERSION=$(echo "${TARGET_MACOS_VERSION}" | sed 's/\./-/g')
-  TRIPLET_FILE="../cmake/triplets/x64-osx-${TRIPLET_VERSION}.cmake"
+  TRIPLET_FILE="$TRIPLETS_DIR/x64-osx-${TRIPLET_VERSION}.cmake"
   cp ../vcpkg/triplets/x64-osx.cmake "$TRIPLET_FILE"
   echo "set(VCPKG_CMAKE_SYSTEM_VERSION ${TARGET_MACOS_VERSION})" >> "$TRIPLET_FILE"
   echo "set(VCPKG_OSX_DEPLOYMENT_TARGET ${TARGET_MACOS_VERSION})" >> "$TRIPLET_FILE"
-  flags+=("-DVCPKG_OVERLAY_TRIPLETS=../cmake/triplets")
+  flags+=("-DVCPKG_OVERLAY_TRIPLETS=$TRIPLETS_DIR")
   flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-${TRIPLET_VERSION}")
   flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=${TARGET_MACOS_VERSION}")
   echo "::group::Generated triplet $TRIPLET_FILE"
