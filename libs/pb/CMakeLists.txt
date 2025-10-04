@@ -167,15 +167,22 @@ set(PROTO_FILES
 
 if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   message(STATUS "Using Protobuf Legacy Mode")
-  include_directories(${PROTOBUF_INCLUDE_DIRS})
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pb)
   set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/pb")
+
+  include_directories(${PROTOBUF_INCLUDE_DIRS})
+  include_directories(${PROTO_BINARY_DIR})  # pb/ folder
+
   protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
-  foreach (file ${PROTO_SRCS} ${PROTO_HDRS})
-    get_filename_component(fname ${file} NAME)
-    file(RENAME ${file} ${CMAKE_CURRENT_BINARY_DIR}/pb/${fname})
+  # Move files at build time using a custom command
+  foreach (f ${PROTO_SRCS} ${PROTO_HDRS})
+    get_filename_component(fname ${f} NAME)
+    add_custom_command(
+        TARGET cockatrice_protocol POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${f} ${PROTO_BINARY_DIR}/${fname}
+    )
   endforeach ()
 
   add_library(cockatrice_protocol ${PROTO_SRCS} ${PROTO_HDRS})
@@ -184,8 +191,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
     set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lpthread)
   endif(UNIX)
   target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
-  target_include_directories(cockatrice_protocol PUBLIC "${PROTOBUF_INCLUDE_DIRS}" PUBLIC ${CMAKE_CURRENT_BINARY_DIR} PUBLIC ${PROTO_BINARY_DIR})
-
+  target_include_directories(cockatrice_protocol PUBLIC ${PROTO_BINARY_DIR})
   # ubuntu uses an outdated package for protobuf, 3.1.0 is required
   if(${Protobuf_VERSION} VERSION_LESS "3.1.0")
     # remove unused parameter and misleading indentation warnings when compiling to avoid errors
