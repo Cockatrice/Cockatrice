@@ -13,5 +13,5 @@ target_link_libraries(cockatrice_protocol_wrapper
 
 # Expose the pb/ folder so consumers can do #include "pb/header.pb.h"
 target_include_directories(cockatrice_protocol_wrapper
-    PUBLIC ${CMAKE_BINARY_DIR}  # points to the generated headers
+    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}  # points to the generated headers
 )
