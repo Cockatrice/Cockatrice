@@ -31,5 +31,5 @@ target_include_directories(cockatrice_deck_list
 )
 
 target_link_libraries(cockatrice_deck_list
-    PUBLIC utility ${COCKATRICE_QT_MODULES}
+    PUBLIC cockatrice_protocol utility ${COCKATRICE_QT_MODULES}
 )

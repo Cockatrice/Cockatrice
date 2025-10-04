@@ -11,13 +11,13 @@
 #define DECKLIST_H
 
 #include "inner_deck_list_node.h"
+#include "pb/move_card_to_zone.pb.h"
 #include "utility/card_ref.h"
 
 #include <QMap>
 #include <QVector>
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
-#include <common/pb/move_card_to_zone.pb.h>
 
 class AbstractDecklistNode;
 class DecklistCardNode;
