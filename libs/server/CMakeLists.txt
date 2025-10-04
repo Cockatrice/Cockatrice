@@ -53,6 +53,8 @@ add_library(cockatrice_server STATIC
     ${MOC_SOURCES}
 )
 
+add_dependencies(cockatrice_server cockatrice_protocol_wrapper)
+
 target_include_directories(cockatrice_server
     PUBLIC include
     PUBLIC ${CMAKE_SOURCE_DIR}/common
@@ -60,5 +62,5 @@ target_include_directories(cockatrice_server
 
 # Make cockatrice_server depend on cockatrice_protocol
 target_link_libraries(cockatrice_server
-    PUBLIC cockatrice_common cockatrice_protocol utility cockatrice_rng cockatrice_deck_list ${COCKATRICE_QT_MODULES}
+    PUBLIC cockatrice_common cockatrice_protocol_wrapper utility cockatrice_rng cockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )

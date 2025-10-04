@@ -25,10 +25,12 @@ add_library(cockatrice_deck_list STATIC
     ${MOC_SOURCES}
 )
 
+add_dependencies(cockatrice_deck_list cockatrice_protocol_wrapper)
+
 target_include_directories(cockatrice_deck_list
     PUBLIC include
 )
 
 target_link_libraries(cockatrice_deck_list
-    PUBLIC cockatrice_protocol utility ${COCKATRICE_QT_MODULES}
+    PUBLIC cockatrice_protocol_wrapper utility ${COCKATRICE_QT_MODULES}
 )

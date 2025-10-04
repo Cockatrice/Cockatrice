@@ -165,46 +165,18 @@ set(PROTO_FILES
     session_event.proto
 )
 
-# Common output directory for generated files
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pb)
-set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/pb")
-
 if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   message(STATUS "Using Protobuf Legacy Mode")
-
   include_directories(${PROTOBUF_INCLUDE_DIRS})
-  include_directories(${PROTO_BINARY_DIR})  # expose pb/ folder
-
-  # Generate protobuf cpp/h files directly into pb/
-  set(PROTO_SRCS)
-  set(PROTO_HDRS)
-  foreach (f ${PROTO_FILES})
-    get_filename_component(fname ${f} NAME_WE)
-    set(src_cpp ${PROTO_BINARY_DIR}/${fname}.pb.cc)
-    set(src_h ${PROTO_BINARY_DIR}/${fname}.pb.h)
-
-    add_custom_command(
-        OUTPUT ${src_cpp} ${src_h}
-        COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-        --cpp_out=${PROTO_BINARY_DIR}
-        -I ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/${f}
-        DEPENDS ${CMAKE_CURRENT_LIST_DIR}/${f}
-        COMMENT "Generating ${fname}.pb.cc / .pb.h"
-    )
-
-    list(APPEND PROTO_SRCS ${src_cpp})
-    list(APPEND PROTO_HDRS ${src_h})
-  endforeach ()
+  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
   add_library(cockatrice_protocol ${PROTO_SRCS} ${PROTO_HDRS})
-
   set(cockatrice_protocol_LIBS ${PROTOBUF_LIBRARIES})
   if(UNIX)
     set(cockatrice_protocol_LIBS ${cockatrice_protocol_LIBS} -lpthread)
   endif(UNIX)
   target_link_libraries(cockatrice_protocol ${cockatrice_protocol_LIBS})
-  target_include_directories(cockatrice_protocol PUBLIC ${PROTO_BINARY_DIR})
 
   # ubuntu uses an outdated package for protobuf, 3.1.0 is required
   if(${Protobuf_VERSION} VERSION_LESS "3.1.0")
@@ -218,7 +190,8 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
 else()
   add_library(cockatrice_protocol ${PROTO_FILES})
   target_link_libraries(cockatrice_protocol PUBLIC protobuf::libprotobuf)
-  target_include_directories(cockatrice_protocol PUBLIC "${PROTOBUF_INCLUDE_DIRS}" PUBLIC ${CMAKE_CURRENT_BINARY_DIR} PUBLIC ${PROTO_BINARY_DIR})
+  set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+  target_include_directories(cockatrice_protocol PUBLIC "${PROTOBUF_INCLUDE_DIRS}")
 
   protobuf_generate(
       TARGET cockatrice_protocol IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}" PROTOC_OUT_DIR "${PROTO_BINARY_DIR}"
