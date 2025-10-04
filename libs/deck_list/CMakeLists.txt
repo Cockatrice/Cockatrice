@@ -16,7 +16,7 @@ elseif (Qt5_FOUND)
     qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif ()
 
-qt_add_library(cockatrice_deck_list STATIC
+add_library(cockatrice_deck_list STATIC
     src/abstract_deck_list_card_node.cpp
     src/abstract_deck_list_node.cpp
     src/deck_list.cpp
