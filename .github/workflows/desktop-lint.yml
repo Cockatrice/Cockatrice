@@ -2,14 +2,15 @@ name: Code Style (C++)
 
 on:
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'doc/**'
-      - 'webclient/**'
-      - '.github/workflows/docker-*.yml'
-      - '.github/workflows/documentation-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/web-*.yml'
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky'
+      - '!.tx'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-lint.yml'
 
 jobs:
   format:

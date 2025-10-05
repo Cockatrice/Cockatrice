@@ -9,25 +9,27 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-      - 'doc/**'
-      - 'webclient/**'
-      - '.github/workflows/docker-*.yml'
-      - '.github/workflows/documentation-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/web-*.yml'
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
     tags:
       - '*'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'doc/**'
-      - 'webclient/**'
-      - '.github/workflows/docker-*.yml'
-      - '.github/workflows/documentation-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/web-*.yml'
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
