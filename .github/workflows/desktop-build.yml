@@ -9,20 +9,31 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
     tags:
       - '*'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:

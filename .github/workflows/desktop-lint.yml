@@ -2,12 +2,20 @@ name: Code Style (C++)
 
 on:
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.ci/**'
+      - '!.github/**'
+      - '!.husky'
+      - '!.tx'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-lint.yml'
+      - '.ci/lint_cpp.sh'
+      - '.clang-format'
+      - '.cmake-format.json'
+      - 'format.sh'
 
 jobs:
   format:
