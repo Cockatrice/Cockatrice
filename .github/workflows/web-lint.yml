@@ -1,11 +1,18 @@
 name: Code Style (TypeScript) 
 
 on:
-  pull_request:
+  push:
+    branches:
+      - master
     paths:
-      - '.github/workflows/web-*.yml'
       - 'webclient/**'
       - '!**.md'
+      - '.github/workflows/web-lint.yml'
+  pull_request:
+    paths:
+      - 'webclient/**'
+      - '!**.md'
+      - '.github/workflows/web-lint.yml'
 
 jobs:
   ESLint:

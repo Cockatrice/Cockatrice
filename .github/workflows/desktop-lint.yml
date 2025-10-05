@@ -1,14 +1,30 @@
 name: Code Style (C++) 
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**'
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-lint.yml'
+      - '.ci/lint_cpp.sh'
+      - '.clang-format'
+      - '.cmake-format.json'
+      - 'format.sh'
   pull_request:
     paths:
       - '*/**'    # matches all files not in root
       - '!**.md'
       - '!.ci/**'
       - '!.github/**'
-      - '!.husky'
-      - '!.tx'
+      - '!.husky/**'
+      - '!.tx/**'
       - '!doc/**'
       - '!webclient/**'
       - '.github/workflows/desktop-lint.yml'
