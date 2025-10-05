@@ -251,12 +251,6 @@ jobs:
             type: Release
             make_package: 1
 
-          - target: 15
-            soc: Apple
-            os: macos-15
-            xcode: "16.2"
-            type: Debug
-
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.os}}
@@ -398,6 +392,56 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
         run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
+
+  build-macos-debug:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: 15
+            soc: Apple
+            os: macos-15
+            xcode: "16.4"
+            type: Debug
+
+    name: macOS Debug (homebrew)
+    needs: configure
+    runs-on: ${{matrix.os}}
+    continue-on-error: ${{matrix.allow-failure == 'yes'}}
+    env:
+      CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
+      CCACHE_SIZE: 500M
+      DEVELOPER_DIR:
+        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+      CMAKE_GENERATOR: 'Ninja'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install dependencies using Homebrew
+        shell: bash
+        # CMake cannot find the MySQL connector
+        # Neither of these works: mariadb-connector-c mysql-connector-c++
+        env:
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+        run: |
+          brew update
+          brew install ccache protobuf qt --force-bottle
+
+      - name: Setup ccache
+        uses: jianmingyong/ccache-action@v1
+        with:
+          ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.soc}}-${{matrix.type}}
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build on Xcode ${{matrix.xcode}}
+        shell: bash
+        id: build
+        env:
+          BUILDTYPE: '${{matrix.type}}'
+          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
 
   build-windows:
     strategy:
