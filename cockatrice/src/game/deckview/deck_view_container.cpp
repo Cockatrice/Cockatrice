@@ -1,6 +1,5 @@
 #include "deck_view_container.h"
 
-#include "../../../../libs/utility/include/utility/trice_limits.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
@@ -10,20 +9,21 @@
 #include "../../server/pending_command.h"
 #include "../../tabs/tab_game.h"
 #include "../game_scene.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/card_database_manager.h"
 #include "deck_view.h"
-#include "pb/command_deck_select.pb.h"
-#include "pb/command_ready_start.pb.h"
-#include "pb/command_set_sideboard_lock.pb.h"
-#include "pb/command_set_sideboard_plan.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "settings/cache_settings.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QToolButton>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/command_deck_select.pb.h>
+#include <libcockatrice/protocol/pb/command_ready_start.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
 {

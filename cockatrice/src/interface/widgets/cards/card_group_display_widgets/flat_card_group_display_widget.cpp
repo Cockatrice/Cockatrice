@@ -2,10 +2,10 @@
 
 #include "../../../../deck/deck_list_model.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_info_comparator.h"
 
 #include <QResizeEvent>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_info_comparator.h>
 #include <utility>
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,

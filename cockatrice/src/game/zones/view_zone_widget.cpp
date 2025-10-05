@@ -5,8 +5,6 @@
 #include "../board/card_item.h"
 #include "../game_scene.h"
 #include "../player/player.h"
-#include "pb/command_shuffle.pb.h"
-#include "settings/cache_settings.h"
 #include "view_zone.h"
 
 #include <QCheckBox>
@@ -18,6 +16,8 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
+#include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * @param _player the player the cards were revealed to.

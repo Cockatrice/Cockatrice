@@ -7,9 +7,8 @@
 #ifndef PICTURE_TO_LOAD_H
 #define PICTURE_TO_LOAD_H
 
-#include "card/card_printing/exact_card.h"
-
 #include <QLoggingCategory>
+#include <libcockatrice/card/card_printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureToLoadLog, "card_picture_loader.picture_to_load");
 

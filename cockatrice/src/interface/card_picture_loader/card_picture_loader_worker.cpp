@@ -1,15 +1,15 @@
 #include "card_picture_loader_worker.h"
 
-#include "card/card_database/card_database_manager.h"
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
-#include "settings/cache_settings.h"
 
 #include <QDirIterator>
 #include <QMovie>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;

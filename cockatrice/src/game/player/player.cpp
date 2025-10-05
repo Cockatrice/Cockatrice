@@ -12,22 +12,22 @@
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
-#include "pb/command_attach_card.pb.h"
-#include "pb/command_set_card_counter.pb.h"
-#include "pb/event_create_arrow.pb.h"
-#include "pb/event_create_counter.pb.h"
-#include "pb/event_draw_cards.pb.h"
-#include "pb/serverinfo_player.pb.h"
-#include "pb/serverinfo_user.pb.h"
-#include "pb/serverinfo_zone.pb.h"
 #include "player_target.h"
-#include "utility/color.h"
 
 #include <QDebug>
 #include <QMenu>
 #include <QMetaType>
 #include <QPainter>
 #include <QtConcurrent>
+#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
+#include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
+#include <libcockatrice/protocol/pb/event_create_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
+#include <libcockatrice/utility/color.h>
 
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),

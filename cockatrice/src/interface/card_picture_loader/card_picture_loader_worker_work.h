@@ -7,7 +7,6 @@
 #ifndef PICTURE_LOADER_WORKER_WORK_H
 #define PICTURE_LOADER_WORKER_WORK_H
 
-#include "card/card_database/card_database.h"
 #include "card_picture_loader_worker.h"
 #include "card_picture_to_load.h"
 
@@ -16,6 +15,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QThread>
+#include <libcockatrice/card/card_database/card_database.h>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"

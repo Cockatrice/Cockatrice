@@ -9,10 +9,10 @@
 #define REPLAY_MANAGER_H
 
 #include "network/replay_timeline_widget.h"
-#include "pb/game_replay.pb.h"
 
 #include <QToolButton>
 #include <QWidget>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
 
 class TabGame;
 

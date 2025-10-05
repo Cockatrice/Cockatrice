@@ -12,13 +12,13 @@
 #include "../../../deck/deck_loader.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
-#include "card/card_info.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QTreeView>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 class CardAmountWidget : public QWidget
 {

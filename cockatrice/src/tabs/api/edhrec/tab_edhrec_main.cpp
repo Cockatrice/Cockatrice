@@ -6,9 +6,6 @@
 #include "api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "api_response/top_commanders/edhrec_top_commanders_api_response.h"
 #include "api_response/top_tags/edhrec_top_tags_api_response.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_database/model/card/card_completer_proxy_model.h"
-#include "card/card_database/model/card/card_search_model.h"
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
 #include "display/top_cards/edhrec_top_cards_api_response_display_widget.h"
 #include "display/top_commander/edhrec_top_commanders_api_response_display_widget.h"
@@ -25,6 +22,9 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QResizeEvent>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/card_database/model/card/card_search_model.h>
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)
 {

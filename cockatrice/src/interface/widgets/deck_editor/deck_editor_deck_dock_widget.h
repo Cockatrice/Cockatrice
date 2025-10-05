@@ -11,14 +11,14 @@
 #include "../../../deck/custom_line_edit.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
-#include "card/card_info.h"
-#include "utility/key_signals.h"
 
 #include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
 #include <QTextEdit>
 #include <QTreeView>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/utility/key_signals.h>
 
 class DeckListModel;
 class AbstractTabDeckEditor;

@@ -1,7 +1,6 @@
-#include "../libs/utility/include/utility/expression.h"
-
 #include "gtest/gtest.h"
 #include <QtMath>
+#include <libcockatrice/utility/expression.h>
 
 #define TEST_EXPR(name, a, b)                                                                                          \
     TEST(ExpressionTest, name)                                                                                         \

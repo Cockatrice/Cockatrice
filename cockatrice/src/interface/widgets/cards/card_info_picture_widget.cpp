@@ -4,15 +4,15 @@
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../window_main.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_relation/card_relation.h"
-#include "settings/cache_settings.h"
 
 #include <QMenu>
 #include <QMouseEvent>
 #include <QScreen>
 #include <QStylePainter>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**

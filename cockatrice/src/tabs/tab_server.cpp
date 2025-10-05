@@ -3,10 +3,6 @@
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/user/user_list_widget.h"
-#include "pb/event_list_rooms.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/response_join_room.pb.h"
-#include "pb/session_commands.pb.h"
 #include "tab_supervisor.h"
 
 #include <QCheckBox>
@@ -20,6 +16,10 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
+#include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/response_join_room.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox(parent), client(_client)
 {

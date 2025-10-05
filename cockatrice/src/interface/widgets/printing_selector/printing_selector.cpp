@@ -6,10 +6,10 @@
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
-#include "settings/cache_settings.h"
 
 #include <QFrame>
 #include <QScrollBar>
+#include <libcockatrice/settings/cache_settings.h>
 #include <qboxlayout.h>
 
 /**

@@ -7,10 +7,9 @@
 #ifndef GAME_META_INFO_H
 #define GAME_META_INFO_H
 
-#include "pb/serverinfo_game.pb.h"
-
 #include <QMap>
 #include <QObject>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 // Translation layer class to expose protobuf safely and hook it up to Qt Signals.
 // This class de-couples the domain object (i.e. the GameMetaInfo) from the network object.

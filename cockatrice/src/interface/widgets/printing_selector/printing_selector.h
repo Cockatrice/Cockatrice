@@ -11,7 +11,6 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
-#include "card/card_info.h"
 
 #include <QCheckBox>
 #include <QLabel>
@@ -19,6 +18,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 #define BATCH_SIZE 10
 

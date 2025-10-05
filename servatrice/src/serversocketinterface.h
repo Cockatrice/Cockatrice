@@ -20,12 +20,11 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include "server/server_protocolhandler.h"
-
 #include <QHostAddress>
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/server/server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
@@ -147,7 +146,7 @@ public:
     AbstractServerSocketInterface(Servatrice *_server,
                                   Servatrice_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
-    ~AbstractServerSocketInterface(){};
+    ~AbstractServerSocketInterface() {};
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;

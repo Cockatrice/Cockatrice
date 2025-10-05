@@ -11,11 +11,11 @@
 #include "../../general/display/banner_widget.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 #include "../card_size_widget.h"
-#include "card/card_info.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 class CardGroupDisplayWidget : public QWidget
 {

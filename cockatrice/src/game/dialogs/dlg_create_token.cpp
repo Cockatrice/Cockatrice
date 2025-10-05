@@ -2,12 +2,6 @@
 
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../main.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_database/model/card_database_model.h"
-#include "card/card_database/model/token/token_display_model.h"
-#include "deck_list/deck_list.h"
-#include "settings/cache_settings.h"
-#include "utility/trice_limits.h"
 
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -22,6 +16,12 @@
 #include <QRadioButton>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/card_database/model/token/token_display_model.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
     : QDialog(parent), predefinedTokens(_predefinedTokens)

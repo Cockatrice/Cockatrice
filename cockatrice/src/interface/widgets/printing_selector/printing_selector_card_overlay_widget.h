@@ -11,9 +11,10 @@
 #include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../cards/card_info_picture_widget.h"
 #include "all_zones_card_amount_widget.h"
-#include "card/card_info.h"
 #include "card_amount_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
+
+#include <libcockatrice/card/card_info.h>
 
 class PrintingSelectorCardOverlayWidget : public QWidget
 {

@@ -8,12 +8,6 @@
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_database/model/card/card_completer_proxy_model.h"
-#include "card/card_database/model/card/card_search_model.h"
-#include "card/card_database/model/card_database_model.h"
-#include "card/card_info_comparator.h"
 
 #include <QCheckBox>
 #include <QCompleter>
@@ -21,6 +15,12 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/card_database/model/card/card_search_model.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/card_info_comparator.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)

@@ -2,15 +2,15 @@
 
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../game_scene.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/card_database_manager.h"
-#include "settings/cache_settings.h"
 
 #include <QCursor>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <algorithm>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, Player *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),

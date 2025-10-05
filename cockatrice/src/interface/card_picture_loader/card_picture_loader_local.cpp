@@ -1,11 +1,11 @@
 #include "card_picture_loader_local.h"
 
-#include "card/card_database/card_database_manager.h"
 #include "card_picture_to_load.h"
-#include "settings/cache_settings.h"
 
 #include <QDirIterator>
 #include <QMovie>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 

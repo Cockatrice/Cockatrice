@@ -12,10 +12,10 @@
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
-#include "pb/serverinfo_user.pb.h"
 #include "player_target.h"
 
 #include <QObject>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class PlayerInfo : public QObject
 {

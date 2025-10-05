@@ -8,13 +8,13 @@
 #define ZONEVIEWWIDGET_H
 
 #include "logic/card_zone_logic.h"
-#include "utility/macros.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
+#include <libcockatrice/utility/macros.h>
 
 class QLabel;
 class QPushButton;

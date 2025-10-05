@@ -1,6 +1,5 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/tapped_out_interface.h"
 #include "../deck/deck_stats_interface.h"
 #include "../dialogs/dlg_load_deck.h"
@@ -11,11 +10,6 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_database/model/card_database_model.h"
-#include "pb/command_deck_upload.pb.h"
-#include "pb/response.pb.h"
-#include "settings/cache_settings.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -39,6 +33,12 @@
 #include <QTextStream>
 #include <QTreeView>
 #include <QUrl>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {

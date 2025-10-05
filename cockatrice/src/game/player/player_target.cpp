@@ -1,13 +1,13 @@
 #include "player_target.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "pb/serverinfo_user.pb.h"
 #include "player.h"
 
 #include <QDebug>
 #include <QPainter>
 #include <QPixmapCache>
 #include <QtMath>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 PlayerCounter::PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
     : AbstractCounter(_player, _id, _name, false, _value, false, parent)

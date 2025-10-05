@@ -8,8 +8,6 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../../../libs/server/include/server/room_message_type.h"
-#include "../../../../libs/server/include/server/user_level.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
 
@@ -18,6 +16,8 @@
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextFragment>
+#include <libcockatrice/server/room_message_type.h>
+#include <libcockatrice/server/user_level.h>
 
 class AbstractGame;
 class QTextTable;

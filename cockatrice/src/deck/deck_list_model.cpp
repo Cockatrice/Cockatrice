@@ -1,9 +1,7 @@
 #include "deck_list_model.h"
 
 #include "../main.h"
-#include "card/card_database/card_database_manager.h"
 #include "deck_loader.h"
-#include "settings/cache_settings.h"
 
 #include <QBrush>
 #include <QFont>
@@ -13,6 +11,8 @@
 #include <QTextDocument>
 #include <QTextStream>
 #include <QTextTable>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)

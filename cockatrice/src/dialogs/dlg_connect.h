@@ -9,10 +9,10 @@
 
 #include "../server/handle_public_servers.h"
 #include "../server/user/user_info_connection.h"
-#include "utility/macros.h"
 
 #include <QDialog>
 #include <QLineEdit>
+#include <libcockatrice/utility/macros.h>
 
 class QCheckBox;
 class QComboBox;

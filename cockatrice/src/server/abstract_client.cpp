@@ -1,25 +1,25 @@
 #include "abstract_client.h"
 
-#include "../../../libs/server/include/server/get_pb_extension.h"
-#include "../../../libs/utility/include/utility/featureset.h"
-#include "pb/commands.pb.h"
-#include "pb/event_add_to_list.pb.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_list_rooms.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_remove_from_list.pb.h"
-#include "pb/event_replay_added.pb.h"
-#include "pb/event_server_identification.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/event_server_shutdown.pb.h"
-#include "pb/event_user_joined.pb.h"
-#include "pb/event_user_left.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/server_message.pb.h"
 #include "pending_command.h"
 
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
+#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
+#include <libcockatrice/protocol/pb/event_notify_user.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
+#include <libcockatrice/protocol/pb/event_replay_added.pb.h>
+#include <libcockatrice/protocol/pb/event_server_identification.pb.h>
+#include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_user_left.pb.h>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/server_message.pb.h>
+#include <libcockatrice/server/get_pb_extension.h>
+#include <libcockatrice/utility/featureset.h>
 
 AbstractClient::AbstractClient(QObject *parent)
     : QObject(parent), nextCmdId(0), status(StatusDisconnected), serverSupportsPasswordHash(false)

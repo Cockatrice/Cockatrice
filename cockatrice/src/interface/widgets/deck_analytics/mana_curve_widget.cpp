@@ -4,10 +4,10 @@
 #include "../../../main.h"
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/card_database_manager.h"
 
-#include <deck_list/deck_list.h>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list.h>
 #include <unordered_map>
 
 ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)

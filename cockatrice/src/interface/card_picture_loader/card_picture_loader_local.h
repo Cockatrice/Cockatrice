@@ -7,11 +7,10 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include "card/card_printing/exact_card.h"
-
 #include <QLoggingCategory>
 #include <QObject>
 #include <QTimer>
+#include <libcockatrice/card/card_printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLocalLog, "card_picture_loader.local");
 

@@ -16,9 +16,6 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/model/card_database_model.h"
-#include "utility/key_signals.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
@@ -31,6 +28,9 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/utility/key_signals.h>
 #include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");

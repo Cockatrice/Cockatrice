@@ -2,17 +2,6 @@
 
 #include "../../main.h"
 #include "../pending_command.h"
-#include "pb/event_server_identification.pb.h"
-#include "pb/response_activate.pb.h"
-#include "pb/response_forgotpasswordrequest.pb.h"
-#include "pb/response_login.pb.h"
-#include "pb/response_password_salt.pb.h"
-#include "pb/response_register.pb.h"
-#include "pb/server_message.pb.h"
-#include "pb/session_commands.pb.h"
-#include "server/debug_pb_message.h"
-#include "settings/cache_settings.h"
-#include "utility/passwordhasher.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -23,6 +12,17 @@
 #include <QThread>
 #include <QTimer>
 #include <QWebSocket>
+#include <libcockatrice/protocol/pb/event_server_identification.pb.h>
+#include <libcockatrice/protocol/pb/response_activate.pb.h>
+#include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
+#include <libcockatrice/protocol/pb/response_login.pb.h>
+#include <libcockatrice/protocol/pb/response_password_salt.pb.h>
+#include <libcockatrice/protocol/pb/response_register.pb.h>
+#include <libcockatrice/protocol/pb/server_message.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/server/debug_pb_message.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 static const unsigned int protocolVersion = 14;
 

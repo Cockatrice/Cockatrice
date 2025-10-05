@@ -1,15 +1,15 @@
 #include "card_info_frame_widget.h"
 
 #include "../../../game/board/card_item.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_relation/card_relation.h"
 #include "card_info_display_widget.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
-#include "settings/cache_settings.h"
 
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)

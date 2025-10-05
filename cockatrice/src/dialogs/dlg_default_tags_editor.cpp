@@ -1,9 +1,8 @@
 #include "dlg_default_tags_editor.h"
 
-#include "settings/cache_settings.h"
-
 #include <QMessageBox>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/cache_settings.h>
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)
 {

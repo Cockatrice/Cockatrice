@@ -1,13 +1,12 @@
 #include "card_picture_to_load.h"
 
-#include "card/card_set/card_set_comparator.h"
-#include "settings/cache_settings.h"
-
 #include <QCoreApplication>
 #include <QDate>
 #include <QRegularExpression>
 #include <QUrl>
 #include <algorithm>
+#include <libcockatrice/card/card_set/card_set_comparator.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())

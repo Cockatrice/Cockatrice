@@ -8,16 +8,16 @@
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
 #include "arrow_item.h"
-#include "card/card_info.h"
 #include "card_drag_item.h"
-#include "pb/serverinfo_card.pb.h"
-#include "settings/cache_settings.h"
-#include "settings/card_counter_settings.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 #include <QPainter>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/settings/card_counter_settings.h>
 
 CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)
     : AbstractCardItem(parent, cardRef, _owner, _cardid), zone(_zone), attacking(false), destroyOnZoneChange(false),

@@ -1,19 +1,19 @@
 #include "chat_view.h"
 
-#include "../../../../libs/server/include/server/user_level.h"
 #include "../../client/sound_engine.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"
 #include "../user/user_context_menu.h"
 #include "../user/user_list_manager.h"
 #include "../user/user_list_proxy.h"
-#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <libcockatrice/server/user_level.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 

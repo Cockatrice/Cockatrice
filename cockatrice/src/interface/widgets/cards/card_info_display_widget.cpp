@@ -2,13 +2,13 @@
 
 #include "../../../game/board/card_item.h"
 #include "../../../main.h"
-#include "card/card_database/card_database_manager.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
 #include <QApplication>
 #include <QScreen>
 #include <QVBoxLayout>
+#include <libcockatrice/card/card_database/card_database_manager.h>
 #include <utility>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)

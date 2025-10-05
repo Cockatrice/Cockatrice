@@ -7,13 +7,13 @@
 #ifndef FILTER_STRING_H
 #define FILTER_STRING_H
 
-#include "card/card_info.h"
 #include "filter_tree.h"
 
 #include <QLoggingCategory>
 #include <QMap>
 #include <QString>
 #include <functional>
+#include <libcockatrice/card/card_info.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string");

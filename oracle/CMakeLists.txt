@@ -30,6 +30,30 @@ set(oracle_SOURCES
     ${VERSION_STRING_CPP}
 )
 
+# ------------------------
+# Translations
+# ------------------------
+
+if(UPDATE_TRANSLATIONS)
+  file(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
+  set(translate_SRCS ${translate_oracle_SRCS})
+  set(oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/oracle_en@source.ts")
+else()
+  file(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+endif(UPDATE_TRANSLATIONS)
+
+if(WIN32)
+  set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
+endif(WIN32)
+
+if(APPLE)
+  set(MACOSX_BUNDLE_ICON_FILE appicon.icns)
+  set_source_files_properties(
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+  )
+  set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+endif(APPLE)
+
 set(oracle_RESOURCES oracle.qrc)
 
 # ------------------------
@@ -44,7 +68,10 @@ endif()
 # ------------------------
 # Include directories
 # ------------------------
-include_directories(../libs/card/include ../libs/settings/include ../cockatrice/src ../common)
+include_directories(
+  ../libcockatrice-card/libcockatrice/card/include ../libcockatrice_settings/libcockatrice/settings/include
+  ../cockatrice/src ../common
+)
 
 # ------------------------
 # Optional libraries
@@ -72,7 +99,13 @@ endif()
 # ------------------------
 # Build executable
 # ------------------------
+
+set(ORACLE_MAC_QM_INSTALL_DIR "oracle.app/Contents/Resources/translations")
+set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
+set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
+
 if(Qt6_FOUND)
+  # Qt6 Translations are linked after the executable is created in manual mode
   qt6_add_executable(
     oracle
     WIN32
@@ -83,16 +116,24 @@ if(Qt6_FOUND)
     MANUAL_FINALIZATION
   )
 elseif(Qt5_FOUND)
+  # Qt5 Translations need to be linked at executable creation time
   if(Qt5LinguistTools_FOUND)
     if(UPDATE_TRANSLATIONS)
-      file(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
-      qt5_create_translation(oracle_QM ${translate_oracle_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/oracle_en@source.ts)
+      qt5_create_translation(oracle_QM ${translate_SRCS} ${oracle_TS})
     else()
-      file(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
       qt5_add_translation(oracle_QM ${oracle_TS})
     endif()
   endif()
   add_executable(oracle WIN32 MACOSX_BUNDLE ${oracle_MOC_SRCS} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_SOURCES})
+  if(UNIX)
+    if(APPLE)
+      install(FILES ${oracle_QM} DESTINATION ${ORACLE_MAC_QM_INSTALL_DIR})
+    else()
+      install(FILES ${oracle_QM} DESTINATION ${ORACLE_UNIX_QM_INSTALL_DIR})
+    endif()
+  elseif(WIN32)
+    install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
+  endif()
 endif()
 
 # ------------------------
@@ -100,17 +141,17 @@ endif()
 # ------------------------
 target_link_libraries(
   oracle
-  PRIVATE cockatrice_card
-  PRIVATE cockatrice_settings
-  PRIVATE ${ORACLE_QT_MODULES}
+  PUBLIC libcockatrice_card
+  PUBLIC libcockatrice_settings
+  PUBLIC ${ORACLE_QT_MODULES}
 )
 
 if(ZLIB_FOUND)
-  target_link_libraries(oracle PRIVATE ${ZLIB_LIBRARIES})
+  target_link_libraries(oracle PUBLIC ${ZLIB_LIBRARIES})
 endif()
 
 if(LIBLZMA_FOUND)
-  target_link_libraries(oracle PRIVATE ${LIBLZMA_LIBRARIES})
+  target_link_libraries(oracle PUBLIC ${LIBLZMA_LIBRARIES})
 endif()
 
 # ------------------------
@@ -118,9 +159,17 @@ endif()
 # ------------------------
 if(UNIX)
   if(APPLE)
+    set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
     set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
+
     install(TARGETS oracle BUNDLE DESTINATION ./)
   else()
+    # Assume linux
     install(TARGETS oracle RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
@@ -131,15 +180,17 @@ endif()
 
 if(NOT WIN32 AND NOT APPLE)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
-endif()
+endif(NOT WIN32 AND NOT APPLE)
 
 # ------------------------
 # Qt plugin handling
 # ------------------------
 if(APPLE)
+  # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir oracle.app/Contents/Plugins)
   set(qtconf_dest_dir oracle.app/Contents/Resources)
 
+  # Qt plugins: iconengines, platforms, styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -155,7 +206,7 @@ if(APPLE)
 
   install(
     CODE "
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
     "
@@ -164,17 +215,18 @@ Translations = Resources/translations\")
 
   install(
     CODE "
-    file(GLOB_RECURSE QTPLUGINS
-        \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
-    set(BU_CHMOD_BUNDLE_ITEMS ON)
-    include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-    "
+        file(GLOB_RECURSE QTPLUGINS
+            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/oracle.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        "
     COMPONENT Runtime
   )
 endif()
 
 if(WIN32)
+  # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
@@ -186,6 +238,7 @@ if(WIN32)
     PATTERN "*.dll"
   )
 
+  # Qt plugins: iconengines, platforms, styles, tls (Qt6)
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -207,7 +260,7 @@ if(WIN32)
 
   install(
     CODE "
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
+        file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
     "
@@ -216,12 +269,12 @@ Translations = Resources/translations\")
 
   install(
     CODE "
-    file(GLOB_RECURSE QTPLUGINS
-        \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
-    set(BU_CHMOD_BUNDLE_ITEMS ON)
-    include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
-    "
+        file(GLOB_RECURSE QTPLUGINS
+            \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/Oracle.exe\" \"\${QTPLUGINS}\" \"${libSearchDirs}\")
+        "
     COMPONENT Runtime
   )
 endif()
@@ -230,14 +283,14 @@ endif()
 # Qt translations
 # ------------------------
 if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+  #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
-    file(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
     qt6_add_translations(
       oracle
       TS_FILES
       ${oracle_TS}
       SOURCES
-      ${translate_oracle_SRCS}
+      ${translate_SRCS}
       QM_FILES_OUTPUT_VARIABLE
       oracle_QM
     )

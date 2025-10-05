@@ -20,8 +20,6 @@
 
 #include "main.h"
 
-#include "../../libs/rng/include/rng/rng_sfmt.h"
-#include "../../libs/utility/include/utility/featureset.h"
 #include "QtNetwork/QNetworkInterface"
 #include "client/network/spoiler_background_updater.h"
 #include "client/sound_engine.h"
@@ -29,8 +27,6 @@
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
 #include "interface/window_main.h"
-#include "settings/cache_settings.h"
-#include "utility/logger.h"
 #include "version_string.h"
 
 #include <QApplication>
@@ -45,6 +41,10 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
+#include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/featureset.h>
+#include <libcockatrice/utility/logger.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;

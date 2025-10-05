@@ -7,12 +7,12 @@
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
-#include "card/card_relation/card_relation_type.h"
 #include "event_processing_options.h"
 #include "player.h"
 
 #include <QMenu>
 #include <QObject>
+#include <libcockatrice/card/card_relation/card_relation_type.h>
 
 namespace google
 {

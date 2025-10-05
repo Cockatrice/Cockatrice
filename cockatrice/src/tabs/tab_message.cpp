@@ -1,6 +1,5 @@
 #include "tab_message.h"
 
-#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
@@ -8,16 +7,17 @@
 #include "../server/chat_view/chat_view.h"
 #include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/serverinfo_user.pb.h"
-#include "pb/session_commands.pb.h"
-#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QDebug>
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,

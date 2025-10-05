@@ -1,8 +1,7 @@
 #include "mana_symbol_widget.h"
 
-#include "settings/cache_settings.h"
-
 #include <QResizeEvent>
+#include <libcockatrice/settings/cache_settings.h>
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
     : QLabel(parent), symbol(_symbol), isActive(_isActive), mayBeToggled(_mayBeToggled)

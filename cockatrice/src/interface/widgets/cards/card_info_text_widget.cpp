@@ -1,8 +1,6 @@
 #include "card_info_text_widget.h"
 
 #include "../../../game/board/card_item.h"
-#include "card/card_relation/card_relation.h"
-#include "card/game_specific_terms.h"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -10,6 +8,8 @@
 #include <QScrollBar>
 #include <QSizePolicy>
 #include <QTextEdit>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/card/game_specific_terms.h>
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
 {

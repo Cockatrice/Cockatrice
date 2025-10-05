@@ -7,9 +7,8 @@
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H
 
-#include "card/card_info.h"
-
 #include <QDialog>
+#include <libcockatrice/card/card_info.h>
 
 class QModelIndex;
 class CardDatabaseModel;

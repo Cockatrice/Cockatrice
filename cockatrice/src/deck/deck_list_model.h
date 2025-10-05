@@ -1,13 +1,12 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
-#include "card/card_printing/exact_card.h"
-#include "deck_list/abstract_deck_list_card_node.h"
-#include "deck_list/deck_list.h"
-#include "deck_list/deck_list_card_node.h"
-
 #include <QAbstractItemModel>
 #include <QList>
+#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/deck_list/abstract_deck_list_card_node.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_card_node.h>
 
 class DeckLoader;
 class CardDatabase;

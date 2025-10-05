@@ -5,10 +5,11 @@
 #include "../../zones/hand_zone.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"
-#include "card/card_database/card_database_manager.h"
 #include "card_menu.h"
 #include "hand_menu.h"
-#include "pb/command_reveal_cards.pb.h"
+
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {

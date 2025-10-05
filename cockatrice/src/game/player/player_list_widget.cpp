@@ -8,14 +8,14 @@
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"
-#include "pb/command_kick_from_game.pb.h"
-#include "pb/serverinfo_playerproperties.pb.h"
-#include "pb/session_commands.pb.h"
 
 #include <QAction>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMouseEvent>
+#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {

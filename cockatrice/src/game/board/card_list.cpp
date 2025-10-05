@@ -1,10 +1,10 @@
 #include "card_list.h"
 
-#include "card/card_info.h"
 #include "card_item.h"
 
 #include <QDebug>
 #include <algorithm>
+#include <libcockatrice/card/card_info.h>
 
 CardList::CardList(bool _contentsKnown) : QList<CardItem *>(), contentsKnown(_contentsKnown)
 {

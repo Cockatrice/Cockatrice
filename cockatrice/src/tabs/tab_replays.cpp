@@ -3,17 +3,6 @@
 #include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/remote/remote_replay_list_tree_widget.h"
-#include "pb/command_replay_delete_match.pb.h"
-#include "pb/command_replay_download.pb.h"
-#include "pb/command_replay_get_code.pb.h"
-#include "pb/command_replay_modify_match.pb.h"
-#include "pb/command_replay_submit_code.pb.h"
-#include "pb/event_replay_added.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/response.pb.h"
-#include "pb/response_replay_download.pb.h"
-#include "pb/response_replay_get_code.pb.h"
-#include "settings/cache_settings.h"
 #include "tab_game.h"
 
 #include <QAction>
@@ -30,6 +19,17 @@
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_download.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_get_code.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_modify_match.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_submit_code.pb.h>
+#include <libcockatrice/protocol/pb/event_replay_added.pb.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_download.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)

@@ -3,8 +3,9 @@
 
 #include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "abstract_tab_deck_editor.h"
-#include "card/card_info.h"
-#include "utility/key_signals.h"
+
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/utility/key_signals.h>
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;

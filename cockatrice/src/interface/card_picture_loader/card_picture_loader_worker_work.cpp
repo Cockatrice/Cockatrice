@@ -1,8 +1,6 @@
 #include "card_picture_loader_worker_work.h"
 
-#include "card/card_database/card_database_manager.h"
 #include "card_picture_loader_worker.h"
-#include "settings/cache_settings.h"
 
 #include <QBuffer>
 #include <QDirIterator>
@@ -12,6 +10,8 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QThreadPool>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};

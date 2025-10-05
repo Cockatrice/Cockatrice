@@ -7,8 +7,6 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
-#include "utility/macros.h"
-
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
@@ -17,6 +15,7 @@
 #include <QLoggingCategory>
 #include <QPushButton>
 #include <QSpinBox>
+#include <libcockatrice/utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
 

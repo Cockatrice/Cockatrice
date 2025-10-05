@@ -6,26 +6,27 @@
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
 #include "../zones/logic/view_zone_logic.h"
-#include "card/card_database/card_database_manager.h"
-#include "card/card_relation/card_relation.h"
 #include "card_menu_action_type.h"
-#include "pb/command_attach_card.pb.h"
-#include "pb/command_change_zone_properties.pb.h"
-#include "pb/command_concede.pb.h"
-#include "pb/command_create_token.pb.h"
-#include "pb/command_draw_cards.pb.h"
-#include "pb/command_flip_card.pb.h"
-#include "pb/command_game_say.pb.h"
-#include "pb/command_move_card.pb.h"
-#include "pb/command_mulligan.pb.h"
-#include "pb/command_reveal_cards.pb.h"
-#include "pb/command_roll_die.pb.h"
-#include "pb/command_set_card_attr.pb.h"
-#include "pb/command_set_card_counter.pb.h"
-#include "pb/command_shuffle.pb.h"
-#include "pb/command_undo_draw.pb.h"
-#include "pb/context_move_card.pb.h"
-#include "utility/trice_limits.h"
+
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
+#include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/command_concede.pb.h>
+#include <libcockatrice/protocol/pb/command_create_token.pb.h>
+#include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
+#include <libcockatrice/protocol/pb/command_flip_card.pb.h>
+#include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/protocol/pb/command_mulligan.pb.h>
+#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
+#include <libcockatrice/protocol/pb/command_roll_die.pb.h>
+#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
+#include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;

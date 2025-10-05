@@ -1,6 +1,5 @@
 #include "tab_game.h"
 
-#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/network/replay_timeline_widget.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
@@ -23,13 +22,6 @@
 #include "../main.h"
 #include "../server/abstract_client.h"
 #include "../server/user/user_list_manager.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/card_database_manager.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/serverinfo_player.pb.h"
-#include "pb/serverinfo_user.pb.h"
-#include "settings/cache_settings.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -46,6 +38,14 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)

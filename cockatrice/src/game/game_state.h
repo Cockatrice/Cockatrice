@@ -8,10 +8,10 @@
 #define COCKATRICE_GAME_STATE_H
 
 #include "../server/abstract_client.h"
-#include "pb/serverinfo_game.pb.h"
 
 #include <QObject>
 #include <QTimer>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 class AbstractGame;
 class ServerInfo_PlayerProperties;

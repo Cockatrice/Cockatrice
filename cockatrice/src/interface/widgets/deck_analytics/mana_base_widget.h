@@ -12,7 +12,7 @@
 
 #include <QHBoxLayout>
 #include <QWidget>
-#include <deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list.h>
 #include <utility>
 
 class ManaBaseWidget : public QWidget

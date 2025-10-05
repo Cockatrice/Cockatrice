@@ -8,11 +8,11 @@
 #define REMOTECLIENT_H
 
 #include "../abstract_client.h"
-#include "pb/commands.pb.h"
 
 #include <QLoggingCategory>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/protocol/pb/commands.pb.h>
 
 inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
 

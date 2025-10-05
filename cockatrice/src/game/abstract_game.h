@@ -10,10 +10,10 @@
 #include "game_event_handler.h"
 #include "game_meta_info.h"
 #include "game_state.h"
-#include "pb/game_replay.pb.h"
 #include "player/player_manager.h"
 
 #include <QObject>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
 
 class CardItem;
 class TabGame;

@@ -7,12 +7,11 @@
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H
 
-#include "../../../../../libs/utility/include/utility/card_ref.h"
-#include "card/card_printing/exact_card.h"
-
 #include <QComboBox>
 #include <QFrame>
 #include <QStringList>
+#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/utility/card_ref.h>
 
 class CardInfoPictureWidget;
 class CardInfoTextWidget;

@@ -2,7 +2,6 @@
 
 #include "../deck/deck_loader.h"
 #include "dlg_settings.h"
-#include "settings/cache_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -13,6 +12,7 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window

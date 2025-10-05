@@ -7,10 +7,11 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "../../../../libs/utility/include/utility/card_ref.h"
 #include "arrow_target.h"
-#include "card/card_printing/exact_card.h"
 #include "graphics_item_type.h"
+
+#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/utility/card_ref.h>
 
 class Player;
 

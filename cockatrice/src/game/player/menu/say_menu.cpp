@@ -2,7 +2,8 @@
 
 #include "../player.h"
 #include "../player_actions.h"
-#include "settings/cache_settings.h"
+
+#include <libcockatrice/settings/cache_settings.h>
 
 SayMenu::SayMenu(Player *_player) : player(_player)
 {

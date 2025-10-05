@@ -10,9 +10,9 @@
 #include "game_type_map.h"
 
 #include <QGroupBox>
-#include <pb/commands.pb.h>
-#include <pb/event_add_to_list.pb.h>
-#include <pb/event_remove_from_list.pb.h>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
 
 class QTreeView;
 class GamesModel;

@@ -1,6 +1,6 @@
 #include "filter_string.h"
 
-#include "../../../common/lib/peglib.h"
+#include "../../../libcockatrice_utility/libcockatrice/utility/peglib.h"
 
 #include <QByteArray>
 #include <QDebug>

@@ -7,11 +7,11 @@
 #ifndef TAB_ADMIN_H
 #define TAB_ADMIN_H
 
-#include "pb/commands.pb.h"
-#include "pb/response.pb.h"
 #include "tab.h"
 
 #include <QDialog>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
 
 class AbstractClient;
 

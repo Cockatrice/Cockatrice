@@ -11,13 +11,13 @@
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/overlap_widget.h"
 #include "../visual_deck_editor/visual_deck_editor_widget.h"
-#include "card/card_info.h"
 #include "card_group_display_widgets/card_group_display_widget.h"
 #include "card_info_picture_with_text_overlay_widget.h"
 #include "card_size_widget.h"
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 class DeckCardZoneDisplayWidget : public QWidget
 {

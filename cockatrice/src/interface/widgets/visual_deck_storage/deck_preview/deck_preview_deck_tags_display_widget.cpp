@@ -7,12 +7,12 @@
 #include "deck_preview_tag_dialog.h"
 #include "deck_preview_tag_display_widget.h"
 #include "deck_preview_widget.h"
-#include "settings/cache_settings.h"
 
 #include <QDirIterator>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/settings/cache_settings.h>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
     : QWidget(_parent), deckList(nullptr)

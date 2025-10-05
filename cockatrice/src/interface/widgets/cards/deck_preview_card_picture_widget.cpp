@@ -1,7 +1,5 @@
 #include "deck_preview_card_picture_widget.h"
 
-#include "settings/cache_settings.h"
-
 #include <QApplication>
 #include <QFileInfo>
 #include <QFontMetrics>
@@ -9,6 +7,7 @@
 #include <QPainterPath>
 #include <QStylePainter>
 #include <QTextOption>
+#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.

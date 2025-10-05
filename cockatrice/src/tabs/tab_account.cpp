@@ -1,6 +1,5 @@
 #include "tab_account.h"
 
-#include "../../../libs/utility/include/utility/trice_limits.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../server/abstract_client.h"
@@ -8,16 +7,17 @@
 #include "../server/user/user_info_box.h"
 #include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
-#include "pb/event_add_to_list.pb.h"
-#include "pb/event_remove_from_list.pb.h"
-#include "pb/event_user_joined.pb.h"
-#include "pb/event_user_left.pb.h"
-#include "pb/response_list_users.pb.h"
-#include "pb/session_commands.pb.h"
 #include "tab_supervisor.h"
 
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
+#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_user_left.pb.h>
+#include <libcockatrice/protocol/pb/response_list_users.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)

@@ -10,12 +10,12 @@
 
 #include "../../../deck/custom_line_edit.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
-#include "card/card_database/model/card_database_display_model.h"
-#include "card/card_database/model/card_database_model.h"
-#include "utility/key_signals.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_database/model/card_database_display_model.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/utility/key_signals.h>
 
 class AbstractTabDeckEditor;
 class DeckEditorDatabaseDisplayWidget : public QWidget

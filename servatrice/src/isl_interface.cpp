@@ -1,25 +1,25 @@
 #include "isl_interface.h"
 
-#include "../../libs/server/include/server/debug_pb_message.h"
-#include "../../libs/server/include/server/get_pb_extension.h"
 #include "main.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_join_room.pb.h"
-#include "pb/event_leave_room.pb.h"
-#include "pb/event_list_games.pb.h"
-#include "pb/event_remove_messages.pb.h"
-#include "pb/event_room_say.pb.h"
-#include "pb/event_server_complete_list.pb.h"
-#include "pb/event_user_joined.pb.h"
-#include "pb/event_user_left.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/isl_message.pb.h"
-#include "server/server_protocolhandler.h"
-#include "server/server_room.h"
 #include "server_logger.h"
 
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_join_room.pb.h>
+#include <libcockatrice/protocol/pb/event_leave_room.pb.h>
+#include <libcockatrice/protocol/pb/event_list_games.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_say.pb.h>
+#include <libcockatrice/protocol/pb/event_server_complete_list.pb.h>
+#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_user_left.pb.h>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/isl_message.pb.h>
+#include <libcockatrice/server/debug_pb_message.h>
+#include <libcockatrice/server/get_pb_extension.h>
+#include <libcockatrice/server/server_protocolhandler.h>
+#include <libcockatrice/server/server_room.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {

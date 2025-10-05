@@ -1,12 +1,11 @@
 #include "dlg_roll_dice.h"
 
-#include "../../../../libs/utility/include/utility/trice_limits.h"
-
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgRollDice::DlgRollDice(QWidget *parent) : QDialog(parent)
 {

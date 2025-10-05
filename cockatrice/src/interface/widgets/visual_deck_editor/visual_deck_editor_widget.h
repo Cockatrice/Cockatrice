@@ -13,15 +13,15 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
-#include "card/card_database/card_database.h"
-#include "card/card_database/model/card/card_completer_proxy_model.h"
-#include "card/card_database/model/card_database_display_model.h"
-#include "card/card_database/model/card_database_model.h"
 
 #include <QCheckBox>
 #include <QListWidget>
 #include <QPushButton>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/card_database/model/card_database_display_model.h>
+#include <libcockatrice/card/card_database/model/card_database_model.h>
 #include <qscrollarea.h>
 
 class DeckCardZoneDisplayWidget;

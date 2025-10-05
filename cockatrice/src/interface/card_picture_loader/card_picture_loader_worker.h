@@ -7,8 +7,6 @@
 #ifndef PICTURE_LOADER_WORKER_H
 #define PICTURE_LOADER_WORKER_H
 
-#include "card/card_database/card_database.h"
-#include "card/card_info.h"
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
 #include "card_picture_to_load.h"
@@ -20,6 +18,8 @@
 #include <QObject>
 #include <QQueue>
 #include <QTimer>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_info.h>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"

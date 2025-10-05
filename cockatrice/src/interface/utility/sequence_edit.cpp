@@ -1,10 +1,9 @@
 #include "sequence_edit.h"
 
-#include "settings/cache_settings.h"
-
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QToolTip>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)

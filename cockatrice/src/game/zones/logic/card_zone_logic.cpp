@@ -4,13 +4,13 @@
 #include "../../player/player.h"
 #include "../pile_zone.h"
 #include "../view_zone.h"
-#include "card/card_database/card_database_manager.h"
-#include "pb/command_move_card.pb.h"
-#include "pb/serverinfo_user.pb.h"
 #include "view_zone_logic.h"
 
 #include <QAction>
 #include <QDebug>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 /**
  * @param _player the player that the zone belongs to
