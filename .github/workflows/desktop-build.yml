@@ -10,7 +10,7 @@ on:
     branches:
       - master
     paths:
-      - '**'
+      - '*/**'    # matches all files not in root
       - '!**.md'
       - '!.github/**'
       - '!.husky/**'
@@ -18,11 +18,13 @@ on:
       - '!doc/**'
       - '!webclient/**'
       - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
     tags:
       - '*'
   pull_request:
     paths:
-      - '**'
+      - '*/**'    # matches all files not in root
       - '!**.md'
       - '!.github/**'
       - '!.husky/**'
@@ -30,6 +32,8 @@ on:
       - '!doc/**'
       - '!webclient/**'
       - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
