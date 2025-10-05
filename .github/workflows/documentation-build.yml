@@ -28,13 +28,10 @@ jobs:
         run: sudo apt-get install -y doxygen graphviz
 
       - name: Generate Documentation
-        id: build_docs
         shell: bash
         run: doxygen Doxyfile
 
       - name: Upload Documentation
-        id: upload_docs
-        if: steps.build_docs.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: Cockatrice_Docs
@@ -42,8 +39,7 @@ jobs:
           if-no-files-found: error
 
       - name: Deploy to cockatrice.github.io/docs
-        id: deploy_docs
-        if: github.event_name != 'pull_request' && steps.upload_docs.outcome == 'success'
+        if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
@@ -53,6 +49,6 @@ jobs:
           destination_dir: docs    # Subfolder of the GitHub Pages URL where the docs live
 
       - name: Link to Documentation Page
-        if: steps.deploy_docs.outcome == 'success'
+        if: github.event_name != 'pull_request'
         shell: bash
         run: echo "::notice title=New documentation published ::Shortly available at https://cockatrice.github.io/docs/"
