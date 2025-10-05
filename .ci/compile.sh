@@ -66,6 +66,10 @@ while [[ $# != 0 ]]; do
         shift
       fi
       ;;
+    '--vcpkg')
+      USE_VCPKG=1
+      shift
+      ;;
     '--dir')
       shift
       if [[ $# == 0 ]]; then
@@ -115,6 +119,9 @@ if [[ $USE_CCACHE ]]; then
 fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
+fi
+if [[ $USE_VCPKG ]]; then
+  flags+=("-DUSE_VCPKG=1")
 fi
 
 # Add cmake --build flags
