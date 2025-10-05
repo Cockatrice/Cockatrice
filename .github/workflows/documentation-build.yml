@@ -8,11 +8,8 @@ on:
     paths:
       - '**.h'
       - '/doc/doxygen/**'
-      - '/doc/doxygen-extra-pages/**'
-      - '/doc/doxygen-groups/**'
       - '.github/workflows/documentation-build.yml'
       - 'Doxyfile'
-      - 'DoxygenLayout.xml'
   workflow_dispatch:
 
 env:
