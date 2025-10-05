@@ -1,23 +1,7 @@
 name: Code Style (C++) 
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - '*/**'    # matches all files not in root
-      - '!**.md'
-      - '!.ci/**'
-      - '!.github/**'
-      - '!.husky/**'
-      - '!.tx/**'
-      - '!doc/**'
-      - '!webclient/**'
-      - '.ci/lint_cpp.sh'
-      - '.github/workflows/desktop-lint.yml'
-      - '.clang-format'
-      - '.cmake-format.json'
-      - 'format.sh'
+  # push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:
     paths:
       - '*/**'    # matches all files not in root

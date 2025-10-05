@@ -1,13 +1,7 @@
 name: Code Style (TypeScript) 
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'webclient/**'
-      - '!**.md'
-      - '.github/workflows/web-lint.yml'
+  # push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:
     paths:
       - 'webclient/**'
