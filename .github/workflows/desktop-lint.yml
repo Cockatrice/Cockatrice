@@ -5,15 +5,16 @@ on:
     branches:
       - master
     paths:
-      - '**'
+      - '*/**'    # matches all files not in root
       - '!**.md'
+      - '!.ci/**'
       - '!.github/**'
       - '!.husky/**'
       - '!.tx/**'
       - '!doc/**'
       - '!webclient/**'
-      - '.github/workflows/desktop-lint.yml'
       - '.ci/lint_cpp.sh'
+      - '.github/workflows/desktop-lint.yml'
       - '.clang-format'
       - '.cmake-format.json'
       - 'format.sh'
@@ -27,8 +28,8 @@ on:
       - '!.tx/**'
       - '!doc/**'
       - '!webclient/**'
-      - '.github/workflows/desktop-lint.yml'
       - '.ci/lint_cpp.sh'
+      - '.github/workflows/desktop-lint.yml'
       - '.clang-format'
       - '.cmake-format.json'
       - 'format.sh'
