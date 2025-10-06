@@ -67,6 +67,10 @@ while [[ $# != 0 ]]; do
         shift
       fi
       ;;
+    '--vcpkg')
+      USE_VCPKG=1
+      shift
+      ;;
     '--dir')
       shift
       if [[ $# == 0 ]]; then
@@ -126,7 +130,10 @@ fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
-  if [[ $TARGET_MACOS_VERSION ]]; then
+if [[ $USE_VCPKG ]]; then
+  flags+=("-DUSE_VCPKG=1")
+fi
+if [[ $TARGET_MACOS_VERSION ]]; then
   TRIPLETS_DIR="../cmake/triplets"
   mkdir -p "$TRIPLETS_DIR"
   # Replace dots with hyphens in triplet name for vcpkg compatibility
