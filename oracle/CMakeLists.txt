@@ -44,7 +44,7 @@ endif()
 # ------------------------
 # Include directories
 # ------------------------
-include_directories(../cockatrice/libs/card/include ../cockatrice/libs/settings/include ../cockatrice/src ../common)
+include_directories(../cockatrice/src)
 
 # ------------------------
 # Optional libraries
@@ -100,8 +100,8 @@ endif()
 # ------------------------
 target_link_libraries(
   oracle
-  PRIVATE cardlib
-  PRIVATE settingslib
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_settings
   PRIVATE ${ORACLE_QT_MODULES}
 )
 

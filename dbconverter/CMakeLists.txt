@@ -20,21 +20,12 @@ set(CMAKE_AUTORCC ON)
 add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES})
 
 # ------------------------
-# Include directories
-# ------------------------
-target_include_directories(
-  dbconverter
-  PRIVATE ../common # shared common headers
-  PRIVATE ../libs/card/include # cardlib public headers
-)
-
-# ------------------------
 # Link libraries
 # ------------------------
 target_link_libraries(
   dbconverter
-  PRIVATE cardlib
-  PRIVATE settingslib
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_settings
   PRIVATE ${DB_CONVERTER_QT_MODULES}
 )
 
