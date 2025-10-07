@@ -20,6 +20,7 @@ on:
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
+      - 'vcpkg'
     tags:
       - '*'
   pull_request:
@@ -34,6 +35,7 @@ on:
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
+      - 'vcpkg'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
