@@ -20,8 +20,8 @@ add_executable(carddatabase_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} carddata
 
 target_link_libraries(
   carddatabase_test
-  PRIVATE cardlib
-  PRIVATE settingslib
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_settings
   PRIVATE cockatrice_common
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
@@ -46,8 +46,8 @@ add_executable(
 
 target_link_libraries(
   filter_string_test
-  PRIVATE cardlib
-  PRIVATE settingslib
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_settings
   PRIVATE cockatrice_common
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
