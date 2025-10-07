@@ -21,13 +21,13 @@
 
 #include "../rng_abstract.h"
 #include "pb/command_move_card.pb.h"
+#include "server_abstract_player.h"
 #include "server_card.h"
-#include "server_player.h"
 
 #include <QDebug>
 #include <QSet>
 
-Server_CardZone::Server_CardZone(Server_Player *_player,
+Server_CardZone::Server_CardZone(Server_AbstractPlayer *_player,
                                  const QString &_name,
                                  bool _has_coords,
                                  ServerInfo_Zone::ZoneType _type)

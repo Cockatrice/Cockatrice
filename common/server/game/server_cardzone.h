@@ -28,7 +28,7 @@
 #include <QString>
 
 class Server_Card;
-class Server_Player;
+class Server_AbstractPlayer;
 class Server_AbstractParticipant;
 class Server_Game;
 class GameEventStorage;
@@ -36,7 +36,7 @@ class GameEventStorage;
 class Server_CardZone
 {
 private:
-    Server_Player *player;
+    Server_AbstractPlayer *player;
     QString name;
     bool has_coords; // having coords means this zone has x and y coordinates
     ServerInfo_Zone::ZoneType type;
@@ -52,7 +52,10 @@ private:
     void insertCardIntoCoordMap(Server_Card *card, int x, int y);
 
 public:
-    Server_CardZone(Server_Player *_player, const QString &_name, bool _has_coords, ServerInfo_Zone::ZoneType _type);
+    Server_CardZone(Server_AbstractPlayer *_player,
+                    const QString &_name,
+                    bool _has_coords,
+                    ServerInfo_Zone::ZoneType _type);
     ~Server_CardZone();
 
     const QList<Server_Card *> &getCards() const
@@ -84,7 +87,7 @@ public:
     {
         return name;
     }
-    Server_Player *getPlayer() const
+    Server_AbstractPlayer *getPlayer() const
     {
         return player;
     }

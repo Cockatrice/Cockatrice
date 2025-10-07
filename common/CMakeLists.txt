@@ -18,6 +18,7 @@ set(common_SOURCES
     rng_abstract.cpp
     rng_sfmt.cpp
     server/game/server_abstract_participant.cpp
+    server/game/server_abstract_player.cpp
     server/game/server_arrow.cpp
     server/game/server_arrowtarget.cpp
     server/game/server_card.cpp
