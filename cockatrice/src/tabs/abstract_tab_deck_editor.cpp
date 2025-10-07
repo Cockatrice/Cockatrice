@@ -49,6 +49,9 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this, [this] {
+        printingSelectorDockWidget->setHidden(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+    });
 
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
