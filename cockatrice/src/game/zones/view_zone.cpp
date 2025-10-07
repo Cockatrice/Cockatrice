@@ -112,7 +112,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
     qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
     reorganizeCards();
-    emit getLogic() -> cardCountChanged();
+    emit getLogic()->cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.
