@@ -20,11 +20,11 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include <libcockatrice/network/server/remote/server_protocolhandler.h>
 #include <QHostAddress>
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/network/server/remote/server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
