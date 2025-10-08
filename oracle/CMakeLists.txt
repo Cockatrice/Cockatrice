@@ -69,8 +69,7 @@ endif()
 # Include directories
 # ------------------------
 include_directories(
-  ../libcockatrice-card/libcockatrice/card/include ../libcockatrice_settings/libcockatrice/settings/include
-  ../cockatrice/src ../common
+  ../cockatrice/src
 )
 
 # ------------------------
