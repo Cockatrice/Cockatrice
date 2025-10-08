@@ -5,8 +5,8 @@
 #include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
-#include <libcockatrice/network/server/remote/server.h>
-#include <libcockatrice/network/server/remote/server_database_interface.h>
+#include <server.h>
+#include <server_database_interface.h>
 
 #define DATABASE_SCHEMA_VERSION 34
 

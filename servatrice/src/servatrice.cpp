@@ -40,7 +40,7 @@
 #include <QUrl>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/network/server/remote/server_room.h>
+#include <server_room.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QtMath>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>

@@ -29,7 +29,7 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
-#include <libcockatrice/network/server/remote/server.h>
+#include <server.h>
 #include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)

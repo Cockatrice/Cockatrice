@@ -24,7 +24,7 @@
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/network/server/remote/server_protocolhandler.h>
+#include <server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;

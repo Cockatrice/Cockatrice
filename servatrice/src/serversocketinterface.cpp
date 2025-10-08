@@ -37,9 +37,9 @@
 #include <QString>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/network/server/remote/game/server_player.h>
-#include <libcockatrice/network/server/remote/server_response_containers.h>
-#include <libcockatrice/network/server/remote/server_room.h>
+#include <game/server_player.h>
+#include <server_response_containers.h>
+#include <server_room.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>

@@ -5,8 +5,8 @@
 
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
-#include <libcockatrice/network/server/remote/server_protocolhandler.h>
-#include <libcockatrice/network/server/remote/server_room.h>
+#include <server_protocolhandler.h>
+#include <server_room.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
