@@ -7,6 +7,7 @@ on:
     - cron: '0 0 1 1,4,7,10 *'
   pull_request:
     paths:
+      - '.ci/update_translation_source_strings.sh'
       - '.github/workflows/translations-push.yml'
 
 jobs:

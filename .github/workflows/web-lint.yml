@@ -1,11 +1,12 @@
 name: Code Style (TypeScript) 
 
 on:
+  # push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:
     paths:
-      - '.github/workflows/web-*.yml'
       - 'webclient/**'
       - '!**.md'
+      - '.github/workflows/web-lint.yml'
 
 jobs:
   ESLint:

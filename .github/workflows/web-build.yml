@@ -5,14 +5,16 @@ on:
     branches:
       - master
     paths:
-      - '.github/workflows/web-*.yml'
+      - '.husky/**'
       - 'webclient/**'
       - '!**.md'
+      - '.github/workflows/web-build.yml'
   pull_request:
     paths:
-      - '.github/workflows/web-*.yml'
+      - '.husky/**'
       - 'webclient/**'
       - '!**.md'
+      - '.github/workflows/web-build.yml'
 
 jobs:
   build-web:

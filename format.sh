@@ -12,18 +12,18 @@ olddir="$PWD"
 cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with special links etc.
 
 # defaults
-include=("common" \
-"cockatrice/src" \
+include=("cockatrice/src" \
+"common" \
 "dbconverter/src" \
 "oracle/src" \
 "servatrice/src" \
 "tests")
-exclude=("servatrice/src/smtp" \
-"common/sfmt" \
+exclude=("common/sfmt" \
 "common/lib" \
 "oracle/src/zip" \
 "oracle/src/lzma" \
-"oracle/src/qt-json")
+"oracle/src/qt-json" \
+"servatrice/src/smtp")
 exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
