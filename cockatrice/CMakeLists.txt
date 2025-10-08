@@ -205,7 +205,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    ../libcockatrice_network/libcockatrice/client/abstract_client.cpp
+    ../libcockatrice_network/libcockatrice/client/abstract/abstract_client.cpp
     src/server/chat_view/chat_view.cpp
     src/server/game_selector.cpp
     src/server/games_model.cpp

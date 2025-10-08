@@ -1,6 +1,6 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../client/tapped_out_interface.h"
 #include "../deck/deck_stats_interface.h"
 #include "../dialogs/dlg_load_deck.h"

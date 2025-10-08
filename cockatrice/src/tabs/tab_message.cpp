@@ -1,6 +1,6 @@
 #include "tab_message.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"

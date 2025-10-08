@@ -7,7 +7,7 @@
 #ifndef TAB_HOME_H
 #define TAB_HOME_H
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../interface/widgets/general/home_widget.h"
 #include "tab.h"
 

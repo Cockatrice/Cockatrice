@@ -1,6 +1,6 @@
 #include "user_list_widget.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_supervisor.h"

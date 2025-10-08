@@ -1,6 +1,6 @@
 #include "../../../cockatrice/src/server/abstract_client.h"
 
-#include "../../../cockatrice/src/server/pending_command.h"
+#include "../../../../cockatrice/src/server/pending_command.h"
 
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>

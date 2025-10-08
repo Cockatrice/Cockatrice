@@ -7,7 +7,7 @@
 #ifndef REMOTECLIENT_H
 #define REMOTECLIENT_H
 
-#include "../abstract_client.h"
+#include "../abstract/abstract_client.h"
 
 #include <QLoggingCategory>
 #include <QTcpSocket>

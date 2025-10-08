@@ -3,11 +3,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    abstract/abstract_client.h
+    local_client.h
 )
 
 set(SOURCES
-    abstract/abstract_client.cpp
+    local_client.cpp
 )
 
 if (Qt6_FOUND)
@@ -17,7 +17,7 @@ elseif (Qt5_FOUND)
 endif ()
 
 add_library(
-    libcockatrice_network_client STATIC
+    libcockatrice_network_client_local STATIC
     ${MOC_SOURCES}
     ${SOURCES}
 )

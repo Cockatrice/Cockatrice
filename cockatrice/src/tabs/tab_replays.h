@@ -8,7 +8,7 @@
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "tab.h"
 
 class ServerInfo_User;

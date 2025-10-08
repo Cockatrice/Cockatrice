@@ -1,6 +1,6 @@
 #include "user_context_menu.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"

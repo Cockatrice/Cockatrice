@@ -1,6 +1,6 @@
 #include "tab_replays.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/remote/remote_replay_list_tree_widget.h"
 #include "tab_game.h"

@@ -1,6 +1,6 @@
 #include "game_selector.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../client/get_text_with_max.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
