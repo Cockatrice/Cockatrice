@@ -29,7 +29,6 @@
 #include "interface/window_main.h"
 #include "version_string.h"
 
-#include <libcockatrice/protocol/featureset.h>
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>
@@ -42,6 +41,7 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
+#include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/logger.h>
