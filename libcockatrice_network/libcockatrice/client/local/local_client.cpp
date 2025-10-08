@@ -1,6 +1,6 @@
 #include "local_client.h"
 
-#include "local_server_interface.h"
+#include "../../server/local/local_server_interface.h"
 
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/server/debug_pb_message.h>

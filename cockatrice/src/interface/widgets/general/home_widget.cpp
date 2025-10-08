@@ -1,6 +1,6 @@
 #include "home_widget.h"
 
-#include "../../../server/remote/remote_client.h"
+#include "../../../../../libcockatrice_network/libcockatrice/client/remote/remote_client.h"
 #include "../../../tabs/tab_supervisor.h"
 #include "../../window_main.h"
 #include "background_sources.h"

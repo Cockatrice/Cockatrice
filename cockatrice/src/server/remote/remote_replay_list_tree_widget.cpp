@@ -1,6 +1,6 @@
 #include "remote_replay_list_tree_widget.h"
 
-#include "../abstract_client.h"
+#include "../../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../pending_command.h"
 
 #include <QFileIconProvider>

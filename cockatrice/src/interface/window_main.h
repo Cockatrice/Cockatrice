@@ -25,7 +25,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "../server/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 
 #include <QList>
 #include <QLoggingCategory>

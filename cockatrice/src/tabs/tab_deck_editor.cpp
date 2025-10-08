@@ -1,5 +1,6 @@
 #include "tab_deck_editor.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../client/deck_editor_menu.h"
 #include "../client/tapped_out_interface.h"
 #include "../dialogs/dlg_load_deck.h"
@@ -9,7 +10,6 @@
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
-#include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "tab_supervisor.h"
 

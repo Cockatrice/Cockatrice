@@ -1,8 +1,8 @@
 #include "tab_room.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../dialogs/dlg_settings.h"
 #include "../main.h"
-#include "../server/abstract_client.h"
 #include "../server/chat_view/chat_view.h"
 #include "../server/game_selector.h"
 #include "../server/pending_command.h"

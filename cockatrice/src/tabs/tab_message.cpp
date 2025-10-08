@@ -1,9 +1,9 @@
 #include "tab_message.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
-#include "../server/abstract_client.h"
 #include "../server/chat_view/chat_view.h"
 #include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"

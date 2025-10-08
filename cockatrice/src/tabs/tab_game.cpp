@@ -1,5 +1,6 @@
 #include "tab_game.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../client/network/replay_timeline_widget.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
@@ -20,7 +21,6 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/window_main.h"
 #include "../main.h"
-#include "../server/abstract_client.h"
 #include "../server/user/user_list_manager.h"
 #include "tab_supervisor.h"
 

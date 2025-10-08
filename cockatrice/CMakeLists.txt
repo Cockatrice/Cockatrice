@@ -205,16 +205,16 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    src/server/abstract_client.cpp
+    ../libcockatrice_network/libcockatrice/client/abstract_client.cpp
     src/server/chat_view/chat_view.cpp
     src/server/game_selector.cpp
     src/server/games_model.cpp
     src/server/handle_public_servers.cpp
-    src/server/local_client.cpp
-    src/server/local_server.cpp
-    src/server/local_server_interface.cpp
+    ../libcockatrice_network/libcockatrice/client/local/local_client.cpp
+    ../libcockatrice_network/libcockatrice/server/local/local_server.cpp
+    ../libcockatrice_network/libcockatrice/server/local/local_server_interface.cpp
     src/server/pending_command.cpp
-    src/server/remote/remote_client.cpp
+    ../libcockatrice_network/libcockatrice/client/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp
     src/server/remote/remote_replay_list_tree_widget.cpp
     src/server/user/user_context_menu.cpp

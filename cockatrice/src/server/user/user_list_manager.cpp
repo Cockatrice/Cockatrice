@@ -1,7 +1,7 @@
 #include "user_list_manager.h"
 
+#include "../../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../../client/sound_engine.h"
-#include "../abstract_client.h"
 #include "../pending_command.h"
 #include "user_info_box.h"
 

@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_GAME_STATE_H
 #define COCKATRICE_GAME_STATE_H
 
-#include "../server/abstract_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 
 #include <QObject>
 #include <QTimer>

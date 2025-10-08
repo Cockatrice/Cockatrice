@@ -1,8 +1,8 @@
 #include "tab_account.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
-#include "../server/abstract_client.h"
 #include "../server/pending_command.h"
 #include "../server/user/user_info_box.h"
 #include "../server/user/user_list_manager.h"

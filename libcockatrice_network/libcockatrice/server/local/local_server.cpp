@@ -1,4 +1,4 @@
-#include "local_server.h"
+#include "../../../cockatrice/src/server/local_server.h"
 
 #include "local_server_interface.h"
 

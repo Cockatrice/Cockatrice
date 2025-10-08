@@ -1,8 +1,8 @@
 #include "tab_supervisor.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/abstract_client.h"
 #include "../interface/pixel_map_generator.h"
 #include "../main.h"
-#include "../server/abstract_client.h"
 #include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
 #include "api/edhrec/tab_edhrec_main.h"

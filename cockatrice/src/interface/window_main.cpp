@@ -19,6 +19,9 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../../../libcockatrice_network/libcockatrice/client/local/local_client.h"
+#include "../../../libcockatrice_network/libcockatrice/client/remote/remote_client.h"
+#include "../../../libcockatrice_network/libcockatrice/server/local/local_server.h"
 #include "../client/get_text_with_max.h"
 #include "../client/network/client_update_checker.h"
 #include "../client/network/release_channel.h"
@@ -35,10 +38,7 @@
 #include "../dialogs/dlg_update.h"
 #include "../dialogs/dlg_view_log.h"
 #include "../main.h"
-#include "../server/local_client.h"
-#include "../server/local_server.h"
 #include "../server/local_server_interface.h"
-#include "../server/remote/remote_client.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "version_string.h"

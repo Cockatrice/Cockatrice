@@ -7,7 +7,7 @@
 #ifndef LOCALCLIENT_H
 #define LOCALCLIENT_H
 
-#include "abstract_client.h"
+#include "../abstract_client.h"
 
 #include <QLoggingCategory>
 
