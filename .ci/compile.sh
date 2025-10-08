@@ -141,7 +141,7 @@ function ccachestatsverbose() {
 if [[ $RUNNER_OS == macOS ]]; then
   echo "::group::Signing Certificate"
   if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
-    echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+    echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
     security default-keychain -s build.keychain
     security set-keychain-settings -t 3600 -l build.keychain
@@ -153,6 +153,28 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "No signing certificate configured. Skipping set up of keychain in macOS environment."
   fi
   echo "::endgroup::"
+
+  if [[ $MAKE_PACKAGE ]]; then
+    # Workaround https://github.com/actions/runner-images/issues/7522
+    # have hdiutil repeat the command 10 times in hope of success
+    hdiutil_script="/tmp/hdiutil.sh"
+    # shellcheck disable=SC2016
+    echo '#!/bin/bash
+i=0
+while ! hdiutil "$@"; do
+  if (( ++i >= 10 )); then
+    echo "Error: hdiutil failed $i times!" >&2
+    break
+  fi
+  sleep 1
+done' >"$hdiutil_script"
+    chmod +x "$hdiutil_script"
+    flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
+  fi
+elif [[ $RUNNER_OS == Windows ]]; then
+  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
 if [[ $USE_CCACHE ]]; then
@@ -167,13 +189,7 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-if [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
-else
-  cmake --build . "${buildflags[@]}"
-fi
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
@@ -197,11 +213,6 @@ fi
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   
-  if [[ $RUNNER_OS == macOS ]]; then
-    # Workaround https://github.com/actions/runner-images/issues/7522
-    echo "killing XProtectBehaviorService"; sudo pkill -9 XProtect >/dev/null || true;
-    echo "waiting for XProtectBehaviorService kill"; while pgrep "XProtect"; do sleep 3; done;
-  fi
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
