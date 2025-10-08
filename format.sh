@@ -13,16 +13,22 @@ cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with 
 
 # defaults
 include=("cockatrice/src" \
-"common" \
 "dbconverter/src" \
+"libcockatrice_card" \
+"libcockatrice_deck_list" \
+"libcockatrice_protocol" \
+"libcockatrice_rng" \
+"libcockatrice_server" \
+"libcockatrice_settings" \
+"libcockatrice_utility" \
 "oracle/src" \
 "servatrice/src" \
 "tests")
-exclude=("common/sfmt" \
-"common/lib" \
-"oracle/src/zip" \
+exclude=("libcockatrice_rng/libcockatrice/rng/sfmt" \
+"libcockatrice_utility/libcockatrice/utility/peglib.h" \
 "oracle/src/lzma" \
 "oracle/src/qt-json" \
+"oracle/src/zip" \
 "servatrice/src/smtp")
 exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
