@@ -355,13 +355,13 @@ if(Qt5_FOUND)
     libcockatrice_card
     libcockatrice_deck_list
     libcockatrice_utility
-      libcockatrice_network
+    libcockatrice_network
     libcockatrice_rng
     ${COCKATRICE_QT_MODULES}
   )
 else()
   target_link_libraries(
-      cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_network
+    cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_network
                       libcockatrice_rng ${COCKATRICE_QT_MODULES}
   )
 endif()

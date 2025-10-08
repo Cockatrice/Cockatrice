@@ -6,8 +6,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(UTILITY_SOURCES
-    libcockatrice/utility/expression.cpp libcockatrice/utility/key_signals.cpp
-    libcockatrice/utility/levenshtein.cpp libcockatrice/utility/logger.cpp libcockatrice/utility/passwordhasher.cpp
+    libcockatrice/utility/expression.cpp libcockatrice/utility/key_signals.cpp libcockatrice/utility/levenshtein.cpp
+    libcockatrice/utility/logger.cpp libcockatrice/utility/passwordhasher.cpp
 )
 
 set(UTILITY_HEADERS

@@ -23,33 +23,33 @@ set(HEADERS
     serverinfo_user_container.h
 )
 
-if (Qt6_FOUND)
-    qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif (Qt5_FOUND)
-    qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif ()
+if(Qt6_FOUND)
+  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
+elseif(Qt5_FOUND)
+  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+endif()
 
 add_library(
-    libcockatrice_network_server_remote STATIC
-    ${MOC_SOURCES}
-    game/server_abstract_participant.cpp
-    game/server_abstract_player.cpp
-    game/server_arrow.cpp
-    game/server_arrowtarget.cpp
-    game/server_card.cpp
-    game/server_cardzone.cpp
-    game/server_counter.cpp
-    game/server_game.cpp
-    game/server_player.cpp
-    game/server_spectator.cpp
-    server.cpp
-    server_abstractuserinterface.cpp
-    server_database_interface.cpp
-    server_protocolhandler.cpp
-    server_remoteuserinterface.cpp
-    server_response_containers.cpp
-    server_room.cpp
-    serverinfo_user_container.cpp
+  libcockatrice_network_server_remote STATIC
+  ${MOC_SOURCES}
+  game/server_abstract_participant.cpp
+  game/server_abstract_player.cpp
+  game/server_arrow.cpp
+  game/server_arrowtarget.cpp
+  game/server_card.cpp
+  game/server_cardzone.cpp
+  game/server_counter.cpp
+  game/server_game.cpp
+  game/server_player.cpp
+  game/server_spectator.cpp
+  server.cpp
+  server_abstractuserinterface.cpp
+  server_database_interface.cpp
+  server_protocolhandler.cpp
+  server_remoteuserinterface.cpp
+  server_response_containers.cpp
+  server_room.cpp
+  serverinfo_user_container.cpp
 )
 
 add_dependencies(libcockatrice_network_server_remote libcockatrice_protocol)
@@ -58,6 +58,6 @@ target_include_directories(libcockatrice_network_server_remote PUBLIC .)
 
 # Make cockatrice_server depend on cockatrice_protocol
 target_link_libraries(
-    libcockatrice_network_server_remote PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
-    libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
+  libcockatrice_network_server_remote PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
+                                             libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )
