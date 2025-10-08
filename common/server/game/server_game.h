@@ -36,7 +36,7 @@ class QTimer;
 class GameEventContainer;
 class GameReplay;
 class Server_Room;
-class Server_Player;
+class Server_AbstractPlayer;
 class Server_AbstractParticipant;
 class ServerInfo_User;
 class ServerInfo_Game;
@@ -130,8 +130,8 @@ public:
     }
     int getPlayerCount() const;
     int getSpectatorCount() const;
-    QMap<int, Server_Player *> getPlayers() const;
-    Server_Player *getPlayer(int id) const;
+    QMap<int, Server_AbstractPlayer *> getPlayers() const;
+    Server_AbstractPlayer *getPlayer(int id) const;
     const QMap<int, Server_AbstractParticipant *> &getParticipants() const
     {
         return participants;
@@ -185,8 +185,8 @@ public:
                    bool judge,
                    bool broadcastUpdate = true);
     void removeParticipant(Server_AbstractParticipant *participant, Event_Leave::LeaveReason reason);
-    void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player);
-    void unattachCards(GameEventStorage &ges, Server_Player *player);
+    void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
+    void unattachCards(GameEventStorage &ges, Server_AbstractPlayer *player);
     bool kickParticipant(int playerId);
     void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();

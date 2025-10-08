@@ -41,6 +41,7 @@
 #include "pb/event_set_active_player.pb.h"
 #include "pb/game_replay.pb.h"
 #include "pb/serverinfo_playerping.pb.h"
+#include "server_abstract_player.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
@@ -221,24 +222,24 @@ void Server_Game::pingClockTimeout()
     }
 }
 
-QMap<int, Server_Player *> Server_Game::getPlayers() const // copies pointers to new map
+QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies pointers to new map
 {
-    QMap<int, Server_Player *> players;
+    QMap<int, Server_AbstractPlayer *> players;
     QMutexLocker locker(&gameMutex);
     for (int id : participants.keys()) {
         auto *participant = participants[id];
         if (!participant->getSpectator()) {
-            players[id] = static_cast<Server_Player *>(participant);
+            players[id] = static_cast<Server_AbstractPlayer *>(participant);
         }
     }
     return players;
 }
 
-Server_Player *Server_Game::getPlayer(int id) const
+Server_AbstractPlayer *Server_Game::getPlayer(int id) const
 {
     auto *participant = participants.value(id);
     if (!participant->getSpectator()) {
-        return static_cast<Server_Player *>(participant);
+        return static_cast<Server_AbstractPlayer *>(participant);
     } else {
         return nullptr;
     }
@@ -339,7 +340,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         }
     }
 
-    for (Server_Player *player : players.values()) {
+    for (Server_AbstractPlayer *player : players.values()) {
         player->setupZones();
     }
 
@@ -534,7 +535,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     bool spectator = participant->getSpectator();
     GameEventStorage ges;
     if (!spectator) {
-        auto *player = static_cast<Server_Player *>(participant);
+        auto *player = static_cast<Server_AbstractPlayer *>(participant);
         removeArrowsRelatedToPlayer(ges, player);
         unattachCards(ges, player);
     }
@@ -577,14 +578,14 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     emit gameInfoChanged(gameInfo);
 }
 
-void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Player *player)
+void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_AbstractPlayer *player)
 {
     QMutexLocker locker(&gameMutex);
 
     // Remove all arrows of other players pointing to the player being removed or to one of his cards.
     // Also remove all arrows starting at one of his cards. This is necessary since players can create
     // arrows that start at another person's cards.
-    for (Server_Player *anyPlayer : getPlayers().values()) {
+    for (Server_AbstractPlayer *anyPlayer : getPlayers().values()) {
         QList<Server_Arrow *> arrows = anyPlayer->getArrows().values();
         QList<Server_Arrow *> toDelete;
         for (int i = 0; i < arrows.size(); ++i) {
@@ -593,7 +594,7 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
             if (targetCard) {
                 if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
                     toDelete.append(arrow);
-            } else if (static_cast<Server_Player *>(arrow->getTargetItem()) == player)
+            } else if (static_cast<Server_AbstractPlayer *>(arrow->getTargetItem()) == player)
                 toDelete.append(arrow);
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
@@ -610,7 +611,7 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Play
     }
 }
 
-void Server_Game::unattachCards(GameEventStorage &ges, Server_Player *player)
+void Server_Game::unattachCards(GameEventStorage &ges, Server_AbstractPlayer *player)
 {
     QMutexLocker locker(&gameMutex);
 
