@@ -68,9 +68,7 @@ endif()
 # ------------------------
 # Include directories
 # ------------------------
-include_directories(
-  ../cockatrice/src
-)
+include_directories(../cockatrice/src)
 
 # ------------------------
 # Optional libraries

@@ -274,15 +274,13 @@ set(cockatrice_RESOURCES cockatrice.qrc)
 
 if(UPDATE_TRANSLATIONS)
   # Cockatrice main sources
-  file(GLOB_RECURSE translate_cockatrice_SRCS
-      ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp
-      ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h
+  file(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp
+       ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h
   )
 
   # All libcockatrice_* libraries (recursively)
-  file(GLOB_RECURSE translate_lib_SRCS
-      ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.cpp
-      ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.h
+  file(GLOB_RECURSE translate_lib_SRCS ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.cpp
+       ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.h
   )
 
   # Combine all sources for translation
@@ -292,7 +290,6 @@ if(UPDATE_TRANSLATIONS)
 else()
   file(GLOB cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 endif()
-
 
 if(WIN32)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} cockatrice.rc)
