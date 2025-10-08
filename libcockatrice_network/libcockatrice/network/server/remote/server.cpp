@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "server.h"
 
-
 #include "game/server_game.h"
 #include "game/server_player.h"
 #include "server_database_interface.h"
@@ -30,8 +29,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QThread>
-#include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
+#include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
