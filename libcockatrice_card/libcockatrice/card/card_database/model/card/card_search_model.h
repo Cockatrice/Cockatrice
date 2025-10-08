@@ -7,8 +7,9 @@
 #ifndef CARD_SEARCH_MODEL_H
 #define CARD_SEARCH_MODEL_H
 
-#include <QAbstractListModel>
 #include "../card_database_display_model.h"
+
+#include <QAbstractListModel>
 
 class CardSearchModel : public QAbstractListModel
 {

@@ -21,9 +21,6 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
-#include <libcockatrice/protocol/pb/event_leave.pb.h>
-#include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 #include <QDateTime>
 #include <QMap>
@@ -31,6 +28,9 @@
 #include <QObject>
 #include <QSet>
 #include <QStringList>
+#include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 class QTimer;
 class GameEventContainer;

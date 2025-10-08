@@ -6,9 +6,8 @@
 // https://github.com/protocolbuffers/protobuf/issues/119
 #undef TYPE_BOOL
 #endif
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-
 #include <QFlags>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 Q_DECLARE_FLAGS(UserLevelFlags, ServerInfo_User::UserLevelFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(UserLevelFlags)

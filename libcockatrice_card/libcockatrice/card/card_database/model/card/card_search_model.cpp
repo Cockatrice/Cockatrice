@@ -2,9 +2,9 @@
 
 #include "../card_database_display_model.h"
 #include "../card_database_model.h"
-#include <libcockatrice/utility/levenshtein.h>
 
 #include <algorithm>
+#include <libcockatrice/utility/levenshtein.h>
 
 CardSearchModel::CardSearchModel(CardDatabaseDisplayModel *sourceModel, QObject *parent)
     : QAbstractListModel(parent), sourceModel(sourceModel)

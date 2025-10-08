@@ -6,9 +6,8 @@
 // https://github.com/protocolbuffers/protobuf/issues/119
 #undef TYPE_BOOL
 #endif
-#include <libcockatrice/protocol/pb/event_room_say.pb.h>
-
 #include <QFlags>
+#include <libcockatrice/protocol/pb/event_room_say.pb.h>
 
 Q_DECLARE_FLAGS(RoomMessageTypeFlags, Event_RoomSay::RoomMessageType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(RoomMessageTypeFlags)

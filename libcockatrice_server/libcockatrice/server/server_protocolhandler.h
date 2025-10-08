@@ -1,13 +1,13 @@
 #ifndef SERVER_PROTOCOLHANDLER_H
 #define SERVER_PROTOCOLHANDLER_H
 
-#include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/server_message.pb.h>
 #include "server.h"
 #include "server_abstractuserinterface.h"
 
 #include <QObject>
 #include <QPair>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/server_message.pb.h>
 
 class Features;
 class Server_DatabaseInterface;

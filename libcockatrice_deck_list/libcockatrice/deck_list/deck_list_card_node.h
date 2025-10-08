@@ -13,6 +13,7 @@
 #define COCKATRICE_DECK_LIST_CARD_NODE_H
 
 #include "abstract_deck_list_card_node.h"
+
 #include <libcockatrice/utility/card_ref.h>
 
 /**

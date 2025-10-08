@@ -1,4 +1,5 @@
 #include "card_relation.h"
+
 #include "card_relation_type.h"
 
 CardRelation::CardRelation(const QString &_name,

@@ -10,6 +10,7 @@
 #include "server_cardzone.h"
 #include "server_counter.h"
 #include "server_game.h"
+#include "server_move_card_struct.h"
 
 #include <QDebug>
 #include <QRegularExpression>
@@ -85,7 +86,6 @@
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/trice_limits.h>
-#include "server_move_card_struct.h"
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,

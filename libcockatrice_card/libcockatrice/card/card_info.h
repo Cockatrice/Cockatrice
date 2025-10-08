@@ -7,6 +7,8 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
+#include "card_printing/printing_info.h"
+
 #include <QDate>
 #include <QHash>
 #include <QList>
@@ -16,7 +18,6 @@
 #include <QSharedPointer>
 #include <QStringList>
 #include <QVariant>
-#include "card_printing/printing_info.h"
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");

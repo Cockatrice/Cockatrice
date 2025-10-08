@@ -6,6 +6,11 @@
 #include "get_pb_extension.h"
 #include "server_database_interface.h"
 #include "server_room.h"
+
+#include <QDateTime>
+#include <QDebug>
+#include <QtMath>
+#include <google/protobuf/descriptor.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
@@ -22,11 +27,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/featureset.h>
 #include <libcockatrice/utility/trice_limits.h>
-
-#include <QDateTime>
-#include <QDebug>
-#include <QtMath>
-#include <google/protobuf/descriptor.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,

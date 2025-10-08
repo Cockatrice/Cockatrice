@@ -20,12 +20,11 @@
 #ifndef SERVER_CARDZONE_H
 #define SERVER_CARDZONE_H
 
-#include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
-
 #include <QList>
 #include <QMap>
 #include <QSet>
 #include <QString>
+#include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 
 class Server_Card;
 class Server_AbstractPlayer;

@@ -20,9 +20,8 @@
 #ifndef SERVER_COUNTER_H
 #define SERVER_COUNTER_H
 
-#include <libcockatrice/protocol/pb/color.pb.h>
-
 #include <QString>
+#include <libcockatrice/protocol/pb/color.pb.h>
 
 class ServerInfo_Counter;
 

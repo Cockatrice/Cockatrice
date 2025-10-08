@@ -1,6 +1,7 @@
 #include "server_remoteuserinterface.h"
 
 #include "server.h"
+
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 void Server_RemoteUserInterface::sendProtocolItem(const Response &item)

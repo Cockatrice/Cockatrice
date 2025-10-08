@@ -2,12 +2,12 @@
 #define SERVER_ABSTRACTUSERINTERFACE
 
 #include "serverinfo_user_container.h"
-#include <libcockatrice/protocol/pb/response.pb.h>
-#include <libcockatrice/protocol/pb/server_message.pb.h>
 
 #include <QMap>
 #include <QMutex>
 #include <QPair>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/server_message.pb.h>
 
 class SessionEvent;
 class GameEventContainer;

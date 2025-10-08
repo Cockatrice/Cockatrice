@@ -6,13 +6,13 @@
 #include "server_player_reference.h"
 #include "server_response_containers.h"
 #include "server_room.h"
-#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
-#include <libcockatrice/protocol/pb/event_game_state_changed.pb.h>
 
 #include <QDebug>
 #include <QList>
 #include <QPair>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_game_state_changed.pb.h>
 
 void Server_AbstractUserInterface::sendProtocolItemByType(ServerMessage::MessageType type,
                                                           const ::google::protobuf::Message &item)

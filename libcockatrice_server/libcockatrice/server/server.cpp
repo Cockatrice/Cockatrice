@@ -26,6 +26,10 @@
 #include "server_protocolhandler.h"
 #include "server_remoteuserinterface.h"
 #include "server_room.h"
+
+#include <QCoreApplication>
+#include <QDebug>
+#include <QThread>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
@@ -33,10 +37,6 @@
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
 #include <libcockatrice/protocol/pb/session_event.pb.h>
 #include <libcockatrice/utility/featureset.h>
-
-#include <QCoreApplication>
-#include <QDebug>
-#include <QThread>
 
 Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {

@@ -7,9 +7,10 @@
 #ifndef CARDDATABASE_PARSER_H
 #define CARDDATABASE_PARSER_H
 
+#include "../../card_info.h"
+
 #include <QIODevice>
 #include <QString>
-#include "../../card_info.h"
 
 #define COCKATRICE_XML_XSI_NAMESPACE "http://www.w3.org/2001/XMLSchema-instance"
 

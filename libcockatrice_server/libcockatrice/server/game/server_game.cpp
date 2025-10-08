@@ -19,16 +19,20 @@
  ***************************************************************************/
 #include "server_game.h"
 
+#include "../server.h"
+#include "../server_database_interface.h"
+#include "../server_protocolhandler.h"
+#include "../server_room.h"
 #include "server_abstract_player.h"
 #include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_player.h"
 #include "server_spectator.h"
-#include "../server.h"
-#include "../server_database_interface.h"
-#include "../server_protocolhandler.h"
-#include "../server_room.h"
+
+#include <QDebug>
+#include <QTimer>
+#include <google/protobuf/descriptor.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
@@ -47,10 +51,6 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_playerping.pb.h>
-
-#include <QDebug>
-#include <QTimer>
-#include <google/protobuf/descriptor.h>
 
 Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          int _gameId,

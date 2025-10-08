@@ -1,10 +1,9 @@
 #ifndef SERVER_RESPONSE_CONTAINERS_H
 #define SERVER_RESPONSE_CONTAINERS_H
 
-#include <libcockatrice/protocol/pb/server_message.pb.h>
-
 #include <QList>
 #include <QPair>
+#include <libcockatrice/protocol/pb/server_message.pb.h>
 
 namespace google
 {
