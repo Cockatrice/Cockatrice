@@ -31,10 +31,10 @@ jobs:
       - name: Update Cockatrice translation source
         id: cockatrice
         shell: bash
-        env:
-          FILE: 'cockatrice/cockatrice_en@source.ts'
-          DIRS: 'cockatrice/src common'
-        run: .ci/update_translation_source_strings.sh
+        run: |
+          FILE="cockatrice/cockatrice_en@source.ts"
+          DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
+          FILE="$FILE" DIRS="$DIRS" .ci/update_translation_source_strings.sh
 
       - name: Update Oracle translation source
         id: oracle
