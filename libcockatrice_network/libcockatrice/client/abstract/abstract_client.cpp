@@ -1,4 +1,4 @@
-#include "../../../cockatrice/src/server/abstract_client.h"
+#include "abstract_client.h"
 
 #include "../../../../cockatrice/src/server/pending_command.h"
 

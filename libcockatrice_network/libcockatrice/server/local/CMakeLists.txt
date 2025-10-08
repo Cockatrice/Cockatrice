@@ -3,11 +3,13 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    local_client.h
+    local_server.h
+    local_server_interface.h
 )
 
 set(SOURCES
-    local_client.cpp
+    local_server.cpp
+    local_server_interface.cpp
 )
 
 if (Qt6_FOUND)
@@ -17,15 +19,13 @@ elseif (Qt5_FOUND)
 endif ()
 
 add_library(
-    libcockatrice_network_client_local STATIC
+    libcockatrice_network_server_local STATIC
     ${MOC_SOURCES}
     ${SOURCES}
 )
 
-# add_dependencies(libcockatrice_server libcockatrice_protocol_wrapper)
-
-target_include_directories(libcockatrice_network_client_local PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(libcockatrice_network_server_local PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
-    libcockatrice_network_client_local PUBLIC ${COCKATRICE_QT_MODULES}
+    libcockatrice_network_server_local PUBLIC ${COCKATRICE_QT_MODULES}
 )
