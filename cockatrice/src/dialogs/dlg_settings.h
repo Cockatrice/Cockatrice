@@ -104,6 +104,7 @@ private slots:
     void themeBoxChanged(int index);
     void openThemeLocation();
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
+    void overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T enabled);
 
     void cardViewInitialRowsMaxChanged(int value);
     void cardViewExpandedRowsMaxChanged(int value);

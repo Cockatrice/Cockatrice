@@ -202,7 +202,7 @@ Server_AbstractParticipant::cmdJudge(const Command_Judge &cmd, ResponseContainer
         return Response::RespFunctionNotAllowed;
     }
 
-    Server_Player *player = this->game->getPlayer(cmd.target_id());
+    auto *player = this->game->getPlayer(cmd.target_id());
 
     ges.setForcedByJudge(playerId);
     if (player == nullptr) {

@@ -203,7 +203,10 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
-        selectPrinting = menu.addAction(tr("Select Printing"));
+        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+            selectPrinting = menu.addAction(tr("Select Printing"));
+            connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
+        }
         if (canBeCommander(card.getInfo())) {
             edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
@@ -213,7 +216,6 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-        connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
         connect(edhRecCard, &QAction::triggered, this,
                 [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr()); });
 

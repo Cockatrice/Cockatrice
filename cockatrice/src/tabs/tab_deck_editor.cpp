@@ -93,6 +93,13 @@ void TabDeckEditor::createMenus()
     aPrintingSelectorDockFloating->setCheckable(true);
     connect(aPrintingSelectorDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        printingSelectorDockMenu->setEnabled(false);
+    }
+
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+            [this](bool enabled) { printingSelectorDockMenu->setEnabled(!enabled); });
+
     viewMenu->addSeparator();
 
     aResetLayout = viewMenu->addAction(QString());
@@ -171,6 +178,13 @@ void TabDeckEditor::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        if (!printingSelectorDockWidget->isHidden()) {
+            printingSelectorDockWidget->setHidden(true);
+            aPrintingSelectorDockVisible->setChecked(false);
+        }
+    }
+
     aCardInfoDockVisible->setChecked(!cardInfoDockWidget->isHidden());
     aFilterDockVisible->setChecked(!filterDockWidget->isHidden());
     aDeckDockVisible->setChecked(!deckDockWidget->isHidden());
@@ -203,10 +217,11 @@ void TabDeckEditor::loadLayout()
 
 void TabDeckEditor::restartLayout()
 {
+
     aCardInfoDockVisible->setChecked(true);
     aDeckDockVisible->setChecked(true);
     aFilterDockVisible->setChecked(true);
-    aPrintingSelectorDockVisible->setChecked(true);
+    aPrintingSelectorDockVisible->setChecked(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     aCardInfoDockFloating->setChecked(false);
     aDeckDockFloating->setChecked(false);
@@ -227,7 +242,7 @@ void TabDeckEditor::restartLayout()
     deckDockWidget->setVisible(true);
     cardInfoDockWidget->setVisible(true);
     filterDockWidget->setVisible(true);
-    printingSelectorDockWidget->setVisible(true);
+    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);

@@ -24,6 +24,8 @@ option(WITH_ORACLE "build oracle" ON)
 option(WITH_DBCONVERTER "build dbconverter" ON)
 # Compile tests
 option(TEST "build tests" OFF)
+# Use vcpkg regardless of OS
+option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -48,8 +50,8 @@ if(USE_CCACHE)
   endif()
 endif()
 
-if(WIN32 OR APPLE)
-  # Use vcpkg toolchain on Windows and macOS
+if(WIN32 OR USE_VCPKG)
+  # Use vcpkg toolchain on Windows (and on macOS in CI)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
       CACHE STRING "Vcpkg toolchain file"

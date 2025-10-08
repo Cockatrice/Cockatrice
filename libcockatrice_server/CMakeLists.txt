@@ -4,6 +4,7 @@ set(CMAKE_AUTORCC ON)
 
 set(HEADERS
     libcockatrice/server/game/server_abstract_participant.h
+    libcockatrice/server/game/server_abstract_player.h
     libcockatrice/server/game/server_arrow.h
     libcockatrice/server/game/server_arrowtarget.h
     libcockatrice/server/game/server_card.h
@@ -35,6 +36,7 @@ add_library(
   ${MOC_SOURCES}
   libcockatrice/server/debug_pb_message.cpp
   libcockatrice/server/game/server_abstract_participant.cpp
+  libcockatrice/server/game/server_abstract_player.cpp
   libcockatrice/server/game/server_arrow.cpp
   libcockatrice/server/game/server_arrowtarget.cpp
   libcockatrice/server/game/server_card.cpp

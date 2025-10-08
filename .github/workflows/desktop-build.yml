@@ -9,20 +9,33 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'
     tags:
       - '*'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
@@ -318,7 +331,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE"
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
