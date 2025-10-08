@@ -16,9 +16,9 @@ include=("cockatrice/src" \
 "dbconverter/src" \
 "libcockatrice_card" \
 "libcockatrice_deck_list" \
+"libcockatrice_network" \
 "libcockatrice_protocol" \
 "libcockatrice_rng" \
-"libcockatrice_server" \
 "libcockatrice_settings" \
 "libcockatrice_utility" \
 "oracle/src" \
