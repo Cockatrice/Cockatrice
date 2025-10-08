@@ -29,8 +29,6 @@
 #include "settingscache.h"
 #include "smtpclient.h"
 
-#include <../../libcockatrice_network/libcockatrice/server/remote/server_room.h>
-#include <../../libcockatrice_protocol/libcockatrice/protocol/featureset.h>
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
@@ -42,6 +40,8 @@
 #include <QUrl>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/network/server/remote/server_room.h>
+#include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>

@@ -20,7 +20,7 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include <../../libcockatrice_network/libcockatrice/server/remote/server_protocolhandler.h>
+#include <libcockatrice/network/server/remote/server_protocolhandler.h>
 #include <QHostAddress>
 #include <QMutex>
 #include <QTcpSocket>

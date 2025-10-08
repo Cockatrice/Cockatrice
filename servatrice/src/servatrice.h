@@ -20,7 +20,6 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
-#include <../../libcockatrice_network/libcockatrice/server/remote/server.h>
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>
@@ -30,6 +29,7 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <libcockatrice/network/server/remote/server.h>
 #include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)

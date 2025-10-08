@@ -3,10 +3,10 @@
 #include "main.h"
 #include "server_logger.h"
 
-#include <../../libcockatrice_network/libcockatrice/server/remote/server_protocolhandler.h>
-#include <../../libcockatrice_network/libcockatrice/server/remote/server_room.h>
-#include <../../libcockatrice_protocol/libcockatrice/protocol/debug_pb_message.h>
-#include <../../libcockatrice_protocol/libcockatrice/protocol/get_pb_extension.h>
+#include <libcockatrice/network/server/remote/server_protocolhandler.h>
+#include <libcockatrice/network/server/remote/server_room.h>
+#include <libcockatrice/protocol/debug_pb_message.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>

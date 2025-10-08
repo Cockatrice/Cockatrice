@@ -1,8 +1,8 @@
 #ifndef SERVATRICE_DATABASE_INTERFACE_H
 #define SERVATRICE_DATABASE_INTERFACE_H
 
-#include <../../libcockatrice_network/libcockatrice/server/remote/server.h>
-#include <../../libcockatrice_network/libcockatrice/server/remote/server_database_interface.h>
+#include <libcockatrice/network/server/remote/server.h>
+#include <libcockatrice/network/server/remote/server_database_interface.h>
 #include <QChar>
 #include <QHash>
 #include <QObject>
