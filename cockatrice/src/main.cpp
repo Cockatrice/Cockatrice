@@ -29,7 +29,7 @@
 #include "interface/window_main.h"
 #include "version_string.h"
 
-#include <../../libcockatrice_protocol/libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/featureset.h>
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>

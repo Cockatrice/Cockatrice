@@ -1,6 +1,6 @@
 #include "deck_filter_string.h"
 
-#include "../../../libcockatrice_utility/libcockatrice/utility/peglib.h"
+#include <libcockatrice/utility/peglib.h>
 #include "filter_string.h"
 
 #include <libcockatrice/card/card_database/card_database_manager.h>
