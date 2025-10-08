@@ -1,7 +1,5 @@
 #include "tab_server.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../server/user/user_list_widget.h"
 #include "tab_supervisor.h"
 
@@ -16,10 +14,12 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/response_join_room.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox(parent), client(_client)
 {

@@ -1,8 +1,5 @@
 #include "tab_admin.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
-
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -11,9 +8,11 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/admin_commands.pb.h>
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)

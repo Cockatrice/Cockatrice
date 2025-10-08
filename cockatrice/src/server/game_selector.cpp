@@ -1,7 +1,5 @@
 #include "game_selector.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/get_text_with_max.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
@@ -23,9 +21,11 @@
 #include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,

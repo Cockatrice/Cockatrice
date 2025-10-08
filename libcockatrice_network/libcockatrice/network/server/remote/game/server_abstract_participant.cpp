@@ -1,6 +1,6 @@
 #include "server_abstract_participant.h"
 
-#include "../get_pb_extension.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/get_pb_extension.h"
 #include "../server.h"
 #include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"

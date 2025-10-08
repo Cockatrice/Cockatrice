@@ -19,9 +19,6 @@
  ***************************************************************************/
 #include "window_main.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/local/local_client.h"
-#include "../../../libcockatrice_network/libcockatrice/client/remote/remote_client.h"
-#include "../../../libcockatrice_network/libcockatrice/server/local/local_server.h"
 #include "../client/get_text_with_max.h"
 #include "../client/network/client_update_checker.h"
 #include "../client/network/release_channel.h"
@@ -38,7 +35,6 @@
 #include "../dialogs/dlg_update.h"
 #include "../dialogs/dlg_view_log.h"
 #include "../main.h"
-#include "../server/local_server_interface.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "version_string.h"
@@ -66,6 +62,10 @@
 #include <QtNetwork>
 #include <libcockatrice/card/card_database/card_database.h>
 #include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/network/client/local/local_client.h>
+#include <libcockatrice/network/client/remote/remote_client.h>
+#include <libcockatrice/network/server/local/local_server.h>
+#include <libcockatrice/network/server/local/local_server_interface.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>

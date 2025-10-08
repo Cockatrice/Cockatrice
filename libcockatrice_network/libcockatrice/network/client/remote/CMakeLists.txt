@@ -22,10 +22,10 @@ add_library(
     ${SOURCES}
 )
 
-add_dependencies(libcockatrice_network_client_remote libcockatrice_network_client_abstract)
+add_dependencies(libcockatrice_network_client_remote libcockatrice_network_client_abstract libcockatrice_protocol)
 
-target_include_directories(libcockatrice_network_client_remote PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(libcockatrice_network_client_remote PUBLIC .)
 
 target_link_libraries(
-    libcockatrice_network_client_remote PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_network_client_abstract
+    libcockatrice_network_client_remote PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_network_client_abstract libcockatrice_settings libcockatrice_utility libcockatrice_protocol
 )

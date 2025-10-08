@@ -1,16 +1,16 @@
 #include "user_list_manager.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../client/sound_engine.h"
 #include "user_info_box.h"
 
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
 #include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 UserListManager::UserListManager(AbstractClient *_client, QObject *parent)
     : QObject(parent), client(_client), ownUserInfo(nullptr)

@@ -8,7 +8,7 @@
 #define USER_CONTEXT_MENU_H
 
 #include <QObject>
-#include <libcockatrice/server/user_level.h>
+#include <libcockatrice/network/server/remote/user_level.h>
 
 class AbstractGame;
 class UserListProxy;

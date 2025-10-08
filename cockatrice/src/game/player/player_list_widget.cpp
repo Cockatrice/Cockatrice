@@ -1,6 +1,5 @@
 #include "player_list_widget.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../server/user/user_context_menu.h"
 #include "../../server/user/user_list_manager.h"
@@ -13,6 +12,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QMouseEvent>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>

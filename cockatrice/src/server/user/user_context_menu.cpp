@@ -1,7 +1,5 @@
 #include "user_context_menu.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"
@@ -18,6 +16,7 @@
 #include <QSignalMapper>
 #include <QtGui>
 #include <QtWidgets>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
@@ -28,6 +27,7 @@
 #include <libcockatrice/protocol/pb/response_warn_history.pb.h>
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent, AbstractGame *_game)
     : QObject(parent), client(_tabSupervisor->getClient()), tabSupervisor(_tabSupervisor),

@@ -7,11 +7,11 @@
 #ifndef TAB_HOME_H
 #define TAB_HOME_H
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../interface/widgets/general/home_widget.h"
 #include "tab.h"
 
 #include <QHBoxLayout>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <qgroupbox.h>
 
 class AbstractClient;

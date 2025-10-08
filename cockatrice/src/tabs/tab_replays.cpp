@@ -1,7 +1,5 @@
 #include "tab_replays.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../server/remote/remote_replay_list_tree_widget.h"
 #include "tab_game.h"
 
@@ -19,6 +17,7 @@
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_get_code.pb.h>
@@ -29,6 +28,7 @@
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)

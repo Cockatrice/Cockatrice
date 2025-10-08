@@ -7,8 +7,8 @@
 #ifndef LOCALSERVER_H
 #define LOCALSERVER_H
 
-#include <libcockatrice/server/server.h>
-#include <libcockatrice/server/server_database_interface.h>
+#include <../remote/server.h>
+#include <../remote/server_database_interface.h>
 
 class LocalServerInterface;
 

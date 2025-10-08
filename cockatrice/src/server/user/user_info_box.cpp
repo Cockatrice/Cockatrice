@@ -1,7 +1,5 @@
 #include "user_info_box.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../client/get_text_with_max.h"
 #include "../../dialogs/dlg_edit_avatar.h"
 #include "../../dialogs/dlg_edit_password.h"
@@ -14,9 +12,11 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)

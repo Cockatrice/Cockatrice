@@ -12,6 +12,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QWebSocket>
+#include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
 #include <libcockatrice/protocol/pb/response_activate.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
@@ -20,7 +21,6 @@
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
-#include <libcockatrice/server/debug_pb_message.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/passwordhasher.h>
 

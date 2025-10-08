@@ -1,6 +1,5 @@
 #include "tab_supervisor.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../interface/pixel_map_generator.h"
 #include "../main.h"
 #include "../server/user/user_list_manager.h"
@@ -26,6 +25,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>

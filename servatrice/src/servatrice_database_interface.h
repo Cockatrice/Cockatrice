@@ -1,12 +1,12 @@
 #ifndef SERVATRICE_DATABASE_INTERFACE_H
 #define SERVATRICE_DATABASE_INTERFACE_H
 
+#include <../../libcockatrice_network/libcockatrice/server/remote/server.h>
+#include <../../libcockatrice_network/libcockatrice/server/remote/server_database_interface.h>
 #include <QChar>
 #include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
-#include <libcockatrice/server/server.h>
-#include <libcockatrice/server/server_database_interface.h>
 
 #define DATABASE_SCHEMA_VERSION 34
 

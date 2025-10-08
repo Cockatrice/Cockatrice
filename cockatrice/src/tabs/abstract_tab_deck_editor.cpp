@@ -1,7 +1,5 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/tapped_out_interface.h"
 #include "../deck/deck_stats_interface.h"
 #include "../dialogs/dlg_load_deck.h"
@@ -35,8 +33,10 @@
 #include <QUrl>
 #include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 

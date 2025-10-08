@@ -13,8 +13,8 @@
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
+#include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
-#include <libcockatrice/server/user_level.h>
 
 class QTreeWidget;
 class ServerInfo_User;

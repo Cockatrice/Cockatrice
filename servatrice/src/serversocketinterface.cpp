@@ -28,6 +28,8 @@
 #include "settingscache.h"
 #include "version_string.h"
 
+#include <../../libcockatrice_network/libcockatrice/server/remote/server_response_containers.h>
+#include <../../libcockatrice_network/libcockatrice/server/remote/server_room.h>
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
@@ -78,8 +80,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/server/game/server_player.h>
-#include <libcockatrice/server/server_response_containers.h>
-#include <libcockatrice/server/server_room.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <string>
 

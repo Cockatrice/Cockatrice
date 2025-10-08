@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "server.h"
 
-#include "debug_pb_message.h"
+
 #include "game/server_game.h"
 #include "game/server_player.h"
 #include "server_database_interface.h"
@@ -30,13 +30,14 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QThread>
+#include <libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
 #include <libcockatrice/protocol/pb/session_event.pb.h>
-#include <libcockatrice/utility/featureset.h>
 
 Server::Server(QObject *parent) : QObject(parent), nextLocalGameId(0), tcpUserCount(0), webSocketUserCount(0)
 {

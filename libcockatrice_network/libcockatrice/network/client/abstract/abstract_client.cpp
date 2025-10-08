@@ -1,8 +1,8 @@
 #include "abstract_client.h"
 
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
-
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
@@ -18,8 +18,7 @@
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
-#include <libcockatrice/server/get_pb_extension.h>
-#include <libcockatrice/utility/featureset.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 AbstractClient::AbstractClient(QObject *parent)
     : QObject(parent), nextCmdId(0), status(StatusDisconnected), serverSupportsPasswordHash(false)

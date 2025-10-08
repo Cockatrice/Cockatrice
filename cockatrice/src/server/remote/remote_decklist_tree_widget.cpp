@@ -1,14 +1,13 @@
 #include "remote_decklist_tree_widget.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
-
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 RemoteDeckList_TreeModel::DirectoryNode::DirectoryNode(const QString &_name,
                                                        RemoteDeckList_TreeModel::DirectoryNode *_parent)

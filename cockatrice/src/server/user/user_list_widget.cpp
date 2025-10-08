@@ -1,7 +1,5 @@
 #include "user_list_widget.h"
 
-#include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_supervisor.h"
@@ -25,10 +23,12 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)

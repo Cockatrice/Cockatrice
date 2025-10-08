@@ -1,9 +1,7 @@
 #include "server_protocolhandler.h"
 
-#include "debug_pb_message.h"
 #include "game/server_game.h"
 #include "game/server_player.h"
-#include "get_pb_extension.h"
 #include "server_database_interface.h"
 #include "server_room.h"
 
@@ -11,6 +9,8 @@
 #include <QDebug>
 #include <QtMath>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
@@ -25,7 +25,6 @@
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/featureset.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,

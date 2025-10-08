@@ -1,6 +1,5 @@
 #include "tab_game.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
 #include "../client/network/replay_timeline_widget.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
@@ -40,6 +39,7 @@
 #include <QWidget>
 #include <libcockatrice/card/card_database/card_database.h>
 #include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>

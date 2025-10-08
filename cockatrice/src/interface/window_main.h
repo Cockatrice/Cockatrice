@@ -25,8 +25,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-
 #include <QList>
 #include <QLoggingCategory>
 #include <QMainWindow>
@@ -34,6 +32,7 @@
 #include <QProcess>
 #include <QSystemTrayIcon>
 #include <QtNetwork>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 
 inline Q_LOGGING_CATEGORY(WindowMainLog, "window_main");

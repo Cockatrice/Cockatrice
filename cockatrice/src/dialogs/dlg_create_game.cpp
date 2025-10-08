@@ -1,6 +1,5 @@
 #include "dlg_create_game.h"
 
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../tabs/tab_room.h"
 
 #include <QApplication>
@@ -17,6 +16,7 @@
 #include <QSpinBox>
 #include <QWizard>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 

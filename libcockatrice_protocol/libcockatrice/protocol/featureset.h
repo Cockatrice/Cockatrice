@@ -2,10 +2,11 @@
 #define FEATURESET_H
 
 #include <QMap>
+#include <QObject>
 #include <QSet>
 #include <QString>
 
-class FeatureSet
+class FeatureSet : public QObject
 {
 public:
     FeatureSet();

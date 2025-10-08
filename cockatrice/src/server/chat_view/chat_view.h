@@ -16,8 +16,8 @@
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextFragment>
-#include <libcockatrice/server/room_message_type.h>
-#include <libcockatrice/server/user_level.h>
+#include <libcockatrice/network/server/remote/room_message_type.h>
+#include <libcockatrice/network/server/remote/user_level.h>
 
 class AbstractGame;
 class QTextTable;

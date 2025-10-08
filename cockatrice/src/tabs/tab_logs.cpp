@@ -1,7 +1,5 @@
 #include "tab_logs.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../deck/custom_line_edit.h"
 #include "../dialogs/dlg_manage_sets.h"
 
@@ -17,8 +15,10 @@
 #include <QTabWidget>
 #include <QtGui>
 #include <QtWidgets>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)

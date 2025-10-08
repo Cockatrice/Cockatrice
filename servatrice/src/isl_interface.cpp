@@ -3,6 +3,10 @@
 #include "main.h"
 #include "server_logger.h"
 
+#include <../../libcockatrice_network/libcockatrice/server/remote/server_protocolhandler.h>
+#include <../../libcockatrice_network/libcockatrice/server/remote/server_room.h>
+#include <../../libcockatrice_protocol/libcockatrice/protocol/debug_pb_message.h>
+#include <../../libcockatrice_protocol/libcockatrice/protocol/get_pb_extension.h>
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -16,10 +20,6 @@
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
-#include <libcockatrice/server/debug_pb_message.h>
-#include <libcockatrice/server/get_pb_extension.h>
-#include <libcockatrice/server/server_protocolhandler.h>
-#include <libcockatrice/server/server_room.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {

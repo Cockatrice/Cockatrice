@@ -12,7 +12,7 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
-#include <libcockatrice/server/user_level.h>
+#include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);

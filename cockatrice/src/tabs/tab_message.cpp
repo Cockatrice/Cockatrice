@@ -1,7 +1,5 @@
 #include "tab_message.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/sound_engine.h"
 #include "../deck/custom_line_edit.h"
 #include "../main.h"
@@ -13,9 +11,11 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 

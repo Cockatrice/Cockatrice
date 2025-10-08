@@ -205,16 +205,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    ../libcockatrice_network/libcockatrice/client/abstract/abstract_client.cpp
     src/server/chat_view/chat_view.cpp
     src/server/game_selector.cpp
     src/server/games_model.cpp
     src/server/handle_public_servers.cpp
-    ../libcockatrice_network/libcockatrice/client/local/local_client.cpp
-    ../libcockatrice_network/libcockatrice/server/local/local_server.cpp
-    ../libcockatrice_network/libcockatrice/server/local/local_server_interface.cpp
-    ../libcockatrice_protocol/libcockatrice/protocol/pending_command.cpp
-    ../libcockatrice_network/libcockatrice/client/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp
     src/server/remote/remote_replay_list_tree_widget.cpp
     src/server/user/user_context_menu.cpp
@@ -317,12 +311,6 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
-# Include directories
-include_directories(../common)
-include_directories(${PROTOBUF_INCLUDE_DIR})
-include_directories(${CMAKE_BINARY_DIR}/common)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
@@ -367,13 +355,13 @@ if(Qt5_FOUND)
     libcockatrice_card
     libcockatrice_deck_list
     libcockatrice_utility
-    libcockatrice_server
+      libcockatrice_network
     libcockatrice_rng
     ${COCKATRICE_QT_MODULES}
   )
 else()
   target_link_libraries(
-    cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_server
+      cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_network
                       libcockatrice_rng ${COCKATRICE_QT_MODULES}
   )
 endif()

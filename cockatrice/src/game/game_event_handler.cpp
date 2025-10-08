@@ -1,11 +1,11 @@
 #include "game_event_handler.h"
 
-#include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../tabs/tab_game.h"
 #include "abstract_game.h"
 #include "log/message_log_widget.h"
 
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
@@ -28,7 +28,7 @@
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
-#include <libcockatrice/server/get_pb_extension.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {
