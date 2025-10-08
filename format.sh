@@ -24,12 +24,12 @@ include=("cockatrice/src" \
 "oracle/src" \
 "servatrice/src" \
 "tests")
-exclude=("libcockatrice_rng/libcockatrice/rng/sfmt" \
+exclude=("libcockatrice_rng/libcockatrice/rng/sfmt/" \
 "libcockatrice_utility/libcockatrice/utility/peglib.h" \
-"oracle/src/lzma" \
-"oracle/src/qt-json" \
-"oracle/src/zip" \
-"servatrice/src/smtp")
+"oracle/src/lzma/" \
+"oracle/src/qt-json/" \
+"oracle/src/zip/" \
+"servatrice/src/smtp/")
 exts=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
@@ -240,7 +240,7 @@ fi
 # filter excludes
 for path in "${exclude[@]}"; do
   for i in "${!names[@]}"; do
-    rx="^$path/"
+    rx="^$path"
     if [[ ${names[$i]} =~ $rx ]]; then
       unset "names[$i]"
     fi
