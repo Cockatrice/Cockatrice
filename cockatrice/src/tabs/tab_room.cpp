@@ -9,7 +9,6 @@
 #include "tab_account.h"
 #include "tab_supervisor.h"
 
-#include <../../../libcockatrice_protocol/libcockatrice/protocol/get_pb_extension.h>
 #include <QApplication>
 #include <QCompleter>
 #include <QLabel>
@@ -22,6 +21,7 @@
 #include <QVBoxLayout>
 #include <QtCore/qdatetime.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
 #include <libcockatrice/protocol/pb/event_leave_room.pb.h>
 #include <libcockatrice/protocol/pb/event_list_games.pb.h>

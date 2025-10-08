@@ -1,6 +1,5 @@
 #include "server_player.h"
 
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/get_pb_extension.h"
 #include "../server.h"
 #include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"
@@ -17,6 +16,7 @@
 #include <algorithm>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
