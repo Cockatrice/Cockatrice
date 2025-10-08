@@ -40,11 +40,11 @@
 #include <QUrl>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <server_room.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <server_room.h>
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,

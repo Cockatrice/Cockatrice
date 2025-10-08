@@ -35,11 +35,9 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
+#include <game/server_player.h>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <game/server_player.h>
-#include <server_response_containers.h>
-#include <server_room.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
@@ -81,6 +79,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/trice_limits.h>
+#include <server_response_containers.h>
+#include <server_room.h>
 #include <string>
 
 static const int protocolVersion = 14;

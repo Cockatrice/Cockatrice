@@ -5,8 +5,6 @@
 
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
-#include <server_protocolhandler.h>
-#include <server_room.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -20,6 +18,8 @@
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
+#include <server_protocolhandler.h>
+#include <server_room.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {
