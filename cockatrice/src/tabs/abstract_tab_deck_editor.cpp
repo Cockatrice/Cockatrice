@@ -1,6 +1,7 @@
 #include "abstract_tab_deck_editor.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/tapped_out_interface.h"
 #include "../deck/deck_stats_interface.h"
 #include "../dialogs/dlg_load_deck.h"
@@ -9,7 +10,6 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
-#include "../server/pending_command.h"
 #include "tab_supervisor.h"
 
 #include <QAction>

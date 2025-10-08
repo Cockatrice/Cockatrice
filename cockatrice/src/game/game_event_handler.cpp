@@ -1,7 +1,7 @@
 #include "game_event_handler.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../server/pending_command.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../tabs/tab_game.h"
 #include "abstract_game.h"
 #include "log/message_log_widget.h"

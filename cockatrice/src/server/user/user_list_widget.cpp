@@ -1,11 +1,11 @@
 #include "user_list_widget.h"
 
 #include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../game_selector.h"
-#include "../pending_command.h"
 #include "user_context_menu.h"
 #include "user_list_manager.h"
 

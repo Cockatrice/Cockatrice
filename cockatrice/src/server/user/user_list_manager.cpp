@@ -1,8 +1,8 @@
 #include "user_list_manager.h"
 
 #include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../client/sound_engine.h"
-#include "../pending_command.h"
 #include "user_info_box.h"
 
 #include <libcockatrice/protocol/pb/event_add_to_list.pb.h>

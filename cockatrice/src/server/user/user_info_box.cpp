@@ -1,12 +1,12 @@
 #include "user_info_box.h"
 
 #include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../client/get_text_with_max.h"
 #include "../../dialogs/dlg_edit_avatar.h"
 #include "../../dialogs/dlg_edit_password.h"
 #include "../../dialogs/dlg_edit_user.h"
 #include "../../interface/pixel_map_generator.h"
-#include "../pending_command.h"
 
 #include <QDateTime>
 #include <QGridLayout>

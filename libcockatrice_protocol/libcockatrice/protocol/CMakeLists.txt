@@ -1,15 +1,15 @@
 # Top-level wrapper for the protobuf library
 
-add_subdirectory(libcockatrice/protocol/pb)
+add_subdirectory(pb)
 
 add_library(libcockatrice_protocol STATIC)
 
 set(SOURCES
-    libcockatrice/protocol/pending_command.cpp
+    pending_command.cpp
 )
 
 set(HEADERS
-    libcockatrice/protocol/pending_command.h
+    pending_command.h
 )
 
 target_sources(libcockatrice_protocol
@@ -28,5 +28,5 @@ target_include_directories(
     libcockatrice_protocol
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR} # points to the generated headers
+    ${CMAKE_CURRENT_BINARY_DIR}/pb   # generated pb headers
 )

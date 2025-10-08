@@ -1,7 +1,7 @@
 #include "remote_client.h"
 
 #include "../../../../cockatrice/src/main.h"
-#include "../../../../cockatrice/src/server/pending_command.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>

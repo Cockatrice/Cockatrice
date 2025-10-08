@@ -1,12 +1,12 @@
 #include "deck_view_container.h"
 
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../dialogs/dlg_load_deck_from_website.h"
 #include "../../dialogs/dlg_load_remote_deck.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
-#include "../../server/pending_command.h"
 #include "../../tabs/tab_game.h"
 #include "../game_scene.h"
 #include "deck_view.h"

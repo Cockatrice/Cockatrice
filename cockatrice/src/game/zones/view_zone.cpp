@@ -1,6 +1,6 @@
 #include "view_zone.h"
 
-#include "../../server/pending_command.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
@@ -112,7 +112,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 
     qobject_cast<ZoneViewZoneLogic *>(getLogic())->updateCardIds(ZoneViewZoneLogic::INITIALIZE);
     reorganizeCards();
-    emit getLogic()->cardCountChanged();
+    emit getLogic() -> cardCountChanged();
 }
 
 // Because of boundingRect(), this function must not be called before the zone was added to a scene.

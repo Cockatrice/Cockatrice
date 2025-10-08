@@ -56,12 +56,12 @@ add_library(
   libcockatrice/server/serverinfo_user_container.cpp
 )
 
-add_dependencies(libcockatrice_server libcockatrice_protocol_wrapper)
+add_dependencies(libcockatrice_server libcockatrice_protocol)
 
 target_include_directories(libcockatrice_server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Make cockatrice_server depend on cockatrice_protocol
 target_link_libraries(
-  libcockatrice_server PUBLIC libcockatrice_protocol_wrapper libcockatrice_utility libcockatrice_rng
+    libcockatrice_server PUBLIC libcockatrice_protocol libcockatrice_utility libcockatrice_rng
                               libcockatrice_deck_list ${COCKATRICE_QT_MODULES}
 )

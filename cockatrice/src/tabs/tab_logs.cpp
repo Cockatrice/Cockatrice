@@ -1,9 +1,9 @@
 #include "tab_logs.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../deck/custom_line_edit.h"
 #include "../dialogs/dlg_manage_sets.h"
-#include "../server/pending_command.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>

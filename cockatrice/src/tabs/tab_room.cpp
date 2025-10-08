@@ -1,11 +1,11 @@
 #include "tab_room.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../dialogs/dlg_settings.h"
 #include "../main.h"
 #include "../server/chat_view/chat_view.h"
 #include "../server/game_selector.h"
-#include "../server/pending_command.h"
 #include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
 #include "tab_account.h"

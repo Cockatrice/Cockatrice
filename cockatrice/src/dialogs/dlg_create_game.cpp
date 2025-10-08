@@ -1,6 +1,6 @@
 #include "dlg_create_game.h"
 
-#include "../server/pending_command.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../tabs/tab_room.h"
 
 #include <QApplication>

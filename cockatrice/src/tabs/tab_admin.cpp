@@ -1,7 +1,7 @@
 #include "tab_admin.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../server/pending_command.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

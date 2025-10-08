@@ -1,7 +1,7 @@
 #include "tab_server.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
-#include "../server/pending_command.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../server/user/user_list_widget.h"
 #include "tab_supervisor.h"
 

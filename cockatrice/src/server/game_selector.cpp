@@ -1,6 +1,7 @@
 #include "game_selector.h"
 
 #include "../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/get_text_with_max.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
@@ -9,7 +10,6 @@
 #include "../tabs/tab_room.h"
 #include "../tabs/tab_supervisor.h"
 #include "games_model.h"
-#include "pending_command.h"
 #include "user/user_list_manager.h"
 
 #include <QApplication>

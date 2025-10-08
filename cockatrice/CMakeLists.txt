@@ -213,7 +213,7 @@ set(cockatrice_SOURCES
     ../libcockatrice_network/libcockatrice/client/local/local_client.cpp
     ../libcockatrice_network/libcockatrice/server/local/local_server.cpp
     ../libcockatrice_network/libcockatrice/server/local/local_server_interface.cpp
-    src/server/pending_command.cpp
+    ../libcockatrice_protocol/libcockatrice/protocol/pending_command.cpp
     ../libcockatrice_network/libcockatrice/client/remote/remote_client.cpp
     src/server/remote/remote_decklist_tree_widget.cpp
     src/server/remote/remote_replay_list_tree_widget.cpp

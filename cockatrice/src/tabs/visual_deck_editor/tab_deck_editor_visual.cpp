@@ -1,5 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../deck/deck_list_model.h"
 #include "../../deck/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
@@ -7,7 +8,6 @@
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
-#include "../../server/pending_command.h"
 #include "../tab_deck_editor.h"
 #include "../tab_supervisor.h"
 #include "tab_deck_editor_visual_tab_widget.h"

@@ -1,12 +1,12 @@
 #include "user_context_menu.h"
 
 #include "../../../../libcockatrice_network/libcockatrice/client/abstract/abstract_client.h"
+#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
 #include "../game_selector.h"
-#include "../pending_command.h"
 #include "user_info_box.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"

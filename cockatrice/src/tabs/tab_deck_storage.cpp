@@ -1,8 +1,8 @@
 #include "tab_deck_storage.h"
 
+#include "../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "../client/get_text_with_max.h"
 #include "../deck/deck_loader.h"
-#include "../server/pending_command.h"
 #include "../server/remote/remote_decklist_tree_widget.h"
 
 #include <QAction>
