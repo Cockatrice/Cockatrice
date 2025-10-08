@@ -3,7 +3,7 @@ import React from 'react';
 
 import {CardDTO} from 'services';
 
-import Card from 'card/Card';
+import Card from '../Card/Card';
 
 import './CardDetails.css';
 
