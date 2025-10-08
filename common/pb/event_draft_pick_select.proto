@@ -1,0 +1,27 @@
+syntax = "proto2";
+import "game_event.proto";
+
+// Sent by the server to confirm a player's picks that round
+message Event_DraftPickSelect {
+    extend GameEvent {
+        optional Event_DraftPickSelect ext = 2023;
+    }
+
+    // Index in the sequence of pick selections made
+    optional sint32 selection_index = 1 [default = -1];
+
+    // Amount of cards picked
+    optional sint32 picked_cards = 2 [default = -1];
+
+    // Amount of cards picked to destroy
+    optional sint32 burned_cards = 3 [default = -1];
+
+    // Amount of cards placed into the pack
+    optional sint32 returned_cards = 4 [default = -1];
+
+    // Amount of cards in the pack after picks
+    optional sint32 remaining_cards = 5 [default = -1];
+
+    // Next player receiving the pack
+    optional sint32 passed_to_user_id = 6 [default = -1];
+}

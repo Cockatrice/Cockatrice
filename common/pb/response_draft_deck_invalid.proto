@@ -1,0 +1,16 @@
+syntax = "proto2";
+import "response.proto";
+
+// Sent in response to selecting a deck during a draft that does not meet the requirements. Clients are already aware of
+// what the requirements are but the fields in this serve as an extra validation.
+message Response_DraftDeckInvalid {
+    extend Response {
+        optional Response_DraftDeckInvalid ext = 1201;
+    }
+
+    // amount of cards that should be in the deck but aren't
+    optional uint32 missing_cards = 1;
+
+    // amount of cards that are in the deck but shouldn't
+    optional uint32 additional_cards = 2;
+}

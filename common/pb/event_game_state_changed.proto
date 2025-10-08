@@ -1,6 +1,7 @@
 syntax = "proto2";
 import "game_event.proto";
 import "serverinfo_player.proto";
+import "draft_options.proto";
 
 // Signals that the game state has changed.
 // If a field is present in this message, it will overwrite the client's game state.
@@ -10,7 +11,7 @@ message Event_GameStateChanged {
         optional Event_GameStateChanged ext = 1005;
     }
 
-    // the list of players. Players contain their zones which contain all cards in the game
+    // The list of players. Players contain their zones which contain all cards in the game
     repeated ServerInfo_Player player_list = 1;
 
     // if the game has started
@@ -24,4 +25,7 @@ message Event_GameStateChanged {
 
     // the amount of seconds since the game started
     optional uint32 seconds_elapsed = 5;
+
+    // the options for the draft if this is a draft game
+    optional Draft_Options options = 6;
 }

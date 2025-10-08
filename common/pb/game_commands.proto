@@ -38,6 +38,8 @@ message GameCommand {
         UNCONCEDE = 1032;
         JUDGE = 1033;
         REVERSE_TURN = 1034;
+        DRAFT_OPTIONS_SELECT = 1035;
+        DRAFT_PICK_SELECT = 1036;
     }
     extensions 100 to max;
 }
