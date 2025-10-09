@@ -1,7 +1,7 @@
 #include "message_log_widget.h"
 
 #include "../../client/sound_engine.h"
-#include "../../tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
 #include "../phase.h"

@@ -33,9 +33,9 @@
 #include "../dialogs/dlg_tip_of_the_day.h"
 #include "../dialogs/dlg_update.h"
 #include "../dialogs/dlg_view_log.h"
+#include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
-#include "../tabs/tab_game.h"
-#include "../tabs/tab_supervisor.h"
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
 

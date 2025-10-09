@@ -1,7 +1,7 @@
 #include "player_actions.h"
 
 #include "../../interface/widgets/utility/get_text_with_max.h"
-#include "../../tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"

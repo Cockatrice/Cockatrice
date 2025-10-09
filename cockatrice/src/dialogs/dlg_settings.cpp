@@ -9,8 +9,8 @@
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "../interface/widgets/utility/sequence_edit.h"
+#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
-#include "../tabs/tab_supervisor.h"
 
 #include <QAbstractButton>
 #include <QAbstractListModel>

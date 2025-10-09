@@ -1,6 +1,6 @@
 #include "card_item.h"
 
-#include "../../tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../player/player.h"
 #include "../zones/card_zone.h"

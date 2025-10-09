@@ -7,7 +7,7 @@
 
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../cards/card_info_picture_art_crop_widget.h"
 #include "home_styled_button.h"
 

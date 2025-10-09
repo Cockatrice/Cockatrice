@@ -7,7 +7,7 @@
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../cards/card_info_picture_widget.h"
 #include "all_zones_card_amount_widget.h"
 #include "card_amount_widget.h"

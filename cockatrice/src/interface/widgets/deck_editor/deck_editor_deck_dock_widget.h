@@ -8,8 +8,8 @@
 #ifndef DECK_EDITOR_DECK_DOCK_WIDGET_H
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
 #include "../utility/custom_line_edit.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 
 #include <QComboBox>

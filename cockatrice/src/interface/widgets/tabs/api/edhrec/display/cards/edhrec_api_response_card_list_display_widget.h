@@ -7,8 +7,8 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_LIST_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_CARD_LIST_DISPLAY_WIDGET_H
 
-#include "../../../../../interface/widgets/general/display/banner_widget.h"
-#include "../../../../../interface/widgets/general/layout_containers/flow_widget.h"
+#include "../../../../../general/display/banner_widget.h"
+#include "../../../../../general/layout_containers/flow_widget.h"
 #include "../../api_response/cards/edhrec_api_response_card_list.h"
 
 #include <QResizeEvent>

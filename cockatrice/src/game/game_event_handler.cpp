@@ -1,6 +1,6 @@
 #include "game_event_handler.h"
 
-#include "../tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
 #include "log/message_log_widget.h"
 

@@ -8,7 +8,7 @@
 #ifndef CHATVIEW_H
 #define CHATVIEW_H
 
-#include "../../tabs/tab_supervisor.h"
+#include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
 
 #include <QAction>

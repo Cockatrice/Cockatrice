@@ -1,6 +1,6 @@
 #include "deck_editor_printing_selector_dock_widget.h"
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 
 #include <QVBoxLayout>
 

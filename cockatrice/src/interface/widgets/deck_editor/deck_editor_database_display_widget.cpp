@@ -1,8 +1,8 @@
 #include "deck_editor_database_display_widget.h"
 
 #include "../../../filters/syntax_help.h"
-#include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../pixel_map_generator.h"
 
 #include <QClipboard>

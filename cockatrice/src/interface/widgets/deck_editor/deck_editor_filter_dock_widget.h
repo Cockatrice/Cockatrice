@@ -8,7 +8,7 @@
 #ifndef DECK_EDITOR_FILTER_DOCK_WIDGET_H
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 
 #include <QDockWidget>
 #include <QTreeView>

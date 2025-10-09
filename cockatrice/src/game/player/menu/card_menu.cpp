@@ -1,6 +1,6 @@
 #include "card_menu.h"
 
-#include "../../../tabs/tab_game.h"
+#include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
 #include "../card_menu_action_type.h"

@@ -4,9 +4,9 @@
 #include "../../interface/widgets/server/user/user_context_menu.h"
 #include "../../interface/widgets/server/user/user_list_manager.h"
 #include "../../interface/widgets/server/user/user_list_widget.h"
-#include "../../tabs/tab_account.h"
-#include "../../tabs/tab_game.h"
-#include "../../tabs/tab_supervisor.h"
+#include "../../interface/widgets/tabs/tab_account.h"
+#include "../../interface/widgets/tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_supervisor.h"
 
 #include <QAction>
 #include <QHeaderView>
