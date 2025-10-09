@@ -38,5 +38,5 @@ target_include_directories(libcockatrice_deck_list PUBLIC ${CMAKE_CURRENT_SOURCE
 
 target_link_libraries(
   libcockatrice_deck_list PUBLIC libcockatrice_protocol libcockatrice_card libcockatrice_utility
-  ${COCKATRICE_QT_MODULES}
+                                 ${COCKATRICE_QT_MODULES}
 )
