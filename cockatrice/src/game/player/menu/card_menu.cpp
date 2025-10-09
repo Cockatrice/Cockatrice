@@ -9,8 +9,8 @@
 #include "move_menu.h"
 #include "pt_menu.h"
 
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/card_counter_settings.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)

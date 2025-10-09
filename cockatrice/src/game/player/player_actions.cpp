@@ -8,8 +8,8 @@
 #include "../zones/logic/view_zone_logic.h"
 #include "card_menu_action_type.h"
 
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>

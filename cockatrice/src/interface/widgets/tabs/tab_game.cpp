@@ -37,8 +37,8 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QWidget>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>

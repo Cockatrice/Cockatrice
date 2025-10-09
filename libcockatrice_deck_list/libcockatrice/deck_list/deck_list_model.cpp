@@ -10,7 +10,7 @@
 #include <QTextDocument>
 #include <QTextStream>
 #include <QTextTable>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 DeckListModel::DeckListModel(QObject *parent)

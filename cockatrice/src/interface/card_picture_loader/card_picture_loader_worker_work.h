@@ -15,7 +15,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QThread>
-#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/database/card_database.h>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"

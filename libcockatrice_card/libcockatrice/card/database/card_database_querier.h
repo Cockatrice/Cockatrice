@@ -8,7 +8,7 @@
 #define COCKATRICE_CARD_DATABASE_QUERIER_H
 
 #include "../card_info.h"
-#include "../card_printing/exact_card.h"
+#include "../printing/exact_card.h"
 
 #include <QObject>
 #include <libcockatrice/utility/card_ref.h>

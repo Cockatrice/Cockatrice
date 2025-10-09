@@ -1,9 +1,9 @@
 #include "card_info.h"
 
-#include "card_printing/printing_info.h"
-#include "card_relation/card_relation.h"
-#include "card_set/card_set.h"
 #include "game_specific_terms.h"
+#include "printing/printing_info.h"
+#include "relation/card_relation.h"
+#include "set/card_set.h"
 
 #include <QDir>
 #include <QRegularExpression>

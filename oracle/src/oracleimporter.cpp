@@ -7,8 +7,8 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <climits>
-#include <libcockatrice/card/card_database/parser/cockatrice_xml_4.h>
-#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
+#include <libcockatrice/card/relation/card_relation.h>
 
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,

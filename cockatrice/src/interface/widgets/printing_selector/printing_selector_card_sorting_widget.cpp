@@ -1,6 +1,6 @@
 #include "printing_selector_card_sorting_widget.h"
 
-#include <libcockatrice/card/card_set/card_set_comparator.h>
+#include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");

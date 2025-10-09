@@ -12,7 +12,7 @@
 #include <QMouseEvent>
 #include <QSpinBox>
 #include <QVBoxLayout>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)

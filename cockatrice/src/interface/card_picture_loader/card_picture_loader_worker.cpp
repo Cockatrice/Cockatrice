@@ -8,7 +8,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 

@@ -17,10 +17,10 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QWidget>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
-#include <libcockatrice/card/card_database/model/card_database_display_model.h>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/database/model/card_database_display_model.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/deck_list/deck_list_model.h>
 #include <qscrollarea.h>
 

@@ -2,7 +2,7 @@
 
 #include "../../tab_edhrec_main.h"
 
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
     QWidget *parent,

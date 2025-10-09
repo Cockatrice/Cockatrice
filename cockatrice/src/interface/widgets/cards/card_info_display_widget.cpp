@@ -8,7 +8,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QVBoxLayout>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <utility>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)

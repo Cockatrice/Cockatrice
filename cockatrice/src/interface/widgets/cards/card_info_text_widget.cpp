@@ -8,8 +8,8 @@
 #include <QScrollBar>
 #include <QSizePolicy>
 #include <QTextEdit>
-#include <libcockatrice/card/card_relation/card_relation.h>
 #include <libcockatrice/card/game_specific_terms.h>
+#include <libcockatrice/card/relation/card_relation.h>
 
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
 {

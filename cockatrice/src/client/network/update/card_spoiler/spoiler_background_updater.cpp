@@ -13,8 +13,8 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QtConcurrent>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"

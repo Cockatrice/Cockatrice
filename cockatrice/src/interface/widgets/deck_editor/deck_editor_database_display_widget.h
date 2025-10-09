@@ -13,8 +13,8 @@
 
 #include <QHBoxLayout>
 #include <QWidget>
-#include <libcockatrice/card/card_database/model/card_database_display_model.h>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/database/model/card_database_display_model.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/utility/key_signals.h>
 
 class AbstractTabDeckEditor;

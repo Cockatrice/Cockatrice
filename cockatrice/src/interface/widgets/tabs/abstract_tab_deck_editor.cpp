@@ -31,8 +31,8 @@
 #include <QTextStream>
 #include <QTreeView>
 #include <QUrl>
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>

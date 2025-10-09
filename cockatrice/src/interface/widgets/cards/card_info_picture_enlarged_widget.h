@@ -10,7 +10,7 @@
 
 #include <QPixmap>
 #include <QWidget>
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 
 class CardInfoPictureEnlargedWidget final : public QWidget
 {

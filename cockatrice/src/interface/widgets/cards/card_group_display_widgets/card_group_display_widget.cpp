@@ -5,8 +5,8 @@
 #include "../libcockatrice_deck_list/libcockatrice/deck_list/deck_list_sort_filter_proxy_model.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,

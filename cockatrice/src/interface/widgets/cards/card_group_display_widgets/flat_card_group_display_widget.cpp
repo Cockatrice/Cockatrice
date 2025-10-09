@@ -4,8 +4,8 @@
 #include "../libcockatrice_deck_list/libcockatrice/deck_list/deck_list_model.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <utility>
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,

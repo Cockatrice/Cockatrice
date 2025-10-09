@@ -15,9 +15,9 @@
 
 #include <QHeaderView>
 #include <QScrollBar>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <qpropertyanimation.h>
 #include <utility>

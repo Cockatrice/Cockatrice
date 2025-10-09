@@ -6,7 +6,7 @@
 
 #include <QMessageBox>
 #include <QMouseEvent>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
