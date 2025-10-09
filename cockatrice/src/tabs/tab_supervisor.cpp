@@ -1,9 +1,9 @@
 #include "tab_supervisor.h"
 
 #include "../interface/pixel_map_generator.h"
+#include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
-#include "../server/user/user_list_manager.h"
-#include "../server/user/user_list_widget.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"

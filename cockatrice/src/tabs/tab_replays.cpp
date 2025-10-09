@@ -1,6 +1,6 @@
 #include "tab_replays.h"
 
-#include "../server/remote/remote_replay_list_tree_widget.h"
+#include "../interface/widgets/server/remote/remote_replay_list_tree_widget.h"
 #include "tab_game.h"
 
 #include <QAction>

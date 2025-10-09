@@ -1,7 +1,7 @@
 #include "dlg_update.h"
 
-#include "../client/network/client_update_checker.h"
-#include "../client/network/release_channel.h"
+#include "../client/network/update/client/client_update_checker.h"
+#include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
 
 #include <QApplication>

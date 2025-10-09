@@ -7,7 +7,6 @@
 #ifndef DLG_SELECT_SET_FOR_CARDS_H
 #define DLG_SELECT_SET_FOR_CARDS_H
 
-#include "../deck/deck_list_model.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
 
 #include <QCheckBox>
@@ -17,6 +16,7 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 class SetEntryWidget; // Forward declaration
 

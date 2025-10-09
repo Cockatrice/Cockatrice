@@ -7,7 +7,7 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
-#include "../client/update_downloader.h"
+#include "../client/network/update/client/update_downloader.h"
 
 #include <QDialogButtonBox>
 #include <QLoggingCategory>

@@ -21,7 +21,7 @@
 #include "main.h"
 
 #include "QtNetwork/QNetworkInterface"
-#include "client/network/spoiler_background_updater.h"
+#include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/sound_engine.h"
 #include "dialogs/dlg_settings.h"
 #include "interface/pixel_map_generator.h"

@@ -7,7 +7,6 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-#include "../../../deck/deck_list_model.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "mana_base_widget.h"
 #include "mana_curve_widget.h"
@@ -18,6 +17,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 class DeckAnalyticsWidget : public QWidget
 {

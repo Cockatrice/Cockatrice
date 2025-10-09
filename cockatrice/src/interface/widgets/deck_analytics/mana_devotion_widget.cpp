@@ -1,6 +1,5 @@
 #include "mana_devotion_widget.h"
 
-#include "../../../deck/deck_loader.h"
 #include "../../../main.h"
 #include "../general/display/banner_widget.h"
 #include "../general/display/bar_widget.h"
@@ -9,6 +8,7 @@
 #include <libcockatrice/card/card_database/card_database.h>
 #include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_loader.h>
 #include <regex>
 #include <string>
 #include <unordered_map>

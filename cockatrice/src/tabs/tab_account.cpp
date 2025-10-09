@@ -1,10 +1,10 @@
 #include "tab_account.h"
 
 #include "../client/sound_engine.h"
-#include "../deck/custom_line_edit.h"
-#include "../server/user/user_info_box.h"
-#include "../server/user/user_list_manager.h"
-#include "../server/user/user_list_widget.h"
+#include "../interface/widgets/server/user/user_info_box.h"
+#include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_widget.h"
+#include "../interface/widgets/utility/custom_line_edit.h"
 #include "tab_supervisor.h"
 
 #include <QPushButton>

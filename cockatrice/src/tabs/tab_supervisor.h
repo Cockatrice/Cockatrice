@@ -8,8 +8,7 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../deck/deck_loader.h"
-#include "../server/user/user_list_proxy.h"
+#include "../interface/widgets/server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
@@ -24,6 +23,7 @@
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
+#include <libcockatrice/deck_list/deck_loader.h>
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 

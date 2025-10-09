@@ -1,6 +1,6 @@
 #include "tab_server.h"
 
-#include "../server/user/user_list_widget.h"
+#include "../interface/widgets/server/user/user_list_widget.h"
 #include "tab_supervisor.h"
 
 #include <QCheckBox>

@@ -1,9 +1,9 @@
 #include "player_list_widget.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "../../server/user/user_context_menu.h"
-#include "../../server/user/user_list_manager.h"
-#include "../../server/user/user_list_widget.h"
+#include "../../interface/widgets/server/user/user_context_menu.h"
+#include "../../interface/widgets/server/user/user_list_manager.h"
+#include "../../interface/widgets/server/user/user_list_widget.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"

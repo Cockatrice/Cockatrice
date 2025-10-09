@@ -19,9 +19,8 @@
  ***************************************************************************/
 #include "window_main.h"
 
-#include "../client/get_text_with_max.h"
-#include "../client/network/client_update_checker.h"
-#include "../client/network/release_channel.h"
+#include "../client/network/update/client/client_update_checker.h"
+#include "../client/network/update/client/release_channel.h"
 #include "../dialogs/dlg_connect.h"
 #include "../dialogs/dlg_edit_tokens.h"
 #include "../dialogs/dlg_forgot_password_challenge.h"
@@ -38,6 +37,7 @@
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_supervisor.h"
 #include "version_string.h"
+#include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>

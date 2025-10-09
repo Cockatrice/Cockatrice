@@ -1,7 +1,5 @@
 #include "visual_deck_editor_widget.h"
 
-#include "../../../deck/deck_list_model.h"
-#include "../../../deck/deck_loader.h"
 #include "../../../main.h"
 #include "../../layouts/overlap_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
@@ -21,6 +19,8 @@
 #include <libcockatrice/card/card_database/model/card/card_search_model.h>
 #include <libcockatrice/card/card_database/model/card_database_model.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/deck_list/deck_loader.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)

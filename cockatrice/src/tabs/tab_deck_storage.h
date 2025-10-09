@@ -8,7 +8,7 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
-#include "../server/remote/remote_decklist_tree_widget.h"
+#include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
 #include <libcockatrice/network/client/abstract/abstract_client.h>

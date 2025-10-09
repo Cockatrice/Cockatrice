@@ -7,7 +7,6 @@
 #ifndef PRINTING_SELECTOR_H
 #define PRINTING_SELECTOR_H
 
-#include "../../../deck/deck_list_model.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
@@ -19,6 +18,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 #define BATCH_SIZE 10
 

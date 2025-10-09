@@ -1,10 +1,10 @@
 #include "tab_message.h"
 
 #include "../client/sound_engine.h"
-#include "../deck/custom_line_edit.h"
+#include "../interface/widgets/server/chat_view/chat_view.h"
+#include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/utility/custom_line_edit.h"
 #include "../main.h"
-#include "../server/chat_view/chat_view.h"
-#include "../server/user/user_list_manager.h"
 
 #include <QApplication>
 #include <QDebug>

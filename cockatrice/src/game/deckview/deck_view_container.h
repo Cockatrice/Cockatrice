@@ -7,9 +7,8 @@
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
-#include "../../deck/deck_loader.h"
-
 #include <QPushButton>
+#include <libcockatrice/deck_list/deck_loader.h>
 
 class QVBoxLayout;
 class AbstractCardItem;

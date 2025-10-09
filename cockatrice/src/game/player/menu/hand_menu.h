@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_HAND_MENU_H
 #define COCKATRICE_HAND_MENU_H
 
-#include "../../../interface/tearoff_menu.h"
+#include "../../../interface/widgets/menus/tearoff_menu.h"
 
 #include <QAction>
 #include <QMenu>

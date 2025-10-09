@@ -1,7 +1,6 @@
 #include "tab_deck_editor.h"
 
-#include "../client/deck_editor_menu.h"
-#include "../client/tapped_out_interface.h"
+#include "../client/network/interfaces/tapped_out_interface.h"
 #include "../dialogs/dlg_load_deck.h"
 #include "../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../filters/filter_builder.h"
@@ -9,6 +8,7 @@
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
+#include "../interface/widgets/menus/deck_editor_menu.h"
 #include "tab_supervisor.h"
 
 #include <QAction>

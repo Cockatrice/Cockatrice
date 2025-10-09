@@ -23,7 +23,7 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/qt-json/json.cpp
-    ../cockatrice/src/client/network/release_channel.cpp
+    ../cockatrice/src/client/network/update/client/release_channel.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp

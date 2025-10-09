@@ -1,6 +1,5 @@
 #include "deck_view_container.h"
 
-#include "../../deck/deck_loader.h"
 #include "../../dialogs/dlg_load_deck.h"
 #include "../../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../dialogs/dlg_load_deck_from_website.h"
@@ -16,6 +15,7 @@
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/card/card_database/card_database.h>
 #include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_loader.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_ready_start.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>

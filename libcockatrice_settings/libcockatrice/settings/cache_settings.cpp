@@ -1,8 +1,8 @@
 #include "cache_settings.h"
 
+#include "../../../cockatrice/src/client/network/update/client/release_channel.h"
 #include "card_counter_settings.h"
 #include "card_override_settings.h"
-#include "release_channel.h"
 
 #include <QAbstractListModel>
 #include <QApplication>

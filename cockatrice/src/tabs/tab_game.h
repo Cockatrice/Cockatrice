@@ -9,11 +9,11 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../client/replay_manager.h"
 #include "../game/abstract_game.h"
 #include "../game/log/message_log_widget.h"
 #include "../game/player/player.h"
-#include "../interface/tearoff_menu.h"
+#include "../interface/widgets/menus/tearoff_menu.h"
+#include "../interface/widgets/replay/replay_manager.h"
 #include "../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "tab.h"
 

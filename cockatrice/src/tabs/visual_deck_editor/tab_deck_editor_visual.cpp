@@ -1,7 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
-#include "../../deck/deck_list_model.h"
-#include "../../deck/deck_stats_interface.h"
+#include "../../client/network/interfaces/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
@@ -29,6 +28,7 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
