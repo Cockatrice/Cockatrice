@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           FILE="cockatrice/cockatrice_en@source.ts"
-          DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
+          export DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
           FILE="$FILE" DIRS="$DIRS" .ci/update_translation_source_strings.sh
 
       - name: Update Oracle translation source
