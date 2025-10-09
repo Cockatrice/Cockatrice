@@ -1,6 +1,6 @@
 #include "home_widget.h"
 
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
 #include "background_sources.h"
 #include "home_styled_button.h"

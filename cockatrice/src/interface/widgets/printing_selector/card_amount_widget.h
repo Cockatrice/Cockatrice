@@ -8,7 +8,7 @@
 #ifndef CARD_AMOUNT_WIDGET_H
 #define CARD_AMOUNT_WIDGET_H
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>

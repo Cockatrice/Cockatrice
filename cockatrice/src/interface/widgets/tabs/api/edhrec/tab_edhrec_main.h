@@ -7,9 +7,9 @@
 #ifndef TAB_EDHREC_MAIN_H
 #define TAB_EDHREC_MAIN_H
 
-#include "../../../interface/widgets/cards/card_size_widget.h"
-#include "../../../interface/widgets/general/layout_containers/flow_widget.h"
-#include "../../../interface/widgets/quick_settings/settings_button_widget.h"
+#include "../../interface/widgets/cards/card_size_widget.h"
+#include "../../interface/widgets/general/layout_containers/flow_widget.h"
+#include "../../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab.h"
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
 

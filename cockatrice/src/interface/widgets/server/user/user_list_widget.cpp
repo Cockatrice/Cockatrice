@@ -1,8 +1,8 @@
 #include "user_list_widget.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "../../tabs/tab_account.h"
-#include "../../tabs/tab_supervisor.h"
+#include "../../interface/widgets/tabs/tab_account.h"
+#include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../game_selector.h"
 #include "user_context_menu.h"
 #include "user_list_manager.h"

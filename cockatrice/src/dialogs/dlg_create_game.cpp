@@ -1,6 +1,6 @@
 #include "dlg_create_game.h"
 
-#include "../tabs/tab_room.h"
+#include "../interface/widgets/tabs/tab_room.h"
 
 #include <QApplication>
 #include <QCheckBox>

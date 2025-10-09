@@ -2,7 +2,7 @@
 
 #include "../../../game/board/card_item.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
 
 #include <QMenu>

@@ -1,6 +1,6 @@
 #include "deck_preview_tag_addition_widget.h"
 
-#include "../../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "deck_preview_tag_dialog.h"
 
 #include <QFontMetrics>

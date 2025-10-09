@@ -8,7 +8,7 @@
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
 #include "../../../filters/filter_tree_model.h"
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"

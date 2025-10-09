@@ -1,6 +1,6 @@
 #include "library_menu.h"
 
-#include "../../../tabs/tab_game.h"
+#include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"

@@ -1,8 +1,8 @@
 #include "user_context_menu.h"
 
-#include "../../tabs/tab_account.h"
-#include "../../tabs/tab_game.h"
-#include "../../tabs/tab_supervisor.h"
+#include "../../interface/widgets/tabs/tab_account.h"
+#include "../../interface/widgets/tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
 #include "../game_selector.h"
 #include "user_info_box.h"

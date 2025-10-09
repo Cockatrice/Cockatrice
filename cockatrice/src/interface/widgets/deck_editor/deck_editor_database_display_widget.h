@@ -8,7 +8,7 @@
 #ifndef DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../utility/custom_line_edit.h"
 
 #include <QHBoxLayout>

@@ -1,6 +1,6 @@
 #include "abstract_counter.h"
 
-#include "../../tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../player/player.h"
 #include "translate_counter_name.h"
 
