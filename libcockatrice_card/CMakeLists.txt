@@ -40,7 +40,7 @@ add_library(
   libcockatrice/card/card_database/card_database_querier.cpp
   libcockatrice/card/card_database/model/card/card_completer_proxy_model.cpp
   libcockatrice/card/card_database/model/card/card_search_model.cpp
-    libcockatrice/card/card_database/model/card_set/card_sets_model.cpp
+  libcockatrice/card/card_database/model/card_set/card_sets_model.cpp
   libcockatrice/card/card_database/model/card_database_display_model.cpp
   libcockatrice/card/card_database/model/card_database_model.cpp
   libcockatrice/card/card_database/model/token/token_display_model.cpp
