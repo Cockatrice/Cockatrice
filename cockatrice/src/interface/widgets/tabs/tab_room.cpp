@@ -1,6 +1,6 @@
 #include "tab_room.h"
 
-#include "../dialogs/dlg_settings.h"
+#include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_selector.h"
 #include "../interface/widgets/server/user/user_list_manager.h"

@@ -1,6 +1,6 @@
 #include "visual_database_display_name_filter_widget.h"
 
-#include "../../../dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 
 #include <QHBoxLayout>

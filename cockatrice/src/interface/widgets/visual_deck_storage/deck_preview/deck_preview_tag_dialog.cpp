@@ -1,6 +1,6 @@
 #include "deck_preview_tag_dialog.h"
 
-#include "../../../../dialogs/dlg_default_tags_editor.h"
+#include "../../../../interface/widgets/dialogs/dlg_default_tags_editor.h"
 #include "deck_preview_tag_item_widget.h"
 
 #include <QCheckBox>

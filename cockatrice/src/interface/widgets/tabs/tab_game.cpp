@@ -1,6 +1,5 @@
 #include "tab_game.h"
 
-#include "../dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
 #include "../game/board/card_item.h"
 #include "../game/deckview/deck_view_container.h"
@@ -16,6 +15,7 @@
 #include "../game/zones/card_zone.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
+#include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/replay/replay_timeline_widget.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/line_edit_completer.h"

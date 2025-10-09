@@ -1,7 +1,7 @@
 #include "game_selector.h"
 
-#include "../dialogs/dlg_create_game.h"
-#include "../dialogs/dlg_filter_games.h"
+#include "../interface/widgets/dialogs/dlg_create_game.h"
+#include "../interface/widgets/dialogs/dlg_filter_games.h"
 #include "../interface/widgets/tabs/tab_account.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_room.h"
