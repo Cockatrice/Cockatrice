@@ -1,6 +1,5 @@
 #include "tab_deck_editor.h"
 
-
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../filters/filter_builder.h"
 #include "../filters/filter_tree_model.h"
