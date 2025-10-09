@@ -21,8 +21,6 @@
 
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
-#include "../interface/widgets/tabs/tab_game.h"
-#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/dialogs/dlg_connect.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
@@ -35,6 +33,8 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
