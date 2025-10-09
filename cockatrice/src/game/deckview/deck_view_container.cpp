@@ -1,9 +1,9 @@
 #include "deck_view_container.h"
 
-#include "../../dialogs/dlg_load_deck.h"
-#include "../../dialogs/dlg_load_deck_from_clipboard.h"
-#include "../../dialogs/dlg_load_deck_from_website.h"
-#include "../../dialogs/dlg_load_remote_deck.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"

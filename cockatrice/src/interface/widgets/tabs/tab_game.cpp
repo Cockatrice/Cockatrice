@@ -1,6 +1,6 @@
 #include "tab_game.h"
 
-#include "../dialogs/dlg_create_game.h"
+#include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../game/board/arrow_item.h"
 #include "../game/board/card_item.h"
 #include "../game/deckview/deck_view_container.h"

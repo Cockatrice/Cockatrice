@@ -15,31 +15,31 @@ set(cockatrice_SOURCES
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/sound_engine.cpp
-    src/dialogs/dlg_connect.cpp
-    src/dialogs/dlg_convert_deck_to_cod_format.cpp
-    src/dialogs/dlg_create_game.cpp
-    src/dialogs/dlg_default_tags_editor.cpp
-    src/dialogs/dlg_edit_avatar.cpp
-    src/dialogs/dlg_edit_password.cpp
-    src/dialogs/dlg_edit_tokens.cpp
-    src/dialogs/dlg_edit_user.cpp
-    src/dialogs/dlg_filter_games.cpp
-    src/dialogs/dlg_forgot_password_challenge.cpp
-    src/dialogs/dlg_forgot_password_request.cpp
-    src/dialogs/dlg_forgot_password_reset.cpp
-    src/dialogs/dlg_load_deck.cpp
-    src/dialogs/dlg_load_deck_from_clipboard.cpp
-    src/dialogs/dlg_load_deck_from_website.cpp
-    src/dialogs/dlg_load_remote_deck.cpp
-    src/dialogs/dlg_manage_sets.cpp
-    src/dialogs/dlg_register.cpp
-    src/dialogs/dlg_select_set_for_cards.cpp
-    src/dialogs/dlg_settings.cpp
-    src/dialogs/dlg_startup_card_check.cpp
-    src/dialogs/dlg_tip_of_the_day.cpp
-    src/dialogs/dlg_update.cpp
-    src/dialogs/dlg_view_log.cpp
-    src/dialogs/tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_connect.cpp
+    src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
+    src/interface/widgets/dialogs/dlg_create_game.cpp
+    src/interface/widgets/dialogs/dlg_default_tags_editor.cpp
+    src/interface/widgets/dialogs/dlg_edit_avatar.cpp
+    src/interface/widgets/dialogs/dlg_edit_password.cpp
+    src/interface/widgets/dialogs/dlg_edit_tokens.cpp
+    src/interface/widgets/dialogs/dlg_edit_user.cpp
+    src/interface/widgets/dialogs/dlg_filter_games.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_load_deck.cpp
+    src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
+    src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
+    src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
+    src/interface/widgets/dialogs/dlg_manage_sets.cpp
+    src/interface/widgets/dialogs/dlg_register.cpp
+    src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_settings.cpp
+    src/interface/widgets/dialogs/dlg_startup_card_check.cpp
+    src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_update.cpp
+    src/interface/widgets/dialogs/dlg_view_log.cpp
+    src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
     src/filters/filter_card.cpp

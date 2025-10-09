@@ -1,8 +1,8 @@
 #include "tab_deck_editor.h"
 
+#include "../interface/widgets/dialogs/dlg_load_deck.h"
+#include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
-#include "../dialogs/dlg_load_deck.h"
-#include "../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../filters/filter_builder.h"
 #include "../filters/filter_tree_model.h"
 #include "../interface/pixel_map_generator.h"

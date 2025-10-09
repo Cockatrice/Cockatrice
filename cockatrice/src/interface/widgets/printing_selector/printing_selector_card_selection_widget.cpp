@@ -1,6 +1,6 @@
 #include "printing_selector_card_selection_widget.h"
 
-#include "../../../dialogs/dlg_select_set_for_cards.h"
+#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
 
 /**
  * @brief Constructs a PrintingSelectorCardSelectionWidget for navigating through cards in the deck.

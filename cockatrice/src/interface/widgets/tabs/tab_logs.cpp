@@ -1,6 +1,6 @@
 #include "tab_logs.h"
 
-#include "../dialogs/dlg_manage_sets.h"
+#include "../interface/widgets/dialogs/dlg_manage_sets.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 
 #include <QCheckBox>
