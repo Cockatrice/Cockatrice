@@ -1,7 +1,7 @@
 #include "printing_selector.h"
 
-#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
