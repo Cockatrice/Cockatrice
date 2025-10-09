@@ -1,9 +1,5 @@
 #include "dlg_register.h"
 
-#include "../settings/cache_settings.h"
-#include "pb/serverinfo_user.pb.h"
-#include "trice_limits.h"
-
 #include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -11,6 +7,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {

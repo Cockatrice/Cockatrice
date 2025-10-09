@@ -1,6 +1,5 @@
 #include "dlg_select_set_for_cards.h"
 
-#include "../database/card_database_manager.h"
 #include "../deck/deck_loader.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
@@ -17,6 +16,7 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 #include <algorithm>
+#include <libcockatrice/card/card_database/card_database_manager.h>
 #include <qdrag.h>
 #include <qevent.h>
 

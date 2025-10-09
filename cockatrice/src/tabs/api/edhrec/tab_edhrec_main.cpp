@@ -1,8 +1,5 @@
 #include "tab_edhrec_main.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../database/model/card/card_completer_proxy_model.h"
-#include "../../../database/model/card/card_search_model.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
@@ -25,6 +22,9 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QResizeEvent>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/card_database/model/card/card_search_model.h>
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)
 {

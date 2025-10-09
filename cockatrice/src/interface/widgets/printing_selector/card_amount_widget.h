@@ -8,7 +8,6 @@
 #ifndef CARD_AMOUNT_WIDGET_H
 #define CARD_AMOUNT_WIDGET_H
 
-#include "../../../card/card_info.h"
 #include "../../../deck/deck_list_model.h"
 #include "../../../deck/deck_loader.h"
 #include "../../../tabs/abstract_tab_deck_editor.h"
@@ -19,6 +18,7 @@
 #include <QPushButton>
 #include <QTreeView>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
 class CardAmountWidget : public QWidget
 {

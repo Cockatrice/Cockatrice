@@ -10,14 +10,14 @@
 
 #include "../../tabs/tab_supervisor.h"
 #include "../user/user_list_widget.h"
-#include "room_message_type.h"
-#include "user_level.h"
 
 #include <QAction>
 #include <QColor>
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextFragment>
+#include <libcockatrice/network/server/remote/room_message_type.h>
+#include <libcockatrice/network/server/remote/user_level.h>
 
 class AbstractGame;
 class QTextTable;

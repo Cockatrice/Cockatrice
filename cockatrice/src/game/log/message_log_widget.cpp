@@ -1,17 +1,17 @@
 #include "message_log_widget.h"
 
 #include "../../client/sound_engine.h"
-#include "../../settings/card_counter_settings.h"
 #include "../../tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
 #include "../phase.h"
 #include "../player/player.h"
 #include "../zones/card_zone.h"
-#include "pb/context_move_card.pb.h"
-#include "pb/context_mulligan.pb.h"
-#include "pb/serverinfo_user.pb.h"
 
+#include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/card_counter_settings.h>
 #include <utility>
 
 static const QString TABLE_ZONE_NAME = "table";

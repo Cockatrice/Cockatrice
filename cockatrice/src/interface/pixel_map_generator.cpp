@@ -1,13 +1,12 @@
 #include "pixel_map_generator.h"
 
-#include "pb/serverinfo_user.pb.h"
-
 #include <QApplication>
 #include <QDomDocument>
 #include <QFile>
 #include <QPainter>
 #include <QPalette>
 #include <QSvgRenderer>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 #define DEFAULT_COLOR_UNREGISTERED "#32c8ec";
 #define DEFAULT_COLOR_REGISTERED "#5ed900";

@@ -2,18 +2,7 @@
 
 #include "../client/get_text_with_max.h"
 #include "../deck/deck_loader.h"
-#include "../server/pending_command.h"
 #include "../server/remote/remote_decklist_tree_widget.h"
-#include "../settings/cache_settings.h"
-#include "deck_list.h"
-#include "pb/command_deck_del.pb.h"
-#include "pb/command_deck_del_dir.pb.h"
-#include "pb/command_deck_download.pb.h"
-#include "pb/command_deck_new_dir.pb.h"
-#include "pb/command_deck_upload.pb.h"
-#include "pb/response.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "pb/response_deck_upload.pb.h"
 
 #include <QAction>
 #include <QApplication>
@@ -29,6 +18,17 @@
 #include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/pb/command_deck_del.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,

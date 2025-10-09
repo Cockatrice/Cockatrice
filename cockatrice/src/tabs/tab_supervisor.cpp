@@ -2,20 +2,9 @@
 
 #include "../interface/pixel_map_generator.h"
 #include "../main.h"
-#include "../server/abstract_client.h"
 #include "../server/user/user_list_manager.h"
 #include "../server/user/user_list_widget.h"
-#include "../settings/cache_settings.h"
 #include "api/edhrec/tab_edhrec_main.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/game_event_container.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/room_commands.pb.h"
-#include "pb/room_event.pb.h"
-#include "pb/serverinfo_room.pb.h"
-#include "pb/serverinfo_user.pb.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_deck_editor.h"
@@ -36,6 +25,17 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_notify_user.pb.h>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/game_event_container.pb.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/protocol/pb/room_event.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {

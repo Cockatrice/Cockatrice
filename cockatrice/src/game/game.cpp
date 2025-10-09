@@ -1,7 +1,8 @@
 #include "game.h"
 
 #include "../tabs/tab_game.h"
-#include "pb/event_game_joined.pb.h"
+
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 
 Game::Game(TabGame *_tab,
            QList<AbstractClient *> &_clients,

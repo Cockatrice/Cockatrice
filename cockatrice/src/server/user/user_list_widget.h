@@ -7,15 +7,14 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
-#include "pb/moderator_commands.pb.h"
-#include "user_level.h"
-
 #include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
+#include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 
 class QTreeWidget;
 class ServerInfo_User;

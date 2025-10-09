@@ -7,9 +7,8 @@
 #ifndef CARDINFOTEXT_H
 #define CARDINFOTEXT_H
 
-#include "../../../card/card_info.h"
-
 #include <QFrame>
+#include <libcockatrice/card/card_info.h>
 class QLabel;
 class QScrollArea;
 class QTextEdit;

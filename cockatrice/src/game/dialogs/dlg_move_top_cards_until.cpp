@@ -1,7 +1,5 @@
 #include "dlg_move_top_cards_until.h"
 
-#include "../../database/card_database.h"
-#include "../../database/card_database_manager.h"
 #include "../../filters/filter_string.h"
 
 #include <QDialogButtonBox>
@@ -12,6 +10,8 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
 
 DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QStringList exprs, uint _numberOfHits, bool autoPlay)
     : QDialog(parent)

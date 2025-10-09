@@ -1,12 +1,8 @@
 #include "visual_database_display_widget.h"
 
-#include "../../../database/card_database.h"
-#include "../../../database/card_database_manager.h"
 #include "../../../deck/custom_line_edit.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../../filters/syntax_help.h"
-#include "../../../settings/cache_settings.h"
-#include "../../../utility/card_info_comparator.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../quick_settings/settings_button_widget.h"
@@ -19,6 +15,10 @@
 
 #include <QHeaderView>
 #include <QScrollBar>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <qpropertyanimation.h>
 #include <utility>
 

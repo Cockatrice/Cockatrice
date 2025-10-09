@@ -7,7 +7,6 @@
 #ifndef TAB_EDHREC_MAIN_H
 #define TAB_EDHREC_MAIN_H
 
-#include "../../../database/card_database.h"
 #include "../../../interface/widgets/cards/card_size_widget.h"
 #include "../../../interface/widgets/general/layout_containers/flow_widget.h"
 #include "../../../interface/widgets/quick_settings/settings_button_widget.h"
@@ -18,6 +17,7 @@
 #include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QPushButton>
+#include <libcockatrice/card/card_database/card_database.h>
 
 class TabEdhRecMain : public Tab
 {

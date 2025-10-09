@@ -1,47 +1,37 @@
-# CMakeLists for dbconverter directory
-
+cmake_minimum_required(VERSION 3.16)
 project(Dbconverter VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-set(dbconverter_SOURCES
-    src/main.cpp
-    src/mocks.cpp
-    ../cockatrice/src/card/card_info.cpp
-    ../cockatrice/src/card/card_relation.cpp
-    ../cockatrice/src/card/card_set.cpp
-    ../cockatrice/src/card/card_set_list.cpp
-    ../cockatrice/src/card/exact_card.cpp
-    ../cockatrice/src/card/printing_info.cpp
-    ../cockatrice/src/database/card_database.cpp
-    ../cockatrice/src/database/card_database_loader.cpp
-    ../cockatrice/src/database/card_database_querier.cpp
-    ../cockatrice/src/database/parser/card_database_parser.cpp
-    ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
-    ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
-    ../cockatrice/src/settings/settings_manager.cpp
-    ${VERSION_STRING_CPP}
+# ------------------------
+# Sources
+# ------------------------
+set(dbconverter_SOURCES src/main.cpp src/mocks.cpp ${VERSION_STRING_CPP})
+
+# ------------------------
+# Qt configuration
+# ------------------------
+set(QT_DONT_USE_QTGUI TRUE)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+# ------------------------
+# Build executable
+# ------------------------
+add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES})
+
+# ------------------------
+# Link libraries
+# ------------------------
+target_link_libraries(
+  dbconverter
+  PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_settings
+  PRIVATE ${DB_CONVERTER_QT_MODULES}
 )
 
-set(QT_DONT_USE_QTGUI TRUE)
-
-if(Qt6_FOUND)
-  qt6_wrap_cpp(
-    dbconverter_SOURCES ../cockatrice/src/settings/cache_settings.h ../cockatrice/src/settings/card_database_settings.h
-  )
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(
-    dbconverter_SOURCES ../cockatrice/src/settings/cache_settings.h ../cockatrice/src/settings/card_database_settings.h
-  )
-endif()
-
-# Include directories
-include_directories(../common) # Required due to card_ref.h
-
-# Build servatrice binary and link it
-add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_MOC_SRCS} ${dbconverter_SOURCES})
-
-target_link_libraries(dbconverter ${DB_CONVERTER_QT_MODULES})
-
-# install rules
+# ------------------------
+# Install rules
+# ------------------------
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
@@ -53,19 +43,20 @@ if(UNIX)
 
     install(TARGETS dbconverter BUNDLE DESTINATION ./)
   else()
-    # Assume linux
+    # Linux
     install(TARGETS dbconverter RUNTIME DESTINATION bin/)
   endif()
 elseif(WIN32)
   install(TARGETS dbconverter RUNTIME DESTINATION ./)
 endif()
 
+# ------------------------
+# Qt plugin handling
+# ------------------------
 if(APPLE)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir dbconverter.app/Contents/Plugins)
   set(qtconf_dest_dir dbconverter.app/Contents/Resources)
 
-  # Qt plugins: platforms
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -81,7 +72,7 @@ if(APPLE)
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
-    "
+        "
     COMPONENT Runtime
   )
 
@@ -89,16 +80,15 @@ Translations = Resources/translations\")
     CODE "
         file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dylib\")
-    set(BU_CHMOD_BUNDLE_ITEMS ON)
-    include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
-    "
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.app\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR};${MYSQLCLIENT_LIBRARY_DIR}\")
+        "
     COMPONENT Runtime
   )
 endif()
 
 if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
 
@@ -109,7 +99,6 @@ if(WIN32)
     PATTERN "*.dll"
   )
 
-  # Qt plugins: platforms
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -126,7 +115,7 @@ if(WIN32)
         file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"[Paths]
 Plugins = Plugins
 Translations = Resources/translations\")
-    "
+        "
     COMPONENT Runtime
   )
 
@@ -134,10 +123,10 @@ Translations = Resources/translations\")
     CODE "
         file(GLOB_RECURSE QTPLUGINS
         \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/*.dll\")
-    set(BU_CHMOD_BUNDLE_ITEMS ON)
-    include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
-    "
+        set(BU_CHMOD_BUNDLE_ITEMS ON)
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/dbconverter.exe\" \"\${QTPLUGINS}\" \"${QT_LIBRARY_DIR}\")
+        "
     COMPONENT Runtime
   )
 endif()

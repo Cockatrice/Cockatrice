@@ -1,21 +1,21 @@
 #include "player_list_widget.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "../../server/abstract_client.h"
 #include "../../server/user/user_context_menu.h"
 #include "../../server/user/user_list_manager.h"
 #include "../../server/user/user_list_widget.h"
 #include "../../tabs/tab_account.h"
 #include "../../tabs/tab_game.h"
 #include "../../tabs/tab_supervisor.h"
-#include "pb/command_kick_from_game.pb.h"
-#include "pb/serverinfo_playerproperties.pb.h"
-#include "pb/session_commands.pb.h"
 
 #include <QAction>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMouseEvent>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
+#include <libcockatrice/protocol/pb/session_commands.pb.h>
 
 PlayerListItemDelegate::PlayerListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
 {

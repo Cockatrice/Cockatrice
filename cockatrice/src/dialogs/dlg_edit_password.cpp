@@ -1,13 +1,12 @@
 #include "dlg_edit_password.h"
 
-#include "../settings/cache_settings.h"
-#include "trice_limits.h"
-
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 {

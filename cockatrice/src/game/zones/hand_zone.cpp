@@ -1,13 +1,13 @@
 #include "hand_zone.h"
 
 #include "../../interface/theme_manager.h"
-#include "../../settings/cache_settings.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
-#include "pb/command_move_card.pb.h"
 
 #include <QPainter>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)

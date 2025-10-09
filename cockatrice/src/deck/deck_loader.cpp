@@ -1,10 +1,6 @@
 #include "deck_loader.h"
 
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
 #include "../main.h"
-#include "deck_list.h"
-#include "deck_list_card_node.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -16,6 +12,10 @@
 #include <QRegularExpression>
 #include <QStringList>
 #include <QtConcurrentRun>
+#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_card_node.h>
 
 const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.dek", "*.txt", "*.mwDeck"};
 

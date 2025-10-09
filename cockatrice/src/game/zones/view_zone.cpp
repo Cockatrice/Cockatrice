@@ -1,21 +1,21 @@
 #include "view_zone.h"
 
-#include "../../card/card_info.h"
-#include "../../server/pending_command.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
 #include "logic/view_zone_logic.h"
-#include "pb/command_dump_zone.pb.h"
-#include "pb/command_move_card.pb.h"
-#include "pb/response_dump_zone.pb.h"
-#include "pb/serverinfo_card.pb.h"
 
 #include <QBrush>
 #include <QDebug>
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
 #include <QtMath>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 /**
  * @param parent the parent QGraphicsWidget containing the reveal zone

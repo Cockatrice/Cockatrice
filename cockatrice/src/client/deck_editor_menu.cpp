@@ -1,7 +1,7 @@
 #include "deck_editor_menu.h"
 
-#include "../settings/cache_settings.h"
-#include "../settings/shortcuts_settings.h"
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/settings/shortcuts_settings.h>
 
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {

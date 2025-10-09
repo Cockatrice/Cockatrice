@@ -1,10 +1,10 @@
 #include "card_info_picture_enlarged_widget.h"
 
-#include "../../../picture_loader/picture_loader.h"
-#include "../../../settings/cache_settings.h"
+#include "../../../interface/card_picture_loader/card_picture_loader.h"
 
 #include <QPainterPath>
 #include <QStylePainter>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**
@@ -35,9 +35,9 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent) : 
 void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
 {
     if (card) {
-        PictureLoader::getPixmap(enlargedPixmap, card, size);
+        CardPictureLoader::getPixmap(enlargedPixmap, card, size);
     } else {
-        PictureLoader::getCardBackPixmap(enlargedPixmap, size);
+        CardPictureLoader::getCardBackPixmap(enlargedPixmap, size);
     }
     pixmapDirty = false;
 }

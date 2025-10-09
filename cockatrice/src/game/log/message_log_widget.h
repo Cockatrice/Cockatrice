@@ -10,7 +10,8 @@
 #include "../../client/translation.h"
 #include "../../server/chat_view/chat_view.h"
 #include "../zones/logic/card_zone_logic.h"
-#include "user_level.h"
+
+#include <libcockatrice/network/server/remote/user_level.h>
 
 class AbstractGame;
 class CardItem;
