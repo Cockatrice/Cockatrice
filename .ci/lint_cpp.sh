@@ -13,7 +13,7 @@ fi
 # Check formatting using format.sh
 echo "Checking your code using clang-format/cmake-format..."
 
-diff="$(./format.sh --diff --cmake --print-version --branch origin/master)"
+diff="$(./format.sh --diff --cmake --shell --print-version --branch origin/master)"
 err=$?
 
 sep="
