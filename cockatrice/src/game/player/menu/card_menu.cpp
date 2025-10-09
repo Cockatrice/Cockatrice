@@ -489,12 +489,4 @@ void CardMenu::setShortcutsActive()
         aRemoveCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aRC" + colorWords[i]));
         aSetCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aSC" + colorWords[i]));
     }
-
-    // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
-    // when there are more than 1 player.
-    if (!player->getGame()->getGameState()->getIsLocalGame()) {
-        // unattach action is only active in card menu if the active card is attached.
-        // make unattach shortcut always active so that it consistently works when multiple cards are selected.
-        player->getGame()->getTab()->addAction(aUnattach);
-    }
 }
