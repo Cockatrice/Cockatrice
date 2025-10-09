@@ -1,9 +1,9 @@
 #include "overlap_widget.h"
 
-#include "../../../../deck/deck_list_model.h"
 #include "../../../layouts/flow_layout.h"
 
 #include <QWidget>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 /**
  * @class OverlapWidget

@@ -1,11 +1,11 @@
 #include "visual_database_display_widget.h"
 
-#include "../../../deck/custom_line_edit.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"

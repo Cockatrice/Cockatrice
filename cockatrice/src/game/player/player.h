@@ -8,7 +8,7 @@
 #define PLAYER_H
 
 #include "../../filters/filter_string.h"
-#include "../../interface/tearoff_menu.h"
+#include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/abstract_graphics_item.h"
 #include "../dialogs/dlg_create_token.h"
 #include "menu/player_menu.h"

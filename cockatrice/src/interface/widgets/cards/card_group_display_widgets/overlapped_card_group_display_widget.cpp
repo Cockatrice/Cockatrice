@@ -1,11 +1,11 @@
 #include "overlapped_card_group_display_widget.h"
 
-#include "../../../../deck/deck_list_model.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>
 #include <libcockatrice/card/card_database/card_database_manager.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *parent,
                                                                    DeckListModel *_deckListModel,

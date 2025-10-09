@@ -7,7 +7,7 @@
 #ifndef DLG_FILTER_GAMES_H
 #define DLG_FILTER_GAMES_H
 
-#include "../server/games_model.h"
+#include "../interface/widgets/server/games_model.h"
 
 #include <QCheckBox>
 #include <QComboBox>

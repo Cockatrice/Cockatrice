@@ -1,6 +1,6 @@
 #include "replay_manager.h"
 
-#include "../tabs/tab_game.h"
+#include "../../../tabs/tab_game.h"
 
 #include <QHBoxLayout>
 #include <QToolButton>

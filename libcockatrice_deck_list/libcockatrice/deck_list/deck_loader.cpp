@@ -1,7 +1,5 @@
 #include "deck_loader.h"
 
-#include "../main.h"
-
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>

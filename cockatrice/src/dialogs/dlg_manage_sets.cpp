@@ -1,8 +1,7 @@
 #include "dlg_manage_sets.h"
 
-#include "../client/network/sets_model.h"
-#include "../deck/custom_line_edit.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
+#include "../interface/widgets/utility/custom_line_edit.h"
 #include "../main.h"
 
 #include <QAction>
@@ -21,6 +20,7 @@
 #include <QTreeView>
 #include <algorithm>
 #include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/card_database/model/card_set/card_sets_model.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 #define SORT_RESET -1

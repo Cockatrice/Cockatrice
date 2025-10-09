@@ -1,7 +1,7 @@
 #include "abstract_tab_deck_editor.h"
 
-#include "../client/tapped_out_interface.h"
-#include "../deck/deck_stats_interface.h"
+#include "../client/network/interfaces/deck_stats_interface.h"
+#include "../client/network/interfaces/tapped_out_interface.h"
 #include "../dialogs/dlg_load_deck.h"
 #include "../dialogs/dlg_load_deck_from_clipboard.h"
 #include "../dialogs/dlg_load_deck_from_website.h"

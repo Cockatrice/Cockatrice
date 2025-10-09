@@ -1,8 +1,8 @@
 #include "game_selector.h"
 
-#include "../client/get_text_with_max.h"
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
+#include "../interface/widgets/utility/get_text_with_max.h"
 #include "../tabs/tab_account.h"
 #include "../tabs/tab_game.h"
 #include "../tabs/tab_room.h"

@@ -8,7 +8,7 @@
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H
 
-#include "../interface/line_edit_completer.h"
+#include "../interface/widgets/utility/line_edit_completer.h"
 #include "tab.h"
 
 #include <QFocusEvent>

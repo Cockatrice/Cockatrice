@@ -1,7 +1,7 @@
 #include "dlg_load_remote_deck.h"
 
+#include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../main.h"
-#include "../server/remote/remote_decklist_tree_widget.h"
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>

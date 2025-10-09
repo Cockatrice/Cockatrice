@@ -1,7 +1,7 @@
 #include "spoiler_background_updater.h"
 
-#include "../../interface/window_main.h"
-#include "../../main.h"
+#include "../../../../interface/window_main.h"
+#include "../../../../main.h"
 
 #include <QApplication>
 #include <QCryptographicHash>

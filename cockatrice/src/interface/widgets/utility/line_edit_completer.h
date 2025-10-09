@@ -7,7 +7,7 @@
 #ifndef LINEEDITCOMPLETER_H
 #define LINEEDITCOMPLETER_H
 
-#include "../deck/custom_line_edit.h"
+#include "custom_line_edit.h"
 
 #include <QFocusEvent>
 #include <QKeyEvent>

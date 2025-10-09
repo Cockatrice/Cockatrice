@@ -8,7 +8,7 @@
 #ifndef REPLAY_MANAGER_H
 #define REPLAY_MANAGER_H
 
-#include "network/replay_timeline_widget.h"
+#include "replay_timeline_widget.h"
 
 #include <QToolButton>
 #include <QWidget>

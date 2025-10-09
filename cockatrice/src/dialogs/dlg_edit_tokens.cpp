@@ -1,6 +1,6 @@
 #include "dlg_edit_tokens.h"
 
-#include "../client/get_text_with_max.h"
+#include "../interface/widgets/utility/get_text_with_max.h"
 #include "../main.h"
 
 #include <QAction>

@@ -1,11 +1,11 @@
 #include "tab_room.h"
 
 #include "../dialogs/dlg_settings.h"
+#include "../interface/widgets/server/chat_view/chat_view.h"
+#include "../interface/widgets/server/game_selector.h"
+#include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
-#include "../server/chat_view/chat_view.h"
-#include "../server/game_selector.h"
-#include "../server/user/user_list_manager.h"
-#include "../server/user/user_list_widget.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
 

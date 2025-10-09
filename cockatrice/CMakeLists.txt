@@ -7,22 +7,14 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/client/deck_editor_menu.cpp
-    src/client/get_text_with_max.cpp
-    src/client/network/client_update_checker.cpp
+    src/client/network/update/client/update_downloader.cpp
+    src/client/network/interfaces/deck_stats_interface.cpp
+    src/client/network/interfaces/tapped_out_interface.cpp
     src/client/network/parsers/deck_link_to_api_transformer.cpp
-    src/client/network/release_channel.cpp
-    src/client/network/replay_timeline_widget.cpp
-    src/client/network/sets_model.cpp
-    src/client/network/spoiler_background_updater.cpp
-    src/client/replay_manager.cpp
+    src/client/network/update/client/client_update_checker.cpp
+    src/client/network/update/client/release_channel.cpp
+    src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/sound_engine.cpp
-    src/client/tapped_out_interface.cpp
-    src/client/update_downloader.cpp
-    src/deck/custom_line_edit.cpp
-    src/deck/deck_list_model.cpp
-    src/deck/deck_loader.cpp
-    src/deck/deck_stats_interface.cpp
     src/dialogs/dlg_connect.cpp
     src/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/dialogs/dlg_create_game.cpp
@@ -128,7 +120,7 @@ set(cockatrice_SOURCES
     src/interface/card_picture_loader/card_picture_to_load.cpp
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
-    src/interface/line_edit_completer.cpp
+    src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_manager.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
@@ -169,6 +161,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/layout_containers/flow_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_widget.cpp
+    src/interface/widgets/menus/deck_editor_menu.cpp
     src/interface/widgets/printing_selector/all_zones_card_amount_widget.cpp
     src/interface/widgets/printing_selector/card_amount_widget.cpp
     src/interface/widgets/printing_selector/printing_selector.cpp
@@ -180,6 +173,22 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
+    src/interface/widgets/replay/replay_manager.cpp
+    src/interface/widgets/replay/replay_timeline_widget.cpp
+    src/interface/widgets/server/chat_view/chat_view.cpp
+    src/interface/widgets/server/game_selector.cpp
+    src/interface/widgets/server/games_model.cpp
+    src/interface/widgets/server/handle_public_servers.cpp
+    src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp
+    src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp
+    src/interface/widgets/server/user/user_context_menu.cpp
+    src/interface/widgets/server/user/user_info_box.cpp
+    src/interface/widgets/server/user/user_info_connection.cpp
+    src/interface/widgets/server/user/user_list_manager.cpp
+    src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/utility/custom_line_edit.cpp
+    src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
@@ -205,17 +214,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    src/server/chat_view/chat_view.cpp
-    src/server/game_selector.cpp
-    src/server/games_model.cpp
-    src/server/handle_public_servers.cpp
-    src/server/remote/remote_decklist_tree_widget.cpp
-    src/server/remote/remote_replay_list_tree_widget.cpp
-    src/server/user/user_context_menu.cpp
-    src/server/user/user_info_box.cpp
-    src/server/user/user_info_connection.cpp
-    src/server/user/user_list_manager.cpp
-    src/server/user/user_list_widget.cpp
     src/tabs/abstract_tab_deck_editor.cpp
     src/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
@@ -260,8 +258,6 @@ set(cockatrice_SOURCES
     src/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
-    src/interface/utility/deck_list_sort_filter_proxy_model.cpp
-    src/interface/utility/sequence_edit.cpp
 )
 
 add_subdirectory(sounds)

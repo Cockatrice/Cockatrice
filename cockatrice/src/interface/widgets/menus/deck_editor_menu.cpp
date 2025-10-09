@@ -1,4 +1,4 @@
-#include "deck_editor_menu.h"
+#include "../../../interface/widgets/menus/deck_editor_menu.h"
 
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/shortcuts_settings.h>
