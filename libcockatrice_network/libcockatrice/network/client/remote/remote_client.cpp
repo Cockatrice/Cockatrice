@@ -1,7 +1,6 @@
 #include "remote_client.h"
 
 #include "../../../../cockatrice/src/main.h"
-#include "../../../../libcockatrice_protocol/libcockatrice/protocol/pending_command.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -21,6 +20,7 @@
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
