@@ -60,8 +60,8 @@
 #include <QWindow>
 #include <QtConcurrent>
 #include <QtNetwork>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/local/local_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/network/server/local/local_server.h>

@@ -8,7 +8,7 @@
 
 #include <QAction>
 #include <QDebug>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 

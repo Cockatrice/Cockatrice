@@ -13,8 +13,8 @@
 #include <QMouseEvent>
 #include <QToolButton>
 #include <google/protobuf/descriptor.h>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_loader.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_ready_start.pb.h>

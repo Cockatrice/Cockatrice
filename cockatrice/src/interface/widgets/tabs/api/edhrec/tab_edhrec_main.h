@@ -17,7 +17,7 @@
 #include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QPushButton>
-#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/database/card_database.h>
 
 class TabEdhRecMain : public Tab
 {

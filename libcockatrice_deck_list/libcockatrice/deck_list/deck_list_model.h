@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <QList>
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/deck_list/abstract_deck_list_card_node.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>

@@ -10,7 +10,7 @@
 #include <QLoggingCategory>
 #include <QObject>
 #include <QTimer>
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLocalLog, "card_picture_loader.local");
 

@@ -1,6 +1,6 @@
 #include "card_database.h"
 
-#include "../card_relation/card_relation.h"
+#include "../relation/card_relation.h"
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 

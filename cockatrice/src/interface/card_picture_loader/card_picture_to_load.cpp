@@ -5,7 +5,7 @@
 #include <QRegularExpression>
 #include <QUrl>
 #include <algorithm>
-#include <libcockatrice/card/card_set/card_set_comparator.h>
+#include <libcockatrice/card/set/card_set_comparator.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)

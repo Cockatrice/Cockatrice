@@ -12,7 +12,7 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QWidget>
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 

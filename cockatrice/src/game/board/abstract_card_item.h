@@ -10,7 +10,7 @@
 #include "arrow_target.h"
 #include "graphics_item_type.h"
 
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 
 class Player;

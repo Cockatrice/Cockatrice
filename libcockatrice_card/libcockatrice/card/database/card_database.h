@@ -7,7 +7,7 @@
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
-#include "../card_set/card_set_list.h"
+#include "../set/card_set_list.h"
 #include "card_database_loader.h"
 #include "card_database_querier.h"
 

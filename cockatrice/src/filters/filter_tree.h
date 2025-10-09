@@ -12,7 +12,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
-#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/database/card_database.h>
 #include <utility>
 
 class FilterTreeNode

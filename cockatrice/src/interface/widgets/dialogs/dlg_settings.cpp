@@ -43,8 +43,8 @@
 #include <QToolBar>
 #include <QTranslator>
 #include <QVariant>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/card_counter_settings.h>
 #include <libcockatrice/settings/shortcut_treeview.h>

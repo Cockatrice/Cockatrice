@@ -7,7 +7,7 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
-#include "card_printing/printing_info.h"
+#include "printing/printing_info.h"
 
 #include <QDate>
 #include <QHash>

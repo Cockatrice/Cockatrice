@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 
 VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)

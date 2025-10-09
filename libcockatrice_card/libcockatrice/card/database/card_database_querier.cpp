@@ -1,8 +1,8 @@
 #include "card_database_querier.h"
 
 #include "../card_info.h"
-#include "../card_printing/exact_card.h"
-#include "../card_set/card_set_comparator.h"
+#include "../printing/exact_card.h"
+#include "../set/card_set_comparator.h"
 #include "card_database.h"
 
 #include <qrandom.h>

@@ -18,8 +18,8 @@
 #include <QObject>
 #include <QQueue>
 #include <QTimer>
-#include <libcockatrice/card/card_database/card_database.h>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/database/card_database.h>
 
 #define REDIRECT_HEADER_NAME "redirects"
 #define REDIRECT_ORIGINAL_URL "original"

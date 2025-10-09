@@ -13,12 +13,12 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QResizeEvent>
-#include <libcockatrice/card/card_database/card_database.h>
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_database/model/card/card_completer_proxy_model.h>
-#include <libcockatrice/card/card_database/model/card/card_search_model.h>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
 #include <libcockatrice/card/card_info_comparator.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/model/card/card_completer_proxy_model.h>
+#include <libcockatrice/card/database/model/card/card_search_model.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/deck_list/deck_list_model.h>
 #include <libcockatrice/deck_list/deck_loader.h>
 #include <qscrollarea.h>

@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_PRINTING_INFO_H
 #define COCKATRICE_PRINTING_INFO_H
 
-#include "../card_set/card_set.h"
+#include "../set/card_set.h"
 
 #include <QList>
 #include <QMap>

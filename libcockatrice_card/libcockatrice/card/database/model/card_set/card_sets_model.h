@@ -11,7 +11,7 @@
 #include <QMimeData>
 #include <QSet>
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/card_database/card_database.h>
+#include <libcockatrice/card/database/card_database.h>
 
 class SetsProxyModel;
 

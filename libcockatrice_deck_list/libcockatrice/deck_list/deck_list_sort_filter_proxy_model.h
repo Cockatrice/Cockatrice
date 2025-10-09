@@ -8,7 +8,7 @@
 #define COCKATRICE_DECK_LIST_SORT_FILTER_PROXY_MODEL_H
 
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 
 class DeckListSortFilterProxyModel : public QSortFilterProxyModel
 {

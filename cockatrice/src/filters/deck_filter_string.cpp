@@ -2,7 +2,7 @@
 
 #include "filter_string.h"
 
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/peglib.h>
 
 static peg::parser search(R"(

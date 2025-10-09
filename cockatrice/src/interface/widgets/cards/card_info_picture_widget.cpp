@@ -10,8 +10,8 @@
 #include <QScreen>
 #include <QStylePainter>
 #include <QWidget>
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_relation/card_relation.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 

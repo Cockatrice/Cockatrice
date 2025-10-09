@@ -10,7 +10,7 @@
 #include <QComboBox>
 #include <QFrame>
 #include <QStringList>
-#include <libcockatrice/card/card_printing/exact_card.h>
+#include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 
 class CardInfoPictureWidget;

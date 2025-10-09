@@ -1,6 +1,6 @@
 #include "printing_info.h"
 
-#include "../card_set/card_set.h"
+#include "../set/card_set.h"
 
 PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {

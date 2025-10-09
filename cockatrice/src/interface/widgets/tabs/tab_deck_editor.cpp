@@ -32,8 +32,8 @@
 #include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <libcockatrice/card/card_database/card_database_manager.h>
-#include <libcockatrice/card/card_database/model/card_database_model.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>

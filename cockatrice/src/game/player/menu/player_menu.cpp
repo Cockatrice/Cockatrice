@@ -8,7 +8,7 @@
 #include "card_menu.h"
 #include "hand_menu.h"
 
-#include <libcockatrice/card/card_database/card_database_manager.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
