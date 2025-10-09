@@ -1,6 +1,5 @@
 #include "deck_list_model.h"
 
-#include "../main.h"
 #include "deck_loader.h"
 
 #include <QBrush>

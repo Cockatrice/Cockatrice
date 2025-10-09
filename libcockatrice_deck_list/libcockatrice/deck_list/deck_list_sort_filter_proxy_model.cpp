@@ -1,6 +1,6 @@
 #include "deck_list_sort_filter_proxy_model.h"
 
-#include "../../deck/deck_list_model.h"
+#include "deck_list_model.h"
 
 bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {

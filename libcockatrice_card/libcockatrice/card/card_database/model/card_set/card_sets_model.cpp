@@ -1,4 +1,4 @@
-#include "sets_model.h"
+#include "card_sets_model.h"
 
 #include <QSortFilterProxyModel>
 
