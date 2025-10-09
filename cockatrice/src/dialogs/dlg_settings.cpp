@@ -6,10 +6,10 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
+#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "../interface/widgets/utility/sequence_edit.h"
-#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
 
 #include <QAbstractButton>

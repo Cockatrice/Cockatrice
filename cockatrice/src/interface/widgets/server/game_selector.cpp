@@ -2,11 +2,11 @@
 
 #include "../dialogs/dlg_create_game.h"
 #include "../dialogs/dlg_filter_games.h"
-#include "../interface/widgets/utility/get_text_with_max.h"
 #include "../interface/widgets/tabs/tab_account.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
+#include "../interface/widgets/utility/get_text_with_max.h"
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
