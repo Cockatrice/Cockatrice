@@ -13,8 +13,16 @@ fi
 # Check formatting using format.sh
 echo "Checking your code using clang-format/cmake-format..."
 
-diff="$(./format.sh --diff --cmake --cf-version --branch origin/master)"
+diff="$(./format.sh --diff --cmake --print-version --branch origin/master)"
 err=$?
+
+sep="
+----------
+"
+used_version="${diff%%"$sep"*}"
+diff="${diff#*"$sep"}"
+changes_to_make="${diff%%"$sep"*}"
+files_to_edit="${diff#*"$sep"}"
 
 case $err in
   1)
@@ -33,14 +41,13 @@ case $err in
 ***********************************************************
 
 Used version:
-${diff%%
-----------
-*}
+$used_version
+
+Affected files:
+$files_to_edit
 
 The following changes should be made:
-${diff#*
-----------
-}
+$changes_to_make
 
 Exiting...
 EOM
@@ -57,6 +64,9 @@ EOM
 ***                      Awesome 👍                     ***
 ***                                                     ***
 ***********************************************************
+
+Used version:
+$used_version
 
 Exiting...
 EOM

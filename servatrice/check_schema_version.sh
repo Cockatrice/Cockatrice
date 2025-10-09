@@ -6,6 +6,7 @@ version_line="$(grep 'INSERT INTO cockatrice_schema_version' servatrice/servatri
 version_line="${version_line#*VALUES(}"
 declare -i schema_ver="${version_line%%)*}"
 
+# shellcheck disable=2012
 latest_migration="$(ls -1 servatrice/migrations/ | tail -n1)"
 xtoysql="${latest_migration#servatrice_}"
 xtoy="${xtoysql%.sql}"
@@ -23,7 +24,7 @@ if ((schema_ver != new_ver)); then
 fi
 
 expected_sql="^UPDATE cockatrice_schema_version SET version=${new_ver} WHERE version=${old_ver};$"
-if ! grep -q "$expected_sql" servatrice/migrations/$latest_migration; then
+if ! grep -q "$expected_sql" "servatrice/migrations/$latest_migration"; then
     echo "$latest_migration does not contain expected sql: $expected_sql"
     exit 1
 fi
