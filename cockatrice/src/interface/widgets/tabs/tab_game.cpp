@@ -323,10 +323,11 @@ void TabGame::retranslateUi()
         }
     }
     if (aLeaveGame) {
-        aLeaveGame->setText(tr("&Leave game"));
-    }
-    if (aCloseReplay) {
-        aCloseReplay->setText(tr("C&lose replay"));
+        if (replayManager->replay) {
+            aLeaveGame->setText(tr("C&lose replay"));
+        } else {
+            aLeaveGame->setText(tr("&Leave game"));
+        }
     }
     if (aFocusChat) {
         aFocusChat->setText(tr("&Focus Chat"));
@@ -443,9 +444,6 @@ void TabGame::refreshShortcuts()
     }
     if (aLeaveGame) {
         aLeaveGame->setShortcuts(shortcuts.getShortcut("Player/aLeaveGame"));
-    }
-    if (aCloseReplay) {
-        aCloseReplay->setShortcuts(shortcuts.getShortcut("Player/aCloseReplay"));
     }
     if (aResetLayout) {
         aResetLayout->setShortcuts(shortcuts.getShortcut("Player/aResetLayout"));
@@ -979,7 +977,6 @@ void TabGame::createMenuItems()
     connect(aLeaveGame, &QAction::triggered, this, &TabGame::closeRequest);
     aFocusChat = new QAction(this);
     connect(aFocusChat, &QAction::triggered, sayEdit, qOverload<>(&LineEditCompleter::setFocus));
-    aCloseReplay = nullptr;
 
     phasesMenu = new TearOffMenu(this);
 
@@ -1029,13 +1026,12 @@ void TabGame::createReplayMenuItems()
     aGameInfo = nullptr;
     aConcede = nullptr;
     aFocusChat = nullptr;
-    aLeaveGame = nullptr;
-    aCloseReplay = new QAction(this);
-    connect(aCloseReplay, &QAction::triggered, this, &TabGame::closeRequest);
+    aLeaveGame = new QAction(this);
+    connect(aLeaveGame, &QAction::triggered, this, &TabGame::closeRequest);
 
     phasesMenu = nullptr;
     gameMenu = new QMenu(this);
-    gameMenu->addAction(aCloseReplay);
+    gameMenu->addAction(aLeaveGame);
 
     aCardMenu = nullptr;
 
