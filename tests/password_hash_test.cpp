@@ -1,8 +1,7 @@
-#include "../common/passwordhasher.h"
-#include "../common/rng_abstract.h"
-#include "../common/rng_sfmt.h"
-
 #include "gtest/gtest.h"
+#include <libcockatrice/rng/rng_abstract.h>
+#include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 RNG_Abstract *rng;
 

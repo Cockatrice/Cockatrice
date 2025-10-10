@@ -4,12 +4,12 @@
 #include "../board/card_item.h"
 #include "../player/player.h"
 #include "logic/pile_zone_logic.h"
-#include "pb/command_move_card.pb.h"
 #include "view_zone.h"
 
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <libcockatrice/protocol/pb/command_move_card.pb.h>
 
 PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)
 {

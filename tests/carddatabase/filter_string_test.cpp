@@ -1,8 +1,8 @@
-#include "../../cockatrice/src/database/card_database_manager.h"
 #include "../../cockatrice/src/filters/filter_string.h"
 #include "mocks.h"
 
 #include "gtest/gtest.h"
+#include <libcockatrice/card/database/card_database_manager.h>
 
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \

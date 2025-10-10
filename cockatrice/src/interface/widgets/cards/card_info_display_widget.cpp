@@ -1,6 +1,5 @@
 #include "card_info_display_widget.h"
 
-#include "../../../database/card_database_manager.h"
 #include "../../../game/board/card_item.h"
 #include "../../../main.h"
 #include "card_info_picture_widget.h"
@@ -9,6 +8,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <utility>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)

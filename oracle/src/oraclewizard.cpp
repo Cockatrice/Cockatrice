@@ -2,7 +2,6 @@
 
 #include "main.h"
 #include "oracleimporter.h"
-#include "settings/cache_settings.h"
 #include "version_string.h"
 
 #include <QAbstractButton>
@@ -25,6 +24,7 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/cache_settings.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"

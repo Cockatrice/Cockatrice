@@ -7,8 +7,6 @@
 #ifndef CARD_GROUP_DISPLAY_WIDGET_H
 #define CARD_GROUP_DISPLAY_WIDGET_H
 
-#include "../../../../card/card_info.h"
-#include "../../../../deck/deck_list_model.h"
 #include "../../general/display/banner_widget.h"
 #include "../card_info_picture_with_text_overlay_widget.h"
 #include "../card_size_widget.h"
@@ -16,6 +14,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 
 class CardGroupDisplayWidget : public QWidget
 {

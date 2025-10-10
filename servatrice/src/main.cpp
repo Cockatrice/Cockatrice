@@ -18,8 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "passwordhasher.h"
-#include "rng_sfmt.h"
 #include "servatrice.h"
 #include "server_logger.h"
 #include "settingscache.h"
@@ -34,6 +32,8 @@
 #include <QMetaType>
 #include <QtGlobal>
 #include <iostream>
+#include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 RNG_Abstract *rng;
 ServerLogger *logger;

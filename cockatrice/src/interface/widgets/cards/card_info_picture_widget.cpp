@@ -1,11 +1,8 @@
 #include "card_info_picture_widget.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
 #include "../../../game/board/card_item.h"
-#include "../../../picture_loader/picture_loader.h"
-#include "../../../settings/cache_settings.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
 
 #include <QMenu>
@@ -13,6 +10,9 @@
 #include <QScreen>
 #include <QStylePainter>
 #include <QWidget>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**
@@ -152,11 +152,11 @@ void CardInfoPictureWidget::updatePixmap()
  */
 void CardInfoPictureWidget::loadPixmap()
 {
-    PictureLoader::getCardBackLoadingInProgressPixmap(resizedPixmap, size());
+    CardPictureLoader::getCardBackLoadingInProgressPixmap(resizedPixmap, size());
     if (exactCard) {
-        PictureLoader::getPixmap(resizedPixmap, exactCard, size());
+        CardPictureLoader::getPixmap(resizedPixmap, exactCard, size());
     } else {
-        PictureLoader::getCardBackLoadingFailedPixmap(resizedPixmap, size());
+        CardPictureLoader::getCardBackLoadingFailedPixmap(resizedPixmap, size());
     }
 
     pixmapDirty = false;

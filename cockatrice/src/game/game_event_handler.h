@@ -7,12 +7,12 @@
 #ifndef COCKATRICE_GAME_EVENT_HANDLER_H
 #define COCKATRICE_GAME_EVENT_HANDLER_H
 
-#include "pb/event_leave.pb.h"
-#include "pb/serverinfo_player.pb.h"
 #include "player/event_processing_options.h"
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 
 class AbstractClient;
 class Response;

@@ -96,19 +96,18 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
-# Include directories
-include_directories(../common)
-include_directories(${PROTOBUF_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/../common)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 # Build servatrice binary and link it
 add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
-  target_link_libraries(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY})
+  target_link_libraries(
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    ${LIBEXECINFO_LIBRARY}
+  )
 else()
-  target_link_libraries(servatrice cockatrice_common Threads::Threads ${SERVATRICE_QT_MODULES})
+  target_link_libraries(
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+  )
 endif()
 
 # install rules

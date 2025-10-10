@@ -1,9 +1,6 @@
 #include "card_menu.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/card_counter_settings.h"
-#include "../../../tabs/tab_game.h"
+#include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
 #include "../card_menu_action_type.h"
@@ -11,6 +8,10 @@
 #include "../player_actions.h"
 #include "move_menu.h"
 #include "pt_menu.h"
+
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/card_counter_settings.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
@@ -487,13 +488,5 @@ void CardMenu::setShortcutsActive()
         aAddCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aCC" + colorWords[i]));
         aRemoveCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aRC" + colorWords[i]));
         aSetCounter[i]->setShortcuts(shortcuts.getShortcut("Player/aSC" + colorWords[i]));
-    }
-
-    // Don't enable always-active shortcuts in local games, since it causes keyboard shortcuts to work inconsistently
-    // when there are more than 1 player.
-    if (!player->getGame()->getGameState()->getIsLocalGame()) {
-        // unattach action is only active in card menu if the active card is attached.
-        // make unattach shortcut always active so that it consistently works when multiple cards are selected.
-        player->getGame()->getTab()->addAction(aUnattach);
     }
 }

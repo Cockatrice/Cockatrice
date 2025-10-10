@@ -7,10 +7,9 @@
 #ifndef COCKATRICE_PLAYER_MANAGER_H
 #define COCKATRICE_PLAYER_MANAGER_H
 
-#include "pb/serverinfo_playerproperties.pb.h"
-
 #include <QMap>
 #include <QObject>
+#include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
 
 class AbstractGame;
 class Player;

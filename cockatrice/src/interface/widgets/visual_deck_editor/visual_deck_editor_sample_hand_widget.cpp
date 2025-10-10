@@ -1,10 +1,10 @@
 #include "visual_deck_editor_sample_hand_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../deck/deck_loader.h"
-#include "../../../settings/cache_settings.h"
 #include "../cards/card_info_picture_widget.h"
 
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/settings/cache_settings.h>
 #include <random>
 
 VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent, DeckListModel *_deckListModel)

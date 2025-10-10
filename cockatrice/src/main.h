@@ -7,9 +7,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "utility/macros.h"
-
 #include <QLoggingCategory>
+#include <libcockatrice/utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(MainLog, "main");
 inline Q_LOGGING_CATEGORY(QtTranslatorDebug, "qt_translator");

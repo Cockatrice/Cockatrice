@@ -1,29 +1,29 @@
 #include "deck_view_container.h"
 
-#include "../../database/card_database.h"
-#include "../../database/card_database_manager.h"
-#include "../../deck/deck_loader.h"
-#include "../../dialogs/dlg_load_deck.h"
-#include "../../dialogs/dlg_load_deck_from_clipboard.h"
-#include "../../dialogs/dlg_load_deck_from_website.h"
-#include "../../dialogs/dlg_load_remote_deck.h"
-#include "../../picture_loader/picture_loader.h"
-#include "../../server/pending_command.h"
-#include "../../settings/cache_settings.h"
-#include "../../tabs/tab_game.h"
+#include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "deck_view.h"
-#include "pb/command_deck_select.pb.h"
-#include "pb/command_ready_start.pb.h"
-#include "pb/command_set_sideboard_lock.pb.h"
-#include "pb/command_set_sideboard_plan.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "trice_limits.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QToolButton>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/protocol/pb/command_deck_select.pb.h>
+#include <libcockatrice/protocol/pb/command_ready_start.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
 {
@@ -332,7 +332,7 @@ void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }

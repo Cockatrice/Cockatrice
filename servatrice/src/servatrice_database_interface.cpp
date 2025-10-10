@@ -1,8 +1,5 @@
 #include "servatrice_database_interface.h"
 
-#include "deck_list.h"
-#include "passwordhasher.h"
-#include "pb/game_replay.pb.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
@@ -12,6 +9,9 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId), sqlDatabase(QSqlDatabase()), server(_server)

@@ -1,33 +1,34 @@
 #include "game_event_handler.h"
 
-#include "../server/abstract_client.h"
-#include "../server/pending_command.h"
-#include "../tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
-#include "get_pb_extension.h"
 #include "log/message_log_widget.h"
-#include "pb/command_concede.pb.h"
-#include "pb/command_delete_arrow.pb.h"
-#include "pb/command_game_say.pb.h"
-#include "pb/command_leave_game.pb.h"
-#include "pb/command_next_turn.pb.h"
-#include "pb/command_reverse_turn.pb.h"
-#include "pb/command_set_active_phase.pb.h"
-#include "pb/context_connection_state_changed.pb.h"
-#include "pb/context_deck_select.pb.h"
-#include "pb/context_ping_changed.pb.h"
-#include "pb/event_game_closed.pb.h"
-#include "pb/event_game_host_changed.pb.h"
-#include "pb/event_game_say.pb.h"
-#include "pb/event_game_state_changed.pb.h"
-#include "pb/event_join.pb.h"
-#include "pb/event_kicked.pb.h"
-#include "pb/event_leave.pb.h"
-#include "pb/event_player_properties_changed.pb.h"
-#include "pb/event_reverse_turn.pb.h"
-#include "pb/event_set_active_phase.pb.h"
-#include "pb/event_set_active_player.pb.h"
-#include "pb/game_event_container.pb.h"
+
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
+#include <libcockatrice/protocol/pb/command_concede.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_leave_game.pb.h>
+#include <libcockatrice/protocol/pb/command_next_turn.pb.h>
+#include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
+#include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
+#include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
+#include <libcockatrice/protocol/pb/context_deck_select.pb.h>
+#include <libcockatrice/protocol/pb/context_ping_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_host_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_game_say.pb.h>
+#include <libcockatrice/protocol/pb/event_game_state_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_join.pb.h>
+#include <libcockatrice/protocol/pb/event_kicked.pb.h>
+#include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_reverse_turn.pb.h>
+#include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
+#include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
+#include <libcockatrice/protocol/pb/game_event_container.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 
 GameEventHandler::GameEventHandler(AbstractGame *_game) : QObject(_game), game(_game)
 {

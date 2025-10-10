@@ -7,66 +7,39 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/card/card_info.cpp
-    src/card/card_relation.cpp
-    src/card/card_set.cpp
-    src/card/card_set_list.cpp
-    src/card/exact_card.cpp
-    src/card/printing_info.cpp
-    src/client/deck_editor_menu.cpp
-    src/client/get_text_with_max.cpp
-    src/client/network/client_update_checker.cpp
+    src/client/network/update/client/update_downloader.cpp
+    src/client/network/interfaces/deck_stats_interface.cpp
+    src/client/network/interfaces/tapped_out_interface.cpp
     src/client/network/parsers/deck_link_to_api_transformer.cpp
-    src/client/network/release_channel.cpp
-    src/client/network/replay_timeline_widget.cpp
-    src/client/network/sets_model.cpp
-    src/client/network/spoiler_background_updater.cpp
-    src/client/replay_manager.cpp
+    src/client/network/update/client/client_update_checker.cpp
+    src/client/network/update/client/release_channel.cpp
+    src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/sound_engine.cpp
-    src/client/tapped_out_interface.cpp
-    src/client/update_downloader.cpp
-    src/database/card_database.cpp
-    src/database/card_database_loader.cpp
-    src/database/card_database_manager.cpp
-    src/database/card_database_querier.cpp
-    src/database/model/card_database_model.cpp
-    src/database/model/card_database_display_model.cpp
-    src/database/model/card/card_completer_proxy_model.cpp
-    src/database/model/card/card_search_model.cpp
-    src/database/model/token/token_display_model.cpp
-    src/database/model/token/token_edit_model.cpp
-    src/database/parser/card_database_parser.cpp
-    src/database/parser/cockatrice_xml_3.cpp
-    src/database/parser/cockatrice_xml_4.cpp
-    src/deck/custom_line_edit.cpp
-    src/deck/deck_list_model.cpp
-    src/deck/deck_loader.cpp
-    src/deck/deck_stats_interface.cpp
-    src/dialogs/dlg_connect.cpp
-    src/dialogs/dlg_convert_deck_to_cod_format.cpp
-    src/dialogs/dlg_create_game.cpp
-    src/dialogs/dlg_default_tags_editor.cpp
-    src/dialogs/dlg_edit_avatar.cpp
-    src/dialogs/dlg_edit_password.cpp
-    src/dialogs/dlg_edit_tokens.cpp
-    src/dialogs/dlg_edit_user.cpp
-    src/dialogs/dlg_filter_games.cpp
-    src/dialogs/dlg_forgot_password_challenge.cpp
-    src/dialogs/dlg_forgot_password_request.cpp
-    src/dialogs/dlg_forgot_password_reset.cpp
-    src/dialogs/dlg_load_deck.cpp
-    src/dialogs/dlg_load_deck_from_clipboard.cpp
-    src/dialogs/dlg_load_deck_from_website.cpp
-    src/dialogs/dlg_load_remote_deck.cpp
-    src/dialogs/dlg_manage_sets.cpp
-    src/dialogs/dlg_register.cpp
-    src/dialogs/dlg_select_set_for_cards.cpp
-    src/dialogs/dlg_settings.cpp
-    src/dialogs/dlg_startup_card_check.cpp
-    src/dialogs/dlg_tip_of_the_day.cpp
-    src/dialogs/dlg_update.cpp
-    src/dialogs/dlg_view_log.cpp
-    src/dialogs/tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_connect.cpp
+    src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
+    src/interface/widgets/dialogs/dlg_create_game.cpp
+    src/interface/widgets/dialogs/dlg_default_tags_editor.cpp
+    src/interface/widgets/dialogs/dlg_edit_avatar.cpp
+    src/interface/widgets/dialogs/dlg_edit_password.cpp
+    src/interface/widgets/dialogs/dlg_edit_tokens.cpp
+    src/interface/widgets/dialogs/dlg_edit_user.cpp
+    src/interface/widgets/dialogs/dlg_filter_games.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
+    src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_load_deck.cpp
+    src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
+    src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
+    src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
+    src/interface/widgets/dialogs/dlg_manage_sets.cpp
+    src/interface/widgets/dialogs/dlg_register.cpp
+    src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_settings.cpp
+    src/interface/widgets/dialogs/dlg_startup_card_check.cpp
+    src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_update.cpp
+    src/interface/widgets/dialogs/dlg_view_log.cpp
+    src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
     src/filters/filter_card.cpp
@@ -138,9 +111,16 @@ set(cockatrice_SOURCES
     src/game/zones/table_zone.cpp
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader.cpp
+    src/interface/card_picture_loader/card_picture_loader_local.cpp
+    src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader_status_bar.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
+    src/interface/card_picture_loader/card_picture_to_load.cpp
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
-    src/interface/line_edit_completer.cpp
+    src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_manager.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
@@ -181,6 +161,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/layout_containers/flow_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_widget.cpp
+    src/interface/widgets/menus/deck_editor_menu.cpp
     src/interface/widgets/printing_selector/all_zones_card_amount_widget.cpp
     src/interface/widgets/printing_selector/card_amount_widget.cpp
     src/interface/widgets/printing_selector/printing_selector.cpp
@@ -192,6 +173,22 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
+    src/interface/widgets/replay/replay_manager.cpp
+    src/interface/widgets/replay/replay_timeline_widget.cpp
+    src/interface/widgets/server/chat_view/chat_view.cpp
+    src/interface/widgets/server/game_selector.cpp
+    src/interface/widgets/server/games_model.cpp
+    src/interface/widgets/server/handle_public_servers.cpp
+    src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp
+    src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp
+    src/interface/widgets/server/user/user_context_menu.cpp
+    src/interface/widgets/server/user/user_info_box.cpp
+    src/interface/widgets/server/user/user_info_connection.cpp
+    src/interface/widgets/server/user/user_list_manager.cpp
+    src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/utility/custom_line_edit.cpp
+    src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
@@ -217,94 +214,50 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
-    src/picture_loader/picture_loader.cpp
-    src/picture_loader/picture_loader_local.cpp
-    src/picture_loader/picture_loader_request_status_display_widget.cpp
-    src/picture_loader/picture_loader_status_bar.cpp
-    src/picture_loader/picture_loader_worker.cpp
-    src/picture_loader/picture_loader_worker_work.cpp
-    src/picture_loader/picture_to_load.cpp
-    src/server/abstract_client.cpp
-    src/server/chat_view/chat_view.cpp
-    src/server/game_selector.cpp
-    src/server/games_model.cpp
-    src/server/handle_public_servers.cpp
-    src/server/local_client.cpp
-    src/server/local_server.cpp
-    src/server/local_server_interface.cpp
-    src/server/pending_command.cpp
-    src/server/remote/remote_client.cpp
-    src/server/remote/remote_decklist_tree_widget.cpp
-    src/server/remote/remote_replay_list_tree_widget.cpp
-    src/server/user/user_context_menu.cpp
-    src/server/user/user_info_box.cpp
-    src/server/user/user_info_connection.cpp
-    src/server/user/user_list_manager.cpp
-    src/server/user/user_list_widget.cpp
-    src/settings/cache_settings.cpp
-    src/settings/card_counter_settings.cpp
-    src/settings/card_database_settings.cpp
-    src/settings/card_override_settings.cpp
-    src/settings/debug_settings.cpp
-    src/settings/download_settings.cpp
-    src/settings/game_filters_settings.cpp
-    src/settings/layouts_settings.cpp
-    src/settings/message_settings.cpp
-    src/settings/recents_settings.cpp
-    src/settings/servers_settings.cpp
-    src/settings/settings_manager.cpp
-    src/settings/shortcut_treeview.cpp
-    src/settings/shortcuts_settings.cpp
-    src/tabs/abstract_tab_deck_editor.cpp
-    src/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
-    src/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
-    src/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
-    src/tabs/api/edhrec/api_response/card_prices/edhrec_api_response_card_prices.cpp
-    src/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_container.cpp
-    src/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_details.cpp
-    src/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_list.cpp
-    src/tabs/api/edhrec/api_response/cards/edhrec_commander_api_response_commander_details.cpp
-    src/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response.cpp
-    src/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_average_deck_statistics.cpp
-    src/tabs/api/edhrec/api_response/top_cards/edhrec_top_cards_api_response.cpp
-    src/tabs/api/edhrec/api_response/top_commanders/edhrec_top_commanders_api_response.cpp
-    src/tabs/api/edhrec/api_response/top_tags/edhrec_top_tags_api_response.cpp
-    src/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
-    src/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
-    src/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
-    src/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
-    src/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
-    src/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
-    src/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
-    src/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
-    src/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
-    src/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
-    src/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
-    src/tabs/api/edhrec/tab_edhrec.cpp
-    src/tabs/api/edhrec/tab_edhrec_main.cpp
-    src/tabs/tab.cpp
-    src/tabs/tab_account.cpp
-    src/tabs/tab_admin.cpp
-    src/tabs/tab_deck_editor.cpp
-    src/tabs/tab_deck_storage.cpp
-    src/tabs/tab_game.cpp
-    src/tabs/tab_home.cpp
-    src/tabs/tab_logs.cpp
-    src/tabs/tab_message.cpp
-    src/tabs/tab_replays.cpp
-    src/tabs/tab_room.cpp
-    src/tabs/tab_server.cpp
-    src/tabs/tab_supervisor.cpp
-    src/tabs/tab_visual_database_display.cpp
-    src/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
-    src/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
-    src/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
-    src/utility/card_info_comparator.cpp
-    src/utility/deck_list_sort_filter_proxy_model.cpp
-    src/utility/key_signals.cpp
-    src/utility/levenshtein.cpp
-    src/utility/logger.cpp
-    src/utility/sequence_edit.cpp
+    src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/card_prices/edhrec_api_response_card_prices.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_container.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_details.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_list.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_commander_api_response_commander_details.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_average_deck_statistics.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_cards/edhrec_top_cards_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_commanders/edhrec_top_commanders_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_tags/edhrec_top_tags_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
+    src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
+    src/interface/widgets/tabs/tab.cpp
+    src/interface/widgets/tabs/tab_account.cpp
+    src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_deck_editor.cpp
+    src/interface/widgets/tabs/tab_deck_storage.cpp
+    src/interface/widgets/tabs/tab_game.cpp
+    src/interface/widgets/tabs/tab_home.cpp
+    src/interface/widgets/tabs/tab_logs.cpp
+    src/interface/widgets/tabs/tab_message.cpp
+    src/interface/widgets/tabs/tab_replays.cpp
+    src/interface/widgets/tabs/tab_room.cpp
+    src/interface/widgets/tabs/tab_server.cpp
+    src/interface/widgets/tabs/tab_supervisor.cpp
+    src/interface/widgets/tabs/tab_visual_database_display.cpp
+    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
+    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
+    src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
 )
 
 add_subdirectory(sounds)
@@ -316,15 +269,23 @@ configure_file(
 set(cockatrice_RESOURCES cockatrice.qrc)
 
 if(UPDATE_TRANSLATIONS)
+  # Cockatrice main sources
   file(GLOB_RECURSE translate_cockatrice_SRCS ${CMAKE_SOURCE_DIR}/cockatrice/src/*.cpp
        ${CMAKE_SOURCE_DIR}/cockatrice/src/*.h
   )
-  file(GLOB_RECURSE translate_common_SRCS ${CMAKE_SOURCE_DIR}/common/*.cpp ${CMAKE_SOURCE_DIR}/common/*.h)
-  set(translate_SRCS ${translate_cockatrice_SRCS} ${translate_common_SRCS})
+
+  # All libcockatrice_* libraries (recursively)
+  file(GLOB_RECURSE translate_lib_SRCS ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.cpp
+       ${CMAKE_SOURCE_DIR}/libcockatrice_*/**/*.h
+  )
+
+  # Combine all sources for translation
+  set(translate_SRCS ${translate_cockatrice_SRCS} ${translate_lib_SRCS})
+
   set(cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/cockatrice_en@source.ts")
 else()
   file(GLOB cockatrice_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
-endif(UPDATE_TRANSLATIONS)
+endif()
 
 if(WIN32)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} cockatrice.rc)
@@ -353,12 +314,6 @@ set(DESKTOPDIR
     share/applications
     CACHE STRING "desktop file destination"
 )
-
-# Include directories
-include_directories(../common)
-include_directories(${PROTOBUF_INCLUDE_DIR})
-include_directories(${CMAKE_BINARY_DIR}/common)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
@@ -399,9 +354,20 @@ elseif(Qt5_FOUND)
 endif()
 
 if(Qt5_FOUND)
-  target_link_libraries(cockatrice cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice
+    libcockatrice_card
+    libcockatrice_deck_list
+    libcockatrice_utility
+    libcockatrice_network
+    libcockatrice_rng
+    ${COCKATRICE_QT_MODULES}
+  )
 else()
-  target_link_libraries(cockatrice PUBLIC cockatrice_common ${COCKATRICE_QT_MODULES})
+  target_link_libraries(
+    cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_network
+                      libcockatrice_rng ${COCKATRICE_QT_MODULES}
+  )
 endif()
 
 if(UNIX)

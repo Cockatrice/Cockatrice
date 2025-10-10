@@ -7,18 +7,14 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../database/card_database.h"
-#include "../../../database/model/card_database_model.h"
-#include "../../../deck/custom_line_edit.h"
-#include "../../../deck/deck_list_model.h"
 #include "../../../filters/filter_tree_model.h"
-#include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../utility/key_signals.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
+#include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
@@ -31,6 +27,10 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QWidget>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/model/card_database_model.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/utility/key_signals.h>
 #include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");

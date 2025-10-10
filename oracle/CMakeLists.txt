@@ -1,15 +1,21 @@
-# CMakeLists for oracle directory
-#
-# provides the oracle binary
-
+cmake_minimum_required(VERSION 3.16)
 project(Oracle VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-# paths
+# ------------------------
+# Paths and directories
+# ------------------------
 set(DESKTOPDIR
     share/applications
     CACHE STRING "path to .desktop files"
 )
 
+set(ORACLE_MAC_QM_INSTALL_DIR "oracle.app/Contents/Resources/translations")
+set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
+set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
+
+# ------------------------
+# Sources
+# ------------------------
 set(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
@@ -17,34 +23,16 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/qt-json/json.cpp
-    ../cockatrice/src/card/card_info.cpp
-    ../cockatrice/src/card/card_relation.cpp
-    ../cockatrice/src/card/card_set.cpp
-    ../cockatrice/src/card/printing_info.cpp
-    ../cockatrice/src/client/network/release_channel.cpp
-    ../cockatrice/src/database/parser/card_database_parser.cpp
-    ../cockatrice/src/database/parser/cockatrice_xml_3.cpp
-    ../cockatrice/src/database/parser/cockatrice_xml_4.cpp
+    ../cockatrice/src/client/network/update/client/release_channel.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
-    ../cockatrice/src/settings/cache_settings.cpp
-    ../cockatrice/src/settings/card_counter_settings.cpp
-    ../cockatrice/src/settings/card_database_settings.cpp
-    ../cockatrice/src/settings/card_override_settings.cpp
-    ../cockatrice/src/settings/debug_settings.cpp
-    ../cockatrice/src/settings/download_settings.cpp
-    ../cockatrice/src/settings/game_filters_settings.cpp
-    ../cockatrice/src/settings/layouts_settings.cpp
-    ../cockatrice/src/settings/message_settings.cpp
-    ../cockatrice/src/settings/recents_settings.cpp
-    ../cockatrice/src/settings/servers_settings.cpp
-    ../cockatrice/src/settings/settings_manager.cpp
-    ../cockatrice/src/settings/shortcuts_settings.cpp
     ${VERSION_STRING_CPP}
 )
 
-set(oracle_RESOURCES oracle.qrc)
+# ------------------------
+# Translations
+# ------------------------
 
 if(UPDATE_TRANSLATIONS)
   file(GLOB_RECURSE translate_oracle_SRCS src/*.cpp src/*.h ../cockatrice/src/settingscache.cpp)
@@ -66,36 +54,48 @@ if(APPLE)
   set(oracle_SOURCES ${oracle_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
+set(oracle_RESOURCES oracle.qrc)
+
+# ------------------------
+# Qt resources
+# ------------------------
 if(Qt6_FOUND)
   qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 elseif(Qt5_FOUND)
   qt5_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 endif()
 
+# ------------------------
+# Include directories
+# ------------------------
 include_directories(../cockatrice/src)
-include_directories(../common)
 
-# Libz is required to support zipped files
+# ------------------------
+# Optional libraries
+# ------------------------
+# ZLIB
 find_package(ZLIB)
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
   add_definitions("-DHAS_ZLIB")
-
-  set(oracle_SOURCES ${oracle_SOURCES} src/zip/unzip.cpp src/zip/zipglobal.cpp)
+  list(APPEND oracle_SOURCES src/zip/unzip.cpp src/zip/zipglobal.cpp)
 else()
   message(STATUS "Oracle: zlib not found; ZIP support disabled")
 endif()
 
-# LibLZMA is required to support xz files
+# LZMA
 find_package(LibLZMA)
 if(LIBLZMA_FOUND)
   include_directories(${LIBLZMA_INCLUDE_DIRS})
   add_definitions("-DHAS_LZMA")
-
-  set(oracle_SOURCES ${oracle_SOURCES} src/lzma/decompress.cpp)
+  list(APPEND oracle_SOURCES src/lzma/decompress.cpp)
 else()
   message(STATUS "Oracle: LibLZMA not found; xz support disabled")
 endif()
+
+# ------------------------
+# Build executable
+# ------------------------
 
 set(ORACLE_MAC_QM_INSTALL_DIR "oracle.app/Contents/Resources/translations")
 set(ORACLE_UNIX_QM_INSTALL_DIR "share/oracle/translations")
@@ -133,7 +133,15 @@ elseif(Qt5_FOUND)
   endif()
 endif()
 
-target_link_libraries(oracle PUBLIC ${ORACLE_QT_MODULES})
+# ------------------------
+# Link libraries
+# ------------------------
+target_link_libraries(
+  oracle
+  PUBLIC libcockatrice_card
+  PUBLIC libcockatrice_settings
+  PUBLIC ${ORACLE_QT_MODULES}
+)
 
 if(ZLIB_FOUND)
   target_link_libraries(oracle PUBLIC ${ZLIB_LIBRARIES})
@@ -143,6 +151,9 @@ if(LIBLZMA_FOUND)
   target_link_libraries(oracle PUBLIC ${LIBLZMA_LIBRARIES})
 endif()
 
+# ------------------------
+# Install rules
+# ------------------------
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
@@ -168,6 +179,9 @@ if(NOT WIN32 AND NOT APPLE)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/oracle.desktop DESTINATION ${DESKTOPDIR})
 endif(NOT WIN32 AND NOT APPLE)
 
+# ------------------------
+# Qt plugin handling
+# ------------------------
 if(APPLE)
   # these needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir oracle.app/Contents/Plugins)
@@ -262,6 +276,9 @@ Translations = Resources/translations\")
   )
 endif()
 
+# ------------------------
+# Qt translations
+# ------------------------
 if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)

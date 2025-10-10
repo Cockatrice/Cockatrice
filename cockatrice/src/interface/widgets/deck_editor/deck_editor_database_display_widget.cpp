@@ -1,11 +1,8 @@
 #include "deck_editor_database_display_widget.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
 #include "../../../filters/syntax_help.h"
-#include "../../../settings/cache_settings.h"
-#include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../pixel_map_generator.h"
 
 #include <QClipboard>
@@ -15,6 +12,9 @@
 #include <QTextBrowser>
 #include <QToolButton>
 #include <QTreeView>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {

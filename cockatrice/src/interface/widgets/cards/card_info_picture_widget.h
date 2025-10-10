@@ -7,12 +7,12 @@
 #ifndef CARD_INFO_PICTURE_H
 #define CARD_INFO_PICTURE_H
 
-#include "../../../card/exact_card.h"
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QWidget>
+#include <libcockatrice/card/printing/exact_card.h>
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
