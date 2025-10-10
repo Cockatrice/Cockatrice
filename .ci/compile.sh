@@ -156,7 +156,7 @@ if [[ $RUNNER_OS == macOS ]]; then
     # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
     # an easy way is to copy the x64-osx.cmake file and modify it
     triplets_dir="/tmp/cmake/triplets"
-    triplet_version="custom_triplet"
+    triplet_version="custom-triplet"
     triplet_file="$triplets_dir/$triplet_version.cmake"
     arch=$(uname -m)
     if [[ $arch == x86_64 ]]; then
