@@ -156,14 +156,18 @@ if [[ $RUNNER_OS == macOS ]]; then
     # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
     # an easy way is to copy the x64-osx.cmake file and modify it
     triplets_dir="/tmp/cmake/triplets"
-    triplet_version=${TARGET_MACOS_VERSION//./-}
-    triplet_file="$triplets_dir/x64-osx-$triplet_version.cmake"
+    triplet_version="custom_triplet"
+    triplet_file="$triplets_dir/$triplet_version.cmake"
+    arch=$(uname -m)
+    if [[ $arch == x86_64 ]]; then
+      arch="x64"
+    fi
     mkdir -p "$triplets_dir"
-    cp "../vcpkg/triplets/x64-osx.cmake" "$triplet_file"
+    cp "../vcpkg/triplets/$arch-osx.cmake" "$triplet_file"
     echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
     echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
     flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
-    flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-$triplet_version")
+    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
     echo "::group::Generated triplet $triplet_file"
     cat "$triplet_file"
     echo "::endgroup::"
