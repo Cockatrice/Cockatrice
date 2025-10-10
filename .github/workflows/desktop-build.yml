@@ -4,6 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
+  actions: write
 
 on:
   push:
