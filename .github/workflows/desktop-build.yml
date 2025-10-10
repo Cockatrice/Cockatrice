@@ -250,6 +250,7 @@ jobs:
             xcode: "16.4"
             type: Release
             make_package: 1
+            override_target: 13
 
           - target: 14
             soc: Apple
@@ -332,8 +333,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # if Intel, set the target macOS version to matrix.target, otherwise empty string
-          TARGET_MACOS_VERSION: ${{ matrix.soc == 'Intel' && matrix.target || '' }}
+          TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
 
       - name: Sign app bundle
