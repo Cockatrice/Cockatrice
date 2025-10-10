@@ -134,6 +134,11 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
 if [[ $TARGET_MACOS_VERSION ]]; then
+  # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
+  flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=${TARGET_MACOS_VERSION}")
+
+  # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
+  # an easy way is to copy the x64-osx.cmake file and modify it
   TRIPLETS_DIR="../cmake/triplets"
   mkdir -p "$TRIPLETS_DIR"
   # Replace dots with hyphens in triplet name for vcpkg compatibility
@@ -144,7 +149,6 @@ if [[ $TARGET_MACOS_VERSION ]]; then
   echo "set(VCPKG_OSX_DEPLOYMENT_TARGET ${TARGET_MACOS_VERSION})" >> "$TRIPLET_FILE"
   flags+=("-DVCPKG_OVERLAY_TRIPLETS=$TRIPLETS_DIR")
   flags+=("-DVCPKG_TARGET_TRIPLET=x64-osx-${TRIPLET_VERSION}")
-  flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=${TARGET_MACOS_VERSION}")
   echo "::group::Generated triplet $TRIPLET_FILE"
   cat "$TRIPLET_FILE"
   echo "::endgroup::"

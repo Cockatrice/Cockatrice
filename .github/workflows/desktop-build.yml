@@ -4,7 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
-  actions: write
+  actions: write # needed for ccache action to be able to delete gha caches
 
 on:
   push:
