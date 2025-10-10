@@ -188,9 +188,16 @@ void CardDatabaseDisplayModel::clearFilterAll()
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+#endif
     if (filterTree != nullptr)
         filterTree->clear();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    endFilterChange();
+#else
     invalidateFilter();
+#endif
 }
 
 void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)

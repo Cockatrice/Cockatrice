@@ -440,7 +440,10 @@ void TabReplays::downloadFinished(const Response &r,
 
     const std::string &_data = resp.replay_data();
     QFile f(filePath);
-    f.open(QIODevice::WriteOnly);
+    if (!f.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open file for writing:" << filePath;
+        return;
+    }
     f.write((const char *)_data.data(), _data.size());
     f.close();
 }

@@ -286,101 +286,111 @@ GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userList
     setDynamicSortFilter(true);
 }
 
+void GamesProxyModel::applyFilterChange()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+    endFilterChange();
+#else
+    invalidateFilter();
+#endif
+}
+
 void GamesProxyModel::setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames)
 {
     hideBuddiesOnlyGames = _showBuddiesOnlyGames;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
 {
     hideIgnoredUserGames = _hideIgnoredUserGames;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHideFullGames(bool _showFullGames)
 {
     hideFullGames = _showFullGames;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHideGamesThatStarted(bool _showGamesThatStarted)
 {
     hideGamesThatStarted = _showGamesThatStarted;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHidePasswordProtectedGames(bool _showPasswordProtectedGames)
 {
     hidePasswordProtectedGames = _showPasswordProtectedGames;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHideNotBuddyCreatedGames(bool value)
 {
     hideNotBuddyCreatedGames = value;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setHideOpenDecklistGames(bool _hideOpenDecklistGames)
 {
     hideOpenDecklistGames = _hideOpenDecklistGames;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
 {
     gameNameFilter = _gameNameFilter;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setCreatorNameFilter(const QString &_creatorNameFilter)
 {
     creatorNameFilter = _creatorNameFilter;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
 {
     gameTypeFilter = _gameTypeFilter;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
 {
     maxPlayersFilterMin = _maxPlayersFilterMin;
     maxPlayersFilterMax = _maxPlayersFilterMax;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setMaxGameAge(const QTime &_maxGameAge)
 {
     maxGameAge = _maxGameAge;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setShowOnlyIfSpectatorsCanWatch(bool _showOnlyIfSpectatorsCanWatch)
 {
     showOnlyIfSpectatorsCanWatch = _showOnlyIfSpectatorsCanWatch;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setShowSpectatorPasswordProtected(bool _showSpectatorPasswordProtected)
 {
     showSpectatorPasswordProtected = _showSpectatorPasswordProtected;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setShowOnlyIfSpectatorsCanChat(bool _showOnlyIfSpectatorsCanChat)
 {
     showOnlyIfSpectatorsCanChat = _showOnlyIfSpectatorsCanChat;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::setShowOnlyIfSpectatorsCanSeeHands(bool _showOnlyIfSpectatorsCanSeeHands)
 {
     showOnlyIfSpectatorsCanSeeHands = _showOnlyIfSpectatorsCanSeeHands;
-    invalidateFilter();
+    applyFilterChange();
 }
 
 int GamesProxyModel::getNumFilteredGames() const
@@ -418,7 +428,7 @@ void GamesProxyModel::resetFilterParameters()
     showOnlyIfSpectatorsCanChat = false;
     showOnlyIfSpectatorsCanSeeHands = false;
 
-    invalidateFilter();
+    applyFilterChange();
 }
 
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
@@ -459,7 +469,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
         }
     }
 
-    invalidateFilter();
+    applyFilterChange();
 }
 
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
@@ -577,5 +587,5 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 
 void GamesProxyModel::refresh()
 {
-    invalidateFilter();
+    applyFilterChange();
 }

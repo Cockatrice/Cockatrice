@@ -95,6 +95,8 @@ private:
     bool showOnlyIfSpectatorsCanWatch, showSpectatorPasswordProtected, showOnlyIfSpectatorsCanChat,
         showOnlyIfSpectatorsCanSeeHands;
 
+    void applyFilterChange();
+
 public:
     explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 

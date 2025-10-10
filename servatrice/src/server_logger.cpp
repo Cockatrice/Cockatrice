@@ -120,7 +120,11 @@ void ServerLogger::rotateLogs()
     flushBuffer();
 
     logFile->close();
-    logFile->open(QIODevice::Append);
+    const auto result = logFile->open(QIODevice::Append);
+    if (!result) {
+        std::cerr << "ERROR: can't open() logfile." << std::endl;
+        return;
+    }
 }
 
 QFile *ServerLogger::logFile;

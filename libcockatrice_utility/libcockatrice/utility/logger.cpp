@@ -51,7 +51,11 @@ void Logger::openLogfileSession()
     }
 
     fileHandle.setFileName(LOGGER_FILENAME);
-    fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    const auto result = fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    if (!result) {
+        std::cerr << "Error: Failed to open log file: " << fileHandle.errorString().toStdString() << std::endl;
+        return;
+    }
     fileStream.setDevice(&fileHandle);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << Qt::endl;

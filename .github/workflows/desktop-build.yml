@@ -278,7 +278,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       # Common parameters for all macOS builds
-      QT_VERSION: 6.6.*
+      QT_VERSION: 6.10.*
       QT_ARCH: clang_64
       QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
       # Build-specific environment variables
@@ -425,8 +425,8 @@ jobs:
             qt_arch: msvc2019_64
 
           - target: 10
-            qt_version: 6.6.*
-            qt_arch: msvc2019_64
+            qt_version: 6.10.*
+            qt_arch: msvc2022_64
             qt_modules: "qtimageformats qtmultimedia qtwebsockets"
 
     name: Windows ${{matrix.target}}

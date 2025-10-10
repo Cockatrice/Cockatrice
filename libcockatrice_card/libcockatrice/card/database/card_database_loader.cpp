@@ -36,8 +36,8 @@ CardDatabaseLoader::~CardDatabaseLoader()
 LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    if (!file.isOpen()) {
+    const auto isOpen = file.open(QIODevice::ReadOnly);
+    if (!isOpen) {
         return FileError;
     }
 
