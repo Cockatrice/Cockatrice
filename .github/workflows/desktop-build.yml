@@ -332,7 +332,9 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg ${{ matrix.soc == 'Intel' && format('--target-macos-version {0}', matrix.target) || '' }}
+          # if Intel, pass the flag and set to matrix.target, otherwise do nothing
+          TARGET_MACOS_VERSION_FLAG: ${{ matrix.soc == 'Intel' && format('--target-macos-version {0}', matrix.target) || '' }}
+        run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg ${{ env.TARGET_MACOS_VERSION_FLAG }}
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
