@@ -263,11 +263,6 @@ if [[ $branch ]]; then
       if [[ $name =~ $filerx ]]; then
         shell_names+=("$name")
       fi
-      for include in "${cmakeinclude[@]}"; do
-        if [[ $name == "$include" ]]; then
-          shell_names+=("$name")
-        fi
-      done
     done
   fi
 else
