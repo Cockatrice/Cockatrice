@@ -93,7 +93,7 @@ idleclienttimeout=3600
 ; * password: require users to specify a common password to log in;
 ; * sql: authenticate users against the "users" table of the database;
 ; Please note that only the "sql" method permits to have registered users and store their data on the server.
-method=none
+method=sql
 
 ; if the chosen authentication method is password, here you can define the password your users will use to log in
 password=123456
@@ -154,15 +154,15 @@ minpasswordlength = 6
 
 ; Servatrice can process registration requests to add new users on the fly.
 ; Enable this feature? Default false.
-;enabled=false
+enabled=true
 
 ; Require users to provide an email address in order to register. Default true.
-;requireemail=true
+requireemail=false
 
 ; Require email activation. Newly registered users will receive an activation token by email,
 ; and will be required to input back this token on cockatrice at the first login to get their
 ; account activated. Default true.
-;requireemailactivation=true
+requireemailactivation=false
 
 ; Set this number to the maximum number of accounts any one user can use to create new accounts
 ; using the same email address. 0 = Unlimited number of accounts (default).
@@ -255,7 +255,7 @@ body="Hi %username, thank our for registering on our Cockatrice server\r\nHere's
 ; Database type. Valid values are:
 ; * none: no database;
 ; * mysql: mysql or compatible database;
-type=none
+type=mysql
 
 ; Prefix used in he database for table names; default is cockatrice
 prefix=cockatrice
