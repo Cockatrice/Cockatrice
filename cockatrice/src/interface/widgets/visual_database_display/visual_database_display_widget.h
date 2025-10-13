@@ -30,7 +30,7 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/deck_list/deck_list_model.h>
-#include <libcockatrice/utility/key_signals.h>
+#include "../../utility/key_signals.h"
 #include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");

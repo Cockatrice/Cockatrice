@@ -16,5 +16,6 @@ add_library(
 )
 
 target_include_directories(libcockatrice_rng PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
 
-target_link_libraries(libcockatrice_rng PUBLIC ${COCKATRICE_QT_MODULES})
+#target_link_libraries(libcockatrice_rng PUBLIC ${LIB_QT_MODULES})
