@@ -196,7 +196,7 @@ jobs:
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          NO_CLIENT: ${{matrix.server_only == yes && '--no-client' || '' }}
+          NO_CLIENT: ${{matrix.server_only == 'yes' && '--no-client' || '' }}
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$package" --dir "$BUILD_DIR" \
