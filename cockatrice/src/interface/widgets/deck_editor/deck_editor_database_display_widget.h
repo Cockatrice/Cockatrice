@@ -8,6 +8,7 @@
 #ifndef DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 
+#include "../../utility/key_signals.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 #include "../utility/custom_line_edit.h"
 
@@ -15,7 +16,6 @@
 #include <QWidget>
 #include <libcockatrice/card/database/model/card_database_display_model.h>
 #include <libcockatrice/card/database/model/card_database_model.h>
-#include "../../utility/key_signals.h"
 
 class AbstractTabDeckEditor;
 class DeckEditorDatabaseDisplayWidget : public QWidget

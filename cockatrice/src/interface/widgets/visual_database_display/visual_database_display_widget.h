@@ -10,6 +10,7 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../layouts/flow_layout.h"
+#include "../../utility/key_signals.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
@@ -30,7 +31,6 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/model/card_database_model.h>
 #include <libcockatrice/deck_list/deck_list_model.h>
-#include "../../utility/key_signals.h"
 #include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");

@@ -8,6 +8,7 @@ set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
     src/interface/utility/key_signals.cpp 
+    src/interface/utility/logger.cpp 
     src/client/network/update/client/update_downloader.cpp
     src/client/network/interfaces/deck_stats_interface.cpp
     src/client/network/interfaces/tapped_out_interface.cpp
