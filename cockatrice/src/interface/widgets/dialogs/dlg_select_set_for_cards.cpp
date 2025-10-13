@@ -209,30 +209,19 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
     if (!decklist)
         return setCounts;
 
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return setCounts;
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto *i : *listRoot) {
-        auto *countCurrentZone = dynamic_cast<InnerDecklistNode *>(i);
-        if (!countCurrentZone)
+    for (auto currentCard : cardsInDeck) {
+        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+        if (!infoPtr)
             continue;
 
-        for (auto *cardNode : *countCurrentZone) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(cardNode);
-            if (!currentCard)
-                continue;
-
-            CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            if (!infoPtr)
-                continue;
-
-            SetToPrintingsMap setMap = infoPtr->getSets();
-            for (auto &setName : setMap.keys()) {
-                setCounts[setName]++;
-            }
+        SetToPrintingsMap setMap = infoPtr->getSets();
+        for (auto &setName : setMap.keys()) {
+            setCounts[setName]++;
         }
     }
+
     return setCounts;
 }
 
@@ -263,48 +252,36 @@ void DlgSelectSetForCards::updateCardLists()
     if (!decklist)
         return;
 
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return;
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto *i : *listRoot) {
-        auto *countCurrentZone = dynamic_cast<InnerDecklistNode *>(i);
-        if (!countCurrentZone)
-            continue;
+    for (auto currentCard : cardsInDeck) {
+        bool found = false;
+        QString foundSetName;
 
-        for (auto *cardNode : *countCurrentZone) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(cardNode);
-            if (!currentCard)
-                continue;
-
-            bool found = false;
-            QString foundSetName;
-
-            // Check across all sets if the card is present
-            for (auto it = selectedCardsBySet.begin(); it != selectedCardsBySet.end(); ++it) {
-                if (it.value().contains(currentCard->getName())) {
-                    found = true;
-                    foundSetName = it.key(); // Store the set name where it was found
-                    break;                   // Stop at the first match
-                }
+        // Check across all sets if the card is present
+        for (auto it = selectedCardsBySet.begin(); it != selectedCardsBySet.end(); ++it) {
+            if (it.value().contains(currentCard->getName())) {
+                found = true;
+                foundSetName = it.key(); // Store the set name where it was found
+                break;                   // Stop at the first match
             }
+        }
 
-            if (!found) {
-                // The card was not in any selected set
-                ExactCard card = CardDatabaseManager::query()->getCard({currentCard->getName()});
-                CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
-                picture_widget->setCard(card);
-                uneditedCardsFlowWidget->addWidget(picture_widget);
-            } else {
-                ExactCard card = CardDatabaseManager::query()->getCard(
-                    {currentCard->getName(), CardDatabaseManager::getInstance()
-                                                 ->query()
-                                                 ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
-                                                 .getUuid()});
-                CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
-                picture_widget->setCard(card);
-                modifiedCardsFlowWidget->addWidget(picture_widget);
-            }
+        if (!found) {
+            // The card was not in any selected set
+            ExactCard card = CardDatabaseManager::query()->getCard({currentCard->getName()});
+            CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
+            picture_widget->setCard(card);
+            uneditedCardsFlowWidget->addWidget(picture_widget);
+        } else {
+            ExactCard card = CardDatabaseManager::query()->getCard(
+                {currentCard->getName(), CardDatabaseManager::getInstance()
+                                             ->query()
+                                             ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
+                                             .getUuid()});
+            CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
+            picture_widget->setCard(card);
+            modifiedCardsFlowWidget->addWidget(picture_widget);
         }
     }
 }
@@ -364,30 +341,19 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
     if (!decklist)
         return setCards;
 
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return setCards;
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto *i : *listRoot) {
-        auto *countCurrentZone = dynamic_cast<InnerDecklistNode *>(i);
-        if (!countCurrentZone)
+    for (auto currentCard : cardsInDeck) {
+        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+        if (!infoPtr)
             continue;
 
-        for (auto *cardNode : *countCurrentZone) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(cardNode);
-            if (!currentCard)
-                continue;
-
-            CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            if (!infoPtr)
-                continue;
-
-            SetToPrintingsMap setMap = infoPtr->getSets();
-            for (auto it = setMap.begin(); it != setMap.end(); ++it) {
-                setCards[it.key()].append(currentCard->getName());
-            }
+        SetToPrintingsMap setMap = infoPtr->getSets();
+        for (auto it = setMap.begin(); it != setMap.end(); ++it) {
+            setCards[it.key()].append(currentCard->getName());
         }
     }
+
     return setCards;
 }
 

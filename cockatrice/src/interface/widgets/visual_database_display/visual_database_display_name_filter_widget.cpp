@@ -67,21 +67,13 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
     DeckList *decklist = deckListModel->getDeckList();
     if (!decklist)
         return;
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return;
 
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-            createNameFilter(currentCard->getName());
-        }
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+
+    for (auto currentCard : cardsInDeck) {
+        createNameFilter(currentCard->getName());
     }
+
     updateFilterModel();
 }
 
