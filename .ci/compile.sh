@@ -168,6 +168,7 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
     flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
     flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
+    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
     echo "::group::Generated triplet $triplet_file"
     cat "$triplet_file"
     echo "::endgroup::"
