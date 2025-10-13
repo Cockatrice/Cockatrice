@@ -46,20 +46,15 @@ void ManaDevotionWidget::setDeckModel(DeckListModel *deckModel)
 std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
 {
     manaDevotionMap.clear();
-    InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
 
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-                if (info) {
-                    auto devotion = countManaSymbols(info->getManaCost());
-                    mergeManaCounts(manaDevotionMap, devotion);
-                }
+    QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
+
+    for (auto currentCard : cardsInDeck) {
+        for (int k = 0; k < currentCard->getNumber(); ++k) {
+            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+            if (info) {
+                auto devotion = countManaSymbols(info->getManaCost());
+                mergeManaCounts(manaDevotionMap, devotion);
             }
         }
     }

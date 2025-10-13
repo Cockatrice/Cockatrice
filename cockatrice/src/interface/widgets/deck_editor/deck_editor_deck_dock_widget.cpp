@@ -285,18 +285,12 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
     // Prepare the new items with deduplication
     QSet<QPair<QString, QString>> bannerCardSet;
-    InnerDecklistNode *listRoot = deckModel->getDeckList()->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
+    QList<DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
 
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                if (CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
-                    bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
-                }
+    for (auto currentCard : cardsInDeck) {
+        for (int k = 0; k < currentCard->getNumber(); ++k) {
+            if (CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
+                bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
             }
         }
     }
