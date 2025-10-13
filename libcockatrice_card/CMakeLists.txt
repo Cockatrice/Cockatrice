@@ -62,9 +62,9 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/filters
 )
-
-target_link_libraries(
-  libcockatrice_card
-  PUBLIC libcockatrice_settings
-  PUBLIC ${COCKATRICE_QT_MODULES}
+include_directories(
+  ${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libcockatrice_utility
+  ${CMAKE_SOURCE_DIR}/libcockatrice_settings
 )
+
+target_link_libraries(libcockatrice_card PUBLIC libcockatrice_settings)
