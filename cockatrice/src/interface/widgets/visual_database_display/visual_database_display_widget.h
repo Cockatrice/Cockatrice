@@ -79,6 +79,11 @@ protected slots:
 
 private:
     QLabel *databaseLoadIndicator;
+
+    QLabel *sortByLabel;
+    QComboBox *sortColumnCombo, *sortOrderCombo;
+
+    QLabel *filterByLabel;
     QToolButton *clearFilterWidget;
     QWidget *filterContainer;
     QHBoxLayout *filterContainerLayout;
