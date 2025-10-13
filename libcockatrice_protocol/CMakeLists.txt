@@ -24,3 +24,4 @@ target_include_directories(
   libcockatrice_protocol PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
                                 ${CMAKE_CURRENT_BINARY_DIR} # points to the generated headers
 )
+include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})
