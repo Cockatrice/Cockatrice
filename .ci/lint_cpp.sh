@@ -11,7 +11,7 @@ if ! git merge-base origin/master HEAD; then
 fi
 
 # Check formatting using format.sh
-echo "Checking your code using clang-format/cmake-format..."
+echo "Checking your code using format.sh..."
 
 diff="$(./format.sh --diff --cmake --shell --print-version --branch origin/master)"
 err=$?
