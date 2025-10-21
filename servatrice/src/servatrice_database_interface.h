@@ -1,13 +1,12 @@
 #ifndef SERVATRICE_DATABASE_INTERFACE_H
 #define SERVATRICE_DATABASE_INTERFACE_H
 
-#include "server/server.h"
-#include "server/server_database_interface.h"
-
 #include <QChar>
 #include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
+#include <server.h>
+#include <server_database_interface.h>
 
 #define DATABASE_SCHEMA_VERSION 34
 

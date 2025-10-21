@@ -19,37 +19,25 @@
  ***************************************************************************/
 #include "window_main.h"
 
-#include "../client/get_text_with_max.h"
-#include "../client/network/client_update_checker.h"
-#include "../client/network/release_channel.h"
-#include "../database/card_database.h"
-#include "../database/card_database_manager.h"
-#include "../dialogs/dlg_connect.h"
-#include "../dialogs/dlg_edit_tokens.h"
-#include "../dialogs/dlg_forgot_password_challenge.h"
-#include "../dialogs/dlg_forgot_password_request.h"
-#include "../dialogs/dlg_forgot_password_reset.h"
-#include "../dialogs/dlg_manage_sets.h"
-#include "../dialogs/dlg_register.h"
-#include "../dialogs/dlg_settings.h"
-#include "../dialogs/dlg_startup_card_check.h"
-#include "../dialogs/dlg_tip_of_the_day.h"
-#include "../dialogs/dlg_update.h"
-#include "../dialogs/dlg_view_log.h"
+#include "../client/network/update/client/client_update_checker.h"
+#include "../client/network/update/client/release_channel.h"
+#include "../interface/widgets/dialogs/dlg_connect.h"
+#include "../interface/widgets/dialogs/dlg_edit_tokens.h"
+#include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
+#include "../interface/widgets/dialogs/dlg_forgot_password_request.h"
+#include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
+#include "../interface/widgets/dialogs/dlg_manage_sets.h"
+#include "../interface/widgets/dialogs/dlg_register.h"
+#include "../interface/widgets/dialogs/dlg_settings.h"
+#include "../interface/widgets/dialogs/dlg_startup_card_check.h"
+#include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
+#include "../interface/widgets/dialogs/dlg_update.h"
+#include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
-#include "../server/local_client.h"
-#include "../server/local_server.h"
-#include "../server/local_server_interface.h"
-#include "../server/remote/remote_client.h"
-#include "../settings/cache_settings.h"
-#include "../tabs/tab_game.h"
-#include "../tabs/tab_supervisor.h"
-#include "../utility/logger.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_server_shutdown.pb.h"
-#include "pb/game_replay.pb.h"
-#include "pb/room_commands.pb.h"
 #include "version_string.h"
+#include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>
@@ -72,6 +60,18 @@
 #include <QWindow>
 #include <QtConcurrent>
 #include <QtNetwork>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/network/client/local/local_client.h>
+#include <libcockatrice/network/client/remote/remote_client.h>
+#include <libcockatrice/network/server/local/local_server.h>
+#include <libcockatrice/network/server/local/local_server_interface.h>
+#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/logger.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"

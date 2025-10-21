@@ -1,12 +1,11 @@
 #include "filter_string.h"
 
-#include "../../../common/lib/peglib.h"
-
 #include <QByteArray>
 #include <QDebug>
 #include <QRegularExpression>
 #include <QString>
 #include <functional>
+#include <libcockatrice/utility/peglib.h>
 
 static peg::parser search(R"(
 Start <- QueryPartList

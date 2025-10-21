@@ -19,17 +19,11 @@
  ***************************************************************************/
 #include "servatrice.h"
 
-#include "deck_list.h"
 #include "email_parser.h"
-#include "featureset.h"
 #include "isl_interface.h"
 #include "main.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/event_server_shutdown.pb.h"
 #include "servatrice_connection_pool.h"
 #include "servatrice_database_interface.h"
-#include "server/server_room.h"
 #include "server_logger.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
@@ -45,6 +39,12 @@
 #include <QTimer>
 #include <QUrl>
 #include <iostream>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <server_room.h>
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,

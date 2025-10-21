@@ -1,11 +1,8 @@
 #include "deck_editor_database_display_widget.h"
 
-#include "../../../card/card_relation.h"
-#include "../../../database/card_database_manager.h"
 #include "../../../filters/syntax_help.h"
-#include "../../../settings/cache_settings.h"
-#include "../../../tabs/abstract_tab_deck_editor.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../pixel_map_generator.h"
 
 #include <QClipboard>
@@ -15,6 +12,9 @@
 #include <QTextBrowser>
 #include <QToolButton>
 #include <QTreeView>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cache_settings.h>
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {
@@ -203,7 +203,10 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
-        selectPrinting = menu.addAction(tr("Select Printing"));
+        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+            selectPrinting = menu.addAction(tr("Select Printing"));
+            connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
+        }
         if (canBeCommander(card.getInfo())) {
             edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
@@ -213,7 +216,6 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-        connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
         connect(edhRecCard, &QAction::triggered, this,
                 [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr()); });
 

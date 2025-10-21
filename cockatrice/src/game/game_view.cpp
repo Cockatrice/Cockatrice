@@ -1,11 +1,11 @@
 #include "game_view.h"
 
-#include "../settings/cache_settings.h"
 #include "game_scene.h"
 
 #include <QAction>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/settings/cache_settings.h>
 
 GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, parent), rubberBand(0)
 {

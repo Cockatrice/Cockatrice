@@ -7,14 +7,14 @@
 
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
-#include "../../../server/abstract_client.h"
-#include "../../../tabs/tab_supervisor.h"
+#include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../cards/card_info_picture_art_crop_widget.h"
 #include "home_styled_button.h"
 
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QWidget>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 
 class HomeWidget : public QWidget
 {

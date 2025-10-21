@@ -4,25 +4,39 @@ permissions:
   contents: write
   id-token: write
   attestations: write
+  actions: write # needed for ccache action to be able to delete gha caches
 
 on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'
     tags:
       - '*'
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
@@ -232,10 +246,11 @@ jobs:
         include:
           - target: 13
             soc: Intel
-            os: macos-13
-            xcode: "14.3.1"
+            os: macos-15-intel
+            xcode: "16.4"
             type: Release
             make_package: 1
+            override_target: 13
 
           - target: 14
             soc: Apple
@@ -247,7 +262,7 @@ jobs:
           - target: 15
             soc: Apple
             os: macos-15
-            xcode: "16.2"
+            xcode: "16.4"
             type: Release
             make_package: 1
 
@@ -312,6 +327,7 @@ jobs:
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
 
       - name: Sign app bundle

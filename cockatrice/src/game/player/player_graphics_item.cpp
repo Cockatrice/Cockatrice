@@ -1,6 +1,6 @@
 #include "player_graphics_item.h"
 
-#include "../../tabs/tab_game.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../hand_counter.h"
 
 PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)

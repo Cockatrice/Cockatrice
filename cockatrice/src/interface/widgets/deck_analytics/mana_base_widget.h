@@ -7,12 +7,12 @@
 #ifndef MANA_BASE_WIDGET_H
 #define MANA_BASE_WIDGET_H
 
-#include "../../../deck/deck_list_model.h"
 #include "../general/display/banner_widget.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
-#include <deck_list.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/deck_list_model.h>
 #include <utility>
 
 class ManaBaseWidget : public QWidget

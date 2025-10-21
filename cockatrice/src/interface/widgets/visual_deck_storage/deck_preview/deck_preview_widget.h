@@ -7,7 +7,6 @@
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../../../deck/deck_loader.h"
 #include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_widget.h"
@@ -19,6 +18,7 @@
 #include <QEvent>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <libcockatrice/deck_list/deck_loader.h>
 
 class QMenu;
 class VisualDeckStorageWidget;

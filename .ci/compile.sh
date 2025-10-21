@@ -11,7 +11,8 @@
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR
+# --target-macos-version <version> sets the min os version - only used for macOS builds
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
@@ -79,6 +80,15 @@ while [[ $# != 0 ]]; do
       BUILD_DIR="$1"
       shift
       ;;
+    '--target-macos-version')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--target-macos-version expects an argument"
+        exit 3
+      fi
+      TARGET_MACOS_VERSION="$1"
+      shift
+      ;;
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -139,9 +149,34 @@ function ccachestatsverbose() {
 
 # Compile
 if [[ $RUNNER_OS == macOS ]]; then
+  if [[ $TARGET_MACOS_VERSION ]]; then
+    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
+    flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
+
+    # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
+    # an easy way is to copy the x64-osx.cmake file and modify it
+    triplets_dir="/tmp/cmake/triplets"
+    triplet_version="custom-triplet"
+    triplet_file="$triplets_dir/$triplet_version.cmake"
+    arch=$(uname -m)
+    if [[ $arch == x86_64 ]]; then
+      arch="x64"
+    fi
+    mkdir -p "$triplets_dir"
+    cp "../vcpkg/triplets/$arch-osx.cmake" "$triplet_file"
+    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
+    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
+    flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
+    flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
+    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
+    echo "::group::Generated triplet $triplet_file"
+    cat "$triplet_file"
+    echo "::endgroup::"
+  fi
+
   echo "::group::Signing Certificate"
   if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
-    echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+    echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
     security default-keychain -s build.keychain
     security set-keychain-settings -t 3600 -l build.keychain
@@ -153,6 +188,28 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "No signing certificate configured. Skipping set up of keychain in macOS environment."
   fi
   echo "::endgroup::"
+
+  if [[ $MAKE_PACKAGE ]]; then
+    # Workaround https://github.com/actions/runner-images/issues/7522
+    # have hdiutil repeat the command 10 times in hope of success
+    hdiutil_script="/tmp/hdiutil.sh"
+    # shellcheck disable=SC2016
+    echo '#!/bin/bash
+i=0
+while ! hdiutil "$@"; do
+  if (( ++i >= 10 )); then
+    echo "Error: hdiutil failed $i times!" >&2
+    break
+  fi
+  sleep 1
+done' >"$hdiutil_script"
+    chmod +x "$hdiutil_script"
+    flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
+  fi
+elif [[ $RUNNER_OS == Windows ]]; then
+  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
 if [[ $USE_CCACHE ]]; then
@@ -167,13 +224,7 @@ cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-if [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  cmake --build . "${buildflags[@]}" -- -p:UseMultiToolTask=true -p:EnableClServerMode=true
-else
-  cmake --build . "${buildflags[@]}"
-fi
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
@@ -197,11 +248,6 @@ fi
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   
-  if [[ $RUNNER_OS == macOS ]]; then
-    # Workaround https://github.com/actions/runner-images/issues/7522
-    echo "killing XProtectBehaviorService"; sudo pkill -9 XProtect >/dev/null || true;
-    echo "waiting for XProtectBehaviorService kill"; while pgrep "XProtect"; do sleep 3; done;
-  fi
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 

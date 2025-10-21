@@ -7,11 +7,10 @@
 #ifndef CARDFRAME_H
 #define CARDFRAME_H
 
-#include "../../../card/exact_card.h"
-#include "card_ref.h"
-
 #include <QPushButton>
 #include <QTabWidget>
+#include <libcockatrice/card/printing/exact_card.h>
+#include <libcockatrice/utility/card_ref.h>
 
 class AbstractCardItem;
 class CardInfoPictureWidget;

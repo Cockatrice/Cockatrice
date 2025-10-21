@@ -1,15 +1,14 @@
 #include "deck_editor_deck_dock_widget.h"
 
-#include "../../../database/card_database_manager.h"
-#include "../../../settings/cache_settings.h"
-
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
 #include <QSplitter>
 #include <QTextEdit>
-#include <trice_limits.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)
@@ -37,11 +36,11 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->sortByColumn(1, Qt::AscendingOrder);
     deckView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     deckView->installEventFilter(&deckViewKeySignals);
-    deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
     connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapCard);
+    deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
     connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapCard);
     connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
@@ -577,13 +576,14 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
-    QMenu menu;
+    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+        QMenu menu;
 
-    QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+        QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+        connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
-    connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
-
-    menu.exec(deckView->mapToGlobal(point));
+        menu.exec(deckView->mapToGlobal(point));
+    }
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()

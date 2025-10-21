@@ -1,14 +1,15 @@
 #include "player_menu.h"
 
-#include "../../../common/pb/command_reveal_cards.pb.h"
-#include "../../../database/card_database_manager.h"
-#include "../../../tabs/tab_game.h"
+#include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/hand_zone.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"
 #include "card_menu.h"
 #include "hand_menu.h"
+
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
 PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 {

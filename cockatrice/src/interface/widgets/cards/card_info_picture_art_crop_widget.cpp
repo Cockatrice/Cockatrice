@@ -1,6 +1,6 @@
 #include "card_info_picture_art_crop_widget.h"
 
-#include "../../../picture_loader/picture_loader.h"
+#include "../../../interface/card_picture_loader/card_picture_loader.h"
 
 CardInfoPictureArtCropWidget::CardInfoPictureArtCropWidget(QWidget *parent)
     : CardInfoPictureWidget(parent, false, false)
@@ -13,9 +13,9 @@ QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &target
     // Load the full-resolution card image, not a pre-scaled one
     QPixmap fullResPixmap;
     if (getCard()) {
-        PictureLoader::getPixmap(fullResPixmap, getCard(), QSize(745, 1040)); // or a high default size
+        CardPictureLoader::getPixmap(fullResPixmap, getCard(), QSize(745, 1040)); // or a high default size
     } else {
-        PictureLoader::getCardBackPixmap(fullResPixmap, QSize(745, 1040));
+        CardPictureLoader::getCardBackPixmap(fullResPixmap, QSize(745, 1040));
     }
 
     // Fail-safe if loading failed

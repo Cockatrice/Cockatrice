@@ -9,7 +9,8 @@
 
 #include "../zones/logic/card_zone_logic.h"
 #include "abstract_card_item.h"
-#include "server/game/server_card.h"
+
+#include <libcockatrice/network/server/remote/game/server_card.h>
 
 class CardDatabase;
 class CardDragItem;
