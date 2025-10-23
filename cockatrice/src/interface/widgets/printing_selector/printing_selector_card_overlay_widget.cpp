@@ -2,8 +2,13 @@
 
 #include "printing_selector_card_display_widget.h"
 
+#include <QGraphicsEffect>
+#include <QIcon>
+#include <QLabel>
 #include <QMenu>
+#include <QMessageBox>
 #include <QMouseEvent>
+#include <QStackedWidget>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
@@ -45,6 +50,39 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setScaleFactor(cardSizeSlider->value());
     cardInfoPicture->setCard(_rootCard);
     mainLayout->addWidget(cardInfoPicture);
+
+    // Pin badge shown when this printing is pinned (hidden by default)
+    pinBadge = new QLabel(this);
+    pinBadge->setObjectName(QStringLiteral("printingSelectorPinBadge"));
+
+    // try resource first, fallback to show visible text
+    QPixmap pinPix = QPixmap("theme:icons/pin");
+
+    if (!pinPix.isNull()) {
+        const double scaleFactor = 1;
+        const QSize targetSize(int(pinPix.width() * scaleFactor), int(pinPix.height() * scaleFactor));
+        pinPix = pinPix.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        pinBadge->setPixmap(pinPix);
+        pinBadge->setFixedSize(pinPix.size());
+        pinBadge->setStyleSheet("background: transparent;");
+    } else {
+        // visible fallback so you can see the badge even without the SVG
+        pinBadge->setText(QStringLiteral("PIN"));
+        pinBadge->setAlignment(Qt::AlignCenter);
+        pinBadge->setFixedSize(24, 12);
+        pinBadge->setStyleSheet("background: yellow; color: black; border: 1px solid red;");
+    }
+
+    pinBadge->setAttribute(Qt::WA_TransparentForMouseEvents);
+    pinBadge->setVisible(false);
+    pinBadge->raise();
+
+    // Update when this overlay emits cardPreferenceChanged or when size/scale changes
+    connect(this, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
+            &PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility);
+    connect(cardSizeSlider, &QSlider::valueChanged, this, &PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility);
+    // initial state
+    updatePinBadgeVisibility();
 
     // Add AllZonesCardAmountWidget
     allZonesCardAmountWidget =
@@ -127,6 +165,37 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 
     // Show the widget if amounts are 0
     allZonesCardAmountWidget->setVisible(true);
+}
+/**
+ * @brief Updates the pin badge visibility and position based on the card's pinned state.
+ *
+ * This method checks whether the current card printing is pinned and updates the
+ * pin badge accordingly. If the card is pinned, the badge is made visible and positioned in the
+ * top-right corner of the card image with appropriate margins. If the card is not pinned, the
+ * badge is hidden.
+ *
+ * The method is called whenever the card preference changes or the card size is adjusted via
+ * the slider to ensure the badge remains properly positioned.
+ */
+void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
+{
+    if (!pinBadge || !cardInfoPicture)
+        return;
+
+    const auto &preferredProviderId =
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard.getName());
+    const auto &cardProviderId = rootCard.getPrinting().getUuid();
+    const bool isPinned = (!preferredProviderId.isEmpty() && preferredProviderId == cardProviderId);
+
+    pinBadge->setVisible(isPinned);
+
+    if (isPinned) {
+        const int margin = qMax(3, int(cardInfoPicture->width() * 0.03));
+        int x = qMax(0, cardInfoPicture->width() - pinBadge->width() - margin);
+        int y = margin * 3;
+        pinBadge->move(x, y);
+        pinBadge->raise();
+    }
 }
 
 /**

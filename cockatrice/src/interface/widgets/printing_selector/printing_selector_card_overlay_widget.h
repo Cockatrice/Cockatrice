@@ -42,9 +42,13 @@ protected:
 signals:
     void cardPreferenceChanged();
 
+private slots:
+    void updatePinBadgeVisibility();
+
 private:
     CardInfoPictureWidget *cardInfoPicture;
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
+    QLabel *pinBadge = nullptr;
     AbstractTabDeckEditor *deckEditor;
     DeckListModel *deckModel;
     QTreeView *deckView;
