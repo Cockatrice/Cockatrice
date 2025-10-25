@@ -44,20 +44,15 @@ void ManaCurveWidget::setDeckModel(DeckListModel *deckModel)
 std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
 {
     manaCurveMap.clear();
-    InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
 
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-                if (info) {
-                    int cmc = info->getCmc().toInt();
-                    manaCurveMap[cmc]++;
-                }
+    QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
+
+    for (auto currentCard : cardsInDeck) {
+        for (int k = 0; k < currentCard->getNumber(); ++k) {
+            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+            if (info) {
+                int cmc = info->getCmc().toInt();
+                manaCurveMap[cmc]++;
             }
         }
     }
