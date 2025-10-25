@@ -14,7 +14,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="218"/>
         <source>Interface language:</source>
-        <translation type="unfinished"/>
+        <translation>Язык интерфейса:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="219"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="289"/>
         <source>Please specify a compatible source for the list of sets and cards. You can specify a URL address that will be downloaded or use an existing file from your computer.</source>
-        <translation type="unfinished"/>
+        <translation>Пожалуйста, укажите источник для перечня сетов и карт. Вы можете использовать ссылку или уже существующий локальный файл.</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="293"/>
@@ -63,7 +63,7 @@
         <location filename="src/oraclewizard.cpp" line="316"/>
         <source>Sets file (%1)</source>
         <oldsource>Sets JSON file (%1)</oldsource>
-        <translation type="unfinished"/>
+        <translation>Файл (%1)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="346"/>
@@ -114,12 +114,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="498"/>
         <source>Xz extraction failed.</source>
-        <translation type="unfinished"/>
+        <translation>Ошибка распаковки архива</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="505"/>
         <source>Sorry, this version of Oracle does not support xz compressed files.</source>
-        <translation type="unfinished"/>
+        <translation>Данная версия Oracle не поддерживает архивы xz</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="525"/>
@@ -144,12 +144,12 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="569"/>
         <source>Failed to interpret downloaded data.</source>
-        <translation type="unfinished"/>
+        <translation>Ошибка в обработке загруженных данных</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="582"/>
         <source>Do you want to download the uncompressed file instead?</source>
-        <translation type="unfinished"/>
+        <translation>Хотите вместо этого загрузить новую несжатую копию?</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="604"/>
@@ -162,22 +162,22 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="790"/>
         <source>Save spoiler database</source>
-        <translation type="unfinished"/>
+        <translation>Сохранить базу карт</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="795"/>
         <source>XML; spoiler database (*.xml)</source>
-        <translation type="unfinished"/>
+        <translation>XML; база карт (*.xml)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="800"/>
         <source>Spoilers import</source>
-        <translation type="unfinished"/>
+        <translation>Импорт карт</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="801"/>
         <source>Please specify a compatible source for spoiler data.</source>
-        <translation type="unfinished"/>
+        <translation>Укажите совместимый ресурс для импорта базы карт</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="803"/>
@@ -192,7 +192,7 @@
     <message>
         <location filename="src/oraclewizard.cpp" line="805"/>
         <source>The spoiler database will be saved at the following location:</source>
-        <translation type="unfinished"/>
+        <translation>База карт будет сохранена в следующей директории:</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="807"/>
@@ -246,7 +246,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="465"/>
+        <location filename="src/oracleimporter.cpp" line="466"/>
         <source>Dummy set containing tokens</source>
         <translation>Пример сета с фишками</translation>
     </message>

@@ -246,7 +246,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="465"/>
+        <location filename="src/oracleimporter.cpp" line="466"/>
         <source>Dummy set containing tokens</source>
         <translation>Set dedicado para tokens</translation>
     </message>
@@ -368,7 +368,7 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid: </source>
-        <translation type="unfinished"/>
+        <translation>La URL proporcionada no es válida:</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>
@@ -484,52 +484,52 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation> La operación ZIP se completó con éxito.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Fallo al iniciar o cargar la librería zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Error en la librería zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>No es posible crear o abrir el archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>No se ha creado ningún archivo todavía.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>El archivo o directorio no existe.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al leer el archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al escribir en archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Error al buscar en el archivo.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Error desconocido.</translation>
     </message>
 </context>
 <context>

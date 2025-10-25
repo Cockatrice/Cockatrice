@@ -247,7 +247,7 @@ e pedine che verranno usate da Cockatrice.</translation>
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="465"/>
+        <location filename="src/oracleimporter.cpp" line="466"/>
         <source>Dummy set containing tokens</source>
         <translation>Set finto contenente i token</translation>
     </message>
