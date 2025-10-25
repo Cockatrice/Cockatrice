@@ -6,10 +6,14 @@ on:
       - '*'   # Only re-generate docs when a new tagged version is pushed
   pull_request:
     paths:
+      - '**.h'
+      - '/doc/doxygen/**'
       - '.github/workflows/documentation-build.yml'
       - 'Doxyfile'
-      - 'doxygen_style.css'
   workflow_dispatch:
+
+env:
+  COCKATRICE_REF: ${{ github.ref_name }}    # Tag name if the commit is tagged, otherwise branch name
 
 jobs:
   docs:
@@ -17,21 +21,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v5
 
       - name: Install Doxygen and Graphviz
+        shell: bash
         run: sudo apt-get install -y doxygen graphviz
 
       - name: Generate Documentation
+        shell: bash
         run: doxygen Doxyfile
 
-      - name: Deploy to cockatrice.github.io
+      - name: Upload Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cockatrice_Docs
+          path: ./docs/html    # Main output folder + subfolder defined in Doxygen config 
+          if-no-files-found: error
+
+      - name: Deploy to cockatrice.github.io/docs
         if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
-          publish_dir: ./docs/html
-          destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
+          publish_dir: ./docs/html    # Main output folder + subfolder defined in Doxygen config 
+          destination_dir: docs    # Subfolder of the GitHub Pages URL where the docs live
+
+      - name: Link to Documentation Page
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: echo "::notice title=New documentation published ::Shortly available at https://cockatrice.github.io/docs/"
