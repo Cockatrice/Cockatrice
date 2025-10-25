@@ -25,8 +25,8 @@ const Room = (props) => {
 
   const roomId = parseInt(params.roomId, 0);
   const room = rooms[roomId];
-  const roomMessages = messages[roomId];
-  const users = room.userList;
+  const roomMessages = messages[roomId] || [];
+  const users = room?.userList || [];
 
   useEffect(() => {
     if (!joined.find(({ roomId: id }) => id === roomId)) {
@@ -38,6 +38,16 @@ const Room = (props) => {
     if (message) {
       RoomsService.roomSay(roomId, message);
     }
+  }
+
+  // Guard against undefined room data
+  if (!room) {
+    return (
+      <Layout className="room-view">
+        <AuthGuard />
+        <div>Loading room...</div>
+      </Layout>
+    );
   }
 
   return (
