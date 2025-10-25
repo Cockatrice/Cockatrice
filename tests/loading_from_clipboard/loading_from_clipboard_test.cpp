@@ -203,6 +203,22 @@ TEST(LoadingFromClipboardTest, emptyMainBoard)
     testEmpty(clipboard);
 }
 
+TEST(LoadingFromClipboardTest, emptyHash)
+{
+    QString clipboard("");
+
+    testHash(clipboard, "r8sq7riu");
+}
+
+TEST(LoadingFromClipboardTest, deckHash)
+{
+    QString clipboard("1 Mountain\n"
+                      "2 Island\n"
+                      "SB: 3 Forest\n");
+
+    testHash(clipboard, "5cac19qm");
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
