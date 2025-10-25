@@ -637,13 +637,13 @@ void SaveSetsPage::initializePage()
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
         messageLog->hide();
-        return;
-    }
-    messageLog->show();
-    connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
+    } else {
+        messageLog->show();
+        connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
 
-    if (!wizard()->importer->startImport()) {
-        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+        if (!wizard()->importer->startImport()) {
+            QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+        }
     }
 
     if (wizard()->backgroundMode) {
