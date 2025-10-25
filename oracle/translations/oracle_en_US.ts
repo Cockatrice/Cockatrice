@@ -63,7 +63,7 @@
         <location filename="src/oraclewizard.cpp" line="316"/>
         <source>Sets file (%1)</source>
         <oldsource>Sets JSON file (%1)</oldsource>
-        <translation type="unfinished"/>
+        <translation>Sets file (%1)</translation>
     </message>
     <message>
         <location filename="src/oraclewizard.cpp" line="346"/>
@@ -246,7 +246,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="465"/>
+        <location filename="src/oracleimporter.cpp" line="466"/>
         <source>Dummy set containing tokens</source>
         <translation>Dummy set containing tokens</translation>
     </message>
@@ -368,7 +368,7 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="73"/>
         <source>The provided URL is not valid: </source>
-        <translation type="unfinished"/>
+        <translation>The provided URL is not valid: </translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="77"/>
@@ -550,7 +550,7 @@
     <message>
         <location filename="src/main.cpp" line="63"/>
         <source>Run in no-confirm background mode</source>
-        <translation type="unfinished"/>
+        <translation>Run in no-confirm background mode</translation>
     </message>
 </context>
 </TS>
