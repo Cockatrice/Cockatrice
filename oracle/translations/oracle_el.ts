@@ -396,87 +396,87 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1175"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Η λειτουργία ZIP ολοκληρώθηκε με επιτυχία.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1176"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν ήταν δυνατή η προετοιμασία ή η φόρτωση της βιβλιοθήκης zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1177"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation> Σφάλμα βιβλιοθήκης zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1178"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν είναι δυνατή η δημιουργία ή το άνοιγμα αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1179"/>
         <source>Partially corrupted archive. Some files might be extracted.</source>
-        <translation type="unfinished"/>
+        <translation>Μερικώς κατεστραμμένο αρχείο. Κάποια αρχεία ενδέχεται να εξαχθούν.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1180"/>
         <source>Corrupted archive.</source>
-        <translation type="unfinished"/>
+        <translation>Κατεστραμμένο αρχείο.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Λάθος κωδικός.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν έχει δημιουργηθεί κανένα αρχείο ακόμα.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1183"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Το αρχείο ή ο κατάλογος δεν υπάρχει.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα ανάγνωσης αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα εγγραφής αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα αναζήτησης αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
         <source>Unable to create a directory.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν είναι δυνατή η δημιουργία ενός καταλόγου.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1188"/>
         <source>Invalid device.</source>
-        <translation type="unfinished"/>
+        <translation>Μη έγκυρη συσκευή.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1189"/>
         <source>Invalid or incompatible zip archive.</source>
-        <translation type="unfinished"/>
+        <translation>Μη έγκυρο ή ασυμβίβαστο zip αρχείο.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1190"/>
         <source>Inconsistent headers. Archive might be corrupted.</source>
-        <translation type="unfinished"/>
+        <translation>Αντιφατικές κεφαλίδες. Το αρχείο μπορεί να είναι κατεστραμμένο.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Άγνωστο σφάλμα.</translation>
     </message>
 </context>
 <context>
@@ -484,52 +484,52 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1604"/>
         <source>ZIP operation completed successfully.</source>
-        <translation type="unfinished"/>
+        <translation>Η λειτουργία ZIP ολοκληρώθηκε με επιτυχία.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1605"/>
         <source>Failed to initialize or load zlib library.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν ήταν δυνατή η προετοιμασία ή η φόρτωση της βιβλιοθήκης zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1606"/>
         <source>zlib library error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα βιβλιοθήκης zlib.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν είναι δυνατή η δημιουργία ή το άνοιγμα αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
         <source>No archive has been created yet.</source>
-        <translation type="unfinished"/>
+        <translation>Δεν έχει δημιουργηθεί αρχείο ακόμα.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1609"/>
         <source>File or directory does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Το αρχείο ή ο κατάλογος δεν υπάρχει.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα ανάγνωσης αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα εγγραφής αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Σφάλμα αναζήτησης αρχείου.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Άγνωστο σφάλμα.</translation>
     </message>
 </context>
 <context>

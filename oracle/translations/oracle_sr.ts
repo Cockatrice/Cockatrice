@@ -426,7 +426,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1181"/>
         <source>Wrong password.</source>
-        <translation type="unfinished"/>
+        <translation>Pogrešna lozinka.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1182"/>
@@ -441,17 +441,17 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1184"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u čitanju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1185"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u pisanju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1186"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u traženju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/unzip.cpp" line="1187"/>
@@ -476,7 +476,7 @@
     <message>
         <location filename="src/zip/unzip.cpp" line="1194"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Nepoznata greška.</translation>
     </message>
 </context>
 <context>
@@ -499,7 +499,7 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1607"/>
         <source>Unable to create or open file.</source>
-        <translation type="unfinished"/>
+        <translation>Nemoguće napraviti ili otvoriti fajl.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1608"/>
@@ -514,22 +514,22 @@
     <message>
         <location filename="src/zip/zip.cpp" line="1610"/>
         <source>File read error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u čitanju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1611"/>
         <source>File write error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u pisanju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1612"/>
         <source>File seek error.</source>
-        <translation type="unfinished"/>
+        <translation>Greška u traženju fajla.</translation>
     </message>
     <message>
         <location filename="src/zip/zip.cpp" line="1616"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"/>
+        <translation>Nepoznata greška.</translation>
     </message>
 </context>
 <context>
