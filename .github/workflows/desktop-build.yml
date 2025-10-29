@@ -303,6 +303,7 @@ jobs:
           - os: Windows
             target: 7
             runner: windows-2022
+            type: Release
             make_package: 1
             package_suffix: "-Win7"
             artifact_name: "Windows7-installer"
@@ -313,6 +314,7 @@ jobs:
           - os: Windows
             target: 10
             runner: windows-2022
+            type: Release
             make_package: 1
             package_suffix: "-Win10"
             artifact_name: "Windows10-installer"
