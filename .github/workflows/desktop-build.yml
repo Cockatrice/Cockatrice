@@ -250,16 +250,18 @@ jobs:
             soc: Intel
             xcode: "16.4"
             type: Release
-            make_package: 1
             override_target: 13
+            make_package: 1
+            package_suffix: "-macOS13_Intel"
 
           - os: macOS
             target: 14
             runner: macos-14
-            soc: Apple      
+            soc: Apple
             xcode: "15.4"
             type: Release
             make_package: 1
+            package_suffix: "-macOS14"
 
           - os: macOS
             target: 15
@@ -268,6 +270,7 @@ jobs:
             xcode: "16.4"
             type: Release
             make_package: 1
+            package_suffix: "-macOS15"
 
           - os: macOS
             target: 15
@@ -275,17 +278,20 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
+            package_suffix: "-macOS15_Debug"
 
           - os: Windows
             target: 7
             runner: windows-2022
             make_package: 1
+            package_suffix: "-Win7"
             qt_version: 5.15.*
 
           - os: Windows
             target: 10
             runner: windows-2022
             make_package: 1
+            package_suffix: "-Win10"
             qt_version: 6.6.*
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -339,14 +345,12 @@ jobs:
       - name: Configure macOS
         if: matrix.os == 'macOS'
         run: |
-          echo "PACKAGE_SUFFIX=-macOS${{ matrix.target }}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=${{ matrix.os }}${{ matrix.target }}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-package" >> $GITHUB_ENV
 
       - name: Configure Windows
         if: matrix.os == 'Windows'
         shell: bash # needs to be bash to export environment variables via GITHUB_ENV
         run: |
-          echo "PACKAGE_SUFFIX=-Win${{ matrix.target }}" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=${{ matrix.os }}${{ matrix.target }}-installer" >> $GITHUB_ENV
 
       # uses environment variables, see compile.sh for more details
@@ -356,6 +360,7 @@ jobs:
         env:
           BUILDTYPE: '${{ matrix.type }}'
           MAKE_PACKAGE: '${{ matrix.make_package }}'
+          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           CMAKE_GENERATOR: ${{ matrix.os == 'macOS' && 'Ninja' || 'Visual Studio 17 2022' }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.os == 'Windows' && 'x64' || '' }}
           USE_CCACHE: ${{ matrix.os == 'macOS' && '1' || '' }}
