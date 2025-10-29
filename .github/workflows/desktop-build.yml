@@ -258,6 +258,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false # qt caches take too much space for macOS (1.1Gi)
+            cmake_generator: "Ninja"
 
           - os: macOS
             target: 14
@@ -272,6 +273,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
+            cmake_generator: "Ninja"
 
           - os: macOS
             target: 15
@@ -286,6 +288,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
+            cmake_generator: "Ninja"
 
           - os: macOS
             target: 15
@@ -299,6 +302,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
+            cmake_generator: "Ninja"
 
           - os: Windows
             target: 7
@@ -310,6 +314,8 @@ jobs:
             qt_version: 5.15.*
             qt_arch: win64_msvc2019_64
             cache_qt: true
+            cmake_generator: "Visual Studio 17 2022"
+            cmake_generator_platform: x64
 
           - os: Windows
             target: 10
@@ -322,6 +328,8 @@ jobs:
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: true
+            cmake_generator: "Visual Studio 17 2022"
+            cmake_generator_platform: x64
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -373,8 +381,8 @@ jobs:
           BUILDTYPE: '${{ matrix.type }}'
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
-          CMAKE_GENERATOR: ${{ matrix.os == 'macOS' && 'Ninja' || 'Visual Studio 17 2022' }}
-          CMAKE_GENERATOR_PLATFORM: ${{ matrix.os == 'Windows' && 'x64' || '' }}
+          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           USE_CCACHE: ${{ matrix.os == 'macOS' && '1' || '' }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
