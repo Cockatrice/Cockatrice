@@ -253,12 +253,12 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            artifact_name: "macOS13_Intel-package"
+            artifact_name: macOS13_Intel-package
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false # qt caches take too much space for macOS (1.1Gi)
-            cmake_generator: "Ninja"
+            cmake_generator: Ninja
             use_ccache: 1
 
           - os: macOS
@@ -269,12 +269,12 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            artifact_name: "macOS14-package"
+            artifact_name: macOS14-package
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
-            cmake_generator: "Ninja"
+            cmake_generator: Ninja
             use_ccache: 1
 
           - os: macOS
@@ -285,12 +285,12 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            artifact_name: "macOS15-package"
+            artifact_name: macOS15-package
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
-            cmake_generator: "Ninja"
+            cmake_generator: Ninja
             use_ccache: 1
           - os: macOS
             target: 15
@@ -299,12 +299,12 @@ jobs:
             xcode: "16.4"
             type: Debug
             package_suffix: "-macOS15_Debug"
-            artifact_name: "macOS15_Debug-package"
+            artifact_name: macOS15_Debug-package
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
-            cmake_generator: "Ninja"
+            cmake_generator: Ninja
             use_ccache: 1
           - os: Windows
             target: 7
@@ -312,7 +312,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win7"
-            artifact_name: "Windows7-installer"
+            artifact_name: Windows7-installer
             qt_version: 5.15.*
             qt_arch: win64_msvc2019_64
             cache_qt: true
@@ -325,7 +325,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            artifact_name: "Windows10-installer"
+            artifact_name: Windows10-installer
             qt_version: 6.6.*
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
