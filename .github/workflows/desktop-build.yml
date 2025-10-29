@@ -259,6 +259,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false # qt caches take too much space for macOS (1.1Gi)
             cmake_generator: "Ninja"
+            use_ccache: 1
 
           - os: macOS
             target: 14
@@ -274,6 +275,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
             cmake_generator: "Ninja"
+            use_ccache: 1
 
           - os: macOS
             target: 15
@@ -289,7 +291,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
             cmake_generator: "Ninja"
-
+            use_ccache: 1
           - os: macOS
             target: 15
             runner: macos-15
@@ -303,7 +305,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cache_qt: false
             cmake_generator: "Ninja"
-
+            use_ccache: 1
           - os: Windows
             target: 7
             runner: windows-2022
@@ -383,7 +385,7 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
-          USE_CCACHE: ${{ matrix.os == 'macOS' && '1' || '' }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           # macOS-specific environment variables, will be ignored on Windows
