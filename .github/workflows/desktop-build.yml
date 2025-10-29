@@ -333,9 +333,9 @@ jobs:
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+    name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{matrix.runner}}
 
     steps:
       - name: Checkout
@@ -357,17 +357,17 @@ jobs:
         uses: jianmingyong/ccache-action@v1
         with:
           install-type: "binary"
-          ccache-key-prefix: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}
+          ccache-key-prefix: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
           max-size: 500M
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Qt ${{ matrix.qt_version }}
+      - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ matrix.qt_version }}
-          arch: ${{ matrix.qt_arch }}
-          modules: ${{ matrix.qt_modules }}
-          cache: ${{ matrix.cache_qt }}
+          version: ${{matrix.qt_version}}
+          arch: ${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
+          cache: ${{matrix.cache_qt}}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
@@ -380,12 +380,12 @@ jobs:
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{ matrix.type }}'
-          MAKE_PACKAGE: '${{ matrix.make_package }}'
-          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
-          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
-          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
-          USE_CCACHE: ${{ matrix.use_ccache }}
+          BUILDTYPE: '${{matrix.type}}'
+          MAKE_PACKAGE: '${{matrix.make_package}}'
+          PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
+          CMAKE_GENERATOR: ${{matrix.cmake_generator}}
+          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
+          USE_CCACHE: ${{matrix.use_ccache}}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           # macOS-specific environment variables, will be ignored on Windows
@@ -393,7 +393,7 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
@@ -406,7 +406,7 @@ jobs:
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{ steps.build.outputs.path }}
+            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
           fi
 
       - name: Notarize app bundle
@@ -426,7 +426,7 @@ jobs:
             # Therefore, we create a zip file containing our app bundle, so that we can send it to the
             # notarization service
             echo "Creating temp notarization archive"
-            ditto -c -k --keepParent ${{ steps.build.outputs.path }} "notarization.zip"
+            ditto -c -k --keepParent ${{steps.build.outputs.path}} "notarization.zip"
 
             # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
             # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
@@ -438,7 +438,7 @@ jobs:
             # Finally, we need to "attach the staple" to our executable, which will allow our app to be
             # validated by macOS even when an internet connection is not available.
             echo "Attach staple"
-            xcrun stapler staple ${{ steps.build.outputs.path }}
+            xcrun stapler staple ${{steps.build.outputs.path}}
           fi
 
       - name: Upload artifact
@@ -446,15 +446,15 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: ${{ steps.build.outputs.path }}
+          name: ${{matrix.artifact_name}}
+          path: ${{steps.build.outputs.path}}
           if-no-files-found: error
 
       - name: Upload pdb database
         if: matrix.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: Windows${{ matrix.target }}-debug-pdbs
+          name: Windows${{matrix.target}}-debug-pdbs
           path: |
             build/cockatrice/Release/*.pdb
             build/servatrice/Release/*.pdb
@@ -465,10 +465,10 @@ jobs:
         if: needs.configure.outputs.tag != null
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
-          asset_path: ${{ steps.build.outputs.path }}
-          asset_name: ${{ steps.build.outputs.name }}
+          GH_TOKEN: ${{github.token}}
+          tag_name: ${{needs.configure.outputs.tag}}
+          asset_path: ${{steps.build.outputs.path}}
+          asset_name: ${{steps.build.outputs.name}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: Attest binary provenance
@@ -476,12 +476,12 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ${{ steps.build.outputs.name }}
+          subject-name: ${{steps.build.outputs.name}}
           subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
 
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify ${{ steps.build.outputs.path }} -R Cockatrice/Cockatrice
+          GH_TOKEN: ${{github.token}}
+        run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
