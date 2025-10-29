@@ -254,6 +254,10 @@ jobs:
             make_package: 1
             package_suffix: "-macOS13_Intel"
             artifact_name: "macOS13_Intel-package"
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cache_qt: false # qt caches take too much space for macOS (1.1Gi)
 
           - os: macOS
             target: 14
@@ -264,6 +268,10 @@ jobs:
             make_package: 1
             package_suffix: "-macOS14"
             artifact_name: "macOS14-package"
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cache_qt: false
 
           - os: macOS
             target: 15
@@ -274,6 +282,10 @@ jobs:
             make_package: 1
             package_suffix: "-macOS15"
             artifact_name: "macOS15-package"
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cache_qt: false
 
           - os: macOS
             target: 15
@@ -283,6 +295,10 @@ jobs:
             type: Debug
             package_suffix: "-macOS15_Debug"
             artifact_name: "macOS15_Debug-package"
+            qt_version: 6.6.*
+            qt_arch: clang_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cache_qt: false
 
           - os: Windows
             target: 7
@@ -291,6 +307,8 @@ jobs:
             package_suffix: "-Win7"
             artifact_name: "Windows7-installer"
             qt_version: 5.15.*
+            qt_arch: win64_msvc2019_64
+            cache_qt: true
 
           - os: Windows
             target: 10
@@ -299,16 +317,13 @@ jobs:
             package_suffix: "-Win10"
             artifact_name: "Windows10-installer"
             qt_version: 6.6.*
+            qt_arch: win64_msvc2019_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cache_qt: true
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{ matrix.runner }}
-    env:
-      # Common parameters for all builds
-      QT_VERSION: ${{ matrix.qt_version || '6.6.*' }}
-      QT_ARCH: ${{ matrix.os == 'macOS' && 'clang_64' || 'win64_msvc2019_64' }}
-      QT_MODULES: ${{ matrix.qt_version != '5.15.*' && 'qtimageformats qtmultimedia qtwebsockets' || '' }}
-      CACHE_QT: ${{ matrix.os != 'macOS' && 'true' || 'false' }} # qt caches take too much space for macOS (1.1Gi)
 
     steps:
       - name: Checkout
@@ -334,13 +349,13 @@ jobs:
           max-size: 500M
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Qt ${{ env.QT_VERSION }}
+      - name: Install Qt ${{ matrix.qt_version }}
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ env.QT_VERSION }}
-          arch: ${{ env.QT_ARCH }}
-          modules: ${{ env.QT_MODULES }}
-          cache: ${{ env.CACHE_QT }}
+          version: ${{ matrix.qt_version }}
+          arch: ${{ matrix.qt_arch }}
+          modules: ${{ matrix.qt_modules }}
+          cache: ${{ matrix.cache_qt }}
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
