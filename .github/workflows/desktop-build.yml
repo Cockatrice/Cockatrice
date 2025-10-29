@@ -253,6 +253,7 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
+            artifact_name: "macOS13_Intel-package"
 
           - os: macOS
             target: 14
@@ -262,6 +263,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
+            artifact_name: "macOS14-package"
 
           - os: macOS
             target: 15
@@ -271,6 +273,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
+            artifact_name: "macOS15-package"
 
           - os: macOS
             target: 15
@@ -279,12 +282,14 @@ jobs:
             xcode: "16.4"
             type: Debug
             package_suffix: "-macOS15_Debug"
+            artifact_name: "macOS15_Debug-package"
 
           - os: Windows
             target: 7
             runner: windows-2022
             make_package: 1
             package_suffix: "-Win7"
+            artifact_name: "Windows7-installer"
             qt_version: 5.15.*
 
           - os: Windows
@@ -292,6 +297,7 @@ jobs:
             runner: windows-2022
             make_package: 1
             package_suffix: "-Win10"
+            artifact_name: "Windows10-installer"
             qt_version: 6.6.*
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -341,17 +347,6 @@ jobs:
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Configure macOS
-        if: matrix.os == 'macOS'
-        run: |
-          echo "ARTIFACT_NAME=${{ matrix.os }}${{ matrix.target }}${{ matrix.soc == 'Intel' && '_Intel' || '' }}${{ matrix.type == 'Debug' && '_Debug' || '' }}-package" >> $GITHUB_ENV
-
-      - name: Configure Windows
-        if: matrix.os == 'Windows'
-        shell: bash # needs to be bash to export environment variables via GITHUB_ENV
-        run: |
-          echo "ARTIFACT_NAME=${{ matrix.os }}${{ matrix.target }}-installer" >> $GITHUB_ENV
 
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
@@ -424,7 +419,7 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: ${{ matrix.artifact_name }}
           path: ${{ steps.build.outputs.path }}
           if-no-files-found: error
 
