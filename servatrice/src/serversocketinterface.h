@@ -146,7 +146,9 @@ public:
     AbstractServerSocketInterface(Servatrice *_server,
                                   Servatrice_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
-    ~AbstractServerSocketInterface(){};
+    ~AbstractServerSocketInterface()
+    {
+    }
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;

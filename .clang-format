@@ -25,6 +25,9 @@ IndentCaseLabels: true
 PointerAlignment: Right
 SortIncludes: true
 IncludeBlocks: Regroup
+StatementAttributeLikeMacros: [emit]
+# requires clang-format 16
+# RemoveSemicolon: true
 ---
 Language: Proto
 AllowShortFunctionsOnASingleLine: None
