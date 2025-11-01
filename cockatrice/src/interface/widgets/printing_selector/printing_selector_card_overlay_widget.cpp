@@ -3,17 +3,21 @@
 #include "printing_selector_card_display_widget.h"
 
 #include <QGraphicsEffect>
+#include <QImageReader>
 #include <QIcon>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QSvgRenderer>
 #include <QStackedWidget>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <utility>
+#include <cmath>
 
 /**
  * @brief Constructs a PrintingSelectorCardOverlayWidget for displaying a card overlay.
@@ -55,17 +59,28 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     pinBadge = new QLabel(this);
     pinBadge->setObjectName(QStringLiteral("printingSelectorPinBadge"));
 
-    // try resource first, fallback to show visible text
-    QPixmap pinPix = QPixmap("theme:icons/pin");
+    bool pinLoaded = false;
+    QImageReader pinReader(QStringLiteral("theme:icons/pin"));
 
-    if (!pinPix.isNull()) {
-        const double scaleFactor = 1;
-        const QSize targetSize(int(pinPix.width() * scaleFactor), int(pinPix.height() * scaleFactor));
-        pinPix = pinPix.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        pinBadge->setPixmap(pinPix);
-        pinBadge->setFixedSize(pinPix.size());
-        pinBadge->setStyleSheet("background: transparent;");
-    } else {
+    if (pinReader.canRead()) {
+        const QSize targetSize(64, 64);
+        const qreal dpr = pinBadge->devicePixelRatioF();
+        const QSize rasterSize(
+            qMax(1, static_cast<int>(std::ceil(targetSize.width() * dpr))),
+            qMax(1, static_cast<int>(std::ceil(targetSize.height() * dpr))));
+        pinReader.setScaledSize(rasterSize);
+        const QImage pinImage = pinReader.read();
+        if (!pinImage.isNull()) {
+            QPixmap pinPix = QPixmap::fromImage(pinImage);
+            pinPix.setDevicePixelRatio(dpr);
+            pinBadge->setPixmap(pinPix);
+            pinBadge->setFixedSize(targetSize);
+            pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
+            pinLoaded = true;
+        }
+    }
+
+    if (!pinLoaded) {
         // visible fallback so you can see the badge even without the SVG
         pinBadge->setText(QStringLiteral("PIN"));
         pinBadge->setAlignment(Qt::AlignCenter);
