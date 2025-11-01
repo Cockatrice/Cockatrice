@@ -342,7 +342,7 @@ jobs:
           echo ""
           find build -maxdepth 3 -name "*.app" -print
           echo ""          
-          vtool -show-build build/cockatrice/cockatrice.app
+          vtool -show-build build/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
           otool -l build/cockatrice/cockatrice.app
           otool -L build/cockatrice/cockatrice.app
           file build/cockatrice/cockatrice.app
