@@ -78,20 +78,14 @@ void ManaBaseWidget::updateDisplay()
 QHash<QString, int> ManaBaseWidget::analyzeManaBase()
 {
     manaBaseMap.clear();
-    InnerDecklistNode *listRoot = deckListModel->getDeckList()->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
+    QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
 
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-                if (info) {
-                    auto devotion = determineManaProduction(info->getText());
-                    mergeManaCounts(manaBaseMap, devotion);
-                }
+    for (auto currentCard : cardsInDeck) {
+        for (int k = 0; k < currentCard->getNumber(); ++k) {
+            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+            if (info) {
+                auto devotion = determineManaProduction(info->getText());
+                mergeManaCounts(manaBaseMap, devotion);
             }
         }
     }

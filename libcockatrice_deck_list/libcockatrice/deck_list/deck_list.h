@@ -289,6 +289,7 @@ public:
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
+    QList<DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
     int getSideboardSize() const;
     InnerDecklistNode *getRoot() const
     {
