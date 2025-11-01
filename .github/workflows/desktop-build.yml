@@ -4,7 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
-  actions: write # needed for ccache action to be able to delete gha caches
+  actions: write    # needed for ccache action to be able to delete gha caches
 
 on:
   push:
@@ -149,7 +149,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}    # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
@@ -284,8 +284,7 @@ jobs:
       # Build-specific environment variables
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
       CCACHE_SIZE: 500M
-      DEVELOPER_DIR:
-        /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -308,18 +307,18 @@ jobs:
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
-          cache: false # qt caches take too much space for macOS (1.1Gi)
+          cache: false    # qt caches take too much space for macOS (1.1Gi)
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
 
-      - name: Setup vcpkg cache
+      - name: Setup vcpkg cache${{ matrix.soc == 'Intel' && ' (targeting Intel arch)' || '' }}
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build on Xcode ${{matrix.xcode}}
+      - name: Build on Xcode ${{ matrix.xcode }}${{ matrix.override_target && format(' (targeting macOS {0})', matrix.override_target) || '' }}
         shell: bash
         id: build
         env:
@@ -335,6 +334,17 @@ jobs:
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
+
+      - name: Inspect details of Mach-O binaries
+        shell: bash
+        run: |
+          for app in cockatrice oracle servatrice dbconverter; do
+            bin="build/$app/$app.app/Contents/MacOS/$app"
+            echo -e "\nInspecting $app..."
+            vtool -show-build "$bin"
+            file "$bin"
+            lipo -info "$bin"
+          done
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
