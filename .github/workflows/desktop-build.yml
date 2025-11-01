@@ -312,7 +312,7 @@ jobs:
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
 
-      - name: Setup vcpkg cache
+      - name: Setup vcpkg cache${{ matrix.soc == 'Intel' && ' (targeting Intel arch)' || '' }}
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
@@ -335,30 +335,24 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
 
-      - name: Inspect & print details of Mach-O binaries
+      - name: Inspect details of Mach-O binaries
         shell: bash
-        run: |
-          echo "${{steps.build.outputs.path}}"
-          echo ""
-          find build -maxdepth 3 -name "*.app" -print
-          echo ""          
+        run: |        
           vtool -show-build build/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
-          otool -l build/cockatrice/cockatrice.app
-          otool -L build/cockatrice/cockatrice.app
-          file build/cockatrice/cockatrice.app
-          lipo -info build/cockatrice/cockatrice.app
-          echo ""
-          vtool -show-build build/oracle/oracle.app
-          otool -l build/oracle/oracle.app
-          file build/oracle/oracle.app
-          echo ""
-          vtool -show-build build/servatrice/servatrice.app
-          otool -l build/servatrice/servatrice.app
-          file build/servatrice/servatrice.app
-          echo ""
-          vtool -show-build build/dbconverter/dbconverter.app
-          otool -l build/dbconverter/dbconverter.app
-          file build/dbconverter/dbconverter.app
+          file build/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
+          lipo -info build/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
+          echo
+          vtool -show-build build/oracle/oracle.app/Contents/MacOS/oracle
+          file build/oracle/oracle.app/Contents/MacOS/oracle
+          lipo -info build/oracle/oracle.app/Contents/MacOS/oracle
+          echo
+          vtool -show-build build/servatrice/servatrice.app/Contents/MacOS/servatrice
+          file build/servatrice/servatrice.app/Contents/MacOS/servatrice
+          lipo -info build/servatrice/servatrice.app/Contents/MacOS/servatrice
+          echo
+          vtool -show-build build/dbconverter/dbconverter.app/Contents/MacOS/dbconverter
+          file build/dbconverter/dbconverter.app/Contents/MacOS/dbconverter
+          lipo -info build/dbconverter/dbconverter.app/Contents/MacOS/dbconverter
 
       - name: Sign app bundle
         if: matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
