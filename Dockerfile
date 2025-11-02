@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y\
   && rm -rf /var/lib/apt/lists/*    # Cleanup
 
 # Order from least changing at the top to more frequently changing at the bottom
-COPY ./libcockatrice_network/libcockatrice/network/server /home/servatrice/code/libcockatrice_network/libcockatrice/network/server
+COPY ./libcockatrice_network /home/servatrice/code/libcockatrice_network
 COPY ./libcockatrice_protocol /home/servatrice/code/libcockatrice_protocol
 COPY ./libcockatrice_rng /home/servatrice/code/libcockatrice_rng
 COPY ./servatrice /home/servatrice/code/servatrice
