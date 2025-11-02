@@ -21,7 +21,7 @@ COPY ./libcockatrice_protocol /home/servatrice/code/libcockatrice_protocol
 COPY ./libcockatrice_rng /home/servatrice/code/libcockatrice_rng
 COPY ./servatrice /home/servatrice/code/servatrice
 COPY ./cmake /home/servatrice/code/cmake
-COPY ./CMakeLists.txt /home/servatrice/code/
+COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
 COPY ./libcockatrice_network /home/servatrice/code/libcockatrice_network
 COPY ./libcockatrice_utility /home/servatrice/code/libcockatrice_utility
 COPY ./libcockatrice_settings /home/servatrice/code/libcockatrice_settings
