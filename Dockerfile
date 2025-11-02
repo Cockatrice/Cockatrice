@@ -26,6 +26,7 @@ COPY ./cmake /home/servatrice/code/cmake
 COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
 COPY ./libcockatrice_utility /home/servatrice/code/libcockatrice_utility
 COPY ./libcockatrice_settings /home/servatrice/code/libcockatrice_settings
+COPY ./libcockatrice_deck_list /home/servatrice/code/libcockatrice_deck_list
 COPY ./libcockatrice_card /home/servatrice/code/libcockatrice_card
 
 WORKDIR /home/servatrice/code
