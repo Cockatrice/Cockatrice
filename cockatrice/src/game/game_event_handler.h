@@ -40,7 +40,7 @@ class AbstractGame;
 class PendingCommand;
 class Player;
 
-inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "tab_game");
+inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "game_event_handler");
 
 class GameEventHandler : public QObject
 {
