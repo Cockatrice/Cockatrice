@@ -12,7 +12,7 @@ const serverPropsFile = `${ROOT_DIR}/server-props.json`;
 const masterProtoFile = `${ROOT_DIR}/proto-files.json`;
 
 const sharedFiles = [
-  ['../common/pb', protoFilesDir],
+  ['../libcockatrice_protocol/libcockatrice/protocol/pb', protoFilesDir],
   ['../cockatrice/resources/countries', `${ROOT_DIR}/images/countries`],
 ];
 
