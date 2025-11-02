@@ -14,17 +14,18 @@ RUN apt-get update && apt-get install -y\
   qt6-websockets-dev \
   protobuf-compiler \
   qt6-tools-dev \
-  qt6-tools-dev-tools
+  qt6-tools-dev-tools \
+  && rm -rf /var/lib/apt/lists/*    # Cleanup
 
 # Order from least changing at the top to more frequently changing at the bottom
 COPY ./libcockatrice_network/libcockatrice/network/server /home/servatrice/code/libcockatrice_network/libcockatrice/network/server
-COPY ./libcockatrice_protocol /home/servatrice/code/
-COPY ./libcockatrice_rng /home/servatrice/code/
-COPY ./servatrice /home/servatrice/code/
-COPY ./cmake /home/servatrice/code/
+COPY ./libcockatrice_protocol /home/servatrice/code/libcockatrice_protocol
+COPY ./libcockatrice_rng /home/servatrice/code/libcockatrice_rng
+COPY ./servatrice /home/servatrice/code/servatrice
+COPY ./cmake /home/servatrice/code/cmake
 COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
-COPY ./libcockatrice_utility /home/servatrice/code/
-COPY ./libcockatrice_card /home/servatrice/code/
+COPY ./libcockatrice_utility /home/servatrice/code/libcockatrice_utility
+COPY ./libcockatrice_card /home/servatrice/code/libcockatrice_card
 
 WORKDIR /home/servatrice/code
 
