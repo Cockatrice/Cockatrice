@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y\
 
 COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
 COPY ./cmake /home/servatrice/code/cmake
-COPY ./common /home/servatrice/code/common
+COPY .libcockatrice_network/libcockatrice/network/server /home/servatrice/code/libcockatrice_network/libcockatrice/network/server
+COPY .libcockatrice_protocol/libcockatrice/protocol /home/servatrice/code/libcockatrice_protocol/libcockatrice/protocol
 COPY ./servatrice /home/servatrice/code/servatrice
 
 WORKDIR /home/servatrice/code
