@@ -21,7 +21,7 @@
 </pre><p><br>
 
 
-# Cockatrice
+# Cockatrice - random test
 
 Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline.<br><br>
 This project uses <kbd>C++</kbd> and the <kbd>Qt</kbd> libraries.<br>
