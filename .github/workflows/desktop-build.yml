@@ -299,8 +299,6 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            package_suffix: "-macOS15_Debug"
-            artifact_name: macOS15_Debug-package
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -355,7 +353,7 @@ jobs:
       # Using jianmingyong/ccache-action to setup ccache without using brew
       # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
       - name: Setup ccache
-        if: matrix.os == 'macOS'
+        if: matrix.use_ccache == 1
         uses: jianmingyong/ccache-action@v1
         with:
           install-type: "binary"
