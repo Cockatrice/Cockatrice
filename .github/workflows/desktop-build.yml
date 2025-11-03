@@ -308,10 +308,15 @@ jobs:
       - name: Install Qt ${{env.QT_VERSION}}
         uses: jurplel/install-qt-action@v4
         with:
-          cache: false # qt caches take too much space for macOS (1.1Gi)
+          cache: true # qt caches take too much space for macOS (1.1Gi)
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
+
+      - name: Strip arch from Qt libraries
+        run: |
+          echo "Stripping arch from Qt libraries"
+          find $RUNNER_WORKSPACE/Qt -type f -exec sh -c 'file -b --mime-type "$0" | grep -q "application/x-mach-binary"' {} \; -exec lipo {} -thin $(uname -m) -output {} \;
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
