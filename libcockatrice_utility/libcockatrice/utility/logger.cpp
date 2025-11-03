@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QDateTime>
+#include <QDebug>
 #include <QLocale>
 #include <QSysInfo>
 #include <iostream>
