@@ -166,11 +166,11 @@ public:
     {
         return showOnlyIfSpectatorsCanSeeHands;
     }
-    void setGameFilters(bool _showBuddiesOnlyGames,
+    void setGameFilters(bool _hideBuddiesOnlyGames,
                         bool _hideIgnoredUserGames,
-                        bool _showFullGames,
-                        bool _showGamesThatStarted,
-                        bool _showPasswordProtectedGames,
+                        bool _hideFullGames,
+                        bool _hideGamesThatStarted,
+                        bool _hidePasswordProtectedGames,
                         bool _hideNotBuddyCreatedGames,
                         bool _hideOpenDecklistGames,
                         const QString &_gameNameFilter,

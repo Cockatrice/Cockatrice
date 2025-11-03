@@ -286,11 +286,11 @@ GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userList
     setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setGameFilters(bool _showBuddiesOnlyGames,
+void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
                                      bool _hideIgnoredUserGames,
-                                     bool _showFullGames,
-                                     bool _showGamesThatStarted,
-                                     bool _showPasswordProtectedGames,
+                                     bool _hideFullGames,
+                                     bool _hideGamesThatStarted,
+                                     bool _hidePasswordProtectedGames,
                                      bool _hideNotBuddyCreatedGames,
                                      bool _hideOpenDecklistGames,
                                      const QString &_gameNameFilter,
@@ -307,11 +307,11 @@ void GamesProxyModel::setGameFilters(bool _showBuddiesOnlyGames,
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
     beginFilterChange();
 #endif
-    hideBuddiesOnlyGames = _showBuddiesOnlyGames;
+    hideBuddiesOnlyGames = _hideBuddiesOnlyGames;
     hideIgnoredUserGames = _hideIgnoredUserGames;
-    hideFullGames = _showFullGames;
-    hideGamesThatStarted = _showGamesThatStarted;
-    hidePasswordProtectedGames = _showPasswordProtectedGames;
+    hideFullGames = _hideFullGames;
+    hideGamesThatStarted = _hideGamesThatStarted;
+    hidePasswordProtectedGames = _hidePasswordProtectedGames;
     hideNotBuddyCreatedGames = _hideNotBuddyCreatedGames;
     hideOpenDecklistGames = _hideOpenDecklistGames;
     gameNameFilter = _gameNameFilter;
@@ -375,9 +375,9 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
         }
     }
 
-    setGameFilters(gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
-                   gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideIgnoredUserGames(),
-                   gameFilters.isHideBuddiesOnlyGames(), gameFilters.isHideNotBuddyCreatedGames(),
+    setGameFilters(gameFilters.isHideBuddiesOnlyGames(), gameFilters.isHideIgnoredUserGames(),
+                   gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
+                   gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideNotBuddyCreatedGames(),
                    gameFilters.isHideOpenDecklistGames(), gameFilters.getGameNameFilter(),
                    gameFilters.getCreatorNameFilter(), newGameTypeFilter, gameFilters.getMinPlayers(),
                    gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
