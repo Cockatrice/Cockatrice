@@ -46,6 +46,7 @@ private slots:
     void updatePinBadgeVisibility();
 
 private:
+    void initializePinBadge();
     CardInfoPictureWidget *cardInfoPicture;
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
     QLabel *pinBadge = nullptr;

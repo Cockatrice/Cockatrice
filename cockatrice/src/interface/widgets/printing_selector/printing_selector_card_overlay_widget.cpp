@@ -56,40 +56,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setCard(_rootCard);
     mainLayout->addWidget(cardInfoPicture);
 
-    // Pin badge shown when this printing is pinned (hidden by default)
-    pinBadge = new QLabel(this);
-    pinBadge->setObjectName(QStringLiteral("printingSelectorPinBadge"));
-
-    bool pinLoaded = false;
-    QImageReader pinReader(QStringLiteral("theme:icons/pin"));
-
-    if (pinReader.canRead()) {
-        const QSize targetSize(64, 64);
-        const qreal dpr = pinBadge->devicePixelRatioF();
-        const QSize rasterSize(qMax(1, qCeil(targetSize.width() * dpr)), qMax(1, qCeil(targetSize.height() * dpr)));
-        pinReader.setScaledSize(rasterSize);
-        const QImage pinImage = pinReader.read();
-        if (!pinImage.isNull()) {
-            QPixmap pinPix = QPixmap::fromImage(pinImage);
-            pinPix.setDevicePixelRatio(dpr);
-            pinBadge->setPixmap(pinPix);
-            pinBadge->setFixedSize(targetSize);
-            pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
-            pinLoaded = true;
-        }
-    }
-
-    if (!pinLoaded) {
-        // visible fallback so you can see the badge even without the SVG
-        pinBadge->setText(QStringLiteral("PIN"));
-        pinBadge->setAlignment(Qt::AlignCenter);
-        pinBadge->setFixedSize(24, 12);
-        pinBadge->setStyleSheet("background: yellow; color: black; border: 1px solid red;");
-    }
-
-    pinBadge->setAttribute(Qt::WA_TransparentForMouseEvents);
-    pinBadge->setVisible(false);
-    pinBadge->raise();
+    initializePinBadge();
 
     // Update when this overlay emits cardPreferenceChanged or when size/scale changes
     connect(this, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
@@ -196,14 +163,17 @@ void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
     if (!pinBadge || !cardInfoPicture)
         return;
 
+    // Query the persisted preference override to decide whether this printing is pinned.
     const auto &preferredProviderId =
         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard.getName());
     const auto &cardProviderId = rootCard.getPrinting().getUuid();
     const bool isPinned = (!preferredProviderId.isEmpty() && preferredProviderId == cardProviderId);
 
+    // Toggle the badge once; the pixmap was already rasterized in initializePinBadge().
     pinBadge->setVisible(isPinned);
 
     if (isPinned) {
+        // Keep a small margin that scales with the card size to avoid obscuring stuff.
         const int margin = qMax(3, int(cardInfoPicture->width() * 0.03));
         int x = qMax(0, cardInfoPicture->width() - pinBadge->width() - margin);
         int y = margin * 3;
@@ -286,4 +256,58 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
         }
     }
     menu.exec(this->mapToGlobal(point));
+}
+
+/**
+ * @brief Initializes the pin badge overlay and loads its icon with DPI-aware rasterization.
+ *
+ * The icon is rasterized once using the label's device pixel ratio so it stays crisp on HiDPI
+ * displays. The resulting pixmap is cached on the QLabel and simply shown/hidden when needed.
+ * If the SVG cannot be read, a textual fallback badge is created instead.
+ */
+void PrintingSelectorCardOverlayWidget::initializePinBadge()
+{
+    if (!pinBadge) {
+        // construct the overlay label once
+        pinBadge = new QLabel(this);
+        pinBadge->setObjectName(QStringLiteral("printingSelectorPinBadge"));
+    } else {
+        // Clear any previous pixmap / style in case we reinitialize for a DPR change.
+        pinBadge->clear();
+        pinBadge->setStyleSheet(QString());
+    }
+
+    bool pinLoaded = false;
+    QImageReader pinReader(QStringLiteral("theme:icons/pin"));
+
+    if (pinReader.canRead()) {
+        // Rasterize a 64×64 logical icon so it has a consistent size regardless of card scaling.
+        const QSize targetSize(64, 64);
+        const qreal dpr = pinBadge->devicePixelRatioF();
+        const QSize rasterSize(qMax(1, qCeil(targetSize.width() * dpr)), qMax(1, qCeil(targetSize.height() * dpr)));
+        pinReader.setScaledSize(rasterSize);
+        const QImage pinImage = pinReader.read();
+        if (!pinImage.isNull()) {
+            // Tag the pixmap with the same DPR so Qt renders it at the correct physical size.
+            QPixmap pinPix = QPixmap::fromImage(pinImage);
+            pinPix.setDevicePixelRatio(dpr);
+            pinBadge->setPixmap(pinPix);
+            pinBadge->setFixedSize(targetSize);
+            pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
+            pinLoaded = true;
+        }
+    }
+
+    if (!pinLoaded) {
+        // Fall back to a text badge when the SVG cannot be decoded (e.g., missing theme resource).
+        pinBadge->setText(QStringLiteral("PIN"));
+        pinBadge->setAlignment(Qt::AlignCenter);
+        pinBadge->setFixedSize(24, 12);
+        pinBadge->setStyleSheet(QStringLiteral("background: yellow; color: black; border: 1px solid red;"));
+    }
+
+    // The overlay is mouse-transparent and hidden until we know the card is pinned.
+    pinBadge->setAttribute(Qt::WA_TransparentForMouseEvents);
+    pinBadge->setVisible(false);
+    pinBadge->raise();
 }
