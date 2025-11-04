@@ -3,13 +3,13 @@
 #include "interface/theme_manager.h"
 #include "oraclewizard.h"
 
+#include <../../cockatrice/src/client/settings/cache_settings.h>
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
-#include <libcockatrice/settings/cache_settings.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;

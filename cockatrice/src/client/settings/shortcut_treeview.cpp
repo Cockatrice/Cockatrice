@@ -1,7 +1,7 @@
 #include "shortcut_treeview.h"
 
+#include "../../../../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h"
 #include "cache_settings.h"
-#include "shortcuts_settings.h"
 
 #include <QHeaderView>
 

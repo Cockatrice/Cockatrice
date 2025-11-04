@@ -1,5 +1,6 @@
 #include "tab_message.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../client/sound_engine.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -16,7 +17,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,

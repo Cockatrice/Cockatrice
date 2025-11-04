@@ -1,5 +1,6 @@
 #include "visual_database_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_tree_model.h"
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
@@ -18,7 +19,6 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <qpropertyanimation.h>
 #include <utility>
 

@@ -1,5 +1,6 @@
 #include "dlg_create_token.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../main.h"
 
@@ -20,7 +21,6 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_display_model.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)

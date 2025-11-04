@@ -1,5 +1,6 @@
 #include "deck_editor_database_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../filters/syntax_help.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
@@ -14,7 +15,6 @@
 #include <QTreeView>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {

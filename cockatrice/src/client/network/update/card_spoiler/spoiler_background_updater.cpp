@@ -2,6 +2,7 @@
 
 #include "../../../../interface/window_main.h"
 #include "../../../../main.h"
+#include "../../../settings/cache_settings.h"
 
 #include <QApplication>
 #include <QCryptographicHash>
@@ -15,7 +16,6 @@
 #include <QtConcurrent>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"

@@ -1,5 +1,6 @@
 #include "library_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../abstract_game.h"
 #include "../player.h"
@@ -7,7 +8,6 @@
 
 #include <QAction>
 #include <QMenu>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/shortcuts_settings.h>
 
 LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)

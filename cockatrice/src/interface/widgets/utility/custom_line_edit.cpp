@@ -1,11 +1,12 @@
 #include "custom_line_edit.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QObject>
 #include <QTreeView>
 #include <QWidget>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/shortcuts_settings.h>
 
 LineEditUnfocusable::LineEditUnfocusable(QWidget *parent) : QLineEdit(parent)

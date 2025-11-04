@@ -1,5 +1,6 @@
 #include "oraclewizard.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "version_string.h"
@@ -24,7 +25,6 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
-#include <libcockatrice/settings/cache_settings.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"

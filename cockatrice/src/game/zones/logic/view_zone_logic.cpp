@@ -1,8 +1,7 @@
 #include "view_zone_logic.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../board/card_item.h"
-
-#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * @param _player the player that the cards are revealed to.

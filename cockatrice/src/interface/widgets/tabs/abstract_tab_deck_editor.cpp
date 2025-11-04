@@ -1,5 +1,6 @@
 #include "abstract_tab_deck_editor.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
@@ -37,7 +38,6 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)

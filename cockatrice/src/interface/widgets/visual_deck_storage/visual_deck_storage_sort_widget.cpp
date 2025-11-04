@@ -1,6 +1,6 @@
 #include "visual_deck_storage_sort_widget.h"
 
-#include <libcockatrice/settings/cache_settings.h>
+#include "../../../client/settings/cache_settings.h"
 
 /**
  * @brief Constructs a PrintingSelectorCardSortWidget for searching cards by set name or set code.

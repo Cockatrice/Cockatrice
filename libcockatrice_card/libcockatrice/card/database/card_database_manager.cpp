@@ -1,9 +1,16 @@
 #include "card_database_manager.h"
 
+QSharedPointer<ICardPreferenceProvider> CardDatabaseManager::cardPreferenceProvider =
+    QSharedPointer<NoopCardPreferenceProvider>::create();
+
+void CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<ICardPreferenceProvider> provider)
+{
+    cardPreferenceProvider = provider;
+}
+
 CardDatabase *CardDatabaseManager::getInstance()
 {
-    static CardDatabase instance(
-        nullptr, QSharedPointer<SettingsCardPreferenceProvider>::create()); // Created only once, on first access
+    static CardDatabase instance(nullptr, cardPreferenceProvider);
     return &instance;
 }
 

@@ -3,7 +3,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    libcockatrice/settings/cache_settings.h
     libcockatrice/settings/card_counter_settings.h
     libcockatrice/settings/card_database_settings.h
     libcockatrice/settings/card_override_settings.h
@@ -15,7 +14,6 @@ set(HEADERS
     libcockatrice/settings/recents_settings.h
     libcockatrice/settings/servers_settings.h
     libcockatrice/settings/settings_manager.h
-    libcockatrice/settings/shortcut_treeview.h
     libcockatrice/settings/shortcuts_settings.h
 )
 
@@ -28,7 +26,6 @@ endif()
 add_library(
   libcockatrice_settings STATIC
   ${MOC_SOURCES}
-  libcockatrice/settings/cache_settings.cpp
   libcockatrice/settings/card_counter_settings.cpp
   libcockatrice/settings/card_database_settings.cpp
   libcockatrice/settings/card_override_settings.cpp
@@ -40,7 +37,6 @@ add_library(
   libcockatrice/settings/recents_settings.cpp
   libcockatrice/settings/servers_settings.cpp
   libcockatrice/settings/settings_manager.cpp
-  libcockatrice/settings/shortcut_treeview.cpp
   libcockatrice/settings/shortcuts_settings.cpp
 )
 

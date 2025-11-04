@@ -1,5 +1,7 @@
 #include "deck_editor_deck_dock_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
@@ -7,7 +9,6 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)

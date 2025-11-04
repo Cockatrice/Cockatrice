@@ -1,7 +1,8 @@
 #ifndef COCKATRICE_SETTINGS_CARD_PREFERENCE_PROVIDER_H
 #define COCKATRICE_SETTINGS_CARD_PREFERENCE_PROVIDER_H
-#include "../../settings/cache_settings.h"
-#include "interface_card_preference_provider.h"
+#include "../../client/settings/cache_settings.h"
+
+#include <libcockatrice/card/database/interface/interface_card_preference_provider.h>
 
 class SettingsCardPreferenceProvider : public ICardPreferenceProvider
 {

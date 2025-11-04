@@ -1,6 +1,6 @@
 #include "card_set.h"
 
-#include <libcockatrice/settings/cache_settings.h>
+#include <../../../../cockatrice/src/client/settings/cache_settings.h>
 
 const char *CardSet::TOKENS_SETNAME = "TK";
 

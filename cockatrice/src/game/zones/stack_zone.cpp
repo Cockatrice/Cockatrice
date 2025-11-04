@@ -7,10 +7,10 @@
 #include "../player/player.h"
 #include "logic/stack_zone_logic.h"
 
+#include <../../client/settings/cache_settings.h>
 #include <QPainter>
 #include <QSet>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 StackZone::StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)

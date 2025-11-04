@@ -1,5 +1,6 @@
 #include "card_item.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../player/player.h"
@@ -16,7 +17,6 @@
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/card_counter_settings.h>
 
 CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)

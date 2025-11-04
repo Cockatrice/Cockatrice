@@ -22,6 +22,7 @@
 
 #include "QtNetwork/QNetworkInterface"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
+#include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
@@ -42,9 +43,9 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/rng/rng_sfmt.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -265,6 +266,8 @@ int main(int argc, char *argv[])
 #endif
 
     SettingsCache::instance().setClientID(generateClientID());
+
+    CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<SettingsCardPreferenceProvider>::create());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB

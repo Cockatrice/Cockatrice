@@ -1,5 +1,6 @@
 #include "printing_selector.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
 #include "printing_selector_card_display_widget.h"
@@ -9,7 +10,6 @@
 
 #include <QFrame>
 #include <QScrollBar>
-#include <libcockatrice/settings/cache_settings.h>
 #include <qboxlayout.h>
 
 /**

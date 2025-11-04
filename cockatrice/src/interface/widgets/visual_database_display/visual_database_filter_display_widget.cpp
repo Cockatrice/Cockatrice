@@ -1,12 +1,13 @@
 #include "visual_database_filter_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QDir>
 #include <QFile>
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QPushButton>
-#include <libcockatrice/settings/cache_settings.h>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
     : QWidget(parent), filterFilename(filename), filterModel(_filterModel)

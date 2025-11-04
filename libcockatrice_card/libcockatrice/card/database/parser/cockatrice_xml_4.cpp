@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
-#include <libcockatrice/settings/cache_settings.h>
 #include <version_string.h>
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
@@ -132,7 +131,8 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
+    bool includeRebalancedCards =
+        true; // TODO: MOVE THIS OUT OF THE PARSER SettingsCache::instance().getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;

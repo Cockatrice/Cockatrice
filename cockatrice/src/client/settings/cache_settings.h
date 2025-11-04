@@ -7,16 +7,16 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "card_database_settings.h"
-#include "card_override_settings.h"
-#include "debug_settings.h"
-#include "download_settings.h"
-#include "game_filters_settings.h"
-#include "layouts_settings.h"
-#include "message_settings.h"
-#include "recents_settings.h"
-#include "servers_settings.h"
-#include "shortcuts_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/card_database_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/card_override_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/debug_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/download_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/game_filters_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/layouts_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/message_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/recents_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/servers_settings.h"
+#include "../../../../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h"
 
 #include <QDate>
 #include <QLoggingCategory>

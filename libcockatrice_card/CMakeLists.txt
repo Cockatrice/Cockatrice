@@ -9,6 +9,8 @@ set(HEADERS
     libcockatrice/card/database/card_database_loader.h
     libcockatrice/card/database/card_database_manager.h
     libcockatrice/card/database/card_database_querier.h
+    libcockatrice/card/database/interface/interface_card_preference_provider.h
+    libcockatrice/card/database/interface/noop_card_preference_provider.h
     libcockatrice/card/database/parser/card_database_parser.h
     libcockatrice/card/database/parser/cockatrice_xml_3.h
     libcockatrice/card/database/parser/cockatrice_xml_4.h

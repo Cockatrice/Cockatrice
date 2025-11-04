@@ -17,6 +17,9 @@ public:
     CardDatabaseManager(const CardDatabaseManager &) = delete;
     CardDatabaseManager &operator=(const CardDatabaseManager &) = delete;
 
+    // To be called once, before instantiation of the manager
+    static void setCardPreferenceProvider(QSharedPointer<ICardPreferenceProvider> provider);
+
     // Static method to access the singleton instance
     static CardDatabase *getInstance();
     static CardDatabaseQuerier *query();
@@ -24,6 +27,7 @@ public:
 private:
     CardDatabaseManager() = default; // Private constructor
     ~CardDatabaseManager() = default;
+    static QSharedPointer<ICardPreferenceProvider> cardPreferenceProvider;
 };
 
 #endif // CARD_DATABASE_ACCESSOR_H

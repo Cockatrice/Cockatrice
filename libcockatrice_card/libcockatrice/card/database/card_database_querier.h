@@ -7,10 +7,10 @@
 #ifndef COCKATRICE_CARD_DATABASE_QUERIER_H
 #define COCKATRICE_CARD_DATABASE_QUERIER_H
 
+#include "../../../../cockatrice/src/database/interface/settings_card_preference_provider.h"
 #include "../card_info.h"
 #include "../printing/exact_card.h"
 #include "interface/interface_card_preference_provider.h"
-#include "interface/settings_card_preference_provider.h"
 
 #include <QObject>
 #include <libcockatrice/utility/card_ref.h>

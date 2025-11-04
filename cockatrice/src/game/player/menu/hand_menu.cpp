@@ -1,5 +1,6 @@
 #include "hand_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../abstract_game.h"
 #include "../../zones/hand_zone.h"
 #include "../player.h"
@@ -7,7 +8,6 @@
 
 #include <QAction>
 #include <QMenu>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/shortcuts_settings.h>
 
 HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)

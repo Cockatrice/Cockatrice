@@ -40,6 +40,7 @@
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
 
+#include <../client/settings/cache_settings.h>
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>
@@ -71,7 +72,6 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"

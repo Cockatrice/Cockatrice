@@ -1,11 +1,12 @@
 #include "handle_public_servers.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QUrl>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 

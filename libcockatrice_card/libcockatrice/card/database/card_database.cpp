@@ -4,6 +4,7 @@
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
+#include <../../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -12,7 +13,6 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <algorithm>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 CardDatabase::CardDatabase(QObject *parent, QSharedPointer<ICardPreferenceProvider> prefs)

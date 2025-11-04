@@ -4,11 +4,11 @@
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
+#include <../../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QDebug>
 #include <QDirIterator>
 #include <QFile>
 #include <QTime>
-#include <libcockatrice/settings/cache_settings.h>
 
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent, CardDatabase *db) : QObject(parent), database(db)
 {

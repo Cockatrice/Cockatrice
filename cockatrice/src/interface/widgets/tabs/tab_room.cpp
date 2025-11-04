@@ -1,5 +1,6 @@
 #include "tab_room.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_selector.h"
@@ -30,7 +31,6 @@
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 TabRoom::TabRoom(TabSupervisor *_tabSupervisor,

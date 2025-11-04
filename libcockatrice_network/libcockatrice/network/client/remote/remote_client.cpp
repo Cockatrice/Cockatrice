@@ -3,6 +3,7 @@
 #include "../../../../cockatrice/src/main.h"
 #include "version_string.h"
 
+#include <../../../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QHostAddress>
@@ -21,7 +22,6 @@
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 static const unsigned int protocolVersion = 14;

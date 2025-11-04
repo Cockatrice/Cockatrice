@@ -1,5 +1,6 @@
 #include "deck_editor_filter_dock_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
 
@@ -7,7 +8,6 @@
 #include <QMenu>
 #include <QToolButton>
 #include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

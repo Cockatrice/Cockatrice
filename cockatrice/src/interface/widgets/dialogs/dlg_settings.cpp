@@ -1,5 +1,7 @@
 #include "dlg_settings.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcut_treeview.h"
 #include "../client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/sound_engine.h"
@@ -45,9 +47,7 @@
 #include <QVariant>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/settings/card_counter_settings.h>
-#include <libcockatrice/settings/shortcut_treeview.h>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"
