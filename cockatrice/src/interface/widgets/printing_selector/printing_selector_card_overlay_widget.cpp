@@ -3,21 +3,22 @@
 #include "printing_selector_card_display_widget.h"
 
 #include <QGraphicsEffect>
-#include <QImageReader>
 #include <QIcon>
+#include <QImageReader>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
-#include <QSvgRenderer>
 #include <QStackedWidget>
+#include <QSvgRenderer>
 #include <QVBoxLayout>
+#include <QtMath>
+#include <cmath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <utility>
-#include <cmath>
 
 /**
  * @brief Constructs a PrintingSelectorCardOverlayWidget for displaying a card overlay.
@@ -65,9 +66,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     if (pinReader.canRead()) {
         const QSize targetSize(64, 64);
         const qreal dpr = pinBadge->devicePixelRatioF();
-        const QSize rasterSize(
-            qMax(1, static_cast<int>(std::ceil(targetSize.width() * dpr))),
-            qMax(1, static_cast<int>(std::ceil(targetSize.height() * dpr))));
+        const QSize rasterSize(qMax(1, qCeil(targetSize.width() * dpr)), qMax(1, qCeil(targetSize.height() * dpr)));
         pinReader.setScaledSize(rasterSize);
         const QImage pinImage = pinReader.read();
         if (!pinImage.isNull()) {
