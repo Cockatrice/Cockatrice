@@ -11,13 +11,13 @@
 #include "arrow_item.h"
 #include "card_drag_item.h"
 
+#include <../../client/settings/card_counter_settings.h>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
-#include <libcockatrice/settings/card_counter_settings.h>
 
 CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)
     : AbstractCardItem(parent, cardRef, _owner, _cardid), zone(_zone), attacking(false), destroyOnZoneChange(false),

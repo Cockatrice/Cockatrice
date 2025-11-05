@@ -7,22 +7,22 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "../../../../libcockatrice_settings/libcockatrice/settings/card_database_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/card_override_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/debug_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/download_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/game_filters_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/layouts_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/message_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/recents_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/servers_settings.h"
-#include "../../../../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h"
+#include "shortcuts_settings.h"
 
 #include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+#include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/game_filters_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/recents_settings.h>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");

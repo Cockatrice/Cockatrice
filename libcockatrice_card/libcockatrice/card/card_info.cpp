@@ -5,7 +5,6 @@
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
-#include <../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QDir>
 #include <QRegularExpression>
 #include <QSharedPointer>

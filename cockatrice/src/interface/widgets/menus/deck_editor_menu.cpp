@@ -2,7 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 
-#include <libcockatrice/settings/shortcuts_settings.h>
+#include <../../../client/settings/shortcuts_settings.h>
 
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {

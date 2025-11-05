@@ -6,9 +6,9 @@
 #include "../player.h"
 #include "../player_actions.h"
 
+#include <../../../client/settings/shortcuts_settings.h>
 #include <QAction>
 #include <QMenu>
-#include <libcockatrice/settings/shortcuts_settings.h>
 
 LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {

@@ -3,7 +3,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    libcockatrice/settings/card_counter_settings.h
     libcockatrice/settings/card_database_settings.h
     libcockatrice/settings/card_override_settings.h
     libcockatrice/settings/debug_settings.h
@@ -14,7 +13,6 @@ set(HEADERS
     libcockatrice/settings/recents_settings.h
     libcockatrice/settings/servers_settings.h
     libcockatrice/settings/settings_manager.h
-    libcockatrice/settings/shortcuts_settings.h
 )
 
 if(Qt6_FOUND)
@@ -26,7 +24,6 @@ endif()
 add_library(
   libcockatrice_settings STATIC
   ${MOC_SOURCES}
-  libcockatrice/settings/card_counter_settings.cpp
   libcockatrice/settings/card_database_settings.cpp
   libcockatrice/settings/card_override_settings.cpp
   libcockatrice/settings/debug_settings.cpp
@@ -37,7 +34,6 @@ add_library(
   libcockatrice/settings/recents_settings.cpp
   libcockatrice/settings/servers_settings.cpp
   libcockatrice/settings/settings_manager.cpp
-  libcockatrice/settings/shortcuts_settings.cpp
 )
 
 target_include_directories(
@@ -46,4 +42,4 @@ target_include_directories(
   PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network
 )
 
-target_link_libraries(libcockatrice_settings PUBLIC libcockatrice_utility ${COCKATRICE_QT_MODULES})
+target_link_libraries(libcockatrice_settings PUBLIC libcockatrice_utility ${QT_CORE_MODULE})

@@ -1,8 +1,8 @@
 #include "cache_settings.h"
 
-#include "../../../../libcockatrice_settings/libcockatrice/settings/card_counter_settings.h"
 #include "../../../../libcockatrice_settings/libcockatrice/settings/card_override_settings.h"
 #include "../network/update/client/release_channel.h"
+#include "card_counter_settings.h"
 
 #include <QAbstractListModel>
 #include <QApplication>

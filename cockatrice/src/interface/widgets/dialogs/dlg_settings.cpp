@@ -14,6 +14,7 @@
 #include "../interface/widgets/utility/sequence_edit.h"
 #include "../main.h"
 
+#include <../../../client/settings/card_counter_settings.h>
 #include <QAbstractButton>
 #include <QAbstractListModel>
 #include <QAction>
@@ -47,7 +48,6 @@
 #include <QVariant>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/card_counter_settings.h>
 
 #define WIKI_CUSTOM_PIC_URL "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Picture-Download-URLs"
 #define WIKI_CUSTOM_SHORTCUTS "https://github.com/Cockatrice/Cockatrice/wiki/Custom-Keyboard-Shortcuts"

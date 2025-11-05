@@ -16,7 +16,9 @@ set(cockatrice_SOURCES
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/sound_engine.cpp
     src/client/settings/cache_settings.cpp
+    src/client/settings/card_counter_settings.cpp
     src/client/settings/shortcut_treeview.cpp
+    src/client/settings/shortcuts_settings.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp

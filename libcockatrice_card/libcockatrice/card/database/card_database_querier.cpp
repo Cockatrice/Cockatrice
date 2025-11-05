@@ -1,6 +1,5 @@
 #include "card_database_querier.h"
 
-#include "../../../../cockatrice/src/database/interface/settings_card_preference_provider.h"
 #include "../card_info.h"
 #include "../printing/exact_card.h"
 #include "../set/card_set_comparator.h"
