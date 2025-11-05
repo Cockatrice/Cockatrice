@@ -2,19 +2,12 @@
 
 #include "printing_selector_card_display_widget.h"
 
-#include <QGraphicsEffect>
-#include <QIcon>
 #include <QImageReader>
 #include <QLabel>
 #include <QMenu>
-#include <QMessageBox>
 #include <QMouseEvent>
-#include <QPainter>
-#include <QStackedWidget>
-#include <QSvgRenderer>
 #include <QVBoxLayout>
 #include <QtMath>
-#include <cmath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/cache_settings.h>
