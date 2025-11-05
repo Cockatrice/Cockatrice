@@ -286,101 +286,49 @@ GamesProxyModel::GamesProxyModel(QObject *parent, const UserListProxy *_userList
     setDynamicSortFilter(true);
 }
 
-void GamesProxyModel::setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames)
+void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
+                                     bool _hideIgnoredUserGames,
+                                     bool _hideFullGames,
+                                     bool _hideGamesThatStarted,
+                                     bool _hidePasswordProtectedGames,
+                                     bool _hideNotBuddyCreatedGames,
+                                     bool _hideOpenDecklistGames,
+                                     const QString &_gameNameFilter,
+                                     const QString &_creatorNameFilter,
+                                     const QSet<int> &_gameTypeFilter,
+                                     int _maxPlayersFilterMin,
+                                     int _maxPlayersFilterMax,
+                                     const QTime &_maxGameAge,
+                                     bool _showOnlyIfSpectatorsCanWatch,
+                                     bool _showSpectatorPasswordProtected,
+                                     bool _showOnlyIfSpectatorsCanChat,
+                                     bool _showOnlyIfSpectatorsCanSeeHands)
 {
-    hideBuddiesOnlyGames = _showBuddiesOnlyGames;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHideIgnoredUserGames(bool _hideIgnoredUserGames)
-{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+    beginFilterChange();
+#endif
+    hideBuddiesOnlyGames = _hideBuddiesOnlyGames;
     hideIgnoredUserGames = _hideIgnoredUserGames;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHideFullGames(bool _showFullGames)
-{
-    hideFullGames = _showFullGames;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHideGamesThatStarted(bool _showGamesThatStarted)
-{
-    hideGamesThatStarted = _showGamesThatStarted;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHidePasswordProtectedGames(bool _showPasswordProtectedGames)
-{
-    hidePasswordProtectedGames = _showPasswordProtectedGames;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHideNotBuddyCreatedGames(bool value)
-{
-    hideNotBuddyCreatedGames = value;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setHideOpenDecklistGames(bool _hideOpenDecklistGames)
-{
+    hideFullGames = _hideFullGames;
+    hideGamesThatStarted = _hideGamesThatStarted;
+    hidePasswordProtectedGames = _hidePasswordProtectedGames;
+    hideNotBuddyCreatedGames = _hideNotBuddyCreatedGames;
     hideOpenDecklistGames = _hideOpenDecklistGames;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setGameNameFilter(const QString &_gameNameFilter)
-{
     gameNameFilter = _gameNameFilter;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setCreatorNameFilter(const QString &_creatorNameFilter)
-{
     creatorNameFilter = _creatorNameFilter;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setGameTypeFilter(const QSet<int> &_gameTypeFilter)
-{
     gameTypeFilter = _gameTypeFilter;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax)
-{
     maxPlayersFilterMin = _maxPlayersFilterMin;
     maxPlayersFilterMax = _maxPlayersFilterMax;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setMaxGameAge(const QTime &_maxGameAge)
-{
     maxGameAge = _maxGameAge;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setShowOnlyIfSpectatorsCanWatch(bool _showOnlyIfSpectatorsCanWatch)
-{
     showOnlyIfSpectatorsCanWatch = _showOnlyIfSpectatorsCanWatch;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setShowSpectatorPasswordProtected(bool _showSpectatorPasswordProtected)
-{
     showSpectatorPasswordProtected = _showSpectatorPasswordProtected;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setShowOnlyIfSpectatorsCanChat(bool _showOnlyIfSpectatorsCanChat)
-{
     showOnlyIfSpectatorsCanChat = _showOnlyIfSpectatorsCanChat;
-    invalidateFilter();
-}
-
-void GamesProxyModel::setShowOnlyIfSpectatorsCanSeeHands(bool _showOnlyIfSpectatorsCanSeeHands)
-{
     showOnlyIfSpectatorsCanSeeHands = _showOnlyIfSpectatorsCanSeeHands;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
+    endFilterChange(QSortFilterProxyModel::Direction::Rows);
+#else
     invalidateFilter();
+#endif
 }
 
 int GamesProxyModel::getNumFilteredGames() const
@@ -400,25 +348,8 @@ int GamesProxyModel::getNumFilteredGames() const
 
 void GamesProxyModel::resetFilterParameters()
 {
-    hideFullGames = false;
-    hideGamesThatStarted = false;
-    hidePasswordProtectedGames = false;
-    hideBuddiesOnlyGames = false;
-    hideIgnoredUserGames = false;
-    hideNotBuddyCreatedGames = false;
-    hideOpenDecklistGames = false;
-    gameNameFilter = QString();
-    creatorNameFilter = QString();
-    gameTypeFilter.clear();
-    maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
-    maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;
-    maxGameAge = DEFAULT_MAX_GAME_AGE;
-    showOnlyIfSpectatorsCanWatch = false;
-    showSpectatorPasswordProtected = false;
-    showOnlyIfSpectatorsCanChat = false;
-    showOnlyIfSpectatorsCanSeeHands = false;
-
-    invalidateFilter();
+    setGameFilters(false, false, false, false, false, false, false, QString(), QString(), {}, DEFAULT_MAX_PLAYERS_MIN,
+                   DEFAULT_MAX_PLAYERS_MAX, DEFAULT_MAX_GAME_AGE, false, false, false, false);
 }
 
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
@@ -434,32 +365,24 @@ bool GamesProxyModel::areFilterParametersSetToDefaults() const
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
 {
     GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
-    hideFullGames = gameFilters.isHideFullGames();
-    hideGamesThatStarted = gameFilters.isHideGamesThatStarted();
-    hidePasswordProtectedGames = gameFilters.isHidePasswordProtectedGames();
-    hideIgnoredUserGames = gameFilters.isHideIgnoredUserGames();
-    hideBuddiesOnlyGames = gameFilters.isHideBuddiesOnlyGames();
-    hideNotBuddyCreatedGames = gameFilters.isHideNotBuddyCreatedGames();
-    hideOpenDecklistGames = gameFilters.isHideOpenDecklistGames();
-    gameNameFilter = gameFilters.getGameNameFilter();
-    creatorNameFilter = gameFilters.getCreatorNameFilter();
-    maxPlayersFilterMin = gameFilters.getMinPlayers();
-    maxPlayersFilterMax = gameFilters.getMaxPlayers();
-    maxGameAge = gameFilters.getMaxGameAge();
-    showOnlyIfSpectatorsCanWatch = gameFilters.isShowOnlyIfSpectatorsCanWatch();
-    showSpectatorPasswordProtected = gameFilters.isShowSpectatorPasswordProtected();
-    showOnlyIfSpectatorsCanChat = gameFilters.isShowOnlyIfSpectatorsCanChat();
-    showOnlyIfSpectatorsCanSeeHands = gameFilters.isShowOnlyIfSpectatorsCanSeeHands();
 
+    QSet<int> newGameTypeFilter;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
     while (gameTypesIterator.hasNext()) {
         gameTypesIterator.next();
         if (gameFilters.isGameTypeEnabled(gameTypesIterator.value())) {
-            gameTypeFilter.insert(gameTypesIterator.key());
+            newGameTypeFilter.insert(gameTypesIterator.key());
         }
     }
 
-    invalidateFilter();
+    setGameFilters(gameFilters.isHideBuddiesOnlyGames(), gameFilters.isHideIgnoredUserGames(),
+                   gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
+                   gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideNotBuddyCreatedGames(),
+                   gameFilters.isHideOpenDecklistGames(), gameFilters.getGameNameFilter(),
+                   gameFilters.getCreatorNameFilter(), newGameTypeFilter, gameFilters.getMinPlayers(),
+                   gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
+                   gameFilters.isShowOnlyIfSpectatorsCanWatch(), gameFilters.isShowSpectatorPasswordProtected(),
+                   gameFilters.isShowOnlyIfSpectatorsCanChat(), gameFilters.isShowOnlyIfSpectatorsCanSeeHands());
 }
 
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
@@ -577,5 +500,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 
 void GamesProxyModel::refresh()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
+    endFilterChange(QSortFilterProxyModel::Direction::Rows);
+#else
     invalidateFilter();
+#endif
 }

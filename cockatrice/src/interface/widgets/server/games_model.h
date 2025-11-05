@@ -102,52 +102,42 @@ public:
     {
         return hideBuddiesOnlyGames;
     }
-    void setHideBuddiesOnlyGames(bool _showBuddiesOnlyGames);
     bool getHideIgnoredUserGames() const
     {
         return hideIgnoredUserGames;
     }
-    void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
     bool getHideFullGames() const
     {
         return hideFullGames;
     }
-    void setHideFullGames(bool _showFullGames);
     bool getHideGamesThatStarted() const
     {
         return hideGamesThatStarted;
     }
-    void setHideGamesThatStarted(bool _showGamesThatStarted);
     bool getHidePasswordProtectedGames() const
     {
         return hidePasswordProtectedGames;
     }
-    void setHidePasswordProtectedGames(bool _showPasswordProtectedGames);
     bool getHideNotBuddyCreatedGames() const
     {
         return hideNotBuddyCreatedGames;
     }
-    void setHideNotBuddyCreatedGames(bool value);
     bool getHideOpenDecklistGames() const
     {
         return hideOpenDecklistGames;
     }
-    void setHideOpenDecklistGames(bool _hideOpenDecklistGames);
     QString getGameNameFilter() const
     {
         return gameNameFilter;
     }
-    void setGameNameFilter(const QString &_gameNameFilter);
     QString getCreatorNameFilter() const
     {
         return creatorNameFilter;
     }
-    void setCreatorNameFilter(const QString &_creatorNameFilter);
     QSet<int> getGameTypeFilter() const
     {
         return gameTypeFilter;
     }
-    void setGameTypeFilter(const QSet<int> &_gameTypeFilter);
     int getMaxPlayersFilterMin() const
     {
         return maxPlayersFilterMin;
@@ -156,32 +146,43 @@ public:
     {
         return maxPlayersFilterMax;
     }
-    void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
     const QTime &getMaxGameAge() const
     {
         return maxGameAge;
     }
-    void setMaxGameAge(const QTime &_maxGameAge);
     bool getShowOnlyIfSpectatorsCanWatch() const
     {
         return showOnlyIfSpectatorsCanWatch;
     }
-    void setShowOnlyIfSpectatorsCanWatch(bool _showOnlyIfSpectatorsCanWatch);
     bool getShowSpectatorPasswordProtected() const
     {
         return showSpectatorPasswordProtected;
     }
-    void setShowSpectatorPasswordProtected(bool _showSpectatorPasswordProtected);
     bool getShowOnlyIfSpectatorsCanChat() const
     {
         return showOnlyIfSpectatorsCanChat;
     }
-    void setShowOnlyIfSpectatorsCanChat(bool _showOnlyIfSpectatorsCanChat);
     bool getShowOnlyIfSpectatorsCanSeeHands() const
     {
         return showOnlyIfSpectatorsCanSeeHands;
     }
-    void setShowOnlyIfSpectatorsCanSeeHands(bool _showOnlyIfSpectatorsCanSeeHands);
+    void setGameFilters(bool _hideBuddiesOnlyGames,
+                        bool _hideIgnoredUserGames,
+                        bool _hideFullGames,
+                        bool _hideGamesThatStarted,
+                        bool _hidePasswordProtectedGames,
+                        bool _hideNotBuddyCreatedGames,
+                        bool _hideOpenDecklistGames,
+                        const QString &_gameNameFilter,
+                        const QString &_creatorNameFilter,
+                        const QSet<int> &_gameTypeFilter,
+                        int _maxPlayersFilterMin,
+                        int _maxPlayersFilterMax,
+                        const QTime &_maxGameAge,
+                        bool _showOnlyIfSpectatorsCanWatch,
+                        bool _showSpectatorPasswordProtected,
+                        bool _showOnlyIfSpectatorsCanChat,
+                        bool _showOnlyIfSpectatorsCanSeeHands);
 
     int getNumFilteredGames() const;
     void resetFilterParameters();
