@@ -9,13 +9,6 @@ set(HEADERS
     libcockatrice/card/database/card_database_loader.h
     libcockatrice/card/database/card_database_manager.h
     libcockatrice/card/database/card_database_querier.h
-    libcockatrice/card/database/model/card_database_model.h
-    libcockatrice/card/database/model/card_database_display_model.h
-    libcockatrice/card/database/model/card/card_completer_proxy_model.h
-    libcockatrice/card/database/model/card/card_search_model.h
-    libcockatrice/card/database/model/card_set/card_sets_model.h
-    libcockatrice/card/database/model/token/token_display_model.h
-    libcockatrice/card/database/model/token/token_edit_model.h
     libcockatrice/card/database/parser/card_database_parser.h
     libcockatrice/card/database/parser/cockatrice_xml_3.h
     libcockatrice/card/database/parser/cockatrice_xml_4.h
@@ -40,13 +33,6 @@ add_library(
   libcockatrice/card/database/card_database_loader.cpp
   libcockatrice/card/database/card_database_manager.cpp
   libcockatrice/card/database/card_database_querier.cpp
-  libcockatrice/card/database/model/card/card_completer_proxy_model.cpp
-  libcockatrice/card/database/model/card/card_search_model.cpp
-  libcockatrice/card/database/model/card_set/card_sets_model.cpp
-  libcockatrice/card/database/model/card_database_display_model.cpp
-  libcockatrice/card/database/model/card_database_model.cpp
-  libcockatrice/card/database/model/token/token_display_model.cpp
-  libcockatrice/card/database/model/token/token_edit_model.cpp
   libcockatrice/card/database/parser/card_database_parser.cpp
   libcockatrice/card/database/parser/cockatrice_xml_3.cpp
   libcockatrice/card/database/parser/cockatrice_xml_4.cpp
@@ -66,5 +52,5 @@ target_include_directories(
 target_link_libraries(
   libcockatrice_card
   PUBLIC libcockatrice_settings
-  PUBLIC ${COCKATRICE_QT_MODULES}
+  PUBLIC ${QT_CORE_MODULE}
 )

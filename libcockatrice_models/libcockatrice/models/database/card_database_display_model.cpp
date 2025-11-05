@@ -184,13 +184,20 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 
 void CardDatabaseDisplayModel::clearFilterAll()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+    beginFilterChange();
+#endif
     cardName.clear();
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
     if (filterTree != nullptr)
         filterTree->clear();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
+    endFilterChange(QSortFilterProxyModel::Direction::Rows);
+#else
     invalidateFilter();
+#endif
 }
 
 void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)

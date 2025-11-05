@@ -10,7 +10,7 @@
 #include "deck_preview_widget.h"
 
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 inline bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath);
 

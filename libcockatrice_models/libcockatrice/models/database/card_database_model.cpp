@@ -1,8 +1,7 @@
 #include "card_database_model.h"
 
-#include "../card_database.h"
-
 #include <QMap>
+#include <libcockatrice/card/database/card_database.h>
 
 #define CARDDBMODEL_COLUMNS 6
 

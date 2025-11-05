@@ -5,7 +5,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMainWindow>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
 {

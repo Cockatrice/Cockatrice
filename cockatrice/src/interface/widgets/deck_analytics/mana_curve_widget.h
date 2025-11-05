@@ -11,7 +11,7 @@
 
 #include <QHBoxLayout>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <unordered_map>
 
 class ManaCurveWidget : public QWidget

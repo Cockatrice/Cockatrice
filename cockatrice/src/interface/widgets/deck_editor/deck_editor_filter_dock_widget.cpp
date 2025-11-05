@@ -6,7 +6,7 @@
 #include <QGridLayout>
 #include <QMenu>
 #include <QToolButton>
-#include <libcockatrice/card/database/model/card_database_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)

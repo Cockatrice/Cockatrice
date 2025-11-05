@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QDateTime>
+#include <QDebug>
 #include <QLocale>
 #include <QSysInfo>
 #include <iostream>
@@ -51,7 +52,10 @@ void Logger::openLogfileSession()
     }
 
     fileHandle.setFileName(LOGGER_FILENAME);
-    fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+    if (!fileHandle.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        qWarning() << "Logger failed to open" << LOGGER_FILENAME << "for writing";
+        return;
+    }
     fileStream.setDevice(&fileHandle);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << Qt::endl;

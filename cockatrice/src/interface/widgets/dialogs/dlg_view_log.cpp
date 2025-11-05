@@ -1,12 +1,13 @@
 #include "dlg_view_log.h"
 
+#include "../../logger.h"
+
 #include <QClipboard>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/cache_settings.h>
-#include <libcockatrice/utility/logger.h>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {

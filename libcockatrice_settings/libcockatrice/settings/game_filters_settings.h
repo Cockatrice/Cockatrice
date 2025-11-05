@@ -22,7 +22,6 @@ public:
     bool isHidePasswordProtectedGames();
     bool isHideIgnoredUserGames();
     bool isHideNotBuddyCreatedGames();
-    void setHideOpenDecklistGames(bool hide);
     bool isHideOpenDecklistGames();
     QString getGameNameFilter();
     QString getCreatorNameFilter();
@@ -37,6 +36,7 @@ public:
 
     void setHideBuddiesOnlyGames(bool hide);
     void setHideIgnoredUserGames(bool hide);
+    void setHideOpenDecklistGames(bool hide);
     void setHideFullGames(bool hide);
     void setHideGamesThatStarted(bool hide);
     void setHidePasswordProtectedGames(bool hide);
@@ -52,9 +52,6 @@ public:
     void setShowSpectatorPasswordProtected(bool show);
     void setShowOnlyIfSpectatorsCanChat(bool show);
     void setShowOnlyIfSpectatorsCanSeeHands(bool show);
-signals:
-
-public slots:
 
 private:
     explicit GameFiltersSettings(const QString &settingPath, QObject *parent = nullptr);

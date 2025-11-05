@@ -258,6 +258,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
+    src/interface/key_signals.cpp
+    src/interface/logger.cpp
 )
 
 add_subdirectory(sounds)
@@ -360,13 +362,20 @@ if(Qt5_FOUND)
     libcockatrice_deck_list
     libcockatrice_utility
     libcockatrice_network
+    libcockatrice_models
     libcockatrice_rng
     ${COCKATRICE_QT_MODULES}
   )
 else()
   target_link_libraries(
-    cockatrice PUBLIC libcockatrice_card libcockatrice_deck_list libcockatrice_utility libcockatrice_network
-                      libcockatrice_rng ${COCKATRICE_QT_MODULES}
+    cockatrice
+    PUBLIC libcockatrice_card
+           libcockatrice_deck_list
+           libcockatrice_utility
+           libcockatrice_network
+           libcockatrice_models
+           libcockatrice_rng
+           ${COCKATRICE_QT_MODULES}
   )
 endif()
 

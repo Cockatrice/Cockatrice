@@ -155,22 +155,13 @@ void GameSelector::actSetFilter()
     if (!dlg.exec())
         return;
 
-    gameListProxyModel->setHideBuddiesOnlyGames(dlg.getHideBuddiesOnlyGames());
-    gameListProxyModel->setHideFullGames(dlg.getHideFullGames());
-    gameListProxyModel->setHideGamesThatStarted(dlg.getHideGamesThatStarted());
-    gameListProxyModel->setHidePasswordProtectedGames(dlg.getHidePasswordProtectedGames());
-    gameListProxyModel->setHideIgnoredUserGames(dlg.getHideIgnoredUserGames());
-    gameListProxyModel->setHideNotBuddyCreatedGames(dlg.getHideNotBuddyCreatedGames());
-    gameListProxyModel->setHideOpenDecklistGames(dlg.getHideOpenDecklistGames());
-    gameListProxyModel->setGameNameFilter(dlg.getGameNameFilter());
-    gameListProxyModel->setCreatorNameFilter(dlg.getCreatorNameFilter());
-    gameListProxyModel->setGameTypeFilter(dlg.getGameTypeFilter());
-    gameListProxyModel->setMaxPlayersFilter(dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax());
-    gameListProxyModel->setMaxGameAge(dlg.getMaxGameAge());
-    gameListProxyModel->setShowOnlyIfSpectatorsCanWatch(dlg.getShowOnlyIfSpectatorsCanWatch());
-    gameListProxyModel->setShowSpectatorPasswordProtected(dlg.getShowSpectatorPasswordProtected());
-    gameListProxyModel->setShowOnlyIfSpectatorsCanChat(dlg.getShowOnlyIfSpectatorsCanChat());
-    gameListProxyModel->setShowOnlyIfSpectatorsCanSeeHands(dlg.getShowOnlyIfSpectatorsCanSeeHands());
+    gameListProxyModel->setGameFilters(
+        dlg.getHideBuddiesOnlyGames(), dlg.getHideIgnoredUserGames(), dlg.getHideFullGames(),
+        dlg.getHideGamesThatStarted(), dlg.getHidePasswordProtectedGames(), dlg.getHideNotBuddyCreatedGames(),
+        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilter(), dlg.getGameTypeFilter(),
+        dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax(), dlg.getMaxGameAge(),
+        dlg.getShowOnlyIfSpectatorsCanWatch(), dlg.getShowSpectatorPasswordProtected(),
+        dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
