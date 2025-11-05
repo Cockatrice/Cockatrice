@@ -258,6 +258,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
+    src/interface/key_signals.cpp
+    src/interface/logger.cpp
 )
 
 add_subdirectory(sounds)

@@ -9,6 +9,7 @@
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../key_signals.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 
@@ -18,7 +19,6 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/utility/key_signals.h>
 
 class DeckListModel;
 class AbstractTabDeckEditor;

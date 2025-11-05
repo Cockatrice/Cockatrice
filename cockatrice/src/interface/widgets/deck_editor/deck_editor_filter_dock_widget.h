@@ -9,10 +9,10 @@
 #define DECK_EDITOR_FILTER_DOCK_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../key_signals.h"
 
 #include <QDockWidget>
 #include <QTreeView>
-#include <libcockatrice/utility/key_signals.h>
 
 class FilterTreeModel;
 class AbstractTabDeckEditor;

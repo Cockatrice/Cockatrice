@@ -23,6 +23,7 @@
 #include "QtNetwork/QNetworkInterface"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/sound_engine.h"
+#include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
 #include "interface/widgets/dialogs/dlg_settings.h"
@@ -44,7 +45,6 @@
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/cache_settings.h>
-#include <libcockatrice/utility/logger.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
