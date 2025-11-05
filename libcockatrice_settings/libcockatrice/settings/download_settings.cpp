@@ -9,21 +9,21 @@ const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
     "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
 
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
-    : SettingsManager(settingPath + "downloads.ini", parent)
+    : SettingsManager(settingPath + "downloads.ini", "downloads", QString(), parent)
 {
 }
 
 void DownloadSettings::setDownloadUrls(const QStringList &downloadURLs)
 {
-    setValue(QVariant::fromValue(downloadURLs), "urls", "downloads");
+    setValue(QVariant::fromValue(downloadURLs), "urls");
 }
 
 QStringList DownloadSettings::getAllURLs()
 {
-    return getValue("urls", "downloads").toStringList();
+    return getValue("urls").toStringList();
 }
 
 void DownloadSettings::resetToDefaultURLs()
 {
-    setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls", "downloads");
+    setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
 }

@@ -5,7 +5,7 @@
 #include <QtMath>
 
 CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *parent)
-    : SettingsManager(settingsPath + "global.ini", parent)
+    : SettingsManager(settingsPath + "global.ini", "cards", "counters", parent)
 {
 }
 

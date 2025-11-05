@@ -1,7 +1,7 @@
 #include "card_database_settings.h"
 
 CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cardDatabase.ini", parent)
+    : SettingsManager(settingPath + "cardDatabase.ini", QString(), QString(), parent)
 {
 }
 
