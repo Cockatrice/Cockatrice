@@ -17,9 +17,7 @@ target_sources(libcockatrice_protocol PRIVATE ${SOURCES} ${HEADERS})
 add_dependencies(libcockatrice_protocol libcockatrice_protocol_pb)
 
 # Link the actual generated protobuf library
-target_link_libraries(
-  libcockatrice_protocol PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_protocol_pb libcockatrice_utility
-)
+target_link_libraries(libcockatrice_protocol PUBLIC ${QT_CORE_MODULE} libcockatrice_protocol_pb libcockatrice_utility)
 
 # Expose include paths
 target_include_directories(

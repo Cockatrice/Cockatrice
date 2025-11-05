@@ -25,6 +25,4 @@ add_dependencies(libcockatrice_deck_list libcockatrice_protocol)
 
 target_include_directories(libcockatrice_deck_list PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(
-  libcockatrice_deck_list PUBLIC libcockatrice_protocol libcockatrice_utility ${COCKATRICE_QT_MODULES}
-)
+target_link_libraries(libcockatrice_deck_list PUBLIC libcockatrice_protocol libcockatrice_utility ${QT_CORE_MODULE})
