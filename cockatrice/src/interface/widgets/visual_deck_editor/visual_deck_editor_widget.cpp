@@ -16,11 +16,11 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/card/database/model/card/card_completer_proxy_model.h>
-#include <libcockatrice/card/database/model/card/card_search_model.h>
-#include <libcockatrice/card/database/model/card_database_model.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
+#include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)

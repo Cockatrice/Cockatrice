@@ -8,7 +8,7 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListModel *_deckListModel)
     : QWidget(parent), deckListModel(_deckListModel)

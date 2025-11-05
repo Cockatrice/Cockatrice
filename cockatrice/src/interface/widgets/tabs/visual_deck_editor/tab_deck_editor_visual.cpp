@@ -27,8 +27,8 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <libcockatrice/card/database/model/card_database_model.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cache_settings.h>

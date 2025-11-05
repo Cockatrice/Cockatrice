@@ -11,7 +11,7 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 /**

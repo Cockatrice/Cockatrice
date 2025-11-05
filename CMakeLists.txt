@@ -335,6 +335,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_rng ${CMAKE_BINARY_DIR}/libco
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_settings ${CMAKE_BINARY_DIR}/libcockatrice_settings)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_card ${CMAKE_BINARY_DIR}/libcockatrice_card)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_utility ${CMAKE_BINARY_DIR}/libcockatrice_utility)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
 if(WITH_SERVER)
   add_subdirectory(servatrice)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})

@@ -3,13 +3,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    libcockatrice/deck_list/abstract_deck_list_card_node.h
-    libcockatrice/deck_list/abstract_deck_list_node.h
-    libcockatrice/deck_list/deck_list.h
-    libcockatrice/deck_list/deck_list_card_node.h
-    libcockatrice/deck_list/deck_list_model.h
-    libcockatrice/deck_list/deck_list_sort_filter_proxy_model.h
-    libcockatrice/deck_list/deck_loader.h
+    libcockatrice/deck_list/abstract_deck_list_card_node.h libcockatrice/deck_list/abstract_deck_list_node.h
+    libcockatrice/deck_list/deck_list.h libcockatrice/deck_list/deck_list_card_node.h
     libcockatrice/deck_list/inner_deck_list_node.h
 )
 
@@ -21,15 +16,9 @@ endif()
 
 add_library(
   libcockatrice_deck_list STATIC
-  ${MOC_SOURCES}
-  libcockatrice/deck_list/abstract_deck_list_card_node.cpp
-  libcockatrice/deck_list/abstract_deck_list_node.cpp
-  libcockatrice/deck_list/deck_list.cpp
-  libcockatrice/deck_list/deck_list_card_node.cpp
-  libcockatrice/deck_list/deck_list_model.cpp
-  libcockatrice/deck_list/deck_list_sort_filter_proxy_model.cpp
-  libcockatrice/deck_list/deck_loader.cpp
-  libcockatrice/deck_list/inner_deck_list_node.cpp
+  ${MOC_SOURCES} libcockatrice/deck_list/abstract_deck_list_card_node.cpp
+  libcockatrice/deck_list/abstract_deck_list_node.cpp libcockatrice/deck_list/deck_list.cpp
+  libcockatrice/deck_list/deck_list_card_node.cpp libcockatrice/deck_list/inner_deck_list_node.cpp
 )
 
 add_dependencies(libcockatrice_deck_list libcockatrice_protocol)
@@ -37,6 +26,5 @@ add_dependencies(libcockatrice_deck_list libcockatrice_protocol)
 target_include_directories(libcockatrice_deck_list PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(
-  libcockatrice_deck_list PUBLIC libcockatrice_protocol libcockatrice_card libcockatrice_utility
-                                 ${COCKATRICE_QT_MODULES}
+  libcockatrice_deck_list PUBLIC libcockatrice_protocol libcockatrice_utility ${COCKATRICE_QT_MODULES}
 )

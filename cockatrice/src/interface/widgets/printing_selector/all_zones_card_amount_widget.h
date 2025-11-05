@@ -11,8 +11,8 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list_model.h>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class AllZonesCardAmountWidget : public QWidget
 {

@@ -23,7 +23,7 @@
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 

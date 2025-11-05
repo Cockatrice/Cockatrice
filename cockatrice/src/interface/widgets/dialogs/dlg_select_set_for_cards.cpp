@@ -16,7 +16,7 @@
 #include <QVBoxLayout>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <qdrag.h>
 #include <qevent.h>
 

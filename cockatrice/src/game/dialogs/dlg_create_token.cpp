@@ -17,9 +17,9 @@
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/card/database/model/card_database_model.h>
-#include <libcockatrice/card/database/model/token/token_display_model.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/models/database/card_database_model.h>
+#include <libcockatrice/models/database/token/token_display_model.h>
 #include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 

@@ -3,7 +3,7 @@
 #include "../../../layouts/flow_layout.h"
 
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 /**
  * @class OverlapWidget

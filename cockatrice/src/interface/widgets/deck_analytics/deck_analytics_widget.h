@@ -17,7 +17,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class DeckAnalyticsWidget : public QWidget
 {

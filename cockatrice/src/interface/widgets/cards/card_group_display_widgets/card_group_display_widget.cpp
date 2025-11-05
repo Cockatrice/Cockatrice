@@ -1,12 +1,12 @@
 #include "card_group_display_widget.h"
 
 #include "../card_info_picture_with_text_overlay_widget.h"
-#include "../libcockatrice_deck_list/libcockatrice/deck_list/deck_list_model.h"
-#include "../libcockatrice_deck_list/libcockatrice/deck_list/deck_list_sort_filter_proxy_model.h"
 
 #include <QResizeEvent>
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_sort_filter_proxy_model.h>
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
