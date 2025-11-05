@@ -20,7 +20,7 @@
 #include <QTreeView>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/card/database/model/card_set/card_sets_model.h>
+#include <libcockatrice/models/database/card_set/card_sets_model.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 #define SORT_RESET -1

@@ -18,7 +18,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 #define BATCH_SIZE 10
 

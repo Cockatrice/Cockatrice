@@ -7,11 +7,10 @@
 #ifndef CARDDATABASEMODEL_H
 #define CARDDATABASEMODEL_H
 
-#include "../card_database.h"
-
 #include <QAbstractListModel>
 #include <QList>
 #include <QSet>
+#include <libcockatrice/card/database/card_database.h>
 
 class CardDatabaseModel : public QAbstractListModel
 {

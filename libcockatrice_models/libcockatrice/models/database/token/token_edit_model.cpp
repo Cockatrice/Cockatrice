@@ -1,8 +1,9 @@
-#include "../token/token_edit_model.h"
+#include "token_edit_model.h"
 
-#include "../../../card_info.h"
 #include "../card_database_display_model.h"
 #include "../card_database_model.h"
+
+#include <libcockatrice/card/card_info.h>
 
 TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(parent)
 {

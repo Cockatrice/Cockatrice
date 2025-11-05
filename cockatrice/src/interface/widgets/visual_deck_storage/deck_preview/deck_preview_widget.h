@@ -18,7 +18,7 @@
 #include <QEvent>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class QMenu;
 class VisualDeckStorageWidget;

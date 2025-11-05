@@ -12,7 +12,7 @@
 #include <QJsonObject>
 #include <QString>
 #include <QVector>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class EdhrecDeckApiResponse
 {

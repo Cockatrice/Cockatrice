@@ -16,7 +16,7 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class SetEntryWidget; // Forward declaration
 

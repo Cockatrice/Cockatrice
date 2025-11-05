@@ -14,7 +14,7 @@
 #include "set_name_and_collectors_number_display_widget.h"
 
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class PrintingSelectorCardOverlayWidget : public QWidget
 {

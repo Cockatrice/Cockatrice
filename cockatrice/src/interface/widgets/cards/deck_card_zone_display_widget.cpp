@@ -5,7 +5,7 @@
 
 #include <QResizeEvent>
 #include <libcockatrice/card/card_info_comparator.h>
-#include <libcockatrice/deck_list/deck_list_model.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,

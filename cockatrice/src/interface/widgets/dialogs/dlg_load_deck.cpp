@@ -1,6 +1,6 @@
 #include "dlg_load_deck.h"
 
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <libcockatrice/settings/cache_settings.h>
 
 DlgLoadDeck::DlgLoadDeck(QWidget *parent) : QFileDialog(parent, tr("Load Deck"))

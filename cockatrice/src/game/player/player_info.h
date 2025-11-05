@@ -14,7 +14,7 @@
 #include "player_target.h"
 
 #include <QObject>
-#include <libcockatrice/deck_list/deck_loader.h>
+#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class PlayerInfo : public QObject
