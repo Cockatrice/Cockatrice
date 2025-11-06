@@ -139,9 +139,34 @@ void PlayerActions::actViewHand()
     player->getGameScene()->toggleZoneView(player, "hand", -1);
 }
 
+/**
+ * @brief The sortHand actions only pass along a single SortOption in its data.
+ * This method fills out the rest of the sort priority list given that option.
+ * @param option The single sort option
+ * @return The sort priority list
+ */
+static QList<CardList::SortOption> expandSortOption(CardList::SortOption option)
+{
+    switch (option) {
+        case CardList::SortByName:
+            return {};
+        case CardList::SortByMainType:
+            return {CardList::SortByMainType, CardList::SortByManaValue};
+        case CardList::SortByManaValue:
+            return {CardList::SortByManaValue, CardList::SortByColors};
+        default:
+            return {};
+    }
+}
+
 void PlayerActions::actSortHand()
 {
-    player->getGraphicsItem()->getHandZoneGraphicsItem()->sortHand();
+    auto *action = static_cast<QAction *>(sender());
+    CardList::SortOption option = static_cast<CardList::SortOption>(action->data().toInt());
+
+    QList<CardList::SortOption> sortOptions = expandSortOption(option);
+
+    player->getGraphicsItem()->getHandZoneGraphicsItem()->sortHand(sortOptions);
 }
 
 void PlayerActions::actViewTopCards()

@@ -111,12 +111,17 @@ void HandZone::reorganizeCards()
     update();
 }
 
-void HandZone::sortHand()
+void HandZone::sortHand(const QList<CardList::SortOption> &options)
 {
     if (getLogic()->getCards().isEmpty()) {
         return;
     }
-    getLogic()->sortCards({CardList::SortByMainType, CardList::SortByManaValue, CardList::SortByColorGrouping});
+
+    // Implicitly sort by name at the end so that cards with the same name appear together.
+    // Also group printings together
+    static QList defaultOptions = {CardList::SortByName, CardList::SortByPrinting};
+
+    getLogic()->sortCards(options + defaultOptions);
     reorganizeCards();
 }
 
