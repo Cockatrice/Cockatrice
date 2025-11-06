@@ -1,5 +1,6 @@
 #include "card_set.h"
 
+#include <QSet>
 #include <utility>
 
 const char *CardSet::TOKENS_SETNAME = "TK";
