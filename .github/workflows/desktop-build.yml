@@ -464,7 +464,7 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           QTDIR: ${{ matrix.os == 'macOS' && format('{0}/Qt/{1}/macos', github.workspace, matrix.qt_version) || '' }}
         run: |
-          ls -lah ${{ github.workspace }}/Qt
+          ls -lah ${{ github.workspace }}/Qt/Qt
           .ci/compile.sh --server --test --vcpkg
 
       - name: Sign app bundle
