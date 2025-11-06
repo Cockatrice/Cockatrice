@@ -1,5 +1,6 @@
 #include "deck_view_container.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
@@ -9,7 +10,6 @@
 #include "../game_scene.h"
 #include "deck_view.h"
 
-#include <../../client/settings/cache_settings.h>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QToolButton>

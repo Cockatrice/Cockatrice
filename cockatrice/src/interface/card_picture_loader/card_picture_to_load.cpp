@@ -1,6 +1,7 @@
 #include "card_picture_to_load.h"
 
-#include <../../client/settings/cache_settings.h>
+#include "../../client/settings/cache_settings.h"
+
 #include <QCoreApplication>
 #include <QDate>
 #include <QRegularExpression>

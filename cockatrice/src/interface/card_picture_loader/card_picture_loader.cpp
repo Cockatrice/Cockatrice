@@ -1,6 +1,7 @@
 #include "card_picture_loader.h"
 
-#include <../../client/settings/cache_settings.h>
+#include "../../client/settings/cache_settings.h"
+
 #include <QApplication>
 #include <QBuffer>
 #include <QDebug>

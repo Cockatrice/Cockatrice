@@ -1,5 +1,6 @@
 #include "stack_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
@@ -7,7 +8,6 @@
 #include "../player/player.h"
 #include "logic/stack_zone_logic.h"
 
-#include <../../client/settings/cache_settings.h>
 #include <QPainter>
 #include <QSet>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>

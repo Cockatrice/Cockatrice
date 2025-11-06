@@ -1,8 +1,8 @@
 #include "card_picture_loader_worker_work.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "card_picture_loader_worker.h"
 
-#include <../../client/settings/cache_settings.h>
 #include <QBuffer>
 #include <QDirIterator>
 #include <QLoggingCategory>

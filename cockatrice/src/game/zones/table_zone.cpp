@@ -1,5 +1,6 @@
 #include "table_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
@@ -7,7 +8,6 @@
 #include "../player/player.h"
 #include "logic/table_zone_logic.h"
 
-#include <../../client/settings/cache_settings.h>
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QSet>

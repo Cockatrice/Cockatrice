@@ -21,6 +21,7 @@
 
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
+#include "../client/settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_connect.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
@@ -40,7 +41,6 @@
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
 
-#include <../client/settings/cache_settings.h>
 #include <QAction>
 #include <QApplication>
 #include <QButtonGroup>

@@ -7,9 +7,8 @@
 #ifndef CARD_COUNTER_SETTINGS_H
 #define CARD_COUNTER_SETTINGS_H
 
-#include "../../../../libcockatrice_settings/libcockatrice/settings/settings_manager.h"
-
 #include <QObject>
+#include <libcockatrice/settings/settings_manager.h>
 
 class QSettings;
 class QColor;
