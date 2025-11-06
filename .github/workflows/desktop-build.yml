@@ -111,7 +111,7 @@ jobs:
           - soc: Apple
             os: macos-15
 
-    name: Install Qt for ${{ matrix.soc }} on ${{ matrix.os }}
+    name: Install Qt for ${{ matrix.soc }}
     runs-on: ${{ matrix.os }}
     env:
       QT_VERSION: 6.6.3
@@ -137,7 +137,7 @@ jobs:
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
-          dir: Qt
+          dir: ${{ github.workspace }}
 
       - name: Thin Qt libraries
         if: steps.restore_qt.outputs.cache-hit != 'true'
