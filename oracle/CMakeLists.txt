@@ -23,6 +23,9 @@ set(oracle_SOURCES
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/qt-json/json.cpp
+    ../cockatrice/src/client/settings/cache_settings.cpp
+    ../cockatrice/src/client/settings/card_counter_settings.cpp
+    ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
@@ -140,6 +143,7 @@ target_link_libraries(
   oracle
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
+  PUBLIC libcockatrice_network
   PUBLIC ${ORACLE_QT_MODULES}
 )
 

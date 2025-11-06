@@ -1,6 +1,6 @@
 #include "oraclewizard.h"
 
-#include "../../../client/settings/cache_settings.h"
+#include "client/settings/cache_settings.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "version_string.h"
