@@ -303,14 +303,11 @@ jobs:
           ccache-key-prefix: ccache-${{matrix.os}}-${{matrix.soc}}-${{matrix.type}}
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Add RUNNER_WORKSPACE to GitHub environment variables
-        run: echo "RUNNER_WORKSPACE=$RUNNER_WORKSPACE" >> $GITHUB_ENV
-
       - name: Restore thin Qt libraries
         id: restore_qt
         uses: actions/cache/restore@v4
         with:
-          path: ${{ env.RUNNER_WORKSPACE }}/Qt
+          path: ${{ github.workspace }}/Qt
           key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       # Using jurplel/install-qt-action to install Qt without using brew
@@ -323,6 +320,7 @@ jobs:
           version: ${{env.QT_VERSION}}
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
+          dir: Qt
 
       - name: Thin Qt libraries
         if: steps.restore_qt.outputs.cache-hit != 'true'
@@ -330,7 +328,7 @@ jobs:
           export ARCH=$(uname -m)
           export NPROC=$(sysctl -n hw.ncpu)
           echo "::group::Thinning Qt libraries to $ARCH using $NPROC cores"
-          find $RUNNER_WORKSPACE/Qt -type f -print0 | \
+          find ${{ github.workspace }}/Qt -type f -print0 | \
             xargs -0 -n1 -P "$NPROC" sh -c \
               'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && echo "Processing $0" && lipo "$0" -thin "$ARCH" -output "$0" || true'
           echo "::endgroup::"
@@ -339,7 +337,7 @@ jobs:
         if: steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: ${{ env.RUNNER_WORKSPACE }}/Qt
+          path: ${{ github.workspace }}/Qt
           key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       - name: Setup vcpkg cache
@@ -363,7 +361,7 @@ jobs:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          QTDIR: ${{ env.RUNNER_WORKSPACE }}/Qt/${{ env.QT_VERSION }}/macos
+          QTDIR: ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos
         run: .ci/compile.sh --server --test --ccache "$CCACHE_SIZE" --vcpkg
 
       - name: Sign app bundle
