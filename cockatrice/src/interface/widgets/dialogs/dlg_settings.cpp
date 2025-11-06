@@ -1484,7 +1484,7 @@ void MessagesSettingsPage::storeSettings()
     SettingsCache::instance()->messages().setCount(messageList->count());
     for (int i = 0; i < messageList->count(); i++)
         SettingsCache::instance()->messages().setMessageAt(i, messageList->item(i)->text());
-    emit SettingsCache::instance() -> messages().messageMacrosChanged();
+    emit SettingsCache::instance()->messages().messageMacrosChanged();
 }
 
 void MessagesSettingsPage::actAdd()
