@@ -123,6 +123,7 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v4
         with:
+          lookup-only: true
           path: ${{ github.workspace }}/Qt
           key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
