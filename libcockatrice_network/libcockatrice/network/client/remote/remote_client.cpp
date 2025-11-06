@@ -1,6 +1,5 @@
 #include "remote_client.h"
 
-#include "../../../../cockatrice/src/main.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
