@@ -28,7 +28,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 {
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance()->getHorizontalHand()) {
         for (x = 0; x < getLogic()->getCards().size(); x++)
             if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x())
                 break;
@@ -54,7 +54,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
 QRectF HandZone::boundingRect() const
 {
-    if (SettingsCache::instance().getHorizontalHand())
+    if (SettingsCache::instance()->getHorizontalHand())
         return QRectF(0, 0, width, CARD_HEIGHT + 10);
     else
         return QRectF(0, 0, 100, zoneHeight);
@@ -70,8 +70,8 @@ void HandZone::reorganizeCards()
 {
     if (!getLogic()->getCards().isEmpty()) {
         const int cardCount = getLogic()->getCards().size();
-        if (SettingsCache::instance().getHorizontalHand()) {
-            bool leftJustified = SettingsCache::instance().getLeftJustified();
+        if (SettingsCache::instance()->getHorizontalHand()) {
+            bool leftJustified = SettingsCache::instance()->getLeftJustified();
             qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
@@ -122,7 +122,7 @@ void HandZone::sortHand()
 
 void HandZone::setWidth(qreal _width)
 {
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance()->getHorizontalHand()) {
         prepareGeometryChange();
         width = _width;
         reorganizeCards();

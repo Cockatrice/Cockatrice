@@ -91,7 +91,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
     connect(chooseTokenFromDeckRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromDeck);
 
-    QByteArray deckHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
+    QByteArray deckHeaderState = SettingsCache::instance()->layouts().getDeckEditorDbHeaderState();
     chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);
@@ -151,13 +151,13 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     setWindowTitle(tr("Create token"));
 
     resize(600, 500);
-    restoreGeometry(SettingsCache::instance().getTokenDialogGeometry());
+    restoreGeometry(SettingsCache::instance()->getTokenDialogGeometry());
 }
 
 void DlgCreateToken::closeEvent(QCloseEvent *event)
 {
     event->accept();
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance()->setTokenDialogGeometry(saveGeometry());
 }
 
 void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
@@ -190,7 +190,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
-        if (SettingsCache::instance().getAnnotateTokens())
+        if (SettingsCache::instance()->getAnnotateTokens())
             annotationEdit->setText(cardInfo->getText());
     } else {
         nameEdit->setText("");
@@ -234,13 +234,13 @@ void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 
 void DlgCreateToken::actOk()
 {
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance()->setTokenDialogGeometry(saveGeometry());
     accept();
 }
 
 void DlgCreateToken::actReject()
 {
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance()->setTokenDialogGeometry(saveGeometry());
     reject();
 }
 
@@ -252,5 +252,5 @@ TokenInfo DlgCreateToken::getTokenInfo() const
             .annotation = annotationEdit->text(),
             .destroy = destroyCheckBox->isChecked(),
             .faceDown = faceDownCheckBox->isChecked(),
-            .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(nameEdit->text())};
+            .providerId = SettingsCache::instance()->cardOverrides().getCardPreferenceOverride(nameEdit->text())};
 }

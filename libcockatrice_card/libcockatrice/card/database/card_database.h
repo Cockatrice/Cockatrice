@@ -10,6 +10,7 @@
 #include "../set/card_set_list.h"
 #include "card_database_loader.h"
 #include "card_database_querier.h"
+#include "interface/interface_card_database_path_provider.h"
 #include "interface/noop_card_preference_provider.h"
 
 #include <QBasicMutex>
@@ -28,6 +29,8 @@ class CardDatabase : public QObject
 {
     Q_OBJECT
 protected:
+    QSharedPointer<ICardSetPriorityController> setPriorityController;
+
     /*
      * The cards, indexed by name.
      */
@@ -58,7 +61,10 @@ private:
                 *removeCardMutex = new QBasicMutex();
 
 public:
-    explicit CardDatabase(QObject *parent = nullptr, QSharedPointer<ICardPreferenceProvider> prefs = nullptr);
+    explicit CardDatabase(QObject *parent = nullptr,
+                          QSharedPointer<ICardPreferenceProvider> prefs = nullptr,
+                          QSharedPointer<ICardDatabasePathProvider> pathProvider = nullptr,
+                          QSharedPointer<ICardSetPriorityController> setPriorityController = nullptr);
     ~CardDatabase() override;
 
     void removeCard(CardInfoPtr card);

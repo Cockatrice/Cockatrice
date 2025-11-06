@@ -645,7 +645,7 @@ void MessageLogWidget::logSetCardCounter(Player *player, QString cardName, int c
         finalStr = tr("%1 removes %2 \"%3\" counter(s) from %4 (now %5).", "", delta);
     }
 
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    auto &cardCounterSettings = SettingsCache::instance()->cardCounters();
     appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg("<font class=\"blue\">" + QString::number(delta) + "</font>")
                                 .arg(cardCounterSettings.displayName(counterId))

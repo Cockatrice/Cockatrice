@@ -7,6 +7,8 @@
 #ifndef COCKATRICE_CARD_DATABASE_LOADER_H
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 
+#include "interface/interface_card_database_path_provider.h"
+
 #include <QBasicMutex>
 #include <QList>
 #include <QLoggingCategory>
@@ -32,7 +34,9 @@ class CardDatabaseLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit CardDatabaseLoader(QObject *parent, CardDatabase *db);
+    explicit CardDatabaseLoader(QObject *parent,
+                                CardDatabase *db,
+                                QSharedPointer<ICardDatabasePathProvider> pathProvider);
     ~CardDatabaseLoader() override;
 
 public slots:
@@ -52,6 +56,8 @@ private:
     QStringList collectCustomDatabasePaths() const;
 
     CardDatabase *database; // non-owning pointer to the container
+
+    QSharedPointer<ICardDatabasePathProvider> pathProvider; // pointer to the implementation providing the paths
 
     // parsers
     QList<ICardDatabaseParser *> availableParsers;

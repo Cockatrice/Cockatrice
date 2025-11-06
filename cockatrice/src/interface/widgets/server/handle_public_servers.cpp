@@ -87,11 +87,11 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         }
 
         if (serverFound) {
-            SettingsCache::instance().servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort,
-                                                                                serverSite);
+            SettingsCache::instance()->servers().updateExistingServerWithoutLoss(serverName, serverAddress, serverPort,
+                                                                                 serverSite);
         } else {
-            SettingsCache::instance().servers().addNewServer(serverName, serverAddress, serverPort, "", "", false,
-                                                             serverSite);
+            SettingsCache::instance()->servers().addNewServer(serverName, serverAddress, serverPort, "", "", false,
+                                                              serverSite);
         }
     }
 
@@ -102,7 +102,7 @@ void HandlePublicServers::updateServerINISettings(QMap<QString, QVariant> jsonMa
         QString serverAddr = pair.first;
 
         if (publicServersToRemove.indexOf(serverAddr) != -1) {
-            SettingsCache::instance().servers().removeServer(serverAddr);
+            SettingsCache::instance()->servers().removeServer(serverAddr);
         }
     }
 

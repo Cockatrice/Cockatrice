@@ -80,7 +80,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     connectMessageLogToGameEventHandler();
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);
     refreshShortcuts();
     messageLog->logReplayStarted(game->getGameMetaInfo()->gameId());
@@ -125,7 +125,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     connectMessageLogToGameEventHandler();
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabGame::refreshShortcuts);
     refreshShortcuts();
 
@@ -254,7 +254,7 @@ void TabGame::resetChatAndPhase()
 void TabGame::emitUserEvent()
 {
     bool globalEvent =
-        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+        !game->getPlayerManager()->isSpectator() || SettingsCache::instance()->getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
@@ -377,7 +377,7 @@ void TabGame::retranslateUi()
 
 void TabGame::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     for (int i = 0; i < phaseActions.size(); ++i) {
         QAction *temp = phaseActions.at(i);
         switch (i) {
@@ -625,8 +625,8 @@ void TabGame::actRotateViewCCW()
 
 void TabGame::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance()->getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                         : completer->setCompletionRole(1);
 }
 
 void TabGame::notifyPlayerJoin(QString playerName)
@@ -688,7 +688,7 @@ void TabGame::addLocalPlayer(Player *newPlayer, int playerId)
     deckViewContainerLayout->addWidget(deckView);
 
     // auto load deck for player if that debug setting is enabled
-    QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getPlayerInfo()->getName());
+    QString deckPath = SettingsCache::instance()->debug().getDeckPathForPlayer(newPlayer->getPlayerInfo()->getName());
     if (!deckPath.isEmpty()) {
         QTimer::singleShot(0, this, [deckView, deckPath] {
             deckView->playerDeckView->loadDeckFromFile(deckPath);
@@ -1089,7 +1089,7 @@ void TabGame::createViewMenuItems()
 
 void TabGame::loadLayout()
 {
-    LayoutsSettings &layouts = SettingsCache::instance().layouts();
+    LayoutsSettings &layouts = SettingsCache::instance()->layouts();
     if (replayManager->replay) {
         restoreGeometry(layouts.getReplayPlayAreaGeometry());
         restoreState(layouts.getReplayPlayAreaLayoutState());
@@ -1323,7 +1323,7 @@ void TabGame::createMessageDock(bool bReplay)
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+        connect(SettingsCache::instance().get(), &SettingsCache::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
     }
 
@@ -1384,7 +1384,7 @@ void TabGame::createMessageDock(bool bReplay)
 
 void TabGame::hideEvent(QHideEvent *event)
 {
-    LayoutsSettings &layouts = SettingsCache::instance().layouts();
+    LayoutsSettings &layouts = SettingsCache::instance()->layouts();
     if (replayManager->replay) {
         layouts.setReplayPlayAreaState(saveState());
         layouts.setReplayPlayAreaGeometry(saveGeometry());

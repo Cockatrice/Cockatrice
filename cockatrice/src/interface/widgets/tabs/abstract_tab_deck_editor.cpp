@@ -49,9 +49,11 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this, [this] {
-        printingSelectorDockWidget->setHidden(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
-    });
+    connect(SettingsCache::instance().get(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+            [this] {
+                printingSelectorDockWidget->setHidden(
+                    SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference());
+            });
 
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
@@ -71,7 +73,7 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
             &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
@@ -153,7 +155,7 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
     setDeck(deck);
 
     if (!deck->getLastFileName().isEmpty()) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
+        SettingsCache::instance()->recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
     }
 }
 
@@ -227,7 +229,7 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
     // handle `openDeckInNewTab` setting
-    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+    if (SettingsCache::instance()->getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && isBlankNewDeck()) {
             return SAME_TAB;
         } else {
@@ -366,7 +368,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
 bool AbstractTabDeckEditor::actSaveDeckAs()
 {
     QFileDialog dialog(this, tr("Save deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+    dialog.setDirectory(SettingsCache::instance()->getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
@@ -386,7 +388,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     }
     setModified(false);
 
-    SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
+    SettingsCache::instance()->recents().updateRecentlyOpenedDeckPaths(fileName);
 
     return true;
 }
@@ -577,7 +579,7 @@ bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
         }
     }
     if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
+        LayoutsSettings &layouts = SettingsCache::instance()->layouts();
         layouts.setDeckEditorLayoutState(saveState());
         layouts.setDeckEditorGeometry(saveGeometry());
         layouts.setDeckEditorCardSize(cardInfoDockWidget->size());

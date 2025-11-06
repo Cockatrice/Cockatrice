@@ -21,7 +21,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
     backgroundSourceDeck = new DeckLoader();
 
-    backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
+    backgroundSourceDeck->loadFromFile(SettingsCache::instance()->getDeckPath() + "background.cod",
                                        DeckLoader::CockatriceFormat, false);
 
     gradientColors = extractDominantColors(background);
@@ -43,9 +43,9 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     updateConnectButton(tabSupervisor->getClient()->getStatus());
 
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
-    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundSourceChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::homeTabBackgroundSourceChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
-    connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
 }
 
@@ -57,7 +57,7 @@ void HomeWidget::initializeBackgroundFromSource()
         return;
     }
 
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance()->getHomeTabBackgroundSource());
 
     cardChangeTimer->stop();
 
@@ -68,19 +68,19 @@ void HomeWidget::initializeBackgroundFromSource()
             update();
             break;
         case BackgroundSources::RandomCardArt:
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            cardChangeTimer->start(SettingsCache::instance()->getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
         case BackgroundSources::DeckFileArt:
-            backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
+            backgroundSourceDeck->loadFromFile(SettingsCache::instance()->getDeckPath() + "background.cod",
                                                DeckLoader::CockatriceFormat, false);
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            cardChangeTimer->start(SettingsCache::instance()->getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
     }
 }
 
 void HomeWidget::updateRandomCard()
 {
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance()->getHomeTabBackgroundSource());
 
     ExactCard newCard;
 
@@ -121,7 +121,7 @@ void HomeWidget::updateRandomCard()
     backgroundSourceCard->setCard(newCard);
     background = backgroundSourceCard->getProcessedBackground(size());
 
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
+    if (SettingsCache::instance()->getHomeTabBackgroundShuffleFrequency() <= 0) {
         cardChangeTimer->stop();
     }
 }
@@ -129,10 +129,10 @@ void HomeWidget::updateRandomCard()
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
 {
     cardChangeTimer->stop();
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
+    if (SettingsCache::instance()->getHomeTabBackgroundShuffleFrequency() <= 0) {
         return;
     }
-    cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+    cardChangeTimer->start(SettingsCache::instance()->getHomeTabBackgroundShuffleFrequency() * 1000);
 }
 
 void HomeWidget::updateBackgroundProperties()
@@ -236,8 +236,8 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    if (SettingsCache::instance().getThemeName() == "Default" &&
-        SettingsCache::instance().getHomeTabBackgroundSource() == BackgroundSources::toId(BackgroundSources::Theme)) {
+    if (SettingsCache::instance()->getThemeName() == "Default" &&
+        SettingsCache::instance()->getHomeTabBackgroundSource() == BackgroundSources::toId(BackgroundSources::Theme)) {
         return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
     }
 

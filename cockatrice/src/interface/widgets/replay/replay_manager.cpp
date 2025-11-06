@@ -88,7 +88,7 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
 
     connect(this, &ReplayManager::requestChatAndPhaseReset, game, &TabGame::resetChatAndPhase);
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &ReplayManager::refreshShortcuts);
     refreshShortcuts();
 }
@@ -128,7 +128,7 @@ void ReplayManager::replayRewind()
 
 void ReplayManager::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     if (aReplaySkipForward) {
         aReplaySkipForward->setShortcuts(shortcuts.getShortcut("Replays/aSkipForward"));
     }

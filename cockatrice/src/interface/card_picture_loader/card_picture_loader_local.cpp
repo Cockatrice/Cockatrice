@@ -10,11 +10,11 @@
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 
 CardPictureLoaderLocal::CardPictureLoaderLocal(QObject *parent)
-    : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath())
+    : QObject(parent), picsPath(SettingsCache::instance()->getPicsPath()),
+      customPicsPath(SettingsCache::instance()->getCustomPicsPath())
 {
     // Hook up signals to settings
-    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::picsPathChanged, this,
             &CardPictureLoaderLocal::picsPathChanged);
 
     refreshIndex();
@@ -150,6 +150,6 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
 void CardPictureLoaderLocal::picsPathChanged()
 {
-    picsPath = SettingsCache::instance().getPicsPath();
-    customPicsPath = SettingsCache::instance().getCustomPicsPath();
+    picsPath = SettingsCache::instance()->getPicsPath();
+    customPicsPath = SettingsCache::instance()->getCustomPicsPath();
 }

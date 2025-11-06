@@ -1,8 +1,7 @@
 #include "../../../interface/widgets/menus/deck_editor_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
-
-#include <../../../client/settings/shortcuts_settings.h>
+#include "../../../client/settings/shortcuts_settings.h"
 
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
@@ -13,7 +12,7 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     connect(aLoadDeck, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::actLoadDeck);
 
     loadRecentDeckMenu = new QMenu(this);
-    connect(&SettingsCache::instance().recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
+    connect(&SettingsCache::instance().get()->recents(), &RecentsSettings::recentlyOpenedDeckPathsChanged, this,
             &DeckEditorMenu::updateRecentlyOpened);
 
     aClearRecents = new QAction(QString(), this);
@@ -110,7 +109,7 @@ DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), d
     addAction(aClose);
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &DeckEditorMenu::refreshShortcuts);
     refreshShortcuts();
 }
@@ -131,7 +130,7 @@ void DeckEditorMenu::setSaveStatus(bool newStatus)
 void DeckEditorMenu::updateRecentlyOpened()
 {
     loadRecentDeckMenu->clear();
-    for (const auto &deckPath : SettingsCache::instance().recents().getRecentlyOpenedDeckPaths()) {
+    for (const auto &deckPath : SettingsCache::instance()->recents().getRecentlyOpenedDeckPaths()) {
         QAction *aRecentlyOpenedDeck = new QAction(deckPath, this);
         loadRecentDeckMenu->addAction(aRecentlyOpenedDeck);
         connect(aRecentlyOpenedDeck, &QAction::triggered, deckEditor,
@@ -139,12 +138,12 @@ void DeckEditorMenu::updateRecentlyOpened()
     }
     loadRecentDeckMenu->addSeparator();
     loadRecentDeckMenu->addAction(aClearRecents);
-    aClearRecents->setEnabled(SettingsCache::instance().recents().getRecentlyOpenedDeckPaths().length() > 0);
+    aClearRecents->setEnabled(SettingsCache::instance()->recents().getRecentlyOpenedDeckPaths().length() > 0);
 }
 
 void DeckEditorMenu::actClearRecents()
 {
-    SettingsCache::instance().recents().clearRecentlyOpenedDeckPaths();
+    SettingsCache::instance()->recents().clearRecentlyOpenedDeckPaths();
 }
 
 void DeckEditorMenu::retranslateUi()
@@ -183,7 +182,7 @@ void DeckEditorMenu::retranslateUi()
 
 void DeckEditorMenu::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     aNewDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aNewDeck"));
     aLoadDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeck"));
     aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));

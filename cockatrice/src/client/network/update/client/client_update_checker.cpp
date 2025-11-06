@@ -9,7 +9,7 @@ ClientUpdateChecker::ClientUpdateChecker(QObject *parent) : QObject(parent)
 
 void ClientUpdateChecker::check()
 {
-    auto releaseChannel = SettingsCache::instance().getUpdateReleaseChannel();
+    auto releaseChannel = SettingsCache::instance()->getUpdateReleaseChannel();
 
     finishedCheckConnection =
         connect(releaseChannel, &ReleaseChannel::finishedCheck, this, &ClientUpdateChecker::actFinishedCheck);

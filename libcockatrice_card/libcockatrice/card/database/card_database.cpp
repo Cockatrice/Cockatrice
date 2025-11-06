@@ -4,25 +4,26 @@
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
-#include <../../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
-#include <QMessageBox>
 #include <QRegularExpression>
 #include <algorithm>
 #include <utility>
 
-CardDatabase::CardDatabase(QObject *parent, QSharedPointer<ICardPreferenceProvider> prefs)
-    : QObject(parent), loadStatus(NotLoaded)
+CardDatabase::CardDatabase(QObject *parent,
+                           QSharedPointer<ICardPreferenceProvider> prefs,
+                           QSharedPointer<ICardDatabasePathProvider> pathProvider,
+                           QSharedPointer<ICardSetPriorityController> _setPriorityController)
+    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
     // create loader and wire it up
-    loader = new CardDatabaseLoader(this, this);
+    loader = new CardDatabaseLoader(this, this, pathProvider);
     // re-emit loader signals (so other code doesn't need to know about internals)
     connect(loader, &CardDatabaseLoader::loadingFinished, this, &CardDatabase::cardDatabaseLoadingFinished);
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
@@ -139,7 +140,7 @@ CardSetPtr CardDatabase::getSet(const QString &setName)
     if (sets.contains(setName)) {
         return sets.value(setName);
     } else {
-        CardSetPtr newSet = CardSet::newInstance(setName);
+        CardSetPtr newSet = CardSet::newInstance(setPriorityController, setName);
         sets.insert(setName, newSet);
         return newSet;
     }

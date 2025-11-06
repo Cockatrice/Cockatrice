@@ -95,11 +95,11 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     setLayout(deckViewLayout);
 
     retranslateUi();
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &DeckViewContainer::refreshShortcuts);
     refreshShortcuts();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageInGameChanged, this,
             &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
@@ -142,7 +142,7 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    if (SettingsCache::instance().getVisualDeckStorageInGame()) {
+    if (SettingsCache::instance()->getVisualDeckStorageInGame()) {
         deckView->setHidden(true);
 
         tryCreateVisualDeckStorageWidget();
@@ -203,13 +203,13 @@ void DeckViewContainer::updateSideboardLockButtonText()
         sideboardLockButton->setText(tr("Sideboard locked"));
     }
     // setting text on a button removes its shortcut
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
 }
 
 void DeckViewContainer::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
     loadFromClipboardButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromClipboardButton"));

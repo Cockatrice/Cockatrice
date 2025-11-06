@@ -63,18 +63,18 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     showBannerCardCheckBox = new QCheckBox();
     showBannerCardCheckBox->setObjectName("showBannerCardCheckBox");
-    showBannerCardCheckBox->setChecked(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
-    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+    showBannerCardCheckBox->setChecked(SettingsCache::instance()->getDeckEditorBannerCardComboBoxVisible());
+    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
             &SettingsCache::setDeckEditorBannerCardComboBoxVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorBannerCardComboBoxVisibleChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::deckEditorBannerCardComboBoxVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowBannerCardComboBox);
 
     showTagsWidgetCheckBox = new QCheckBox();
     showTagsWidgetCheckBox->setObjectName("showTagsWidgetCheckBox");
-    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().getDeckEditorTagsWidgetVisible());
-    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+    showTagsWidgetCheckBox->setChecked(SettingsCache::instance()->getDeckEditorTagsWidgetVisible());
+    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
             &SettingsCache::setDeckEditorTagsWidgetVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowTagsWidget);
 
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
@@ -91,7 +91,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance()->getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(deckModel, &DeckListModel::dataChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -99,10 +99,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
     });
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::setBannerCard);
-    bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardComboBox->setHidden(!SettingsCache::instance()->getDeckEditorBannerCardComboBoxVisible());
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
-    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
+    deckTagsDisplayWidget->setHidden(!SettingsCache::instance()->getDeckEditorTagsWidgetVisible());
 
     activeGroupCriteriaLabel = new QLabel(this);
 
@@ -577,7 +577,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+    if (!SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference()) {
         QMenu menu;
 
         QAction *selectPrinting = menu.addAction(tr("Select Printing"));
@@ -589,7 +589,7 @@ void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 
 void DeckEditorDeckDockWidget::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     aRemoveCard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aRemoveCard"));
     aIncrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aIncrement"));
     aDecrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aDecrement"));

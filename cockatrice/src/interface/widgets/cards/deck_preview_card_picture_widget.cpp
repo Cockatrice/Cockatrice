@@ -40,7 +40,7 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
     connect(singleClickTimer, &QTimer::timeout, this, [this]() { emit imageClicked(lastMouseEvent, this); });
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
             &CardInfoPictureWidget::setRaiseOnEnterEnabled);
 }
 

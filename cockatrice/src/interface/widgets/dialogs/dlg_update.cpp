@@ -23,10 +23,10 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     statusLabel = new QLabel(this);
     statusLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
     statusLabel->setWordWrap(true);
-    descriptionLabel =
-        new QLabel(tr("Current release channel") +
-                       QString(": %1").arg(tr(SettingsCache::instance().getUpdateReleaseChannel()->getName().toUtf8())),
-                   this);
+    descriptionLabel = new QLabel(
+        tr("Current release channel") +
+            QString(": %1").arg(tr(SettingsCache::instance()->getUpdateReleaseChannel()->getName().toUtf8())),
+        this);
     progress = new QProgressBar(this);
 
     buttonBox = new QDialogButtonBox(this);
@@ -84,7 +84,7 @@ void DlgUpdate::closeDialog()
 
 void DlgUpdate::gotoDownloadPage()
 {
-    QDesktopServices::openUrl(SettingsCache::instance().getUpdateReleaseChannel()->getManualDownloadUrl());
+    QDesktopServices::openUrl(SettingsCache::instance()->getUpdateReleaseChannel()->getManualDownloadUrl());
 }
 
 void DlgUpdate::downloadUpdate(const QString &releaseName)
@@ -141,7 +141,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
                 "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
                 tr("Selected release channel") +
-                QString(":</b> %1").arg(tr(SettingsCache::instance().getUpdateReleaseChannel()->getName().toUtf8())));
+                QString(":</b> %1").arg(tr(SettingsCache::instance()->getUpdateReleaseChannel()->getName().toUtf8())));
         return;
     }
 

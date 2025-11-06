@@ -1,12 +1,12 @@
 #include "hand_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../abstract_game.h"
 #include "../../zones/hand_zone.h"
 #include "../player.h"
 #include "../player_actions.h"
 
-#include <../../../client/settings/shortcuts_settings.h>
 #include <QAction>
 #include <QMenu>
 
@@ -89,7 +89,7 @@ void HandMenu::retranslateUi()
 
 void HandMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
     aSortHand->setShortcuts(shortcuts.getShortcut("Player/aSortHand"));
     aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));

@@ -42,4 +42,4 @@ target_include_directories(
   PUBLIC ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network
 )
 
-target_link_libraries(libcockatrice_settings PUBLIC libcockatrice_utility ${QT_CORE_MODULE})
+target_link_libraries(libcockatrice_settings PUBLIC libcockatrice_card libcockatrice_utility ${QT_CORE_MODULE})

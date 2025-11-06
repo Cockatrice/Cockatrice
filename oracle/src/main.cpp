@@ -21,7 +21,7 @@ bool isBackgrounded;
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance()->getLang();
 
     QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))

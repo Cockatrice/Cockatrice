@@ -14,7 +14,7 @@
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
-    ServersSettings &servers = SettingsCache::instance().servers();
+    ServersSettings &servers = SettingsCache::instance()->servers();
     infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
                               "Your email will be used to verify your account."));
     infoLabel->setWordWrap(true);
@@ -312,7 +312,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/zm"), "zm");
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
-    QStringList countries = SettingsCache::instance().getCountries();
+    QStringList countries = SettingsCache::instance()->getCountries();
     for (const QString &c : countries)
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
 

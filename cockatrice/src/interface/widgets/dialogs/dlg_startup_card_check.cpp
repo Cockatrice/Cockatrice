@@ -10,7 +10,7 @@ DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 
     layout = new QVBoxLayout(this);
 
-    QDate lastCheckDate = SettingsCache::instance().getLastCardUpdateCheck();
+    QDate lastCheckDate = SettingsCache::instance()->getLastCardUpdateCheck();
     int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
 
     instructionLabel = new QLabel(

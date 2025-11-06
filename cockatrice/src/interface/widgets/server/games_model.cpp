@@ -364,7 +364,7 @@ bool GamesProxyModel::areFilterParametersSetToDefaults() const
 
 void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameTypes)
 {
-    GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
+    GameFiltersSettings &gameFilters = SettingsCache::instance()->gameFilters();
 
     QSet<int> newGameTypeFilter;
     QMapIterator<int, QString> gameTypesIterator(allGameTypes);
@@ -387,7 +387,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
 
 void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameTypes)
 {
-    GameFiltersSettings &gameFilters = SettingsCache::instance().gameFilters();
+    GameFiltersSettings &gameFilters = SettingsCache::instance()->gameFilters();
     gameFilters.setHideBuddiesOnlyGames(hideBuddiesOnlyGames);
     gameFilters.setHideFullGames(hideFullGames);
     gameFilters.setHideGamesThatStarted(hideGamesThatStarted);

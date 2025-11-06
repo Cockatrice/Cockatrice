@@ -59,7 +59,7 @@ ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
 
     expandAll();
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &ShortcutTreeView::refreshShortcuts);
 }
 
@@ -67,10 +67,10 @@ void ShortcutTreeView::populateShortcutsModel()
 {
     QHash<QString, QStandardItem *> parentItems;
     QStandardItem *curParent = nullptr;
-    for (const auto &key : SettingsCache::instance().shortcuts().getAllShortcutKeys()) {
-        QString name = SettingsCache::instance().shortcuts().getShortcut(key).getName();
-        QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
-        QString shortcut = SettingsCache::instance().shortcuts().getShortcutString(key);
+    for (const auto &key : SettingsCache::instance()->shortcuts().getAllShortcutKeys()) {
+        QString name = SettingsCache::instance()->shortcuts().getShortcut(key).getName();
+        QString group = SettingsCache::instance()->shortcuts().getShortcut(key).getGroupName();
+        QString shortcut = SettingsCache::instance()->shortcuts().getShortcutString(key);
 
         if (parentItems.contains(group)) {
             curParent = parentItems.value(group);
@@ -110,7 +110,7 @@ static void loopOverModel(QAbstractItemModel *model, const QModelIndex &parent =
         if (model->hasChildren(friendlyNameIndex)) {
             const auto childIndex = model->index(0, 2, friendlyNameIndex);
             const auto key = model->data(childIndex).toString();
-            const auto shortcutGroupName = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
+            const auto shortcutGroupName = SettingsCache::instance()->shortcuts().getShortcut(key).getGroupName();
             model->setData(friendlyNameIndex, shortcutGroupName);
 
             loopOverModel(model, friendlyNameIndex);
@@ -119,8 +119,8 @@ static void loopOverModel(QAbstractItemModel *model, const QModelIndex &parent =
             const auto keyIndex = model->index(r, 2, parent);
             const auto key = model->data(keyIndex).toString();
 
-            const auto shortcutKey = SettingsCache::instance().shortcuts().getShortcut(key).getName();
-            const auto shortcutSequence = SettingsCache::instance().shortcuts().getShortcutString(key);
+            const auto shortcutKey = SettingsCache::instance()->shortcuts().getShortcut(key).getName();
+            const auto shortcutSequence = SettingsCache::instance()->shortcuts().getShortcutString(key);
             model->setData(friendlyNameIndex, shortcutKey);
             model->setData(shortcutSequenceIndex, shortcutSequence);
         }

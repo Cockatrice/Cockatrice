@@ -14,7 +14,20 @@
 #include <QStandardPaths>
 #include <utility>
 
-Q_GLOBAL_STATIC(SettingsCache, settingsCache);
+QSharedPointer<SettingsCache> SettingsCache::settingsInstance = nullptr;
+
+QSharedPointer<SettingsCache> SettingsCache::instance()
+{
+    if (!settingsInstance) {
+        settingsInstance.reset(new SettingsCache()); // default real instance
+    }
+    return settingsInstance;
+}
+
+void SettingsCache::setInstance(QSharedPointer<SettingsCache> newInstance)
+{
+    settingsInstance = newInstance;
+}
 
 QString SettingsCache::getDataPath()
 {
@@ -61,9 +74,9 @@ void SettingsCache::translateLegacySettings()
     QStringList setsGroups = legacySetting.childGroups();
     for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
-        cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
-        cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
-        cardDatabase().setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
+        cardDatabase()->setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
+        cardDatabase()->setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
+        cardDatabase()->setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
         legacySetting.endGroup();
     }
     QStringList setsKeys = legacySetting.allKeys();
@@ -171,7 +184,7 @@ SettingsCache::SettingsCache()
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
-    cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
+    cardDatabaseSettings = QSharedPointer<CardDatabaseSettings>(new CardDatabaseSettings(settingsPath, this));
     serversSettings = new ServersSettings(settingsPath, this);
     messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);
@@ -1498,11 +1511,6 @@ void SettingsCache::resetPaths()
     if (picsPath_ != picsPath) {
         emit picsPathChanged();
     }
-}
-
-SettingsCache &SettingsCache::instance()
-{
-    return *settingsCache;
 }
 
 CardCounterSettings &SettingsCache::cardCounters() const

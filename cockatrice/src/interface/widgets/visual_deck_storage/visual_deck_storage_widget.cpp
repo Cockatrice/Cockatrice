@@ -55,10 +55,10 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
+    updateTagsVisibility(SettingsCache::instance()->getVisualDeckStorageShowTagFilter());
 
-    deckPreviewSelectionAnimationEnabled = SettingsCache::instance().getVisualDeckStorageSelectionAnimation();
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+    deckPreviewSelectionAnimationEnabled = SettingsCache::instance()->getVisualDeckStorageSelectionAnimation();
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
             &VisualDeckStorageWidget::updateSelectionAnimationEnabled);
 
     // deck area
@@ -143,7 +143,7 @@ void VisualDeckStorageWidget::reapplySortAndFilters()
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance()->getDeckPath(), false,
                                                             quickSettingsWidget->getShowFolders());
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget

@@ -25,10 +25,11 @@ CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef
 {
     owner->addCard(this);
 
-    connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
-        if (counters.contains(counterId))
-            update();
-    });
+    connect(&SettingsCache::instance().get()->cardCounters(), &CardCounterSettings::colorChanged, this,
+            [this](int counterId) {
+                if (counters.contains(counterId))
+                    update();
+            });
 }
 
 void CardItem::prepareDelete()
@@ -71,7 +72,7 @@ void CardItem::retranslateUi()
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    auto &cardCounterSettings = SettingsCache::instance()->cardCounters();
 
     painter->save();
     AbstractCardItem::paint(painter, option, widget);
@@ -379,7 +380,7 @@ void CardItem::playCard(bool faceDown)
     if (tz)
         emit tz->toggleTapped();
     else {
-        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance()->getClickPlaysAllSelected()) {
             faceDown ? zone->getPlayer()->getPlayerActions()->actPlayFacedown()
                      : zone->getPlayer()->getPlayerActions()->actPlay();
         } else {
@@ -409,7 +410,7 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 void CardItem::handleClickedToPlay(bool shiftHeld)
 {
     if (isUnwritableRevealZone(zone)) {
-        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance()->getClickPlaysAllSelected()) {
             zone->getPlayer()->getPlayerActions()->actHide();
         } else {
             zone->removeCard(this);
@@ -431,7 +432,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             }
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-               (!SettingsCache::instance().getDoubleClickToPlay())) {
+               (!SettingsCache::instance()->getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
 
@@ -444,7 +445,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
-        (SettingsCache::instance().getDoubleClickToPlay())) {
+        (SettingsCache::instance()->getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();

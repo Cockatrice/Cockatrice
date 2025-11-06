@@ -1,8 +1,8 @@
 #include "custom_line_edit.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 
-#include <../../../client/settings/shortcuts_settings.h>
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QObject>
@@ -36,7 +36,7 @@ bool LineEditUnfocusable::isUnfocusShortcut(QKeyEvent *event)
     keyNoMod = QKeySequence(event->key()).toString();
 
     QKeySequence key(modifier + keyNoMod);
-    QList<QKeySequence> unfocusShortcut = SettingsCache::instance().shortcuts().getShortcut("Player/unfocusTextBox");
+    QList<QKeySequence> unfocusShortcut = SettingsCache::instance()->shortcuts().getShortcut("Player/unfocusTextBox");
 
     for (const auto &unfocusKey : unfocusShortcut) {
         if (key.matches(unfocusKey) == QKeySequence::ExactMatch)

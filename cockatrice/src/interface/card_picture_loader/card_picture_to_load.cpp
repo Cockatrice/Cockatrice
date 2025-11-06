@@ -9,7 +9,7 @@
 #include <libcockatrice/card/set/card_set_comparator.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
-    : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
+    : card(_card), urlTemplates(SettingsCache::instance()->downloads().getAllURLs())
 {
     if (card) {
         sortedSets = extractSetsSorted(card);
@@ -33,12 +33,12 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
         }
     }
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance("", "", "", QDate());
+        sortedSets << CardSet::newInstance(SettingsCache::instance()->cardDatabase(), "", "", "", QDate());
     }
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
     // If the user hasn't disabled arts other than their personal preference...
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+    if (!SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
         qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
         if (setIndex > 0) { // we don't need to move the set if it's already first

@@ -24,8 +24,9 @@
 CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 {
     worker = new CardPictureLoaderWorker;
-    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &CardPictureLoader::picsPathChanged);
-    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::picsPathChanged, this,
+            &CardPictureLoader::picsPathChanged);
+    connect(SettingsCache::instance().get(), &SettingsCache::picDownloadChanged, this,
             &CardPictureLoader::picDownloadChanged);
 
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
@@ -215,7 +216,7 @@ void CardPictureLoader::picsPathChanged()
 
 bool CardPictureLoader::hasCustomArt()
 {
-    auto picsPath = SettingsCache::instance().getPicsPath();
+    auto picsPath = SettingsCache::instance()->getPicsPath();
     QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
 
     // Check if there is at least one non-directory file in the pics path, other

@@ -44,7 +44,7 @@ AbstractDlgDeckTextEdit::AbstractDlgDeckTextEdit(QWidget *parent) : QDialog(pare
 
     resize(500, 500);
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &AbstractDlgDeckTextEdit::refreshShortcuts);
     refreshShortcuts();
 }
@@ -52,7 +52,7 @@ AbstractDlgDeckTextEdit::AbstractDlgDeckTextEdit(QWidget *parent) : QDialog(pare
 void AbstractDlgDeckTextEdit::refreshShortcuts()
 {
     refreshButton->setShortcut(
-        SettingsCache::instance().shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
+        SettingsCache::instance()->shortcuts().getSingleShortcut("DlgLoadDeckFromClipboard/refreshButton"));
 }
 
 /**

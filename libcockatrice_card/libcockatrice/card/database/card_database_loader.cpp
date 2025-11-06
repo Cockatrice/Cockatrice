@@ -4,13 +4,15 @@
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
-#include <../../../../cockatrice/src/client/settings/cache_settings.h>
 #include <QDebug>
 #include <QDirIterator>
 #include <QFile>
 #include <QTime>
 
-CardDatabaseLoader::CardDatabaseLoader(QObject *parent, CardDatabase *db) : QObject(parent), database(db)
+CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
+                                       CardDatabase *db,
+                                       QSharedPointer<ICardDatabasePathProvider> _pathProvider)
+    : QObject(parent), database(db), pathProvider(_pathProvider)
 {
     // instantiate available parsers here and connect them to the database
     availableParsers << new CockatriceXml4Parser;
@@ -23,7 +25,7 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent, CardDatabase *db) : QObj
     }
 
     // when SettingsCache's path changes, trigger reloads
-    connect(&SettingsCache::instance(), &SettingsCache::cardDatabasePathChanged, this,
+    connect(pathProvider.get(), &ICardDatabasePathProvider::cardDatabasePathChanged, this,
             &CardDatabaseLoader::loadCardDatabases);
 }
 
@@ -83,10 +85,9 @@ LoadStatus CardDatabaseLoader::loadCardDatabases()
 
     database->clear(); // remove old db
 
-    LoadStatus loadStatus =
-        loadCardDatabase(SettingsCache::instance().getCardDatabasePath());    // load main card database
-    loadCardDatabase(SettingsCache::instance().getTokenDatabasePath());       // load tokens database
-    loadCardDatabase(SettingsCache::instance().getSpoilerCardDatabasePath()); // load spoilers database
+    LoadStatus loadStatus = loadCardDatabase(pathProvider->getCardDatabasePath()); // load main card database
+    loadCardDatabase(pathProvider->getTokenDatabasePath());                        // load tokens database
+    loadCardDatabase(pathProvider->getSpoilerCardDatabasePath());                  // load spoilers database
 
     // find all custom card databases, recursively & following symlinks
     // then load them alphabetically
@@ -117,7 +118,7 @@ LoadStatus CardDatabaseLoader::loadCardDatabases()
 
 QStringList CardDatabaseLoader::collectCustomDatabasePaths() const
 {
-    QDirIterator it(SettingsCache::instance().getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
+    QDirIterator it(pathProvider->getCustomCardDatabasePath(), {"*.xml"}, QDir::Files,
                     QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
     QStringList paths;
@@ -134,7 +135,7 @@ bool CardDatabaseLoader::saveCustomTokensToFile()
         return false;
     }
 
-    QString fileName = SettingsCache::instance().getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
+    QString fileName = pathProvider->getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
 
     SetNameMap tmpSets;
     CardSetPtr customTokensSet = database->getSet(CardSet::TOKENS_SETNAME);

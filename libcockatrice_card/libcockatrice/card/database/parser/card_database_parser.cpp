@@ -1,5 +1,7 @@
 #include "card_database_parser.h"
 
+#include "libcockatrice/card/database/interface/noop_card_set_priority_controller.h"
+
 SetNameMap ICardDatabaseParser::sets;
 
 void ICardDatabaseParser::clearSetlist()
@@ -17,7 +19,7 @@ CardSetPtr ICardDatabaseParser::internalAddSet(const QString &setName,
         return sets.value(setName);
     }
 
-    CardSetPtr newSet = CardSet::newInstance(setName);
+    CardSetPtr newSet = CardSet::newInstance(QSharedPointer<NoopCardSetPriorityController>::create(), setName);
     newSet->setLongName(longName);
     newSet->setSetType(setType);
     newSet->setReleaseDate(releaseDate);

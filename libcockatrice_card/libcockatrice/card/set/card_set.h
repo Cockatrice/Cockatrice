@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_CARD_SET_H
 #define COCKATRICE_CARD_SET_H
 
+#include "libcockatrice/card/database/interface/interface_card_set_priority_controller.h"
+
 #include <QDate>
 #include <QList>
 #include <QSharedPointer>
@@ -28,6 +30,7 @@ public:
     static const char *TOKENS_SETNAME;
 
 private:
+    QSharedPointer<ICardSetPriorityController> priorityController;
     QString shortName, longName;
     unsigned int sortKey;
     QDate releaseDate;
@@ -36,13 +39,15 @@ private:
     bool enabled, isknown;
 
 public:
-    explicit CardSet(const QString &_shortName = QString(),
+    explicit CardSet(QSharedPointer<ICardSetPriorityController> priorityController,
+                     const QString &_shortName = QString(),
                      const QString &_longName = QString(),
                      const QString &_setType = QString(),
                      const QDate &_releaseDate = QDate(),
                      const Priority _priority = PriorityFallback);
 
-    static CardSetPtr newInstance(const QString &_shortName = QString(),
+    static CardSetPtr newInstance(QSharedPointer<ICardSetPriorityController> priorityController,
+                                  const QString &_shortName = QString(),
                                   const QString &_longName = QString(),
                                   const QString &_setType = QString(),
                                   const QDate &_releaseDate = QDate(),

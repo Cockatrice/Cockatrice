@@ -1,12 +1,12 @@
 #include "library_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"
 
-#include <../../../client/settings/shortcuts_settings.h>
 #include <QAction>
 #include <QMenu>
 
@@ -318,7 +318,7 @@ void LibraryMenu::onRevealTopCardTriggered()
 
 void LibraryMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
 
     aViewLibrary->setShortcuts(shortcuts.getShortcut("Player/aViewLibrary"));
     aViewTopCards->setShortcuts(shortcuts.getShortcut("Player/aViewTopCards"));

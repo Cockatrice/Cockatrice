@@ -109,7 +109,7 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
         // The rewind only happens once the timer runs out.
         // If another backwards skip happens, the timer will just get reset instead of rewinding.
         rewindBufferingTimer->stop();
-        rewindBufferingTimer->start(SettingsCache::instance().getRewindBufferingMs());
+        rewindBufferingTimer->start(SettingsCache::instance()->getRewindBufferingMs());
     } else {
         // otherwise, process the rewind immediately
         processRewind();

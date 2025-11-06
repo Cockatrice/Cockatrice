@@ -16,7 +16,7 @@ DlgForgotPasswordChallenge::DlgForgotPasswordChallenge(QWidget *parent) : QDialo
     QString lastfphost;
     QString lastfpport;
     QString lastfpplayername;
-    ServersSettings &servers = SettingsCache::instance().servers();
+    ServersSettings &servers = SettingsCache::instance()->servers();
     lastfphost = servers.getHostname();
     lastfpport = servers.getPort();
     lastfpplayername = servers.getPlayerName();
@@ -98,7 +98,7 @@ void DlgForgotPasswordChallenge::actOk()
         return;
     }
 
-    ServersSettings &servers = SettingsCache::instance().servers();
+    ServersSettings &servers = SettingsCache::instance()->servers();
     servers.setFPHostName(hostEdit->text());
     servers.setFPPort(portEdit->text());
     servers.setFPPlayerName(playernameEdit->text());

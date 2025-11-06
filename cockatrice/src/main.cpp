@@ -24,6 +24,7 @@
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
+#include "database/interface/settings_card_preference_provider.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -130,7 +131,7 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance()->getLang();
 
     QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -251,6 +252,11 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
+    // Dependency Injections
+    CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<SettingsCardPreferenceProvider>::create());
+    CardDatabaseManager::setCardDatabasePathProvider(SettingsCache::instance());
+    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance()->cardDatabase());
+
     qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
@@ -265,9 +271,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setDesktopFileName("cockatrice");
 #endif
 
-    SettingsCache::instance().setClientID(generateClientID());
-
-    CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<SettingsCardPreferenceProvider>::create());
+    SettingsCache::instance()->setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -277,7 +281,7 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance()->getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

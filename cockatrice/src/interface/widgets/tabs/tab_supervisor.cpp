@@ -176,7 +176,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabLog->setCheckable(true);
     connect(aTabLog, &QAction::triggered, this, &TabSupervisor::actTabLog);
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
     refreshShortcuts();
 
@@ -252,7 +252,7 @@ void TabSupervisor::retranslateUi()
 
 void TabSupervisor::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
     aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
 
@@ -323,13 +323,13 @@ void TabSupervisor::initStartupTabs()
     openTabHome();
     setCurrentWidget(tabHome);
 
-    if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
+    if (SettingsCache::instance()->getTabVisualDeckStorageOpen()) {
         openTabVisualDeckStorage();
     }
-    if (SettingsCache::instance().getTabDeckStorageOpen()) {
+    if (SettingsCache::instance()->getTabDeckStorageOpen()) {
         openTabDeckStorage();
     }
-    if (SettingsCache::instance().getTabReplaysOpen()) {
+    if (SettingsCache::instance()->getTabReplaysOpen()) {
         openTabReplays();
     }
 }
@@ -408,10 +408,10 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
 
-    if (SettingsCache::instance().getTabServerOpen()) {
+    if (SettingsCache::instance()->getTabServerOpen()) {
         openTabServer();
     }
-    if (SettingsCache::instance().getTabAccountOpen()) {
+    if (SettingsCache::instance()->getTabAccountOpen()) {
         openTabAccount();
     }
 
@@ -422,10 +422,10 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
 
-        if (SettingsCache::instance().getTabAdminOpen()) {
+        if (SettingsCache::instance()->getTabAdminOpen()) {
             openTabAdmin();
         }
-        if (SettingsCache::instance().getTabLogOpen()) {
+        if (SettingsCache::instance()->getTabLogOpen()) {
             openTabLog();
         }
     }
@@ -528,7 +528,7 @@ void TabSupervisor::openTabHome()
 
 void TabSupervisor::actTabVisualDeckStorage(bool checked)
 {
-    SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
+    SettingsCache::instance()->setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
         openTabVisualDeckStorage();
         setCurrentWidget(tabVisualDeckStorage);
@@ -552,7 +552,7 @@ void TabSupervisor::openTabVisualDeckStorage()
 
 void TabSupervisor::actTabServer(bool checked)
 {
-    SettingsCache::instance().setTabServerOpen(checked);
+    SettingsCache::instance()->setTabServerOpen(checked);
     if (checked && !tabServer) {
         openTabServer();
         setCurrentWidget(tabServer);
@@ -575,7 +575,7 @@ void TabSupervisor::openTabServer()
 
 void TabSupervisor::actTabAccount(bool checked)
 {
-    SettingsCache::instance().setTabAccountOpen(checked);
+    SettingsCache::instance()->setTabAccountOpen(checked);
     if (checked && !tabAccount) {
         openTabAccount();
         setCurrentWidget(tabAccount);
@@ -600,7 +600,7 @@ void TabSupervisor::openTabAccount()
 
 void TabSupervisor::actTabDeckStorage(bool checked)
 {
-    SettingsCache::instance().setTabDeckStorageOpen(checked);
+    SettingsCache::instance()->setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
         openTabDeckStorage();
         setCurrentWidget(tabDeckStorage);
@@ -623,7 +623,7 @@ void TabSupervisor::openTabDeckStorage()
 
 void TabSupervisor::actTabReplays(bool checked)
 {
-    SettingsCache::instance().setTabReplaysOpen(checked);
+    SettingsCache::instance()->setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
         openTabReplays();
         setCurrentWidget(tabReplays);
@@ -648,7 +648,7 @@ void TabSupervisor::openTabReplays()
 
 void TabSupervisor::actTabAdmin(bool checked)
 {
-    SettingsCache::instance().setTabAdminOpen(checked);
+    SettingsCache::instance()->setTabAdminOpen(checked);
     if (checked && !tabAdmin) {
         openTabAdmin();
         setCurrentWidget(tabAdmin);
@@ -671,7 +671,7 @@ void TabSupervisor::openTabAdmin()
 
 void TabSupervisor::actTabLog(bool checked)
 {
-    SettingsCache::instance().setTabLogOpen(checked);
+    SettingsCache::instance()->setTabLogOpen(checked);
     if (checked && !tabLog) {
         openTabLog();
         setCurrentWidget(tabLog);
@@ -849,7 +849,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const DeckLoader *deckToOpen)
 {
-    int type = SettingsCache::instance().getDefaultDeckEditorType();
+    int type = SettingsCache::instance()->getDefaultDeckEditorType();
     switch (type) {
         case ClassicDeckEditor:
             addDeckEditorTab(deckToOpen);
@@ -940,7 +940,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
-    if (globalEvent && SettingsCache::instance().getNotificationsEnabled())
+    if (globalEvent && SettingsCache::instance()->getNotificationsEnabled())
         QApplication::alert(this);
 }
 
@@ -978,7 +978,7 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
             auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
-            if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
+            if (SettingsCache::instance()->getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered))
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
@@ -1022,7 +1022,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
             }
         }
 
-        if (SettingsCache::instance().getBuddyConnectNotificationsEnabled()) {
+        if (SettingsCache::instance()->getBuddyConnectNotificationsEnabled()) {
             QApplication::alert(this);
             this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
         }

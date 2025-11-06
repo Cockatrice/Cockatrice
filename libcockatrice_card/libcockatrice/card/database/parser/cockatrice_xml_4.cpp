@@ -132,7 +132,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
     bool includeRebalancedCards =
-        true; // TODO: MOVE THIS OUT OF THE PARSER SettingsCache::instance().getIncludeRebalancedCards();
+        true; // TODO: MOVE THIS OUT OF THE PARSER SettingsCache::instance()->getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;

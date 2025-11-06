@@ -42,9 +42,9 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
             &DeckPreviewWidget::updateTagsVisibility);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
             &DeckPreviewWidget::updateBannerCardComboBoxVisibility);
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::deckPreviewTooltipChanged, this,
             &DeckPreviewWidget::refreshBannerCardToolTip);
@@ -96,8 +96,8 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
             &DeckPreviewWidget::setBannerCard);
 
     updateBannerCardComboBox();
-    updateBannerCardComboBoxVisibility(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+    updateBannerCardComboBoxVisibility(SettingsCache::instance()->getVisualDeckStorageShowBannerCardComboBox());
+    updateTagsVisibility(SettingsCache::instance()->getVisualDeckStorageShowTagsOnDeckPreviews());
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);

@@ -57,7 +57,7 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         sayMenu = nullptr;
     }
 
-    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
     refreshShortcuts();
 

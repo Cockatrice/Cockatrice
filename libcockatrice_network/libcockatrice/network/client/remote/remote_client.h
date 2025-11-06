@@ -7,6 +7,7 @@
 #ifndef REMOTECLIENT_H
 #define REMOTECLIENT_H
 
+#include "../../interfaces/INetworkSettingsProvider.h"
 #include "../abstract/abstract_client.h"
 
 #include <QLoggingCategory>
@@ -97,6 +98,7 @@ private slots:
     void submitForgotPasswordChallengeResponse(const Response &response);
 
 private:
+    QSharedPointer<INetworkSettingsProvider> networkSettingsProvider;
     int maxTimeout;
     int timeRunning, lastDataReceived;
     QByteArray inputBuffer;
@@ -120,7 +122,8 @@ protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;
 
 public:
-    explicit RemoteClient(QObject *parent = nullptr);
+    explicit RemoteClient(QObject *parent = nullptr,
+                          QSharedPointer<INetworkSettingsProvider> networkSettingsProvider = nullptr);
     ~RemoteClient() override;
     QString peerName() const
     {

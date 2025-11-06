@@ -1,5 +1,6 @@
 #include "card_menu.h"
 
+#include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
@@ -11,7 +12,6 @@
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <libcockatrice/settings/card_counter_settings.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
@@ -414,7 +414,7 @@ void CardMenu::addRelatedCardActions()
     if (createRelatedCards) {
         if (shortcutsActive) {
             createRelatedCards->setShortcuts(
-                SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
+                SettingsCache::instance()->shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
         connect(createRelatedCards, &QAction::triggered, player->getPlayerActions(),
                 &PlayerActions::actCreateAllRelatedCards);
@@ -447,7 +447,7 @@ void CardMenu::retranslateUi()
 
     mCardCounters->setTitle(tr("Ca&rd counters"));
 
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    auto &cardCounterSettings = SettingsCache::instance()->cardCounters();
 
     for (int i = 0; i < aAddCounter.size(); ++i) {
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
@@ -462,7 +462,7 @@ void CardMenu::retranslateUi()
 
 void CardMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
 
     aHide->setShortcuts(shortcuts.getShortcut("Player/aHide"));
     aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));

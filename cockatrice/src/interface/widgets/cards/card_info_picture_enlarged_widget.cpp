@@ -18,11 +18,12 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent) : 
     setWindowFlags(Qt::ToolTip); // Keeps this widget on top of everything
     setAttribute(Qt::WA_TranslucentBackground);
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(SettingsCache::instance().get(), &SettingsCache::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 /**
@@ -86,7 +87,7 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
 
     // Define the radius for rounded corners
     // Adjust the radius as needed for rounded corners
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * scaledSize.width() : 0.;
+    qreal radius = SettingsCache::instance()->getRoundCardCorners() ? 0.05 * scaledSize.width() : 0.;
 
     QStylePainter painter(this);
     // Fill the background with transparent color to ensure rounded corners are rendered properly

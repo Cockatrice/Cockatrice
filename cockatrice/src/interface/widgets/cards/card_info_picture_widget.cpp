@@ -58,11 +58,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
     animation->setStartValue(originalPos);
     animation->setEndValue(originalPos - QPoint(0, animationOffset));
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(SettingsCache::instance().get(), &SettingsCache::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 /**
@@ -182,7 +183,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
-    if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
+    if (SettingsCache::instance()->getAutoRotateSidewaysLayoutCards()) {
         if (exactCard.getInfo().getLandscapeOrientation()) {
             // Rotate pixmap 90 degrees to the left
             QTransform transform;
@@ -212,7 +213,8 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     // Compute rounded corner radius
     // Ensure consistent rounding
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
+    qreal radius =
+        SettingsCache::instance()->getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);

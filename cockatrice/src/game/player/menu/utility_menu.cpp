@@ -94,7 +94,7 @@ void UtilityMenu::retranslateUi()
 
 void UtilityMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));

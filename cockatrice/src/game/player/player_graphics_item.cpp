@@ -5,9 +5,9 @@
 
 PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
 {
-    connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::horizontalHandChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
-    connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::handJustificationChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(player, &Player::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
 
@@ -92,7 +92,7 @@ qreal PlayerGraphicsItem::getMinimumWidth() const
 {
     qreal result = tableZoneGraphicsItem->getMinimumWidth() + CARD_HEIGHT + 15 + counterAreaWidth +
                    stackZoneGraphicsItem->boundingRect().width();
-    if (!SettingsCache::instance().getHorizontalHand()) {
+    if (!SettingsCache::instance()->getHorizontalHand()) {
         result += handZoneGraphicsItem->boundingRect().width();
     }
     return result;
@@ -109,7 +109,7 @@ void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
     // Extend table (and hand, if horizontal) to accommodate the new player width.
     qreal tableWidth =
         newPlayerWidth - CARD_HEIGHT - 15 - counterAreaWidth - stackZoneGraphicsItem->boundingRect().width();
-    if (!SettingsCache::instance().getHorizontalHand()) {
+    if (!SettingsCache::instance()->getHorizontalHand()) {
         tableWidth -= handZoneGraphicsItem->boundingRect().width();
     }
 
@@ -148,7 +148,7 @@ void PlayerGraphicsItem::rearrangeCounters()
 void PlayerGraphicsItem::rearrangeZones()
 {
     QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance()->getHorizontalHand()) {
         if (mirrored) {
             if (player->getHandZone()->contentsKnown()) {
                 player->getPlayerInfo()->setHandVisible(true);
@@ -199,7 +199,7 @@ void PlayerGraphicsItem::updateBoundingRect()
 {
     prepareGeometryChange();
     qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stackZoneGraphicsItem->boundingRect().width();
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance()->getHorizontalHand()) {
         qreal handHeight =
             player->getPlayerInfo()->getHandVisible() ? handZoneGraphicsItem->boundingRect().height() : 0;
         bRect = QRectF(0, 0, width + tableZoneGraphicsItem->boundingRect().width(),

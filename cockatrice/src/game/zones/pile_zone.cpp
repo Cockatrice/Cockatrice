@@ -22,12 +22,13 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
                      .rotate(90)
                      .translate((float)-CARD_WIDTH / 2, (float)-CARD_HEIGHT / 2));
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(SettingsCache::instance().get(), &SettingsCache::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        prepareGeometryChange();
-        update();
-    });
+                prepareGeometryChange();
+                update();
+            });
 }
 
 QRectF PileZone::boundingRect() const
@@ -38,7 +39,7 @@ QRectF PileZone::boundingRect() const
 QPainterPath PileZone::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance()->getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }

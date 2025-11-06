@@ -22,9 +22,9 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     resetAndHandSizeLayout->addWidget(resetButton);
 
     handSizeSpinBox = new QSpinBox(this);
-    handSizeSpinBox->setValue(SettingsCache::instance().getVisualDeckEditorSampleHandSize());
+    handSizeSpinBox->setValue(SettingsCache::instance()->getVisualDeckEditorSampleHandSize());
     handSizeSpinBox->setMinimum(1);
-    connect(handSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), &SettingsCache::instance(),
+    connect(handSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), SettingsCache::instance().get(),
             &SettingsCache::setVisualDeckEditorSampleHandSize);
     connect(handSizeSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &VisualDeckEditorSampleHandWidget::updateDisplay);

@@ -60,7 +60,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = info.getTableRow();
-    bool playToStack = SettingsCache::instance().getPlayToStack();
+    bool playToStack = SettingsCache::instance()->getPlayToStack();
     QString currentZone = card->getZone()->getName();
     if (currentZone == "stack" && tableRow == 3) {
         cmd.set_target_zone("grave");
@@ -280,7 +280,7 @@ void PlayerActions::actDrawCard()
 
 void PlayerActions::actMulligan()
 {
-    int startSize = SettingsCache::instance().getStartingHandSize();
+    int startSize = SettingsCache::instance()->getStartingHandSize();
     int handSize = player->getHandZone()->getCards().size();
     int deckSize = player->getDeckZone()->getCards().size() + handSize; // hand is shuffled back into the deck
     bool ok;
@@ -302,7 +302,7 @@ void PlayerActions::actMulligan()
     }
     sendGameCommand(cmd);
     if (startSize != number) {
-        SettingsCache::instance().setStartingHandSize(number);
+        SettingsCache::instance()->setStartingHandSize(number);
     }
 }
 
@@ -878,10 +878,10 @@ void PlayerActions::setLastToken(CardInfoPtr cardInfo)
     lastTokenInfo = {.name = cardInfo->getName(),
                      .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
                      .pt = cardInfo->getPowTough(),
-                     .annotation = SettingsCache::instance().getAnnotateTokens() ? cardInfo->getText() : "",
+                     .annotation = SettingsCache::instance()->getAnnotateTokens() ? cardInfo->getText() : "",
                      .destroy = true,
                      .providerId =
-                         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
+                         SettingsCache::instance()->cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
     lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getTableRow());
 
@@ -1072,7 +1072,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
     }
 
     cmd.set_pt(cardInfo->getPowTough().toStdString());
-    if (SettingsCache::instance().getAnnotateTokens()) {
+    if (SettingsCache::instance()->getAnnotateTokens()) {
         cmd.set_annotation(cardInfo->getText().toStdString());
     } else {
         cmd.set_annotation("");

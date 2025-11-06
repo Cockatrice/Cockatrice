@@ -18,16 +18,16 @@ VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentS
 
     filterToMostRecentSetsCheckBox = new QCheckBox(this);
     filterToMostRecentSetsCheckBox->setChecked(
-        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled());
-    connect(filterToMostRecentSetsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+        SettingsCache::instance()->getVisualDatabaseDisplayFilterToMostRecentSetsEnabled());
+    connect(filterToMostRecentSetsCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
             &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled);
 
     filterToMostRecentSetsAmount = new QSpinBox(this);
     filterToMostRecentSetsAmount->setMinimum(1);
     filterToMostRecentSetsAmount->setMaximum(100);
     filterToMostRecentSetsAmount->setValue(
-        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
-    connect(filterToMostRecentSetsAmount, QOverload<int>::of(&QSpinBox::valueChanged), &SettingsCache::instance(),
+        SettingsCache::instance()->getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
+    connect(filterToMostRecentSetsAmount, QOverload<int>::of(&QSpinBox::valueChanged), SettingsCache::instance().get(),
             &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount);
 
     layout->addWidget(filterToMostRecentSetsCheckBox);
@@ -54,10 +54,10 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
     layout->addWidget(recentSetsSettingsWidget);
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged,
+            this, &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+    connect(SettingsCache::instance().get(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged,
+            this, &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
 
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search sets..."));
@@ -115,7 +115,7 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 
 void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
 {
-    if (SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled()) {
+    if (SettingsCache::instance()->getVisualDatabaseDisplayFilterToMostRecentSetsEnabled()) {
         for (auto set : activeSets.keys()) {
             activeSets[set] = false;
         }
@@ -126,7 +126,7 @@ void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
         std::sort(allSets.begin(), allSets.end(),
                   [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
 
-        int setsToPreactivate = SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
+        int setsToPreactivate = SettingsCache::instance()->getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
         int setsActivated = 0;
 
         for (const auto &set : allSets) {

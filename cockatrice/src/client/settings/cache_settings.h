@@ -7,6 +7,8 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
+#include "libcockatrice/card/database/interface/interface_card_database_path_provider.h"
+#include "libcockatrice/network/interfaces/INetworkSettingsProvider.h"
 #include "shortcuts_settings.h"
 
 #include <QDate>
@@ -132,14 +134,13 @@ inline QStringList defaultTags = {
 class QSettings;
 class CardCounterSettings;
 
-class SettingsCache : public QObject
+class SettingsCache : public ICardDatabasePathProvider, public INetworkSettingsProvider
 {
     Q_OBJECT
 
 signals:
     void langChanged();
     void picsPathChanged();
-    void cardDatabasePathChanged();
     void themeChanged();
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
@@ -187,7 +188,7 @@ signals:
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
-    CardDatabaseSettings *cardDatabaseSettings;
+    QSharedPointer<CardDatabaseSettings> cardDatabaseSettings;
     ServersSettings *serversSettings;
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
@@ -324,8 +325,11 @@ private:
     bool roundCardCorners;
     bool showStatusBar;
 
+    explicit SettingsCache();
+
+    static QSharedPointer<SettingsCache> settingsInstance;
+
 public:
-    SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
     QString getCachePath() const;
@@ -374,19 +378,19 @@ public:
     {
         return customPicsPath;
     }
-    QString getCustomCardDatabasePath() const
+    QString getCustomCardDatabasePath() const override
     {
         return customCardDatabasePath;
     }
-    QString getCardDatabasePath() const
+    QString getCardDatabasePath() const override
     {
         return cardDatabasePath;
     }
-    QString getSpoilerCardDatabasePath() const
+    QString getSpoilerCardDatabasePath() const override
     {
         return spoilerDatabasePath;
     }
-    QString getTokenDatabasePath() const
+    QString getTokenDatabasePath() const override
     {
         return tokenDatabasePath;
     }
@@ -483,7 +487,7 @@ public:
         return getLastCardUpdateCheck().daysTo(QDateTime::currentDateTime().date()) >= getCardUpdateCheckInterval() &&
                getLastCardUpdateCheck() != QDateTime::currentDateTime().date();
     }
-    bool getNotifyAboutUpdates() const
+    bool getNotifyAboutUpdates() const override
     {
         return notifyAboutUpdates;
     }
@@ -835,11 +839,11 @@ public:
     {
         return rememberGameSettings;
     }
-    int getKeepAlive() const
+    int getKeepAlive() const override
     {
         return keepalive;
     }
-    int getTimeOut() const
+    int getTimeOut() const override
     {
         return timeout;
     }
@@ -849,13 +853,13 @@ public:
     }
     void setClientID(const QString &clientID);
     void setClientVersion(const QString &clientVersion);
-    void setKnownMissingFeatures(const QString &_knownMissingFeatures);
+    void setKnownMissingFeatures(const QString &_knownMissingFeatures) override;
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
-    QString getClientID()
+    QString getClientID() override
     {
         return clientID;
     }
@@ -863,7 +867,7 @@ public:
     {
         return clientVersion;
     }
-    QString getKnownMissingFeatures()
+    QString getKnownMissingFeatures() override
     {
         return knownMissingFeatures;
     }
@@ -891,9 +895,9 @@ public:
     {
         return *shortcutsSettings;
     }
-    CardDatabaseSettings &cardDatabase() const
+    QSharedPointer<CardDatabaseSettings> cardDatabase() const
     {
-        return *cardDatabaseSettings;
+        return cardDatabaseSettings;
     }
     ServersSettings &servers() const
     {
@@ -942,7 +946,8 @@ public:
         return roundCardCorners;
     }
 
-    static SettingsCache &instance();
+    static QSharedPointer<SettingsCache> instance();
+    static void setInstance(QSharedPointer<SettingsCache> newInstance);
     void resetPaths();
 
 public slots:

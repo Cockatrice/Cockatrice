@@ -15,7 +15,7 @@
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance()->getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -25,18 +25,18 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     networkManager->setTransferTimeout();
 #endif
     cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
+    cache->setCacheDirectory(SettingsCache::instance()->getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
-                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
+                               static_cast<qint64>(SettingsCache::instance()->getNetworkCacheSizeInMB()));
     // Note: the settings is in MB, but QNetworkDiskCache uses bytes
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, this,
+    connect(SettingsCache::instance().get(), &SettingsCache::networkCacheSizeChanged, this,
             [this](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
     networkManager->setCache(cache);
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
+    cacheFilePath = SettingsCache::instance()->getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
     cleanStaleEntries();
 
@@ -223,7 +223,7 @@ void CardPictureLoaderWorker::cleanStaleEntries()
 
     auto it = redirectCache.begin();
     while (it != redirectCache.end()) {
-        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
+        if (it.value().second.addDays(SettingsCache::instance()->getRedirectCacheTtl()) < now) {
             it = redirectCache.erase(it); // Remove stale entry
         } else {
             ++it;
