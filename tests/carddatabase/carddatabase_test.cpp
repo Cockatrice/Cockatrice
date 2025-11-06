@@ -7,7 +7,6 @@ namespace
 
 TEST(CardDatabaseTest, LoadXml)
 {
-    settingsCache = new SettingsCache;
     CardDatabase *db = new CardDatabase;
 
     // ensure the card database is empty at start

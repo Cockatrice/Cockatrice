@@ -2,8 +2,8 @@
 #define MAIN_H
 
 #include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/card/database/interface/noop_card_preference_provider.h">
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
+#include <libcockatrice/interfaces/noop_card_preference_provider.h>
 
 class CardDatabaseConverter : public CardDatabase
 {

@@ -455,10 +455,3 @@ void SettingsCache::setRoundCardCorners(bool /* _roundCardCorners */)
 void CardPictureLoader::clearPixmapCache(CardInfoPtr /* card */)
 {
 }
-
-SettingsCache *settingsCache;
-
-SettingsCache &SettingsCache::instance()
-{
-    return *settingsCache;
-}

@@ -3,6 +3,7 @@
 
 #include "gtest/gtest.h"
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/interfaces/noop_card_preference_provider.h>
 
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \
@@ -72,8 +73,6 @@ QUERY(Color4, cat, "c!gw", false)
 
 int main(int argc, char **argv)
 {
-    settingsCache = new SettingsCache;
-
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
