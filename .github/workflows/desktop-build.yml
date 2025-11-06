@@ -101,6 +101,61 @@ jobs:
               --target "$target" --title "$release_name" \
               --notes-file "$body_path"
 
+  install-qt:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - soc: Intel
+            os: macos-15-intel
+          - soc: Apple
+            os: macos-15
+
+    name: Install Qt for ${{ matrix.soc }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      QT_VERSION: 6.6.3
+      QT_ARCH: clang_64
+      QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
+
+    steps:
+      - name: Restore thin Qt libraries
+        id: restore_qt
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
+      - name: Install Qt ${{env.QT_VERSION}}
+        if: steps.restore_qt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false # caching manually after thinning
+          version: ${{env.QT_VERSION}}
+          arch: ${{env.QT_ARCH}}
+          modules: ${{env.QT_MODULES}}
+          dir: Qt
+
+      - name: Thin Qt libraries
+        if: steps.restore_qt.outputs.cache-hit != 'true'
+        run: |
+          export ARCH=$(uname -m)
+          export NPROC=$(sysctl -n hw.ncpu)
+          echo "::group::Thinning Qt libraries to $ARCH using $NPROC cores"
+          find ${{ github.workspace }}/Qt -type f -print0 | \
+            xargs -0 -n1 -P "$NPROC" sh -c \
+              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && echo "Processing $0" && lipo "$0" -thin "$ARCH" -output "$0" || true'
+          echo "::endgroup::"
+
+      - name: Cache thin Qt libraries
+        if: steps.restore_qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+
   build-linux:
     strategy:
       fail-fast: false
@@ -273,14 +328,12 @@ jobs:
             type: Debug
 
     name: macOS ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
-    needs: configure
+    needs: [configure, install-qt]
     runs-on: ${{matrix.os}}
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       # Common parameters for all macOS builds
       QT_VERSION: 6.6.3
-      QT_ARCH: clang_64
-      QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
       # Build-specific environment variables
       CCACHE_DIR: ${{github.workspace}}/.ccache/${{matrix.os}}-${{matrix.type}}
       CCACHE_SIZE: 500M
@@ -306,36 +359,6 @@ jobs:
       - name: Restore thin Qt libraries
         id: restore_qt
         uses: actions/cache/restore@v4
-        with:
-          path: ${{ github.workspace }}/Qt
-          key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
-
-      # Using jurplel/install-qt-action to install Qt without using brew
-      # qt build using vcpkg either just fails or takes too long to build
-      - name: Install Qt ${{env.QT_VERSION}}
-        if: steps.restore_qt.outputs.cache-hit != 'true'
-        uses: jurplel/install-qt-action@v4
-        with:
-          cache: false # caching manually after thinning
-          version: ${{env.QT_VERSION}}
-          arch: ${{env.QT_ARCH}}
-          modules: ${{env.QT_MODULES}}
-          dir: Qt
-
-      - name: Thin Qt libraries
-        if: steps.restore_qt.outputs.cache-hit != 'true'
-        run: |
-          export ARCH=$(uname -m)
-          export NPROC=$(sysctl -n hw.ncpu)
-          echo "::group::Thinning Qt libraries to $ARCH using $NPROC cores"
-          find ${{ github.workspace }}/Qt -type f -print0 | \
-            xargs -0 -n1 -P "$NPROC" sh -c \
-              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && echo "Processing $0" && lipo "$0" -thin "$ARCH" -output "$0" || true'
-          echo "::endgroup::"
-
-      - name: Cache thin Qt libraries
-        if: steps.restore_qt.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/Qt
           key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
