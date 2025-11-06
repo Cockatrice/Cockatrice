@@ -154,6 +154,7 @@ jobs:
         if: steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
+          enableCrossOsArchive: true
           path: ${{ github.workspace }}/Qt
           key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
