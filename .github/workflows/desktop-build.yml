@@ -313,10 +313,14 @@ jobs:
           arch: ${{env.QT_ARCH}}
           modules: ${{env.QT_MODULES}}
 
-      - name: Strip arch from Qt libraries
+      - name: Thin Qt libraries
         run: |
-          echo "Stripping arch from Qt libraries"
-          find $RUNNER_WORKSPACE/Qt -type f -exec sh -c 'file -b --mime-type "$0" | grep -q "application/x-mach-binary"' {} \; -exec lipo {} -thin $(uname -m) -output {} \;
+          export ARCH=$(uname -m)
+          export NPROC=$(sysctl -n hw.ncpu)
+          echo "Thinning Qt libraries to $ARCH using $NPROC cores"
+          find $RUNNER_WORKSPACE/Qt -type f -print0 | \
+            xargs -0 -n1 -P "$NPROC" sh -c \
+              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && lipo "$0" -thin "$ARCH" -output "$0" || true'
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
