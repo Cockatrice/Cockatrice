@@ -1,12 +1,11 @@
 #ifndef COCKATRICE_CARD_SET_H
 #define COCKATRICE_CARD_SET_H
 
-#include "libcockatrice/card/database/interface/interface_card_set_priority_controller.h"
-
 #include <QDate>
 #include <QList>
 #include <QSharedPointer>
 #include <QString>
+#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 class CardInfo;
 using CardInfoPtr = QSharedPointer<CardInfo>;

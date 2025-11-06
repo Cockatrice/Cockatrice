@@ -13,7 +13,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QVariant>
-#include <libcockatrice/card/database/interface/interface_card_set_priority_controller.h>
+#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 class CardDatabaseSettings : public SettingsManager, public ICardSetPriorityController
 {

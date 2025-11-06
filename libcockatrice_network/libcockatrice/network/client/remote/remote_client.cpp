@@ -1,7 +1,6 @@
 #include "remote_client.h"
 
 #include "../../../../cockatrice/src/main.h"
-#include "../../interfaces/INetworkSettingsProvider.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -12,6 +11,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QWebSocket>
+#include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
 #include <libcockatrice/protocol/pb/response_activate.pb.h>

@@ -9,9 +9,9 @@ public:
 
     virtual QString getClientID() = 0;
 
-    virtual int getTimeOut() const = 0;
-    virtual int getKeepAlive() const = 0;
-    virtual bool getNotifyAboutUpdates() const = 0;
+    [[nodiscard]] virtual int getTimeOut() const = 0;
+    [[nodiscard]] virtual int getKeepAlive() const = 0;
+    [[nodiscard]] virtual bool getNotifyAboutUpdates() const = 0;
 
     virtual void setKnownMissingFeatures(const QString &_knownMissingFeatures) = 0;
     virtual QString getKnownMissingFeatures() = 0;

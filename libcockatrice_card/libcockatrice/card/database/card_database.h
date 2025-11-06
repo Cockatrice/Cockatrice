@@ -10,8 +10,6 @@
 #include "../set/card_set_list.h"
 #include "card_database_loader.h"
 #include "card_database_querier.h"
-#include "interface/interface_card_database_path_provider.h"
-#include "interface/noop_card_preference_provider.h"
 
 #include <QBasicMutex>
 #include <QDate>
@@ -20,6 +18,7 @@
 #include <QLoggingCategory>
 #include <QStringList>
 #include <QVector>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <utility>
 

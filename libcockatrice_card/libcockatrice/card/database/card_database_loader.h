@@ -7,12 +7,11 @@
 #ifndef COCKATRICE_CARD_DATABASE_LOADER_H
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 
-#include "interface/interface_card_database_path_provider.h"
-
 #include <QBasicMutex>
 #include <QList>
 #include <QLoggingCategory>
 #include <QObject>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");

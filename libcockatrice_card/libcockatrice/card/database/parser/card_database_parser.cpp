@@ -1,6 +1,6 @@
 #include "card_database_parser.h"
 
-#include "libcockatrice/card/database/interface/noop_card_set_priority_controller.h"
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 SetNameMap ICardDatabaseParser::sets;
 

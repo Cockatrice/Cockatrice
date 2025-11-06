@@ -1,7 +1,8 @@
 #include "card_database_manager.h"
 
-#include "interface/noop_card_database_path_provider.h"
-#include "interface/noop_card_set_priority_controller.h"
+#include <libcockatrice/interfaces/noop_card_database_path_provider.h>
+#include <libcockatrice/interfaces/noop_card_preference_provider.h>
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 QSharedPointer<ICardPreferenceProvider> CardDatabaseManager::cardPreferenceProvider =
     QSharedPointer<NoopCardPreferenceProvider>::create();

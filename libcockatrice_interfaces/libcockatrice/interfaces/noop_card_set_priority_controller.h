@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_NOOP_CARD_SET_PRIORITY_CONTROLLER_H
 #define COCKATRICE_NOOP_CARD_SET_PRIORITY_CONTROLLER_H
+
 #include "interface_card_set_priority_controller.h"
 
 class NoopCardSetPriorityController : public ICardSetPriorityController

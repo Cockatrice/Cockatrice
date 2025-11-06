@@ -9,9 +9,9 @@
 
 #include "../card_info.h"
 #include "../printing/exact_card.h"
-#include "interface/interface_card_preference_provider.h"
 
 #include <QObject>
+#include <libcockatrice/interfaces/interface_card_preference_provider.h>
 #include <libcockatrice/utility/card_ref.h>
 
 class CardDatabase;

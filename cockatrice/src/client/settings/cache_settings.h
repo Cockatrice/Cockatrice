@@ -7,8 +7,6 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "libcockatrice/card/database/interface/interface_card_database_path_provider.h"
-#include "libcockatrice/network/interfaces/INetworkSettingsProvider.h"
 #include "shortcuts_settings.h"
 
 #include <QDate>
@@ -16,6 +14,8 @@
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
+#include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
