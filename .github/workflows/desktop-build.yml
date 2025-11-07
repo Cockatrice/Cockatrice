@@ -361,7 +361,7 @@ jobs:
           max-size: 500M
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Restore thin Qt libraries
+      - name: Restore thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@v4
@@ -371,7 +371,7 @@ jobs:
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # qt build using vcpkg either just fails or takes too long to build
-      - name: Install Qt ${{matrix.qt_version}} (macOS)
+      - name: Install fat Qt ${{matrix.qt_version}} (macOS)
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
@@ -381,7 +381,8 @@ jobs:
           modules: ${{matrix.qt_modules}}
           dir: ${{github.workspace}}
 
-      - name: Thin Qt libraries
+      # the binaries from aqt are fat (universal), so we thin them to the target architecture to reduce the size of the packages and caches
+      - name: Thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: |
           export ARCH=$(uname -m)
@@ -389,10 +390,12 @@ jobs:
           echo "::group::Thinning Qt libraries to $ARCH using $NPROC cores"
           find ${{ github.workspace }}/Qt -type f -print0 | \
             xargs -0 -n1 -P "$NPROC" sh -c \
-              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && echo "Processing $0" && lipo "$0" -thin "$ARCH" -output "$0" || true'
+              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && \
+                echo "Processing $0" && \
+                lipo "$0" -thin "$ARCH" -output "$0" || true'
           echo "::endgroup::"
 
-      - name: Cache thin Qt libraries
+      - name: Cache thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
@@ -434,6 +437,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action, which sets a few environment variables
           QTDIR: ${{ matrix.os == 'macOS' && format('{0}/Qt/{1}/macos', github.workspace, matrix.qt_version) || '' }}
         run: .ci/compile.sh --server --test --vcpkg
 
