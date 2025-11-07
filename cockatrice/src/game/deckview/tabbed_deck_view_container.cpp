@@ -21,6 +21,8 @@ void TabbedDeckViewContainer::addOpponentDeckView(const DeckList &opponentDeck, 
         opponentDeckViews[opponentId]->setDeck(opponentDeck);
     } else {
         auto *opponentDeckView = new DeckView(this);
+        connect(opponentDeckView, &DeckView::newCardAdded, playerDeckView, &DeckViewContainer::newCardAdded);
+
         opponentDeckView->setDeck(opponentDeck);
 
         addTab(opponentDeckView, QString("%1's Deck").arg(opponentName));
