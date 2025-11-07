@@ -123,6 +123,8 @@ jobs:
         if: true
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
         run: gh cache delete qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       - name: Restore thin Qt libraries
