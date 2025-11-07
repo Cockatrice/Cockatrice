@@ -161,12 +161,14 @@ static QList<CardList::SortOption> expandSortOption(CardList::SortOption option)
 
 void PlayerActions::actSortHand()
 {
-    auto *action = static_cast<QAction *>(sender());
+    auto *action = qobject_cast<QAction *>(sender());
     CardList::SortOption option = static_cast<CardList::SortOption>(action->data().toInt());
 
     QList<CardList::SortOption> sortOptions = expandSortOption(option);
 
-    player->getGraphicsItem()->getHandZoneGraphicsItem()->sortHand(sortOptions);
+    static QList defaultOptions = {CardList::SortByName, CardList::SortByPrinting};
+
+    player->getGraphicsItem()->getHandZoneGraphicsItem()->sortHand(sortOptions + defaultOptions);
 }
 
 void PlayerActions::actViewTopCards()

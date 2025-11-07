@@ -117,11 +117,7 @@ void HandZone::sortHand(const QList<CardList::SortOption> &options)
         return;
     }
 
-    // Implicitly sort by name at the end so that cards with the same name appear together.
-    // Also group printings together
-    static QList defaultOptions = {CardList::SortByName, CardList::SortByPrinting};
-
-    getLogic()->sortCards(options + defaultOptions);
+    getLogic()->sortCards(options);
     reorganizeCards();
 }
 
