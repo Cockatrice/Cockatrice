@@ -26,9 +26,11 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
         aSortHandByManaValue = new QAction(this);
         aSortHandByManaValue->setData(CardList::SortByManaValue);
 
-        connect(aSortHandByType, &QAction::triggered, actions, &PlayerActions::actSortHand);
-        connect(aSortHandByName, &QAction::triggered, actions, &PlayerActions::actSortHand);
-        connect(aSortHandByManaValue, &QAction::triggered, actions, &PlayerActions::actSortHand);
+        connect(aSortHandByType, &QAction::triggered, actions, [actions] { actions->actSortHand({}); });
+        connect(aSortHandByName, &QAction::triggered, actions,
+                [actions] { actions->actSortHand({CardList::SortByMainType, CardList::SortByManaValue}); });
+        connect(aSortHandByManaValue, &QAction::triggered, actions,
+                [actions] { actions->actSortHand({CardList::SortByManaValue, CardList::SortByColors}); });
 
         mSortHand->addAction(aSortHandByName);
         mSortHand->addAction(aSortHandByType);

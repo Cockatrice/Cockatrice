@@ -152,7 +152,7 @@ public slots:
     void actRevealRandomHandCard(int revealToPlayerId);
     void actRevealLibrary(int revealToPlayerId);
 
-    void actSortHand();
+    void actSortHand(const QList<CardList::SortOption> &sortOptions);
 
     void cardMenuAction();
 
