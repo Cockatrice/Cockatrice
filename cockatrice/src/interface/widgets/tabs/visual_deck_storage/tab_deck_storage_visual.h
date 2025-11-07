@@ -27,7 +27,9 @@ class TabDeckStorageVisual final : public Tab
     Q_OBJECT
 public:
     explicit TabDeckStorageVisual(TabSupervisor *_tabSupervisor);
-    void retranslateUi() override{};
+    void retranslateUi() override
+    {
+    }
     [[nodiscard]] QString getTabText() const override
     {
         return tr("Visual Deck Storage");

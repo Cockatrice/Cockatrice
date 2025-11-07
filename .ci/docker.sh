@@ -137,10 +137,11 @@ if [[ $SAVE ]]; then
 fi
 
 # Set compile function, runs the compile script on the image, passes arguments to the script
+# shellcheck disable=2120
 function RUN ()
 {
   echo "running image:"
-  if [[ $(docker images) =~ "$IMAGE_NAME" ]]; then
+  if [[ $(docker images) =~ $IMAGE_NAME ]]; then
     local args=(--mount "type=bind,source=$PWD,target=/src")
     args+=(--workdir "/src")
     args+=(--user "$(id -u):$(id -g)")
@@ -151,6 +152,7 @@ function RUN ()
     if [[ -n "$CMAKE_GENERATOR" ]]; then
       args+=(--env "CMAKE_GENERATOR=$CMAKE_GENERATOR")
     fi
+  # shellcheck disable=2086
     docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
   else
@@ -164,5 +166,6 @@ function RUN ()
 if [[ $INTERACTIVE ]]; then
   export BUILD_SCRIPT="-i"
   export RUN_ARGS="$RUN_ARGS -it"
+  # shellcheck disable=2119
   RUN
 fi

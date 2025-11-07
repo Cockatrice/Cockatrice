@@ -182,7 +182,9 @@ class LoadSpoilersPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadSpoilersPage(QWidget * = nullptr){};
+    explicit LoadSpoilersPage(QWidget * = nullptr)
+    {
+    }
     void retranslateUi() override;
 
 protected:
@@ -197,7 +199,9 @@ class LoadTokensPage : public SimpleDownloadFilePage
 {
     Q_OBJECT
 public:
-    explicit LoadTokensPage(QWidget * = nullptr){};
+    explicit LoadTokensPage(QWidget * = nullptr)
+    {
+    }
     void retranslateUi() override;
 
 protected:
