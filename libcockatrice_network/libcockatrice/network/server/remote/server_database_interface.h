@@ -146,7 +146,9 @@ public:
                             const QString & /* logMessage */,
                             LogMessage_TargetType /* targetType */,
                             const int /* targetId */,
-                            const QString & /* targetName */){};
+                            const QString & /* targetName */)
+    {
+    }
     virtual bool checkUserIsBanned(Server_ProtocolHandler * /* session */,
                                    QString & /* banReason */,
                                    int & /* banSecondsRemaining */)

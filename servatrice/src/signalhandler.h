@@ -10,7 +10,9 @@ class SignalHandler : public QObject
     Q_OBJECT
 public:
     SignalHandler(QObject *parent = 0);
-    ~SignalHandler(){};
+    ~SignalHandler()
+    {
+    }
     static void sigHupHandler(int /* sig */);
     static void sigSegvHandler(int sig);
 

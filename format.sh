@@ -2,7 +2,8 @@
 
 # This script will run clang-format on all modified, non-3rd-party C++/Header files.
 # Optionally runs cmake-format on all modified cmake files.
-# Uses clang-format cmake-format git diff find
+# Optionally runs shellcheck on all modified shell files.
+# Uses clang-format cmake-format git diff find shellcheck
 # Never, ever, should this receive a path with a newline in it. Don't bother proofing it for that.
 
 set -o pipefail
@@ -36,7 +37,10 @@ branch="origin/master"
 cmakefile="CMakeLists.txt"
 cmakedir="cmake/.*\\.cmake"
 cmakeinclude=("cmake/gtest-CMakeLists.txt.in")
+scripts="*.sh"
 color="--"
+verbosity=0
+sep="----------"
 
 # parse options
 while [[ $* ]]; do
@@ -102,11 +106,21 @@ OPTIONS:
     -n, --names
         Display a list of filenames that require formatting. Implies --test.
 
+    --no-clang-format
+        Do not check any source files for clang-format.
+
+    --print-version
+        Print the version of clang-format being used before continuing.
+
+    --shell
+        Use shellcheck to lint shell files. Not available in the default inline
+        mode.
+
     -t, --test
         Do not edit files in place. Set exit code to 1 if changes are required.
 
-    --cf-version
-        Print the version of clang-format being used before continuing.
+    -v, --verbose
+        Display output on successes.
 
 EXIT CODES:
     0 on a successful format or if no files require formatting.
@@ -123,7 +137,7 @@ EXAMPLES:
         Tests if the source files in the current directory are correctly
         formatted and prints an error message if formatting is required.
 
-    $0 --cmake --branch "" ""
+    $0 --cmake --branch "" --no-clang-format
         Unconditionally format all cmake files and no source files.
 EOM
       exit 0
@@ -132,12 +146,24 @@ EOM
       mode="name"
       shift
       ;;
+    '--no-clang-format')
+      include=() # do not check any dirs
+      shift
+      ;;
+    '--print-version')
+      print_version=1
+      shift
+      ;;
+    '--shell')
+      do_shell=1
+      shift
+      ;;
     '-t'|'--test')
       mode="code"
       shift
       ;;
-    '--cf-version')
-      print_version=1
+    '-v'|'--verbose')
+      verbosity=1
       shift
       ;;
     '--')
@@ -191,6 +217,12 @@ if [[ $do_cmake ]] && ! hash cmake-format 2>/dev/null; then
   exit 3
 fi
 
+# check availability of shellcheck
+if [[ $do_shell ]] && ! hash shellcheck 2>/dev/null; then
+  echo "could not find shellcheck" >&2
+  exit 3
+fi
+
 if [[ $branch ]]; then
   # get all dirty files through git
   if ! base=$(git merge-base "$branch" HEAD); then
@@ -224,6 +256,15 @@ if [[ $branch ]]; then
       done
     done
   fi
+  if [[ $do_shell ]]; then
+    shell_names=()
+    for name in "${basenames[@]}"; do
+      filerx="(^|/)$scripts$"
+      if [[ $name =~ $filerx ]]; then
+        shell_names+=("$name")
+      fi
+    done
+  fi
 else
   exts_o=()
   for ext in "${exts[@]}"; do
@@ -234,6 +275,9 @@ else
   if [[ $do_cmake ]]; then
     mapfile -t cmake_names < <(find . -maxdepth 2 -type f -name "$cmakefile" -o -path "./${cmakedir/.}")
     cmake_names+=("${cmakeinclude[@]}")
+  fi
+  if [[ $do_shell ]]; then
+    mapfile -t shell_names < <(find . -maxdepth 5 -type f -name "$scripts")
   fi
 fi
 
@@ -250,14 +294,18 @@ done
 # optionally print version
 if [[ $print_version ]]; then
   $cf_cmd -version
-  [[ $do_cmake ]] && echo "cmake-format $(cmake-format --version)"
-  echo "----------"
+  [[ $do_cmake ]] && echo "cmake-format version $(cmake-format --version)"
+  [[ $do_shell ]] && echo "shellcheck $(shellcheck --version | grep "version:")"
+  echo "$sep"
 fi
 
 if [[ ! ${cmake_names[*]} ]]; then
   unset do_cmake
 fi
-if [[ ! ( ${names[*]} || $do_cmake ) ]]; then
+if [[ ! ${shell_names[*]} ]]; then
+  unset do_shell
+fi
+if [[ ! ( ${names[*]} || $do_cmake || $do_shell ) ]]; then
   exit 0 # nothing to format means format is successful!
 fi
 
@@ -265,16 +313,31 @@ fi
 case $mode in
   diff)
     declare -i code=0
+    files_to_format=()
     for name in "${names[@]}"; do
       if ! $cf_cmd "$name" | diff "$name" - -p "$color"; then
         code=1
+        files_to_format+=("$name")
       fi
     done
     for name in "${cmake_names[@]}"; do
       if ! cmake-format "$name" | diff "$name" - -p "$color"; then
         code=1
+        files_to_format+=("$name")
       fi
     done
+    for name in "${shell_names[@]}"; do
+      if ! shellcheck "$name"; then
+        code=1
+        files_to_format+=("$name")
+      fi
+    done
+    if (( code>0 )); then
+      echo "$sep"
+      for name in "${files_to_format[@]}"; do
+        echo "$name"
+      done
+    fi
     exit $code
     ;;
   name)
@@ -291,6 +354,12 @@ case $mode in
         code=1
       fi
     done
+    for name in "${shell_names[@]}"; do
+      if ! shellcheck "$name" >/dev/null; then
+        echo "$name"
+        code=1
+      fi
+    done
     exit $code
     ;;
   code)
@@ -300,6 +369,9 @@ case $mode in
     for name in "${cmake_names[@]}"; do
       cmake-format "$name" --check || exit 1
     done
+    for name in "${shell_names[@]}"; do
+      shellcheck "$name" >/dev/null || exit 1
+    done
     ;;
   *)
     if [[ "${names[*]}" ]]; then
@@ -307,6 +379,17 @@ case $mode in
     fi
     if [[ $do_cmake ]]; then
       cmake-format -i "${cmake_names[@]}"
+    fi
+    if [[ $do_shell ]]; then
+      echo "warning: --shell is not compatible with the current mode but shell files were modified!" >&2
+      echo "recommendation: try $0 --diff --shell" >&2
+    fi
+    if (( verbosity>0 )); then
+      count="${#names[*]}"
+      if [[ $do_cmake ]]; then
+        (( count+=${#cmake_names[*]} ))
+      fi
+      echo "parsed $count files that differ from base $branch"
     fi
     ;;
 esac
