@@ -121,6 +121,8 @@ jobs:
     steps:
       - name: Force clean cache
         if: true
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: gh cache delete qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       - name: Restore thin Qt libraries
