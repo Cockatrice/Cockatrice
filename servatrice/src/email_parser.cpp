@@ -25,7 +25,7 @@ QPair<QString, QString> EmailParser::parseEmailAddress(const QString &dirtyEmail
 
     // Trim out dots and pluses from Google/Gmail domains
     if (capturedEmailAddressDomain.toLower() == "gmail.com") {
-        // Remove all content after first plus sign (as unnecessary with gmail)
+        // Remove all content after the first plus sign (as unnecessary with gmail)
         // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         const auto firstPlusSign = capturedEmailUser.indexOf("+");
         if (firstPlusSign != -1) {
@@ -35,6 +35,13 @@ QPair<QString, QString> EmailParser::parseEmailAddress(const QString &dirtyEmail
         // Remove all periods (as unnecessary with gmail)
         // https://gmail.googleblog.com/2008/03/2-hidden-ways-to-get-more-from-your.html
         capturedEmailUser.replace(".", "");
+    }
+    // Trim out minuses from Yahoo domains
+    else if (capturedEmailAddressDomain.toLower() == "yahoo.com") {
+        const auto firstMinusSign = capturedEmailUser.indexOf("-");
+        if (firstMinusSign != -1) {
+            capturedEmailUser = capturedEmailUser.left(firstMinusSign);
+        }
     }
 
     return {capturedEmailUser, capturedEmailAddressDomain};
