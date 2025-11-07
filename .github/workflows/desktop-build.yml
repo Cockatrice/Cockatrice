@@ -120,12 +120,12 @@ jobs:
 
     steps:
       - name: Force clean cache
-        if: true
+        if: false
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
-        run: gh api --method DELETE /repos/${{ github.repository }}/actions/caches?key=qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+        run: gh cache delete qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       - name: Restore thin Qt libraries
         id: restore_qt
@@ -133,7 +133,7 @@ jobs:
         with:
           lookup-only: true
           path: ${{ github.workspace }}/Qt
-          key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+          key: thin-qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # qt build using vcpkg either just fails or takes too long to build
@@ -162,9 +162,8 @@ jobs:
         if: steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          enableCrossOsArchive: true
           path: ${{ github.workspace }}/Qt
-          key: qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+          key: thin-qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
 
   build-linux:
     strategy:
@@ -431,9 +430,8 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v4
         with:
-          enableCrossOsArchive: true
           path: ${{ github.workspace }}/Qt
-          key: qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
+          key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
 
       - name: Install Qt ${{matrix.qt_version}}
         if: matrix.os == 'Windows'
