@@ -119,6 +119,10 @@ jobs:
       QT_MODULES: "qtimageformats qtmultimedia qtwebsockets"
 
     steps:
+      - name: Force clean cache
+        if: true
+        run: gh cache delete qt-macos-${{ matrix.soc }}-${{ env.QT_VERSION }}
+
       - name: Restore thin Qt libraries
         id: restore_qt
         uses: actions/cache/restore@v4
