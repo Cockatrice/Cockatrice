@@ -56,7 +56,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
-        if (SettingsCache::instance()->getFocusCardViewSearchBar()) {
+        if (SettingsCache::instance().getFocusCardViewSearchBar()) {
             this->setActive(true);
             searchEdit.setFocus();
         }
@@ -144,9 +144,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
                 &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
-        groupBySelector.setCurrentIndex(SettingsCache::instance()->getZoneViewGroupByIndex());
-        sortBySelector.setCurrentIndex(SettingsCache::instance()->getZoneViewSortByIndex());
-        pileViewCheckBox.setChecked(SettingsCache::instance()->getZoneViewPileView());
+        groupBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewGroupByIndex());
+        sortBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewSortByIndex());
+        pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
 
         if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
@@ -176,7 +176,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 void ZoneViewWidget::processGroupBy(int index)
 {
     auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
-    SettingsCache::instance()->setZoneViewGroupByIndex(index);
+    SettingsCache::instance().setZoneViewGroupByIndex(index);
     zone->setGroupBy(option);
 
     // disable pile view checkbox if we're not grouping by anything
@@ -200,13 +200,13 @@ void ZoneViewWidget::processSortBy(int index)
         return;
     }
 
-    SettingsCache::instance()->setZoneViewSortByIndex(index);
+    SettingsCache::instance().setZoneViewSortByIndex(index);
     zone->setSortBy(option);
 }
 
 void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance()->setZoneViewPileView(value);
+    SettingsCache::instance().setZoneViewPileView(value);
     zone->setPileView(value);
 }
 
@@ -301,7 +301,7 @@ static qreal rowsToHeight(int rows)
  **/
 static qreal calcMaxInitialHeight()
 {
-    return rowsToHeight(SettingsCache::instance()->getCardViewInitialRowsMax());
+    return rowsToHeight(SettingsCache::instance().getCardViewInitialRowsMax());
 }
 
 /**
@@ -379,7 +379,7 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 void ZoneViewWidget::expandWindow()
 {
     qreal maxInitialHeight = calcMaxInitialHeight();
-    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance()->getCardViewExpandedRowsMax());
+    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
     qreal height = rect().height() - extraHeight - 10;
     qreal maxHeight = maximumHeight() - extraHeight - 10;
 

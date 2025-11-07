@@ -28,7 +28,7 @@ class CardDatabase : public QObject
 {
     Q_OBJECT
 protected:
-    QSharedPointer<ICardSetPriorityController> setPriorityController;
+    ICardSetPriorityController *setPriorityController;
 
     /*
      * The cards, indexed by name.
@@ -61,9 +61,9 @@ private:
 
 public:
     explicit CardDatabase(QObject *parent = nullptr,
-                          QSharedPointer<ICardPreferenceProvider> prefs = nullptr,
-                          QSharedPointer<ICardDatabasePathProvider> pathProvider = nullptr,
-                          QSharedPointer<ICardSetPriorityController> setPriorityController = nullptr);
+                          ICardPreferenceProvider *prefs = nullptr,
+                          ICardDatabasePathProvider *pathProvider = nullptr,
+                          ICardSetPriorityController *setPriorityController = nullptr);
     ~CardDatabase() override;
 
     void removeCard(CardInfoPtr card);

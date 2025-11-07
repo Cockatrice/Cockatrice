@@ -23,7 +23,7 @@ QMap<QString, std::pair<QString, UserConnection_Information>> UserConnection_Inf
 {
     QMap<QString, std::pair<QString, UserConnection_Information>> serverList;
 
-    ServersSettings &servers = SettingsCache::instance()->servers();
+    ServersSettings &servers = SettingsCache::instance().servers();
 
     int size = servers.getValue("totalServers", "server", "server_details").toInt() + 1;
 
@@ -47,7 +47,7 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
 {
     QStringList _server;
 
-    ServersSettings &servers = SettingsCache::instance()->servers();
+    ServersSettings &servers = SettingsCache::instance().servers();
 
     int size = servers.getValue("totalServers", "server", "server_details").toInt() + 1;
     for (int i = 0; i < size; i++) {

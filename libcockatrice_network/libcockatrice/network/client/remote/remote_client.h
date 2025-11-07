@@ -98,7 +98,7 @@ private slots:
     void submitForgotPasswordChallengeResponse(const Response &response);
 
 private:
-    QSharedPointer<INetworkSettingsProvider> networkSettingsProvider;
+    INetworkSettingsProvider *networkSettingsProvider;
     int maxTimeout;
     int timeRunning, lastDataReceived;
     QByteArray inputBuffer;
@@ -122,8 +122,7 @@ protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;
 
 public:
-    explicit RemoteClient(QObject *parent = nullptr,
-                          QSharedPointer<INetworkSettingsProvider> networkSettingsProvider = nullptr);
+    explicit RemoteClient(QObject *parent = nullptr, INetworkSettingsProvider *networkSettingsProvider = nullptr);
     ~RemoteClient() override;
     QString peerName() const
     {

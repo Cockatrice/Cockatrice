@@ -12,7 +12,7 @@ public:
     {
         // Replace querier with one that ignores SettingsCache
         delete querier;
-        querier = new CardDatabaseQuerier(this, this, QSharedPointer<NoopCardPreferenceProvider>::create());
+        querier = new CardDatabaseQuerier(this, this, new NoopCardPreferenceProvider());
     };
 
     LoadStatus loadCardDatabase(const QString &path)

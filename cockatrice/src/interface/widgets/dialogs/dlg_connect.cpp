@@ -75,7 +75,7 @@ DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
     autoConnectCheckBox = new QCheckBox(tr("A&uto connect"));
     autoConnectCheckBox->setToolTip(tr("Automatically connect to the most recent login when Cockatrice opens"));
 
-    auto &servers = SettingsCache::instance()->servers();
+    auto &servers = SettingsCache::instance().servers();
     if (servers.getSavePassword()) {
         autoConnectCheckBox->setChecked(servers.getAutoConnect() > 0);
         autoConnectCheckBox->setEnabled(true);
@@ -213,7 +213,7 @@ void DlgConnect::rebuildComboBoxList(int failure)
     UserConnection_Information uci;
     savedHostList = uci.getServerInfo();
 
-    auto &servers = SettingsCache::instance()->servers();
+    auto &servers = SettingsCache::instance().servers();
     bool autoConnectEnabled = servers.getAutoConnect() > 0;
     QString previousHostName = servers.getPrevioushostName();
     QString autoConnectSaveName = servers.getSaveName();
@@ -330,7 +330,7 @@ void DlgConnect::passwordSaved(QT_STATE_CHANGED_T state)
 
 void DlgConnect::actOk()
 {
-    ServersSettings &servers = SettingsCache::instance()->servers();
+    ServersSettings &servers = SettingsCache::instance().servers();
 
     if (newHostButton->isChecked()) {
         if (saveEdit->text().isEmpty()) {
@@ -363,7 +363,7 @@ QString DlgConnect::getHost() const
 
 void DlgConnect::actForgotPassword()
 {
-    ServersSettings &servers = SettingsCache::instance()->servers();
+    ServersSettings &servers = SettingsCache::instance().servers();
     servers.setFPHostName(hostEdit->text());
     servers.setFPPort(portEdit->text());
     servers.setFPPlayerName(playernameEdit->text().trimmed());
@@ -373,6 +373,6 @@ void DlgConnect::actForgotPassword()
 
 void DlgConnect::actRemoveSavedServer()
 {
-    SettingsCache::instance()->servers().removeServer(hostEdit->text());
+    SettingsCache::instance().servers().removeServer(hostEdit->text());
     previousHosts->removeItem(previousHosts->currentIndex());
 }

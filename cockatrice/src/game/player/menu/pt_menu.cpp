@@ -63,7 +63,7 @@ void PtMenu::retranslateUi()
 
 void PtMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aIncP->setShortcuts(shortcuts.getShortcut("Player/aIncP"));
     aDecP->setShortcuts(shortcuts.getShortcut("Player/aDecP"));

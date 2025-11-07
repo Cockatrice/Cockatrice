@@ -43,7 +43,7 @@ MoveMenu::MoveMenu(Player *player) : QMenu(tr("Move to"))
 
 void MoveMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aMoveToTopLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToTopLibrary"));
     aMoveToBottomLibrary->setShortcuts(shortcuts.getShortcut("Player/aMoveToBottomLibrary"));

@@ -49,7 +49,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
     if (filename.isEmpty())
         return;
 
-    QString filePath = SettingsCache::instance()->getFiltersPath() + QDir::separator() + filename + ".json";
+    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename + ".json";
 
     // Serialize the filter model to JSON
     QJsonArray filtersArray;
@@ -74,7 +74,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filename)
 {
-    QString filePath = SettingsCache::instance()->getFiltersPath() + QDir::separator() + filename;
+    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
@@ -124,7 +124,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
     fileButtons.clear(); // Clear the list of buttons
 
     // Refresh the filter file list
-    QDir dir(SettingsCache::instance()->getFiltersPath());
+    QDir dir(SettingsCache::instance().getFiltersPath());
     QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Name);
 
     // Loop through the filter files and create widgets for them

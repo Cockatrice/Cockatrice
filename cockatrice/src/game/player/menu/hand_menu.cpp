@@ -89,7 +89,7 @@ void HandMenu::retranslateUi()
 
 void HandMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
     aSortHand->setShortcuts(shortcuts.getShortcut("Player/aSortHand"));
     aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));

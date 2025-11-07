@@ -45,15 +45,15 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     // Create the checkbox for navigation buttons visibility
     navigationCheckBox = new QCheckBox(this);
-    navigationCheckBox->setChecked(SettingsCache::instance()->getPrintingSelectorNavigationButtonsVisible());
+    navigationCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
     connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &PrintingSelector::toggleVisibilityNavigationButtons);
-    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorNavigationButtonsVisible);
 
     cardSizeWidget =
-        new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance()->getPrintingSelectorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, SettingsCache::instance().get(),
+        new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setPrintingSelectorCardSize);
 
     displayOptionsWidget->addSettingsWidget(sortToolBar);
@@ -76,7 +76,7 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     layout->addWidget(flowWidget);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
-    cardSelectionBar->setVisible(SettingsCache::instance()->getPrintingSelectorNavigationButtonsVisible());
+    cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
     layout->addWidget(cardSelectionBar);
 
     // Connect deck model data change signal to update display
@@ -206,7 +206,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());
     QList<PrintingInfo> printingsToUse;
 
-    if (SettingsCache::instance()->getBumpSetsWithCardsInDeckToTop()) {
+    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
         printingsToUse = sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckModel);
     } else {
         printingsToUse = filteredPrintings;

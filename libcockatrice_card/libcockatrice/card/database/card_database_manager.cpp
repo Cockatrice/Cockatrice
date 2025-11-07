@@ -4,24 +4,21 @@
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
-QSharedPointer<ICardPreferenceProvider> CardDatabaseManager::cardPreferenceProvider =
-    QSharedPointer<NoopCardPreferenceProvider>::create();
-QSharedPointer<ICardDatabasePathProvider> CardDatabaseManager::pathProvider =
-    QSharedPointer<NoopCardDatabasePathProvider>::create();
-QSharedPointer<ICardSetPriorityController> CardDatabaseManager::setPriorityController =
-    QSharedPointer<NoopCardSetPriorityController>::create();
+ICardPreferenceProvider *CardDatabaseManager::cardPreferenceProvider = new NoopCardPreferenceProvider();
+ICardDatabasePathProvider *CardDatabaseManager::pathProvider = new NoopCardDatabasePathProvider();
+ICardSetPriorityController *CardDatabaseManager::setPriorityController = new NoopCardSetPriorityController();
 
-void CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<ICardPreferenceProvider> provider)
+void CardDatabaseManager::setCardPreferenceProvider(ICardPreferenceProvider *provider)
 {
     cardPreferenceProvider = provider;
 }
 
-void CardDatabaseManager::setCardDatabasePathProvider(QSharedPointer<ICardDatabasePathProvider> provider)
+void CardDatabaseManager::setCardDatabasePathProvider(ICardDatabasePathProvider *provider)
 {
     pathProvider = provider;
 }
 
-void CardDatabaseManager::setCardSetPriorityController(QSharedPointer<ICardSetPriorityController> controller)
+void CardDatabaseManager::setCardSetPriorityController(ICardSetPriorityController *controller)
 {
     setPriorityController = controller;
 }

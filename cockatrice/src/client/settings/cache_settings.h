@@ -188,7 +188,7 @@ signals:
 private:
     QSettings *settings;
     ShortcutsSettings *shortcutsSettings;
-    QSharedPointer<CardDatabaseSettings> cardDatabaseSettings;
+    CardDatabaseSettings *cardDatabaseSettings;
     ServersSettings *serversSettings;
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
@@ -325,11 +325,8 @@ private:
     bool roundCardCorners;
     bool showStatusBar;
 
-    explicit SettingsCache();
-
-    static QSharedPointer<SettingsCache> settingsInstance;
-
 public:
+    SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
     QString getCachePath() const;
@@ -895,7 +892,7 @@ public:
     {
         return *shortcutsSettings;
     }
-    QSharedPointer<CardDatabaseSettings> cardDatabase() const
+    CardDatabaseSettings *cardDatabase() const
     {
         return cardDatabaseSettings;
     }
@@ -946,8 +943,7 @@ public:
         return roundCardCorners;
     }
 
-    static QSharedPointer<SettingsCache> instance();
-    static void setInstance(QSharedPointer<SettingsCache> newInstance);
+    static SettingsCache &instance();
     void resetPaths();
 
 public slots:

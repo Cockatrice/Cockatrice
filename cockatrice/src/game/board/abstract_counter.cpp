@@ -57,7 +57,7 @@ AbstractCounter::AbstractCounter(Player *_player,
         menu = nullptr;
     }
 
-    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &AbstractCounter::refreshShortcuts);
     refreshShortcuts();
     retranslateUi();
@@ -88,7 +88,7 @@ void AbstractCounter::setShortcutsActive()
     if (!player->getPlayerInfo()->getLocal()) {
         return;
     }
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     if (name == "life") {
         shortcutActive = true;
         aSet->setShortcuts(shortcuts.getShortcut("Player/aSet"));

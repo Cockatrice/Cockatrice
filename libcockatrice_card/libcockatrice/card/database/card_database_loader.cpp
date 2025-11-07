@@ -9,9 +9,7 @@
 #include <QFile>
 #include <QTime>
 
-CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
-                                       CardDatabase *db,
-                                       QSharedPointer<ICardDatabasePathProvider> _pathProvider)
+CardDatabaseLoader::CardDatabaseLoader(QObject *parent, CardDatabase *db, ICardDatabasePathProvider *_pathProvider)
     : QObject(parent), database(db), pathProvider(_pathProvider)
 {
     // instantiate available parsers here and connect them to the database
@@ -25,7 +23,7 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
     }
 
     // when SettingsCache's path changes, trigger reloads
-    connect(pathProvider.get(), &ICardDatabasePathProvider::cardDatabasePathChanged, this,
+    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this,
             &CardDatabaseLoader::loadCardDatabases);
 }
 

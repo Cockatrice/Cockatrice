@@ -20,16 +20,15 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(SettingsCache::instance().get(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
+    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
     refreshCardInfo();
 
-    connect(SettingsCache::instance().get(), &SettingsCache::roundCardCornersChanged, this,
-            [this](bool _roundCardCorners) {
-                Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
+        Q_UNUSED(_roundCardCorners);
 
-                prepareGeometryChange();
-                update();
-            });
+        prepareGeometryChange();
+        update();
+    });
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -45,7 +44,7 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance()->getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -95,7 +94,7 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = SettingsCache::instance()->getMaxFontSize();
+    const int MAX_FONT_SIZE = SettingsCache::instance().getMaxFontSize();
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
@@ -144,7 +143,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawPath(shape());
     }
 
-    if (translatedPixmap.isNull() || SettingsCache::instance()->getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
@@ -155,7 +154,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
             nameStr = "# " + QString::number(id);
         else {
             QString prefix = "";
-            if (SettingsCache::instance()->debug().getShowCardId()) {
+            if (SettingsCache::instance().debug().getShowCardId()) {
                 prefix = "#" + QString::number(id) + " ";
             }
             nameStr = prefix + cardRef.name;
@@ -216,7 +215,7 @@ void AbstractCardItem::setHovered(bool _hovered)
         processHoverEvent();
     isHovered = _hovered;
     setZValue(_hovered ? 2000000004 : realZValue);
-    setScale(_hovered && SettingsCache::instance()->getScaleCards() ? 1.1 : 1);
+    setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
 }
@@ -268,7 +267,7 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
         return;
 
     tapped = _tapped;
-    if (SettingsCache::instance()->getTapAnimation() && canAnimate)
+    if (SettingsCache::instance().getTapAnimation() && canAnimate)
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     else {
         tapAngle = tapped ? 90 : 0;

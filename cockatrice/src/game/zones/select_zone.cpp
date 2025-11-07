@@ -9,7 +9,7 @@
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse)
 {
-    qreal cardMinOverlap = cardHeight * SettingsCache::instance()->getStackCardOverlapPercent() / 100;
+    qreal cardMinOverlap = cardHeight * SettingsCache::instance().getStackCardOverlapPercent() / 100;
     qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
     qreal y;
     if (desiredHeight > totalHeight) {

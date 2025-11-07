@@ -15,7 +15,7 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
     oldPasswordEdit = new QLineEdit();
     oldPasswordEdit->setMaxLength(MAX_NAME_LENGTH);
 
-    auto &servers = SettingsCache::instance()->servers();
+    auto &servers = SettingsCache::instance().servers();
     if (servers.getSavePassword()) {
         oldPasswordEdit->setText(servers.getPassword());
     }

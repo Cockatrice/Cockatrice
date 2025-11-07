@@ -25,7 +25,7 @@
 
 static const unsigned int protocolVersion = 14;
 
-RemoteClient::RemoteClient(QObject *parent, QSharedPointer<INetworkSettingsProvider> _networkSettingsProvider)
+RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
     : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
       messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword()
 {

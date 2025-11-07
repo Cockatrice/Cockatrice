@@ -5,7 +5,7 @@
 
 const char *CardSet::TOKENS_SETNAME = "TK";
 
-CardSet::CardSet(QSharedPointer<ICardSetPriorityController> _priorityController,
+CardSet::CardSet(ICardSetPriorityController *_priorityController,
                  const QString &_shortName,
                  const QString &_longName,
                  const QString &_setType,
@@ -17,7 +17,7 @@ CardSet::CardSet(QSharedPointer<ICardSetPriorityController> _priorityController,
     loadSetOptions();
 }
 
-CardSetPtr CardSet::newInstance(QSharedPointer<ICardSetPriorityController> _priorityController,
+CardSetPtr CardSet::newInstance(ICardSetPriorityController *_priorityController,
                                 const QString &_shortName,
                                 const QString &_longName,
                                 const QString &_setType,

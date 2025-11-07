@@ -24,7 +24,7 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 
     coClearLog = new QCheckBox;
     coClearLog->setText(tr("Clear log when closing"));
-    coClearLog->setChecked(SettingsCache::instance()->servers().getClearDebugLogStatus(false));
+    coClearLog->setChecked(SettingsCache::instance().servers().getClearDebugLogStatus(false));
     connect(coClearLog, &QCheckBox::toggled, this, &DlgViewLog::actCheckBoxChanged);
 
     copyToClipboardButton = new QPushButton;
@@ -49,7 +49,7 @@ DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 
 void DlgViewLog::actCheckBoxChanged(bool abNewValue)
 {
-    SettingsCache::instance()->servers().setClearDebugLogStatus(abNewValue);
+    SettingsCache::instance().servers().setClearDebugLogStatus(abNewValue);
 }
 
 void DlgViewLog::actCopyToClipboard()

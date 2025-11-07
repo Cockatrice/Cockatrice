@@ -46,7 +46,7 @@ void SequenceEdit::setShortcutName(const QString &_shortcutName)
         clearButton->setEnabled(true);
         defaultButton->setEnabled(true);
         lineEdit->setEnabled(true);
-        lineEdit->setText(SettingsCache::instance()->shortcuts().getShortcutString(shortcutName));
+        lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
         // Correct as in-line translation
         lineEdit->setPlaceholderText(tr("Hit the key/combination of keys you want to set for this action"));
     }
@@ -74,13 +74,13 @@ void SequenceEdit::removeLastShortcut()
 
 void SequenceEdit::restoreDefault()
 {
-    lineEdit->setText(SettingsCache::instance()->shortcuts().getDefaultShortcutString(shortcutName));
+    lineEdit->setText(SettingsCache::instance().shortcuts().getDefaultShortcutString(shortcutName));
     updateSettings();
 }
 
 void SequenceEdit::refreshShortcut()
 {
-    lineEdit->setText(SettingsCache::instance()->shortcuts().getShortcutString(shortcutName));
+    lineEdit->setText(SettingsCache::instance().shortcuts().getShortcutString(shortcutName));
 }
 
 void SequenceEdit::clear()
@@ -169,7 +169,7 @@ bool SequenceEdit::validateShortcut(const QKeySequence &sequence)
         return true;
     }
 
-    const auto &shortcutsSettings = SettingsCache::instance()->shortcuts();
+    const auto &shortcutsSettings = SettingsCache::instance().shortcuts();
     const QString sequenceString = sequence.toString();
 
     if (!shortcutsSettings.isKeyAllowed(shortcutName, sequenceString)) {
@@ -209,7 +209,7 @@ void SequenceEdit::finishShortcut()
 
 void SequenceEdit::updateSettings()
 {
-    SettingsCache::instance()->shortcuts().setShortcuts(shortcutName, lineEdit->text());
+    SettingsCache::instance().shortcuts().setShortcuts(shortcutName, lineEdit->text());
 }
 
 void SequenceEdit::retranslateUi()

@@ -14,9 +14,9 @@
 #include <utility>
 
 CardDatabase::CardDatabase(QObject *parent,
-                           QSharedPointer<ICardPreferenceProvider> prefs,
-                           QSharedPointer<ICardDatabasePathProvider> pathProvider,
-                           QSharedPointer<ICardSetPriorityController> _setPriorityController)
+                           ICardPreferenceProvider *prefs,
+                           ICardDatabasePathProvider *pathProvider,
+                           ICardSetPriorityController *_setPriorityController)
     : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");

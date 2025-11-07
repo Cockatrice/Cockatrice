@@ -14,19 +14,11 @@
 #include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
-QSharedPointer<SettingsCache> SettingsCache::settingsInstance = nullptr;
+Q_GLOBAL_STATIC(SettingsCache, settingsCache)
 
-QSharedPointer<SettingsCache> SettingsCache::instance()
+SettingsCache &SettingsCache::instance()
 {
-    if (!settingsInstance) {
-        settingsInstance.reset(new SettingsCache()); // default real instance
-    }
-    return settingsInstance;
-}
-
-void SettingsCache::setInstance(QSharedPointer<SettingsCache> newInstance)
-{
-    settingsInstance = newInstance;
+    return *settingsCache; // returns a QT managed singleton reference
 }
 
 QString SettingsCache::getDataPath()
@@ -184,7 +176,7 @@ SettingsCache::SettingsCache()
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
-    cardDatabaseSettings = QSharedPointer<CardDatabaseSettings>(new CardDatabaseSettings(settingsPath, this));
+    cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
     serversSettings = new ServersSettings(settingsPath, this);
     messageSettings = new MessageSettings(settingsPath, this);
     gameFiltersSettings = new GameFiltersSettings(settingsPath, this);

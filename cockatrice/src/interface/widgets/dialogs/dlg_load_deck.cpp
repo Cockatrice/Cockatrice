@@ -6,9 +6,9 @@
 
 DlgLoadDeck::DlgLoadDeck(QWidget *parent) : QFileDialog(parent, tr("Load Deck"))
 {
-    QString startingDir = SettingsCache::instance()->recents().getLatestDeckDirPath();
+    QString startingDir = SettingsCache::instance().recents().getLatestDeckDirPath();
     if (startingDir.isEmpty()) {
-        startingDir = SettingsCache::instance()->getDeckPath();
+        startingDir = SettingsCache::instance().getDeckPath();
     }
 
     setDirectory(startingDir);
@@ -19,5 +19,5 @@ DlgLoadDeck::DlgLoadDeck(QWidget *parent) : QFileDialog(parent, tr("Load Deck"))
 
 void DlgLoadDeck::actAccepted()
 {
-    SettingsCache::instance()->recents().setLatestDeckDirPath(directory().absolutePath());
+    SettingsCache::instance().recents().setLatestDeckDirPath(directory().absolutePath());
 }

@@ -68,7 +68,7 @@ void FilterDisplayWidget::deleteFilter()
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         // If confirmed, delete the filter
-        QString filePath = SettingsCache::instance()->getFiltersPath() + QDir::separator() + filterFilename;
+        QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filterFilename;
         QFile file(filePath);
         if (file.remove()) {
             emit filterDeleted(filterFilename); // Emit signal for deletion

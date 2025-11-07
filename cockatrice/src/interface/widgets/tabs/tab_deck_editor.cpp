@@ -93,11 +93,11 @@ void TabDeckEditor::createMenus()
     aPrintingSelectorDockFloating->setCheckable(true);
     connect(aPrintingSelectorDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
 
-    if (SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference()) {
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         printingSelectorDockMenu->setEnabled(false);
     }
 
-    connect(SettingsCache::instance().get(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
             [this](bool enabled) { printingSelectorDockMenu->setEnabled(!enabled); });
 
     viewMenu->addSeparator();
@@ -151,7 +151,7 @@ void TabDeckEditor::retranslateUi()
 
 void TabDeckEditor::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
 }
 
@@ -166,7 +166,7 @@ void TabDeckEditor::showPrintingSelector()
 
 void TabDeckEditor::loadLayout()
 {
-    LayoutsSettings &layouts = SettingsCache::instance()->layouts();
+    LayoutsSettings &layouts = SettingsCache::instance().layouts();
 
     setCentralWidget(databaseDisplayDockWidget);
 
@@ -178,7 +178,7 @@ void TabDeckEditor::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
-    if (SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference()) {
+    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         if (!printingSelectorDockWidget->isHidden()) {
             printingSelectorDockWidget->setHidden(true);
             aPrintingSelectorDockVisible->setChecked(false);
@@ -221,7 +221,7 @@ void TabDeckEditor::restartLayout()
     aCardInfoDockVisible->setChecked(true);
     aDeckDockVisible->setChecked(true);
     aFilterDockVisible->setChecked(true);
-    aPrintingSelectorDockVisible->setChecked(!SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference());
+    aPrintingSelectorDockVisible->setChecked(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     aCardInfoDockFloating->setChecked(false);
     aDeckDockFloating->setChecked(false);
@@ -242,7 +242,7 @@ void TabDeckEditor::restartLayout()
     deckDockWidget->setVisible(true);
     cardInfoDockWidget->setVisible(true);
     filterDockWidget->setVisible(true);
-    printingSelectorDockWidget->setVisible(!SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference());
+    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);
@@ -362,7 +362,7 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
         }
     }
     if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance()->layouts();
+        LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
         layouts.setDeckEditorGeometry(saveGeometry());
         layouts.setDeckEditorCardSize(cardInfoDockWidget->size());

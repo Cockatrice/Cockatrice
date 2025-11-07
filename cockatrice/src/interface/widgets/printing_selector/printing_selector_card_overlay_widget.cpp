@@ -168,20 +168,20 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     menu.addMenu(preferenceMenu);
 
     const auto &preferredProviderId =
-        SettingsCache::instance()->cardOverrides().getCardPreferenceOverride(rootCard.getName());
+        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard.getName());
     const auto &cardProviderId = rootCard.getPrinting().getUuid();
 
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
         auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
         connect(pinAction, &QAction::triggered, this, [this] {
-            SettingsCache::instance()->cardOverrides().setCardPreferenceOverride(
+            SettingsCache::instance().cardOverrides().setCardPreferenceOverride(
                 {rootCard.getName(), rootCard.getPrinting().getUuid()});
             emit cardPreferenceChanged();
         });
     } else {
         auto *unpinAction = preferenceMenu->addAction(tr("Unpin Printing"));
         connect(unpinAction, &QAction::triggered, this, [this] {
-            SettingsCache::instance()->cardOverrides().deleteCardPreferenceOverride(rootCard.getName());
+            SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard.getName());
             emit cardPreferenceChanged();
         });
     }

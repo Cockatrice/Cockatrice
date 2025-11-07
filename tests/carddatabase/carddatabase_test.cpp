@@ -10,9 +10,8 @@ namespace
 
 TEST(CardDatabaseTest, LoadXml)
 {
-    CardDatabase *db = new CardDatabase(nullptr, QSharedPointer<NoopCardPreferenceProvider>::create(),
-                                        QSharedPointer<TestCardDatabasePathProvider>::create(),
-                                        QSharedPointer<NoopCardSetPriorityController>::create());
+    CardDatabase *db = new CardDatabase(nullptr, new NoopCardPreferenceProvider(), new TestCardDatabasePathProvider(),
+                                        new NoopCardSetPriorityController());
 
     // ensure the card database is empty at start
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty at start";

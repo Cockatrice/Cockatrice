@@ -18,7 +18,7 @@ static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};
 
 CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
     : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
-      picDownload(SettingsCache::instance()->getPicDownload())
+      picDownload(SettingsCache::instance().getPicDownload())
 {
     // Hook up signals to the orchestrator
     connect(this, &CardPictureLoaderWorkerWork::requestImageDownload, worker, &CardPictureLoaderWorker::queueRequest);
@@ -30,7 +30,7 @@ CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoader
             &CardPictureLoaderWorker::imageRequestSucceeded);
 
     // Hook up signals to settings
-    connect(SettingsCache::instance().get(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
     startNextPicDownload();
 }
@@ -219,5 +219,5 @@ void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 
 void CardPictureLoaderWorkerWork::picDownloadChanged()
 {
-    picDownload = SettingsCache::instance()->getPicDownload();
+    picDownload = SettingsCache::instance().getPicDownload();
 }

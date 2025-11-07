@@ -83,7 +83,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
             &DeckEditorDatabaseDisplayWidget::updateCard);
     connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
 
-    QByteArray dbHeaderState = SettingsCache::instance()->layouts().getDeckEditorDbHeaderState();
+    QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     if (dbHeaderState.isNull()) {
         // first run
         databaseView->setColumnWidth(0, 200);
@@ -189,7 +189,7 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
-        if (!SettingsCache::instance()->getOverrideAllCardArtWithPersonalPreference()) {
+        if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
             selectPrinting = menu.addAction(tr("Select Printing"));
             connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
         }
@@ -232,7 +232,7 @@ void DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents()
 
 void DeckEditorDatabaseDisplayWidget::saveDbHeaderState()
 {
-    SettingsCache::instance()->layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
+    SettingsCache::instance().layouts().setDeckEditorDbHeaderState(databaseView->header()->saveState());
 }
 
 void DeckEditorDatabaseDisplayWidget::setFilterTree(FilterTree *filterTree)

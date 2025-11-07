@@ -318,7 +318,7 @@ void LibraryMenu::onRevealTopCardTriggered()
 
 void LibraryMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aViewLibrary->setShortcuts(shortcuts.getShortcut("Player/aViewLibrary"));
     aViewTopCards->setShortcuts(shortcuts.getShortcut("Player/aViewTopCards"));

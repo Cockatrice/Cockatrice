@@ -33,9 +33,7 @@ class CardDatabaseLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit CardDatabaseLoader(QObject *parent,
-                                CardDatabase *db,
-                                QSharedPointer<ICardDatabasePathProvider> pathProvider);
+    explicit CardDatabaseLoader(QObject *parent, CardDatabase *db, ICardDatabasePathProvider *pathProvider);
     ~CardDatabaseLoader() override;
 
 public slots:
@@ -56,7 +54,7 @@ private:
 
     CardDatabase *database; // non-owning pointer to the container
 
-    QSharedPointer<ICardDatabasePathProvider> pathProvider; // pointer to the implementation providing the paths
+    ICardDatabasePathProvider *pathProvider; // pointer to the implementation providing the paths
 
     // parsers
     QList<ICardDatabaseParser *> availableParsers;

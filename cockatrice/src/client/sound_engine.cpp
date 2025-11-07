@@ -15,9 +15,8 @@
 SoundEngine::SoundEngine(QObject *parent) : QObject(parent), audioOutput(nullptr), player(nullptr)
 {
     ensureThemeDirectoryExists();
-    connect(SettingsCache::instance().get(), &SettingsCache::soundThemeChanged, this, &SoundEngine::themeChangedSlot);
-    connect(SettingsCache::instance().get(), &SettingsCache::soundEnabledChanged, this,
-            &SoundEngine::soundEnabledChanged);
+    connect(&SettingsCache::instance(), &SettingsCache::soundThemeChanged, this, &SoundEngine::themeChangedSlot);
+    connect(&SettingsCache::instance(), &SettingsCache::soundEnabledChanged, this, &SoundEngine::soundEnabledChanged);
 
     soundEnabledChanged();
     themeChangedSlot();
@@ -37,7 +36,7 @@ SoundEngine::~SoundEngine()
 
 void SoundEngine::soundEnabledChanged()
 {
-    if (SettingsCache::instance()->getSoundEnabled()) {
+    if (SettingsCache::instance().getSoundEnabled()) {
         qCInfo(SoundEngineLog) << "SoundEngine: enabling sound with" << audioData.size() << "sounds";
         if (!player) {
             player = new QMediaPlayer;
@@ -71,7 +70,7 @@ void SoundEngine::playSound(const QString &fileName)
     }
 
     player->stop();
-    int volumeSliderValue = SettingsCache::instance()->getMasterVolume();
+    int volumeSliderValue = SettingsCache::instance().getMasterVolume();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     player->audioOutput()->setVolume(qreal(volumeSliderValue) / 100);
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
@@ -89,10 +88,10 @@ void SoundEngine::testSound()
 
 void SoundEngine::ensureThemeDirectoryExists()
 {
-    if (SettingsCache::instance()->getSoundThemeName().isEmpty() ||
-        !getAvailableThemes().contains(SettingsCache::instance()->getSoundThemeName())) {
+    if (SettingsCache::instance().getSoundThemeName().isEmpty() ||
+        !getAvailableThemes().contains(SettingsCache::instance().getSoundThemeName())) {
         qCInfo(SoundEngineLog) << "Sounds theme name not set, setting default value";
-        SettingsCache::instance()->setSoundThemeName(DEFAULT_THEME_NAME);
+        SettingsCache::instance().setSoundThemeName(DEFAULT_THEME_NAME);
     }
 }
 
@@ -103,7 +102,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
     // load themes from user profile dir
 
-    dir.setPath(SettingsCache::instance()->getDataPath() + "/sounds");
+    dir.setPath(SettingsCache::instance().getDataPath() + "/sounds");
 
     for (const QString &themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName))
@@ -131,7 +130,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
 void SoundEngine::themeChangedSlot()
 {
-    QString themeName = SettingsCache::instance()->getSoundThemeName();
+    QString themeName = SettingsCache::instance().getSoundThemeName();
     qCInfo(SoundEngineLog) << "Sound theme changed:" << themeName;
 
     QDir dir = getAvailableThemes().value(themeName);

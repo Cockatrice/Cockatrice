@@ -105,8 +105,8 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
         if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) != DeckLoader::CockatriceFormat) {
             canAddTags = false;
             // Retrieve saved preference if the prompt is disabled
-            if (!SettingsCache::instance()->getVisualDeckStoragePromptForConversion()) {
-                if (SettingsCache::instance()->getVisualDeckStorageAlwaysConvert()) {
+            if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+                if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
 
                     if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
                         return;
@@ -130,16 +130,16 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                     canAddTags = true;
 
                     if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance()->setVisualDeckStoragePromptForConversion(false);
-                        SettingsCache::instance()->setVisualDeckStorageAlwaysConvert(true);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
+                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
                     }
                 } else {
-                    SettingsCache::instance()->setVisualDeckStorageAlwaysConvert(false);
+                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
 
                     if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance()->setVisualDeckStoragePromptForConversion(false);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
                     } else {
-                        SettingsCache::instance()->setVisualDeckStoragePromptForConversion(true);
+                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(true);
                     }
                 }
             }
@@ -166,7 +166,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
         if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
             auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
             QStringList knownTags;
-            QStringList allFiles = getAllFiles(SettingsCache::instance()->getDeckPath());
+            QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
             DeckLoader loader;
             for (const QString &file : allFiles) {
                 loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);

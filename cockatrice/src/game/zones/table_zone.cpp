@@ -25,7 +25,7 @@ TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
-    connect(SettingsCache::instance().get(), &SettingsCache::invertVerticalCoordinateChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
             &TableZone::reorganizeCards);
 
     updateBg();
@@ -51,9 +51,9 @@ QRectF TableZone::boundingRect() const
 bool TableZone::isInverted() const
 {
     return ((getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             !SettingsCache::instance()->getInvertVerticalCoordinate()) ||
+             !SettingsCache::instance().getInvertVerticalCoordinate()) ||
             (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             SettingsCache::instance()->getInvertVerticalCoordinate()));
+             SettingsCache::instance().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)

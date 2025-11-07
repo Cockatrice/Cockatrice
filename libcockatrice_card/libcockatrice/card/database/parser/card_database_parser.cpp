@@ -19,7 +19,7 @@ CardSetPtr ICardDatabaseParser::internalAddSet(const QString &setName,
         return sets.value(setName);
     }
 
-    CardSetPtr newSet = CardSet::newInstance(QSharedPointer<NoopCardSetPriorityController>::create(), setName);
+    CardSetPtr newSet = CardSet::newInstance(new NoopCardSetPriorityController(), setName);
     newSet->setLongName(longName);
     newSet->setSetType(setType);
     newSet->setReleaseDate(releaseDate);

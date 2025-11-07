@@ -59,7 +59,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
-    connect(SettingsCache::instance().get(), &SettingsCache::chatMentionCompleterChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
             &TabRoom::actCompleterChanged);
     sayLabel = new QLabel;
     sayEdit = new LineEditCompleter;
@@ -127,7 +127,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     sayEdit->setCompleter(completer);
     actCompleterChanged();
-    connect(&SettingsCache::instance().get()->shortcuts(), &ShortcutsSettings::shortCutChanged, this,
+    connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabRoom::refreshShortcuts);
     refreshShortcuts();
 
@@ -229,8 +229,8 @@ void TabRoom::actOpenChatSettings()
 
 void TabRoom::actCompleterChanged()
 {
-    SettingsCache::instance()->getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                         : completer->setCompletionRole(1);
+    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                        : completer->setCompletionRole(1);
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
@@ -291,12 +291,12 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     ServerInfo_User userInfo = {};
     if (twi) {
         userInfo = twi->getUserInfo();
-        if (SettingsCache::instance()->getIgnoreUnregisteredUsers() &&
+        if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
             !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered))
             return;
     }
 
-    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance()->getRoomHistory())
+    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().getRoomHistory())
         return;
 
     if (event.message_type() == Event_RoomSay::ChatHistory)
@@ -318,7 +318,7 @@ void TabRoom::processRemoveMessagesEvent(const Event_RemoveMessages &event)
 
 void TabRoom::refreshShortcuts()
 {
-    aClearChat->setShortcuts(SettingsCache::instance()->shortcuts().getShortcut("tab_room/aClearChat"));
+    aClearChat->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("tab_room/aClearChat"));
 }
 
 void TabRoom::addMentionTag(QString mentionTag)

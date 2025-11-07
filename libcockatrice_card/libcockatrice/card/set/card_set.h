@@ -38,14 +38,14 @@ private:
     bool enabled, isknown;
 
 public:
-    explicit CardSet(QSharedPointer<ICardSetPriorityController> priorityController,
+    explicit CardSet(ICardSetPriorityController *priorityController,
                      const QString &_shortName = QString(),
                      const QString &_longName = QString(),
                      const QString &_setType = QString(),
                      const QDate &_releaseDate = QDate(),
                      const Priority _priority = PriorityFallback);
 
-    static CardSetPtr newInstance(QSharedPointer<ICardSetPriorityController> priorityController,
+    static CardSetPtr newInstance(ICardSetPriorityController *priorityController,
                                   const QString &_shortName = QString(),
                                   const QString &_longName = QString(),
                                   const QString &_setType = QString(),

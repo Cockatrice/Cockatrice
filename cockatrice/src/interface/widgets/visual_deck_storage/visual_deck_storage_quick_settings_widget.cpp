@@ -12,43 +12,43 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
 {
     // show folders checkbox
     showFoldersCheckBox = new QCheckBox(this);
-    showFoldersCheckBox->setChecked(SettingsCache::instance()->getVisualDeckStorageShowFolders());
+    showFoldersCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowFolders());
     connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &VisualDeckStorageQuickSettingsWidget::showFoldersChanged);
-    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(showFoldersCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowFolders);
 
     // show tag filter widget checkbox
     showTagFilterCheckBox = new QCheckBox(this);
-    showTagFilterCheckBox->setChecked(SettingsCache::instance()->getVisualDeckStorageShowTagFilter());
+    showTagFilterCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
     connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &VisualDeckStorageQuickSettingsWidget::showTagFilterChanged);
-    connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowTagFilter);
 
     // show tags on DeckPreviewWidget checkbox
     showTagsOnDeckPreviewsCheckBox = new QCheckBox(this);
-    showTagsOnDeckPreviewsCheckBox->setChecked(SettingsCache::instance()->getVisualDeckStorageShowTagsOnDeckPreviews());
+    showTagsOnDeckPreviewsCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
     connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &VisualDeckStorageQuickSettingsWidget::showTagsOnDeckPreviewsChanged);
-    connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(showTagsOnDeckPreviewsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowTagsOnDeckPreviews);
 
     // show banner card selector checkbox
     showBannerCardComboBoxCheckBox = new QCheckBox(this);
-    showBannerCardComboBoxCheckBox->setChecked(SettingsCache::instance()->getVisualDeckStorageShowBannerCardComboBox());
+    showBannerCardComboBoxCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
     connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &VisualDeckStorageQuickSettingsWidget::showBannerCardComboBoxChanged);
-    connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(showBannerCardComboBoxCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowBannerCardComboBox);
 
     // draw unused color identities checkbox
     drawUnusedColorIdentitiesCheckBox = new QCheckBox(this);
     drawUnusedColorIdentitiesCheckBox->setChecked(
-        SettingsCache::instance()->getVisualDeckStorageDrawUnusedColorIdentities());
+        SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities());
     connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &VisualDeckStorageQuickSettingsWidget::drawUnusedColorIdentitiesChanged);
-    connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, SettingsCache::instance().get(),
+    connect(drawUnusedColorIdentitiesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
     // color identity opacity selector
@@ -60,11 +60,11 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     unusedColorIdentitiesOpacitySpinBox->setMinimum(0);
     unusedColorIdentitiesOpacitySpinBox->setMaximum(100);
     unusedColorIdentitiesOpacitySpinBox->setValue(
-        SettingsCache::instance()->getVisualDeckStorageUnusedColorIdentitiesOpacity());
+        SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
     connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &VisualDeckStorageQuickSettingsWidget::unusedColorIdentitiesOpacityChanged);
     connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-            SettingsCache::instance().get(), &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
+            &SettingsCache::instance(), &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
 
     unusedColorIdentitiesOpacityLabel->setBuddy(unusedColorIdentitiesOpacitySpinBox);
 
@@ -82,11 +82,11 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     deckPreviewTooltipComboBox->addItem("", TooltipType::None);
     deckPreviewTooltipComboBox->addItem("", TooltipType::Filepath);
 
-    deckPreviewTooltipComboBox->setCurrentIndex(SettingsCache::instance()->getVisualDeckStorageTooltipType());
+    deckPreviewTooltipComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageTooltipType());
     connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [this] { emit deckPreviewTooltipChanged(getDeckPreviewTooltip()); });
-    connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            SettingsCache::instance().get(), &SettingsCache::setVisualDeckStorageTooltipType);
+    connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageTooltipType);
 
     auto deckPreviewTooltipLayout = new QHBoxLayout(deckPreviewTooltipWidget);
     deckPreviewTooltipLayout->setContentsMargins(11, 0, 11, 0);
@@ -94,10 +94,10 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     deckPreviewTooltipLayout->addWidget(deckPreviewTooltipComboBox);
 
     // card size slider
-    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance()->getVisualDeckStorageCardSize());
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckStorageCardSize());
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
             &VisualDeckStorageQuickSettingsWidget::cardSizeChanged);
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, SettingsCache::instance().get(),
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageCardSize);
 
     // putting everything together
@@ -110,7 +110,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     this->addSettingsWidget(deckPreviewTooltipWidget);
     this->addSettingsWidget(cardSizeWidget);
 
-    connect(SettingsCache::instance().get(), &SettingsCache::langChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this,
             &VisualDeckStorageQuickSettingsWidget::retranslateUi);
     retranslateUi();
 }

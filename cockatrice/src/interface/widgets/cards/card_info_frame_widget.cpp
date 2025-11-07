@@ -61,7 +61,7 @@ CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     tab3Layout->addWidget(splitter);
     tab3->setLayout(tab3Layout);
 
-    setViewMode(SettingsCache::instance()->getCardInfoViewMode());
+    setViewMode(SettingsCache::instance().getCardInfoViewMode());
 }
 
 void CardInfoFrameWidget::retranslateUi()
@@ -128,7 +128,7 @@ void CardInfoFrameWidget::setViewMode(int mode)
 
     refreshLayout();
 
-    SettingsCache::instance()->setCardInfoViewMode(mode);
+    SettingsCache::instance().setCardInfoViewMode(mode);
 }
 
 static bool hasTransformation(const CardInfo &info)

@@ -158,7 +158,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
-    includeRebalancedCards = SettingsCache::instance()->getIncludeRebalancedCards();
+    includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
     QCheckBox *includeRebalancedCardsCheckBox =
         new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
     includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
@@ -192,11 +192,11 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(tr("Manage sets"));
     setMinimumSize(800, 500);
-    auto &geometry = SettingsCache::instance()->getSetsDialogGeometry();
+    auto &geometry = SettingsCache::instance().getSetsDialogGeometry();
     if (!geometry.isEmpty()) {
         restoreGeometry(geometry);
     }
-    auto &headerState = SettingsCache::instance()->layouts().getSetsDialogHeaderState();
+    auto &headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
     if (!headerState.isEmpty()) {
         view->header()->restoreState(headerState);
         view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
@@ -212,12 +212,12 @@ WndSets::~WndSets()
 
 void WndSets::closeEvent(QCloseEvent * /*ev*/)
 {
-    SettingsCache::instance()->setSetsDialogGeometry(saveGeometry());
+    SettingsCache::instance().setSetsDialogGeometry(saveGeometry());
 }
 
 void WndSets::saveHeaderState()
 {
-    SettingsCache::instance()->layouts().setSetsDialogHeaderState(view->header()->saveState());
+    SettingsCache::instance().layouts().setSetsDialogHeaderState(view->header()->saveState());
 }
 
 void WndSets::rebuildMainLayout(int actionToTake)
@@ -250,7 +250,7 @@ void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
-    SettingsCache::instance()->setIncludeRebalancedCards(includeRebalancedCards);
+    SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
     close();
 }

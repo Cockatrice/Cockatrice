@@ -112,7 +112,7 @@ void GraveyardMenu::retranslateUi()
 
 void GraveyardMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aViewGraveyard->setShortcuts(shortcuts.getShortcut("Player/aViewGraveyard"));
 }
 

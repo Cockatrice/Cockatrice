@@ -22,7 +22,7 @@ void SideboardMenu::retranslateUi()
 
 void SideboardMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance()->shortcuts();
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aViewSideboard->setShortcuts(shortcuts.getShortcut("Player/aViewSideboard"));
 }

@@ -27,7 +27,7 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, CardInfoPtr _card) : Q
 
         populateManaSymbolWidgets();
     }
-    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
             &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
@@ -42,7 +42,7 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, QString _manaCost)
 
     populateManaSymbolWidgets();
 
-    connect(SettingsCache::instance().get(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
             &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
@@ -52,7 +52,7 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     QString fullColorIdentity = "WUBRG";
     QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
 
-    if (SettingsCache::instance()->getVisualDeckStorageDrawUnusedColorIdentities()) {
+    if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
         for (const QString symbol : fullColorIdentity) {
             auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
             layout->addWidget(manaSymbol);

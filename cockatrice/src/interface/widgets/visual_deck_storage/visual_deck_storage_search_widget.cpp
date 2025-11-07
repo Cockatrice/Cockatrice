@@ -59,7 +59,7 @@ QString VisualDeckStorageSearchWidget::getSearchText()
  */
 static QString toRelativeFilepath(const QString &filePath)
 {
-    QString deckPath = SettingsCache::instance()->getDeckPath();
+    QString deckPath = SettingsCache::instance().getDeckPath();
     if (filePath.startsWith(deckPath)) {
         return filePath.mid(deckPath.length());
     }

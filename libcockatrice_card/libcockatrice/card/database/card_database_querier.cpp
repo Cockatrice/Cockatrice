@@ -9,7 +9,7 @@
 
 CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
                                          const CardDatabase *_db,
-                                         const QSharedPointer<ICardPreferenceProvider> &prefs)
+                                         const ICardPreferenceProvider *prefs)
     : QObject(_parent), db(_db), prefs(prefs)
 {
 }

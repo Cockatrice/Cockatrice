@@ -20,9 +20,8 @@ class CardQuery : public ::testing::Test
 protected:
     void SetUp() override
     {
-        CardDatabase *db = new CardDatabase(nullptr, QSharedPointer<NoopCardPreferenceProvider>::create(),
-                                            QSharedPointer<TestCardDatabasePathProvider>::create(),
-                                            QSharedPointer<NoopCardSetPriorityController>::create());
+        CardDatabase *db = new CardDatabase(nullptr, new NoopCardPreferenceProvider(),
+                                            new TestCardDatabasePathProvider(), new NoopCardSetPriorityController());
         db->loadCardDatabases();
 
         cat = db->query()->getCardBySimpleName("Cat");

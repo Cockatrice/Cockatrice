@@ -20,9 +20,7 @@ class CardDatabaseQuerier : public QObject
     Q_OBJECT
 
 public:
-    explicit CardDatabaseQuerier(QObject *parent,
-                                 const CardDatabase *db,
-                                 const QSharedPointer<ICardPreferenceProvider> &prefs);
+    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, const ICardPreferenceProvider *prefs);
 
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
@@ -59,7 +57,7 @@ public:
 private:
     const CardDatabase *db;
 
-    QSharedPointer<ICardPreferenceProvider> prefs;
+    const ICardPreferenceProvider *prefs;
 
     CardInfoPtr lookupCardByName(const QString &name) const;
 };

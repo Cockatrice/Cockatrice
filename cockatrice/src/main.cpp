@@ -131,7 +131,7 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance()->getLang();
+    QString lang = SettingsCache::instance().getLang();
 
     QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -253,9 +253,9 @@ int main(int argc, char *argv[])
     QLocale::setDefault(QLocale::English);
 
     // Dependency Injections
-    CardDatabaseManager::setCardPreferenceProvider(QSharedPointer<SettingsCardPreferenceProvider>::create());
-    CardDatabaseManager::setCardDatabasePathProvider(SettingsCache::instance());
-    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance()->cardDatabase());
+    CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
+    CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
+    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
 
     qCInfo(MainLog) << "Starting main program";
 
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setDesktopFileName("cockatrice");
 #endif
 
-    SettingsCache::instance()->setClientID(generateClientID());
+    SettingsCache::instance().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance()->getShowShortcuts());
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
