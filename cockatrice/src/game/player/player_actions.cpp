@@ -155,7 +155,7 @@ static QList<CardList::SortOption> expandSortOption(CardList::SortOption option)
         case CardList::SortByManaValue:
             return {CardList::SortByManaValue, CardList::SortByColors};
         default:
-            return {};
+            return {option};
     }
 }
 
