@@ -491,10 +491,6 @@ void TabSupervisor::stop()
         tabsToDelete << i.value();
     }
 
-    for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
-        tabsToDelete << i.value();
-    }
-
     for (const auto tab : tabsToDelete) {
         tab->close();
     }
