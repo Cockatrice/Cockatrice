@@ -1,5 +1,6 @@
 #include "table_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
@@ -13,7 +14,6 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
 const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);

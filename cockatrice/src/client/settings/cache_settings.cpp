@@ -1,8 +1,7 @@
 #include "cache_settings.h"
 
-#include "../../../cockatrice/src/client/network/update/client/release_channel.h"
+#include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
-#include "card_override_settings.h"
 
 #include <QAbstractListModel>
 #include <QApplication>
@@ -12,9 +11,15 @@
 #include <QGlobalStatic>
 #include <QSettings>
 #include <QStandardPaths>
+#include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
-Q_GLOBAL_STATIC(SettingsCache, settingsCache);
+Q_GLOBAL_STATIC(SettingsCache, settingsCache)
+
+SettingsCache &SettingsCache::instance()
+{
+    return *settingsCache; // returns a QT managed singleton reference
+}
 
 QString SettingsCache::getDataPath()
 {
@@ -61,9 +66,9 @@ void SettingsCache::translateLegacySettings()
     QStringList setsGroups = legacySetting.childGroups();
     for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
-        cardDatabase().setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
-        cardDatabase().setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
-        cardDatabase().setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
+        cardDatabase()->setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
+        cardDatabase()->setIsKnown(setsGroups.at(i), legacySetting.value("isknown").toBool());
+        cardDatabase()->setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
         legacySetting.endGroup();
     }
     QStringList setsKeys = legacySetting.allKeys();
@@ -1498,11 +1503,6 @@ void SettingsCache::resetPaths()
     if (picsPath_ != picsPath) {
         emit picsPathChanged();
     }
-}
-
-SettingsCache &SettingsCache::instance()
-{
-    return *settingsCache;
 }
 
 CardCounterSettings &SettingsCache::cardCounters() const

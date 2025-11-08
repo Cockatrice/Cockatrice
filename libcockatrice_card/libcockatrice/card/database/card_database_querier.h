@@ -11,6 +11,7 @@
 #include "../printing/exact_card.h"
 
 #include <QObject>
+#include <libcockatrice/interfaces/interface_card_preference_provider.h>
 #include <libcockatrice/utility/card_ref.h>
 
 class CardDatabase;
@@ -19,7 +20,7 @@ class CardDatabaseQuerier : public QObject
     Q_OBJECT
 
 public:
-    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db);
+    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, const ICardPreferenceProvider *prefs);
 
     [[nodiscard]] CardInfoPtr getCardInfo(const QString &cardName) const;
     [[nodiscard]] QList<CardInfoPtr> getCardInfos(const QStringList &cardNames) const;
@@ -46,6 +47,7 @@ public:
     [[nodiscard]] PrintingInfo getSpecificPrinting(const CardRef &cardRef) const;
     [[nodiscard]] PrintingInfo
     getSpecificPrinting(const QString &cardName, const QString &setCode, const QString &collectorNumber) const;
+    ExactCard getPreferredCard(const QString &cardName) const;
     [[nodiscard]] PrintingInfo findPrintingWithId(const CardInfoPtr &card, const QString &providerId) const;
 
     [[nodiscard]] QStringList getAllMainCardTypes() const;
@@ -54,6 +56,8 @@ public:
 
 private:
     const CardDatabase *db;
+
+    const ICardPreferenceProvider *prefs;
 
     CardInfoPtr lookupCardByName(const QString &name) const;
 };

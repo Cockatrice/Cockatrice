@@ -1,5 +1,6 @@
 #include "oracleimporter.h"
 
+#include "client/settings/cache_settings.h"
 #include "parsehelpers.h"
 #include "qt-json/json.h"
 
@@ -7,6 +8,7 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <climits>
+#include <database/interface/settings_card_preference_provider.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
@@ -463,13 +465,14 @@ int OracleImporter::startImport()
 {
     int setCards = 0, setIndex = 0;
     // add an empty set for tokens
-    CardSetPtr tokenSet = CardSet::newInstance(CardSet::TOKENS_SETNAME, tr("Dummy set containing tokens"), "Tokens");
+    CardSetPtr tokenSet = CardSet::newInstance(SettingsCache::instance().cardDatabase(), CardSet::TOKENS_SETNAME,
+                                               tr("Dummy set containing tokens"), "Tokens");
     sets.insert(CardSet::TOKENS_SETNAME, tokenSet);
 
     for (const SetToDownload &curSetToParse : allSets) {
-        CardSetPtr newSet =
-            CardSet::newInstance(curSetToParse.getShortName(), curSetToParse.getLongName(), curSetToParse.getSetType(),
-                                 curSetToParse.getReleaseDate(), curSetToParse.getPriority());
+        CardSetPtr newSet = CardSet::newInstance(SettingsCache::instance().cardDatabase(), curSetToParse.getShortName(),
+                                                 curSetToParse.getLongName(), curSetToParse.getSetType(),
+                                                 curSetToParse.getReleaseDate(), curSetToParse.getPriority());
         if (!sets.contains(newSet->getShortName()))
             sets.insert(newSet->getShortName(), newSet);
 
@@ -488,7 +491,7 @@ int OracleImporter::startImport()
 
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
-    CockatriceXml4Parser parser;
+    CockatriceXml4Parser parser(new SettingsCardPreferenceProvider());
     return parser.saveToFile(sets, cards, fileName, sourceUrl, sourceVersion);
 }
 

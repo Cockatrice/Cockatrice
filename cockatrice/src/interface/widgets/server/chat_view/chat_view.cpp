@@ -1,5 +1,6 @@
 #include "chat_view.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../client/sound_engine.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/tabs/tab_account.h"
@@ -13,7 +14,6 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <libcockatrice/network/server/remote/user_level.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 

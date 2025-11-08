@@ -1,5 +1,6 @@
 #include "dlg_update.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
@@ -13,7 +14,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QtNetwork>
-#include <libcockatrice/settings/cache_settings.h>
 #include <version_string.h>
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)

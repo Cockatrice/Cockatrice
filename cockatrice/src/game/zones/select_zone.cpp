@@ -1,11 +1,11 @@
 #include "select_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../board/card_item.h"
 #include "../game_scene.h"
 
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
-#include <libcockatrice/settings/cache_settings.h>
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse)
 {

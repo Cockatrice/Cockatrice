@@ -6,8 +6,9 @@
 
 #pragma once
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QMenu>
-#include <libcockatrice/settings/cache_settings.h>
 
 class TearOffMenu : public QMenu
 {

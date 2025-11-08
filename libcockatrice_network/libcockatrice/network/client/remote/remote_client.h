@@ -12,6 +12,7 @@
 #include <QLoggingCategory>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 
 inline Q_LOGGING_CATEGORY(RemoteClientLog, "remote_client");
@@ -97,6 +98,7 @@ private slots:
     void submitForgotPasswordChallengeResponse(const Response &response);
 
 private:
+    INetworkSettingsProvider *networkSettingsProvider;
     int maxTimeout;
     int timeRunning, lastDataReceived;
     QByteArray inputBuffer;
@@ -120,7 +122,7 @@ protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;
 
 public:
-    explicit RemoteClient(QObject *parent = nullptr);
+    explicit RemoteClient(QObject *parent = nullptr, INetworkSettingsProvider *networkSettingsProvider = nullptr);
     ~RemoteClient() override;
     QString peerName() const
     {

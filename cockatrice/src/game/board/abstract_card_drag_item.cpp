@@ -1,10 +1,11 @@
 #include "abstract_card_drag_item.h"
 
+#include "../../client/settings/cache_settings.h"
+
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
-#include <libcockatrice/settings/cache_settings.h>
 
 static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
 static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;

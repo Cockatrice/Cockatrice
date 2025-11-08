@@ -1,5 +1,6 @@
 #include "dlg_create_token.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/cards/card_info_picture_widget.h"
 #include "../../main.h"
 
@@ -20,7 +21,6 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/database/token/token_display_model.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent)
@@ -199,16 +199,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         annotationEdit->setText("");
     }
 
-    const auto &cardProviderId =
-        SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName());
-    if (!cardProviderId.isEmpty()) {
-        CardRef ref;
-        ref.name = cardInfo->getName();
-        ref.providerId = cardProviderId;
-        pic->setCard(CardDatabaseManager::query()->getCard(ref));
-    } else {
-        pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
-    }
+    pic->setCard(CardDatabaseManager::query()->getPreferredCard(cardInfo));
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const

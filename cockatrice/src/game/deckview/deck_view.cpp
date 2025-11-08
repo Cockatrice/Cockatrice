@@ -1,5 +1,6 @@
 #include "deck_view.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
 
 #include <QApplication>
@@ -10,7 +11,6 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,

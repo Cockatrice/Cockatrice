@@ -1,5 +1,6 @@
 #include "deck_preview_tag_addition_widget.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "deck_preview_tag_dialog.h"
 
@@ -7,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QPainter>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent, QString _tagName)

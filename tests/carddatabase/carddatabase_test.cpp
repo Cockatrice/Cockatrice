@@ -1,14 +1,17 @@
 #include "mocks.h"
+#include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
+#include <libcockatrice/interfaces/noop_card_preference_provider.h>
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 namespace
 {
 
 TEST(CardDatabaseTest, LoadXml)
 {
-    settingsCache = new SettingsCache;
-    CardDatabase *db = new CardDatabase;
+    CardDatabase *db = new CardDatabase(nullptr, new NoopCardPreferenceProvider(), new TestCardDatabasePathProvider(),
+                                        new NoopCardSetPriorityController());
 
     // ensure the card database is empty at start
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty at start";

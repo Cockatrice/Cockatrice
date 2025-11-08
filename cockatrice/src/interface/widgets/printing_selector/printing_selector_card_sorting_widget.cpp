@@ -1,7 +1,8 @@
 #include "printing_selector_card_sorting_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <libcockatrice/card/set/card_set_comparator.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");
@@ -88,7 +89,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const SetToPrint
     }
 
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance("", "", "", QDate());
+        sortedSets << CardSet::newInstance(SettingsCache::instance().cardDatabase(), "", "", "", QDate());
     }
 
     if (sortOptionsSelector->currentText() == SORT_OPTIONS_PREFERENCE) {

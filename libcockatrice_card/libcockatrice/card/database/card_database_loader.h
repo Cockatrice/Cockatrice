@@ -11,6 +11,8 @@
 #include <QList>
 #include <QLoggingCategory>
 #include <QObject>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
+#include <libcockatrice/interfaces/interface_card_preference_provider.h>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");
@@ -32,7 +34,10 @@ class CardDatabaseLoader : public QObject
 {
     Q_OBJECT
 public:
-    explicit CardDatabaseLoader(QObject *parent, CardDatabase *db);
+    explicit CardDatabaseLoader(QObject *parent,
+                                CardDatabase *db,
+                                ICardDatabasePathProvider *pathProvider,
+                                ICardPreferenceProvider *preferenceProvider);
     ~CardDatabaseLoader() override;
 
 public slots:
@@ -52,6 +57,8 @@ private:
     QStringList collectCustomDatabasePaths() const;
 
     CardDatabase *database; // non-owning pointer to the container
+
+    ICardDatabasePathProvider *pathProvider; // pointer to the implementation providing the paths
 
     // parsers
     QList<ICardDatabaseParser *> availableParsers;

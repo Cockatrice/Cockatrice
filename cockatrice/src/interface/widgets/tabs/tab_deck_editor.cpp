@@ -1,5 +1,6 @@
 #include "tab_deck_editor.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../filters/filter_builder.h"
 #include "../filters/filter_tree_model.h"
@@ -36,7 +37,6 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 TabDeckEditor::TabDeckEditor(TabSupervisor *_tabSupervisor) : AbstractTabDeckEditor(_tabSupervisor)

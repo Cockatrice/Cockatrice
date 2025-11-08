@@ -11,7 +11,6 @@
 #include <QString>
 #include <QVariant>
 #include <algorithm>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 class CardRelation;

@@ -1,5 +1,6 @@
 #include "deck_preview_tag_dialog.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/dialogs/dlg_default_tags_editor.h"
 #include "deck_preview_tag_item_widget.h"
 
@@ -11,7 +12,6 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <libcockatrice/settings/cache_settings.h>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
                                            const QStringList &_activeTags,

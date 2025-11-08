@@ -1,5 +1,6 @@
 #include "printing_selector_card_overlay_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "printing_selector_card_display_widget.h"
 
 #include <QMenu>
@@ -7,7 +8,6 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**

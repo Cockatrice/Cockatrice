@@ -1,10 +1,10 @@
 #include "card_info_picture_enlarged_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 
 #include <QPainterPath>
 #include <QStylePainter>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 /**

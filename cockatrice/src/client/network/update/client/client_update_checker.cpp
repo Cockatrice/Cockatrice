@@ -1,8 +1,7 @@
 #include "client_update_checker.h"
 
+#include "../../../settings/cache_settings.h"
 #include "release_channel.h"
-
-#include <libcockatrice/settings/cache_settings.h>
 
 ClientUpdateChecker::ClientUpdateChecker(QObject *parent) : QObject(parent)
 {

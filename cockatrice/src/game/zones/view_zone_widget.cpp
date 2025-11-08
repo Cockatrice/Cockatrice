@@ -1,5 +1,6 @@
 #include "view_zone_widget.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../filters/syntax_help.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../board/card_item.h"
@@ -17,7 +18,6 @@
 #include <QStyleOption>
 #include <QStyleOptionTitleBar>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * @param _player the player the cards were revealed to.

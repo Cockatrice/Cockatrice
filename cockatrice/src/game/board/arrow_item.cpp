@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 #include "arrow_item.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../player/player.h"
 #include "../player/player_target.h"
 #include "../zones/card_zone.h"
@@ -15,7 +16,6 @@
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/color.h>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)

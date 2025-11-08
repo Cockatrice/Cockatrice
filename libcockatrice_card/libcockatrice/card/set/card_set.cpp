@@ -1,26 +1,30 @@
 #include "card_set.h"
 
-#include <libcockatrice/settings/cache_settings.h>
+#include <QSet>
+#include <utility>
 
 const char *CardSet::TOKENS_SETNAME = "TK";
 
-CardSet::CardSet(const QString &_shortName,
+CardSet::CardSet(ICardSetPriorityController *_priorityController,
+                 const QString &_shortName,
                  const QString &_longName,
                  const QString &_setType,
                  const QDate &_releaseDate,
                  const CardSet::Priority _priority)
-    : shortName(_shortName), longName(_longName), releaseDate(_releaseDate), setType(_setType), priority(_priority)
+    : priorityController(std::move(_priorityController)), shortName(_shortName), longName(_longName),
+      releaseDate(_releaseDate), setType(_setType), priority(_priority)
 {
     loadSetOptions();
 }
 
-CardSetPtr CardSet::newInstance(const QString &_shortName,
+CardSetPtr CardSet::newInstance(ICardSetPriorityController *_priorityController,
+                                const QString &_shortName,
                                 const QString &_longName,
                                 const QString &_setType,
                                 const QDate &_releaseDate,
                                 const Priority _priority)
 {
-    CardSetPtr ptr(new CardSet(_shortName, _longName, _setType, _releaseDate, _priority));
+    CardSetPtr ptr(new CardSet(_priorityController, _shortName, _longName, _setType, _releaseDate, _priority));
     // ptr->setSmartPointer(ptr);
     return ptr;
 }
@@ -57,25 +61,25 @@ QString CardSet::getCorrectedShortName() const
 
 void CardSet::loadSetOptions()
 {
-    sortKey = SettingsCache::instance().cardDatabase().getSortKey(shortName);
-    enabled = SettingsCache::instance().cardDatabase().isEnabled(shortName);
-    isknown = SettingsCache::instance().cardDatabase().isKnown(shortName);
+    sortKey = priorityController->getSortKey(shortName);
+    enabled = priorityController->isEnabled(shortName);
+    isknown = priorityController->isKnown(shortName);
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)
 {
     sortKey = _sortKey;
-    SettingsCache::instance().cardDatabase().setSortKey(shortName, _sortKey);
+    priorityController->setSortKey(shortName, _sortKey);
 }
 
 void CardSet::setEnabled(bool _enabled)
 {
     enabled = _enabled;
-    SettingsCache::instance().cardDatabase().setEnabled(shortName, _enabled);
+    priorityController->setEnabled(shortName, _enabled);
 }
 
 void CardSet::setIsKnown(bool _isknown)
 {
     isknown = _isknown;
-    SettingsCache::instance().cardDatabase().setIsKnown(shortName, _isknown);
+    priorityController->setIsKnown(shortName, _isknown);
 }

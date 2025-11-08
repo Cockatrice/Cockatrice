@@ -51,6 +51,7 @@ target_include_directories(
 
 target_link_libraries(
   libcockatrice_card
-  PUBLIC libcockatrice_settings
+  PUBLIC libcockatrice_interfaces
+  PUBLIC libcockatrice_utility
   PUBLIC ${QT_CORE_MODULE}
 )

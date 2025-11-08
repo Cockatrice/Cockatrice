@@ -1,5 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../client/network/interfaces/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
@@ -31,7 +32,6 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 /**

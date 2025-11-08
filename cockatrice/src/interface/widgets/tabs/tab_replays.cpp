@@ -1,5 +1,6 @@
 #include "tab_replays.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/server/remote/remote_replay_list_tree_widget.h"
 #include "tab_game.h"
 
@@ -29,7 +30,6 @@
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)

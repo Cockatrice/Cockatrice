@@ -18,6 +18,7 @@
 #include <QLoggingCategory>
 #include <QStringList>
 #include <QVector>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <utility>
 
@@ -27,6 +28,8 @@ class CardDatabase : public QObject
 {
     Q_OBJECT
 protected:
+    ICardSetPriorityController *setPriorityController;
+
     /*
      * The cards, indexed by name.
      */
@@ -57,7 +60,10 @@ private:
                 *removeCardMutex = new QBasicMutex();
 
 public:
-    explicit CardDatabase(QObject *parent = nullptr);
+    explicit CardDatabase(QObject *parent = nullptr,
+                          ICardPreferenceProvider *prefs = nullptr,
+                          ICardDatabasePathProvider *pathProvider = nullptr,
+                          ICardSetPriorityController *setPriorityController = nullptr);
     ~CardDatabase() override;
 
     void removeCard(CardInfoPtr card);
