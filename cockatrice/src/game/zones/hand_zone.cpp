@@ -111,12 +111,13 @@ void HandZone::reorganizeCards()
     update();
 }
 
-void HandZone::sortHand()
+void HandZone::sortHand(const QList<CardList::SortOption> &options)
 {
     if (getLogic()->getCards().isEmpty()) {
         return;
     }
-    getLogic()->sortCards({CardList::SortByMainType, CardList::SortByManaValue, CardList::SortByColorGrouping});
+
+    getLogic()->sortCards(options);
     reorganizeCards();
 }
 

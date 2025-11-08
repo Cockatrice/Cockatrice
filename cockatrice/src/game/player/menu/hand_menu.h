@@ -45,8 +45,12 @@ private:
     Player *player;
 
     QAction *aViewHand = nullptr;
-    QAction *aSortHand = nullptr;
     QAction *aMulligan = nullptr;
+
+    QMenu *mSortHand = nullptr;
+    QAction *aSortHandByName = nullptr;
+    QAction *aSortHandByType = nullptr;
+    QAction *aSortHandByManaValue = nullptr;
 
     QMenu *mRevealHand = nullptr;
     QMenu *mRevealRandomHandCard = nullptr;
