@@ -9,11 +9,14 @@
 #include <QFile>
 #include <QTime>
 
-CardDatabaseLoader::CardDatabaseLoader(QObject *parent, CardDatabase *db, ICardDatabasePathProvider *_pathProvider)
+CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
+                                       CardDatabase *db,
+                                       ICardDatabasePathProvider *_pathProvider,
+                                       ICardPreferenceProvider *_preferenceProvider)
     : QObject(parent), database(db), pathProvider(_pathProvider)
 {
     // instantiate available parsers here and connect them to the database
-    availableParsers << new CockatriceXml4Parser;
+    availableParsers << new CockatriceXml4Parser(_preferenceProvider);
     availableParsers << new CockatriceXml3Parser;
 
     for (auto *p : availableParsers) {

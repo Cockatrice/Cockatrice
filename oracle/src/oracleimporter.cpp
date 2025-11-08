@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <climits>
+#include <database/interface/settings_card_preference_provider.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
@@ -490,7 +491,7 @@ int OracleImporter::startImport()
 
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
-    CockatriceXml4Parser parser;
+    CockatriceXml4Parser parser(new SettingsCardPreferenceProvider());
     return parser.saveToFile(sets, cards, fileName, sourceUrl, sourceVersion);
 }
 

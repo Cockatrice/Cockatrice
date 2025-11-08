@@ -22,7 +22,7 @@ public:
 
     bool saveCardDatabase(const QString &fileName)
     {
-        CockatriceXml4Parser parser;
+        CockatriceXml4Parser parser(new NoopCardPreferenceProvider());
         return parser.saveToFile(sets, cards, fileName);
     }
 };
