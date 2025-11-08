@@ -3,7 +3,6 @@
  * @brief Defines the AbstractTabDeckEditor class, which provides a base for
  * deck editor tabs in the application.
  *
-
  */
 
 #ifndef TAB_GENERIC_DECK_EDITOR_H

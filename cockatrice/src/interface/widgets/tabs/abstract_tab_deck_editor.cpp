@@ -564,15 +564,22 @@ void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite 
 {
     if (DeckLoader *const deck = getDeckList()) {
         QString decklistUrlString = deck->exportDeckToDecklist(website);
+        // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {
+            // Show an error if the deck is empty, and return.
             QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
             return;
         }
 
+        // Encode the string recieved from the model to make sure all characters are encoded.
+        // first we put it into a qurl object
         QUrl decklistUrl = QUrl(decklistUrlString);
+        // we get the correctly encoded url.
         decklistUrlString = decklistUrl.toEncoded();
+        // We open the url in the user's default browser
         QDesktopServices::openUrl(decklistUrlString);
     } else {
+        // if there's no deck loader object, return an error
         QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be exported."));
     }
 }
