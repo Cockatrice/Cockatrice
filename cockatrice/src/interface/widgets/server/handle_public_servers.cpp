@@ -39,11 +39,13 @@ void HandlePublicServers::actFinishParsingDownloadedData()
             QVariantMap jsonMap = jsonResponse.toVariant().toMap();
             updateServerINISettings(jsonMap);
         } else {
-            qDebug() << "[PUBLIC SERVER HANDLER]" << "JSON Parsing Error:" << parseError.errorString();
+            qDebug() << "[PUBLIC SERVER HANDLER]"
+                     << "JSON Parsing Error:" << parseError.errorString();
             emit sigPublicServersDownloadedUnsuccessfully(errorCode);
         }
     } else {
-        qDebug() << "[PUBLIC SERVER HANDLER]" << "Error Downloading Public Servers" << errorCode;
+        qDebug() << "[PUBLIC SERVER HANDLER]"
+                 << "Error Downloading Public Servers" << errorCode;
         emit sigPublicServersDownloadedUnsuccessfully(errorCode);
     }
 
