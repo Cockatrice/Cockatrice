@@ -7,8 +7,6 @@
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
-
-#include "../board/card_list.h"
 #include "event_processing_options.h"
 #include "player.h"
 
@@ -154,7 +152,7 @@ public slots:
     void actRevealRandomHandCard(int revealToPlayerId);
     void actRevealLibrary(int revealToPlayerId);
 
-    void actSortHand(const QList<CardList::SortOption> &sortOptions);
+    void actSortHand();
 
     void cardMenuAction();
 
