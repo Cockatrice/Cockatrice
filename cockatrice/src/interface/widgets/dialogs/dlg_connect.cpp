@@ -263,13 +263,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     QStringList _data = uci.getServerInfo(saveName);
 
     if (_data.isEmpty()) {
-        _data << ""
-              << ""
-              << ""
-              << ""
-              << ""
-              << ""
-              << "";
+        _data << "" << "" << "" << "" << "" << "" << "";
     }
 
     bool savePasswordStatus = (_data.at(5) == "1");
