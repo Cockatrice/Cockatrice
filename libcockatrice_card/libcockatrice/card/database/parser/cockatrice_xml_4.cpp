@@ -13,6 +13,11 @@
 #define COCKATRICE_XML4_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v4/cards.xsd"
 
+CockatriceXml4Parser::CockatriceXml4Parser(ICardPreferenceProvider *_cardPreferenceProvider)
+    : cardPreferenceProvider(_cardPreferenceProvider)
+{
+}
+
 bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
     qCInfo(CockatriceXml4Log) << "Trying to parse: " << fileName;
@@ -131,8 +136,7 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
 
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
-    bool includeRebalancedCards =
-        true; // TODO: MOVE THIS OUT OF THE PARSER SettingsCache::instance().getIncludeRebalancedCards();
+    bool includeRebalancedCards = cardPreferenceProvider->getIncludeRebalancedCards();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;

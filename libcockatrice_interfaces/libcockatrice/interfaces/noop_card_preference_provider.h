@@ -9,6 +9,11 @@ public:
     {
         return {};
     }
+
+    bool getIncludeRebalancedCards() const override
+    {
+        return true;
+    }
 };
 
 #endif // COCKATRICE_NOOP_CARD_PREFERENCE_PROVIDER_H

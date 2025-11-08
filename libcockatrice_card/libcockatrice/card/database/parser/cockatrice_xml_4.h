@@ -11,6 +11,7 @@
 
 #include <QLoggingCategory>
 #include <QXmlStreamReader>
+#include <libcockatrice/interfaces/interface_card_preference_provider.h>
 
 inline Q_LOGGING_CATEGORY(CockatriceXml4Log, "cockatrice_xml.xml_4_parser");
 
@@ -18,7 +19,7 @@ class CockatriceXml4Parser : public ICardDatabaseParser
 {
     Q_OBJECT
 public:
-    CockatriceXml4Parser() = default;
+    CockatriceXml4Parser(ICardPreferenceProvider *cardPreferenceProvider);
     ~CockatriceXml4Parser() override = default;
     bool getCanParseFile(const QString &name, QIODevice &device) override;
     void parseFile(QIODevice &device) override;
@@ -29,6 +30,8 @@ public:
                     const QString &sourceVersion = "unknown") override;
 
 private:
+    ICardPreferenceProvider *cardPreferenceProvider;
+
     QVariantHash loadCardPropertiesFromXml(QXmlStreamReader &xml);
     void loadCardsFromXml(QXmlStreamReader &xml);
     void loadSetsFromXml(QXmlStreamReader &xml);
