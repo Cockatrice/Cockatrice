@@ -60,6 +60,11 @@ public:
     DeckLoader *getDeckList() const;
     void setModified(bool _windowModified);
 
+    DeckEditorDeckDockWidget *getDeckDockWidget() const
+    {
+        return deckDockWidget;
+    }
+
     // UI Elements
     DeckEditorMenu *deckMenu;
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;

@@ -41,6 +41,10 @@ public:
     {
         return nameEdit->text().simplified();
     }
+    QComboBox *getGroupByComboBox()
+    {
+        return activeGroupCriteriaComboBox;
+    }
 
 public slots:
     void cleanDeck();
