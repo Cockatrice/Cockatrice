@@ -124,6 +124,11 @@ public:
      */
     void setModified(bool _windowModified);
 
+    DeckEditorDeckDockWidget *getDeckDockWidget() const
+    {
+        return deckDockWidget;
+    }
+
     // UI Elements
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;       ///< Database dock
