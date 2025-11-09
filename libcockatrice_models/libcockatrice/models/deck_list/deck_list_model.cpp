@@ -103,14 +103,18 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
             case Qt::EditRole:
                 switch (index.column()) {
-                case 0: return group->recursiveCount(true);
-                case 1: return (role == Qt::DisplayRole
-                                ? group->getVisibleName()
-                                : group->getName());
-                case 2: return group->getCardSetShortName();
-                case 3: return group->getCardCollectorNumber();
-                case 4: return group->getCardProviderId();
-                default: return {};
+                    case 0:
+                        return group->recursiveCount(true);
+                    case 1:
+                        return (role == Qt::DisplayRole ? group->getVisibleName() : group->getName());
+                    case 2:
+                        return group->getCardSetShortName();
+                    case 3:
+                        return group->getCardCollectorNumber();
+                    case 4:
+                        return group->getCardProviderId();
+                    default:
+                        return {};
                 }
 
             case DeckRoles::IsCardRole:
@@ -133,12 +137,18 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
             switch (index.column()) {
-            case 0: return card->getNumber();
-            case 1: return card->getName();
-            case 2: return card->getCardSetShortName();
-            case 3: return card->getCardCollectorNumber();
-            case 4: return card->getCardProviderId();
-            default: return {};
+                case 0:
+                    return card->getNumber();
+                case 1:
+                    return card->getName();
+                case 2:
+                    return card->getCardSetShortName();
+                case 3:
+                    return card->getCardCollectorNumber();
+                case 4:
+                    return card->getCardProviderId();
+                default:
+                    return {};
             }
 
         case DeckRoles::IsCardRole:
