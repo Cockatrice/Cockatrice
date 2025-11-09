@@ -1,6 +1,7 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
 #include "dlg_settings.h"
 
 #include <QApplication>
@@ -12,7 +13,6 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window

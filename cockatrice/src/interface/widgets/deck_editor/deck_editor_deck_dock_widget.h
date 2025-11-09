@@ -27,6 +27,7 @@ class DeckEditorDeckDockWidget : public QDockWidget
     Q_OBJECT
 public:
     explicit DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent);
+    DeckLoader *deckLoader;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
@@ -50,7 +51,8 @@ public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
-    DeckLoader *getDeckList();
+    DeckList *getDeckList();
+    DeckLoader *getDeckLoader();
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
     void actDecrementCard(const ExactCard &card, QString zoneName);

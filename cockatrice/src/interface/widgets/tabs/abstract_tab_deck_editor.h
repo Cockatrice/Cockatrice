@@ -117,7 +117,8 @@ public:
     void openDeck(DeckLoader *deck);
 
     /** @brief Returns the currently active deck. */
-    DeckLoader *getDeckList() const;
+    DeckList *getDeckList() const;
+    DeckLoader *getDeckLoader() const;
 
     /** @brief Sets the modified state of the tab.
      *  @param _windowModified Whether the tab is modified.

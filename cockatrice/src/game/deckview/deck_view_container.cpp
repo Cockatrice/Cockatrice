@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/deck_loader/deck_loader.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
@@ -16,7 +17,6 @@
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_ready_start.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>

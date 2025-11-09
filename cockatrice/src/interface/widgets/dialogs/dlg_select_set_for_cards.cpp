@@ -1,5 +1,6 @@
 #include "dlg_select_set_for_cards.h"
 
+#include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
 #include "dlg_select_set_for_cards.h"
@@ -16,7 +17,6 @@
 #include <QVBoxLayout>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <qdrag.h>
 #include <qevent.h>
 
@@ -162,14 +162,14 @@ void DlgSelectSetForCards::actOK()
 
 void DlgSelectSetForCards::actClear()
 {
-    model->getDeckList()->clearSetNamesAndNumbers();
+    qobject_cast<DeckLoader *>(model->getDeckList())->clearSetNamesAndNumbers();
     accept();
 }
 
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
-    model->getDeckList()->clearSetNamesAndNumbers();
-    model->getDeckList()->setProviderIdToPreferredPrinting();
+    qobject_cast<DeckLoader *>(model->getDeckList())->clearSetNamesAndNumbers();
+    qobject_cast<DeckLoader *>(model->getDeckList())->setProviderIdToPreferredPrinting();
     accept();
 }
 

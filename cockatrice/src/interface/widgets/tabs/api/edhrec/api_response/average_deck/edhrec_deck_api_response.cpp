@@ -1,11 +1,12 @@
 #include "edhrec_deck_api_response.h"
 
+#include "../../../../../../deck_loader/deck_loader.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMainWindow>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
 {

@@ -1,7 +1,5 @@
 #include "deck_list_model.h"
 
-#include "deck_loader.h"
-
 #include <QBrush>
 #include <QFont>
 #include <QPrinter>
@@ -15,10 +13,8 @@
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
-    deckList = new DeckLoader;
+    deckList = new DeckList;
     deckList->setParent(this);
-    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
-    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     root = new InnerDecklistNode;
 }
 
@@ -528,19 +524,17 @@ void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteri
 
 void DeckListModel::cleanList()
 {
-    setDeckList(new DeckLoader);
+    setDeckList(new DeckList);
 }
 
 /**
  * @param _deck The deck. Takes ownership of the object
  */
-void DeckListModel::setDeckList(DeckLoader *_deck)
+void DeckListModel::setDeckList(DeckList *_deck)
 {
     deckList->deleteLater();
     deckList = _deck;
     deckList->setParent(this);
-    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
-    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     rebuildTree();
 }
 

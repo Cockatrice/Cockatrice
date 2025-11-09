@@ -1,6 +1,7 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -366,7 +367,11 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
  */
 void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 {
-    deckModel->setDeckList(_deck);
+    deckLoader = _deck;
+
+    deckModel->setDeckList(qobject_cast<DeckList *>(_deck));
+    connect(_deck, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
+    connect(_deck, &DeckLoader::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
@@ -383,9 +388,14 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     emit deckChanged();
 }
 
-DeckLoader *DeckEditorDeckDockWidget::getDeckList()
+DeckList *DeckEditorDeckDockWidget::getDeckList()
 {
     return deckModel->getDeckList();
+}
+
+DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
+{
+    return deckLoader;
 }
 
 /**

@@ -7,12 +7,13 @@
 #ifndef EDHREC_DECK_API_RESPONSE_H
 #define EDHREC_DECK_API_RESPONSE_H
 
+#include "../../../../../../deck_loader/deck_loader.h"
+
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
 #include <QVector>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class EdhrecDeckApiResponse
 {

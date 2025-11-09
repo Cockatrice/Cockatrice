@@ -217,9 +217,14 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 }
 
 /** @brief Returns the currently loaded deck. */
-DeckLoader *AbstractTabDeckEditor::getDeckList() const
+DeckList *AbstractTabDeckEditor::getDeckList() const
 {
     return deckDockWidget->getDeckList();
+}
+
+DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
+{
+    return deckDockWidget->getDeckLoader();
 }
 
 /**
@@ -237,7 +242,7 @@ void AbstractTabDeckEditor::setModified(bool _modified)
  */
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
-    DeckLoader *deck = getDeckList();
+    DeckLoader *deck = deckDockWidget->getDeckLoader();
     return !modified && deck->isBlankDeck() && deck->hasNotBeenLoaded();
 }
 
@@ -377,7 +382,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
  */
 bool AbstractTabDeckEditor::actSaveDeck()
 {
-    DeckLoader *const deck = getDeckList();
+    DeckLoader *const deck = getDeckLoader();
     if (deck->getLastRemoteDeckId() != -1) {
         QString deckString = deck->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
@@ -426,7 +431,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    if (!getDeckList()->saveToFile(fileName, fmt)) {
+    if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
@@ -480,7 +485,7 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
  */
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(*getDeckList(), annotated, this);
+    DlgEditDeckInClipboard dlg(*getDeckLoader(), annotated, this);
     if (!dlg.exec())
         return;
 
@@ -504,25 +509,25 @@ void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 /** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    getDeckList()->saveToClipboard(true, true);
+    getDeckLoader()->saveToClipboard(true, true);
 }
 
 /** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    getDeckList()->saveToClipboard(true, false);
+    getDeckLoader()->saveToClipboard(true, false);
 }
 
 /** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    getDeckList()->saveToClipboard(false, true);
+    getDeckLoader()->saveToClipboard(false, true);
 }
 
 /** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    getDeckList()->saveToClipboard(false, false);
+    getDeckLoader()->saveToClipboard(false, false);
 }
 
 /** @brief Prints the deck using a QPrintPreviewDialog. */
@@ -562,7 +567,7 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
  */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    if (DeckLoader *const deck = getDeckList()) {
+    if (DeckLoader *const deck = getDeckLoader()) {
         QString decklistUrlString = deck->exportDeckToDecklist(website);
         // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {

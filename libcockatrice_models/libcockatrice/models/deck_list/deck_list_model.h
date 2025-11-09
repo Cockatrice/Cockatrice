@@ -8,7 +8,6 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>
 
-class DeckLoader;
 class CardDatabase;
 class QPrinter;
 class QTextCursor;
@@ -124,7 +123,8 @@ public:
 class DeckListModel : public QAbstractItemModel
 {
     Q_OBJECT
-private slots:
+
+public slots:
     /**
      * @brief Rebuilds the model tree from the underlying DeckLoader.
      *
@@ -132,8 +132,6 @@ private slots:
      * state of the deck.
      */
     void rebuildTree();
-
-public slots:
     /**
      * @brief Prints the decklist to the provided QPrinter.
      * @param printer The printer to render the decklist to.
@@ -222,11 +220,11 @@ public:
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
-    DeckLoader *getDeckList() const
+    DeckList *getDeckList() const
     {
         return deckList;
     }
-    void setDeckList(DeckLoader *_deck);
+    void setDeckList(DeckList *_deck);
 
     QList<ExactCard> getCards() const;
     QList<ExactCard> getCardsForZone(const QString &zoneName) const;
@@ -239,7 +237,7 @@ public:
     void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
 
 private:
-    DeckLoader *deckList;    /**< Pointer to the deck loader providing the underlying data. */
+    DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
     InnerDecklistNode *root; /**< Root node of the model tree. */
     DeckListModelGroupCriteria activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
