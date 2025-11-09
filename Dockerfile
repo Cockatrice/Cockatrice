@@ -1,6 +1,5 @@
-FROM ubuntu:24.04
-
-ARG DEBIAN_FRONTEND=noninteractive
+# -------- Build Stage --------
+FROM ubuntu:24.04 AS build
 
 RUN apt-get update && apt-get install -y \
   build-essential \
@@ -16,26 +15,25 @@ RUN apt-get update && apt-get install -y \
   qt6-tools-dev \
   qt6-tools-dev-tools
 
-# Order from least changing at the top to more frequently changing at the bottom
-COPY ./libcockatrice_protocol /home/servatrice/code/libcockatrice_protocol
-COPY ./libcockatrice_rng /home/servatrice/code/libcockatrice_rng
-COPY ./servatrice /home/servatrice/code/servatrice
-COPY ./cmake /home/servatrice/code/cmake
-COPY ./CMakeLists.txt ./LICENSE ./README.md /home/servatrice/code/
-COPY ./libcockatrice_network /home/servatrice/code/libcockatrice_network
-COPY ./libcockatrice_utility /home/servatrice/code/libcockatrice_utility
-COPY ./libcockatrice_settings /home/servatrice/code/libcockatrice_settings
-COPY ./libcockatrice_deck_list /home/servatrice/code/libcockatrice_deck_list
-COPY ./libcockatrice_card /home/servatrice/code/libcockatrice_card
+WORKDIR /src
+COPY . .
+RUN mkdir build && cd build && \
+    cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 -DWITH_DBCONVERTER=0 && \
+    make -j$(nproc) && \
+    make install
 
-WORKDIR /home/servatrice/code/build
 
-RUN cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 -DWITH_DBCONVERTER=0 && \
-  make && \
-  make install
+# -------- Runtime Stage (clean) --------
+FROM ubuntu:24.04
 
-WORKDIR /home/servatrice
+RUN apt-get update && apt-get install -y \
+  libmariadb-dev-compat \
+  libprotobuf-dev \
+  libqt6sql6-mysql \
+  qt6-websockets-dev
+
+# Only copy installed binaries, not source
+COPY --from=build /usr/local /usr/local
 
 EXPOSE 4748
-
 ENTRYPOINT [ "servatrice", "--log-to-console" ]
