@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QObject>
 #include <libcockatrice/card/relation/card_relation_type.h>
+#include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 
 namespace google
