@@ -1,8 +1,7 @@
 #include "deck_filter_string.h"
 
-#include "filter_string.h"
-
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
 
 static peg::parser search(R"(
