@@ -1,7 +1,5 @@
 #include "deck_list_model.h"
 
-#include <QBrush>
-#include <QFont>
 #include <libcockatrice/card/database/card_database_manager.h>
 
 DeckListModel::DeckListModel(QObject *parent)
