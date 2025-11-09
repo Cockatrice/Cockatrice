@@ -303,6 +303,15 @@ void CardMenu::createHandOrCustomZoneMenu()
     }
 }
 
+/**
+ * @brief Populates the menu with an action for each active player.
+ *
+ * The "all players" action is created separately, so it has to be passed into this function.
+ * It will be put at the top of the menu.
+ *
+ * @param menu The menu to add the player actions to.
+ * @param allPlayersAction The action for "all players".
+ */
 void CardMenu::initContextualPlayersMenu(QMenu *menu, QAction *allPlayersAction)
 {
     allPlayersAction->setData(-1);
