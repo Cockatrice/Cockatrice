@@ -29,8 +29,9 @@ QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
         }
     }
 
-    if (role == Qt::ForegroundRole)
+    if (role == Qt::ForegroundRole) {
         return QBrush(QColor(0, 0, 0));
+    }
 
     return value;
 }
