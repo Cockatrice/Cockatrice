@@ -209,7 +209,7 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckLoader()->getCardRefList()));
     setModified(false);
 
     aDeckDockVisible->setChecked(true);
@@ -217,11 +217,6 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 }
 
 /** @brief Returns the currently loaded deck. */
-DeckList *AbstractTabDeckEditor::getDeckList() const
-{
-    return deckDockWidget->getDeckList();
-}
-
 DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
 {
     return deckDockWidget->getDeckLoader();
@@ -423,7 +418,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(getDeckList()->getName().trimmed());
+    dialog.selectFile(getDeckLoader()->getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -605,14 +600,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(getDeckLoader());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(getDeckLoader());
 }
 
 /** @brief Applies a new filter tree to the database display. */

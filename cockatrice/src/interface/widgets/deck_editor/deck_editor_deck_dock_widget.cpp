@@ -393,11 +393,6 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     emit deckChanged();
 }
 
-DeckList *DeckEditorDeckDockWidget::getDeckList()
-{
-    return deckModel->getDeckList();
-}
-
 DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
 {
     return deckLoader;
