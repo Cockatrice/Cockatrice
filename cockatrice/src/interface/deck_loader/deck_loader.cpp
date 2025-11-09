@@ -7,14 +7,18 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
+#include <QPrinter>
 #include <QRegularExpression>
 #include <QStringList>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextStream>
+#include <QTextTable>
 #include <QtConcurrentRun>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>
-#include <qtexttable.h>
 
 const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.dek", "*.txt", "*.mwDeck"};
 
