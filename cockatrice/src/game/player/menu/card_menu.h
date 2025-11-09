@@ -26,6 +26,7 @@ public:
     QMenu *mCardCounters;
 
     QAction *aPlay, *aPlayFacedown;
+    QAction *aRevealToAll;
     QAction *aHide;
     QAction *aClone;
     QAction *aSelectAll, *aSelectRow, *aSelectColumn;
@@ -45,7 +46,7 @@ private:
 
     void addRelatedCardActions();
     void retranslateUi();
-    void initContextualPlayersMenu(QMenu *menu);
+    void initContextualPlayersMenu(QMenu *menu, QAction *allPlayersAction);
     void setShortcutsActive();
     void addRelatedCardView();
 };
