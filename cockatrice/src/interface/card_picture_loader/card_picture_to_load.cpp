@@ -1,6 +1,7 @@
 #include "card_picture_to_load.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 
 #include <QCoreApplication>
 #include <QDate>
@@ -34,7 +35,7 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
         }
     }
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance(SettingsCache::instance().cardDatabase(), "", "", "", QDate());
+        sortedSets << CardSet::newInstance(new NoopCardSetPriorityController(), "", "", "", QDate());
     }
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
