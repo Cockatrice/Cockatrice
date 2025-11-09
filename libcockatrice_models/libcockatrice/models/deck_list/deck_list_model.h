@@ -12,6 +12,14 @@ class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
+namespace DeckRoles {
+enum {
+    IsCardRole = Qt::UserRole + 1,
+    DepthRole,
+    IsLegalRole
+};
+}
+
 /**
  * @brief Specifies the criteria used to group cards in the DeckListModel.
  */
@@ -163,6 +171,7 @@ public:
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
+    void emitBackgroundUpdates(const QModelIndex &parent);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     QModelIndex parent(const QModelIndex &index) const override;

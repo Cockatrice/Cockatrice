@@ -88,91 +88,85 @@ int DeckListModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant DeckListModel::data(const QModelIndex &index, int role) const
 {
-    // debugIndexInfo("data", index);
-    if (!index.isValid()) {
+    if (!index.isValid())
         return {};
-    }
 
-    if (index.column() >= columnCount()) {
+    if (index.column() >= columnCount())
         return {};
-    }
 
-    auto *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
-    auto *card = dynamic_cast<DecklistModelCardNode *>(temp);
-    if (card == nullptr) {
-        const auto *node = dynamic_cast<InnerDecklistNode *>(temp);
+    auto *node = static_cast<AbstractDecklistNode *>(index.internalPointer());
+    auto *card = dynamic_cast<DecklistModelCardNode *>(node);
+
+    // Group node
+    if (!card) {
+        auto *group = static_cast<InnerDecklistNode *>(node);
+
         switch (role) {
-            case Qt::FontRole: {
-                QFont f;
-                f.setBold(true);
-                return f;
-            }
             case Qt::DisplayRole:
-            case Qt::EditRole: {
+            case Qt::EditRole:
                 switch (index.column()) {
-                    case 0:
-                        return node->recursiveCount(true);
-                    case 1: {
-                        if (role == Qt::DisplayRole)
-                            return node->getVisibleName();
-                        return node->getName();
-                    }
-                    case 2: {
-                        return node->getCardSetShortName();
-                    }
-                    case 3: {
-                        return node->getCardCollectorNumber();
-                    }
-                    case 4: {
-                        return node->getCardProviderId();
-                    }
-                    default:
-                        return {};
+                case 0: return group->recursiveCount(true);
+                case 1: return (role == Qt::DisplayRole
+                                ? group->getVisibleName()
+                                : group->getName());
+                case 2: return group->getCardSetShortName();
+                case 3: return group->getCardCollectorNumber();
+                case 4: return group->getCardProviderId();
+                default: return {};
                 }
-            }
-            case Qt::UserRole + 1:
+
+            case DeckRoles::IsCardRole:
                 return false;
-            case Qt::BackgroundRole: {
-                int color = 90 + 60 * node->depth();
-                return QBrush(QColor(color, 255, color));
-            }
-            case Qt::ForegroundRole: {
-                return QBrush(QColor(0, 0, 0));
-            }
-            default:
-                return {};
-        }
-    } else {
-        switch (role) {
-            case Qt::DisplayRole:
-            case Qt::EditRole: {
-                switch (index.column()) {
-                    case 0:
-                        return card->getNumber();
-                    case 1:
-                        return card->getName();
-                    case 2:
-                        return card->getCardSetShortName();
-                    case 3:
-                        return card->getCardCollectorNumber();
-                    case 4:
-                        return card->getCardProviderId();
-                    default:
-                        return {};
-                }
-            }
-            case Qt::UserRole + 1:
+
+            case DeckRoles::DepthRole:
+                return group->depth();
+
+                // legality does not apply to group nodes
+            case DeckRoles::IsLegalRole:
                 return true;
-            case Qt::BackgroundRole: {
-                int color = 255 - (index.row() % 2) * 30;
-                return QBrush(QColor(color, color, color));
-            }
-            case Qt::ForegroundRole: {
-                return QBrush(QColor(0, 0, 0));
-            }
+
             default:
                 return {};
         }
+    }
+
+    // Card node
+    switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+            switch (index.column()) {
+            case 0: return card->getNumber();
+            case 1: return card->getName();
+            case 2: return card->getCardSetShortName();
+            case 3: return card->getCardCollectorNumber();
+            case 4: return card->getCardProviderId();
+            default: return {};
+            }
+
+        case DeckRoles::IsCardRole:
+            return true;
+
+        case DeckRoles::DepthRole:
+            return card->depth();
+
+        default:
+            return {};
+    }
+}
+
+void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
+{
+    int rows = rowCount(parent);
+    if (rows == 0)
+        return;
+
+    QModelIndex topLeft = index(0, 0, parent);
+    QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
+    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
+
+    for (int r = 0; r < rows; ++r) {
+        QModelIndex child = index(r, 0, parent);
+        emitBackgroundUpdates(child);
     }
 }
 

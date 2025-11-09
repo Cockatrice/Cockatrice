@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "deck_list_style_proxy.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -30,9 +31,13 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
+
+    DeckListStyleProxy *proxy = new DeckListStyleProxy(this);
+    proxy->setSourceModel(deckModel);
+
     deckView = new QTreeView();
     deckView->setObjectName("deckView");
-    deckView->setModel(deckModel);
+    deckView->setModel(proxy);
     deckView->setUniformRowHeights(true);
     deckView->setSortingEnabled(true);
     deckView->sortByColumn(1, Qt::AscendingOrder);
