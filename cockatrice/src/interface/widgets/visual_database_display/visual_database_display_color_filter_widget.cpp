@@ -1,10 +1,10 @@
 #include "visual_database_display_color_filter_widget.h"
 
-#include "../../../filters/filter_tree.h"
 #include "../cards/additional_info/mana_symbol_widget.h"
 
 #include <QSet>
 #include <QTimer>
+#include <libcockatrice/filters/filter_tree.h>
 
 /**
  * This widget provides a graphical control element for the CardFilter::Attr::AttrColor filters applied to the filter

@@ -1,8 +1,8 @@
-#include "../../cockatrice/src/filters/filter_string.h"
 #include "mocks.h"
 #include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
+#include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 

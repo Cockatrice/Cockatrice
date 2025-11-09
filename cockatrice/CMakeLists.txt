@@ -46,9 +46,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
-    src/filters/filter_card.cpp
-    src/filters/filter_string.cpp
-    src/filters/filter_tree.cpp
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
@@ -364,6 +361,7 @@ if(Qt5_FOUND)
     cockatrice
     libcockatrice_card
     libcockatrice_deck_list
+    libcockatrice_filters
     libcockatrice_utility
     libcockatrice_network
     libcockatrice_models
@@ -376,6 +374,7 @@ else()
     cockatrice
     PUBLIC libcockatrice_card
            libcockatrice_deck_list
+           libcockatrice_filters
            libcockatrice_utility
            libcockatrice_network
            libcockatrice_models

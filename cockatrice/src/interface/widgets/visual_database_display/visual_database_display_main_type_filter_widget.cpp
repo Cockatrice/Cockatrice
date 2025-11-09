@@ -1,12 +1,12 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
-#include "../../../filters/filter_tree.h"
 #include "../../../filters/filter_tree_model.h"
 
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/filters/filter_tree.h>
 
 VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)

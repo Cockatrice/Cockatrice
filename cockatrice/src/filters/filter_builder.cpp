@@ -1,11 +1,11 @@
 #include "filter_builder.h"
 
 #include "../interface/widgets/utility/custom_line_edit.h"
-#include "filter_card.h"
 
 #include <QComboBox>
 #include <QGridLayout>
 #include <QPushButton>
+#include <libcockatrice/filters/filter_card.h>
 
 FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
 {

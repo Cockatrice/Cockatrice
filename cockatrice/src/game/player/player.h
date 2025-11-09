@@ -7,7 +7,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../filters/filter_string.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/abstract_graphics_item.h"
 #include "../dialogs/dlg_create_token.h"
@@ -24,6 +23,7 @@
 #include <QPoint>
 #include <QTimer>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
 
