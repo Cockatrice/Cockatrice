@@ -534,7 +534,7 @@ void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
+    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->getDeckLoader(), &DeckLoader::printDeckList);
     dlg->exec();
 }
 

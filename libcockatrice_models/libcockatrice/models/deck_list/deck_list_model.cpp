@@ -2,12 +2,6 @@
 
 #include <QBrush>
 #include <QFont>
-#include <QPrinter>
-#include <QProgressDialog>
-#include <QTextCursor>
-#include <QTextDocument>
-#include <QTextStream>
-#include <QTextTable>
 #include <libcockatrice/card/database/card_database_manager.h>
 
 DeckListModel::DeckListModel(QObject *parent)
@@ -622,98 +616,4 @@ QList<QString> *DeckListModel::getZones() const
         zones->append(currentZone->getName());
     }
     return zones;
-}
-
-void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
-{
-    const int totalColumns = 2;
-
-    if (node->height() == 1) {
-        QTextBlockFormat blockFormat;
-        QTextCharFormat charFormat;
-        charFormat.setFontPointSize(11);
-        charFormat.setFontWeight(QFont::Bold);
-        cursor->insertBlock(blockFormat, charFormat);
-
-        QTextTableFormat tableFormat;
-        tableFormat.setCellPadding(0);
-        tableFormat.setCellSpacing(0);
-        tableFormat.setBorder(0);
-        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
-
-            QTextCharFormat cellCharFormat;
-            cellCharFormat.setFontPointSize(9);
-
-            QTextTableCell cell = table->cellAt(i, 0);
-            cell.setFormat(cellCharFormat);
-            QTextCursor cellCursor = cell.firstCursorPosition();
-            cellCursor.insertText(QString("%1 ").arg(card->getNumber()));
-
-            cell = table->cellAt(i, 1);
-            cell.setFormat(cellCharFormat);
-            cellCursor = cell.firstCursorPosition();
-            cellCursor.insertText(card->getName());
-        }
-    } else if (node->height() == 2) {
-        QTextBlockFormat blockFormat;
-        QTextCharFormat charFormat;
-        charFormat.setFontPointSize(14);
-        charFormat.setFontWeight(QFont::Bold);
-
-        cursor->insertBlock(blockFormat, charFormat);
-
-        QTextTableFormat tableFormat;
-        tableFormat.setCellPadding(10);
-        tableFormat.setCellSpacing(0);
-        tableFormat.setBorder(0);
-        QVector<QTextLength> constraints;
-        for (int i = 0; i < totalColumns; i++) {
-            constraints << QTextLength(QTextLength::PercentageLength, 100.0 / totalColumns);
-        }
-        tableFormat.setColumnWidthConstraints(constraints);
-
-        QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
-            printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
-        }
-    }
-
-    cursor->movePosition(QTextCursor::End);
-}
-
-void DeckListModel::printDeckList(QPrinter *printer)
-{
-    QTextDocument doc;
-
-    QFont font("Serif");
-    font.setStyleHint(QFont::Serif);
-    doc.setDefaultFont(font);
-
-    QTextCursor cursor(&doc);
-
-    QTextBlockFormat headerBlockFormat;
-    QTextCharFormat headerCharFormat;
-    headerCharFormat.setFontPointSize(16);
-    headerCharFormat.setFontWeight(QFont::Bold);
-
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getName());
-
-    headerCharFormat.setFontPointSize(12);
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getComments());
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-
-    for (int i = 0; i < root->size(); i++) {
-        cursor.insertHtml("<br><img src=theme:hr.jpg>");
-        // cursor.insertHtml("<hr>");
-        cursor.insertBlock(headerBlockFormat, headerCharFormat);
-
-        printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(root->at(i)));
-    }
-
-    doc.print(printer);
 }

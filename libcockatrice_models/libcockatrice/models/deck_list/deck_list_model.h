@@ -132,11 +132,6 @@ public slots:
      * state of the deck.
      */
     void rebuildTree();
-    /**
-     * @brief Prints the decklist to the provided QPrinter.
-     * @param printer The printer to render the decklist to.
-     */
-    void printDeckList(QPrinter *printer);
 
 signals:
     /**
@@ -251,8 +246,6 @@ private:
                                         const QString &cardNumber = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
-
-    void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
     template <typename T> T getNode(const QModelIndex &index) const
     {
