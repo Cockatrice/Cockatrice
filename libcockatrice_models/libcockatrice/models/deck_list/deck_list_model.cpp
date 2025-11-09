@@ -106,43 +106,35 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
             case Qt::EditRole: {
                 switch (index.column()) {
-                    case CARD_AMOUNT: {
+                    case CARD_AMOUNT:
                         return group->recursiveCount(true);
-                    }
-                    case CARD_NAME: {
-                        if (role == Qt::DisplayRole)
+                    case CARD_NAME:
+                        if (role == Qt::DisplayRole) {
                             return group->getVisibleName();
+                        }
                         return group->getName();
-                    }
-                    case CARD_SET: {
+                    case CARD_SET:
                         return group->getCardSetShortName();
-                    }
-                    case CARD_COLLECTOR_NUMBER: {
+                    case CARD_COLLECTOR_NUMBER:
                         return group->getCardCollectorNumber();
-                    }
-                    case CARD_PROVIDER_ID: {
+                    case CARD_PROVIDER_ID:
                         return group->getCardProviderId();
-                    }
                     default:
                         return {};
                 }
             }
-            case DeckRoles::IsCardRole: {
+            case DeckRoles::IsCardRole:
                 return false;
-            }
 
-            case DeckRoles::DepthRole: {
+            case DeckRoles::DepthRole:
                 return group->depth();
-            }
 
                 // legality does not apply to group nodes
-            case DeckRoles::IsLegalRole: {
+            case DeckRoles::IsLegalRole:
                 return true;
-            }
 
-            default: {
+            default:
                 return {};
-            }
         }
     }
 
@@ -151,24 +143,18 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
             switch (index.column()) {
-                case CARD_AMOUNT: {
+                case CARD_AMOUNT:
                     return card->getNumber();
-                }
-                case CARD_NAME: {
+                case CARD_NAME:
                     return card->getName();
-                }
-                case CARD_SET: {
+                case CARD_SET:
                     return card->getCardSetShortName();
-                }
-                case CARD_COLLECTOR_NUMBER: {
+                case CARD_COLLECTOR_NUMBER:
                     return card->getCardCollectorNumber();
-                }
-                case CARD_PROVIDER_ID: {
+                case CARD_PROVIDER_ID:
                     return card->getCardProviderId();
-                }
-                default: {
+                default:
                     return {};
-                }
             }
 
         case DeckRoles::IsCardRole: {
