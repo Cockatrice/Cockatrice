@@ -106,21 +106,21 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
             case Qt::EditRole: {
                 switch (index.column()) {
-                    case 0: {
+                    case CARD_AMOUNT: {
                         return group->recursiveCount(true);
                     }
-                    case 1: {
+                    case CARD_NAME: {
                         if (role == Qt::DisplayRole)
                             return group->getVisibleName();
                         return group->getName();
                     }
-                    case 2: {
+                    case CARD_SET: {
                         return group->getCardSetShortName();
                     }
-                    case 3: {
+                    case CARD_COLLECTOR_NUMBER: {
                         return group->getCardCollectorNumber();
                     }
-                    case 4: {
+                    case CARD_PROVIDER_ID: {
                         return group->getCardProviderId();
                     }
                     default:
@@ -151,19 +151,19 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
             switch (index.column()) {
-                case 0: {
+                case CARD_AMOUNT: {
                     return card->getNumber();
                 }
-                case 1: {
+                case CARD_NAME: {
                     return card->getName();
                 }
-                case 2: {
+                case CARD_SET: {
                     return card->getCardSetShortName();
                 }
-                case 3: {
+                case CARD_COLLECTOR_NUMBER: {
                     return card->getCardCollectorNumber();
                 }
-                case 4: {
+                case CARD_PROVIDER_ID: {
                     return card->getCardProviderId();
                 }
                 default: {
@@ -212,15 +212,15 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
     }
 
     switch (section) {
-        case 0:
+        case CARD_AMOUNT:
             return tr("Count");
-        case 1:
+        case CARD_NAME:
             return tr("Card");
-        case 2:
+        case CARD_SET:
             return tr("Set");
-        case 3:
+        case CARD_COLLECTOR_NUMBER:
             return tr("Number");
-        case 4:
+        case CARD_PROVIDER_ID:
             return tr("Provider ID");
         default:
             return {};
@@ -277,19 +277,19 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     switch (index.column()) {
-        case 0:
+        case CARD_AMOUNT:
             node->setNumber(value.toInt());
             break;
-        case 1:
+        case CARD_NAME:
             node->setName(value.toString());
             break;
-        case 2:
+        case CARD_SET:
             node->setCardSetShortName(value.toString());
             break;
-        case 3:
+        case CARD_COLLECTOR_NUMBER:
             node->setCardCollectorNumber(value.toString());
             break;
-        case 4:
+        case CARD_PROVIDER_ID:
             node->setCardProviderId(value.toString());
             break;
         default:
