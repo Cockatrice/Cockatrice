@@ -106,18 +106,18 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
             case Qt::DisplayRole:
             case Qt::EditRole: {
                 switch (index.column()) {
-                    case CARD_AMOUNT:
+                    case DeckListModelColumns::CARD_AMOUNT:
                         return group->recursiveCount(true);
-                    case CARD_NAME:
+                    case DeckListModelColumns::CARD_NAME:
                         if (role == Qt::DisplayRole) {
                             return group->getVisibleName();
                         }
                         return group->getName();
-                    case CARD_SET:
+                    case DeckListModelColumns::CARD_SET:
                         return group->getCardSetShortName();
-                    case CARD_COLLECTOR_NUMBER:
+                    case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
                         return group->getCardCollectorNumber();
-                    case CARD_PROVIDER_ID:
+                    case DeckListModelColumns::CARD_PROVIDER_ID:
                         return group->getCardProviderId();
                     default:
                         return {};
@@ -143,15 +143,15 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
         case Qt::DisplayRole:
         case Qt::EditRole:
             switch (index.column()) {
-                case CARD_AMOUNT:
+                case DeckListModelColumns::CARD_AMOUNT:
                     return card->getNumber();
-                case CARD_NAME:
+                case DeckListModelColumns::CARD_NAME:
                     return card->getName();
-                case CARD_SET:
+                case DeckListModelColumns::CARD_SET:
                     return card->getCardSetShortName();
-                case CARD_COLLECTOR_NUMBER:
+                case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
                     return card->getCardCollectorNumber();
-                case CARD_PROVIDER_ID:
+                case DeckListModelColumns::CARD_PROVIDER_ID:
                     return card->getCardProviderId();
                 default:
                     return {};
@@ -198,15 +198,15 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
     }
 
     switch (section) {
-        case CARD_AMOUNT:
+        case DeckListModelColumns::CARD_AMOUNT:
             return tr("Count");
-        case CARD_NAME:
+        case DeckListModelColumns::CARD_NAME:
             return tr("Card");
-        case CARD_SET:
+        case DeckListModelColumns::CARD_SET:
             return tr("Set");
-        case CARD_COLLECTOR_NUMBER:
+        case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
             return tr("Number");
-        case CARD_PROVIDER_ID:
+        case DeckListModelColumns::CARD_PROVIDER_ID:
             return tr("Provider ID");
         default:
             return {};
@@ -263,19 +263,19 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     switch (index.column()) {
-        case CARD_AMOUNT:
+        case DeckListModelColumns::CARD_AMOUNT:
             node->setNumber(value.toInt());
             break;
-        case CARD_NAME:
+        case DeckListModelColumns::CARD_NAME:
             node->setName(value.toString());
             break;
-        case CARD_SET:
+        case DeckListModelColumns::CARD_SET:
             node->setCardSetShortName(value.toString());
             break;
-        case CARD_COLLECTOR_NUMBER:
+        case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
             node->setCardCollectorNumber(value.toString());
             break;
-        case CARD_PROVIDER_ID:
+        case DeckListModelColumns::CARD_PROVIDER_ID:
             node->setCardProviderId(value.toString());
             break;
         default:

@@ -12,21 +12,27 @@ class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
-namespace DeckRoles {
-enum {
+namespace DeckRoles
+{
+enum
+{
     IsCardRole = Qt::UserRole + 1,
     DepthRole,
     IsLegalRole
 };
 }
 
-enum ModelColumns{
+namespace DeckListModelColumns
+{
+enum
+{
     CARD_AMOUNT = 0,
     CARD_NAME = 1,
     CARD_SET = 2,
     CARD_COLLECTOR_NUMBER = 3,
     CARD_PROVIDER_ID = 4
 };
+}
 
 /**
  * @brief Specifies the criteria used to group cards in the DeckListModel.
