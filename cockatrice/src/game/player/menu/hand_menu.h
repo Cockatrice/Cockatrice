@@ -53,7 +53,10 @@ private:
     QAction *aSortHandByManaValue = nullptr;
 
     QMenu *mRevealHand = nullptr;
+    QAction *aRevealHandToAll = nullptr;
+
     QMenu *mRevealRandomHandCard = nullptr;
+    QAction *aRevealRandomHandCardToAll = nullptr;
 
     QMenu *mMoveHandMenu = nullptr;
     QAction *aMoveHandToTopLibrary = nullptr;
