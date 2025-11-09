@@ -33,6 +33,7 @@ public:
         Move_bottom,
         Gameplay,
         Drawing,
+        Hand,
         Chat_room,
         Game_window,
         Load_deck,
@@ -71,6 +72,8 @@ public:
                 return QApplication::translate("shortcutsTab", "Gameplay");
             case Drawing:
                 return QApplication::translate("shortcutsTab", "Drawing");
+            case Hand:
+                return QApplication::translate("shortcutsTab", "Hand");
             case Chat_room:
                 return QApplication::translate("shortcutsTab", "Chat Room");
             case Game_window:
@@ -564,13 +567,13 @@ private:
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::View)},
         {"Player/aSortHandByName", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Name"),
                                                parseSequenceString(""),
-                                               ShortcutGroup::View)},
+                                               ShortcutGroup::Hand)},
         {"Player/aSortHandByType", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Type"),
                                                parseSequenceString("Ctrl+Shift+H"),
-                                               ShortcutGroup::View)},
+                                               ShortcutGroup::Hand)},
         {"Player/aSortHandByManaValue", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Mana Value"),
                                                     parseSequenceString(""),
-                                                    ShortcutGroup::View)},
+                                                    ShortcutGroup::Hand)},
         {"Player/aViewGraveyard",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"), parseSequenceString("F4"), ShortcutGroup::View)},
         {"Player/aViewLibrary",
