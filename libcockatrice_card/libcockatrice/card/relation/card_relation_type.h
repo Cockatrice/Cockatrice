@@ -4,7 +4,13 @@
 #include <QString>
 
 /**
- * Represents how a card relates to another (attach, transform, etc.).
+ * @enum CardRelationType
+ * @ingroup Cards
+ * @brief Types of attachments between cards.
+ *
+ * DoesNotAttach: No attachment is present.
+ * AttachTo: This card attaches to another card.
+ * TransformInto: This card transforms into another card.
  */
 enum class CardRelationType
 {
@@ -13,7 +19,7 @@ enum class CardRelationType
     TransformInto = 2,
 };
 
-// Optional helper
+// Helper function to transform the enum values into human-readable strings
 inline QString cardAttachTypeToString(CardRelationType type)
 {
     switch (type) {
