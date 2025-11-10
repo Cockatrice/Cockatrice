@@ -374,7 +374,7 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 {
     deckLoader = _deck;
 
-    deckModel->setDeckList(qobject_cast<DeckList *>(_deck));
+    deckModel->setDeckList(_deck);
     connect(_deck, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
     connect(_deck, &DeckLoader::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
