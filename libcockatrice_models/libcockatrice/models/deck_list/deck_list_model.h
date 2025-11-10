@@ -140,7 +140,6 @@ public:
  *
  * Slots:
  * - rebuildTree(): rebuilds the model structure from the underlying DeckLoader.
- * - printDeckList(): renders the decklist to a QPrinter.
  */
 class DeckListModel : public QAbstractItemModel
 {
