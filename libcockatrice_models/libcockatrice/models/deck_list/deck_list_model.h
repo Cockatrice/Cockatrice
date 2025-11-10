@@ -68,7 +68,7 @@ namespace DeckListModelGroupCriteria
  * @enum DeckListModelGroupCriteria
  * @brief Available grouping strategies for deck visualization.
  */
-enum
+enum Type
 {
     MAIN_TYPE, /**< Group cards by their main type (e.g., creature, instant). */
     MANA_COST, /**< Group cards by their total mana cost. */
@@ -283,12 +283,12 @@ public:
      * @brief Sets the criteria used to group cards in the model.
      * @param newCriteria The new grouping criteria.
      */
-    void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
+    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
 
 private:
     DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
     InnerDecklistNode *root; /**< Root node of the model tree. */
-    DeckListModelGroupCriteria activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
+    DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
 

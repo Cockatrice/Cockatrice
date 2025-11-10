@@ -521,7 +521,7 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     emit layoutChanged();
 }
 
-void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria)
+void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria)
 {
     activeGroupCriteria = newCriteria;
     rebuildTree();
