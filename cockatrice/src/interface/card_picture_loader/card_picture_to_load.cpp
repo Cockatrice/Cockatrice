@@ -8,6 +8,7 @@
 #include <QUrl>
 #include <algorithm>
 #include <libcockatrice/card/set/card_set_comparator.h>
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
@@ -34,7 +35,7 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
         }
     }
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance(SettingsCache::instance().cardDatabase(), "", "", "", QDate());
+        sortedSets << CardSet::newInstance(new NoopCardSetPriorityController(), "", "", "", QDate());
     }
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
