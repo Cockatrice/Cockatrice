@@ -266,7 +266,7 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
         return -1;
     }
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes({deckZone});
 
     int count = 0;
     for (auto currentCard : cardsInDeck) {
