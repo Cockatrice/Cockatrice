@@ -12,37 +12,69 @@ class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
+/**
+ * @namespace DeckRoles
+ * @brief Custom model roles used by the DeckListModel for data retrieval.
+ *
+ * These roles extend Qt's item data roles starting at Qt::UserRole.
+ */
 namespace DeckRoles
 {
+/**
+ * @enum DeckRoles
+ * @brief Custom data roles for deck-related model items.
+ *
+ * These roles are used to retrieve specialized data from the DeckListModel.
+ */
 enum
 {
-    IsCardRole = Qt::UserRole + 1,
-    DepthRole,
-    IsLegalRole
+    IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
+    DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
+    IsLegalRole                    /**< Whether the card is legal in the current deck format. */
 };
-}
-
-namespace DeckListModelColumns
-{
-enum
-{
-    CARD_AMOUNT = 0,
-    CARD_NAME = 1,
-    CARD_SET = 2,
-    CARD_COLLECTOR_NUMBER = 3,
-    CARD_PROVIDER_ID = 4
-};
-}
+} // namespace DeckRoles
 
 /**
- * @brief Specifies the criteria used to group cards in the DeckListModel.
+ * @namespace DeckListModelColumns
+ * @brief Column indices for the DeckListModel.
+ *
+ * These values map to the columns in the deck list table representation.
  */
-enum DeckListModelGroupCriteria
+namespace DeckListModelColumns
+{
+/**
+ * @enum DeckListModelColumns
+ * @brief Column identifiers for displaying card information in the deck list.
+ */
+enum
+{
+    CARD_AMOUNT = 0,           /**< The number of copies of the card. */
+    CARD_NAME = 1,             /**< The card's name. */
+    CARD_SET = 2,              /**< The set or expansion the card belongs to. */
+    CARD_COLLECTOR_NUMBER = 3, /**< Collector number of the card within the set. */
+    CARD_PROVIDER_ID = 4       /**< ID used by the external data provider (e.g., Scryfall). */
+};
+} // namespace DeckListModelColumns
+
+/**
+ * @namespace DeckListModelGroupCriteria
+ * @brief Specifies criteria used to group cards in the DeckListModel.
+ *
+ * These values determine how cards are grouped in UI views such as the deck editor.
+ */
+namespace DeckListModelGroupCriteria
+{
+/**
+ * @enum DeckListModelGroupCriteria
+ * @brief Available grouping strategies for deck visualization.
+ */
+enum
 {
     MAIN_TYPE, /**< Group cards by their main type (e.g., creature, instant). */
-    MANA_COST, /**< Group cards by their mana cost. */
+    MANA_COST, /**< Group cards by their total mana cost. */
     COLOR      /**< Group cards by their color identity. */
 };
+} // namespace DeckListModelGroupCriteria
 
 /**
  * @class DecklistModelCardNode
