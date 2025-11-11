@@ -1,24 +1,12 @@
 #include "deck_list_model.h"
 
-#include "deck_loader.h"
-
-#include <QBrush>
-#include <QFont>
-#include <QPrinter>
-#include <QProgressDialog>
-#include <QTextCursor>
-#include <QTextDocument>
-#include <QTextStream>
-#include <QTextTable>
 #include <libcockatrice/card/database/card_database_manager.h>
 
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
-    deckList = new DeckLoader;
+    deckList = new DeckList;
     deckList->setParent(this);
-    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
-    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     root = new InnerDecklistNode;
 }
 
@@ -107,82 +95,95 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
         return {};
     }
 
-    auto *temp = static_cast<AbstractDecklistNode *>(index.internalPointer());
-    auto *card = dynamic_cast<DecklistModelCardNode *>(temp);
-    if (card == nullptr) {
-        const auto *node = dynamic_cast<InnerDecklistNode *>(temp);
+    auto *node = static_cast<AbstractDecklistNode *>(index.internalPointer());
+    auto *card = dynamic_cast<DecklistModelCardNode *>(node);
+
+    // Group node
+    if (!card) {
+        const auto *group = dynamic_cast<InnerDecklistNode *>(node);
+
         switch (role) {
-            case Qt::FontRole: {
-                QFont f;
-                f.setBold(true);
-                return f;
-            }
             case Qt::DisplayRole:
             case Qt::EditRole: {
                 switch (index.column()) {
-                    case 0:
-                        return node->recursiveCount(true);
-                    case 1: {
-                        if (role == Qt::DisplayRole)
-                            return node->getVisibleName();
-                        return node->getName();
-                    }
-                    case 2: {
-                        return node->getCardSetShortName();
-                    }
-                    case 3: {
-                        return node->getCardCollectorNumber();
-                    }
-                    case 4: {
-                        return node->getCardProviderId();
-                    }
+                    case DeckListModelColumns::CARD_AMOUNT:
+                        return group->recursiveCount(true);
+                    case DeckListModelColumns::CARD_NAME:
+                        if (role == Qt::DisplayRole) {
+                            return group->getVisibleName();
+                        }
+                        return group->getName();
+                    case DeckListModelColumns::CARD_SET:
+                        return group->getCardSetShortName();
+                    case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
+                        return group->getCardCollectorNumber();
+                    case DeckListModelColumns::CARD_PROVIDER_ID:
+                        return group->getCardProviderId();
                     default:
                         return {};
                 }
             }
-            case Qt::UserRole + 1:
+            case DeckRoles::IsCardRole:
                 return false;
-            case Qt::BackgroundRole: {
-                int color = 90 + 60 * node->depth();
-                return QBrush(QColor(color, 255, color));
-            }
-            case Qt::ForegroundRole: {
-                return QBrush(QColor(0, 0, 0));
-            }
-            default:
-                return {};
-        }
-    } else {
-        switch (role) {
-            case Qt::DisplayRole:
-            case Qt::EditRole: {
-                switch (index.column()) {
-                    case 0:
-                        return card->getNumber();
-                    case 1:
-                        return card->getName();
-                    case 2:
-                        return card->getCardSetShortName();
-                    case 3:
-                        return card->getCardCollectorNumber();
-                    case 4:
-                        return card->getCardProviderId();
-                    default:
-                        return {};
-                }
-            }
-            case Qt::UserRole + 1:
+
+            case DeckRoles::DepthRole:
+                return group->depth();
+
+                // legality does not apply to group nodes
+            case DeckRoles::IsLegalRole:
                 return true;
-            case Qt::BackgroundRole: {
-                int color = 255 - (index.row() % 2) * 30;
-                return QBrush(QColor(color, color, color));
-            }
-            case Qt::ForegroundRole: {
-                return QBrush(QColor(0, 0, 0));
-            }
+
             default:
                 return {};
         }
+    }
+
+    // Card node
+    switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+            switch (index.column()) {
+                case DeckListModelColumns::CARD_AMOUNT:
+                    return card->getNumber();
+                case DeckListModelColumns::CARD_NAME:
+                    return card->getName();
+                case DeckListModelColumns::CARD_SET:
+                    return card->getCardSetShortName();
+                case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
+                    return card->getCardCollectorNumber();
+                case DeckListModelColumns::CARD_PROVIDER_ID:
+                    return card->getCardProviderId();
+                default:
+                    return {};
+            }
+
+        case DeckRoles::IsCardRole: {
+            return true;
+        }
+
+        case DeckRoles::DepthRole: {
+            return card->depth();
+        }
+
+        default: {
+            return {};
+        }
+    }
+}
+
+void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
+{
+    int rows = rowCount(parent);
+    if (rows == 0)
+        return;
+
+    QModelIndex topLeft = index(0, 0, parent);
+    QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
+    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
+
+    for (int r = 0; r < rows; ++r) {
+        QModelIndex child = index(r, 0, parent);
+        emitBackgroundUpdates(child);
     }
 }
 
@@ -197,15 +198,15 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
     }
 
     switch (section) {
-        case 0:
+        case DeckListModelColumns::CARD_AMOUNT:
             return tr("Count");
-        case 1:
+        case DeckListModelColumns::CARD_NAME:
             return tr("Card");
-        case 2:
+        case DeckListModelColumns::CARD_SET:
             return tr("Set");
-        case 3:
+        case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
             return tr("Number");
-        case 4:
+        case DeckListModelColumns::CARD_PROVIDER_ID:
             return tr("Provider ID");
         default:
             return {};
@@ -262,19 +263,19 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     }
 
     switch (index.column()) {
-        case 0:
+        case DeckListModelColumns::CARD_AMOUNT:
             node->setNumber(value.toInt());
             break;
-        case 1:
+        case DeckListModelColumns::CARD_NAME:
             node->setName(value.toString());
             break;
-        case 2:
+        case DeckListModelColumns::CARD_SET:
             node->setCardSetShortName(value.toString());
             break;
-        case 3:
+        case DeckListModelColumns::CARD_COLLECTOR_NUMBER:
             node->setCardCollectorNumber(value.toString());
             break;
-        case 4:
+        case DeckListModelColumns::CARD_PROVIDER_ID:
             node->setCardProviderId(value.toString());
             break;
         default:
@@ -520,7 +521,7 @@ void DeckListModel::sort(int column, Qt::SortOrder order)
     emit layoutChanged();
 }
 
-void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria)
+void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria)
 {
     activeGroupCriteria = newCriteria;
     rebuildTree();
@@ -528,19 +529,17 @@ void DeckListModel::setActiveGroupCriteria(DeckListModelGroupCriteria newCriteri
 
 void DeckListModel::cleanList()
 {
-    setDeckList(new DeckLoader);
+    setDeckList(new DeckList);
 }
 
 /**
  * @param _deck The deck. Takes ownership of the object
  */
-void DeckListModel::setDeckList(DeckLoader *_deck)
+void DeckListModel::setDeckList(DeckList *_deck)
 {
     deckList->deleteLater();
     deckList = _deck;
     deckList->setParent(this);
-    connect(deckList, &DeckLoader::deckLoaded, this, &DeckListModel::rebuildTree);
-    connect(deckList, &DeckLoader::deckHashChanged, this, &DeckListModel::deckHashChanged);
     rebuildTree();
 }
 
@@ -628,98 +627,4 @@ QList<QString> *DeckListModel::getZones() const
         zones->append(currentZone->getName());
     }
     return zones;
-}
-
-void DeckListModel::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
-{
-    const int totalColumns = 2;
-
-    if (node->height() == 1) {
-        QTextBlockFormat blockFormat;
-        QTextCharFormat charFormat;
-        charFormat.setFontPointSize(11);
-        charFormat.setFontWeight(QFont::Bold);
-        cursor->insertBlock(blockFormat, charFormat);
-
-        QTextTableFormat tableFormat;
-        tableFormat.setCellPadding(0);
-        tableFormat.setCellSpacing(0);
-        tableFormat.setBorder(0);
-        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
-
-            QTextCharFormat cellCharFormat;
-            cellCharFormat.setFontPointSize(9);
-
-            QTextTableCell cell = table->cellAt(i, 0);
-            cell.setFormat(cellCharFormat);
-            QTextCursor cellCursor = cell.firstCursorPosition();
-            cellCursor.insertText(QString("%1 ").arg(card->getNumber()));
-
-            cell = table->cellAt(i, 1);
-            cell.setFormat(cellCharFormat);
-            cellCursor = cell.firstCursorPosition();
-            cellCursor.insertText(card->getName());
-        }
-    } else if (node->height() == 2) {
-        QTextBlockFormat blockFormat;
-        QTextCharFormat charFormat;
-        charFormat.setFontPointSize(14);
-        charFormat.setFontWeight(QFont::Bold);
-
-        cursor->insertBlock(blockFormat, charFormat);
-
-        QTextTableFormat tableFormat;
-        tableFormat.setCellPadding(10);
-        tableFormat.setCellSpacing(0);
-        tableFormat.setBorder(0);
-        QVector<QTextLength> constraints;
-        for (int i = 0; i < totalColumns; i++) {
-            constraints << QTextLength(QTextLength::PercentageLength, 100.0 / totalColumns);
-        }
-        tableFormat.setColumnWidthConstraints(constraints);
-
-        QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
-            printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
-        }
-    }
-
-    cursor->movePosition(QTextCursor::End);
-}
-
-void DeckListModel::printDeckList(QPrinter *printer)
-{
-    QTextDocument doc;
-
-    QFont font("Serif");
-    font.setStyleHint(QFont::Serif);
-    doc.setDefaultFont(font);
-
-    QTextCursor cursor(&doc);
-
-    QTextBlockFormat headerBlockFormat;
-    QTextCharFormat headerCharFormat;
-    headerCharFormat.setFontPointSize(16);
-    headerCharFormat.setFontWeight(QFont::Bold);
-
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getName());
-
-    headerCharFormat.setFontPointSize(12);
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getComments());
-    cursor.insertBlock(headerBlockFormat, headerCharFormat);
-
-    for (int i = 0; i < root->size(); i++) {
-        cursor.insertHtml("<br><img src=theme:hr.jpg>");
-        // cursor.insertHtml("<hr>");
-        cursor.insertBlock(headerBlockFormat, headerCharFormat);
-
-        printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(root->at(i)));
-    }
-
-    doc.print(printer);
 }

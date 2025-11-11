@@ -1,6 +1,8 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "deck_list_style_proxy.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -29,9 +31,13 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
+
+    DeckListStyleProxy *proxy = new DeckListStyleProxy(this);
+    proxy->setSourceModel(deckModel);
+
     deckView = new QTreeView();
     deckView->setObjectName("deckView");
-    deckView->setModel(deckModel);
+    deckView->setModel(proxy);
     deckView->setUniformRowHeights(true);
     deckView->setSortingEnabled(true);
     deckView->sortByColumn(1, Qt::AscendingOrder);
@@ -111,8 +117,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
     activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
     connect(activeGroupCriteriaComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
-        deckModel->setActiveGroupCriteria(
-            static_cast<DeckListModelGroupCriteria>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
+        deckModel->setActiveGroupCriteria(static_cast<DeckListModelGroupCriteria::Type>(
+            activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
         deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
         deckView->expandAll();
         deckView->expandAll();
@@ -366,7 +372,11 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
  */
 void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 {
+    deckLoader = _deck;
+
     deckModel->setDeckList(_deck);
+    connect(_deck, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
+    connect(_deck, &DeckLoader::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
@@ -383,9 +393,9 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     emit deckChanged();
 }
 
-DeckLoader *DeckEditorDeckDockWidget::getDeckList()
+DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
 {
-    return deckModel->getDeckList();
+    return deckLoader;
 }
 
 /**

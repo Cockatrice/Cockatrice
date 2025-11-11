@@ -7,6 +7,7 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
+#include "../../deck_loader/deck_loader.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"

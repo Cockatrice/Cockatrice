@@ -209,7 +209,7 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckLoader()->getCardRefList()));
     setModified(false);
 
     aDeckDockVisible->setChecked(true);
@@ -217,9 +217,9 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 }
 
 /** @brief Returns the currently loaded deck. */
-DeckLoader *AbstractTabDeckEditor::getDeckList() const
+DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
 {
-    return deckDockWidget->getDeckList();
+    return deckDockWidget->getDeckLoader();
 }
 
 /**
@@ -237,7 +237,7 @@ void AbstractTabDeckEditor::setModified(bool _modified)
  */
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
-    DeckLoader *deck = getDeckList();
+    DeckLoader *deck = deckDockWidget->getDeckLoader();
     return !modified && deck->isBlankDeck() && deck->hasNotBeenLoaded();
 }
 
@@ -377,7 +377,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
  */
 bool AbstractTabDeckEditor::actSaveDeck()
 {
-    DeckLoader *const deck = getDeckList();
+    DeckLoader *const deck = getDeckLoader();
     if (deck->getLastRemoteDeckId() != -1) {
         QString deckString = deck->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
@@ -418,7 +418,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(getDeckList()->getName().trimmed());
+    dialog.selectFile(getDeckLoader()->getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -426,7 +426,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    if (!getDeckList()->saveToFile(fileName, fmt)) {
+    if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
@@ -480,7 +480,7 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
  */
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(*getDeckList(), annotated, this);
+    DlgEditDeckInClipboard dlg(*getDeckLoader(), annotated, this);
     if (!dlg.exec())
         return;
 
@@ -504,32 +504,32 @@ void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 /** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    getDeckList()->saveToClipboard(true, true);
+    getDeckLoader()->saveToClipboard(true, true);
 }
 
 /** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    getDeckList()->saveToClipboard(true, false);
+    getDeckLoader()->saveToClipboard(true, false);
 }
 
 /** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    getDeckList()->saveToClipboard(false, true);
+    getDeckLoader()->saveToClipboard(false, true);
 }
 
 /** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    getDeckList()->saveToClipboard(false, false);
+    getDeckLoader()->saveToClipboard(false, false);
 }
 
 /** @brief Prints the deck using a QPrintPreviewDialog. */
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
+    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->getDeckLoader(), &DeckLoader::printDeckList);
     dlg->exec();
 }
 
@@ -562,7 +562,7 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
  */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    if (DeckLoader *const deck = getDeckList()) {
+    if (DeckLoader *const deck = getDeckLoader()) {
         QString decklistUrlString = deck->exportDeckToDecklist(website);
         // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {
@@ -600,14 +600,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(getDeckLoader());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(getDeckLoader());
 }
 
 /** @brief Applies a new filter tree to the database display. */

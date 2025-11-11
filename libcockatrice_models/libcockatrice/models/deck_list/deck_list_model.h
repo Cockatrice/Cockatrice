@@ -8,20 +8,73 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_card_node.h>
 
-class DeckLoader;
 class CardDatabase;
 class QPrinter;
 class QTextCursor;
 
 /**
- * @brief Specifies the criteria used to group cards in the DeckListModel.
+ * @namespace DeckRoles
+ * @brief Custom model roles used by the DeckListModel for data retrieval.
+ *
+ * These roles extend Qt's item data roles starting at Qt::UserRole.
  */
-enum DeckListModelGroupCriteria
+namespace DeckRoles
+{
+/**
+ * @enum DeckRoles
+ * @brief Custom data roles for deck-related model items.
+ *
+ * These roles are used to retrieve specialized data from the DeckListModel.
+ */
+enum
+{
+    IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
+    DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
+    IsLegalRole                    /**< Whether the card is legal in the current deck format. */
+};
+} // namespace DeckRoles
+
+/**
+ * @namespace DeckListModelColumns
+ * @brief Column indices for the DeckListModel.
+ *
+ * These values map to the columns in the deck list table representation.
+ */
+namespace DeckListModelColumns
+{
+/**
+ * @enum DeckListModelColumns
+ * @brief Column identifiers for displaying card information in the deck list.
+ */
+enum
+{
+    CARD_AMOUNT = 0,           /**< The number of copies of the card. */
+    CARD_NAME = 1,             /**< The card's name. */
+    CARD_SET = 2,              /**< The set or expansion the card belongs to. */
+    CARD_COLLECTOR_NUMBER = 3, /**< Collector number of the card within the set. */
+    CARD_PROVIDER_ID = 4       /**< ID used by the external data provider (e.g., Scryfall). */
+};
+} // namespace DeckListModelColumns
+
+/**
+ * @namespace DeckListModelGroupCriteria
+ * @brief Specifies criteria used to group cards in the DeckListModel.
+ *
+ * These values determine how cards are grouped in UI views such as the deck editor.
+ */
+namespace DeckListModelGroupCriteria
+{
+/**
+ * @enum DeckListModelGroupCriteria
+ * @brief Available grouping strategies for deck visualization.
+ */
+enum Type
 {
     MAIN_TYPE, /**< Group cards by their main type (e.g., creature, instant). */
-    MANA_COST, /**< Group cards by their mana cost. */
+    MANA_COST, /**< Group cards by their total mana cost. */
     COLOR      /**< Group cards by their color identity. */
 };
+} // namespace DeckListModelGroupCriteria
 
 /**
  * @class DecklistModelCardNode
@@ -119,12 +172,12 @@ public:
  *
  * Slots:
  * - rebuildTree(): rebuilds the model structure from the underlying DeckLoader.
- * - printDeckList(): renders the decklist to a QPrinter.
  */
 class DeckListModel : public QAbstractItemModel
 {
     Q_OBJECT
-private slots:
+
+public slots:
     /**
      * @brief Rebuilds the model tree from the underlying DeckLoader.
      *
@@ -132,13 +185,6 @@ private slots:
      * state of the deck.
      */
     void rebuildTree();
-
-public slots:
-    /**
-     * @brief Prints the decklist to the provided QPrinter.
-     * @param printer The printer to render the decklist to.
-     */
-    void printDeckList(QPrinter *printer);
 
 signals:
     /**
@@ -170,6 +216,7 @@ public:
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
+    void emitBackgroundUpdates(const QModelIndex &parent);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent) const override;
     QModelIndex parent(const QModelIndex &index) const override;
@@ -222,11 +269,11 @@ public:
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
-    DeckLoader *getDeckList() const
+    DeckList *getDeckList() const
     {
         return deckList;
     }
-    void setDeckList(DeckLoader *_deck);
+    void setDeckList(DeckList *_deck);
 
     QList<ExactCard> getCards() const;
     QList<ExactCard> getCardsForZone(const QString &zoneName) const;
@@ -236,12 +283,12 @@ public:
      * @brief Sets the criteria used to group cards in the model.
      * @param newCriteria The new grouping criteria.
      */
-    void setActiveGroupCriteria(DeckListModelGroupCriteria newCriteria);
+    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
 
 private:
-    DeckLoader *deckList;    /**< Pointer to the deck loader providing the underlying data. */
+    DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
     InnerDecklistNode *root; /**< Root node of the model tree. */
-    DeckListModelGroupCriteria activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
+    DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
 
@@ -253,8 +300,6 @@ private:
                                         const QString &cardNumber = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
-
-    void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
     template <typename T> T getNode(const QModelIndex &index) const
     {

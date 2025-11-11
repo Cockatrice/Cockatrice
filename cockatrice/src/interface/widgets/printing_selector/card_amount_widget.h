@@ -9,6 +9,7 @@
 #define CARD_AMOUNT_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../deck_loader/deck_loader.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>
@@ -18,7 +19,6 @@
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class CardAmountWidget : public QWidget
 {

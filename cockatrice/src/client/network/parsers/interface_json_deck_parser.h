@@ -6,9 +6,10 @@
 
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
+#include "../../../interface/deck_loader/deck_loader.h"
+
 #include <QJsonArray>
 #include <QJsonObject>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class IJsonDeckParser
 {

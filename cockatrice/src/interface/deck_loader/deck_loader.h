@@ -8,6 +8,8 @@
 #define DECK_LOADER_H
 
 #include <QLoggingCategory>
+#include <QPrinter>
+#include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
@@ -18,6 +20,13 @@ inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 signals:
     void deckLoaded();
     void loadFinished(bool success);
+
+public slots:
+    /**
+     * @brief Prints the decklist to the provided QPrinter.
+     * @param printer The printer to render the decklist to.
+     */
+    void printDeckList(QPrinter *printer);
 
 public:
     enum FileFormat
@@ -92,6 +101,9 @@ public:
     // overload
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
     bool convertToCockatriceFormat(QString fileName);
+
+private:
+    void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
 protected:
     void saveToStream_DeckHeader(QTextStream &out) const;

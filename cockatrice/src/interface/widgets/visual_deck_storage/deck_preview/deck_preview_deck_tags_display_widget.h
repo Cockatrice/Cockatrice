@@ -7,10 +7,10 @@
 #ifndef DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 
+#include "../../../deck_loader/deck_loader.h"
 #include "deck_preview_widget.h"
 
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 inline bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath);
 

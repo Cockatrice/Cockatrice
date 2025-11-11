@@ -7,6 +7,7 @@
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 
+#include "../../interface/deck_loader/deck_loader.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
@@ -14,7 +15,6 @@
 #include "player_target.h"
 
 #include <QObject>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class PlayerInfo : public QObject
