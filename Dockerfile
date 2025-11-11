@@ -29,10 +29,9 @@ RUN mkdir build && cd build && \
 FROM ubuntu:24.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  libmariadb-dev-compat \
-  libprotobuf-dev \
+  libprotobuf32t64 \
   libqt6sql6-mysql \
-  qt6-websockets-dev \
+  libqt6websockets6 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
