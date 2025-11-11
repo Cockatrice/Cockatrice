@@ -209,7 +209,7 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
     deckDockWidget->setDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckLoader()->getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
     setModified(false);
 
     aDeckDockVisible->setChecked(true);
@@ -220,6 +220,12 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
 {
     return deckDockWidget->getDeckLoader();
+}
+
+/** @brief Returns the currently loaded deck list. */
+DeckList *AbstractTabDeckEditor::getDeckList() const
+{
+    return deckDockWidget->getDeckList();
 }
 
 /**
@@ -238,7 +244,7 @@ void AbstractTabDeckEditor::setModified(bool _modified)
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
     DeckLoader *deck = deckDockWidget->getDeckLoader();
-    return !modified && deck->isBlankDeck() && deck->hasNotBeenLoaded();
+    return !modified && deck->getDeckList()->isBlankDeck() && deck->hasNotBeenLoaded();
 }
 
 /** @brief Creates a new deck. Handles opening in new tab if needed. */
@@ -354,7 +360,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    auto *l = new DeckLoader;
+    auto *l = new DeckLoader(this);
     if (l->loadFromFile(fileName, fmt, true)) {
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
@@ -379,7 +385,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckLoader();
     if (deck->getLastRemoteDeckId() != -1) {
-        QString deckString = deck->writeToString_Native();
+        QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
             return false;
@@ -418,7 +424,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(getDeckLoader()->getName().trimmed());
+    dialog.selectFile(getDeckList()->getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -600,14 +606,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckLoader());
+    interface->analyzeDeck(getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckLoader());
+    interface->analyzeDeck(getDeckList());
 }
 
 /** @brief Applies a new filter tree to the database display. */

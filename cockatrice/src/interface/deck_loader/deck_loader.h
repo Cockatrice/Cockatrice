@@ -14,7 +14,7 @@
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
-    class DeckLoader : public DeckList
+    class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
@@ -52,14 +52,15 @@ public:
     };
 
 private:
+    DeckList *deckList;
     QString lastFileName;
     FileFormat lastFileFormat;
     int lastRemoteDeckId;
 
 public:
-    DeckLoader();
-    explicit DeckLoader(const QString &nativeString);
-    explicit DeckLoader(const DeckList &other);
+    DeckLoader(QObject *parent);
+    DeckLoader(QObject *parent, DeckList *_deckList);
+    void setDeckList(DeckList *_deckList);
     DeckLoader(const DeckLoader &other);
     const QString &getLastFileName() const
     {
@@ -102,6 +103,11 @@ public:
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
     bool convertToCockatriceFormat(QString fileName);
 
+    DeckList *getDeckList()
+    {
+        return deckList;
+    }
+
 private:
     void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
 
@@ -116,8 +122,8 @@ protected:
                                     QList<DecklistCardNode *> cards,
                                     bool addComments = true,
                                     bool addSetNameAndNumber = true) const;
-    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
-    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
+    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName);
+    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const;
 };
 
 #endif

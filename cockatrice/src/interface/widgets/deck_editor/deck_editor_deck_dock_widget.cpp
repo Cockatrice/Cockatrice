@@ -32,6 +32,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
 
+    deckLoader = new DeckLoader(this, deckModel->getDeckList());
+
     DeckListStyleProxy *proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);
 
@@ -373,10 +375,9 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 {
     deckLoader = _deck;
-
-    deckModel->setDeckList(_deck);
-    connect(_deck, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
-    connect(_deck, &DeckLoader::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
+    deckModel->setDeckList(deckLoader->getDeckList());
+    connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
+    connect(deckLoader->getDeckList(), &DeckList::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
     nameEdit->setText(deckModel->getDeckList()->getName());
     commentsEdit->setText(deckModel->getDeckList()->getComments());
@@ -396,6 +397,11 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
 DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
 {
     return deckLoader;
+}
+
+DeckList *DeckEditorDeckDockWidget::getDeckList()
+{
+    return deckModel->getDeckList();
 }
 
 /**

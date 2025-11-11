@@ -87,7 +87,7 @@ public:
         return tr("Deck Storage");
     }
 signals:
-    void openDeckEditor(const DeckLoader *deckLoader);
+    void openDeckEditor(DeckLoader *deckLoader);
 };
 
 #endif

@@ -66,7 +66,7 @@ class Player : public QObject
     Q_OBJECT
 
 signals:
-    void openDeckEditor(const DeckLoader *deck);
+    void openDeckEditor(DeckLoader *deck);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();

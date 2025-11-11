@@ -19,7 +19,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
-    backgroundSourceDeck = new DeckLoader();
+    backgroundSourceDeck = new DeckLoader(this);
 
     backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
                                        DeckLoader::CockatriceFormat, false);
@@ -94,7 +94,7 @@ void HomeWidget::updateRandomCard()
                      newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
         case BackgroundSources::DeckFileArt:
-            QList<CardRef> cardRefs = backgroundSourceDeck->getCardRefList();
+            QList<CardRef> cardRefs = backgroundSourceDeck->getDeckList()->getCardRefList();
             ExactCard oldCard = backgroundSourceCard->getCard();
 
             if (!cardRefs.empty()) {

@@ -121,7 +121,7 @@ signals:
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
     void openMessageDialog(const QString &userName, bool focus);
-    void openDeckEditor(const DeckLoader *deck);
+    void openDeckEditor(DeckLoader *deck);
     void notIdle();
 
     void phaseChanged(int phase);
