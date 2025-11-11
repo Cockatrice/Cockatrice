@@ -32,7 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libmariadb-dev-compat \
   libprotobuf-dev \
   libqt6sql6-mysql \
-  qt6-websockets-dev
+  qt6-websockets-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Only copy installed binaries, not source
 COPY --from=build /usr/local /usr/local
