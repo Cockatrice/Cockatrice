@@ -32,6 +32,4 @@ add_library(
 
 target_include_directories(libcockatrice_models_database PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(
-  libcockatrice_models_database PUBLIC libcockatrice_card libcockatrice_filters ${COCKATRICE_QT_MODULES}
-)
+target_link_libraries(libcockatrice_models_database PUBLIC libcockatrice_card libcockatrice_filters ${QT_CORE_MODULE})
