@@ -1,7 +1,9 @@
 # -------- Build Stage --------
 FROM ubuntu:24.04 AS build
 
-RUN apt-get update && apt-get install -y \
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
   file \
@@ -26,7 +28,7 @@ RUN mkdir build && cd build && \
 # -------- Runtime Stage (clean) --------
 FROM ubuntu:24.04
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   libmariadb-dev-compat \
   libprotobuf-dev \
   libqt6sql6-mysql \
