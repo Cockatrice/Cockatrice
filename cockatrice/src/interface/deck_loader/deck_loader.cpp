@@ -36,7 +36,7 @@ DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList)
 }
 
 DeckLoader::DeckLoader(const DeckLoader &other)
-    : deckList(other.deckList), lastFileName(other.lastFileName), lastFileFormat(other.lastFileFormat),
+    : QObject(), deckList(other.deckList), lastFileName(other.lastFileName), lastFileFormat(other.lastFileFormat),
       lastRemoteDeckId(other.lastRemoteDeckId)
 {
 }
