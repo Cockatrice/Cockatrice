@@ -115,7 +115,7 @@ jobs:
             version: 11
             package: DEB
 
-          - distro: Debian
+          - distro: Servatrice_Debian
             version: 11
             package: DEB
             test: skip
