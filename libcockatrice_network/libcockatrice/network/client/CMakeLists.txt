@@ -11,6 +11,8 @@ add_library(libcockatrice_network_client INTERFACE)
 target_include_directories(libcockatrice_network_client INTERFACE .)
 
 target_link_libraries(
-  libcockatrice_network_client INTERFACE ${COCKATRICE_QT_MODULES} libcockatrice_network_client_abstract
-                                         libcockatrice_network_client_local libcockatrice_network_client_remote
+  libcockatrice_network_client
+  INTERFACE ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets
+            libcockatrice_network_client_abstract libcockatrice_network_client_local
+            libcockatrice_network_client_remote
 )

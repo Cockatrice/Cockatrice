@@ -19,6 +19,7 @@ add_dependencies(libcockatrice_network_client_remote libcockatrice_network_clien
 target_include_directories(libcockatrice_network_client_remote PUBLIC .)
 
 target_link_libraries(
-  libcockatrice_network_client_remote PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_network_client_abstract
-                                             libcockatrice_interfaces libcockatrice_utility libcockatrice_protocol
+  libcockatrice_network_client_remote
+  PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets
+         libcockatrice_network_client_abstract libcockatrice_interfaces libcockatrice_utility libcockatrice_protocol
 )
