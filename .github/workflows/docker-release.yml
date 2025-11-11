@@ -11,6 +11,7 @@ on:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
+      - 'Dockerfile'
 
 jobs:
   docker:
