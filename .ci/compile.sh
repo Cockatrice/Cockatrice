@@ -227,12 +227,12 @@ fi
 
 echo "::group::Configure cmake"
 cmake --version
-echo "Running cmake with flags: ${flags[@]}"
+echo "Running cmake with flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[@]}"
+echo "Running cmake --build with flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
