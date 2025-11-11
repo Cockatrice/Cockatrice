@@ -39,5 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Only copy installed binaries, not source
 COPY --from=build /usr/local /usr/local
 
+WORKDIR /home/servatrice
+
 EXPOSE 4748
 ENTRYPOINT [ "servatrice", "--log-to-console" ]
