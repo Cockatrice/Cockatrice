@@ -187,9 +187,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // table row
     int tableRow = 1;
     QString mainCardType = properties.value("maintype").toString();
-    if ((mainCardType == "Land"))
+    if (mainCardType == "Land")
         tableRow = 0;
-    else if ((mainCardType == "Sorcery") || (mainCardType == "Instant"))
+    else if (mainCardType == "Sorcery" || mainCardType == "Instant")
         tableRow = 3;
     else if (mainCardType == "Creature")
         tableRow = 2;
