@@ -20,8 +20,8 @@ narrow the results.
 
 ### Generic Card Infos
 
-To check if a card with the exact provided name exists as a CardInfo in the CardDatabase use, CardDatabaseQuerier::
-getCardInfo() or CardDatabaseQuerier::getCardInfos() for multiple cards.
+To check if a card with the exact provided name exists as a CardInfo in the CardDatabase use,
+CardDatabaseQuerier::getCardInfo() or CardDatabaseQuerier::getCardInfos() for multiple cards.
 
 ### Guessing Cards
 
@@ -37,5 +37,3 @@ To obtain an ExactCard from the CardDatabaseQuerier, you must use a CardRef as a
 getCard(), CardDatabaseQuerier::getCards(), or CardDatabaseQuerier::guessCard().
 
 CardRef is a simple struct consisting of a card name and a card provider ID as QString%s.
-
-There are
