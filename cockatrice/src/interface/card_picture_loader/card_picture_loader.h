@@ -1,18 +1,3 @@
-/**
- * @file card_picture_loader.h
- * @ingroup PictureLoader
- * @brief Provides functionality to asynchronously load, cache, and manage card images for the client.
- *
- * This class is a singleton and handles:
- * - Loading card images from disk or network.
- * - Caching images in QPixmapCache for fast reuse.
- * - Providing themed card backs, including fallback and in-progress/failed states.
- * - Emitting updates when pixmaps are loaded.
- *
- * It interacts with CardPictureLoaderWorker for background loading and
- * CardPictureLoaderStatusBar to display loading progress in the main window.
- */
-
 #ifndef CARD_PICTURE_LOADER_H
 #define CARD_PICTURE_LOADER_H
 
