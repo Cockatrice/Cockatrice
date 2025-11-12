@@ -1,9 +1,3 @@
-/**
- * @file card_info.h
- * @ingroup Cards
- * @brief TODO: Document this.
- */
-
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
