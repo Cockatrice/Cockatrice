@@ -33,7 +33,7 @@ uses CardDatabaseQuerier::getCardBySimpleName() as a fallback.
 
 ### ExactCard%s
 
-To obtain an ExactCard from the CardDatabaseQuerier, you must use a CardRef as a parameter to CardDatabaseQuerier::
-getCard(), CardDatabaseQuerier::getCards(), or CardDatabaseQuerier::guessCard().
+To obtain an ExactCard from the CardDatabaseQuerier, you must use a CardRef as a parameter to
+CardDatabaseQuerier::getCard(), CardDatabaseQuerier::getCards(), or CardDatabaseQuerier::guessCard().
 
 CardRef is a simple struct consisting of a card name and a card provider ID as QString%s.
