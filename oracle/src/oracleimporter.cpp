@@ -242,7 +242,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
 
     int numCards = 0;
+
+    // Keeps track of any split card faces encountered so far
     QMap<QString, QPair<QList<SplitCardPart>, QString>> splitCards;
+
+    // Keeps track of all names encountered so far
     QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
