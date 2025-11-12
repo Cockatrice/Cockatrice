@@ -12,6 +12,7 @@ inline Q_LOGGING_CATEGORY(CardPictureLoaderCardBackCacheFailLog, "card_picture_l
 
 /**
  * @class CardPictureLoader
+ * @ingroup PictureLoader
  * @brief Singleton class to manage card image loading and caching. Provides functionality to asynchronously load,
  * cache, and manage card images for the client.
  *
