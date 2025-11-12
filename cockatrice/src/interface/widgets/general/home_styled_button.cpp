@@ -9,7 +9,7 @@ HomeStyledButton::HomeStyledButton(const QString &text, QPair<QColor, QColor> _g
     : QPushButton(text, parent), gradientColors(_gradientColors)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumHeight(50);
+    setMinimumHeight(25);
     setStyleSheet(generateButtonStylesheet(gradientColors));
 }
 
