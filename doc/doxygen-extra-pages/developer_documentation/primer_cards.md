@@ -6,3 +6,4 @@ All non-gui code related to cards used by Cockatrice is contained within libcock
 
 # A Basic Card Object: CardInfo
 
+@ref CardInfo::Basic_Properties_Accessors "Basic Properties Accessors"
