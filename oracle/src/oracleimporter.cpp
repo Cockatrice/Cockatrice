@@ -274,7 +274,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // card properties
         QVariantHash properties;
-        for (auto [mtgjsonProperty, xmlPropertyName] : cardProperties.asKeyValueRange()) {
+        for (auto i = cardProperties.cbegin(), end = cardProperties.cend(); i != end; ++i) {
+            QString mtgjsonProperty = i.key();
+            QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
                 properties.insert(xmlPropertyName, propertyValue);
@@ -282,15 +284,19 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // per-set properties
         PrintingInfo printingInfo = PrintingInfo(currentSet);
-        for (auto [mtgjsonProperty, xmlPropertyName] : setInfoProperties.asKeyValueRange()) {
+        for (auto i = setInfoProperties.cbegin(), end = setInfoProperties.cend(); i != end; ++i) {
+            QString mtgjsonProperty = i.key();
+            QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
         // Identifiers
-        for (auto [mtgjsonProperty, xmlPropertyName] : identifierProperties.asKeyValueRange()) {
-            auto propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
+        for (auto i = identifierProperties.cbegin(), end = identifierProperties.cend(); i != end; ++i) {
+            QString mtgjsonProperty = i.key();
+            QString xmlPropertyName = i.value();
+            QString propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
             }
@@ -338,8 +344,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         auto legalities = card.value("legalities").toMap();
-        for (auto [fmtName, value] : legalities.asKeyValueRange()) {
-            properties.insert(QString("format-%1").arg(fmtName), value.toString().toLower());
+        for (auto i = legalities.cbegin(), end = legalities.cend(); i != end; ++i) {
+            properties.insert(QString("format-%1").arg(i.key()), i.value().toString().toLower());
         }
 
         // split cards are considered a single card, enqueue for later merging
@@ -423,9 +429,10 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 printingInfo = tmp.getPrintingInfo();
             } else {
                 const QVariantHash &tmpProps = tmp.getProperties();
-                for (auto [prop, value] : tmpProps.asKeyValueRange()) {
+                for (auto i = tmpProps.cbegin(), end = tmpProps.cend(); i != end; ++i) {
+                    QString prop = i.key();
                     QString originalPropertyValue = properties.value(prop).toString();
-                    QString thisCardPropertyValue = value.toString();
+                    QString thisCardPropertyValue = i.value().toString();
                     if (!thisCardPropertyValue.isEmpty() && originalPropertyValue != thisCardPropertyValue) {
                         if (originalPropertyValue.isEmpty()) { // don't create //es if one field is empty
                             properties.insert(prop, thisCardPropertyValue);
