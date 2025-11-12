@@ -463,7 +463,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
 int OracleImporter::startImport()
 {
-    int setCards = 0, setIndex = 0;
+    int setIndex = 0;
     // add an empty set for tokens
     CardSetPtr tokenSet = CardSet::newInstance(SettingsCache::instance().cardDatabase(), CardSet::TOKENS_SETNAME,
                                                tr("Dummy set containing tokens"), "Tokens");
@@ -483,7 +483,7 @@ int OracleImporter::startImport()
         emit setIndexChanged(numCardsInSet, setIndex, curSetToParse.getLongName());
     }
 
-    emit setIndexChanged(setCards, setIndex, QString());
+    emit setIndexChanged(0, setIndex, QString());
 
     // total number of sets
     return setIndex;
