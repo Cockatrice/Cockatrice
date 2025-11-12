@@ -13,6 +13,8 @@
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderWorkerWorkLog, "card_picture_loader.worker");
 
+class CardPictureLoaderWorker;
+
 /**
  * @class CardPictureLoaderWorkerWork
  * @ingroup PictureLoader
