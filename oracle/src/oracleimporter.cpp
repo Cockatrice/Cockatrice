@@ -237,26 +237,22 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
 
-    int numCards = 0;
-    QMap<QString, QPair<QList<SplitCardPart>, QString>> splitCards;
-    QString ptSeparator("/");
-    QVariantMap card;
-    QString layout, name, text, colors, colorIdentity, faceName;
+    static const QString ptSeparator = "/";
     static constexpr bool isToken = false;
     static const QList<QString> setsWithCardsWithSameNameButDifferentText = {"UST"};
-    QVariantHash properties;
-    PrintingInfo printingInfo;
-    QList<CardRelation *> relatedCards;
+
+    int numCards = 0;
+    QMap<QString, QPair<QList<SplitCardPart>, QString>> splitCards;
     QList<QString> allNameProps;
 
     for (const QVariant &cardVar : cardsList) {
-        card = cardVar.toMap();
+        QVariantMap card = cardVar.toMap();
 
         /* Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
          * saga, scheme, split, token, transform, vanguard
          */
-        layout = getStringPropertyFromMap(card, "layout");
+        QString layout = getStringPropertyFromMap(card, "layout");
 
         // don't import tokens from the json file
         if (layout == "token") {
@@ -264,15 +260,15 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // normal cards handling
-        name = getStringPropertyFromMap(card, "name");
-        text = getStringPropertyFromMap(card, "text");
-        faceName = getStringPropertyFromMap(card, "faceName");
+        QString name = getStringPropertyFromMap(card, "name");
+        QString text = getStringPropertyFromMap(card, "text");
+        QString faceName = getStringPropertyFromMap(card, "faceName");
         if (faceName.isEmpty()) {
             faceName = name;
         }
 
         // card properties
-        properties.clear();
+        QVariantHash properties;
         QMapIterator it(cardProperties);
         while (it.hasNext()) {
             it.next();
@@ -284,7 +280,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // per-set properties
-        printingInfo = PrintingInfo(currentSet);
+        PrintingInfo printingInfo = PrintingInfo(currentSet);
         QMapIterator it2(setInfoProperties);
         while (it2.hasNext()) {
             it2.next();
@@ -320,13 +316,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         allNameProps.append(faceName);
 
         // special handling properties
-        colors = card.value("colors").toStringList().join("");
+        QString colors = card.value("colors").toStringList().join("");
         if (!colors.isEmpty()) {
             properties.insert("colors", colors);
         }
 
         // special handling properties
-        colorIdentity = card.value("colorIdentity").toStringList().join("");
+        QString colorIdentity = card.value("colorIdentity").toStringList().join("");
         if (!colorIdentity.isEmpty()) {
             properties.insert("coloridentity", colorIdentity);
         }
@@ -367,7 +363,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             }
         } else {
             // relations
-            relatedCards.clear();
+            QList<CardRelation *> relatedCards;
 
             // add other face for split cards as card relation
             if (!getStringPropertyFromMap(card, "side").isEmpty()) {
@@ -415,17 +411,17 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     // split cards handling
     static const QString splitCardPropSeparator = QString(" // ");
     static const QString splitCardTextSeparator = QString("\n\n---\n\n");
+    static const QList<CardRelation *> noRelatedCards = {};
     for (const QString &nameSplit : splitCards.keys()) {
         // get all parts for this specific card
         QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit).first;
-        name = splitCards.value(nameSplit).second;
+        QString name = splitCards.value(nameSplit).second;
 
-        text.clear();
-        properties.clear();
-        relatedCards.clear();
+        QString text;
+        QVariantHash properties;
+        PrintingInfo printingInfo;
 
         for (const SplitCardPart &tmp : splitCardParts) {
-            QString splitName = tmp.getName();
             if (!text.isEmpty()) {
                 text.append(splitCardTextSeparator);
             }
@@ -454,7 +450,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 }
             }
         }
-        CardInfoPtr newCard = addCard(name, text, isToken, properties, relatedCards, printingInfo);
+        CardInfoPtr newCard = addCard(name, text, isToken, properties, noRelatedCards, printingInfo);
         numCards++;
     }
 
