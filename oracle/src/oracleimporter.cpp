@@ -273,11 +273,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // card properties
         QVariantHash properties;
-        QMapIterator it(cardProperties);
-        while (it.hasNext()) {
-            it.next();
-            QString mtgjsonProperty = it.key();
-            QString xmlPropertyName = it.value();
+        for (auto [mtgjsonProperty, xmlPropertyName] : cardProperties.asKeyValueRange()) {
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
                 properties.insert(xmlPropertyName, propertyValue);
@@ -285,22 +281,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // per-set properties
         PrintingInfo printingInfo = PrintingInfo(currentSet);
-        QMapIterator it2(setInfoProperties);
-        while (it2.hasNext()) {
-            it2.next();
-            QString mtgjsonProperty = it2.key();
-            QString xmlPropertyName = it2.value();
+        for (auto [mtgjsonProperty, xmlPropertyName] : setInfoProperties.asKeyValueRange()) {
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty())
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
         // Identifiers
-        QMapIterator it3(identifierProperties);
-        while (it3.hasNext()) {
-            it3.next();
-            auto mtgjsonProperty = it3.key();
-            auto xmlPropertyName = it3.value();
+        for (auto [mtgjsonProperty, xmlPropertyName] : identifierProperties.asKeyValueRange()) {
             auto propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
@@ -349,8 +337,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         auto legalities = card.value("legalities").toMap();
-        for (const QString &fmtName : legalities.keys()) {
-            properties.insert(QString("format-%1").arg(fmtName), legalities.value(fmtName).toString().toLower());
+        for (auto [fmtName, value] : legalities.asKeyValueRange()) {
+            properties.insert(QString("format-%1").arg(fmtName), value.toString().toLower());
         }
 
         // split cards are considered a single card, enqueue for later merging
@@ -416,11 +404,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     static const QString splitCardPropSeparator = QString(" // ");
     static const QString splitCardTextSeparator = QString("\n\n---\n\n");
     static const QList<CardRelation *> noRelatedCards = {};
-    for (const QString &nameSplit : splitCards.keys()) {
-        // get all parts for this specific card
-        QList<SplitCardPart> splitCardParts = splitCards.value(nameSplit).first;
-        QString name = splitCards.value(nameSplit).second;
 
+    QList<QPair<QList<SplitCardPart>, QString>> partsAndNames = splitCards.values();
+    for (auto [splitCardParts, name] : partsAndNames) {
         QString text;
         QVariantHash properties;
         PrintingInfo printingInfo;
@@ -436,9 +422,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 printingInfo = tmp.getPrintingInfo();
             } else {
                 const QVariantHash &tmpProps = tmp.getProperties();
-                for (const QString &prop : tmpProps.keys()) {
+                for (auto [prop, value] : tmpProps.asKeyValueRange()) {
                     QString originalPropertyValue = properties.value(prop).toString();
-                    QString thisCardPropertyValue = tmpProps.value(prop).toString();
+                    QString thisCardPropertyValue = value.toString();
                     if (!thisCardPropertyValue.isEmpty() && originalPropertyValue != thisCardPropertyValue) {
                         if (originalPropertyValue.isEmpty()) { // don't create //es if one field is empty
                             properties.insert(prop, thisCardPropertyValue);
