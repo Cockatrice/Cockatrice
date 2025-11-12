@@ -28,7 +28,7 @@ inline Q_LOGGING_CATEGORY(CardPictureLoaderCardBackCacheFailLog, "card_picture_l
  * Provides static accessors for:
  * - Card images by ExactCard.
  * - Card back images (normal, in-progress, failed).
- * - Cache management (clearPixmapCache, clearNetworkCache, cacheCardPixmaps).
+ * - Cache management (clearPixmapCache(), clearNetworkCache(), cacheCardPixmaps(const QList<ExactCard> &cards)).
  *
  * Uses a worker thread for asynchronous image loading and a status bar widget
  * to track load progress.
