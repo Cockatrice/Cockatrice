@@ -23,8 +23,8 @@ Available pre-compiled binaries for installation:
    • <kbd>Debian 13</kbd> <sub><i>Trixie</i></sub>
    • <kbd>Debian 12</kbd> <sub><i>Bookworm</i></sub>
    • <kbd>Debian 11</kbd> <sub><i>Bullseye</i></sub>
+   • <kbd>Fedora 43</kbd>
    • <kbd>Fedora 42</kbd>
-   • <kbd>Fedora 41</kbd>
 
 <sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
 <sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>

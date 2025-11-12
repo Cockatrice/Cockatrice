@@ -131,12 +131,12 @@ jobs:
             package: DEB
 
           - distro: Fedora
-            version: 41
+            version: 42
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
-            version: 42
+            version: 43
             package: RPM
 
           - distro: Ubuntu
