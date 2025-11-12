@@ -40,14 +40,14 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
 {
-    QList<SetToDownload> newSetList;
-
     bool ok;
     auto setsMap = QtJson::Json::parse(QString(data), ok).toMap().value("data").toMap();
     if (!ok) {
         qDebug() << "error: QtJson::Json::parse()";
         return false;
     }
+
+    QList<SetToDownload> newSetList;
 
     QListIterator it(setsMap.values());
 
