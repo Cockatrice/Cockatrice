@@ -169,9 +169,9 @@ signals:
     void showWindowIfHidden();
 
 public slots:
-    void openDeckInNewTab(const DeckLoader *deckToOpen);
-    TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
-    TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
+    void openDeckInNewTab(DeckLoader *deckToOpen);
+    TabDeckEditor *addDeckEditorTab(DeckLoader *deckToOpen);
+    TabDeckEditorVisual *addVisualDeckEditorTab(DeckLoader *deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRecMain *addEdhrecMainTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);

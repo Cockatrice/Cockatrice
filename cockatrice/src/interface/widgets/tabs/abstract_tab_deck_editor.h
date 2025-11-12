@@ -116,8 +116,11 @@ public:
      */
     void openDeck(DeckLoader *deck);
 
-    /** @brief Returns the currently active deck. */
+    /** @brief Returns the currently active deck loader. */
     DeckLoader *getDeckLoader() const;
+
+    /** @brief Returns the currently active deck list. */
+    DeckList *getDeckList() const;
 
     /** @brief Sets the modified state of the tab.
      *  @param _windowModified Whether the tab is modified.
@@ -178,7 +181,7 @@ public slots:
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
-    void openDeckEditor(const DeckLoader *deckLoader);
+    void openDeckEditor(DeckLoader *deckLoader);
 
     /** @brief Emitted before the tab is closed. */
     void deckEditorClosing(AbstractTabDeckEditor *tab);

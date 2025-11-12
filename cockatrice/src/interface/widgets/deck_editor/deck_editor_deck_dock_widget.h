@@ -52,6 +52,7 @@ public slots:
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
     DeckLoader *getDeckLoader();
+    DeckList *getDeckList();
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
     void actDecrementCard(const ExactCard &card, QString zoneName);

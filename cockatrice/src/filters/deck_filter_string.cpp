@@ -117,7 +117,7 @@ static void setupParserRules()
 
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
-            deck->deckLoader->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
+            deck->deckLoader->getDeckList()->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
                 auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
@@ -136,7 +136,7 @@ static void setupParserRules()
     search["DeckNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
-            return deck->deckLoader->getName().contains(name, Qt::CaseInsensitive);
+            return deck->deckLoader->getDeckList()->getName().contains(name, Qt::CaseInsensitive);
         };
     };
 
