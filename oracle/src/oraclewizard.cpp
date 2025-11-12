@@ -641,7 +641,9 @@ void SaveSetsPage::initializePage()
         messageLog->show();
         connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
 
-        if (!wizard()->importer->startImport()) {
+        int setsImported = wizard()->importer->startImport();
+
+        if (setsImported == 0) {
             QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
         }
     }
