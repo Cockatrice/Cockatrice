@@ -340,6 +340,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         }
     }
 
+    players = getPlayers(); // players could have been kicked, get new list of players
     for (Server_AbstractPlayer *player : players.values()) {
         player->setupZones();
     }
