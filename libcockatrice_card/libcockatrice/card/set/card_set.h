@@ -51,15 +51,15 @@ public:
     static const char *TOKENS_SETNAME; ///< Reserved identifier for token-like sets.
 
 private:
-    QSharedPointer<ICardSetPriorityController> priorityController; ///< Interface to the card set priority controller.
-    QString shortName;                                             ///< Short identifier for the set.
-    QString longName;                                              ///< Full name for the set.
-    unsigned int sortKey;                                          ///< Custom numeric sort key.
-    QDate releaseDate;                                             ///< Release date, may be empty if unknown.
-    QString setType;                                               ///< Type/category label for the set.
-    Priority priority;                                             ///< Priority level for sorting and relevance.
-    bool enabled;                                                  ///< Whether the set is active/enabled.
-    bool isknown;                                                  ///< Whether the set is considered known.
+    ICardSetPriorityController *priorityController; ///< Interface to the card set priority controller.
+    QString shortName;                              ///< Short identifier for the set.
+    QString longName;                               ///< Full name for the set.
+    unsigned int sortKey;                           ///< Custom numeric sort key.
+    QDate releaseDate;                              ///< Release date, may be empty if unknown.
+    QString setType;                                ///< Type/category label for the set.
+    Priority priority;                              ///< Priority level for sorting and relevance.
+    bool enabled;                                   ///< Whether the set is active/enabled.
+    bool isknown;                                   ///< Whether the set is considered known.
 
 public:
     /**
