@@ -305,9 +305,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
         auto *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
         connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
-                auto jsonData = versionReply->readAll();
+                auto data = versionReply->readAll();
                 QJsonParseError jsonError{};
-                auto jsonResponse = QJsonDocument::fromJson(jsonData, &jsonError);
+                auto jsonResponse = QJsonDocument::fromJson(data, &jsonError);
 
                 if (jsonError.error == QJsonParseError::NoError) {
                     const auto jsonMap = jsonResponse.toVariant().toMap();
