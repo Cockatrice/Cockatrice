@@ -1,0 +1,1 @@
+@page loading_card_pictures Loading Card Pictures
