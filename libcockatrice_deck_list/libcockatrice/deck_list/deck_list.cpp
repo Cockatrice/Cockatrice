@@ -76,6 +76,8 @@ void SideboardPlan::write(QXmlStreamWriter *xml)
 }
 
 DeckList::DeckList()
+    : QObject(), name(QString()), comments(QString()), bannerCard({}), lastLoadedTimestamp(QString()),
+      tags(QStringList()), cachedDeckHash(QString())
 {
     root = new InnerDecklistNode;
 }
@@ -95,6 +97,8 @@ DeckList::DeckList(const DeckList &other)
 }
 
 DeckList::DeckList(const QString &nativeString)
+    : QObject(), name(QString()), comments(QString()), bannerCard({}), lastLoadedTimestamp(QString()),
+      tags(QStringList()), cachedDeckHash(QString())
 {
     root = new InnerDecklistNode;
     loadFromString_Native(nativeString);
