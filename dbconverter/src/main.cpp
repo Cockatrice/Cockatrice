@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    settingsCache = new SettingsCache;
     CardDatabaseConverter *db = new CardDatabaseConverter;
 
     qInfo() << "---------------------------------------------";

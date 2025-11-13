@@ -139,7 +139,14 @@ void PlayerMenu::retranslateUi()
 void PlayerMenu::refreshShortcuts()
 {
     if (shortcutsActive) {
-        setShortcutsActive();
+        // Judges get access to every player's menus but only want shortcuts to be set for their own.
+        if (player->getPlayerInfo()->getLocalOrJudge() && !player->getPlayerInfo()->getLocal()) {
+            setShortcutsInactive();
+        } else {
+            setShortcutsActive();
+        }
+    } else {
+        setShortcutsInactive();
     }
 }
 

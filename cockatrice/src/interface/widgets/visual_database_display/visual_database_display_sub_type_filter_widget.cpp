@@ -1,6 +1,5 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
-#include "../../../filters/filter_tree.h"
 #include "../../../filters/filter_tree_model.h"
 
 #include <QLineEdit>
@@ -8,6 +7,7 @@
 #include <QSpinBox>
 #include <QTimer>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/filters/filter_tree.h>
 
 VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidget(QWidget *parent,
                                                                                    FilterTreeModel *_filterModel)

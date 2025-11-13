@@ -91,7 +91,7 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard()
     if (!dlg.exec())
         return;
 
-    QStringList cardsInClipboard = dlg.getDeckList()->getCardList();
+    QStringList cardsInClipboard = dlg.getDeckList()->getDeckList()->getCardList();
     for (QString cardName : cardsInClipboard) {
         createNameFilter(cardName);
     }

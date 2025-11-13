@@ -1,11 +1,12 @@
 #include "edhrec_deck_api_response.h"
 
+#include "../../../../../../deck_loader/deck_loader.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMainWindow>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
 {
@@ -14,10 +15,10 @@ void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
         deckList += cardlistValue.toString() + "\n";
     }
 
-    deckLoader = new DeckLoader();
+    deckLoader = new DeckLoader(nullptr);
 
     QTextStream stream(&deckList);
-    deckLoader->loadFromStream_Plain(stream, true);
+    deckLoader->getDeckList()->loadFromStream_Plain(stream, true);
 }
 
 void EdhrecDeckApiResponse::debugPrint() const

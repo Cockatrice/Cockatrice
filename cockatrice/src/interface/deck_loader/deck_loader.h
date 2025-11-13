@@ -8,16 +8,25 @@
 #define DECK_LOADER_H
 
 #include <QLoggingCategory>
+#include <QPrinter>
+#include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
 
-    class DeckLoader : public DeckList
+    class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
     void deckLoaded();
     void loadFinished(bool success);
+
+public slots:
+    /**
+     * @brief Prints the decklist to the provided QPrinter.
+     * @param printer The printer to render the decklist to.
+     */
+    void printDeckList(QPrinter *printer);
 
 public:
     enum FileFormat
@@ -43,14 +52,15 @@ public:
     };
 
 private:
+    DeckList *deckList;
     QString lastFileName;
     FileFormat lastFileFormat;
     int lastRemoteDeckId;
 
 public:
-    DeckLoader();
-    explicit DeckLoader(const QString &nativeString);
-    explicit DeckLoader(const DeckList &other);
+    DeckLoader(QObject *parent);
+    DeckLoader(QObject *parent, DeckList *_deckList);
+    void setDeckList(DeckList *_deckList);
     DeckLoader(const DeckLoader &other);
     const QString &getLastFileName() const
     {
@@ -93,6 +103,14 @@ public:
     bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
     bool convertToCockatriceFormat(QString fileName);
 
+    DeckList *getDeckList()
+    {
+        return deckList;
+    }
+
+private:
+    void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
+
 protected:
     void saveToStream_DeckHeader(QTextStream &out) const;
     void saveToStream_DeckZone(QTextStream &out,
@@ -104,8 +122,8 @@ protected:
                                     QList<DecklistCardNode *> cards,
                                     bool addComments = true,
                                     bool addSetNameAndNumber = true) const;
-    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName) override;
-    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const override;
+    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName);
+    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const;
 };
 
 #endif

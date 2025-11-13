@@ -1,5 +1,6 @@
 #include "games_model.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/tabs/tab_account.h"
 #include "user/user_list_manager.h"
@@ -12,7 +13,6 @@
 #include <QTime>
 #include <QTimeZone>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 enum GameListColumn
 {

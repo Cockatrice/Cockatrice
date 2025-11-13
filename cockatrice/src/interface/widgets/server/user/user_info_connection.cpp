@@ -1,7 +1,8 @@
 #include "user_info_connection.h"
 
+#include "../../../../client/settings/cache_settings.h"
+
 #include <QDebug>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
 UserConnection_Information::UserConnection_Information() = default;

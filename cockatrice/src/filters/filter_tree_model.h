@@ -7,9 +7,8 @@
 #ifndef FILTERTREEMODEL_H
 #define FILTERTREEMODEL_H
 
-#include "filter_card.h"
-
 #include <QAbstractItemModel>
+#include <libcockatrice/filters/filter_card.h>
 
 class FilterTree;
 class CardFilter;

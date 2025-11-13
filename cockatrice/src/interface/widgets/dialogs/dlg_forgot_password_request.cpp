@@ -1,5 +1,7 @@
 #include "dlg_forgot_password_request.h"
 
+#include "../../../client/settings/cache_settings.h"
+
 #include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
@@ -7,7 +9,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(parent)

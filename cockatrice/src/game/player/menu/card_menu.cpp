@@ -1,5 +1,6 @@
 #include "card_menu.h"
 
+#include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
@@ -11,7 +12,6 @@
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <libcockatrice/settings/card_counter_settings.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
@@ -65,6 +65,8 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     connect(aHide, &QAction::triggered, playerActions, &PlayerActions::actHide);
     aPlayFacedown = new QAction(this);
     connect(aPlayFacedown, &QAction::triggered, playerActions, &PlayerActions::actPlayFacedown);
+
+    aRevealToAll = new QAction(this);
 
     mCardCounters = new QMenu;
 
@@ -274,7 +276,7 @@ void CardMenu::createHandOrCustomZoneMenu()
 
     QMenu *revealMenu = addMenu(tr("Re&veal to..."));
 
-    initContextualPlayersMenu(revealMenu);
+    initContextualPlayersMenu(revealMenu, aRevealToAll);
 
     connect(revealMenu, &QMenu::triggered, player->getPlayerActions(), &PlayerActions::actReveal);
 
@@ -301,9 +303,19 @@ void CardMenu::createHandOrCustomZoneMenu()
     }
 }
 
-void CardMenu::initContextualPlayersMenu(QMenu *menu)
+/**
+ * @brief Populates the menu with an action for each active player.
+ *
+ * The "all players" action is created separately, so it has to be passed into this function.
+ * It will be put at the top of the menu.
+ *
+ * @param menu The menu to add the player actions to.
+ * @param allPlayersAction The action for "all players".
+ */
+void CardMenu::initContextualPlayersMenu(QMenu *menu, QAction *allPlayersAction)
 {
-    menu->addAction(tr("&All players"))->setData(-1);
+    allPlayersAction->setData(-1);
+    menu->addAction(allPlayersAction);
     menu->addSeparator();
 
     for (const auto &playerInfo : playersInfo) {
@@ -431,6 +443,7 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Toggle &normal untapping"));
@@ -466,6 +479,9 @@ void CardMenu::setShortcutsActive()
 
     aHide->setShortcuts(shortcuts.getShortcut("Player/aHide"));
     aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
+    aPlayFacedown->setShortcuts(shortcuts.getShortcut("Player/aPlayFacedown"));
+    aRevealToAll->setShortcuts(shortcuts.getShortcut("Player/aRevealToAll"));
+
     aTap->setShortcuts(shortcuts.getShortcut("Player/aTap"));
     aDoesntUntap->setShortcuts(shortcuts.getShortcut("Player/aDoesntUntap"));
     aFlip->setShortcuts(shortcuts.getShortcut("Player/aFlip"));
@@ -479,9 +495,6 @@ void CardMenu::setShortcutsActive()
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
     aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
-
-    aPlayFacedown->setShortcuts(shortcuts.getShortcut("Player/aPlayFacedown"));
-    aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
 
     static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
     for (int i = 0; i < aAddCounter.size(); i++) {

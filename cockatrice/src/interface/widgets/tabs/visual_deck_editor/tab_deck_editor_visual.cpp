@@ -1,5 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../client/network/interfaces/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
@@ -31,27 +32,33 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
+/**
+ * @brief Constructs the TabDeckEditorVisual instance.
+ *
+ * Sets up the central widget, tab container, menus, shortcuts,
+ * and restores the saved layout.
+ * @param _tabSupervisor Parent tab supervisor managing this tab.
+ */
 TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : AbstractTabDeckEditor(_tabSupervisor)
 {
     setObjectName("TabDeckEditorVisual");
 
     createCentralFrame();
-
-    TabDeckEditorVisual::createMenus();
+    createMenus();
 
     installEventFilter(this);
 
-    TabDeckEditorVisual::retranslateUi();
+    retranslateUi();
     connect(&SettingsCache::instance().shortcuts(), SIGNAL(shortCutChanged()), this, SLOT(refreshShortcuts()));
-    TabDeckEditorVisual::refreshShortcuts();
+    refreshShortcuts();
 
-    TabDeckEditorVisual::loadLayout();
+    loadLayout();
     databaseDisplayDockWidget->setHidden(true);
 }
 
+/** @brief Creates the central frame containing the tab container. */
 void TabDeckEditorVisual::createCentralFrame()
 {
     centralWidget = new QWidget(this);
@@ -63,21 +70,22 @@ void TabDeckEditorVisual::createCentralFrame()
     tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckDockWidget->deckModel,
                                                     databaseDisplayDockWidget->databaseModel,
                                                     databaseDisplayDockWidget->databaseDisplayModel);
+
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChangedDatabaseDisplay, this,
             &AbstractTabDeckEditor::updateCard);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClicked, this,
             &TabDeckEditorVisual::processMainboardCardClick);
-
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisual::processCardClickDatabaseDisplay);
-    centralFrame->addWidget(tabContainer);
 
+    centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
+/** @brief Updates the visual deck, analytics, and sample hand after a deck change. */
 void TabDeckEditorVisual::onDeckChanged()
 {
     AbstractTabDeckEditor::onDeckModified();
@@ -86,6 +94,7 @@ void TabDeckEditorVisual::onDeckChanged()
     tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 
+/** @brief Creates menus for deck editing and view options, including dock actions. */
 void TabDeckEditorVisual::createMenus()
 {
     deckMenu = new DeckEditorMenu(this);
@@ -140,10 +149,10 @@ void TabDeckEditorVisual::createMenus()
     viewMenu->addAction(aResetLayout);
 
     deckMenu->setSaveStatus(false);
-
     addTabMenu(viewMenu);
 }
 
+/** @brief Returns the tab text, prepending a mark if the deck has unsaved changes. */
 QString TabDeckEditorVisual::getTabText() const
 {
     QString result = tr("Visual Deck: %1").arg(deckDockWidget->getSimpleDeckName());
@@ -152,12 +161,14 @@ QString TabDeckEditorVisual::getTabText() const
     return result;
 }
 
+/** @brief Updates card info and highlights the corresponding card in the deck view. */
 void TabDeckEditorVisual::changeModelIndexAndCardInfo(const ExactCard &activeCard)
 {
     updateCard(activeCard);
     changeModelIndexToCard(activeCard);
 }
 
+/** @brief Selects the given card in the deck view, checking main and side zones. */
 void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
 {
     QString cardName = activeCard.getName();
@@ -168,6 +179,7 @@ void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
     deckDockWidget->deckView->setCurrentIndex(index);
 }
 
+/** @brief Handles clicks on cards in the mainboard deck. */
 void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
                                                     CardInfoPictureWithTextOverlayWidget *instance,
                                                     QString zoneName)
@@ -181,6 +193,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
     }
 }
 
+/** @brief Handles clicks on cards in the database display. */
 void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
                                                           CardInfoPictureWithTextOverlayWidget *instance)
 {
@@ -193,15 +206,16 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
     }
 }
 
+/** @brief Performs "Save Deck As..." while temporarily disabling the search bar. */
 bool TabDeckEditorVisual::actSaveDeckAs()
 {
-    // We have to disable the quick-add search bar or else it'll steal focus after dialog creation.
     tabContainer->visualDeckView->searchBar->setEnabled(false);
     auto result = AbstractTabDeckEditor::actSaveDeckAs();
     tabContainer->visualDeckView->searchBar->setEnabled(true);
     return result;
 }
 
+/** @brief Shows the printing selector dock and updates it with the current card. */
 void TabDeckEditorVisual::showPrintingSelector()
 {
     printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr(),
@@ -211,6 +225,7 @@ void TabDeckEditorVisual::showPrintingSelector()
     printingSelectorDockWidget->setVisible(true);
 }
 
+/** @brief Set size restrictions for free floating dock widgets. */
 void TabDeckEditorVisual::freeDocksSize()
 {
     deckDockWidget->setMinimumSize(100, 100);
@@ -226,12 +241,14 @@ void TabDeckEditorVisual::freeDocksSize()
     printingSelectorDockWidget->setMaximumSize(5000, 5000);
 }
 
+/** @brief Refreshes keyboard shortcuts for this tab from settings. */
 void TabDeckEditorVisual::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditorVisual/aResetLayout"));
 }
 
+/** @brief Loads the saved layout or resets to default if no layout exists. */
 void TabDeckEditorVisual::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
@@ -280,6 +297,7 @@ void TabDeckEditorVisual::loadLayout()
     QTimer::singleShot(100, this, &TabDeckEditorVisual::freeDocksSize);
 }
 
+/** @brief Resets the layout to default positions and dock states. */
 void TabDeckEditorVisual::restartLayout()
 {
     aCardInfoDockVisible->setChecked(true);
@@ -315,6 +333,7 @@ void TabDeckEditorVisual::restartLayout()
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
 
+/** @brief Retranslates UI elements for localization. */
 void TabDeckEditorVisual::retranslateUi()
 {
     deckMenu->setTitle(tr("&Visual Deck Editor"));
@@ -344,7 +363,11 @@ void TabDeckEditorVisual::retranslateUi()
     aResetLayout->setText(tr("Reset layout"));
 }
 
-// Method uses to sync docks state with menu items state
+/**
+ * @brief Handles dock visibility, floating, and layout saving events.
+ *
+ * Keeps dock state in sync with menu items and saves layout when hidden.
+ */
 bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
 {
     if (e->type() == QEvent::Close) {
@@ -362,6 +385,7 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
             aPrintingSelectorDockFloating->setEnabled(false);
         }
     }
+
     if (o == this && e->type() == QEvent::Hide) {
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
@@ -374,6 +398,7 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+/** @brief Toggles dock visibility based on the corresponding menu action. */
 void TabDeckEditorVisual::dockVisibleTriggered()
 {
     QObject *o = sender();
@@ -402,6 +427,7 @@ void TabDeckEditorVisual::dockVisibleTriggered()
     }
 }
 
+/** @brief Toggles dock floating state based on the corresponding menu action. */
 void TabDeckEditorVisual::dockFloatingTriggered()
 {
     QObject *o = sender();
@@ -426,6 +452,7 @@ void TabDeckEditorVisual::dockFloatingTriggered()
     }
 }
 
+/** @brief Updates menu checkboxes when a dock's top-level/floating state changes. */
 void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
 {
     QObject *o = sender();

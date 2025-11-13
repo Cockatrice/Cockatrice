@@ -1,11 +1,11 @@
 #include "visual_deck_storage_quick_settings_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "visual_deck_storage_widget.h"
 
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
-#include <libcockatrice/settings/cache_settings.h>
 
 VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
     : SettingsButtonWidget(parent)

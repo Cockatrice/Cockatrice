@@ -1,6 +1,6 @@
 #include "visual_deck_storage_sort_widget.h"
 
-#include <libcockatrice/settings/cache_settings.h>
+#include "../../../client/settings/cache_settings.h"
 
 /**
  * @brief Constructs a PrintingSelectorCardSortWidget for searching cards by set name or set code.
@@ -93,14 +93,14 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
 
         switch (sortOrder) {
             case ByName:
-                return widget1->deckLoader->getName() < widget2->deckLoader->getName();
+                return widget1->deckLoader->getDeckList()->getName() < widget2->deckLoader->getDeckList()->getName();
             case Alphabetical:
                 return QString::localeAwareCompare(info1.fileName(), info2.fileName()) <= 0;
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
             case ByLastLoaded: {
-                QDateTime time1 = QDateTime::fromString(widget1->deckLoader->getLastLoadedTimestamp());
-                QDateTime time2 = QDateTime::fromString(widget2->deckLoader->getLastLoadedTimestamp());
+                QDateTime time1 = QDateTime::fromString(widget1->deckLoader->getDeckList()->getLastLoadedTimestamp());
+                QDateTime time2 = QDateTime::fromString(widget2->deckLoader->getDeckList()->getLastLoadedTimestamp());
                 return time1 > time2;
             }
         }

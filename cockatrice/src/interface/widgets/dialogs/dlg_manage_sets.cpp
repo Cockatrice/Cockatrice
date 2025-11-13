@@ -1,5 +1,6 @@
 #include "dlg_manage_sets.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../main.h"
@@ -21,7 +22,6 @@
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define SORT_RESET -1
 

@@ -7,12 +7,12 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "../../filters/filter_string.h"
 #include "logic/view_zone_logic.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>
 #include <QLoggingCategory>
+#include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 
 inline Q_LOGGING_CATEGORY(ViewZoneLog, "view_zone");

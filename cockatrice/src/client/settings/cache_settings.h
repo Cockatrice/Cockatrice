@@ -7,15 +7,6 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "card_database_settings.h"
-#include "card_override_settings.h"
-#include "debug_settings.h"
-#include "download_settings.h"
-#include "game_filters_settings.h"
-#include "layouts_settings.h"
-#include "message_settings.h"
-#include "recents_settings.h"
-#include "servers_settings.h"
 #include "shortcuts_settings.h"
 
 #include <QDate>
@@ -23,6 +14,17 @@
 #include <QObject>
 #include <QSize>
 #include <QStringList>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
+#include <libcockatrice/interfaces/interface_network_settings_provider.h>
+#include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/game_filters_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/recents_settings.h>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
@@ -132,14 +134,13 @@ inline QStringList defaultTags = {
 class QSettings;
 class CardCounterSettings;
 
-class SettingsCache : public QObject
+class SettingsCache : public ICardDatabasePathProvider, public INetworkSettingsProvider
 {
     Q_OBJECT
 
 signals:
     void langChanged();
     void picsPathChanged();
-    void cardDatabasePathChanged();
     void themeChanged();
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
@@ -374,19 +375,19 @@ public:
     {
         return customPicsPath;
     }
-    QString getCustomCardDatabasePath() const
+    QString getCustomCardDatabasePath() const override
     {
         return customCardDatabasePath;
     }
-    QString getCardDatabasePath() const
+    QString getCardDatabasePath() const override
     {
         return cardDatabasePath;
     }
-    QString getSpoilerCardDatabasePath() const
+    QString getSpoilerCardDatabasePath() const override
     {
         return spoilerDatabasePath;
     }
-    QString getTokenDatabasePath() const
+    QString getTokenDatabasePath() const override
     {
         return tokenDatabasePath;
     }
@@ -483,7 +484,7 @@ public:
         return getLastCardUpdateCheck().daysTo(QDateTime::currentDateTime().date()) >= getCardUpdateCheckInterval() &&
                getLastCardUpdateCheck() != QDateTime::currentDateTime().date();
     }
-    bool getNotifyAboutUpdates() const
+    bool getNotifyAboutUpdates() const override
     {
         return notifyAboutUpdates;
     }
@@ -835,11 +836,11 @@ public:
     {
         return rememberGameSettings;
     }
-    int getKeepAlive() const
+    int getKeepAlive() const override
     {
         return keepalive;
     }
-    int getTimeOut() const
+    int getTimeOut() const override
     {
         return timeout;
     }
@@ -849,13 +850,13 @@ public:
     }
     void setClientID(const QString &clientID);
     void setClientVersion(const QString &clientVersion);
-    void setKnownMissingFeatures(const QString &_knownMissingFeatures);
+    void setKnownMissingFeatures(const QString &_knownMissingFeatures) override;
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
-    QString getClientID()
+    QString getClientID() override
     {
         return clientID;
     }
@@ -863,7 +864,7 @@ public:
     {
         return clientVersion;
     }
-    QString getKnownMissingFeatures()
+    QString getKnownMissingFeatures() override
     {
         return knownMissingFeatures;
     }
@@ -891,9 +892,9 @@ public:
     {
         return *shortcutsSettings;
     }
-    CardDatabaseSettings &cardDatabase() const
+    CardDatabaseSettings *cardDatabase() const
     {
-        return *cardDatabaseSettings;
+        return cardDatabaseSettings;
     }
     ServersSettings &servers() const
     {

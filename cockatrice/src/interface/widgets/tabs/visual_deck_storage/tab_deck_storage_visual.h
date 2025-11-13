@@ -39,7 +39,7 @@ public slots:
     void actOpenLocalDeck(const QString &filePath);
 
 signals:
-    void openDeckEditor(const DeckLoader *deckLoader);
+    void openDeckEditor(DeckLoader *deckLoader);
 
 private:
     VisualDeckStorageWidget *visualDeckStorageWidget;

@@ -1,5 +1,6 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
+#include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../../interface/widgets/tabs/tab_deck_editor.h"
 #include "../../general/layout_containers/flow_widget.h"
@@ -12,7 +13,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <libcockatrice/settings/cache_settings.h>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
     : QWidget(_parent), deckList(nullptr)
@@ -167,10 +167,10 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
             QStringList knownTags;
             QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
-            DeckLoader loader;
+            DeckLoader loader(this);
             for (const QString &file : allFiles) {
                 loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
-                QStringList tags = loader.getTags();
+                QStringList tags = loader.getDeckList()->getTags();
                 knownTags.append(tags);
                 knownTags.removeDuplicates();
             }

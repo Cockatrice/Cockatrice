@@ -1,8 +1,10 @@
-#include "../../cockatrice/src/filters/filter_string.h"
 #include "mocks.h"
+#include "test_card_database_path_provider.h"
 
 #include "gtest/gtest.h"
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/interfaces/noop_card_preference_provider.h>
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 #define QUERY(name, card, query, match)                                                                                \
     TEST_F(CardQuery, name)                                                                                            \
@@ -18,10 +20,14 @@ class CardQuery : public ::testing::Test
 protected:
     void SetUp() override
     {
-        cat = CardDatabaseManager::query()->getCardBySimpleName("Cat");
-        notDeadAfterAll = CardDatabaseManager::query()->getCardBySimpleName("Not Dead");
-        truth = CardDatabaseManager::query()->getCardBySimpleName("Truth");
-        doctor = CardDatabaseManager::query()->getCardBySimpleName("Doctor");
+        CardDatabase *db = new CardDatabase(nullptr, new NoopCardPreferenceProvider(),
+                                            new TestCardDatabasePathProvider(), new NoopCardSetPriorityController());
+        db->loadCardDatabases();
+
+        cat = db->query()->getCardBySimpleName("Cat");
+        notDeadAfterAll = db->query()->getCardBySimpleName("Not Dead");
+        truth = db->query()->getCardBySimpleName("Truth");
+        doctor = db->query()->getCardBySimpleName("Doctor");
     }
     // void TearDown() override {}
 
@@ -69,9 +75,6 @@ QUERY(Color4, cat, "c!gw", false)
 
 int main(int argc, char **argv)
 {
-    settingsCache = new SettingsCache;
-    CardDatabaseManager::getInstance()->loadCardDatabases();
-
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

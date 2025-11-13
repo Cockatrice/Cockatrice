@@ -1,5 +1,6 @@
 #include "abstract_counter.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../player/player.h"
 #include "translate_counter_name.h"
@@ -14,7 +15,6 @@
 #include <QString>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/expression.h>
 
 AbstractCounter::AbstractCounter(Player *_player,

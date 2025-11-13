@@ -1,5 +1,7 @@
 #include "dlg_load_deck_from_clipboard.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
 #include "dlg_settings.h"
 
 #include <QApplication>
@@ -11,8 +13,6 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
-#include <libcockatrice/models/deck_list/deck_loader.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window
@@ -75,12 +75,12 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
     QString buffer = contentsEdit->toPlainText();
 
     if (buffer.contains("<cockatrice_deck version=\"1\">")) {
-        return deckLoader->loadFromString_Native(buffer);
+        return deckLoader->getDeckList()->loadFromString_Native(buffer);
     }
 
     QTextStream stream(&buffer);
 
-    if (deckLoader->loadFromStream_Plain(stream, true)) {
+    if (deckLoader->getDeckList()->loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
             deckLoader->resolveSetNameAndNumberToProviderID();
         } else {
@@ -121,8 +121,7 @@ void DlgLoadDeckFromClipboard::actRefresh()
 
 void DlgLoadDeckFromClipboard::actOK()
 {
-    deckList = new DeckLoader;
-    deckList->setParent(this);
+    deckList = new DeckLoader(this);
 
     if (loadIntoDeck(deckList)) {
         accept();

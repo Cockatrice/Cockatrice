@@ -9,26 +9,28 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
-#include <QMessageBox>
 #include <QRegularExpression>
 #include <algorithm>
-#include <libcockatrice/settings/cache_settings.h>
 #include <utility>
 
-CardDatabase::CardDatabase(QObject *parent) : QObject(parent), loadStatus(NotLoaded)
+CardDatabase::CardDatabase(QObject *parent,
+                           ICardPreferenceProvider *prefs,
+                           ICardDatabasePathProvider *pathProvider,
+                           ICardSetPriorityController *_setPriorityController)
+    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
     // create loader and wire it up
-    loader = new CardDatabaseLoader(this, this);
+    loader = new CardDatabaseLoader(this, this, pathProvider, prefs);
     // re-emit loader signals (so other code doesn't need to know about internals)
     connect(loader, &CardDatabaseLoader::loadingFinished, this, &CardDatabase::cardDatabaseLoadingFinished);
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
 
-    querier = new CardDatabaseQuerier(this, this);
+    querier = new CardDatabaseQuerier(this, this, prefs);
 }
 
 CardDatabase::~CardDatabase()
@@ -138,7 +140,7 @@ CardSetPtr CardDatabase::getSet(const QString &setName)
     if (sets.contains(setName)) {
         return sets.value(setName);
     } else {
-        CardSetPtr newSet = CardSet::newInstance(setName);
+        CardSetPtr newSet = CardSet::newInstance(setPriorityController, setName);
         sets.insert(setName, newSet);
         return newSet;
     }

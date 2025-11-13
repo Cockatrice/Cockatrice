@@ -1,5 +1,6 @@
 #include "deck_editor_database_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../filters/syntax_help.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
@@ -14,7 +15,6 @@
 #include <QTreeView>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {
@@ -143,7 +143,7 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
     }
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        emit cardChanged(getCardOrPinnedPrinting(cardName));
+        emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
     }
 }
 
@@ -176,21 +176,7 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
 
     const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
 
-    return getCardOrPinnedPrinting(cardName);
-}
-
-ExactCard DeckEditorDatabaseDisplayWidget::getCardOrPinnedPrinting(QString cardName) const
-{
-    const auto &cardProviderId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
-
-    ExactCard card = CardDatabaseManager::query()->getCard({cardName});
-
-    if (cardProviderId != "") {
-        return ExactCard(card.getCardPtr(),
-                         CardDatabaseManager::query()->getSpecificPrinting({cardName, cardProviderId}));
-    }
-
-    return card;
+    return CardDatabaseManager::query()->getPreferredCard(cardName);
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)

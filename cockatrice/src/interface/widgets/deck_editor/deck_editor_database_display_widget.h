@@ -31,7 +31,6 @@ public:
 
 public slots:
     ExactCard currentCard() const;
-    ExactCard getCardOrPinnedPrinting(QString cardName) const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();
 

@@ -15,6 +15,11 @@ set(cockatrice_SOURCES
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/sound_engine.cpp
+    src/client/settings/cache_settings.cpp
+    src/client/settings/card_counter_settings.cpp
+    src/client/settings/shortcut_treeview.cpp
+    src/client/settings/shortcuts_settings.cpp
+    src/interface/deck_loader/deck_loader.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
@@ -42,9 +47,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
-    src/filters/filter_card.cpp
-    src/filters/filter_string.cpp
-    src/filters/filter_tree.cpp
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
@@ -148,6 +150,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/banner_widget.cpp
     src/interface/widgets/general/display/bar_widget.cpp
@@ -360,10 +363,12 @@ if(Qt5_FOUND)
     cockatrice
     libcockatrice_card
     libcockatrice_deck_list
+    libcockatrice_filters
     libcockatrice_utility
     libcockatrice_network
     libcockatrice_models
     libcockatrice_rng
+    libcockatrice_settings
     ${COCKATRICE_QT_MODULES}
   )
 else()
@@ -371,10 +376,12 @@ else()
     cockatrice
     PUBLIC libcockatrice_card
            libcockatrice_deck_list
+           libcockatrice_filters
            libcockatrice_utility
            libcockatrice_network
            libcockatrice_models
            libcockatrice_rng
+           libcockatrice_settings
            ${COCKATRICE_QT_MODULES}
   )
 endif()

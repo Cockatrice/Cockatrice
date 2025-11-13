@@ -1,5 +1,15 @@
+/**
+ * @file abstract_tab_deck_editor.cpp
+ * @brief Implementation of the AbstractTabDeckEditor class.
+ *
+ * Handles deck editor tab UI, deck management, card operations, clipboard
+ * operations, printing, deck export, remote uploads, and interactions with
+ * external services (DeckStats, TappedOut, etc.).
+ */
+
 #include "abstract_tab_deck_editor.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
@@ -37,9 +47,13 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
+/**
+ * @brief Constructs the AbstractTabDeckEditor.
+ * Initializes all dock widgets and connects signals/slots.
+ * @param _tabSupervisor The tab supervisor managing this tab.
+ */
 AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
@@ -53,10 +67,13 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
         printingSelectorDockWidget->setHidden(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
     });
 
+    // Connect deck signals to this tab
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);
     connect(this, &AbstractTabDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
+
+    // Connect database display signals to this tab
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
             &AbstractTabDeckEditor::updateCard);
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
@@ -68,69 +85,97 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
             &AbstractTabDeckEditor::actDecrementCardFromSideboard);
 
+    // Connect filter signals
     connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
             &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
 
+    // Connect shortcut changes
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
+/**
+ * @brief Updates the card info dock and printing selector.
+ * @param card The card to display.
+ */
 void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
     cardInfoDockWidget->updateCard(card);
     printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr(), DECK_ZONE_MAIN);
 }
 
+/** @brief Placeholder: called when the deck changes. */
 void AbstractTabDeckEditor::onDeckChanged()
 {
 }
 
+/**
+ * @brief Marks the tab as modified and updates the save menu status.
+ */
 void AbstractTabDeckEditor::onDeckModified()
 {
     setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());
 }
 
+/**
+ * @brief Helper for adding a card to a deck zone.
+ * @param card Card to add.
+ * @param zoneName Zone to add the card to.
+ */
 void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneName)
 {
     if (!card)
         return;
+
     if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
     QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
-    // recursiveExpand(newCardIndex);
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
     setModified(true);
+
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
 
+/**
+ * @brief Adds a card to the main deck or sideboard depending on Ctrl key.
+ */
 void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
 {
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
         actAddCardToSideboard(card);
     else
         addCardHelper(card, DECK_ZONE_MAIN);
+
     deckMenu->setSaveStatus(true);
 }
 
+/** @brief Adds a card to the sideboard explicitly. */
 void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
 {
     addCardHelper(card, DECK_ZONE_SIDE);
     deckMenu->setSaveStatus(true);
 }
 
+/** @brief Decrements a card from the main deck. */
 void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
 {
     emit decrementCard(card, DECK_ZONE_MAIN);
 }
 
+/** @brief Decrements a card from the sideboard. */
 void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
 {
     emit decrementCard(card, DECK_ZONE_SIDE);
 }
 
+/**
+ * @brief Swaps a card in a deck zone.
+ * @param card Card to swap.
+ * @param zoneName Zone to swap in.
+ */
 void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zoneName)
 {
     QString providerId = card.getPrinting().getUuid();
@@ -145,8 +190,8 @@ void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zo
 }
 
 /**
- * Opens the deck in this tab.
- * @param deck The deck. Takes ownership of the object
+ * @brief Opens a deck in this tab.
+ * @param deck DeckLoader object (takes ownership).
  */
 void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 {
@@ -158,8 +203,8 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 }
 
 /**
- * Sets the currently active deck for this tab
- * @param _deck The deck. Takes ownership of the object
+ * @brief Sets the currently active deck.
+ * @param _deck DeckLoader object.
  */
 void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
 {
@@ -167,16 +212,26 @@ void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
     CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
     setModified(false);
 
-    // If they load a deck, make the deck list appear
     aDeckDockVisible->setChecked(true);
     deckDockWidget->setVisible(aDeckDockVisible->isChecked());
 }
 
-DeckLoader *AbstractTabDeckEditor::getDeckList() const
+/** @brief Returns the currently loaded deck. */
+DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
+{
+    return deckDockWidget->getDeckLoader();
+}
+
+/** @brief Returns the currently loaded deck list. */
+DeckList *AbstractTabDeckEditor::getDeckList() const
 {
     return deckDockWidget->getDeckList();
 }
 
+/**
+ * @brief Sets the modified state of the tab.
+ * @param _modified True if tab is modified, false otherwise.
+ */
 void AbstractTabDeckEditor::setModified(bool _modified)
 {
     modified = _modified;
@@ -184,21 +239,20 @@ void AbstractTabDeckEditor::setModified(bool _modified)
 }
 
 /**
- * @brief Returns true if this tab is a blank newly opened tab, as if it was just created with the `New Deck` action.
+ * @brief Returns true if the tab is a blank newly created deck.
  */
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
-    DeckLoader *deck = getDeckList();
-    return !modified && deck->isBlankDeck() && deck->hasNotBeenLoaded();
+    DeckLoader *deck = deckDockWidget->getDeckLoader();
+    return !modified && deck->getDeckList()->isBlankDeck() && deck->hasNotBeenLoaded();
 }
 
+/** @brief Creates a new deck. Handles opening in new tab if needed. */
 void AbstractTabDeckEditor::actNewDeck()
 {
     auto deckOpenLocation = confirmOpen(false);
-
-    if (deckOpenLocation == CANCELLED) {
+    if (deckOpenLocation == CANCELLED)
         return;
-    }
 
     if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor(nullptr);
@@ -208,6 +262,7 @@ void AbstractTabDeckEditor::actNewDeck()
     cleanDeckAndResetModified();
 }
 
+/** @brief Clears the current deck and resets modified flag. */
 void AbstractTabDeckEditor::cleanDeckAndResetModified()
 {
     deckMenu->setSaveStatus(false);
@@ -216,43 +271,29 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
 }
 
 /**
- * @brief Displays the save confirmation dialogue that is shown before loading a deck, if required. Takes into
- * account the `openDeckInNewTab` settting.
- *
- * @param openInSameTabIfBlank Open the deck in the same tab instead of a new tab if the current tab is completely
- * blank. Only relevant when the `openDeckInNewTab` setting is enabled.
- *
- * @returns An enum that indicates if and where to load the deck
+ * @brief Displays the save confirmation dialog before loading a deck.
+ * @param openInSameTabIfBlank Open in same tab if current tab is blank.
+ * @return DeckOpenLocation enum indicating where to open the deck.
  */
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
-    // handle `openDeckInNewTab` setting
     if (SettingsCache::instance().getOpenDeckInNewTab()) {
-        if (openInSameTabIfBlank && isBlankNewDeck()) {
+        if (openInSameTabIfBlank && isBlankNewDeck())
             return SAME_TAB;
-        } else {
+        else
             return NEW_TAB;
-        }
     }
 
-    // early return if deck is unmodified
-    if (!modified) {
+    if (!modified)
         return SAME_TAB;
-    }
 
-    // do the save confirmation dialogue
     tabSupervisor->setCurrentWidget(this);
-
     QMessageBox *msgBox = createSaveConfirmationWindow();
     QPushButton *newTabButton = msgBox->addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
-
     int ret = msgBox->exec();
 
-    // `exec()` returns an opaque value if a non-standard button was clicked.
-    // Directly check if newTabButton was clicked before switching over the standard buttons.
-    if (msgBox->clickedButton() == newTabButton) {
+    if (msgBox->clickedButton() == newTabButton)
         return NEW_TAB;
-    }
 
     switch (ret) {
         case QMessageBox::Save:
@@ -265,9 +306,8 @@ AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const
 }
 
 /**
- * @brief Creates the base save confirmation dialogue box.
- *
- * @returns A QMessageBox that can be further modified
+ * @brief Creates the base save confirmation dialog.
+ * @return Pointer to a QMessageBox.
  */
 QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
 {
@@ -279,13 +319,15 @@ QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
     return msgBox;
 }
 
+/**
+ * @brief Loads a deck from file using a dialog.
+ * Displays a save confirmation if needed.
+ */
 void AbstractTabDeckEditor::actLoadDeck()
 {
     auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
+    if (deckOpenLocation == CANCELLED)
         return;
-    }
 
     DlgLoadDeck dialog(this);
     if (!dialog.exec())
@@ -296,27 +338,29 @@ void AbstractTabDeckEditor::actLoadDeck()
     deckDockWidget->updateBannerCardComboBox();
 }
 
+/**
+ * @brief Opens a recently used deck file.
+ * @param fileName Path to the deck file.
+ */
 void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
 {
     auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
+    if (deckOpenLocation == CANCELLED)
         return;
-    }
 
     openDeckFromFile(fileName, deckOpenLocation);
 }
 
 /**
- * Actually opens the deck from file
- * @param fileName The path of the deck to open
- * @param deckOpenLocation Which tab to open the deck
+ * @brief Actually opens a deck from file.
+ * @param fileName Path to the deck file.
+ * @param deckOpenLocation Where to open the deck (same or new tab).
  */
 void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    auto *l = new DeckLoader;
+    auto *l = new DeckLoader(this);
     if (l->loadFromFile(fileName, fmt, true)) {
         if (deckOpenLocation == NEW_TAB) {
             emit openDeckEditor(l);
@@ -332,11 +376,16 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
     deckMenu->setSaveStatus(true);
 }
 
+/**
+ * @brief Saves the current deck.
+ * If remote deck, sends upload command.
+ * @return True if save succeeded, false otherwise.
+ */
 bool AbstractTabDeckEditor::actSaveDeck()
 {
-    DeckLoader *const deck = getDeckList();
+    DeckLoader *const deck = getDeckLoader();
     if (deck->getLastRemoteDeckId() != -1) {
-        QString deckString = deck->writeToString_Native();
+        QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
             return false;
@@ -357,12 +406,17 @@ bool AbstractTabDeckEditor::actSaveDeck()
         setModified(false);
         return true;
     }
+
     QMessageBox::critical(
         this, tr("Error"),
         tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
     return false;
 }
 
+/**
+ * @brief Saves the deck to a user-selected file.
+ * @return True if save succeeded.
+ */
 bool AbstractTabDeckEditor::actSaveDeckAs()
 {
     QFileDialog dialog(this, tr("Save deck"));
@@ -378,19 +432,22 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
 
-    if (!getDeckList()->saveToFile(fileName, fmt)) {
+    if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
         return false;
     }
+
     setModified(false);
-
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
-
     return true;
 }
 
+/**
+ * @brief Callback for remote deck save completion.
+ * @param response Server response.
+ */
 void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
 {
     if (response.response_code() != Response::RespOk)
@@ -399,13 +456,15 @@ void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
         setModified(false);
 }
 
+/**
+ * @brief Loads a deck from clipboard.
+ * Displays confirmation if the tab is modified.
+ */
 void AbstractTabDeckEditor::actLoadDeckFromClipboard()
 {
     auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
+    if (deckOpenLocation == CANCELLED)
         return;
-    }
 
     DlgLoadDeckFromClipboard dlg(this);
     if (!dlg.exec())
@@ -421,62 +480,73 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
     deckMenu->setSaveStatus(true);
 }
 
+/**
+ * @brief Opens the deck editor to edit clipboard contents.
+ * @param annotated If true, edits with annotations.
+ */
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(*getDeckList(), annotated, this);
+    DlgEditDeckInClipboard dlg(*getDeckLoader(), annotated, this);
     if (!dlg.exec())
         return;
 
     setDeck(dlg.getDeckList());
     setModified(true);
-
     deckMenu->setSaveStatus(true);
 }
 
+/** @brief Slot for editing deck in clipboard with annotations. */
 void AbstractTabDeckEditor::actEditDeckInClipboard()
 {
     editDeckInClipboard(true);
 }
 
+/** @brief Slot for editing deck in clipboard without annotations. */
 void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 {
     editDeckInClipboard(false);
 }
 
+/** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    getDeckList()->saveToClipboard(true, true);
+    getDeckLoader()->saveToClipboard(true, true);
 }
 
+/** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    getDeckList()->saveToClipboard(true, false);
+    getDeckLoader()->saveToClipboard(true, false);
 }
 
+/** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    getDeckList()->saveToClipboard(false, true);
+    getDeckLoader()->saveToClipboard(false, true);
 }
 
+/** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    getDeckList()->saveToClipboard(false, false);
+    getDeckLoader()->saveToClipboard(false, false);
 }
 
+/** @brief Prints the deck using a QPrintPreviewDialog. */
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->deckModel, &DeckListModel::printDeckList);
+    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->getDeckLoader(), &DeckLoader::printDeckList);
     dlg->exec();
 }
 
+/**
+ * @brief Loads a deck from a website.
+ */
 void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 {
     auto deckOpenLocation = confirmOpen();
-
-    if (deckOpenLocation == CANCELLED) {
+    if (deckOpenLocation == CANCELLED)
         return;
-    }
 
     DlgLoadDeckFromWebsite dlg(this);
     if (!dlg.exec())
@@ -492,18 +562,21 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
     deckMenu->setSaveStatus(true);
 }
 
+/**
+ * @brief Exports the deck to a decklist website.
+ * @param website Website to export to.
+ */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    // check if deck is not null
-    if (DeckLoader *const deck = getDeckList()) {
-        // Get the decklist url string from the deck loader class.
+    if (DeckLoader *const deck = getDeckLoader()) {
         QString decklistUrlString = deck->exportDeckToDecklist(website);
         // Check to make sure the string isn't empty.
-        if (QString::compare(decklistUrlString, "", Qt::CaseInsensitive) == 0) {
+        if (decklistUrlString.isEmpty()) {
             // Show an error if the deck is empty, and return.
             QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
             return;
         }
+
         // Encode the string recieved from the model to make sure all characters are encoded.
         // first we put it into a qurl object
         QUrl decklistUrl = QUrl(decklistUrlString);
@@ -517,48 +590,54 @@ void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite 
     }
 }
 
-/**
- * Exports the deck to www.decklist.org (the old website)
- */
+/** @brief Exports deck to www.decklist.org. */
 void AbstractTabDeckEditor::actExportDeckDecklist()
 {
     exportToDecklistWebsite(DeckLoader::DecklistOrg);
 }
 
-/**
- * Exports the deck to www.decklist.xyz (the new website)
- */
+/** @brief Exports deck to www.decklist.xyz. */
 void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 {
     exportToDecklistWebsite(DeckLoader::DecklistXyz);
 }
 
+/** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
-                                             this); // it deletes itself when done
+    auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
     interface->analyzeDeck(getDeckList());
 }
 
+/** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(),
-                                             this); // it deletes itself when done
+    auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
     interface->analyzeDeck(getDeckList());
 }
 
+/** @brief Applies a new filter tree to the database display. */
 void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
     databaseDisplayDockWidget->setFilterTree(filterTree);
 }
 
+/**
+ * @brief Handles the close event of the tab.
+ * @param event Close event.
+ */
 void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
 {
     emit deckEditorClosing(this);
     event->accept();
 }
 
-// Method uses to sync docks state with menu items state
+/**
+ * @brief Event filter for dock visibility and geometry changes.
+ * @param o Object sending the event.
+ * @param e Event.
+ * @return False always.
+ */
 bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
     if (e->type() == QEvent::Close) {
@@ -576,6 +655,7 @@ bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
             aPrintingSelectorDockFloating->setEnabled(false);
         }
     }
+
     if (o == this && e->type() == QEvent::Hide) {
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
@@ -585,9 +665,11 @@ bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
         layouts.setDeckEditorDeckSize(deckDockWidget->size());
         layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
     }
+
     return false;
 }
 
+/** @brief Shows a confirmation dialog before closing. */
 bool AbstractTabDeckEditor::confirmClose()
 {
     if (modified) {
@@ -601,11 +683,10 @@ bool AbstractTabDeckEditor::confirmClose()
     return true;
 }
 
+/** @brief Handles close requests from outside (tab manager). */
 bool AbstractTabDeckEditor::closeRequest()
 {
-    if (!confirmClose()) {
+    if (!confirmClose())
         return false;
-    }
-
     return close();
 }

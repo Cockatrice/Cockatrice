@@ -1,5 +1,6 @@
 #include "game_scene.h"
 
+#include "../client/settings/cache_settings.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/player.h"
@@ -14,7 +15,6 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
-#include <libcockatrice/settings/cache_settings.h>
 #include <numeric>
 
 /**

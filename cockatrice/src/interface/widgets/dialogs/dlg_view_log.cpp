@@ -1,5 +1,6 @@
 #include "dlg_view_log.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../logger.h"
 
 #include <QClipboard>
@@ -7,7 +8,6 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
-#include <libcockatrice/settings/cache_settings.h>
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {

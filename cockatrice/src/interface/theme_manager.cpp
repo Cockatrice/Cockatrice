@@ -1,12 +1,13 @@
 #include "theme_manager.h"
 
+#include "../../client/settings/cache_settings.h"
+
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
 #include <QLibraryInfo>
 #include <QPixmapCache>
 #include <QStandardPaths>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define NONE_THEME_NAME "Default"
 #define STYLE_CSS_NAME "style.css"

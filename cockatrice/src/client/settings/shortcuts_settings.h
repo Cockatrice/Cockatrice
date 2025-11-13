@@ -33,6 +33,7 @@ public:
         Move_bottom,
         Gameplay,
         Drawing,
+        Hand,
         Chat_room,
         Game_window,
         Load_deck,
@@ -71,6 +72,8 @@ public:
                 return QApplication::translate("shortcutsTab", "Gameplay");
             case Drawing:
                 return QApplication::translate("shortcutsTab", "Drawing");
+            case Hand:
+                return QApplication::translate("shortcutsTab", "Hand");
             case Chat_room:
                 return QApplication::translate("shortcutsTab", "Chat Room");
             case Game_window:
@@ -540,6 +543,9 @@ private:
         {"Player/aSelectColumn", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Select All Cards in Column"),
                                              parseSequenceString("Ctrl+Shift+C"),
                                              ShortcutGroup::Playing_Area)},
+        {"Player/aRevealToAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Reveal Selected Cards to All Players"),
+                                            parseSequenceString(""),
+                                            ShortcutGroup::Playing_Area)},
         {"Player/aMoveToBottomLibrary", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom of Library"),
                                                     parseSequenceString("Ctrl+B"),
                                                     ShortcutGroup::Move_selected)},
@@ -562,9 +568,6 @@ private:
                                      ShortcutGroup::Move_selected)},
         {"Player/aViewHand",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Hand"), parseSequenceString(""), ShortcutGroup::View)},
-        {"Player/aSortHand", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand"),
-                                         parseSequenceString("Ctrl+Shift+H"),
-                                         ShortcutGroup::View)},
         {"Player/aViewGraveyard",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Graveyard"), parseSequenceString("F4"), ShortcutGroup::View)},
         {"Player/aViewLibrary",
@@ -672,6 +675,22 @@ private:
         {"Player/aAlwaysLookAtTopCard", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Always Look At Top Card"),
                                                     parseSequenceString("Ctrl+Shift+N"),
                                                     ShortcutGroup::Drawing)},
+        {"Player/aSortHandByName", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Name"),
+                                               parseSequenceString(""),
+                                               ShortcutGroup::Hand)},
+        {"Player/aSortHandByType", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Type"),
+                                               parseSequenceString("Ctrl+Shift+H"),
+                                               ShortcutGroup::Hand)},
+        {"Player/aSortHandByManaValue", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Sort Hand by Mana Value"),
+                                                    parseSequenceString(""),
+                                                    ShortcutGroup::Hand)},
+        {"Player/aRevealHandToAll", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Reveal Hand to All Players"),
+                                                parseSequenceString(""),
+                                                ShortcutGroup::Hand)},
+        {"Player/aRevealRandomHandCardToAll",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Reveal Random Card to All Players"),
+                     parseSequenceString(""),
+                     ShortcutGroup::Hand)},
         {"Player/aRotateViewCW", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Rotate View Clockwise"),
                                              parseSequenceString(""),
                                              ShortcutGroup::Gameplay)},

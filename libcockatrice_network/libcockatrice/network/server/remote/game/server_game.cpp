@@ -340,6 +340,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         }
     }
 
+    players = getPlayers(); // players could have been kicked, get new list of players
     for (Server_AbstractPlayer *player : players.values()) {
         player->setupZones();
     }
@@ -586,27 +587,26 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Abst
     // Also remove all arrows starting at one of his cards. This is necessary since players can create
     // arrows that start at another person's cards.
     for (Server_AbstractPlayer *anyPlayer : getPlayers().values()) {
-        QList<Server_Arrow *> arrows = anyPlayer->getArrows().values();
         QList<Server_Arrow *> toDelete;
-        for (int i = 0; i < arrows.size(); ++i) {
-            Server_Arrow *arrow = arrows[i];
+        for (auto *arrow : anyPlayer->getArrows().values()) {
             Server_Card *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
             if (targetCard) {
                 if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
                     toDelete.append(arrow);
-            } else if (static_cast<Server_AbstractPlayer *>(arrow->getTargetItem()) == player)
+            } else if (arrow->getTargetItem() == player) {
                 toDelete.append(arrow);
+            }
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
             if (arrow->getStartCard()->getZone() != nullptr && arrow->getStartCard()->getZone()->getPlayer() == player)
                 toDelete.append(arrow);
         }
-        for (int i = 0; i < toDelete.size(); ++i) {
+        for (auto *arrow : toDelete) {
             Event_DeleteArrow event;
-            event.set_arrow_id(toDelete[i]->getId());
-            ges.enqueueGameEvent(event, player->getPlayerId());
+            event.set_arrow_id(arrow->getId());
+            ges.enqueueGameEvent(event, anyPlayer->getPlayerId());
 
-            player->deleteArrow(toDelete[i]->getId());
+            anyPlayer->deleteArrow(arrow->getId());
         }
     }
 }

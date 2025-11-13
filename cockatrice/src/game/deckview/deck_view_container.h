@@ -7,8 +7,9 @@
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
+#include "../../interface/deck_loader/deck_loader.h"
+
 #include <QPushButton>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class QVBoxLayout;
 class AbstractCardItem;
@@ -84,12 +85,12 @@ public:
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
-    void setDeck(const DeckLoader &deck);
+    void setDeck(DeckLoader &deck);
     void setVisualDeckStorageExists(bool exists);
 
 public slots:
     void loadDeckFromFile(const QString &filePath);
-    void loadDeckFromDeckLoader(const DeckLoader *deck);
+    void loadDeckFromDeckLoader(DeckLoader *deck);
 };
 
 #endif // DECK_VIEW_CONTAINER_H

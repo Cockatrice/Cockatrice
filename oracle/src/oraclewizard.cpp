@@ -1,5 +1,6 @@
 #include "oraclewizard.h"
 
+#include "client/settings/cache_settings.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "version_string.h"
@@ -24,7 +25,6 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
-#include <libcockatrice/settings/cache_settings.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"
@@ -637,13 +637,15 @@ void SaveSetsPage::initializePage()
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
         messageLog->hide();
-        return;
-    }
-    messageLog->show();
-    connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
+    } else {
+        messageLog->show();
+        connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
 
-    if (!wizard()->importer->startImport()) {
-        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+        int setsImported = wizard()->importer->startImport();
+
+        if (setsImported == 0) {
+            QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+        }
     }
 
     if (wizard()->backgroundMode) {

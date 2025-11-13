@@ -1,6 +1,5 @@
 #include "remote_client.h"
 
-#include "../../../../cockatrice/src/main.h"
 #include "version_string.h"
 
 #include <QCryptographicHash>
@@ -11,6 +10,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QWebSocket>
+#include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
 #include <libcockatrice/protocol/pb/response_activate.pb.h>
@@ -21,19 +21,18 @@
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 static const unsigned int protocolVersion = 14;
 
-RemoteClient::RemoteClient(QObject *parent)
-    : AbstractClient(parent), timeRunning(0), lastDataReceived(0), messageInProgress(false), handshakeStarted(false),
-      usingWebSocket(false), messageLength(0), hashedPassword()
+RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
+    : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
+      messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword()
 {
 
     clearNewClientFeatures();
-    maxTimeout = SettingsCache::instance().getTimeOut();
-    int keepalive = SettingsCache::instance().getKeepAlive();
+    maxTimeout = networkSettingsProvider->getTimeOut();
+    int keepalive = networkSettingsProvider->getKeepAlive();
     timer = new QTimer(this);
     timer->setInterval(keepalive * 1000);
     connect(timer, &QTimer::timeout, this, &RemoteClient::ping);
@@ -308,8 +307,8 @@ void RemoteClient::loginResponse(const Response &response)
         emit ignoreListReceived(ignoreList);
 
         if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
-            SettingsCache::instance().getNotifyAboutUpdates()) {
-            SettingsCache::instance().setKnownMissingFeatures(possibleMissingFeatures);
+            networkSettingsProvider->getNotifyAboutUpdates()) {
+            networkSettingsProvider->setKnownMissingFeatures(possibleMissingFeatures);
             emit notifyUserAboutUpdate();
         }
 
@@ -586,7 +585,7 @@ void RemoteClient::disconnectFromServer()
 
 QString RemoteClient::getSrvClientID(const QString &_hostname)
 {
-    QString srvClientID = SettingsCache::instance().getClientID();
+    QString srvClientID = networkSettingsProvider->getClientID();
     QHostInfo hostInfo = QHostInfo::fromName(_hostname);
     if (!hostInfo.error()) {
         QHostAddress hostAddress = hostInfo.addresses().first();
@@ -606,7 +605,7 @@ bool RemoteClient::newMissingFeatureFound(const QString &_serversMissingFeatures
     QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
     for (const QString &feature : serversMissingFeaturesList) {
         if (!feature.isEmpty()) {
-            if (!SettingsCache::instance().getKnownMissingFeatures().contains(feature))
+            if (!networkSettingsProvider->getKnownMissingFeatures().contains(feature))
                 return true;
         }
     }
@@ -616,14 +615,14 @@ bool RemoteClient::newMissingFeatureFound(const QString &_serversMissingFeatures
 void RemoteClient::clearNewClientFeatures()
 {
     QString newKnownMissingFeatures;
-    QStringList existingKnownMissingFeatures = SettingsCache::instance().getKnownMissingFeatures().split(",");
+    QStringList existingKnownMissingFeatures = networkSettingsProvider->getKnownMissingFeatures().split(",");
     for (const QString &existingKnownFeature : existingKnownMissingFeatures) {
         if (!existingKnownFeature.isEmpty()) {
             if (!clientFeatures.contains(existingKnownFeature))
                 newKnownMissingFeatures.append("," + existingKnownFeature);
         }
     }
-    SettingsCache::instance().setKnownMissingFeatures(newKnownMissingFeatures);
+    networkSettingsProvider->setKnownMissingFeatures(newKnownMissingFeatures);
 }
 
 void RemoteClient::requestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName)

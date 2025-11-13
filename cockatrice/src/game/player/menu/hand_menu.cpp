@@ -1,5 +1,7 @@
 #include "hand_menu.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../abstract_game.h"
 #include "../../zones/hand_zone.h"
 #include "../player.h"
@@ -7,8 +9,6 @@
 
 #include <QAction>
 #include <QMenu>
-#include <libcockatrice/settings/cache_settings.h>
-#include <libcockatrice/settings/shortcuts_settings.h>
 
 HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -17,17 +17,42 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
         connect(aViewHand, &QAction::triggered, actions, &PlayerActions::actViewHand);
         addAction(aViewHand);
 
-        aSortHand = new QAction(this);
-        connect(aSortHand, &QAction::triggered, actions, &PlayerActions::actSortHand);
-        addAction(aSortHand);
+        mSortHand = addMenu(QString());
+
+        aSortHandByName = new QAction(this);
+        aSortHandByName->setData(CardList::SortByName);
+        aSortHandByType = new QAction(this);
+        aSortHandByType->setData(CardList::SortByMainType);
+        aSortHandByManaValue = new QAction(this);
+        aSortHandByManaValue->setData(CardList::SortByManaValue);
+
+        connect(aSortHandByType, &QAction::triggered, actions, &PlayerActions::actSortHand);
+        connect(aSortHandByName, &QAction::triggered, actions, &PlayerActions::actSortHand);
+        connect(aSortHandByManaValue, &QAction::triggered, actions, &PlayerActions::actSortHand);
+
+        mSortHand->addAction(aSortHandByName);
+        mSortHand->addAction(aSortHandByType);
+        mSortHand->addAction(aSortHandByManaValue);
     }
 
     mRevealHand = addMenu(QString());
     connect(mRevealHand, &QMenu::aboutToShow, this, &HandMenu::populateRevealHandMenuWithActivePlayers);
 
+    aRevealHandToAll = new QAction(this);
+    aRevealHandToAll->setData(-1);
+    connect(aRevealHandToAll, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
+
     mRevealRandomHandCard = addMenu(QString());
     connect(mRevealRandomHandCard, &QMenu::aboutToShow, this,
             &HandMenu::populateRevealRandomHandCardMenuWithActivePlayers);
+
+    aRevealRandomHandCardToAll = new QAction(this);
+    aRevealRandomHandCardToAll->setData(-1);
+    connect(aRevealRandomHandCardToAll, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+
+    // We still need to add these actions to menu here so that the shortcuts are active right away
+    mRevealHand->addAction(aRevealHandToAll);
+    mRevealRandomHandCard->addAction(aRevealRandomHandCardToAll);
 
     addSeparator();
 
@@ -73,7 +98,12 @@ void HandMenu::retranslateUi()
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aViewHand->setText(tr("&View hand"));
-        aSortHand->setText(tr("&Sort hand"));
+
+        mSortHand->setTitle(tr("Sort hand by..."));
+        aSortHandByName->setText(tr("Name"));
+        aSortHandByType->setText(tr("Type"));
+        aSortHandByManaValue->setText(tr("Mana Value"));
+
         aMulligan->setText(tr("Take &mulligan"));
 
         mMoveHandMenu->setTitle(tr("&Move hand to..."));
@@ -83,7 +113,10 @@ void HandMenu::retranslateUi()
         aMoveHandToRfg->setText(tr("&Exile"));
 
         mRevealHand->setTitle(tr("&Reveal hand to..."));
+        aRevealHandToAll->setText(tr("All players"));
+
         mRevealRandomHandCard->setTitle(tr("Reveal r&andom card to..."));
+        aRevealRandomHandCardToAll->setText(tr("All players"));
     }
 }
 
@@ -91,24 +124,30 @@ void HandMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
-    aSortHand->setShortcuts(shortcuts.getShortcut("Player/aSortHand"));
+    aSortHandByName->setShortcuts(shortcuts.getShortcut("Player/aSortHandByName"));
+    aSortHandByType->setShortcuts(shortcuts.getShortcut("Player/aSortHandByType"));
+    aSortHandByManaValue->setShortcuts(shortcuts.getShortcut("Player/aSortHandByManaValue"));
     aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));
+    aRevealHandToAll->setShortcuts(shortcuts.getShortcut("Player/aRevealHandToAll"));
+    aRevealRandomHandCardToAll->setShortcuts(shortcuts.getShortcut("Player/aRevealRandomHandCardToAll"));
 }
 
 void HandMenu::setShortcutsInactive()
 {
     aViewHand->setShortcut(QKeySequence());
-    aSortHand->setShortcut(QKeySequence());
+    aSortHandByName->setShortcut(QKeySequence());
+    aSortHandByType->setShortcut(QKeySequence());
+    aSortHandByManaValue->setShortcut(QKeySequence());
     aMulligan->setShortcut(QKeySequence());
+    aRevealHandToAll->setShortcut(QKeySequence());
+    aRevealRandomHandCardToAll->setShortcut(QKeySequence());
 }
 
 void HandMenu::populateRevealHandMenuWithActivePlayers()
 {
     mRevealHand->clear();
 
-    QAction *allPlayers = mRevealHand->addAction(tr("&All players"));
-    allPlayers->setData(-1);
-    connect(allPlayers, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
+    mRevealHand->addAction(aRevealHandToAll);
 
     mRevealHand->addSeparator();
 
@@ -126,9 +165,7 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
 {
     mRevealRandomHandCard->clear();
 
-    QAction *allPlayers = mRevealRandomHandCard->addAction(tr("&All players"));
-    allPlayers->setData(-1);
-    connect(allPlayers, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
+    mRevealRandomHandCard->addAction(aRevealRandomHandCardToAll);
 
     mRevealRandomHandCard->addSeparator();
 

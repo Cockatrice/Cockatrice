@@ -1,5 +1,6 @@
 #include "home_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
 #include "background_sources.h"
@@ -11,7 +12,6 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
@@ -19,7 +19,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
-    backgroundSourceDeck = new DeckLoader();
+    backgroundSourceDeck = new DeckLoader(this);
 
     backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
                                        DeckLoader::CockatriceFormat, false);
@@ -94,7 +94,7 @@ void HomeWidget::updateRandomCard()
                      newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
         case BackgroundSources::DeckFileArt:
-            QList<CardRef> cardRefs = backgroundSourceDeck->getCardRefList();
+            QList<CardRef> cardRefs = backgroundSourceDeck->getDeckList()->getCardRefList();
             ExactCard oldCard = backgroundSourceCard->getCard();
 
             if (!cardRefs.empty()) {

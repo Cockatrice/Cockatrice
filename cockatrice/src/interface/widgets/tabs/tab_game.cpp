@@ -1,5 +1,6 @@
 #include "tab_game.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../game/board/arrow_item.h"
 #include "../game/board/card_item.h"
 #include "../game/deckview/deck_view_container.h"
@@ -44,7 +45,6 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
@@ -754,8 +754,9 @@ void TabGame::loadDeckForLocalPlayer(Player *localPlayer, int playerId, ServerIn
 {
     TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
     if (playerInfo.has_deck_list()) {
-        DeckLoader newDeck(QString::fromStdString(playerInfo.deck_list()));
-        CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
+        DeckLoader newDeck(this, new DeckList(QString::fromStdString(playerInfo.deck_list())));
+        CardPictureLoader::cacheCardPixmaps(
+            CardDatabaseManager::query()->getCards(newDeck.getDeckList()->getCardRefList()));
         deckViewContainer->playerDeckView->setDeck(newDeck);
         localPlayer->setDeck(newDeck);
     }

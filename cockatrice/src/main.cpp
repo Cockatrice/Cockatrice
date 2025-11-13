@@ -22,7 +22,9 @@
 
 #include "QtNetwork/QNetworkInterface"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
+#include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
+#include "database/interface/settings_card_preference_provider.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -42,9 +44,9 @@
 #include <QTextStream>
 #include <QTranslator>
 #include <QtPlugin>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/rng/rng_sfmt.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -249,6 +251,11 @@ int main(int argc, char *argv[])
     installNewTranslator();
 
     QLocale::setDefault(QLocale::English);
+
+    // Dependency Injections
+    CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
+    CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
+    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
 
     qCInfo(MainLog) << "Starting main program";
 

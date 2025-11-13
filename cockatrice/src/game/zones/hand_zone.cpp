@@ -1,5 +1,6 @@
 #include "hand_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
@@ -7,7 +8,6 @@
 
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)
@@ -111,12 +111,13 @@ void HandZone::reorganizeCards()
     update();
 }
 
-void HandZone::sortHand()
+void HandZone::sortHand(const QList<CardList::SortOption> &options)
 {
     if (getLogic()->getCards().isEmpty()) {
         return;
     }
-    getLogic()->sortCards({CardList::SortByMainType, CardList::SortByManaValue, CardList::SortByColorGrouping});
+
+    getLogic()->sortCards(options);
     reorganizeCards();
 }
 

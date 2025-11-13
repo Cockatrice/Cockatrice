@@ -1,12 +1,14 @@
 #include "card_picture_to_load.h"
 
+#include "../../client/settings/cache_settings.h"
+
 #include <QCoreApplication>
 #include <QDate>
 #include <QRegularExpression>
 #include <QUrl>
 #include <algorithm>
 #include <libcockatrice/card/set/card_set_comparator.h>
-#include <libcockatrice/settings/cache_settings.h>
+#include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 
 CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     : card(_card), urlTemplates(SettingsCache::instance().downloads().getAllURLs())
@@ -33,7 +35,7 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
         }
     }
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance("", "", "", QDate());
+        sortedSets << CardSet::newInstance(new NoopCardSetPriorityController(), "", "", "", QDate());
     }
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 

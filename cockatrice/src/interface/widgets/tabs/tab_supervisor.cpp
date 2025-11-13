@@ -1,5 +1,6 @@
 #include "tab_supervisor.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
@@ -35,7 +36,6 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -491,10 +491,6 @@ void TabSupervisor::stop()
         tabsToDelete << i.value();
     }
 
-    for (auto i = messageTabs.cbegin(), end = messageTabs.cend(); i != end; ++i) {
-        tabsToDelete << i.value();
-    }
-
     for (const auto tab : tabsToDelete) {
         tab->close();
     }
@@ -847,7 +843,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  * Creates either a classic or visual deck editor tab depending on settings
  * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
  */
-void TabSupervisor::openDeckInNewTab(const DeckLoader *deckToOpen)
+void TabSupervisor::openDeckInNewTab(DeckLoader *deckToOpen)
 {
     int type = SettingsCache::instance().getDefaultDeckEditorType();
     switch (type) {
@@ -869,11 +865,11 @@ void TabSupervisor::openDeckInNewTab(const DeckLoader *deckToOpen)
  * Creates a new deck editor tab
  * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
  */
-TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
+TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckLoader *deckToOpen)
 {
     auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
-        tab->openDeck(new DeckLoader(*deckToOpen));
+        tab->openDeck(new DeckLoader(this, deckToOpen->getDeckList()));
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -882,11 +878,11 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const DeckLoader *deckToOpen)
     return tab;
 }
 
-TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const DeckLoader *deckToOpen)
+TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(DeckLoader *deckToOpen)
 {
     auto *tab = new TabDeckEditorVisual(this);
     if (deckToOpen)
-        tab->openDeck(new DeckLoader(*deckToOpen));
+        tab->openDeck(new DeckLoader(this, deckToOpen->getDeckList()));
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);

@@ -6,9 +6,10 @@
 
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
+#include "../../../interface/deck_loader/deck_loader.h"
+
 #include <QJsonArray>
 #include <QJsonObject>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 class IJsonDeckParser
 {
@@ -23,13 +24,13 @@ class ArchidektJsonParser : public IJsonDeckParser
 public:
     DeckLoader *parse(const QJsonObject &obj) override
     {
-        DeckLoader *list = new DeckLoader();
+        DeckLoader *loader = new DeckLoader(nullptr);
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        list->setName(deckName);
-        list->setComments(deckDescription);
+        loader->getDeckList()->setName(deckName);
+        loader->getDeckList()->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -46,10 +47,10 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        list->loadFromStream_Plain(outStream, false);
-        list->resolveSetNameAndNumberToProviderID();
+        loader->getDeckList()->loadFromStream_Plain(outStream, false);
+        loader->resolveSetNameAndNumberToProviderID();
 
-        return list;
+        return loader;
     }
 };
 
@@ -58,13 +59,13 @@ class MoxfieldJsonParser : public IJsonDeckParser
 public:
     DeckLoader *parse(const QJsonObject &obj) override
     {
-        DeckLoader *list = new DeckLoader();
+        DeckLoader *loader = new DeckLoader(nullptr);
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        list->setName(deckName);
-        list->setComments(deckDescription);
+        loader->getDeckList()->setName(deckName);
+        loader->getDeckList()->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -93,8 +94,8 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        list->loadFromStream_Plain(outStream, false);
-        list->resolveSetNameAndNumberToProviderID();
+        loader->getDeckList()->loadFromStream_Plain(outStream, false);
+        loader->resolveSetNameAndNumberToProviderID();
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
@@ -105,12 +106,12 @@ public:
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
 
-                list->setBannerCard({commanderName, providerId});
-                list->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+                loader->getDeckList()->setBannerCard({commanderName, providerId});
+                loader->getDeckList()->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
         }
 
-        return list;
+        return loader;
     }
 };
 

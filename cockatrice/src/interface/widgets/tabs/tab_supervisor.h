@@ -8,6 +8,7 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
+#include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/edhrec/tab_edhrec.h"
@@ -23,7 +24,6 @@
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
@@ -169,9 +169,9 @@ signals:
     void showWindowIfHidden();
 
 public slots:
-    void openDeckInNewTab(const DeckLoader *deckToOpen);
-    TabDeckEditor *addDeckEditorTab(const DeckLoader *deckToOpen);
-    TabDeckEditorVisual *addVisualDeckEditorTab(const DeckLoader *deckToOpen);
+    void openDeckInNewTab(DeckLoader *deckToOpen);
+    TabDeckEditor *addDeckEditorTab(DeckLoader *deckToOpen);
+    TabDeckEditorVisual *addVisualDeckEditorTab(DeckLoader *deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRecMain *addEdhrecMainTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);

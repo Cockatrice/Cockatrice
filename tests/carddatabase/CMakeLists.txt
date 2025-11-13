@@ -21,7 +21,6 @@ add_executable(carddatabase_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} carddata
 target_link_libraries(
   carddatabase_test
   PRIVATE libcockatrice_card
-  PRIVATE libcockatrice_settings
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
   PRIVATE ${TEST_QT_MODULES}
@@ -32,21 +31,11 @@ add_test(NAME carddatabase_test COMMAND carddatabase_test)
 # ------------------------
 # Filter String Test
 # ------------------------
-add_executable(
-  filter_string_test
-  ${MOCKS_SOURCES}
-  ${VERSION_STRING_CPP}
-  ../../cockatrice/src/filters/filter_card.cpp
-  ../../cockatrice/src/filters/filter_string.cpp
-  ../../cockatrice/src/filters/filter_tree.cpp
-  filter_string_test.cpp
-  mocks.cpp
-)
+add_executable(filter_string_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} filter_string_test.cpp mocks.cpp)
 
 target_link_libraries(
   filter_string_test
-  PRIVATE libcockatrice_card
-  PRIVATE libcockatrice_settings
+  PRIVATE libcockatrice_filters
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
   PRIVATE ${TEST_QT_MODULES}

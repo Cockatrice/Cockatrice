@@ -25,6 +25,7 @@ add_executable(dbconverter MACOSX_BUNDLE ${dbconverter_SOURCES})
 target_link_libraries(
   dbconverter
   PRIVATE libcockatrice_card
+  PRIVATE libcockatrice_interfaces
   PRIVATE libcockatrice_settings
   PRIVATE ${DB_CONVERTER_QT_MODULES}
 )

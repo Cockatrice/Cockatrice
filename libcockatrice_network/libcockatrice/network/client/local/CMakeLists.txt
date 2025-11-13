@@ -19,5 +19,7 @@ add_dependencies(libcockatrice_network_client_local libcockatrice_network_client
 target_include_directories(libcockatrice_network_client_local PUBLIC .)
 
 target_link_libraries(
-  libcockatrice_network_client_local PUBLIC ${COCKATRICE_QT_MODULES} libcockatrice_network_client_abstract
+  libcockatrice_network_client_local
+  PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Network ${COCKATRICE_QT_VERSION_NAME}::WebSockets
+         libcockatrice_network_client_abstract
 )

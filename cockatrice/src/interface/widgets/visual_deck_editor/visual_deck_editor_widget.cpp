@@ -1,11 +1,14 @@
 #include "visual_deck_editor_widget.h"
 
 #include "../../../main.h"
+#include "../../deck_loader/deck_loader.h"
 #include "../../layouts/overlap_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
+#include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
+#include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 
 #include <QCheckBox>
 #include <QCompleter>
@@ -20,7 +23,6 @@
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <libcockatrice/models/deck_list/deck_loader.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_deckListModel)
@@ -119,13 +121,30 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent, DeckListModel *_
     groupAndSortLayout->setAlignment(Qt::AlignLeft);
     groupAndSortContainer->setLayout(groupAndSortLayout);
 
-    groupByComboBox = new QComboBox();
-    QStringList groupProperties = {"maintype", "colors", "cmc", "name"};
-    groupByComboBox->addItems(groupProperties);
-    groupByComboBox->setMinimumWidth(300);
-    connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-            &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
-    actChangeActiveGroupCriteria();
+    groupByComboBox = new QComboBox(this);
+    if (auto tabWidget = qobject_cast<TabDeckEditorVisualTabWidget *>(parent)) {
+        // Inside a central widget QWidget container inside TabDeckEditorVisual
+        if (auto tab = qobject_cast<TabDeckEditorVisual *>(tabWidget->parent()->parent())) {
+            auto originalBox = tab->getDeckDockWidget()->getGroupByComboBox();
+            groupByComboBox->setModel(originalBox->model());
+            groupByComboBox->setModelColumn(originalBox->modelColumn());
+
+            // Original -> clone
+            connect(originalBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                    [this](int index) { groupByComboBox->setCurrentIndex(index); });
+
+            // Clone -> original
+            connect(groupByComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                    [originalBox](int index) { originalBox->setCurrentIndex(index); });
+        }
+    } else {
+        QStringList groupProperties = {"maintype", "colors", "cmc", "name"};
+        groupByComboBox->addItems(groupProperties);
+        groupByComboBox->setMinimumWidth(300);
+        connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
+                &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
+        actChangeActiveGroupCriteria();
+    }
 
     sortCriteriaButton = new SettingsButtonWidget(this);
 

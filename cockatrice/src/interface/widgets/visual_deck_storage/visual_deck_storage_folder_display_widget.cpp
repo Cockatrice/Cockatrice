@@ -1,10 +1,10 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "deck_preview/deck_preview_widget.h"
 
 #include <QDirIterator>
 #include <QMouseEvent>
-#include <libcockatrice/settings/cache_settings.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
@@ -210,7 +210,7 @@ QStringList VisualDeckStorageFolderDisplayWidget::gatherAllTagsFromFlowWidget() 
         // Iterate through all DeckPreviewWidgets
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             // Get tags from each DeckPreviewWidget
-            QStringList tags = display->deckLoader->getTags();
+            QStringList tags = display->deckLoader->getDeckList()->getTags();
 
             // Add tags to the list while avoiding duplicates
             allTags.append(tags);

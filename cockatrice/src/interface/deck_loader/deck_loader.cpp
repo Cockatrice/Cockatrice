@@ -7,8 +7,13 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
+#include <QPrinter>
 #include <QRegularExpression>
 #include <QStringList>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextStream>
+#include <QTextTable>
 #include <QtConcurrentRun>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -20,24 +25,25 @@ const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.d
 const QStringList DeckLoader::FILE_NAME_FILTERS = {
     tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
-DeckLoader::DeckLoader() : DeckList(), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
+DeckLoader::DeckLoader(QObject *parent)
+    : QObject(parent), deckList(new DeckList()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {
 }
 
-DeckLoader::DeckLoader(const QString &nativeString)
-    : DeckList(nativeString), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
-{
-}
-
-DeckLoader::DeckLoader(const DeckList &other)
-    : DeckList(other), lastFileName(QString()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
+DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList)
+    : QObject(parent), deckList(_deckList), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {
 }
 
 DeckLoader::DeckLoader(const DeckLoader &other)
-    : DeckList(other), lastFileName(other.lastFileName), lastFileFormat(other.lastFileFormat),
+    : QObject(), deckList(other.deckList), lastFileName(other.lastFileName), lastFileFormat(other.lastFileFormat),
       lastRemoteDeckId(other.lastRemoteDeckId)
 {
+}
+
+void DeckLoader::setDeckList(DeckList *_deckList)
+{
+    deckList = _deckList;
 }
 
 bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest)
@@ -50,15 +56,15 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
     bool result = false;
     switch (fmt) {
         case PlainTextFormat:
-            result = loadFromFile_Plain(&file);
+            result = deckList->loadFromFile_Plain(&file);
             break;
         case CockatriceFormat: {
-            result = loadFromFile_Native(&file);
+            result = deckList->loadFromFile_Native(&file);
             qCInfo(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
                 qCInfo(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
-                result = loadFromFile_Plain(&file);
+                result = deckList->loadFromFile_Plain(&file);
                 fmt = PlainTextFormat;
             }
             break;
@@ -110,13 +116,13 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
 
         switch (fmt) {
             case PlainTextFormat:
-                return loadFromFile_Plain(&file);
+                return deckList->loadFromFile_Plain(&file);
             case CockatriceFormat: {
                 bool result = false;
-                result = loadFromFile_Native(&file);
+                result = deckList->loadFromFile_Native(&file);
                 if (!result) {
                     file.seek(0);
-                    return loadFromFile_Plain(&file);
+                    return deckList->loadFromFile_Plain(&file);
                 }
                 return result;
             }
@@ -132,7 +138,7 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
 
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
-    bool result = loadFromString_Native(nativeString);
+    bool result = deckList->loadFromString_Native(nativeString);
     if (result) {
         lastFileName = QString();
         lastFileFormat = CockatriceFormat;
@@ -153,10 +159,10 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     bool result = false;
     switch (fmt) {
         case PlainTextFormat:
-            result = saveToFile_Plain(&file);
+            result = deckList->saveToFile_Plain(&file);
             break;
         case CockatriceFormat:
-            result = saveToFile_Native(&file);
+            result = deckList->saveToFile_Native(&file);
             break;
     }
 
@@ -193,11 +199,11 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
     // Perform file modifications
     switch (fmt) {
         case PlainTextFormat:
-            result = saveToFile_Plain(&file);
+            result = deckList->saveToFile_Plain(&file);
             break;
         case CockatriceFormat:
-            setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-            result = saveToFile_Native(&file);
+            deckList->setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = deckList->saveToFile_Native(&file);
             break;
     }
 
@@ -296,7 +302,7 @@ QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
     };
 
     // call our struct function for each card in the deck
-    forEachCard(formatDeckListForExport);
+    deckList->forEachCard(formatDeckListForExport);
     // Remove the extra return at the end of the last cards
     mainBoardCards.chop(3);
     sideBoardCards.chop(3);
@@ -344,7 +350,7 @@ void DeckLoader::setProviderIdToPreferredPrinting()
     SetProviderIdToPreferred setProviderIdToPreferred;
 
     // Call the forEachCard method for each card in the deck
-    forEachCard(setProviderIdToPreferred);
+    deckList->forEachCard(setProviderIdToPreferred);
 }
 
 /**
@@ -365,7 +371,7 @@ void DeckLoader::resolveSetNameAndNumberToProviderID()
         card->setCardProviderId(providerId);
     };
 
-    forEachCard(setProviderId);
+    deckList->forEachCard(setProviderId);
 }
 
 // This struct is here to support the forEachCard function call, defined in decklist.
@@ -400,7 +406,7 @@ void DeckLoader::clearSetNamesAndNumbers()
         card->setCardProviderId(nullptr);
     };
 
-    forEachCard(clearSetNameAndNumber);
+    deckList->forEachCard(clearSetNameAndNumber);
 }
 
 DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
@@ -427,8 +433,8 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool add
     }
 
     // loop zones
-    for (int i = 0; i < getRoot()->size(); i++) {
-        const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(getRoot()->at(i));
+    for (int i = 0; i < deckList->getRoot()->size(); i++) {
+        const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i));
 
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
@@ -441,12 +447,12 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool add
 
 void DeckLoader::saveToStream_DeckHeader(QTextStream &out) const
 {
-    if (!getName().isEmpty()) {
-        out << "// " << getName() << "\n\n";
+    if (!deckList->getName().isEmpty()) {
+        out << "// " << deckList->getName() << "\n\n";
     }
 
-    if (!getComments().isEmpty()) {
-        QStringList commentRows = getComments().split(QRegularExpression("\n|\r\n|\r"));
+    if (!deckList->getComments().isEmpty()) {
+        QStringList commentRows = deckList->getComments().split(QRegularExpression("\n|\r\n|\r"));
         for (const QString &row : commentRows) {
             out << "// " << row << "\n";
         }
@@ -553,7 +559,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
     switch (getFormatFromName(fileName)) {
         case PlainTextFormat:
             // Save in Cockatrice's native format
-            result = saveToFile_Native(&file);
+            result = deckList->saveToFile_Native(&file);
             break;
         case CockatriceFormat:
             qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
@@ -602,4 +608,98 @@ QString DeckLoader::getCompleteCardName(const QString &cardName) const
     }
 
     return cardName;
+}
+
+void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
+{
+    const int totalColumns = 2;
+
+    if (node->height() == 1) {
+        QTextBlockFormat blockFormat;
+        QTextCharFormat charFormat;
+        charFormat.setFontPointSize(11);
+        charFormat.setFontWeight(QFont::Bold);
+        cursor->insertBlock(blockFormat, charFormat);
+
+        QTextTableFormat tableFormat;
+        tableFormat.setCellPadding(0);
+        tableFormat.setCellSpacing(0);
+        tableFormat.setBorder(0);
+        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
+        for (int i = 0; i < node->size(); i++) {
+            auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
+
+            QTextCharFormat cellCharFormat;
+            cellCharFormat.setFontPointSize(9);
+
+            QTextTableCell cell = table->cellAt(i, 0);
+            cell.setFormat(cellCharFormat);
+            QTextCursor cellCursor = cell.firstCursorPosition();
+            cellCursor.insertText(QString("%1 ").arg(card->getNumber()));
+
+            cell = table->cellAt(i, 1);
+            cell.setFormat(cellCharFormat);
+            cellCursor = cell.firstCursorPosition();
+            cellCursor.insertText(card->getName());
+        }
+    } else if (node->height() == 2) {
+        QTextBlockFormat blockFormat;
+        QTextCharFormat charFormat;
+        charFormat.setFontPointSize(14);
+        charFormat.setFontWeight(QFont::Bold);
+
+        cursor->insertBlock(blockFormat, charFormat);
+
+        QTextTableFormat tableFormat;
+        tableFormat.setCellPadding(10);
+        tableFormat.setCellSpacing(0);
+        tableFormat.setBorder(0);
+        QVector<QTextLength> constraints;
+        for (int i = 0; i < totalColumns; i++) {
+            constraints << QTextLength(QTextLength::PercentageLength, 100.0 / totalColumns);
+        }
+        tableFormat.setColumnWidthConstraints(constraints);
+
+        QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
+        for (int i = 0; i < node->size(); i++) {
+            QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
+            printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
+        }
+    }
+
+    cursor->movePosition(QTextCursor::End);
+}
+
+void DeckLoader::printDeckList(QPrinter *printer)
+{
+    QTextDocument doc;
+
+    QFont font("Serif");
+    font.setStyleHint(QFont::Serif);
+    doc.setDefaultFont(font);
+
+    QTextCursor cursor(&doc);
+
+    QTextBlockFormat headerBlockFormat;
+    QTextCharFormat headerCharFormat;
+    headerCharFormat.setFontPointSize(16);
+    headerCharFormat.setFontWeight(QFont::Bold);
+
+    cursor.insertBlock(headerBlockFormat, headerCharFormat);
+    cursor.insertText(deckList->getName());
+
+    headerCharFormat.setFontPointSize(12);
+    cursor.insertBlock(headerBlockFormat, headerCharFormat);
+    cursor.insertText(deckList->getComments());
+    cursor.insertBlock(headerBlockFormat, headerCharFormat);
+
+    for (int i = 0; i < deckList->getRoot()->size(); i++) {
+        cursor.insertHtml("<br><img src=theme:hr.jpg>");
+        // cursor.insertHtml("<hr>");
+        cursor.insertBlock(headerBlockFormat, headerCharFormat);
+
+        printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i)));
+    }
+
+    doc.print(printer);
 }

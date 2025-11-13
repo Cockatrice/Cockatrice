@@ -114,7 +114,12 @@ jobs:
           - distro: Debian
             version: 11
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
+
+          - distro: Servatrice_Debian
+            version: 11
+            package: DEB
+            test: skip
+            server_only: yes
 
           - distro: Debian
             version: 12
@@ -126,12 +131,12 @@ jobs:
             package: DEB
 
           - distro: Fedora
-            version: 41
+            version: 42
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
-            version: 42
+            version: 43
             package: RPM
 
           - distro: Ubuntu
@@ -191,10 +196,11 @@ jobs:
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
           CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
+          NO_CLIENT: ${{matrix.server_only == 'yes' && '--no-client' || '' }}
         run: |
           source .ci/docker.sh
           RUN --server --release --package "$package" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE"
+                  --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
       - name: Save compiler cache (ccache)

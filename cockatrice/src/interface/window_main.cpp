@@ -21,6 +21,7 @@
 
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
+#include "../client/settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_connect.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
@@ -71,7 +72,6 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
-#include <libcockatrice/settings/cache_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -846,7 +846,7 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::pixmapCacheSizeChanged);
     pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
 
-    client = new RemoteClient;
+    client = new RemoteClient(nullptr, &SettingsCache::instance());
     connect(client, &RemoteClient::connectionClosedEventReceived, this, &MainWindow::processConnectionClosedEvent);
     connect(client, &RemoteClient::serverShutdownEventReceived, this, &MainWindow::processServerShutdownEvent);
     connect(client, &RemoteClient::loginError, this, &MainWindow::loginError);
