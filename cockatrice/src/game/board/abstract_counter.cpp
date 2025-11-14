@@ -85,9 +85,13 @@ void AbstractCounter::retranslateUi()
 
 void AbstractCounter::setShortcutsActive()
 {
+    if (!menu) {
+        return;
+    }
     if (!player->getPlayerInfo()->getLocal()) {
         return;
     }
+
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     if (name == "life") {
         shortcutActive = true;
@@ -104,6 +108,10 @@ void AbstractCounter::setShortcutsActive()
 
 void AbstractCounter::setShortcutsInactive()
 {
+    if (!menu) {
+        return;
+    }
+
     shortcutActive = false;
     if (name == "life" || useNameForShortcut) {
         aSet->setShortcut(QKeySequence());
