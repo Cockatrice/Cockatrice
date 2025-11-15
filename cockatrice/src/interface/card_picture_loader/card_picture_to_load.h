@@ -69,6 +69,7 @@ public:
      * @return True if a next set exists and was selected, false if at the end.
      *
      * Updates currentSet and repopulates currentSetUrls.
+     * If we are already at the end of the list, then currentSet is set to empty.
      */
     bool nextSet();
 
@@ -77,6 +78,7 @@ public:
      * @return True if a next URL exists, false if at the end.
      *
      * Updates currentUrl.
+     * If we are already at the end of the list, then currentUrl is set to empty.
      */
     bool nextUrl();
 

@@ -46,6 +46,19 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
     return sortedSets;
 }
 
+/**
+ * Finds the PrintingInfo corresponding to the exactCards's card name that belongs to a given set and has the
+ * exactCards's providerId.
+ * If the set name is in the CardInfo, but no printings in that set match the card's providerId, then the first
+ * PrintingInfo for the set is returned.
+ *
+ * This method only exists to maintain existing behavior.
+ * TODO: check if going through all sets is still necessary after the ExactCard refactor.
+ *
+ * @param card The card to look in
+ * @param setName The set's short name
+ * @return A PrintingInfo, or a default-constructed PrintingInfo if the set name is not in the CardInfo.
+ */
 static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
 {
     SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
