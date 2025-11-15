@@ -460,9 +460,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))
             return false;
     if (!creatorNameFilters.isEmpty()) {
-        qInfo() << "Creator Name filters: " << creatorNameFilters;
         bool found = false;
-        for (auto createNameFilter : creatorNameFilters) {
+        for (const auto &createNameFilter : creatorNameFilters) {
             if (QString::fromStdString(game.creator_info().name()).contains(createNameFilter, Qt::CaseInsensitive)) {
                 found = true;
             }
