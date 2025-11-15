@@ -34,7 +34,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     deckLoader = new DeckLoader(this, deckModel->getDeckList());
 
-    DeckListStyleProxy *proxy = new DeckListStyleProxy(this);
+    proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);
 
     deckView = new QTreeView();
@@ -434,7 +434,9 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
 {
     auto selectedRows = deckView->selectionModel()->selectedRows();
 
-    const auto notLeafNode = [this](const auto &index) { return deckModel->hasChildren(index); };
+    const auto notLeafNode = [this](const QModelIndex &index) {
+        return deckModel->hasChildren(proxy->mapToSource(index));
+    };
     selectedRows.erase(std::remove_if(selectedRows.begin(), selectedRows.end(), notLeafNode), selectedRows.end());
 
     std::reverse(selectedRows.begin(), selectedRows.end());
@@ -501,7 +503,7 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
                                     // Third argument (true) says create the card no matter what, even if not in DB
                                     : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
-    recursiveExpand(newCardIndex);
+    recursiveExpand(proxy->mapToSource(newCardIndex));
 
     return true;
 }
@@ -522,7 +524,7 @@ void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString z
     }
 
     deckView->clearSelection();
-    deckView->setCurrentIndex(idx);
+    deckView->setCurrentIndex(proxy->mapToSource(idx));
     offsetCountAtIndex(idx, -1);
 }
 
@@ -558,7 +560,8 @@ void DeckEditorDeckDockWidget::actRemoveCard()
         if (!index.isValid() || deckModel->hasChildren(index)) {
             continue;
         }
-        deckModel->removeRow(index.row(), index.parent());
+        QModelIndex sourceIndex = proxy->mapToSource(index);
+        deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
         isModified = true;
     }
 
@@ -575,13 +578,17 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
         return;
     }
 
-    const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
+    QModelIndex sourceIndex = proxy->mapToSource(idx);
+
+    const QModelIndex numberIndex = sourceIndex.sibling(sourceIndex.row(), 0);
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
-    if (new_count <= 0)
-        deckModel->removeRow(idx.row(), idx.parent());
-    else
+
+    if (new_count <= 0) {
+        deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
+    } else {
         deckModel->setData(numberIndex, new_count, Qt::EditRole);
+    }
 
     emit deckModified();
 }

@@ -12,6 +12,7 @@
 #include "../../key_signals.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "deck_list_style_proxy.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -28,6 +29,7 @@ class DeckEditorDeckDockWidget : public QDockWidget
 public:
     explicit DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent);
     DeckLoader *deckLoader;
+    DeckListStyleProxy *proxy;
     DeckListModel *deckModel;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
