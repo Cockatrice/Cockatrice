@@ -563,6 +563,29 @@ QList<CardRef> DeckList::getCardRefList() const
     return result;
 }
 
+QList<DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZones) const
+{
+    QList<DecklistCardNode *> result;
+
+    for (auto *node : *root) {
+        auto *zoneNode = dynamic_cast<InnerDecklistNode *>(node);
+        if (zoneNode == nullptr) {
+            continue;
+        }
+        if (!restrictToZones.isEmpty() && !restrictToZones.contains(node->getName())) {
+            continue;
+        }
+        for (auto *cardNode : *zoneNode) {
+            auto *cardCardNode = dynamic_cast<DecklistCardNode *>(cardNode);
+            if (cardCardNode != nullptr) {
+                result.append(cardCardNode);
+            }
+        }
+    }
+
+    return result;
+}
+
 int DeckList::getSideboardSize() const
 {
     int size = 0;
