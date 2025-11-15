@@ -20,6 +20,7 @@ class CardInfo;
 using CardInfoPtr = QSharedPointer<CardInfo>;
 
 CardInfo::CardInfo(const QString &_name,
+                   const QSet<QString> &_altNames,
                    const QString &_text,
                    bool _isToken,
                    QVariantHash _properties,
@@ -30,9 +31,9 @@ CardInfo::CardInfo(const QString &_name,
                    bool _landscapeOrientation,
                    int _tableRow,
                    bool _upsideDownArt)
-    : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), cipt(_cipt),
-      landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
+    : name(_name), altNames(_altNames), text(_text), isToken(_isToken), properties(std::move(_properties)),
+      relatedCards(_relatedCards), reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)),
+      cipt(_cipt), landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
 {
     simpleName = CardInfo::simplifyName(name);
 
@@ -41,11 +42,12 @@ CardInfo::CardInfo(const QString &_name,
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
-    return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
+    return newInstance(_name, {}, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
                        SetToPrintingsMap(), false, false, 0, false);
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
+                                  const QSet<QString> &_altNames,
                                   const QString &_text,
                                   bool _isToken,
                                   QVariantHash _properties,
@@ -57,8 +59,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   int _tableRow,
                                   bool _upsideDownArt)
 {
-    CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
-                                 _sets, _cipt, _landscapeOrientation, _tableRow, _upsideDownArt));
+    CardInfoPtr ptr(new CardInfo(_name, _altNames, _text, _isToken, std::move(_properties), _relatedCards,
+                                 _reverseRelatedCards, _sets, _cipt, _landscapeOrientation, _tableRow, _upsideDownArt));
     ptr->setSmartPointer(ptr);
 
     for (const auto &printings : _sets) {
@@ -104,6 +106,10 @@ void CardInfo::combineLegalities(const QVariantHash &props)
             smartThis->setProperty(it.key(), it.value().toString());
         }
     }
+}
+void CardInfo::addAltName(const QString &altName)
+{
+    altNames.insert(altName);
 }
 
 void CardInfo::refreshCachedSetNames()

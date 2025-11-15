@@ -60,7 +60,7 @@ void AbstractCardItem::refreshCardInfo()
     exactCard = CardDatabaseManager::query()->getCard(cardRef);
 
     if (!exactCard && !cardRef.name.isEmpty()) {
-        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, false, false, -1, false);
+        auto info = CardInfo::newInstance(cardRef.name, {}, "", true, {}, {}, {}, {}, false, false, -1, false);
         exactCard = ExactCard(info);
     }
     if (exactCard) {

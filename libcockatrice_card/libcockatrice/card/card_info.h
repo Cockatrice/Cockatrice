@@ -57,6 +57,7 @@ private:
     CardInfoPtr smartThis;                         ///< Smart pointer to self for safe cross-references.
     QString name;                                  ///< Full name of the card.
     QString simpleName;                            ///< Simplified name for fuzzy matching.
+    QSet<QString> altNames;                        ///< Alternative names for the card, used when searching by name.
     QString text;                                  ///< Text description or rules text of the card.
     bool isToken;                                  ///< Whether this card is a token or not.
     QVariantHash properties;                       ///< Key-value store of dynamic card properties.
@@ -75,6 +76,7 @@ public:
      * @brief Constructs a CardInfo with full initialization.
      *
      * @param _name The name of the card.
+     * @param _altNames Alternative names for the card
      * @param _text Rules text or description of the card.
      * @param _isToken Flag indicating whether the card is a token.
      * @param _properties Arbitrary key-value properties.
@@ -87,6 +89,7 @@ public:
      * @param _upsideDownArt Whether the artwork should be displayed upside down.
      */
     explicit CardInfo(const QString &_name,
+                      const QSet<QString> &_altNames,
                       const QString &_text,
                       bool _isToken,
                       QVariantHash _properties,
@@ -106,8 +109,8 @@ public:
      * @param other Another CardInfo to copy.
      */
     CardInfo(const CardInfo &other)
-        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
-          isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
+        : QObject(other.parent()), name(other.name), simpleName(other.simpleName), altNames(other.altNames),
+          text(other.text), isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), setsNames(other.setsNames), cipt(other.cipt),
           landscapeOrientation(other.landscapeOrientation), tableRow(other.tableRow), upsideDownArt(other.upsideDownArt)
@@ -128,6 +131,7 @@ public:
      * @brief Creates a new instance with full initialization.
      *
      * @param _name Name of the card.
+     * @param _altNames Alternative names for the card, used when searching by name
      * @param _text Rules text or description.
      * @param _isToken Token flag.
      * @param _properties Arbitrary properties.
@@ -141,6 +145,7 @@ public:
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
+                                   const QSet<QString> &_altNames,
                                    const QString &_text,
                                    bool _isToken,
                                    QVariantHash _properties,
@@ -186,6 +191,10 @@ public:
     const QString &getSimpleName() const
     {
         return simpleName;
+    }
+    const QSet<QString> &getAltNames() const
+    {
+        return altNames;
     }
     const QString &getText() const
     {
@@ -318,6 +327,14 @@ public:
      * @param props Key-value mapping of format legalities.
      */
     void combineLegalities(const QVariantHash &props);
+
+    /**
+     * Adds a new name to the altNames.
+     * AltName is deduplicated; adding an existing altName is a no-op.
+     *
+     * @param altName The name to add
+     */
+    void addAltName(const QString &altName);
 
     /**
      * @brief Refreshes the cached, human-readable list of set names.
