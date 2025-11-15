@@ -2,7 +2,7 @@
 #include "mocks.h"
 
 CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cardDatabase.ini", parent)
+    : SettingsManager(settingPath + "cardDatabase.ini", QString(), QString(), parent)
 {
 }
 void CardDatabaseSettings::setSortKey(QString /* shortName */, unsigned int /* sortKey */)
