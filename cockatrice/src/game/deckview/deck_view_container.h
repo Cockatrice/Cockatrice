@@ -32,7 +32,7 @@ signals:
 
 public:
     explicit ToggleButton(QWidget *parent = nullptr);
-    bool getState() const
+    [[nodiscard]] bool getState() const
     {
         return state;
     }

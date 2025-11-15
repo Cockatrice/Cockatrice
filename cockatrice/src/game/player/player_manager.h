@@ -27,39 +27,39 @@ public:
     bool localPlayerIsSpectator;
     QMap<int, ServerInfo_User> spectators;
 
-    bool isSpectator() const
+    [[nodiscard]] bool isSpectator() const
     {
         return localPlayerIsSpectator;
     }
 
-    bool isJudge() const
+    [[nodiscard]] bool isJudge() const
     {
         return localPlayerIsJudge;
     }
 
-    int getLocalPlayerId() const
+    [[nodiscard]] int getLocalPlayerId() const
     {
         return localPlayerId;
     }
 
-    const QMap<int, Player *> &getPlayers() const
+    [[nodiscard]] const QMap<int, Player *> &getPlayers() const
     {
         return players;
     }
 
-    int getPlayerCount() const
+    [[nodiscard]] int getPlayerCount() const
     {
         return players.size();
     }
 
-    Player *getActiveLocalPlayer(int activePlayer) const;
+    [[nodiscard]] Player *getActiveLocalPlayer(int activePlayer) const;
     bool isLocalPlayer(int playerId);
 
     Player *addPlayer(int playerId, const ServerInfo_User &info);
 
     void removePlayer(int playerId);
 
-    Player *getPlayer(int playerId) const;
+    [[nodiscard]] Player *getPlayer(int playerId) const;
 
     void onPlayerConceded(int playerId, bool conceded);
 
@@ -70,17 +70,17 @@ public:
         return playerId == getLocalPlayerId();
     }
 
-    const QMap<int, ServerInfo_User> &getSpectators() const
+    [[nodiscard]] const QMap<int, ServerInfo_User> &getSpectators() const
     {
         return spectators;
     }
 
-    ServerInfo_User getSpectator(int playerId) const
+    [[nodiscard]] ServerInfo_User getSpectator(int playerId) const
     {
         return spectators.value(playerId);
     }
 
-    QString getSpectatorName(int spectatorId) const
+    [[nodiscard]] QString getSpectatorName(int spectatorId) const
     {
         return QString::fromStdString(spectators.value(spectatorId).name());
     }
@@ -100,7 +100,7 @@ public:
         emit spectatorRemoved(spectatorId, spectatorInfo);
     }
 
-    AbstractGame *getGame() const
+    [[nodiscard]] AbstractGame *getGame() const
     {
         return game;
     }

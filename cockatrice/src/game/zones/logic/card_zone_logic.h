@@ -63,16 +63,16 @@ public:
     {
         cards.sortBy(options);
     }
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return name;
     }
-    QString getTranslatedName(bool theirOwn, GrammaticalCase gc) const;
-    Player *getPlayer() const
+    [[nodiscard]] QString getTranslatedName(bool theirOwn, GrammaticalCase gc) const;
+    [[nodiscard]] Player *getPlayer() const
     {
         return player;
     }
-    bool contentsKnown() const
+    [[nodiscard]] bool contentsKnown() const
     {
         return cards.getContentsKnown();
     }
@@ -84,15 +84,15 @@ public:
     {
         alwaysRevealTopCard = _alwaysRevealTopCard;
     }
-    bool getAlwaysRevealTopCard() const
+    [[nodiscard]] bool getAlwaysRevealTopCard() const
     {
         return alwaysRevealTopCard;
     }
-    bool getHasCardAttr() const
+    [[nodiscard]] bool getHasCardAttr() const
     {
         return hasCardAttr;
     }
-    bool getIsShufflable() const
+    [[nodiscard]] bool getIsShufflable() const
     {
         return isShufflable;
     }

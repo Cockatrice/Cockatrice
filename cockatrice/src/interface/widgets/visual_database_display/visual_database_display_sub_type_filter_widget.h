@@ -25,7 +25,7 @@ public:
     void retranslateUi();
     void createSubTypeButtons();
     void updateSubTypeButtonsVisibility();
-    int getMaxSubTypeCount() const;
+    [[nodiscard]] int getMaxSubTypeCount() const;
 
     void handleSubTypeToggled(const QString &mainType, bool active);
     void updateSubTypeFilter();

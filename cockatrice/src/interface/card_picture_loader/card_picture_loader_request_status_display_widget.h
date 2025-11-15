@@ -28,7 +28,7 @@ public:
         repaint();
     }
 
-    bool getFinished() const
+    [[nodiscard]] bool getFinished() const
     {
         return finished->text() == "True";
     }
@@ -50,12 +50,12 @@ public:
         return elapsedTime->text().toInt();
     }
 
-    QString getStartTime() const
+    [[nodiscard]] QString getStartTime() const
     {
         return startTime->text();
     }
 
-    QString getUrl() const
+    [[nodiscard]] QString getUrl() const
     {
         return url->text();
     }

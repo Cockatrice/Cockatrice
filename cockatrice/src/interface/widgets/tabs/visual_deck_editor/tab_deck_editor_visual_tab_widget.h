@@ -73,10 +73,10 @@ public:
     void setTabTitle(int index, const QString &title);
 
     /// Get the currently active tab widget.
-    QWidget *getCurrentTab() const;
+    [[nodiscard]] QWidget *getCurrentTab() const;
 
     /// Get the total number of tabs.
-    int getTabCount() const;
+    [[nodiscard]] int getTabCount() const;
 
     VisualDeckEditorWidget *visualDeckView;             ///< Visual deck editor widget.
     DeckAnalyticsWidget *deckAnalytics;                 ///< Deck analytics widget.

@@ -68,7 +68,7 @@ private:
     QAction *messageClicked;
     QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
 
-    QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
+    [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);

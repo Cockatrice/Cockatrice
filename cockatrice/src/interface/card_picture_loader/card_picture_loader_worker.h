@@ -65,7 +65,7 @@ private:
     CardPictureLoaderLocal *localLoader;
     QSet<QString> currentlyLoading; // for deduplication purposes. Contains pixmapCacheKey
 
-    QUrl getCachedRedirect(const QUrl &originalUrl) const;
+    [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
     void loadRedirectCache();
     void saveRedirectCache() const;
     void cleanStaleEntries();

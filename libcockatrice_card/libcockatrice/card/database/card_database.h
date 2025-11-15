@@ -101,7 +101,7 @@ public:
     void clear();
 
     /** @brief Returns the map of cards by name. */
-    const CardNameMap &getCardList() const
+    [[nodiscard]] const CardNameMap &getCardList() const
     {
         return cards;
     }
@@ -114,16 +114,16 @@ public:
     CardSetPtr getSet(const QString &setName);
 
     /** @brief Returns a list of all sets in the database. */
-    CardSetList getSetList() const;
+    [[nodiscard]] CardSetList getSetList() const;
 
     /** @brief Returns the current load status. */
-    LoadStatus getLoadStatus() const
+    [[nodiscard]] LoadStatus getLoadStatus() const
     {
         return loadStatus;
     }
 
     /** @brief Returns the querier for performing card lookups. */
-    CardDatabaseQuerier *query() const
+    [[nodiscard]] CardDatabaseQuerier *query() const
     {
         return querier;
     }

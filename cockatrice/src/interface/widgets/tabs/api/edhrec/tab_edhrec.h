@@ -20,7 +20,7 @@ public:
     explicit TabEdhRec(TabSupervisor *_tabSupervisor);
 
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
         return tr("EDHREC: ") + cardName;

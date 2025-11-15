@@ -35,7 +35,7 @@ public:
                           const QString &_originZone = QString());
     ~DeckViewCard() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    const QString &getOriginZone() const
+    [[nodiscard]] const QString &getOriginZone() const
     {
         return originZone;
     }
@@ -71,34 +71,34 @@ private:
     QMultiMap<QString, DeckViewCard *> cardsByType;
     QList<QPair<int, int>> currentRowsAndCols;
     qreal width, height;
-    int getCardTypeTextWidth() const;
+    [[nodiscard]] int getCardTypeTextWidth() const;
 
 public:
     enum
     {
         Type = typeDeckViewCardContainer
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
     explicit DeckViewCardContainer(const QString &_name);
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void addCard(DeckViewCard *card);
     void removeCard(DeckViewCard *card);
-    const QList<DeckViewCard *> &getCards() const
+    [[nodiscard]] const QList<DeckViewCard *> &getCards() const
     {
         return cards;
     }
-    const QString &getName() const
+    [[nodiscard]] const QString &getName() const
     {
         return name;
     }
     void setWidth(qreal _width);
 
-    QList<QPair<int, int>> getRowsAndCols() const;
-    QSizeF calculateBoundingRect(const QList<QPair<int, int>> &rowsAndCols) const;
+    [[nodiscard]] QList<QPair<int, int>> getRowsAndCols() const;
+    [[nodiscard]] QSizeF calculateBoundingRect(const QList<QPair<int, int>> &rowsAndCols) const;
     void rearrangeItems(const QList<QPair<int, int>> &rowsAndCols);
 };
 
@@ -123,7 +123,7 @@ public:
     {
         locked = _locked;
     }
-    bool getLocked() const
+    [[nodiscard]] bool getLocked() const
     {
         return locked;
     }
@@ -135,7 +135,7 @@ public:
     }
     void rearrangeItems();
     void updateContents();
-    QList<MoveCard_ToZone> getSideboardPlan() const;
+    [[nodiscard]] QList<MoveCard_ToZone> getSideboardPlan() const;
     void resetSideboardPlan();
     void applySideboardPlan(const QList<MoveCard_ToZone> &plan);
 };
@@ -162,7 +162,7 @@ public:
     {
         deckViewScene->setLocked(_locked);
     }
-    QList<MoveCard_ToZone> getSideboardPlan() const
+    [[nodiscard]] QList<MoveCard_ToZone> getSideboardPlan() const
     {
         return deckViewScene->getSideboardPlan();
     }

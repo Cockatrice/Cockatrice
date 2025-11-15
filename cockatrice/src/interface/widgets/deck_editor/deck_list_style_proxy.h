@@ -9,7 +9,7 @@ class DeckListStyleProxy : public QIdentityProxyModel
 public:
     using QIdentityProxyModel::QIdentityProxyModel;
 
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 };
 
 #endif // COCKATRICE_DECK_LIST_STYLE_PROXY_H

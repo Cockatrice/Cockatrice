@@ -20,19 +20,19 @@ class DlgForgotPasswordChallenge : public QDialog
     Q_OBJECT
 public:
     explicit DlgForgotPasswordChallenge(QWidget *parent = nullptr);
-    QString getHost() const
+    [[nodiscard]] QString getHost() const
     {
         return hostEdit->text();
     }
-    int getPort() const
+    [[nodiscard]] int getPort() const
     {
         return portEdit->text().toInt();
     }
-    QString getPlayerName() const
+    [[nodiscard]] QString getPlayerName() const
     {
         return playernameEdit->text();
     }
-    QString getEmail() const
+    [[nodiscard]] QString getEmail() const
     {
         return emailEdit->text();
     }

@@ -59,31 +59,31 @@ public:
     }
 
     /// @return The number of copies of this card in the deck.
-    virtual int getNumber() const = 0;
+    [[nodiscard]] virtual int getNumber() const = 0;
 
     /// @param _number Set the number of copies of this card.
     virtual void setNumber(int _number) = 0;
 
     /// @return The display name of this card.
-    QString getName() const override = 0;
+    [[nodiscard]] QString getName() const override = 0;
 
     /// @param _name Set the display name of this card.
     virtual void setName(const QString &_name) = 0;
 
     /// @return The provider identifier for this card (e.g., UUID).
-    virtual QString getCardProviderId() const override = 0;
+    [[nodiscard]] virtual QString getCardProviderId() const override = 0;
 
     /// @param _cardProviderId Set the provider identifier for this card.
     virtual void setCardProviderId(const QString &_cardProviderId) = 0;
 
     /// @return The abbreviated set code (e.g., "NEO").
-    virtual QString getCardSetShortName() const override = 0;
+    [[nodiscard]] virtual QString getCardSetShortName() const override = 0;
 
     /// @param _cardSetShortName Set the abbreviated set code.
     virtual void setCardSetShortName(const QString &_cardSetShortName) = 0;
 
     /// @return The collector number of the card within its set.
-    virtual QString getCardCollectorNumber() const override = 0;
+    [[nodiscard]] virtual QString getCardCollectorNumber() const override = 0;
 
     /// @param _cardSetNumber Set the collector number.
     virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
@@ -96,7 +96,7 @@ public:
      *
      * @return 0
      */
-    int height() const override
+    [[nodiscard]] int height() const override
     {
         return 0;
     }

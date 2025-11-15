@@ -176,7 +176,7 @@ public:
      * @brief Compute the height of this node.
      * @return Maximum depth of descendants + 1.
      */
-    int height() const override;
+    [[nodiscard]] int height() const override;
 
     /**
      * @brief Count cards recursively under this node.
@@ -184,7 +184,7 @@ public:
      *        If false, counts unique card nodes.
      * @return Total count.
      */
-    int recursiveCount(bool countTotalCards = false) const;
+    [[nodiscard]] int recursiveCount(bool countTotalCards = false) const;
 
     /**
      * @brief Compare this node against another for sorting.

@@ -39,7 +39,7 @@ class DlgCreateToken : public QDialog
     Q_OBJECT
 public:
     explicit DlgCreateToken(const QStringList &_predefinedTokens, QWidget *parent = nullptr);
-    TokenInfo getTokenInfo() const;
+    [[nodiscard]] TokenInfo getTokenInfo() const;
 
 protected:
     void closeEvent(QCloseEvent *event) override;

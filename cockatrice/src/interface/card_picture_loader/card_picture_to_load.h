@@ -25,20 +25,20 @@ private:
 public:
     explicit CardPictureToLoad(const ExactCard &_card);
 
-    const ExactCard &getCard() const
+    [[nodiscard]] const ExactCard &getCard() const
     {
         return card;
     }
-    QString getCurrentUrl() const
+    [[nodiscard]] QString getCurrentUrl() const
     {
         return currentUrl;
     }
-    CardSetPtr getCurrentSet() const
+    [[nodiscard]] CardSetPtr getCurrentSet() const
     {
         return currentSet;
     }
-    QString getSetName() const;
-    QString transformUrl(const QString &urlTemplate) const;
+    [[nodiscard]] QString getSetName() const;
+    [[nodiscard]] QString transformUrl(const QString &urlTemplate) const;
     bool nextSet();
     bool nextUrl();
     void populateSetUrls();
