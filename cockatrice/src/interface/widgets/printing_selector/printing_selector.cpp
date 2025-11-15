@@ -218,7 +218,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
 
     connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
-            ExactCard card = ExactCard(selectedCard, printingsToUse[currentIndex]);
+            auto card = ExactCard(selectedCard, printingsToUse[currentIndex]);
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(
                 this, deckEditor, deckModel, deckView, cardSizeWidget->getSlider(), card, currentZone);
             flowWidget->addWidget(cardDisplayWidget);

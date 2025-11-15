@@ -67,7 +67,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     sayLabel->setBuddy(sayEdit);
     connect(sayEdit, &LineEditCompleter::returnPressed, this, &TabRoom::sendMessage);
 
-    QMenu *chatSettingsMenu = new QMenu(this);
+    auto *chatSettingsMenu = new QMenu(this);
 
     aClearChat = chatSettingsMenu->addAction(QString());
     connect(aClearChat, &QAction::triggered, this, &TabRoom::actClearChat);
@@ -77,28 +77,28 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     aOpenChatSettings = chatSettingsMenu->addAction(QString());
     connect(aOpenChatSettings, &QAction::triggered, this, &TabRoom::actOpenChatSettings);
 
-    QToolButton *chatSettingsButton = new QToolButton;
+    auto *chatSettingsButton = new QToolButton;
     chatSettingsButton->setIcon(QPixmap("theme:icons/settings"));
     chatSettingsButton->setMenu(chatSettingsMenu);
     chatSettingsButton->setPopupMode(QToolButton::InstantPopup);
 
-    QHBoxLayout *sayHbox = new QHBoxLayout;
+    auto *sayHbox = new QHBoxLayout;
     sayHbox->addWidget(sayLabel);
     sayHbox->addWidget(sayEdit);
     sayHbox->addWidget(chatSettingsButton);
 
-    QVBoxLayout *chatVbox = new QVBoxLayout;
+    auto *chatVbox = new QVBoxLayout;
     chatVbox->addWidget(chatView);
     chatVbox->addLayout(sayHbox);
 
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatVbox);
 
-    QSplitter *splitter = new QSplitter(Qt::Vertical);
+    auto *splitter = new QSplitter(Qt::Vertical);
     splitter->addWidget(gameSelector);
     splitter->addWidget(chatGroupBox);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
+    auto *hbox = new QHBoxLayout;
     hbox->addWidget(splitter, 3);
     hbox->addWidget(userList, 1);
 
@@ -133,7 +133,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
 }

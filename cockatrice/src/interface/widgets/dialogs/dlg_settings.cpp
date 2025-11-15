@@ -141,38 +141,38 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     deckPathEdit = new QLineEdit(settings.getDeckPath());
     deckPathEdit->setReadOnly(true);
-    QPushButton *deckPathButton = new QPushButton("...");
+    auto *deckPathButton = new QPushButton("...");
     connect(deckPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::deckPathButtonClicked);
 
     filtersPathEdit = new QLineEdit(settings.getFiltersPath());
     filtersPathEdit->setReadOnly(true);
-    QPushButton *filtersPathButton = new QPushButton("...");
+    auto *filtersPathButton = new QPushButton("...");
     connect(filtersPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::filtersPathButtonClicked);
 
     replaysPathEdit = new QLineEdit(settings.getReplaysPath());
     replaysPathEdit->setReadOnly(true);
-    QPushButton *replaysPathButton = new QPushButton("...");
+    auto *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::replaysPathButtonClicked);
 
     picsPathEdit = new QLineEdit(settings.getPicsPath());
     picsPathEdit->setReadOnly(true);
-    QPushButton *picsPathButton = new QPushButton("...");
+    auto *picsPathButton = new QPushButton("...");
     connect(picsPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::picsPathButtonClicked);
 
     cardDatabasePathEdit = new QLineEdit(settings.getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
-    QPushButton *cardDatabasePathButton = new QPushButton("...");
+    auto *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::cardDatabasePathButtonClicked);
 
     customCardDatabasePathEdit = new QLineEdit(settings.getCustomCardDatabasePath());
     customCardDatabasePathEdit->setReadOnly(true);
-    QPushButton *customCardDatabasePathButton = new QPushButton("...");
+    auto *customCardDatabasePathButton = new QPushButton("...");
     connect(customCardDatabasePathButton, &QPushButton::clicked, this,
             &GeneralSettingsPage::customCardDatabaseButtonClicked);
 
     tokenDatabasePathEdit = new QLineEdit(settings.getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
-    QPushButton *tokenDatabasePathButton = new QPushButton("...");
+    auto *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::tokenDatabasePathButtonClicked);
 
     // Required init here to avoid crashing on Portable builds

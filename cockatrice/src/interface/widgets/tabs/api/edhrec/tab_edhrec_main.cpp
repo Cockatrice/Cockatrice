@@ -64,14 +64,14 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     auto displayModel = new CardDatabaseDisplayModel(this);
     displayModel->setSourceModel(cardDatabaseModel);
-    CardSearchModel *searchModel = new CardSearchModel(displayModel, this);
+    auto *searchModel = new CardSearchModel(displayModel, this);
 
-    CardCompleterProxyModel *proxyModel = new CardCompleterProxyModel(this);
+    auto *proxyModel = new CardCompleterProxyModel(this);
     proxyModel->setSourceModel(searchModel);
     proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     proxyModel->setFilterRole(Qt::DisplayRole);
 
-    QCompleter *completer = new QCompleter(proxyModel, this);
+    auto *completer = new QCompleter(proxyModel, this);
     completer->setCompletionRole(Qt::DisplayRole);
     completer->setCompletionMode(QCompleter::PopupCompletion);
     completer->setCaseSensitivity(Qt::CaseInsensitive);

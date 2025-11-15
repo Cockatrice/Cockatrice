@@ -35,7 +35,7 @@ void Server_AbstractUserInterface::sendProtocolItemByType(ServerMessage::Message
 
 SessionEvent *Server_AbstractUserInterface::prepareSessionEvent(const ::google::protobuf::Message &sessionEvent)
 {
-    SessionEvent *event = new SessionEvent;
+    auto *event = new SessionEvent;
     event->GetReflection()
         ->MutableMessage(event, sessionEvent.GetDescriptor()->FindExtensionByName("ext"))
         ->CopyFrom(sessionEvent);

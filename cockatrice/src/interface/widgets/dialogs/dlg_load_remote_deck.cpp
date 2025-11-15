@@ -18,7 +18,7 @@ DlgLoadRemoteDeck::DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent) :
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgLoadRemoteDeck::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgLoadRemoteDeck::reject);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(dirView);
     mainLayout->addWidget(buttonBox);
 
