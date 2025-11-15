@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
+#include <qcborvalue.h>
 #include <version_string.h>
 
 #define COCKATRICE_XML4_TAGNAME "cockatrice_carddatabase"
@@ -134,6 +135,27 @@ QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &x
     return properties;
 }
 
+/**
+ * @brief Loads an <altNames> block from a <card> element.
+ * @param xml The open QXmlStreamReader positioned at an <altNames> element.
+ * @return A QSet containing all the altNames
+ */
+static QSet<QString> loadAltNamesFromXml(QXmlStreamReader &xml)
+{
+    Q_ASSERT(xml.name() == "altNames");
+
+    QSet<QString> altNames;
+    while (!xml.atEnd()) {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
+            break;
+        }
+
+        if (xml.name() == "altName") {
+            altNames.insert(xml.readElementText(QXmlStreamReader::IncludeChildElements));
+        }
+    }
+    return altNames;
+}
 void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 {
     bool includeRebalancedCards = cardPreferenceProvider->getIncludeRebalancedCards();
@@ -146,6 +168,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
         if (xmlName == "card") {
             QString name = QString("");
+            QSet<QString> altNames;
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
@@ -166,6 +189,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 // variable - assigned properties
                 if (xmlName == "name") {
                     name = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+                } else if (xmlName == "altNames") {
+                    altNames = loadAltNamesFromXml(xml);
                 } else if (xmlName == "text") {
                     text = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xmlName == "token") {
@@ -263,8 +288,8 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
             }
 
             CardInfoPtr newCard =
-                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
-                                      landscapeOrientation, tableRow, upsideDown);
+                CardInfo::newInstance(name, altNames, text, isToken, properties, relatedCards, reverseRelatedCards,
+                                      _sets, cipt, landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -304,6 +329,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("text", info->getText());
     if (info->getIsToken()) {
         xml.writeTextElement("token", "1");
+    }
+
+    // altNames
+    if (!info->getAltNames().isEmpty()) {
+        xml.writeStartElement("altNames");
+        for (const auto &altName : info->getAltNames()) {
+            xml.writeTextElement("altName", altName);
+        }
+        xml.writeEndElement();
     }
 
     // generic properties

@@ -111,6 +111,28 @@ void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
+/**
+ * @brief Loads an <altNames> block from a <card> element.
+ * @param xml The open QXmlStreamReader positioned at an <altNames> element.
+ * @return A QSet containing all the altNames
+ */
+static QSet<QString> loadAltNamesFromXml(QXmlStreamReader &xml)
+{
+    Q_ASSERT(xml.name() == "altNames");
+
+    QSet<QString> altNames;
+    while (!xml.atEnd()) {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
+            break;
+        }
+
+        if (xml.name() == "altName") {
+            altNames.insert(xml.readElementText(QXmlStreamReader::IncludeChildElements));
+        }
+    }
+    return altNames;
+}
+
 QString CockatriceXml3Parser::getMainCardType(QString &type)
 {
     QString result = type;
@@ -159,6 +181,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
         auto xmlName = xml.name().toString();
         if (xmlName == "card") {
             QString name = QString("");
+            QSet<QString> altNames;
             QString text = QString("");
             QVariantHash properties = QVariantHash();
             QString colors = QString("");
@@ -179,6 +202,8 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 // variable - assigned properties
                 if (xmlName == "name") {
                     name = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+                } else if (xmlName == "altNames") {
+                    altNames = loadAltNamesFromXml(xml);
                 } else if (xmlName == "text") {
                     text = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                 } else if (xmlName == "color" || xmlName == "colors") {
@@ -283,8 +308,8 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
 
             properties.insert("colors", colors);
             CardInfoPtr newCard =
-                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
-                                      landscapeOrientation, tableRow, upsideDown);
+                CardInfo::newInstance(name, altNames, text, isToken, properties, relatedCards, reverseRelatedCards,
+                                      _sets, cipt, landscapeOrientation, tableRow, upsideDown);
             emit addCard(newCard);
         }
     }
@@ -323,6 +348,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     xml.writeTextElement("text", info->getText());
     if (info->getIsToken()) {
         xml.writeTextElement("token", "1");
+    }
+
+    // altNames
+    if (!info->getAltNames().isEmpty()) {
+        xml.writeStartElement("altNames");
+        for (const auto &altName : info->getAltNames()) {
+            xml.writeTextElement("altName", altName);
+        }
+        xml.writeEndElement();
     }
 
     // generic properties
