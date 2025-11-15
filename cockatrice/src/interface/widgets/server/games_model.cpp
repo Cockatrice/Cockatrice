@@ -28,7 +28,7 @@ enum GameListColumn
 
 const int DEFAULT_MAX_PLAYERS_MIN = 1;
 const int DEFAULT_MAX_PLAYERS_MAX = 99;
-constexpr QTime DEFAULT_MAX_GAME_AGE = QTime();
+constexpr auto DEFAULT_MAX_GAME_AGE = QTime();
 
 const QString GamesModel::getGameCreatedString(const int secs)
 {
@@ -333,7 +333,7 @@ void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
 
 int GamesProxyModel::getNumFilteredGames() const
 {
-    GamesModel *model = qobject_cast<GamesModel *>(sourceModel());
+    auto *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
         return 0;
 

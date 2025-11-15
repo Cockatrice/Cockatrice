@@ -17,22 +17,22 @@
 
 ShutdownDialog::ShutdownDialog(QWidget *parent) : QDialog(parent)
 {
-    QLabel *reasonLabel = new QLabel(tr("&Reason for shutdown:"));
+    auto *reasonLabel = new QLabel(tr("&Reason for shutdown:"));
     reasonEdit = new QLineEdit;
     reasonEdit->setMaxLength(MAX_TEXT_LENGTH);
     reasonLabel->setBuddy(reasonEdit);
-    QLabel *minutesLabel = new QLabel(tr("&Time until shutdown (minutes):"));
+    auto *minutesLabel = new QLabel(tr("&Time until shutdown (minutes):"));
     minutesEdit = new QSpinBox;
     minutesLabel->setBuddy(minutesEdit);
     minutesEdit->setMinimum(0);
     minutesEdit->setValue(5);
     minutesEdit->setMaximum(999);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &ShutdownDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &ShutdownDialog::reject);
 
-    QGridLayout *mainLayout = new QGridLayout;
+    auto *mainLayout = new QGridLayout;
     mainLayout->addWidget(reasonLabel, 0, 0);
     mainLayout->addWidget(reasonEdit, 0, 1);
     mainLayout->addWidget(minutesLabel, 1, 0);
@@ -109,7 +109,7 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
     lockButton->setEnabled(false);
     connect(lockButton, &QPushButton::clicked, this, &TabAdmin::actLock);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(adminGroupBox);
     mainLayout->addWidget(moderatorGroupBox);
     mainLayout->addStretch();
@@ -118,7 +118,7 @@ TabAdmin::TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool 
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
 

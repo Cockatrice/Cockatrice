@@ -128,7 +128,7 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
 
 RoomEvent *Server_Room::prepareRoomEvent(const ::google::protobuf::Message &roomEvent)
 {
-    RoomEvent *event = new RoomEvent;
+    auto *event = new RoomEvent;
     event->set_room_id(id);
     event->GetReflection()
         ->MutableMessage(event, roomEvent.GetDescriptor()->FindExtensionByName("ext"))

@@ -982,7 +982,7 @@ void TabGame::createMenuItems()
     phasesMenu = new TearOffMenu(this);
 
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
-        QAction *temp = new QAction(QString(), this);
+        auto *temp = new QAction(QString(), this);
         connect(temp, &QAction::triggered, this, &TabGame::actPhaseAction);
         phasesMenu->addAction(temp);
         phaseActions.append(temp);

@@ -27,7 +27,7 @@ bool PlayerListItemDelegate::editorEvent(QEvent *event,
                                          const QModelIndex &index)
 {
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
-        QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
+        auto *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             static_cast<PlayerListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);

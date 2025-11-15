@@ -1095,12 +1095,11 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                         arrowInfo->set_start_player_id(player->getPlayerId());
                         arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
                         arrowInfo->set_start_card_id(startCard->getId());
-                        const Server_AbstractPlayer *arrowTargetPlayer =
-                            qobject_cast<const Server_AbstractPlayer *>(targetItem);
+                        const auto *arrowTargetPlayer = qobject_cast<const Server_AbstractPlayer *>(targetItem);
                         if (arrowTargetPlayer != nullptr) {
                             arrowInfo->set_target_player_id(arrowTargetPlayer->getPlayerId());
                         } else {
-                            const Server_Card *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
+                            const auto *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
                             arrowInfo->set_target_player_id(arrowTargetCard->getZone()->getPlayer()->getPlayerId());
                             arrowInfo->set_target_zone(arrowTargetCard->getZone()->getName().toStdString());
                             arrowInfo->set_target_card_id(arrowTargetCard->getId());

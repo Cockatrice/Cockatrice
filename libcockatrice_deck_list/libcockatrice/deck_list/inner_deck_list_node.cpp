@@ -145,10 +145,10 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
         const QString childName = xml->name().toString();
         if (xml->isStartElement()) {
             if (childName == "zone") {
-                InnerDecklistNode *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
+                auto *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 newZone->readElement(xml);
             } else if (childName == "card") {
-                DecklistCardNode *newCard = new DecklistCardNode(
+                auto *newCard = new DecklistCardNode(
                     xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(),
                     this, -1, xml->attributes().value("setShortName").toString(),
                     xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());

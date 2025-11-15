@@ -34,7 +34,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     connect(sayEdit, &LineEditUnfocusable::returnPressed, this, &TabMessage::sendMessage);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
+    auto *vbox = new QVBoxLayout;
     vbox->addWidget(chatView);
     vbox->addWidget(sayEdit);
 
@@ -47,7 +47,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(vbox);
     setCentralWidget(mainWidget);
 }

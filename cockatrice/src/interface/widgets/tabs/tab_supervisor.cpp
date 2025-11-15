@@ -931,7 +931,7 @@ void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
 
 void TabSupervisor::tabUserEvent(bool globalEvent)
 {
-    Tab *tab = static_cast<Tab *>(sender());
+    auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
@@ -1032,7 +1032,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 void TabSupervisor::updateCurrent(int index)
 {
     if (index != -1) {
-        Tab *tab = static_cast<Tab *>(widget(index));
+        auto *tab = static_cast<Tab *>(widget(index));
         if (tab->getContentsChanged()) {
             setTabIcon(index, QIcon());
             tab->setContentsChanged(false);

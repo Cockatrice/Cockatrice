@@ -160,7 +160,7 @@ public:
      */
     CardInfoPtr clone() const
     {
-        CardInfoPtr newCardInfo = CardInfoPtr(new CardInfo(*this));
+        auto newCardInfo = CardInfoPtr(new CardInfo(*this));
         newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
         return newCardInfo;
     }
