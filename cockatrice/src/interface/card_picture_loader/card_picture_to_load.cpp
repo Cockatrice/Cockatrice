@@ -20,12 +20,6 @@ CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     }
 }
 
-/**
- * Extracts a list of all the sets from the card, sorted in priority order.
- * If the card does not contain any sets, then a dummy set will be inserted into the list.
- *
- * @return A list of sets. Will not be empty.
- */
 QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
 {
     QList<CardSetPtr> sortedSets;
@@ -52,19 +46,6 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
     return sortedSets;
 }
 
-/**
- * Finds the PrintingInfo corresponding to the exactCards's card name that belongs to a given set and has the
- * exactCards's providerId.
- * If the set name is in the CardInfo, but no printings in that set match the card's providerId, then the first
- * PrintingInfo for the set is returned.
- *
- * This method only exists to maintain existing behavior.
- * TODO: check if going through all sets is still necessary after the ExactCard refactor.
- *
- * @param card The card to look in
- * @param setName The set's short name
- * @return A PrintingInfo, or a default-constructed PrintingInfo if the set name is not in the CardInfo.
- */
 static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
 {
     SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
@@ -109,11 +90,6 @@ void CardPictureToLoad::populateSetUrls()
     (void)nextUrl();
 }
 
-/**
- * Advances the currentSet to the next set in the list. Then repopulates the url list with the urls from that set.
- * If we are already at the end of the list, then currentSet is set to empty.
- * @return If we are already at the end of the list
- */
 bool CardPictureToLoad::nextSet()
 {
     if (!sortedSets.isEmpty()) {
@@ -125,11 +101,6 @@ bool CardPictureToLoad::nextSet()
     return false;
 }
 
-/**
- * Advances the currentUrl to the next url in the list.
- * If we are already at the end of the list, then currentUrl is set to empty.
- * @return If we are already at the end of the list
- */
 bool CardPictureToLoad::nextUrl()
 {
     if (!currentSetUrls.isEmpty()) {

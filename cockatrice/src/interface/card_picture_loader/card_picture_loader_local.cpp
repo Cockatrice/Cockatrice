@@ -47,12 +47,6 @@ void CardPictureLoaderLocal::refreshIndex()
                                        << customFolderIndex.size() << "entries.";
 }
 
-/**
- * Tries to load the card image from the local images.
- *
- * @param toLoad The card to load
- * @return The loaded image, or an empty QImage if loading failed.
- */
 QImage CardPictureLoaderLocal::tryLoad(const ExactCard &toLoad) const
 {
     PrintingInfo setInstance = toLoad.getPrinting();
