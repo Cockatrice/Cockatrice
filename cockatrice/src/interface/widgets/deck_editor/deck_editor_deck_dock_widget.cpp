@@ -233,9 +233,7 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
 
     if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
-        QString cardName = current.sibling(current.row(), 1).data().toString();
-        QString providerId = current.sibling(current.row(), 4).data().toString();
-        if (ExactCard selectedCard = CardDatabaseManager::query()->getCard({cardName, providerId})) {
+        if (ExactCard selectedCard = CardDatabaseManager::query()->getCard({cardName, cardProviderID})) {
             return selectedCard;
         }
     }
