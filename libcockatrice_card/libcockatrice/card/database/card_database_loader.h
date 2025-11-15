@@ -1,12 +1,3 @@
-/**
- * @file card_database_loader.h
- * @ingroup CardDatabase
- * @brief The CardDatabaseLoader is responsible for discovering, loading, and saving card databases from files on disk.
- *
- * This class interacts with available parsers to populate a CardDatabase instance. It also handles
- * loading main, token, spoiler, and custom card databases.
- */
-
 #ifndef COCKATRICE_CARD_DATABASE_LOADER_H
 #define COCKATRICE_CARD_DATABASE_LOADER_H
 

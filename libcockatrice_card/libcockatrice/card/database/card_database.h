@@ -1,10 +1,3 @@
-/**
- * @file card_database.h
- * @ingroup CardDatabase
- * @brief The CardDatabase is responsible for holding the card and set maps, managing card additions/removals,
- * and providing access to sets and card querying via CardDatabaseQuerier.
- */
-
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
