@@ -1,6 +1,6 @@
 @page creating_decks Creating Decks
 
-Creating a new deck is done using either the TabDeckEditor or TabDeckEditorVisual.
+Creating a new deck is done using either the \ref editing_decks_classic or \ref editing_decks_visual.
 
 They can be accessed either by clicking the "Create Deck" button in the TabHome screen, which will open the default deck
 editor configured in the "User Interface" -> "Deck editor/storage settings" -> "Default deck editor type" setting, or
