@@ -31,7 +31,7 @@ Put simply: Whenever the CardPictureLoader loads a new PrintingInfo which is not
 signal so that any widget using a CardInfo object can update the display of it to possibly use this new QPixmap.
 
 \attention It should be noted that it is not possible to use CardPictureLoader::getPixmap() with anything but an
-ExactCard, which is a CardInfo object associated with a PrintingInfo, i.e. a definitive printing of a specific card)
+ExactCard, which is a CardInfo object associated with a PrintingInfo, i.e. a definitive printing of a specific card
 
 The other signal, CardInfo::cardInfoChanged() conceptually works much the same way, except it is concerned with the
 properties of the CardInfo object.
