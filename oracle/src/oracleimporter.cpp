@@ -137,13 +137,23 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // Workaround for card name weirdness
     name = name.replace("Æ", "AE");
     name = name.replace("’", "'");
+
     if (cards.contains(name)) {
         CardInfoPtr card = cards.value(name);
         card->addToSet(printingInfo.getSet(), printingInfo);
         if (card->getProperties().filter(formatRegex).empty()) {
             card->combineLegalities(properties);
         }
+        if (properties.contains("flavorName")) {
+            card->addAltName(properties.value("flavorName").toString());
+        }
         return card;
+    }
+
+    // handle altNames
+    QSet<QString> altNames;
+    if (properties.contains("flavorName")) {
+        altNames.insert(properties.value("flavorName").toString());
     }
 
     // Remove {} around mana costs, except if it's split cost
@@ -206,8 +216,9 @@ CardInfoPtr OracleImporter::addCard(QString name,
     QList<CardRelation *> reverseRelatedCards;
     SetToPrintingsMap setsInfo;
     setsInfo[printingInfo.getSet()->getShortName()].append(printingInfo);
-    CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
-                                                setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
+    CardInfoPtr newCard =
+        CardInfo::newInstance(name, altNames, text, isToken, properties, relatedCards, reverseRelatedCards, setsInfo,
+                              cipt, landscapeOrientation, tableRow, upsideDown);
 
     if (name.isEmpty()) {
         qDebug() << "warning: an empty card was added to set" << printingInfo.getSet()->getShortName();
@@ -346,6 +357,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         auto legalities = card.value("legalities").toMap();
         for (auto i = legalities.cbegin(), end = legalities.cend(); i != end; ++i) {
             properties.insert(QString("format-%1").arg(i.key()), i.value().toString().toLower());
+        }
+
+        // flavorName
+        QString flavorName = getStringPropertyFromMap(card, "flavorName");
+        if (!flavorName.isEmpty()) {
+            properties.insert("flavorName", flavorName);
         }
 
         // split cards are considered a single card, enqueue for later merging
