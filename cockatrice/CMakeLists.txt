@@ -180,6 +180,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/replay/replay_timeline_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_selector.cpp
+    src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
     src/interface/widgets/server/handle_public_servers.cpp
     src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp
