@@ -71,7 +71,7 @@ public:
     bool getHideNotBuddyCreatedGames() const;
     QString getGameNameFilter() const;
     void setGameNameFilter(const QString &_gameNameFilter);
-    QString getCreatorNameFilter() const;
+    QStringList getCreatorNameFilters() const;
     void setCreatorNameFilter(const QString &_creatorNameFilter);
     QSet<int> getGameTypeFilter() const;
     void setGameTypeFilter(const QSet<int> &_gameTypeFilter);

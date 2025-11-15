@@ -25,7 +25,7 @@ void GameFiltersSettings::setHideBuddiesOnlyGames(bool hide)
 bool GameFiltersSettings::isHideBuddiesOnlyGames()
 {
     QVariant previous = getValue("hide_buddies_only_games");
-    return previous == QVariant() || previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setHideFullGames(bool hide)
@@ -36,7 +36,7 @@ void GameFiltersSettings::setHideFullGames(bool hide)
 bool GameFiltersSettings::isHideFullGames()
 {
     QVariant previous = getValue("hide_full_games");
-    return !(previous == QVariant()) && previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setHideGamesThatStarted(bool hide)
@@ -47,7 +47,7 @@ void GameFiltersSettings::setHideGamesThatStarted(bool hide)
 bool GameFiltersSettings::isHideGamesThatStarted()
 {
     QVariant previous = getValue("hide_games_that_started");
-    return !(previous == QVariant()) && previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setHidePasswordProtectedGames(bool hide)
@@ -58,7 +58,7 @@ void GameFiltersSettings::setHidePasswordProtectedGames(bool hide)
 bool GameFiltersSettings::isHidePasswordProtectedGames()
 {
     QVariant previous = getValue("hide_password_protected_games");
-    return previous == QVariant() || previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
@@ -69,7 +69,7 @@ void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
 bool GameFiltersSettings::isHideIgnoredUserGames()
 {
     QVariant previous = getValue("hide_ignored_user_games");
-    return !(previous == QVariant()) && previous.toBool();
+    return previous == QVariant() ? true : previous.toBool();
 }
 
 void GameFiltersSettings::setHideNotBuddyCreatedGames(bool hide)
@@ -80,7 +80,7 @@ void GameFiltersSettings::setHideNotBuddyCreatedGames(bool hide)
 bool GameFiltersSettings::isHideNotBuddyCreatedGames()
 {
     QVariant previous = getValue("hide_not_buddy_created_games");
-    return !(previous == QVariant()) && previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setHideOpenDecklistGames(bool hide)
@@ -91,7 +91,7 @@ void GameFiltersSettings::setHideOpenDecklistGames(bool hide)
 bool GameFiltersSettings::isHideOpenDecklistGames()
 {
     QVariant previous = getValue("hide_open_decklist_games");
-    return !(previous == QVariant()) && previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setGameNameFilter(QString gameName)
@@ -104,14 +104,14 @@ QString GameFiltersSettings::getGameNameFilter()
     return getValue("game_name_filter").toString();
 }
 
-void GameFiltersSettings::setCreatorNameFilter(QString creatorName)
+void GameFiltersSettings::setCreatorNameFilters(QStringList creatorName)
 {
     setValue(creatorName, "creator_name_filter");
 }
 
-QString GameFiltersSettings::getCreatorNameFilter()
+QStringList GameFiltersSettings::getCreatorNameFilters()
 {
-    return getValue("creator_name_filter").toString();
+    return getValue("creator_name_filter").toStringList();
 }
 
 void GameFiltersSettings::setMinPlayers(int min)
@@ -182,7 +182,7 @@ void GameFiltersSettings::setShowSpectatorPasswordProtected(bool show)
 bool GameFiltersSettings::isShowSpectatorPasswordProtected()
 {
     QVariant previous = getValue("show_spectator_password_protected");
-    return previous == QVariant() ? true : previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setShowOnlyIfSpectatorsCanChat(bool show)
@@ -193,7 +193,7 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanChat(bool show)
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanChat()
 {
     QVariant previous = getValue("show_only_if_spectators_can_chat");
-    return previous == QVariant() ? true : previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }
 
 void GameFiltersSettings::setShowOnlyIfSpectatorsCanSeeHands(bool show)
@@ -204,5 +204,5 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanSeeHands(bool show)
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanSeeHands()
 {
     QVariant previous = getValue("show_only_if_spectators_can_see_hands");
-    return previous == QVariant() ? true : previous.toBool();
+    return previous == QVariant() ? false : previous.toBool();
 }

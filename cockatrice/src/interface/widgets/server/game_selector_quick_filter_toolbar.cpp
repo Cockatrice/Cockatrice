@@ -1,6 +1,7 @@
 #include "game_selector_quick_filter_toolbar.h"
 
 #include "games_model.h"
+#include "user/user_list_manager.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -9,23 +10,32 @@
 #include <QLineEdit>
 
 GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
+                                                               TabSupervisor *_tabSupervisor,
                                                                GamesProxyModel *_model,
                                                                const QMap<int, QString> &allGameTypes)
-    : QWidget(parent), model(_model)
+    : QWidget(parent), tabSupervisor(_tabSupervisor), model(_model)
 {
     mainLayout = new QHBoxLayout(this);
 
     searchBar = new QLineEdit(this);
-    searchBar->setText(model->getCreatorNameFilter());
-    connect(searchBar, &QLineEdit::textChanged, this,
-            [this](const QString &text) { model->setCreatorNameFilter(text); });
+    searchBar->setText(model->getCreatorNameFilters().join(", "));
+    connect(searchBar, &QLineEdit::textChanged, this, [this](const QString &text) { model->setGameNameFilter(text); });
 
-    hideGamesWithoutBuddiesCheckBox = new QCheckBox(this);
-    hideGamesWithoutBuddiesCheckBox->setChecked(model->getHideBuddiesOnlyGames());
-    hideGamesWithoutBuddiesLabel = new QLabel(this);
-    hideGamesWithoutBuddiesLabel->setBuddy(hideGamesWithoutBuddiesCheckBox);
-    connect(hideGamesWithoutBuddiesCheckBox, &QCheckBox::toggled, this,
-            [this](bool checked) { model->setHideBuddiesOnlyGames(checked); });
+    hideGamesNotCreatedByBuddiesCheckBox = new QCheckBox(this);
+    hideGamesNotCreatedByBuddiesCheckBox->setChecked(model->getHideBuddiesOnlyGames());
+    hideGamesNotCreatedByBuddiesLabel = new QLabel(this);
+    hideGamesNotCreatedByBuddiesLabel->setBuddy(hideGamesNotCreatedByBuddiesCheckBox);
+    connect(hideGamesNotCreatedByBuddiesCheckBox, &QCheckBox::toggled, this, [this](bool checked) {
+        if (checked) {
+            QStringList buddyNames;
+            for (auto buddy : tabSupervisor->getUserListManager()->getBuddyList().values()) {
+                buddyNames << QString::fromStdString(buddy.name());
+            }
+            model->setCreatorNameFilters(buddyNames);
+        } else {
+            model->setCreatorNameFilters({});
+        }
+    });
 
     hideFullGamesCheckBox = new QCheckBox(this);
     hideFullGamesCheckBox->setChecked(model->getHideFullGames());
@@ -76,8 +86,8 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     });
 
     mainLayout->addWidget(searchBar);
-    mainLayout->addWidget(hideGamesWithoutBuddiesLabel);
-    mainLayout->addWidget(hideGamesWithoutBuddiesCheckBox);
+    mainLayout->addWidget(hideGamesNotCreatedByBuddiesLabel);
+    mainLayout->addWidget(hideGamesNotCreatedByBuddiesCheckBox);
     mainLayout->addWidget(hideFullGamesLabel);
     mainLayout->addWidget(hideFullGamesCheckBox);
     mainLayout->addWidget(hideStartedGamesLabel);
@@ -92,8 +102,8 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 
 void GameSelectorQuickFilterToolBar::retranslateUi()
 {
-    searchBar->setPlaceholderText(tr("Filter by creator name..."));
-    hideGamesWithoutBuddiesLabel->setText(tr("Hide buddies only games"));
+    searchBar->setPlaceholderText(tr("Filter by game name..."));
+    hideGamesNotCreatedByBuddiesLabel->setText(tr("Hide games not created by buddies"));
     hideFullGamesLabel->setText(tr("Hide full games"));
     hideStartedGamesLabel->setText(tr("Hide started games"));
     filterToFormatLabel->setText(tr("Filter to format"));

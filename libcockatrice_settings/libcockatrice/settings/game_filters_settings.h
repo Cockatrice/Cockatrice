@@ -24,7 +24,7 @@ public:
     bool isHideNotBuddyCreatedGames();
     bool isHideOpenDecklistGames();
     QString getGameNameFilter();
-    QString getCreatorNameFilter();
+    QStringList getCreatorNameFilters();
     int getMinPlayers();
     int getMaxPlayers();
     QTime getMaxGameAge();
@@ -42,7 +42,7 @@ public:
     void setHidePasswordProtectedGames(bool hide);
     void setHideNotBuddyCreatedGames(bool hide);
     void setGameNameFilter(QString gameName);
-    void setCreatorNameFilter(QString creatorName);
+    void setCreatorNameFilters(QStringList creatorName);
     void setMinPlayers(int min);
     void setMaxPlayers(int max);
     void setMaxGameAge(const QTime &maxGameAge);

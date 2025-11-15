@@ -129,7 +129,8 @@ private:
     bool hidePasswordProtectedGames;
     bool hideNotBuddyCreatedGames;
     bool hideOpenDecklistGames;
-    QString gameNameFilter, creatorNameFilter;
+    QString gameNameFilter;
+    QStringList creatorNameFilters;
     QSet<int> gameTypeFilter;
     quint32 maxPlayersFilterMin, maxPlayersFilterMax;
     QTime maxGameAge;
@@ -179,9 +180,9 @@ public:
     {
         return gameNameFilter;
     }
-    QString getCreatorNameFilter() const
+    QStringList getCreatorNameFilters() const
     {
-        return creatorNameFilter;
+        return creatorNameFilters;
     }
     QSet<int> getGameTypeFilter() const
     {
@@ -227,7 +228,7 @@ public:
                         bool _hideNotBuddyCreatedGames,
                         bool _hideOpenDecklistGames,
                         const QString &_gameNameFilter,
-                        const QString &_creatorNameFilter,
+                        const QStringList &_creatorNameFilter,
                         const QSet<int> &_gameTypeFilter,
                         int _maxPlayersFilterMin,
                         int _maxPlayersFilterMax,
@@ -278,9 +279,9 @@ public:
         gameNameFilter = value;
         refresh();
     }
-    void setCreatorNameFilter(const QString &value)
+    void setCreatorNameFilters(const QStringList &values)
     {
-        creatorNameFilter = value;
+        creatorNameFilters = values;
         refresh();
     }
     void setGameTypeFilter(const QSet<int> &value)

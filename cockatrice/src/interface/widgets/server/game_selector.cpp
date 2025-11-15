@@ -76,7 +76,7 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-    quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, gameListProxyModel, gameTypeMap);
+    quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
 
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
@@ -169,7 +169,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameFilters(
         dlg.getHideBuddiesOnlyGames(), dlg.getHideIgnoredUserGames(), dlg.getHideFullGames(),
         dlg.getHideGamesThatStarted(), dlg.getHidePasswordProtectedGames(), dlg.getHideNotBuddyCreatedGames(),
-        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilter(), dlg.getGameTypeFilter(),
+        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilters(), dlg.getGameTypeFilter(),
         dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax(), dlg.getMaxGameAge(),
         dlg.getShowOnlyIfSpectatorsCanWatch(), dlg.getShowSpectatorPasswordProtected(),
         dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
