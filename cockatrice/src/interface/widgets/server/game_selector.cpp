@@ -261,28 +261,30 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    return joinGame();
+    joinGame();
 }
 
 void GameSelector::actJoinAsJudge()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        return joinGame();
+        joinGame();
+    } else {
+        joinGame(false, true);
     }
-    return joinGame(false, true);
 }
 
 void GameSelector::actJoinAsSpectator()
 {
-    return joinGame(true);
+    joinGame(true);
 }
 
 void GameSelector::actJoinAsJudgeSpectator()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        return joinGame(true);
+        joinGame(true);
+    } else {
+        joinGame(true, true);
     }
-    return joinGame(true, true);
 }
 
 void GameSelector::customContextMenu(const QPoint &point)

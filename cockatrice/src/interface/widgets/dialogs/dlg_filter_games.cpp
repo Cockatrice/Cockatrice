@@ -37,7 +37,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideIgnoredUserGames = new QCheckBox(tr("Hide 'ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
-    hideNotBuddyCreatedGames = new QCheckBox(tr("Hide games not created by buddy"));
+    hideNotBuddyCreatedGames = new QCheckBox(tr("Hide games not created by buddies"));
     hideNotBuddyCreatedGames->setChecked(gamesProxyModel->getHideNotBuddyCreatedGames());
 
     hideOpenDecklistGames = new QCheckBox(tr("Hide games with forced open decklists"));
