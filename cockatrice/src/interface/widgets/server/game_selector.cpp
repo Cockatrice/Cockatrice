@@ -109,7 +109,6 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
         buttonLayout->addWidget(joinAsJudgeButton);
     } else {
-        qInfo() << tabSupervisor->getUserInfo()->user_level();
         joinAsJudgeButton->setHidden(true);
     }
     buttonLayout->addWidget(spectateButton);
