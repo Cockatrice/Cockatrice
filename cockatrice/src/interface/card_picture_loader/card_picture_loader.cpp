@@ -154,7 +154,7 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
         qCDebug(CardPictureLoaderLog) << "Caching NULL pixmap for" << card.getName();
         QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap());
     } else {
-        if (card.getInfo().getUpsideDownArt()) {
+        if (card.getInfo().getUiAttributes().upsideDownArt) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
             QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
 #else

@@ -26,13 +26,9 @@ CardInfo::CardInfo(const QString &_name,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
-                   bool _cipt,
-                   bool _landscapeOrientation,
-                   int _tableRow,
-                   bool _upsideDownArt)
+                   const UiAttributes _uiAttributes)
     : name(_name), text(_text), isToken(_isToken), properties(std::move(_properties)), relatedCards(_relatedCards),
-      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), cipt(_cipt),
-      landscapeOrientation(_landscapeOrientation), tableRow(_tableRow), upsideDownArt(_upsideDownArt)
+      reverseRelatedCards(_reverseRelatedCards), setsToPrintings(std::move(_sets)), uiAttributes(_uiAttributes)
 {
     simpleName = CardInfo::simplifyName(name);
 
@@ -41,8 +37,7 @@ CardInfo::CardInfo(const QString &_name,
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)
 {
-    return newInstance(_name, QString(), false, QVariantHash(), QList<CardRelation *>(), QList<CardRelation *>(),
-                       SetToPrintingsMap(), false, false, 0, false);
+    return newInstance(_name, "", false, {}, {}, {}, {}, {});
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name,
@@ -52,13 +47,10 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
-                                  bool _cipt,
-                                  bool _landscapeOrientation,
-                                  int _tableRow,
-                                  bool _upsideDownArt)
+                                  const UiAttributes _uiAttributes)
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_properties), _relatedCards, _reverseRelatedCards,
-                                 _sets, _cipt, _landscapeOrientation, _tableRow, _upsideDownArt));
+                                 _sets, _uiAttributes));
     ptr->setSmartPointer(ptr);
 
     for (const auto &printings : _sets) {

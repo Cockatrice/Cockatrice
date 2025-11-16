@@ -183,7 +183,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
     if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
-        if (exactCard.getInfo().getLandscapeOrientation()) {
+        if (exactCard.getInfo().getUiAttributes().landscapeOrientation) {
             // Rotate pixmap 90 degrees to the left
             QTransform transform;
             transform.rotate(90);

@@ -282,9 +282,13 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             }
 
             properties.insert("colors", colors);
-            CardInfoPtr newCard =
-                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets, cipt,
-                                      landscapeOrientation, tableRow, upsideDown);
+
+            CardInfo::UiAttributes attributes = {.cipt = cipt,
+                                                 .landscapeOrientation = landscapeOrientation,
+                                                 .tableRow = tableRow,
+                                                 .upsideDownArt = upsideDown};
+            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
+                                                        reverseRelatedCards, _sets, attributes);
             emit addCard(newCard);
         }
     }
@@ -417,14 +421,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // positioning
-    xml.writeTextElement("tablerow", QString::number(info->getTableRow()));
-    if (info->getCipt()) {
+    const CardInfo::UiAttributes &attributes = info->getUiAttributes();
+    xml.writeTextElement("tablerow", QString::number(attributes.tableRow));
+    if (attributes.cipt) {
         xml.writeTextElement("cipt", "1");
     }
-    if (info->getLandscapeOrientation()) {
+    if (attributes.landscapeOrientation) {
         xml.writeTextElement("landscapeOrientation", "1");
     }
-    if (info->getUpsideDownArt()) {
+    if (attributes.upsideDownArt) {
         xml.writeTextElement("upsidedown", "1");
     }
 
