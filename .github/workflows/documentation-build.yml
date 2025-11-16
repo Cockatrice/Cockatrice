@@ -11,6 +11,9 @@ on:
       - 'doxygen_style.css'
   workflow_dispatch:
 
+env:
+  COCKATRICE_REF: ${{ github.ref_name }}    # Tag name if the commit is tagged, otherwise branch name
+
 jobs:
   docs:
     name: Doxygen
