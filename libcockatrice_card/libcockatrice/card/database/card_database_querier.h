@@ -124,7 +124,7 @@ public:
      * @param cardName Name of the card.
      * @return The preferred ExactCard.
      */
-    ExactCard getPreferredCard(const QString &cardName) const;
+    [[nodiscard]] ExactCard getPreferredCard(const QString &cardName) const;
 
     /**
      * @brief Returns the preferred printing of a card based on user preferences and set priority.

@@ -37,25 +37,25 @@ public:
     explicit CardPictureToLoad(const ExactCard &_card);
 
     /** @return The card being loaded. */
-    const ExactCard &getCard() const
+    [[nodiscard]] const ExactCard &getCard() const
     {
         return card;
     }
 
     /** @return The current URL being attempted. */
-    QString getCurrentUrl() const
+    [[nodiscard]] QString getCurrentUrl() const
     {
         return currentUrl;
     }
 
     /** @return The current set being attempted. */
-    CardSetPtr getCurrentSet() const
+    [[nodiscard]] CardSetPtr getCurrentSet() const
     {
         return currentSet;
     }
 
     /** @return The short name of the current set, or empty string if no set. */
-    QString getSetName() const;
+    [[nodiscard]] QString getSetName() const;
 
     /**
      * @brief Transforms a URL template into a concrete URL for this card/set.

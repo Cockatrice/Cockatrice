@@ -39,7 +39,7 @@ public:
      * to use it, since otherwise it will get destroyed once this dlg is destroyed
      * @return The DeckLoader
      */
-    virtual DeckLoader *getDeckList() const = 0;
+    [[nodiscard]] virtual DeckLoader *getDeckList() const = 0;
 
 protected:
     void setText(const QString &text);
@@ -67,7 +67,7 @@ private:
 public:
     explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
 
-    DeckLoader *getDeckList() const override
+    [[nodiscard]] DeckLoader *getDeckList() const override
     {
         return deckList;
     }
@@ -90,7 +90,7 @@ private:
 public:
     explicit DlgEditDeckInClipboard(const DeckLoader &deckList, bool _annotated, QWidget *parent = nullptr);
 
-    DeckLoader *getDeckList() const override
+    [[nodiscard]] DeckLoader *getDeckList() const override
     {
         return deckLoader;
     }

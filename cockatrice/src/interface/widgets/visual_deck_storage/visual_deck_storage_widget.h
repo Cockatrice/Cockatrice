@@ -40,7 +40,7 @@ public:
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
 
-    const VisualDeckStorageQuickSettingsWidget *settings() const;
+    [[nodiscard]] const VisualDeckStorageQuickSettingsWidget *settings() const;
 
 public slots:
     void createRootFolderWidget(); // Refresh the display of cards based on the current sorting option

@@ -27,18 +27,18 @@ public:
     void insertWidgetAtIndex(QWidget *toInsert, int index);
 
     void addItem(QLayoutItem *item) override;
-    int count() const override;
-    QLayoutItem *itemAt(int index) const override;
+    [[nodiscard]] int count() const override;
+    [[nodiscard]] QLayoutItem *itemAt(int index) const override;
     QLayoutItem *takeAt(int index) override;
     void setGeometry(const QRect &rect) override;
-    QSize minimumSize() const override;
-    QSize sizeHint() const override;
+    [[nodiscard]] QSize minimumSize() const override;
+    [[nodiscard]] QSize sizeHint() const override;
     void setMaxColumns(int _maxColumns);
     void setMaxRows(int _maxRows);
-    int calculateMaxColumns() const;
-    int calculateRowsForColumns(int columns) const;
-    int calculateMaxRows() const;
-    int calculateColumnsForRows(int rows) const;
+    [[nodiscard]] int calculateMaxColumns() const;
+    [[nodiscard]] int calculateRowsForColumns(int columns) const;
+    [[nodiscard]] int calculateMaxRows() const;
+    [[nodiscard]] int calculateColumnsForRows(int rows) const;
     void setDirection(Qt::Orientation _direction);
 
 private:
@@ -50,7 +50,7 @@ private:
     Qt::Orientation flowDirection;
 
     // Calculate the preferred size of the layout
-    QSize calculatePreferredSize() const;
+    [[nodiscard]] QSize calculatePreferredSize() const;
 };
 
 #endif // OVERLAP_LAYOUT_H

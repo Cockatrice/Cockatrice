@@ -123,10 +123,10 @@ public:
      * identifying information about a node, regardless of type.
      * @{
      */
-    virtual QString getName() const = 0;
-    virtual QString getCardProviderId() const = 0;
-    virtual QString getCardSetShortName() const = 0;
-    virtual QString getCardCollectorNumber() const = 0;
+    [[nodiscard]] virtual QString getName() const = 0;
+    [[nodiscard]] virtual QString getCardProviderId() const = 0;
+    [[nodiscard]] virtual QString getCardSetShortName() const = 0;
+    [[nodiscard]] virtual QString getCardCollectorNumber() const = 0;
     /// @}
 
     /**
@@ -138,7 +138,7 @@ public:
     [[nodiscard]] virtual bool isDeckHeader() const = 0;
 
     /// @return The parent node, or nullptr if this is the root.
-    InnerDecklistNode *getParent() const
+    [[nodiscard]] InnerDecklistNode *getParent() const
     {
         return parent;
     }
@@ -147,7 +147,7 @@ public:
      * @brief Compute the depth of this node in the tree.
      * @return Distance from the root (root = 0, children = 1, etc.).
      */
-    int depth() const;
+    [[nodiscard]] int depth() const;
 
     /**
      * @brief Compute the "height" of this node.
@@ -159,7 +159,7 @@ public:
      * - A card node has height 1.
      * - A group node containing cards has height 2.
      */
-    virtual int height() const = 0;
+    [[nodiscard]] virtual int height() const = 0;
 
     /**
      * @brief Compare this node against another for sorting.

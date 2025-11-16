@@ -33,7 +33,7 @@ public:
                                const QString &_filePath);
     void retranslateUi();
     QString getColorIdentity();
-    QString getDisplayName() const;
+    [[nodiscard]] QString getDisplayName() const;
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
     QVBoxLayout *layout;
@@ -47,7 +47,7 @@ public:
     bool filteredBySearch = false;
     bool filteredByColor = false;
     bool filteredByTags = false;
-    bool checkVisibility() const;
+    [[nodiscard]] bool checkVisibility() const;
 
 signals:
     void deckLoadRequested(const QString &filePath);

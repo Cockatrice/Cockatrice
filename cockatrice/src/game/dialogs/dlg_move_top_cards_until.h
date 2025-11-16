@@ -34,10 +34,10 @@ public:
                                   QStringList exprs = QStringList(),
                                   uint numberOfHits = 1,
                                   bool autoPlay = false);
-    QString getExpr() const;
-    QStringList getExprs() const;
-    uint getNumberOfHits() const;
-    bool isAutoPlay() const;
+    [[nodiscard]] QString getExpr() const;
+    [[nodiscard]] QStringList getExprs() const;
+    [[nodiscard]] uint getNumberOfHits() const;
+    [[nodiscard]] bool isAutoPlay() const;
 };
 
 #endif // DLG_MOVE_TOP_CARDS_UNTIL_H

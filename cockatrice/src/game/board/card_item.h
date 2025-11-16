@@ -51,7 +51,7 @@ public:
     {
         Type = typeCard
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
@@ -62,13 +62,13 @@ public:
                       CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
-    CardZoneLogic *getZone() const
+    [[nodiscard]] CardZoneLogic *getZone() const
     {
         return zone;
     }
     void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QPoint getGridPoint() const
+    [[nodiscard]] QPoint getGridPoint() const
     {
         return gridPoint;
     }
@@ -76,11 +76,11 @@ public:
     {
         gridPoint = _gridPoint;
     }
-    QPoint getGridPos() const
+    [[nodiscard]] QPoint getGridPos() const
     {
         return gridPoint;
     }
-    Player *getOwner() const
+    [[nodiscard]] Player *getOwner() const
     {
         return owner;
     }
@@ -88,32 +88,32 @@ public:
     {
         owner = _owner;
     }
-    bool getAttacking() const
+    [[nodiscard]] bool getAttacking() const
     {
         return attacking;
     }
     void setAttacking(bool _attacking);
-    const QMap<int, int> &getCounters() const
+    [[nodiscard]] const QMap<int, int> &getCounters() const
     {
         return counters;
     }
     void setCounter(int _id, int _value);
-    QString getAnnotation() const
+    [[nodiscard]] QString getAnnotation() const
     {
         return annotation;
     }
     void setAnnotation(const QString &_annotation);
-    bool getDoesntUntap() const
+    [[nodiscard]] bool getDoesntUntap() const
     {
         return doesntUntap;
     }
     void setDoesntUntap(bool _doesntUntap);
-    QString getPT() const
+    [[nodiscard]] QString getPT() const
     {
         return pt;
     }
     void setPT(const QString &_pt);
-    bool getDestroyOnZoneChange() const
+    [[nodiscard]] bool getDestroyOnZoneChange() const
     {
         return destroyOnZoneChange;
     }
@@ -121,7 +121,7 @@ public:
     {
         destroyOnZoneChange = _destroy;
     }
-    CardItem *getAttachedTo() const
+    [[nodiscard]] CardItem *getAttachedTo() const
     {
         return attachedTo;
     }
@@ -134,7 +134,7 @@ public:
     {
         attachedCards.removeOne(card);
     }
-    const QList<CardItem *> &getAttachedCards() const
+    [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
     }

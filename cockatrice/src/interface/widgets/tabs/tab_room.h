@@ -68,7 +68,7 @@ private:
     QAction *aLeaveRoom;
     QAction *aOpenChatSettings;
     QAction *aClearChat;
-    QString sanitizeHtml(QString dirty) const;
+    [[nodiscard]] QString sanitizeHtml(QString dirty) const;
 
     QStringList autocompleteUserList;
     QCompleter *completer;
@@ -106,23 +106,23 @@ public:
     void retranslateUi() override;
     void tabActivated() override;
     void processRoomEvent(const RoomEvent &event);
-    int getRoomId() const
+    [[nodiscard]] int getRoomId() const
     {
         return roomId;
     }
-    const QMap<int, QString> &getGameTypes() const
+    [[nodiscard]] const QMap<int, QString> &getGameTypes() const
     {
         return gameTypes;
     }
-    QString getChannelName() const
+    [[nodiscard]] QString getChannelName() const
     {
         return roomName;
     }
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return roomName;
     }
-    const ServerInfo_User *getUserInfo() const
+    [[nodiscard]] const ServerInfo_User *getUserInfo() const
     {
         return ownUser;
     }

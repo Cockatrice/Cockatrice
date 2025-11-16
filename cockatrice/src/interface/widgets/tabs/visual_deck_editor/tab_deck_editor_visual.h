@@ -125,7 +125,7 @@ public:
      * @brief Get the display text for the tab.
      * @return Tab text with optional modification indicator.
      */
-    QString getTabText() const override;
+    [[nodiscard]] QString getTabText() const override;
 
     /**
      * @brief Update the currently selected card in the deck and UI.

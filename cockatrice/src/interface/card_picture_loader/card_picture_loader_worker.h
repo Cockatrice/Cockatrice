@@ -117,7 +117,7 @@ private:
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded
 
     /** @brief Returns cached redirect URL for the given original URL, if available. */
-    QUrl getCachedRedirect(const QUrl &originalUrl) const;
+    [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
 
     /** @brief Loads redirect cache from disk. */
     void loadRedirectCache();

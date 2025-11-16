@@ -61,7 +61,7 @@ public:
         return utilityMenu;
     }
 
-    bool getShortcutsActive() const
+    [[nodiscard]] bool getShortcutsActive() const
     {
         return shortcutsActive;
     }

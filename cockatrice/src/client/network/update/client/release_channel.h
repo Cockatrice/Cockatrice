@@ -57,27 +57,27 @@ protected:
     }
 
 public:
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return name;
     }
-    QString getDescriptionUrl() const
+    [[nodiscard]] QString getDescriptionUrl() const
     {
         return descriptionUrl;
     }
-    QString getDownloadUrl() const
+    [[nodiscard]] QString getDownloadUrl() const
     {
         return downloadUrl;
     }
-    QString getCommitHash() const
+    [[nodiscard]] QString getCommitHash() const
     {
         return commitHash;
     }
-    QDate getPublishDate() const
+    [[nodiscard]] QDate getPublishDate() const
     {
         return publishDate;
     }
-    bool isCompatibleVersionFound() const
+    [[nodiscard]] bool isCompatibleVersionFound() const
     {
         return compatibleVersionFound;
     }
@@ -97,15 +97,15 @@ protected:
 
 protected:
     static bool downloadMatchesCurrentOS(const QString &fileName);
-    virtual QString getReleaseChannelUrl() const = 0;
+    [[nodiscard]] virtual QString getReleaseChannelUrl() const = 0;
 
 public:
     Release *getLastRelease()
     {
         return lastRelease;
     }
-    virtual QString getManualDownloadUrl() const = 0;
-    virtual QString getName() const = 0;
+    [[nodiscard]] virtual QString getManualDownloadUrl() const = 0;
+    [[nodiscard]] virtual QString getName() const = 0;
     void checkForUpdates();
 signals:
     void finishedCheck(bool needToUpdate, bool isCompatible, Release *release);
@@ -122,12 +122,12 @@ public:
     explicit StableReleaseChannel() = default;
     ~StableReleaseChannel() override = default;
 
-    QString getManualDownloadUrl() const override;
+    [[nodiscard]] QString getManualDownloadUrl() const override;
 
-    QString getName() const override;
+    [[nodiscard]] QString getName() const override;
 
 protected:
-    QString getReleaseChannelUrl() const override;
+    [[nodiscard]] QString getReleaseChannelUrl() const override;
 protected slots:
 
     void releaseListFinished() override;
@@ -143,12 +143,12 @@ public:
     BetaReleaseChannel() = default;
     ~BetaReleaseChannel() override = default;
 
-    QString getManualDownloadUrl() const override;
+    [[nodiscard]] QString getManualDownloadUrl() const override;
 
-    QString getName() const override;
+    [[nodiscard]] QString getName() const override;
 
 protected:
-    QString getReleaseChannelUrl() const override;
+    [[nodiscard]] QString getReleaseChannelUrl() const override;
 protected slots:
 
     void releaseListFinished() override;

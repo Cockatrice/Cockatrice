@@ -72,13 +72,13 @@ public:
     void write(QXmlStreamWriter *xml);
 
     /// @return The plan name.
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return name;
     }
 
     /// @return Const reference to the move list.
-    const QList<MoveCard_ToZone> &getMoveList() const
+    [[nodiscard]] const QList<MoveCard_ToZone> &getMoveList() const
     {
         return moveList;
     }

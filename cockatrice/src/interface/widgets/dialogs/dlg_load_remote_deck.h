@@ -28,7 +28,7 @@ private slots:
 
 public:
     explicit DlgLoadRemoteDeck(AbstractClient *_client, QWidget *parent = nullptr);
-    int getDeckId() const;
+    [[nodiscard]] int getDeckId() const;
 };
 
 #endif

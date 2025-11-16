@@ -31,11 +31,11 @@ public:
     GameEventStorageItem(const ::google::protobuf::Message &_event, int _playerId, EventRecipients _recipients);
     ~GameEventStorageItem();
 
-    const GameEvent &getGameEvent() const
+    [[nodiscard]] const GameEvent &getGameEvent() const
     {
         return *event;
     }
-    EventRecipients getRecipients() const
+    [[nodiscard]] EventRecipients getRecipients() const
     {
         return recipients;
     }
@@ -56,15 +56,15 @@ public:
     ~GameEventStorage();
 
     void setGameEventContext(const ::google::protobuf::Message &_gameEventContext);
-    ::google::protobuf::Message *getGameEventContext() const
+    [[nodiscard]] ::google::protobuf::Message *getGameEventContext() const
     {
         return gameEventContext;
     }
-    const QList<GameEventStorageItem *> &getGameEventList() const
+    [[nodiscard]] const QList<GameEventStorageItem *> &getGameEventList() const
     {
         return gameEventList;
     }
-    int getPrivatePlayerId() const
+    [[nodiscard]] int getPrivatePlayerId() const
     {
         return privatePlayerId;
     }
@@ -96,7 +96,7 @@ public:
     ResponseContainer(int _cmdId);
     ~ResponseContainer();
 
-    int getCmdId() const
+    [[nodiscard]] int getCmdId() const
     {
         return cmdId;
     }
@@ -104,7 +104,7 @@ public:
     {
         responseExtension = _responseExtension;
     }
-    ::google::protobuf::Message *getResponseExtension() const
+    [[nodiscard]] ::google::protobuf::Message *getResponseExtension() const
     {
         return responseExtension;
     }
@@ -116,11 +116,13 @@ public:
     {
         postResponseQueue.append(qMakePair(type, item));
     }
-    const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &getPreResponseQueue() const
+    [[nodiscard]] const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &
+    getPreResponseQueue() const
     {
         return preResponseQueue;
     }
-    const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &getPostResponseQueue() const
+    [[nodiscard]] const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &
+    getPostResponseQueue() const
     {
         return postResponseQueue;
     }

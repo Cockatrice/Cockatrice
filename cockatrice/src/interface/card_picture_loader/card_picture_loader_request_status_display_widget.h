@@ -46,7 +46,7 @@ public:
     }
 
     /** Returns whether the request has finished */
-    bool getFinished() const
+    [[nodiscard]] bool getFinished() const
     {
         return finished->text() == "True";
     }
@@ -74,13 +74,13 @@ public:
     }
 
     /** Returns the start time as a string */
-    QString getStartTime() const
+    [[nodiscard]] QString getStartTime() const
     {
         return startTime->text();
     }
 
     /** Returns the URL of the request */
-    QString getUrl() const
+    [[nodiscard]] QString getUrl() const
     {
         return url->text();
     }

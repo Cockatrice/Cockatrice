@@ -19,7 +19,7 @@ public:
     DeckPreviewTagItemWidget(const QString &tagName, bool isChecked, QWidget *parent = nullptr);
 
     // Accessor for the checkbox widget
-    QCheckBox *checkBox() const;
+    [[nodiscard]] QCheckBox *checkBox() const;
 
 private:
     QCheckBox *checkBox_; // Checkbox to represent the tag's state

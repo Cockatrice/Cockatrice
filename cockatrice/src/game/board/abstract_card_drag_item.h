@@ -27,22 +27,22 @@ public:
     {
         Type = typeCardDrag
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
     AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
-    QRectF boundingRect() const override
+    [[nodiscard]] QRectF boundingRect() const override
     {
         return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
     }
-    QPainterPath shape() const override;
+    [[nodiscard]] QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    AbstractCardItem *getItem() const
+    [[nodiscard]] AbstractCardItem *getItem() const
     {
         return item;
     }
-    QPointF getHotSpot() const
+    [[nodiscard]] QPointF getHotSpot() const
     {
         return hotSpot;
     }

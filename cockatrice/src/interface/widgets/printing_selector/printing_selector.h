@@ -36,7 +36,7 @@ public:
 
     void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
     void getAllSetsForCurrentCard();
-    DeckListModel *getDeckModel() const
+    [[nodiscard]] DeckListModel *getDeckModel() const
     {
         return deckModel;
     };

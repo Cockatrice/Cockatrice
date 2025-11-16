@@ -45,10 +45,10 @@ public:
                          QGraphicsItem *parent = nullptr,
                          QAction *_doubleClickAction = nullptr,
                          bool _highlightable = true);
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
     void setWidth(double _width);
     void setActive(bool _active);
-    bool getActive() const
+    [[nodiscard]] bool getActive() const
     {
         return active;
     }
@@ -77,18 +77,18 @@ private:
 
 public:
     explicit PhasesToolbar(QGraphicsItem *parent = nullptr);
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
     void retranslateUi();
     void setHeight(double _height);
-    double getWidth() const
+    [[nodiscard]] double getWidth() const
     {
         return width;
     }
-    int phaseCount() const
+    [[nodiscard]] int phaseCount() const
     {
         return buttonList.size();
     }
-    QString getLongPhaseName(int phase) const;
+    [[nodiscard]] QString getLongPhaseName(int phase) const;
 public slots:
     void setActivePhase(int phase);
     void triggerPhaseAction(int phase);
