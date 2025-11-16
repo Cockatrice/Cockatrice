@@ -63,25 +63,81 @@ newline delimited and annotated group.
 Example: TODO: Adjust this to be non mtg based.
 
 ```
-// Deck Name
+// Full Deck
 
-// Deck Comment
+// An example comment.
 
-// 10 Maindeck
-// 6 Artifact
-2 The Darkness Crystal (FIN) 335
-2 The Fire Crystal (FIN) 337
-2 Black Mage's Rod (FIN) 90
+// 63 Maindeck
+// 4 Ace
+1 Ace of Clubs (PKR) 49
+1 Ace of Diamonds (PKR) 50
+1 Ace of Hearts (PKR) 51
+1 Ace of Spades (PKR) 52
 
-// 6 Sorcery
-2 Nibelheim Aflame (FIN) 339
-4 Cornered by Black Mages (FIN) 93
+// 13 Face
+1 Jack of Clubs (PKR) 53
+1 Jack of Diamonds (PKR) 54
+1 Jack of Hearts (PKR) 55
+1 Jack of Spades (PKR) 56
+1 King of Clubs (PKR) 57
+1 King of Diamonds (PKR) 58
+1 King of Spades (PKR) 60
+1 Queen of Clubs (PKR) 61
+1 Queen of Diamonds (PKR) 62
+1 Queen of Hearts (PKR) 63
+1 Queen of Spades (PKR) 64
+2 King of Hearts (PKR) 59
 
-// 6 Sideboard
-// 6 Creature
-SB: 4 Blazing Bomb (FIN) 130
-SB: 1 Garland, Knight of Cornelia (FIN) 221
-SB: 1 Undercity Dire Rat (FIN) 123
+// 44 Number
+1 0 of Clubs (PKR) 1
+1 0 of Diamonds (PKR) 2
+1 0 of Hearts (PKR) 3
+1 1 of Clubs (PKR) 11
+1 1 of Diamonds (PKR) 12
+1 1 of Hearts (PKR) 13
+1 1 of Spades (PKR) 14
+1 10 of Clubs (PKR) 5
+1 10 of Diamonds (PKR) 6
+1 10 of Hearts (PKR) 7
+1 2 of Clubs (PKR) 17
+1 2 of Diamonds (PKR) 18
+1 2 of Hearts (PKR) 19
+1 2 of Spades (PKR) 20
+1 3 of Clubs (PKR) 21
+1 3 of Diamonds (PKR) 22
+1 3 of Hearts (PKR) 23
+1 3 of Spades (PKR) 24
+1 4 of Clubs (PKR) 25
+1 4 of Diamonds (PKR) 26
+1 4 of Hearts (PKR) 27
+1 4 of Spades (PKR) 28
+1 5 of Clubs (PKR) 29
+1 5 of Diamonds (PKR) 30
+1 5 of Hearts (PKR) 31
+1 5 of Spades (PKR) 32
+1 6 of Clubs (PKR) 33
+1 6 of Diamonds (PKR) 34
+1 6 of Hearts (PKR) 35
+1 6 of Spades (PKR) 36
+1 7 of Clubs (PKR) 37
+1 7 of Diamonds (PKR) 38
+1 7 of Hearts (PKR) 39
+1 7 of Spades (PKR) 40
+1 8 of Clubs (PKR) 41
+1 8 of Diamonds (PKR) 42
+1 8 of Hearts (PKR) 43
+1 8 of Spades (PKR) 44
+1 9 of Clubs (PKR) 45
+1 9 of Diamonds (PKR) 46
+1 9 of Hearts (PKR) 47
+1 9 of Spades (PKR) 48
+1 10 of Spades (PKR) 8
+1 0 of Spades (PKR) 4
+
+
+// 2 Joker
+1 1 Joker (PKR) 10
+1 2 Joker (PKR) 16
 ```
 
 ## From an online service
