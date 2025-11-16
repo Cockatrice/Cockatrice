@@ -473,7 +473,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     if (!missingClientFeatures.isEmpty()) {
         if (features.isRequiredFeaturesMissing(missingClientFeatures, server->getServerRequiredFeatureList())) {
-            Response_Login *re = new Response_Login;
+            auto *re = new Response_Login;
             re->set_denied_reason_str("Client upgrade required");
             QMap<QString, bool>::iterator i;
             for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i) {
@@ -491,7 +491,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
                                                  clientId, clientVersion, connectionType);
     switch (res) {
         case UserIsBanned: {
-            Response_Login *re = new Response_Login;
+            auto *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             if (banSecondsLeft != 0)
                 re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toSecsSinceEpoch());
@@ -503,7 +503,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case WouldOverwriteOldSession:
             return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: {
-            Response_Login *re = new Response_Login;
+            auto *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             rc.setResponseExtension(re);
             return Response::RespUsernameInvalid;
@@ -534,7 +534,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     event.set_message(server->getLoginMessage().toStdString());
     rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
-    Response_Login *re = new Response_Login;
+    auto *re = new Response_Login;
     re->mutable_user_info()->CopyFrom(copyUserInfo(true));
 
     if (authState == PasswordRight) {
@@ -616,7 +616,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
     // We don't need to check whether the user is logged in; persistent games should also work.
     // The client needs to deal with an empty result list.
 
-    Response_GetGamesOfUser *re = new Response_GetGamesOfUser;
+    auto *re = new Response_GetGamesOfUser;
     server->roomsLock.lockForRead();
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
     while (roomIterator.hasNext()) {
@@ -640,7 +640,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
         return Response::RespLoginNeeded;
 
     QString userName = nameFromStdString(cmd.user_name());
-    Response_GetUserInfo *re = new Response_GetUserInfo;
+    auto *re = new Response_GetUserInfo;
     if (userName.isEmpty())
         re->mutable_user_info()->CopyFrom(*userInfo);
     else {
@@ -713,7 +713,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
     joinMessageEvent.set_message_type(Event_RoomSay::Welcome);
     rc.enqueuePostResponseItem(ServerMessage::ROOM_EVENT, room->prepareRoomEvent(joinMessageEvent));
 
-    Response_JoinRoom *re = new Response_JoinRoom;
+    auto *re = new Response_JoinRoom;
     room->getInfo(*re->mutable_room_info(), true);
 
     rc.setResponseExtension(re);
@@ -725,7 +725,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUs
     if (authState == NotLoggedIn)
         return Response::RespLoginNeeded;
 
-    Response_ListUsers *re = new Response_ListUsers;
+    auto *re = new Response_ListUsers;
     server->clientsLock.lockForRead();
     QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
     while (userIterator.hasNext())
@@ -838,10 +838,10 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    Server_Game *game = new Server_Game(
-        copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()), cmd.max_players(), gameTypes,
-        cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(), cmd.spectators_need_password(),
-        cmd.spectators_can_talk(), cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
+    auto *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
+                                 cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
+                                 cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(),
+                                 cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

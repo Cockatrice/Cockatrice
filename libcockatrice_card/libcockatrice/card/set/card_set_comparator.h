@@ -1,6 +1,6 @@
 /**
  * @file card_set_comparator.h
- * @ingroup Cards
+ * @ingroup CardSets
  * @brief TODO: Document this.
  */
 

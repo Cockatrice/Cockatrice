@@ -8,7 +8,7 @@
 
 /**
  * @class CardSetList
- * @ingroup Cards
+ * @ingroup CardSets
  *
  * @brief A list-like container for CardSet objects with extended management methods.
  *

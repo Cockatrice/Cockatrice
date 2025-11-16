@@ -991,7 +991,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = cockatrice doc/doxygen-groups libcockatrice_card libcockatrice_deck_list libcockatrice_filters libcockatrice_interfaces libcockatrice_models libcockatrice_network libcockatrice_protocol libcockatrice_rng libcockatrice_settings libcockatrice_utility
+INPUT                  = cockatrice doc/doxygen-extra-pages doc/doxygen-groups libcockatrice_card libcockatrice_deck_list libcockatrice_filters libcockatrice_interfaces libcockatrice_models libcockatrice_network libcockatrice_protocol libcockatrice_rng libcockatrice_settings libcockatrice_utility
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1145,7 +1145,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = doc/doxygen-images
 
 # The INPUT_FILTER tag can be used to specify a program that Doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

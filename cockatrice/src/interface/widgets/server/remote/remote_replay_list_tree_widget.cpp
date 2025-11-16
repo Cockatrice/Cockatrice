@@ -48,7 +48,7 @@ int RemoteReplayList_TreeModel::rowCount(const QModelIndex &parent) const
     if (!parent.isValid())
         return replayMatches.size();
 
-    MatchNode *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
+    auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
     if (matchNode)
         return matchNode->size();
     else
@@ -62,7 +62,7 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
     if (index.column() >= numberOfColumns)
         return QVariant();
 
-    ReplayNode *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
+    auto *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
     if (replayNode) {
         const ServerInfo_Replay &replayInfo = replayNode->getReplayInfo();
         switch (role) {
@@ -84,7 +84,7 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
                 return index.column() == 0 ? fileIcon : QVariant();
         }
     } else {
-        MatchNode *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
+        auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
         const ServerInfo_ReplayMatch &matchInfo = matchNode->getMatchInfo();
         switch (role) {
             case Qt::TextAlignmentRole:
@@ -170,7 +170,7 @@ QModelIndex RemoteReplayList_TreeModel::index(int row, int column, const QModelI
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    MatchNode *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
+    auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
     if (matchNode) {
         if (row >= matchNode->size())
             return QModelIndex();
@@ -188,7 +188,7 @@ QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
     if (matchNode)
         return QModelIndex();
     else {
-        ReplayNode *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(ind.internalPointer()));
+        auto *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(ind.internalPointer()));
         return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode->getParent());
     }
 }
@@ -206,7 +206,7 @@ ServerInfo_Replay const *RemoteReplayList_TreeModel::getReplay(const QModelIndex
     if (!index.isValid())
         return 0;
 
-    ReplayNode *node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
+    auto *node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node)
         return 0;
     return &node->getReplayInfo();

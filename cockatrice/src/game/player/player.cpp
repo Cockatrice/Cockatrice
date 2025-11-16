@@ -194,7 +194,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
         } else {
             for (int j = 0; j < cardListSize; ++j) {
                 const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
-                CardItem *card = new CardItem(this);
+                auto *card = new CardItem(this);
                 card->processCardInfo(cardInfo);
                 zone->addCard(card, false, cardInfo.x(), cardInfo.y());
             }
