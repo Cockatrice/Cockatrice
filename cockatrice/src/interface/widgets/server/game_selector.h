@@ -35,6 +35,9 @@ private slots:
     void actCreate();
 
     void actJoin();
+    void actJoinAsJudge();
+    void actJoinAsPlayerOrJudge();
+
     void actSpectate();
     void customContextMenu(const QPoint &point);
 
@@ -55,7 +58,7 @@ private:
     QTreeView *gameListView;
     GamesModel *gameListModel;
     GamesProxyModel *gameListProxyModel;
-    QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *spectateButton;
+    QPushButton *filterButton, *clearFilterButton, *createButton, *joinButton, *joinAsJudgeButton, *spectateButton;
     const bool showFilters;
     GameTypeMap gameTypeMap;
 
@@ -63,7 +66,7 @@ private:
     void disableButtons();
     void enableButtons();
     void enableButtonsForIndex(const QModelIndex &current);
-    void joinGame(const bool isSpectator);
+    void joinGame(bool isSpectator = false, bool isJudge = false);
 
 public:
     GameSelector(AbstractClient *_client,
