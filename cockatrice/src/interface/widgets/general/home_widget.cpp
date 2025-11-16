@@ -178,7 +178,7 @@ QGroupBox *HomeWidget::createButtons()
     boxLayout->addSpacing(25);
 
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
-    boxLayout->addWidget(connectButton, 1);
+    boxLayout->addWidget(connectButton);
 
     auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
