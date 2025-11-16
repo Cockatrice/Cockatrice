@@ -31,11 +31,8 @@ private:
 
     QLineEdit *searchBar;
     QCheckBox *hideGamesNotCreatedByBuddiesCheckBox;
-    QLabel *hideGamesNotCreatedByBuddiesLabel;
     QCheckBox *hideFullGamesCheckBox;
-    QLabel *hideFullGamesLabel;
     QCheckBox *hideStartedGamesCheckBox;
-    QLabel *hideStartedGamesLabel;
     QComboBox *filterToFormatComboBox;
 };
 
