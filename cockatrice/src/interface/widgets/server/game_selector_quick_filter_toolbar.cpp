@@ -91,6 +91,14 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
         }
     });
 
+    hideGamesNotCreatedByBuddiesCheckBox->setMinimumSize(20, 20);
+    hideFullGamesCheckBox->setMinimumSize(20, 20);
+    hideStartedGamesCheckBox->setMinimumSize(20, 20);
+
+#if defined(Q_OS_MAC)
+    mainLayout->setSpacing(6);
+#endif
+
     mainLayout->addWidget(searchBar);
     mainLayout->addSpacing(10);
     mainLayout->addWidget(filterToFormatComboBox);
