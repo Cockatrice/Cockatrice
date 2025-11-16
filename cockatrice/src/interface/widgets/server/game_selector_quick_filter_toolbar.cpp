@@ -90,9 +90,9 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     mainLayout->addWidget(searchBar);
     mainLayout->addWidget(filterToFormatComboBox);
     mainLayout->addWidget(hideGamesNotCreatedByBuddiesCheckBox);
-    mainLayout->addSpacing(10);
+    mainLayout->addSpacing(5);
     mainLayout->addWidget(hideFullGamesCheckBox);
-    mainLayout->addSpacing(10);
+    mainLayout->addSpacing(5);
     mainLayout->addWidget(hideStartedGamesCheckBox);
 
     setLayout(mainLayout);
