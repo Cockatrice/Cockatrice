@@ -76,7 +76,11 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-    quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
+    if (showFilters && restoresettings) {
+        quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
+    } else {
+        quickFilterToolBar = nullptr;
+    }
 
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
@@ -121,7 +125,9 @@ GameSelector::GameSelector(AbstractClient *_client,
     buttonLayout->setAlignment(Qt::AlignTop);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(quickFilterToolBar);
+    if (showFilters && restoresettings) {
+        mainLayout->addWidget(quickFilterToolBar);
+    }
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
 
