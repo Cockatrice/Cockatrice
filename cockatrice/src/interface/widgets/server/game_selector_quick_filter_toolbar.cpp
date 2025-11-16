@@ -25,8 +25,10 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 
     hideGamesNotCreatedByBuddiesCheckBox = new QCheckBox(this);
     hideGamesNotCreatedByBuddiesCheckBox->setChecked(model->getHideBuddiesOnlyGames());
+    hideGamesNotCreatedByBuddiesCheckBox->setContentsMargins(5, 0, 0, 5);
     hideGamesNotCreatedByBuddiesLabel = new QLabel(this);
     hideGamesNotCreatedByBuddiesLabel->setBuddy(hideGamesNotCreatedByBuddiesCheckBox);
+    hideGamesNotCreatedByBuddiesLabel->setContentsMargins(0, 0, 5, 0);
     connect(hideGamesNotCreatedByBuddiesCheckBox, &QCheckBox::toggled, this, [this](bool checked) {
         if (checked) {
             QStringList buddyNames;
@@ -41,15 +43,19 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 
     hideFullGamesCheckBox = new QCheckBox(this);
     hideFullGamesCheckBox->setChecked(model->getHideFullGames());
+    hideFullGamesCheckBox->setContentsMargins(5, 0, 0, 0);
     hideFullGamesLabel = new QLabel(this);
     hideFullGamesLabel->setBuddy(hideFullGamesCheckBox);
+    hideFullGamesLabel->setContentsMargins(0, 0, 5, 0);
     connect(hideFullGamesCheckBox, &QCheckBox::toggled, this,
             [this](bool checked) { model->setHideFullGames(checked); });
 
     hideStartedGamesCheckBox = new QCheckBox(this);
     hideStartedGamesCheckBox->setChecked(model->getHideGamesThatStarted());
+    hideStartedGamesCheckBox->setContentsMargins(5, 0, 0, 0);
     hideStartedGamesLabel = new QLabel(this);
     hideStartedGamesLabel->setBuddy(hideStartedGamesCheckBox);
+    hideStartedGamesLabel->setContentsMargins(0, 0, 5, 0);
     connect(hideStartedGamesCheckBox, &QCheckBox::toggled, this,
             [this](bool checked) { model->setHideGamesThatStarted(checked); });
 
