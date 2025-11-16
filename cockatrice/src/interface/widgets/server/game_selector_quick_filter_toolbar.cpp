@@ -17,7 +17,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 {
     mainLayout = new QHBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
+    mainLayout->setSpacing(5);
 
     searchBar = new QLineEdit(this);
     searchBar->setText(model->getCreatorNameFilters().join(", "));
@@ -26,9 +26,9 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     hideGamesNotCreatedByBuddiesCheckBox = new QCheckBox(this);
     hideGamesNotCreatedByBuddiesCheckBox->setChecked(model->getHideBuddiesOnlyGames());
     hideGamesNotCreatedByBuddiesCheckBox->setContentsMargins(5, 0, 0, 5);
-    hideGamesNotCreatedByBuddiesLabel = new QLabel(this);
+    /*hideGamesNotCreatedByBuddiesLabel = new QLabel(this);
     hideGamesNotCreatedByBuddiesLabel->setBuddy(hideGamesNotCreatedByBuddiesCheckBox);
-    hideGamesNotCreatedByBuddiesLabel->setContentsMargins(0, 0, 5, 0);
+    hideGamesNotCreatedByBuddiesLabel->setContentsMargins(0, 0, 5, 0);*/
     connect(hideGamesNotCreatedByBuddiesCheckBox, &QCheckBox::toggled, this, [this](bool checked) {
         if (checked) {
             QStringList buddyNames;
@@ -44,18 +44,18 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     hideFullGamesCheckBox = new QCheckBox(this);
     hideFullGamesCheckBox->setChecked(model->getHideFullGames());
     hideFullGamesCheckBox->setContentsMargins(5, 0, 0, 0);
-    hideFullGamesLabel = new QLabel(this);
+    /*hideFullGamesLabel = new QLabel(this);
     hideFullGamesLabel->setBuddy(hideFullGamesCheckBox);
-    hideFullGamesLabel->setContentsMargins(0, 0, 5, 0);
+    hideFullGamesLabel->setContentsMargins(0, 0, 5, 0);*/
     connect(hideFullGamesCheckBox, &QCheckBox::toggled, this,
             [this](bool checked) { model->setHideFullGames(checked); });
 
     hideStartedGamesCheckBox = new QCheckBox(this);
     hideStartedGamesCheckBox->setChecked(model->getHideGamesThatStarted());
     hideStartedGamesCheckBox->setContentsMargins(5, 0, 0, 0);
-    hideStartedGamesLabel = new QLabel(this);
+    /*hideStartedGamesLabel = new QLabel(this);
     hideStartedGamesLabel->setBuddy(hideStartedGamesCheckBox);
-    hideStartedGamesLabel->setContentsMargins(0, 0, 5, 0);
+    hideStartedGamesLabel->setContentsMargins(0, 0, 5, 0);*/
     connect(hideStartedGamesCheckBox, &QCheckBox::toggled, this,
             [this](bool checked) { model->setHideGamesThatStarted(checked); });
 
@@ -100,17 +100,17 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 #endif
 
     mainLayout->addWidget(searchBar);
-    mainLayout->addSpacing(10);
+    // mainLayout->addSpacing(10);
     mainLayout->addWidget(filterToFormatComboBox);
-    mainLayout->addSpacing(10);
+    // mainLayout->addSpacing(10);
     mainLayout->addWidget(hideGamesNotCreatedByBuddiesCheckBox);
-    mainLayout->addWidget(hideGamesNotCreatedByBuddiesLabel);
-    mainLayout->addSpacing(25);
+    // mainLayout->addWidget(hideGamesNotCreatedByBuddiesLabel);
+    // mainLayout->addSpacing(25);
     mainLayout->addWidget(hideFullGamesCheckBox);
-    mainLayout->addWidget(hideFullGamesLabel);
-    mainLayout->addSpacing(25);
+    // mainLayout->addWidget(hideFullGamesLabel);
+    // mainLayout->addSpacing(25);
     mainLayout->addWidget(hideStartedGamesCheckBox);
-    mainLayout->addWidget(hideStartedGamesLabel);
+    // mainLayout->addWidget(hideStartedGamesLabel);
 
     setLayout(mainLayout);
 
@@ -121,7 +121,7 @@ void GameSelectorQuickFilterToolBar::retranslateUi()
 {
     searchBar->setPlaceholderText(tr("Filter by game name..."));
     filterToFormatComboBox->setToolTip(tr("Filter by game type/format"));
-    hideGamesNotCreatedByBuddiesLabel->setText(tr("Hide games not created by buddies"));
-    hideFullGamesLabel->setText(tr("Hide full games"));
-    hideStartedGamesLabel->setText(tr("Hide started games"));
+    hideGamesNotCreatedByBuddiesCheckBox->setText(tr("Hide games not created by buddies"));
+    hideFullGamesCheckBox->setText(tr("Hide full games"));
+    hideStartedGamesCheckBox->setText(tr("Hide started games"));
 }
