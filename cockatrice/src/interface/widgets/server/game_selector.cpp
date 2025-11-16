@@ -306,7 +306,7 @@ void GameSelector::customContextMenu(const QPoint &point)
     menu.exec(gameListView->mapToGlobal(point));
 }
 
-void GameSelector::joinGame(const bool isSpectator, const bool isJudge)
+void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
 {
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid()) {
@@ -318,7 +318,7 @@ void GameSelector::joinGame(const bool isSpectator, const bool isJudge)
         return;
     }
 
-    bool spectator = isSpectator || game.player_count() == game.max_players();
+    bool spectator = asSpectator || game.player_count() == game.max_players();
 
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
@@ -335,7 +335,7 @@ void GameSelector::joinGame(const bool isSpectator, const bool isJudge)
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
-    cmd.set_join_as_judge(isJudge);
+    cmd.set_join_as_judge(asJudge);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
     if (!r) {

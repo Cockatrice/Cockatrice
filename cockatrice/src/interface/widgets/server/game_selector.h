@@ -159,12 +159,12 @@ private:
 
     /**
      * @brief Performs the join or spectate action for the currently selected game.
-     * @param isSpectator True to join as a spectator, false to join as a player.
-     * @param isJudge True to join as a judge, false to join as a player.
+     * @param asSpectator True to join as a spectator, false to join as a player.
+     * @param asJudge True to join as a judge, false to join as a player.
      *
      * Handles password prompts, overrides, and sending the join command to the server.
      */
-    void joinGame(bool isSpectator = false, bool isJudge = false);
+    void joinGame(bool asSpectator = false, bool asJudge = false);
 
 public:
     /**
