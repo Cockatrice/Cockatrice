@@ -102,15 +102,20 @@ void DlgCreateGame::sharedCtor()
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
-    shareDecklistsOnLoadLabel = new QLabel(tr("Open decklists in lobby"));
-    shareDecklistsOnLoadCheckBox = new QCheckBox();
-    shareDecklistsOnLoadLabel->setBuddy(shareDecklistsOnLoadCheckBox);
+    shareDecklistsOnLoadCheckBox = new QCheckBox(tr("Open decklists in lobby"));
+
+    createGameAsJudgeCheckBox = new QCheckBox(tr("Create game as judge"));
 
     auto *gameSetupOptionsLayout = new QGridLayout;
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
-    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadLabel, 1, 0);
-    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 1);
+    gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
+    if (room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
+    } else {
+        createGameAsJudgeCheckBox->setChecked(false);
+        createGameAsJudgeCheckBox->setHidden(true);
+    }
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"));
     gameSetupOptionsGroupBox->setLayout(gameSetupOptionsLayout);
 
@@ -245,6 +250,7 @@ void DlgCreateGame::actReset()
 
     startingLifeTotalEdit->setValue(20);
     shareDecklistsOnLoadCheckBox->setChecked(false);
+    createGameAsJudgeCheckBox->setChecked(false);
 
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
@@ -270,7 +276,7 @@ void DlgCreateGame::actOK()
     cmd.set_spectators_need_password(spectatorsNeedPasswordCheckBox->isChecked());
     cmd.set_spectators_can_talk(spectatorsCanTalkCheckBox->isChecked());
     cmd.set_spectators_see_everything(spectatorsSeeEverythingCheckBox->isChecked());
-    cmd.set_join_as_judge(QApplication::keyboardModifiers() & Qt::ShiftModifier);
+    cmd.set_join_as_judge(createGameAsJudgeCheckBox->isChecked());
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
     cmd.set_starting_life_total(startingLifeTotalEdit->value());
     cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());

@@ -76,6 +76,12 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
+    if (showFilters && restoresettings) {
+        quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
+    } else {
+        quickFilterToolBar = nullptr;
+    }
+
     filterButton = new QPushButton;
     filterButton->setIcon(QPixmap("theme:icons/search"));
     connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
@@ -92,7 +98,9 @@ GameSelector::GameSelector(AbstractClient *_client,
         createButton = nullptr;
     }
     joinButton = new QPushButton;
+    joinAsJudgeButton = new QPushButton;
     spectateButton = new QPushButton;
+    joinAsJudgeSpectatorButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     if (showFilters) {
@@ -103,10 +111,23 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (room)
         buttonLayout->addWidget(createButton);
     buttonLayout->addWidget(joinButton);
+    if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+        buttonLayout->addWidget(joinAsJudgeButton);
+    } else {
+        joinAsJudgeButton->setHidden(true);
+    }
     buttonLayout->addWidget(spectateButton);
+    if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+        buttonLayout->addWidget(joinAsJudgeSpectatorButton);
+    } else {
+        joinAsJudgeSpectatorButton->setHidden(true);
+    }
     buttonLayout->setAlignment(Qt::AlignTop);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    if (showFilters && restoresettings) {
+        mainLayout->addWidget(quickFilterToolBar);
+    }
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
 
@@ -117,7 +138,9 @@ GameSelector::GameSelector(AbstractClient *_client,
     setMinimumHeight(200);
 
     connect(joinButton, &QPushButton::clicked, this, &GameSelector::actJoin);
-    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actSpectate);
+    connect(joinAsJudgeButton, &QPushButton::clicked, this, &GameSelector::actJoinAsJudge);
+    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actJoinAsSpectator);
+    connect(joinAsJudgeSpectatorButton, &QPushButton::clicked, this, &GameSelector::actJoinAsJudgeSpectator);
     connect(gameListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &GameSelector::actSelectedGameChanged);
     connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoin);
@@ -158,7 +181,7 @@ void GameSelector::actSetFilter()
     gameListProxyModel->setGameFilters(
         dlg.getHideBuddiesOnlyGames(), dlg.getHideIgnoredUserGames(), dlg.getHideFullGames(),
         dlg.getHideGamesThatStarted(), dlg.getHidePasswordProtectedGames(), dlg.getHideNotBuddyCreatedGames(),
-        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilter(), dlg.getGameTypeFilter(),
+        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilters(), dlg.getGameTypeFilter(),
         dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax(), dlg.getMaxGameAge(),
         dlg.getShowOnlyIfSpectatorsCanWatch(), dlg.getShowSpectatorPasswordProtected(),
         dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
@@ -238,12 +261,30 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    return joinGame(false);
+    joinGame();
 }
 
-void GameSelector::actSpectate()
+void GameSelector::actJoinAsJudge()
 {
-    return joinGame(true);
+    if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
+        joinGame();
+    } else {
+        joinGame(false, true);
+    }
+}
+
+void GameSelector::actJoinAsSpectator()
+{
+    joinGame(true);
+}
+
+void GameSelector::actJoinAsJudgeSpectator()
+{
+    if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
+        joinGame(true);
+    } else {
+        joinGame(true, true);
+    }
 }
 
 void GameSelector::customContextMenu(const QPoint &point)
@@ -257,7 +298,7 @@ void GameSelector::customContextMenu(const QPoint &point)
     connect(&joinGame, &QAction::triggered, this, &GameSelector::actJoin);
 
     QAction spectateGame(tr("Spectate Game"));
-    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actSpectate);
+    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actJoinAsSpectator);
 
     QAction getGameInfo(tr("Game Information"));
     connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
@@ -270,12 +311,25 @@ void GameSelector::customContextMenu(const QPoint &point)
 
     QMenu menu;
     menu.addAction(&joinGame);
+
+    if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+        QAction joinGameAsJudge(tr("Join Game as Judge"));
+        connect(&joinGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudge);
+
+        menu.addAction(&joinGameAsJudge);
+
+        QAction spectateGameAsJudge(tr("Spectate Game as Judge"));
+        connect(&spectateGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudgeSpectator);
+
+        menu.addAction(&spectateGameAsJudge);
+    }
+
     menu.addAction(&spectateGame);
     menu.addAction(&getGameInfo);
     menu.exec(gameListView->mapToGlobal(point));
 }
 
-void GameSelector::joinGame(const bool isSpectator)
+void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
 {
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid()) {
@@ -287,7 +341,7 @@ void GameSelector::joinGame(const bool isSpectator)
         return;
     }
 
-    bool spectator = isSpectator || game.player_count() == game.max_players();
+    bool spectator = asSpectator || game.player_count() == game.max_players();
 
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
     QString password;
@@ -304,7 +358,7 @@ void GameSelector::joinGame(const bool isSpectator)
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
-    cmd.set_join_as_judge((QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
+    cmd.set_join_as_judge(asJudge);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
     if (!r) {
@@ -356,7 +410,9 @@ void GameSelector::retranslateUi()
     if (createButton)
         createButton->setText(tr("C&reate"));
     joinButton->setText(tr("&Join"));
+    joinAsJudgeButton->setText(tr("Join as judge"));
     spectateButton->setText(tr("J&oin as spectator"));
+    joinAsJudgeSpectatorButton->setText(tr("Join as judge spectator"));
 
     updateTitle();
 }
