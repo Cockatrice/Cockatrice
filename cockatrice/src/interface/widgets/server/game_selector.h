@@ -116,7 +116,7 @@ signals:
 private:
     AbstractClient *client;       /**< The network client used to communicate with the server. */
     TabSupervisor *tabSupervisor; /**< Reference to TabSupervisor for managing tabs and rooms. */
-    TabRoom *room;                /**< The current room; nullptr if no room is selected. */
+    TabRoom *room;                /**< The current room. */
 
     QTreeView *gameListView;             /**< View widget for displaying the game list. */
     GamesModel *gameListModel;           /**< Model containing all games. */
