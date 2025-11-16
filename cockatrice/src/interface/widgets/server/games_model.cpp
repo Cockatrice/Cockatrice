@@ -294,7 +294,7 @@ void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
                                      bool _hideNotBuddyCreatedGames,
                                      bool _hideOpenDecklistGames,
                                      const QString &_gameNameFilter,
-                                     const QString &_creatorNameFilter,
+                                     const QStringList &_creatorNameFilters,
                                      const QSet<int> &_gameTypeFilter,
                                      int _maxPlayersFilterMin,
                                      int _maxPlayersFilterMax,
@@ -315,7 +315,7 @@ void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
     hideNotBuddyCreatedGames = _hideNotBuddyCreatedGames;
     hideOpenDecklistGames = _hideOpenDecklistGames;
     gameNameFilter = _gameNameFilter;
-    creatorNameFilter = _creatorNameFilter;
+    creatorNameFilters = _creatorNameFilters;
     gameTypeFilter = _gameTypeFilter;
     maxPlayersFilterMin = _maxPlayersFilterMin;
     maxPlayersFilterMax = _maxPlayersFilterMax;
@@ -348,15 +348,15 @@ int GamesProxyModel::getNumFilteredGames() const
 
 void GamesProxyModel::resetFilterParameters()
 {
-    setGameFilters(false, false, false, false, false, false, false, QString(), QString(), {}, DEFAULT_MAX_PLAYERS_MIN,
-                   DEFAULT_MAX_PLAYERS_MAX, DEFAULT_MAX_GAME_AGE, false, false, false, false);
+    setGameFilters(false, false, false, false, false, false, false, QString(), QStringList(), {},
+                   DEFAULT_MAX_PLAYERS_MIN, DEFAULT_MAX_PLAYERS_MAX, DEFAULT_MAX_GAME_AGE, false, false, false, false);
 }
 
 bool GamesProxyModel::areFilterParametersSetToDefaults() const
 {
     return !hideFullGames && !hideGamesThatStarted && !hidePasswordProtectedGames && !hideBuddiesOnlyGames &&
            !hideOpenDecklistGames && !hideIgnoredUserGames && !hideNotBuddyCreatedGames && gameNameFilter.isEmpty() &&
-           creatorNameFilter.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
+           creatorNameFilters.isEmpty() && gameTypeFilter.isEmpty() && maxPlayersFilterMin == DEFAULT_MAX_PLAYERS_MIN &&
            maxPlayersFilterMax == DEFAULT_MAX_PLAYERS_MAX && maxGameAge == DEFAULT_MAX_GAME_AGE &&
            !showOnlyIfSpectatorsCanWatch && !showSpectatorPasswordProtected && !showOnlyIfSpectatorsCanChat &&
            !showOnlyIfSpectatorsCanSeeHands;
@@ -379,7 +379,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
                    gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
                    gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideNotBuddyCreatedGames(),
                    gameFilters.isHideOpenDecklistGames(), gameFilters.getGameNameFilter(),
-                   gameFilters.getCreatorNameFilter(), newGameTypeFilter, gameFilters.getMinPlayers(),
+                   gameFilters.getCreatorNameFilters(), newGameTypeFilter, gameFilters.getMinPlayers(),
                    gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
                    gameFilters.isShowOnlyIfSpectatorsCanWatch(), gameFilters.isShowSpectatorPasswordProtected(),
                    gameFilters.isShowOnlyIfSpectatorsCanChat(), gameFilters.isShowOnlyIfSpectatorsCanSeeHands());
@@ -396,7 +396,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setHideNotBuddyCreatedGames(hideNotBuddyCreatedGames);
     gameFilters.setHideOpenDecklistGames(hideOpenDecklistGames);
     gameFilters.setGameNameFilter(gameNameFilter);
-    gameFilters.setCreatorNameFilter(creatorNameFilter);
+    gameFilters.setCreatorNameFilters(creatorNameFilters);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
@@ -459,9 +459,17 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     if (!gameNameFilter.isEmpty())
         if (!QString::fromStdString(game.description()).contains(gameNameFilter, Qt::CaseInsensitive))
             return false;
-    if (!creatorNameFilter.isEmpty())
-        if (!QString::fromStdString(game.creator_info().name()).contains(creatorNameFilter, Qt::CaseInsensitive))
+    if (!creatorNameFilters.isEmpty()) {
+        bool found = false;
+        for (const auto &createNameFilter : creatorNameFilters) {
+            if (QString::fromStdString(game.creator_info().name()).contains(createNameFilter, Qt::CaseInsensitive)) {
+                found = true;
+            }
+        }
+        if (!found) {
             return false;
+        }
+    }
 
     QSet<int> gameTypes;
     for (int i = 0; i < game.game_types_size(); ++i)

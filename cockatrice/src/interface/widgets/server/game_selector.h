@@ -7,6 +7,7 @@
 #ifndef GAMESELECTOR_H
 #define GAMESELECTOR_H
 
+#include "game_selector_quick_filter_toolbar.h"
 #include "game_type_map.h"
 
 #include <QGroupBox>
@@ -51,6 +52,8 @@ private:
     AbstractClient *client;
     TabSupervisor *tabSupervisor;
     TabRoom *room;
+
+    GameSelectorQuickFilterToolBar *quickFilterToolBar;
 
     QTreeView *gameListView;
     GamesModel *gameListModel;
