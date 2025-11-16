@@ -96,6 +96,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     joinButton = new QPushButton;
     joinAsJudgeButton = new QPushButton;
     spectateButton = new QPushButton;
+    joinAsJudgeSpectatorButton = new QPushButton;
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     if (showFilters) {
@@ -112,6 +113,11 @@ GameSelector::GameSelector(AbstractClient *_client,
         joinAsJudgeButton->setHidden(true);
     }
     buttonLayout->addWidget(spectateButton);
+    if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+        buttonLayout->addWidget(joinAsJudgeSpectatorButton);
+    } else {
+        joinAsJudgeSpectatorButton->setHidden(true);
+    }
     buttonLayout->setAlignment(Qt::AlignTop);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -127,7 +133,8 @@ GameSelector::GameSelector(AbstractClient *_client,
 
     connect(joinButton, &QPushButton::clicked, this, &GameSelector::actJoin);
     connect(joinAsJudgeButton, &QPushButton::clicked, this, &GameSelector::actJoinAsJudge);
-    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actSpectate);
+    connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actJoinAsSpectator);
+    connect(joinAsJudgeSpectatorButton, &QPushButton::clicked, this, &GameSelector::actJoinAsJudgeSpectator);
     connect(gameListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &GameSelector::actSelectedGameChanged);
     connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoin);
@@ -259,9 +266,17 @@ void GameSelector::actJoinAsJudge()
     return joinGame(false, true);
 }
 
-void GameSelector::actSpectate()
+void GameSelector::actJoinAsSpectator()
 {
     return joinGame(true);
+}
+
+void GameSelector::actJoinAsJudgeSpectator()
+{
+    if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
+        return joinGame(true);
+    }
+    return joinGame(true, true);
 }
 
 void GameSelector::customContextMenu(const QPoint &point)
@@ -275,7 +290,7 @@ void GameSelector::customContextMenu(const QPoint &point)
     connect(&joinGame, &QAction::triggered, this, &GameSelector::actJoin);
 
     QAction spectateGame(tr("Spectate Game"));
-    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actSpectate);
+    connect(&spectateGame, &QAction::triggered, this, &GameSelector::actJoinAsSpectator);
 
     QAction getGameInfo(tr("Game Information"));
     connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
@@ -294,6 +309,11 @@ void GameSelector::customContextMenu(const QPoint &point)
         connect(&joinGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudge);
 
         menu.addAction(&joinGameAsJudge);
+
+        QAction spectateGameAsJudge(tr("Spectate Game as Judge"));
+        connect(&spectateGameAsJudge, &QAction::triggered, this, &GameSelector::actJoinAsJudgeSpectator);
+
+        menu.addAction(&spectateGameAsJudge);
     }
 
     menu.addAction(&spectateGame);
@@ -384,6 +404,7 @@ void GameSelector::retranslateUi()
     joinButton->setText(tr("&Join"));
     joinAsJudgeButton->setText(tr("Join as judge"));
     spectateButton->setText(tr("J&oin as spectator"));
+    joinAsJudgeSpectatorButton->setText(tr("Join as judge spectator"));
 
     updateTitle();
 }

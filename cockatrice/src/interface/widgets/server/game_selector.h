@@ -65,7 +65,8 @@ private slots:
     /**
      * @brief Joins the currently selected game as a spectator.
      */
-    void actSpectate();
+    void actJoinAsSpectator();
+    void actJoinAsJudgeSpectator();
 
     /**
      * @brief Shows the custom context menu for a game when right-clicked.
@@ -126,12 +127,13 @@ private:
 
     GameSelectorQuickFilterToolBar *quickFilterToolBar;
 
-    QPushButton *filterButton;      /**< Button to open the filter dialog. */
-    QPushButton *clearFilterButton; /**< Button to clear active filters. */
-    QPushButton *createButton;      /**< Button to create a new game (only if room is set). */
-    QPushButton *joinButton;        /**< Button to join the selected game. */
-    QPushButton *joinAsJudgeButton; /**< Button to join the selected game as a judge. */
-    QPushButton *spectateButton;    /**< Button to spectate the selected game. */
+    QPushButton *filterButton;               /**< Button to open the filter dialog. */
+    QPushButton *clearFilterButton;          /**< Button to clear active filters. */
+    QPushButton *createButton;               /**< Button to create a new game (only if room is set). */
+    QPushButton *joinButton;                 /**< Button to join the selected game. */
+    QPushButton *joinAsJudgeButton;          /**< Button to join the selected game as a judge. */
+    QPushButton *spectateButton;             /**< Button to spectate the selected game. */
+    QPushButton *joinAsJudgeSpectatorButton; /**< Button to join the selected game as a spectating judge. */
 
     const bool showFilters;  /**< Determines whether filter buttons are displayed. */
     GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
