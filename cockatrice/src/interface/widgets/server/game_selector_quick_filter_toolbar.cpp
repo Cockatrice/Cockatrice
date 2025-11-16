@@ -16,6 +16,8 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     : QWidget(parent), tabSupervisor(_tabSupervisor), model(_model)
 {
     mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
 
     searchBar = new QLineEdit(this);
     searchBar->setText(model->getCreatorNameFilters().join(", "));
@@ -52,8 +54,6 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
             [this](bool checked) { model->setHideGamesThatStarted(checked); });
 
     filterToFormatComboBox = new QComboBox(this);
-    filterToFormatLabel = new QLabel(this);
-    filterToFormatLabel->setBuddy(filterToFormatComboBox);
 
     // Add a "No filter" / "All types" option first
     filterToFormatComboBox->addItem(tr("All types"), QVariant()); // empty QVariant = no filter
@@ -86,14 +86,17 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     });
 
     mainLayout->addWidget(searchBar);
-    mainLayout->addWidget(hideGamesNotCreatedByBuddiesLabel);
-    mainLayout->addWidget(hideGamesNotCreatedByBuddiesCheckBox);
-    mainLayout->addWidget(hideFullGamesLabel);
-    mainLayout->addWidget(hideFullGamesCheckBox);
-    mainLayout->addWidget(hideStartedGamesLabel);
-    mainLayout->addWidget(hideStartedGamesCheckBox);
-    mainLayout->addWidget(filterToFormatLabel);
+    mainLayout->addSpacing(10);
     mainLayout->addWidget(filterToFormatComboBox);
+    mainLayout->addSpacing(10);
+    mainLayout->addWidget(hideGamesNotCreatedByBuddiesCheckBox);
+    mainLayout->addWidget(hideGamesNotCreatedByBuddiesLabel);
+    mainLayout->addSpacing(25);
+    mainLayout->addWidget(hideFullGamesCheckBox);
+    mainLayout->addWidget(hideFullGamesLabel);
+    mainLayout->addSpacing(25);
+    mainLayout->addWidget(hideStartedGamesCheckBox);
+    mainLayout->addWidget(hideStartedGamesLabel);
 
     setLayout(mainLayout);
 
@@ -106,5 +109,4 @@ void GameSelectorQuickFilterToolBar::retranslateUi()
     hideGamesNotCreatedByBuddiesLabel->setText(tr("Hide games not created by buddies"));
     hideFullGamesLabel->setText(tr("Hide full games"));
     hideStartedGamesLabel->setText(tr("Hide started games"));
-    filterToFormatLabel->setText(tr("Filter to format"));
 }

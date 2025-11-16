@@ -37,7 +37,6 @@ private:
     QCheckBox *hideStartedGamesCheckBox;
     QLabel *hideStartedGamesLabel;
     QComboBox *filterToFormatComboBox;
-    QLabel *filterToFormatLabel;
 };
 
 #endif // COCKATRICE_GAME_SELECTOR_QUICK_FILTER_TOOLBAR_H
