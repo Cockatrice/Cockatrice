@@ -57,8 +57,10 @@ private slots:
      * @brief Joins the currently selected game as a player.
      */
     void actJoin();
+    /**
+     * @brief Joins the currently selected game as a judge.
+     */
     void actJoinAsJudge();
-    void actJoinAsPlayerOrJudge();
 
     /**
      * @brief Joins the currently selected game as a spectator.

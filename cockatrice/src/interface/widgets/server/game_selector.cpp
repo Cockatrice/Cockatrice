@@ -130,7 +130,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(spectateButton, &QPushButton::clicked, this, &GameSelector::actSpectate);
     connect(gameListView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &GameSelector::actSelectedGameChanged);
-    connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoinAsPlayerOrJudge);
+    connect(gameListView, &QTreeView::activated, this, &GameSelector::actJoin);
 
     connect(client, &AbstractClient::ignoreListReceived, this, &GameSelector::ignoreListReceived);
     connect(client, &AbstractClient::addToListEventReceived, this, &GameSelector::processAddToListEvent);
@@ -253,15 +253,10 @@ void GameSelector::actJoin()
 
 void GameSelector::actJoinAsJudge()
 {
-    return joinGame(false, true);
-}
-
-void GameSelector::actJoinAsPlayerOrJudge()
-{
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
         return joinGame();
     }
-    return joinGame(false, (QApplication::keyboardModifiers() & Qt::ShiftModifier) != 0);
+    return joinGame(false, true);
 }
 
 void GameSelector::actSpectate()
