@@ -106,6 +106,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 void GameSelectorQuickFilterToolBar::retranslateUi()
 {
     searchBar->setPlaceholderText(tr("Filter by game name..."));
+    filterToFormatComboBox->setToolTip(tr("Filter by game type/format"));
     hideGamesNotCreatedByBuddiesLabel->setText(tr("Hide games not created by buddies"));
     hideFullGamesLabel->setText(tr("Hide full games"));
     hideStartedGamesLabel->setText(tr("Hide started games"));
