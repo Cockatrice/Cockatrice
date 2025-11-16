@@ -63,7 +63,7 @@ public:
     void moveOneCardUntil(CardItem *card);
     void stopMoveTopCardsUntil();
 
-    bool isMovingCardsUntil() const
+    [[nodiscard]] bool isMovingCardsUntil() const
     {
         return movingCardsUntil;
     }

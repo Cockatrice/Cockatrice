@@ -20,39 +20,39 @@ public:
     void debugPrint() const;
 
     // Getter methods for card prices
-    const QJsonObject &getCardhoarder() const
+    [[nodiscard]] const QJsonObject &getCardhoarder() const
     {
         return cardhoarder;
     }
-    const QJsonObject &getCardkingdom() const
+    [[nodiscard]] const QJsonObject &getCardkingdom() const
     {
         return cardkingdom;
     }
-    const QJsonObject &getCardmarket() const
+    [[nodiscard]] const QJsonObject &getCardmarket() const
     {
         return cardmarket;
     }
-    const QJsonObject &getFace2face() const
+    [[nodiscard]] const QJsonObject &getFace2face() const
     {
         return face2face;
     }
-    const QJsonObject &getManapool() const
+    [[nodiscard]] const QJsonObject &getManapool() const
     {
         return manapool;
     }
-    const QJsonObject &getMtgstocks() const
+    [[nodiscard]] const QJsonObject &getMtgstocks() const
     {
         return mtgstocks;
     }
-    const QJsonObject &getScg() const
+    [[nodiscard]] const QJsonObject &getScg() const
     {
         return scg;
     }
-    const QJsonObject &getTcgl() const
+    [[nodiscard]] const QJsonObject &getTcgl() const
     {
         return tcgl;
     }
-    const QJsonObject &getTcgplayer() const
+    [[nodiscard]] const QJsonObject &getTcgplayer() const
     {
         return tcgplayer;
     }

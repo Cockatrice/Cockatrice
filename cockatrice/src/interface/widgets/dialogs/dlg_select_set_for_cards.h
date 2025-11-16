@@ -78,7 +78,7 @@ public:
     QStringList getAllCardsForSet();
     void populateCardList();
     void updateCardDisplayWidgets();
-    bool isChecked() const;
+    [[nodiscard]] bool isChecked() const;
     DlgSelectSetForCards *parent;
     QString setName;
     bool expanded;

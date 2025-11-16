@@ -321,7 +321,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     realnameEdit->setMaxLength(MAX_NAME_LENGTH);
     realnameLabel->setBuddy(realnameEdit);
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
     grid->addWidget(infoLabel, 0, 0, 1, 2);
     grid->addWidget(hostLabel, 1, 0);
     grid->addWidget(hostEdit, 1, 1);
@@ -342,11 +342,11 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     grid->addWidget(realnameLabel, 10, 0);
     grid->addWidget(realnameEdit, 10, 1);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgRegister::actOk);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgRegister::reject);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);

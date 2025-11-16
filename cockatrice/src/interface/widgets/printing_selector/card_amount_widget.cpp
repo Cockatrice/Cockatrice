@@ -266,35 +266,16 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
         return -1;
     }
 
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot) {
-        return -1;
-    }
+    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes({deckZone});
 
     int count = 0;
-
-    for (auto *i : *listRoot) {
-        auto *countCurrentZone = dynamic_cast<InnerDecklistNode *>(i);
-        if (!countCurrentZone) {
-            continue;
-        }
-
-        if (countCurrentZone->getName() != deckZone) {
-            continue;
-        }
-
-        for (auto *cardNode : *countCurrentZone) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(cardNode);
-            if (!currentCard) {
-                continue;
-            }
-
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
-                    count++;
-                }
+    for (auto currentCard : cardsInDeck) {
+        for (int k = 0; k < currentCard->getNumber(); ++k) {
+            if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
+                count++;
             }
         }
     }
+
     return count;
 }

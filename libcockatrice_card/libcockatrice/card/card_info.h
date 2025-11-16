@@ -1,9 +1,3 @@
-/**
- * @file card_info.h
- * @ingroup Cards
- * @brief TODO: Document this.
- */
-
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
@@ -54,6 +48,10 @@ class CardInfo : public QObject
     Q_OBJECT
 
 private:
+    /** @name Private Card Properties
+     *  @anchor PrivateCardProperties
+     */
+    ///@{
     CardInfoPtr smartThis;                         ///< Smart pointer to self for safe cross-references.
     QString name;                                  ///< Full name of the card.
     QString simpleName;                            ///< Simplified name for fuzzy matching.
@@ -69,6 +67,7 @@ private:
     bool landscapeOrientation;                     ///< Orientation flag for rendering.
     int tableRow;                                  ///< Row index in a table or visual representation.
     bool upsideDownArt;                            ///< Whether artwork is flipped for visual purposes.
+    ///@}
 
 public:
     /**
@@ -161,7 +160,7 @@ public:
      */
     CardInfoPtr clone() const
     {
-        CardInfoPtr newCardInfo = CardInfoPtr(new CardInfo(*this));
+        auto newCardInfo = CardInfoPtr(new CardInfo(*this));
         newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
         return newCardInfo;
     }

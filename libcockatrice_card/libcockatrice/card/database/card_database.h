@@ -1,10 +1,3 @@
-/**
- * @file card_database.h
- * @ingroup CardDatabase
- * @brief The CardDatabase is responsible for holding the card and set maps, managing card additions/removals,
- * and providing access to sets and card querying via CardDatabaseQuerier.
- */
-
 #ifndef CARDDATABASE_H
 #define CARDDATABASE_H
 
@@ -101,7 +94,7 @@ public:
     void clear();
 
     /** @brief Returns the map of cards by name. */
-    const CardNameMap &getCardList() const
+    [[nodiscard]] const CardNameMap &getCardList() const
     {
         return cards;
     }
@@ -114,16 +107,16 @@ public:
     CardSetPtr getSet(const QString &setName);
 
     /** @brief Returns a list of all sets in the database. */
-    CardSetList getSetList() const;
+    [[nodiscard]] CardSetList getSetList() const;
 
     /** @brief Returns the current load status. */
-    LoadStatus getLoadStatus() const
+    [[nodiscard]] LoadStatus getLoadStatus() const
     {
         return loadStatus;
     }
 
     /** @brief Returns the querier for performing card lookups. */
-    CardDatabaseQuerier *query() const
+    [[nodiscard]] CardDatabaseQuerier *query() const
     {
         return querier;
     }

@@ -15,7 +15,7 @@ using CardSetPtr = QSharedPointer<CardSet>;
 
 /**
  * @class CardSet
- * @ingroup Cards
+ * @ingroup CardSets
  *
  * @brief A collection of cards grouped under a common identifier.
  *

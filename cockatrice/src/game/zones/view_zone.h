@@ -58,12 +58,12 @@ private:
 
 public:
     ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent);
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void reorganizeCards() override;
     void initializeCards(const QList<const ServerInfo_Card *> &cardList = QList<const ServerInfo_Card *>());
     void setGeometry(const QRectF &rect) override;
-    QRectF getOptimumRect() const
+    [[nodiscard]] QRectF getOptimumRect() const
     {
         return optimumRect;
     }
@@ -83,7 +83,7 @@ signals:
     void wheelEventReceived(QGraphicsSceneWheelEvent *event);
 
 protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
+    [[nodiscard]] QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 };
 

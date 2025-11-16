@@ -41,8 +41,8 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 
 void DeckViewCardDragItem::handleDrop(DeckViewCardContainer *target)
 {
-    DeckViewCard *card = static_cast<DeckViewCard *>(item);
-    DeckViewCardContainer *start = static_cast<DeckViewCardContainer *>(item->parentItem());
+    auto *card = static_cast<DeckViewCard *>(item);
+    auto *start = static_cast<DeckViewCardContainer *>(item->parentItem());
     start->removeCard(card);
     target->addCard(card);
     card->setParentItem(target);
@@ -51,13 +51,13 @@ void DeckViewCardDragItem::handleDrop(DeckViewCardContainer *target)
 void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     setCursor(Qt::OpenHandCursor);
-    DeckViewScene *sc = static_cast<DeckViewScene *>(scene());
+    auto *sc = static_cast<DeckViewScene *>(scene());
     sc->removeItem(this);
 
     if (currentZone) {
         handleDrop(currentZone);
         for (int i = 0; i < childDrags.size(); i++) {
-            DeckViewCardDragItem *c = static_cast<DeckViewCardDragItem *>(childDrags[i]);
+            auto *c = static_cast<DeckViewCardDragItem *>(childDrags[i]);
             c->handleDrop(currentZone);
             sc->removeItem(c);
         }
@@ -118,12 +118,12 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QList<QGraphicsItem *> sel = scene()->selectedItems();
     int j = 0;
     for (int i = 0; i < sel.size(); i++) {
-        DeckViewCard *c = static_cast<DeckViewCard *>(sel.at(i));
+        auto *c = static_cast<DeckViewCard *>(sel.at(i));
         if (c == this)
             continue;
         ++j;
-        QPointF childPos = QPointF(j * CARD_WIDTH / 2, 0);
-        DeckViewCardDragItem *drag = new DeckViewCardDragItem(c, childPos, dragItem);
+        auto childPos = QPointF(j * CARD_WIDTH / 2, 0);
+        auto *drag = new DeckViewCardDragItem(c, childPos, dragItem);
         drag->setPos(dragItem->pos() + childPos);
         scene()->addItem(drag);
     }
@@ -140,8 +140,8 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
         QList<QGraphicsItem *> sel = scene()->selectedItems();
 
         for (int i = 0; i < sel.size(); i++) {
-            DeckViewCard *c = static_cast<DeckViewCard *>(sel.at(i));
-            DeckViewCardContainer *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
+            auto *c = static_cast<DeckViewCard *>(sel.at(i));
+            auto *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
             MoveCard_ToZone m;
             m.set_card_name(c->getName().toStdString());
             m.set_start_zone(zone->getName().toStdString());
@@ -345,7 +345,7 @@ void DeckViewScene::rebuildTree()
 
     InnerDecklistNode *listRoot = deck->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
 
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
@@ -355,12 +355,12 @@ void DeckViewScene::rebuildTree()
         }
 
         for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                DeckViewCard *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
+                auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
                 container->addCard(newCard);
                 emit newCardAdded(newCard);
             }

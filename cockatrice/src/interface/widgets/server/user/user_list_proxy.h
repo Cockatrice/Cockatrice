@@ -18,11 +18,11 @@ class ServerInfo_User;
 class UserListProxy
 {
 public:
-    virtual bool isOwnUserRegistered() const = 0;
-    virtual QString getOwnUsername() const = 0;
-    virtual bool isUserBuddy(const QString &userName) const = 0;
-    virtual bool isUserIgnored(const QString &userName) const = 0;
-    virtual const ServerInfo_User *getOnlineUser(const QString &userName) const = 0; // Can return nullptr
+    [[nodiscard]] virtual bool isOwnUserRegistered() const = 0;
+    [[nodiscard]] virtual QString getOwnUsername() const = 0;
+    [[nodiscard]] virtual bool isUserBuddy(const QString &userName) const = 0;
+    [[nodiscard]] virtual bool isUserIgnored(const QString &userName) const = 0;
+    [[nodiscard]] virtual const ServerInfo_User *getOnlineUser(const QString &userName) const = 0; // Can return nullptr
 };
 
 #endif // COCKATRICE_USERLISTPROXY_H

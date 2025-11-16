@@ -28,13 +28,13 @@ public:
     {
         Type = typeOther
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
 
     explicit PlayerArea(QGraphicsItem *parent = nullptr);
-    QRectF boundingRect() const override
+    [[nodiscard]] QRectF boundingRect() const override
     {
         return bRect;
     }
@@ -43,7 +43,7 @@ public:
     void setSize(qreal width, qreal height);
 
     void setPlayerZoneId(int _playerZoneId);
-    int getPlayerZoneId() const
+    [[nodiscard]] int getPlayerZoneId() const
     {
         return playerZoneId;
     }

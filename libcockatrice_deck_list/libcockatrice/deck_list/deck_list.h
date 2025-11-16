@@ -72,13 +72,13 @@ public:
     void write(QXmlStreamWriter *xml);
 
     /// @return The plan name.
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return name;
     }
 
     /// @return Const reference to the move list.
-    const QList<MoveCard_ToZone> &getMoveList() const
+    [[nodiscard]] const QList<MoveCard_ToZone> &getMoveList() const
     {
         return moveList;
     }
@@ -289,6 +289,7 @@ public:
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
+    QList<DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
     int getSideboardSize() const;
     InnerDecklistNode *getRoot() const
     {

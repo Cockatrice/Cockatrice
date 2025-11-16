@@ -34,16 +34,16 @@ signals:
 public:
     explicit DlgConnect(QWidget *parent = nullptr);
     ~DlgConnect() override;
-    QString getHost() const;
-    int getPort() const
+    [[nodiscard]] QString getHost() const;
+    [[nodiscard]] int getPort() const
     {
         return portEdit->text().toInt();
     }
-    QString getPlayerName() const
+    [[nodiscard]] QString getPlayerName() const
     {
         return playernameEdit->text();
     }
-    QString getPassword() const
+    [[nodiscard]] QString getPassword() const
     {
         return passwordEdit->text();
     }

@@ -86,7 +86,7 @@ public:
     void retranslateUi() override;
 
     /** @brief Returns the tab text, including modified mark if applicable. */
-    QString getTabText() const override;
+    [[nodiscard]] QString getTabText() const override;
 
     /** @brief Creates menus for deck editing and view options. */
     void createMenus() override;

@@ -589,7 +589,7 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Abst
     for (Server_AbstractPlayer *anyPlayer : getPlayers().values()) {
         QList<Server_Arrow *> toDelete;
         for (auto *arrow : anyPlayer->getArrows().values()) {
-            Server_Card *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
+            auto *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
             if (targetCard) {
                 if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
                     toDelete.append(arrow);
@@ -781,7 +781,7 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 GameEventContainer *
 Server_Game::prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context)
 {
-    GameEventContainer *cont = new GameEventContainer;
+    auto *cont = new GameEventContainer;
     cont->set_game_id(gameId);
     if (context)
         cont->mutable_context()->CopyFrom(*context);

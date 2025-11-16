@@ -23,15 +23,15 @@ public:
                          QString email = QString(),
                          QString country = QString(),
                          QString realName = QString());
-    QString getEmail() const
+    [[nodiscard]] QString getEmail() const
     {
         return emailEdit->text();
     }
-    QString getCountry() const
+    [[nodiscard]] QString getCountry() const
     {
         return countryEdit->currentIndex() == 0 ? "" : countryEdit->currentText();
     }
-    QString getRealName() const
+    [[nodiscard]] QString getRealName() const
     {
         return realnameEdit->text();
     }

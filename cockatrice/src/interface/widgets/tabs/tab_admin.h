@@ -29,8 +29,8 @@ private:
 
 public:
     explicit ShutdownDialog(QWidget *parent = nullptr);
-    QString getReason() const;
-    int getMinutes() const;
+    [[nodiscard]] QString getReason() const;
+    [[nodiscard]] int getMinutes() const;
 };
 
 class TabAdmin : public Tab
@@ -62,11 +62,11 @@ private slots:
 public:
     TabAdmin(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _fullAdmin);
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Administration");
     }
-    bool getLocked() const
+    [[nodiscard]] bool getLocked() const
     {
         return locked;
     }

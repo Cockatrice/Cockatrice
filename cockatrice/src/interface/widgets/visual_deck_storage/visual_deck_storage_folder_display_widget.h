@@ -27,8 +27,8 @@ public:
     void createWidgetsForFiles();
     void createWidgetsForFolders();
     void flattenFolderStructure();
-    QStringList gatherAllTagsFromFlowWidget() const;
-    FlowWidget *getFlowWidget() const
+    [[nodiscard]] QStringList gatherAllTagsFromFlowWidget() const;
+    [[nodiscard]] FlowWidget *getFlowWidget() const
     {
         return flowWidget;
     };

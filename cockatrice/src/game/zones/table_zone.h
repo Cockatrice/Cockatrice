@@ -84,7 +84,7 @@ private:
      */
     bool active = false;
 
-    bool isInverted() const;
+    [[nodiscard]] bool isInverted() const;
 
 private slots:
     /**
@@ -110,7 +110,7 @@ public:
     /**
        @return a QRectF of the TableZone bounding box.
      */
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
 
     /**
        Render the TableZone
@@ -140,12 +140,12 @@ public:
     /**
        @return CardItem from grid location
      */
-    CardItem *getCardFromGrid(const QPoint &gridPoint) const;
+    [[nodiscard]] CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 
     /**
        @return CardItem from coordinate location
      */
-    CardItem *getCardFromCoords(const QPointF &point) const;
+    [[nodiscard]] CardItem *getCardFromCoords(const QPointF &point) const;
 
     QPointF closestGridPoint(const QPointF &point) override;
 
@@ -157,7 +157,7 @@ public:
      */
     void resizeToContents();
 
-    int getMinimumWidth() const
+    [[nodiscard]] int getMinimumWidth() const
     {
         return currentMinimumWidth;
     }
@@ -166,7 +166,7 @@ public:
         prepareGeometryChange();
         width = _width;
     }
-    qreal getWidth() const
+    [[nodiscard]] qreal getWidth() const
     {
         return width;
     }
@@ -188,13 +188,13 @@ private:
     /*
     Mapping functions for points to/from gridpoints.
     */
-    QPointF mapFromGrid(QPoint gridPoint) const;
-    QPoint mapToGrid(const QPointF &mapPoint) const;
+    [[nodiscard]] QPointF mapFromGrid(QPoint gridPoint) const;
+    [[nodiscard]] QPoint mapToGrid(const QPointF &mapPoint) const;
 
     /*
     Helper function to create a single key from a card stack location.
     */
-    int getCardStackMapKey(int x, int y) const
+    [[nodiscard]] int getCardStackMapKey(int x, int y) const
     {
         return x + (y * 1000);
     }

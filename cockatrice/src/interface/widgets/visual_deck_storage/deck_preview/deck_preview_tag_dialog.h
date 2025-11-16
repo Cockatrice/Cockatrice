@@ -25,7 +25,7 @@ public:
     explicit DeckPreviewTagDialog(const QStringList &knownTags,
                                   const QStringList &activeTags,
                                   QWidget *parent = nullptr);
-    QStringList getActiveTags() const;
+    [[nodiscard]] QStringList getActiveTags() const;
     void filterTags(const QString &text);
 
 private slots:

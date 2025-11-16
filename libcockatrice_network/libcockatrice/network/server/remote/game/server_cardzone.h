@@ -57,7 +57,7 @@ public:
                     ServerInfo_Zone::ZoneType _type);
     ~Server_CardZone();
 
-    const QList<Server_Card *> &getCards() const
+    [[nodiscard]] const QList<Server_Card *> &getCards() const
     {
         return cards;
     }
@@ -65,7 +65,7 @@ public:
     int removeCard(Server_Card *card, bool &wasLookedAt);
     Server_Card *getCard(int id, int *position = nullptr, bool remove = false);
 
-    int getCardsBeingLookedAt() const
+    [[nodiscard]] int getCardsBeingLookedAt() const
     {
         return cardsBeingLookedAt;
     }
@@ -73,28 +73,28 @@ public:
     {
         cardsBeingLookedAt = qMax(0, _cardsBeingLookedAt);
     }
-    bool isCardAtPosLookedAt(int pos) const;
-    bool hasCoords() const
+    [[nodiscard]] bool isCardAtPosLookedAt(int pos) const;
+    [[nodiscard]] bool hasCoords() const
     {
         return has_coords;
     }
-    ServerInfo_Zone::ZoneType getType() const
+    [[nodiscard]] ServerInfo_Zone::ZoneType getType() const
     {
         return type;
     }
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return name;
     }
-    Server_AbstractPlayer *getPlayer() const
+    [[nodiscard]] Server_AbstractPlayer *getPlayer() const
     {
         return player;
     }
     void getInfo(ServerInfo_Zone *info, Server_AbstractParticipant *recipient, bool omniscient);
 
-    int getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const;
-    bool isColumnEmpty(int x, int y) const;
-    bool isColumnStacked(int x, int y) const;
+    [[nodiscard]] int getFreeGridColumn(int x, int y, const QString &cardName, bool dontStackSameName) const;
+    [[nodiscard]] bool isColumnEmpty(int x, int y) const;
+    [[nodiscard]] bool isColumnStacked(int x, int y) const;
     void fixFreeSpaces(GameEventStorage &ges);
     void moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y);
     void insertCard(Server_Card *card, int x, int y);
@@ -102,11 +102,11 @@ public:
     void shuffle(int start = 0, int end = -1);
     void clear();
     void addWritePermission(int playerId);
-    const QSet<int> &getPlayersWithWritePermission() const
+    [[nodiscard]] const QSet<int> &getPlayersWithWritePermission() const
     {
         return playersWithWritePermission;
     }
-    bool getAlwaysRevealTopCard() const
+    [[nodiscard]] bool getAlwaysRevealTopCard() const
     {
         return alwaysRevealTopCard;
     }
@@ -114,7 +114,7 @@ public:
     {
         alwaysRevealTopCard = _alwaysRevealTopCard;
     }
-    bool getAlwaysLookAtTopCard() const
+    [[nodiscard]] bool getAlwaysLookAtTopCard() const
     {
         return alwaysLookAtTopCard;
     }

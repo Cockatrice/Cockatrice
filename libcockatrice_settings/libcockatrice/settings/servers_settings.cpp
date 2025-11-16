@@ -4,34 +4,34 @@
 #include <utility>
 
 ServersSettings::ServersSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "servers.ini", parent)
+    : SettingsManager(settingPath + "servers.ini", "server", QString(), parent)
 {
 }
 
 void ServersSettings::setPreviousHostLogin(int previous)
 {
-    setValue(previous, "previoushostlogin", "server");
+    setValue(previous, "previoushostlogin");
 }
 
 int ServersSettings::getPreviousHostLogin()
 {
-    QVariant previous = getValue("previoushostlogin", "server");
+    QVariant previous = getValue("previoushostlogin");
     return previous == QVariant() ? 1 : previous.toInt();
 }
 
 void ServersSettings::setPreviousHostList(QStringList list)
 {
-    setValue(list, "previoushosts", "server");
+    setValue(list, "previoushosts");
 }
 
 QStringList ServersSettings::getPreviousHostList()
 {
-    return getValue("previoushosts", "server").toStringList();
+    return getValue("previoushosts").toStringList();
 }
 
 void ServersSettings::setPrevioushostName(const QString &name)
 {
-    setValue(name, "previoushostName", "server");
+    setValue(name, "previoushostName");
 }
 
 QString ServersSettings::getSaveName(QString defaultname)
@@ -50,7 +50,7 @@ QString ServersSettings::getSite(QString defaultSite)
 
 QString ServersSettings::getPrevioushostName()
 {
-    QVariant value = getValue("previoushostName", "server");
+    QVariant value = getValue("previoushostName");
     return value == QVariant() ? "Rooster Ranges" : value.toString();
 }
 
@@ -107,56 +107,56 @@ bool ServersSettings::getSavePassword()
 
 void ServersSettings::setAutoConnect(int autoconnect)
 {
-    setValue(autoconnect, "auto_connect", "server");
+    setValue(autoconnect, "auto_connect");
 }
 
 int ServersSettings::getAutoConnect()
 {
-    QVariant autoconnect = getValue("auto_connect", "server");
+    QVariant autoconnect = getValue("auto_connect");
     return autoconnect == QVariant() ? 0 : autoconnect.toInt();
 }
 
 void ServersSettings::setFPHostName(QString hostname)
 {
-    setValue(hostname, "fphostname", "server");
+    setValue(hostname, "fphostname");
 }
 
 QString ServersSettings::getFPHostname(QString defaultHost)
 {
-    QVariant hostname = getValue("fphostname", "server");
+    QVariant hostname = getValue("fphostname");
     return hostname == QVariant() ? std::move(defaultHost) : hostname.toString();
 }
 
 void ServersSettings::setFPPort(QString port)
 {
-    setValue(port, "fpport", "server");
+    setValue(port, "fpport");
 }
 
 QString ServersSettings::getFPPort(QString defaultPort)
 {
-    QVariant port = getValue("fpport", "server");
+    QVariant port = getValue("fpport");
     return port == QVariant() ? std::move(defaultPort) : port.toString();
 }
 
 void ServersSettings::setFPPlayerName(QString playerName)
 {
-    setValue(playerName, "fpplayername", "server");
+    setValue(playerName, "fpplayername");
 }
 
 QString ServersSettings::getFPPlayerName(QString defaultName)
 {
-    QVariant name = getValue("fpplayername", "server");
+    QVariant name = getValue("fpplayername");
     return name == QVariant() ? std::move(defaultName) : name.toString();
 }
 
 void ServersSettings::setClearDebugLogStatus(bool abIsChecked)
 {
-    setValue(abIsChecked, "save_debug_log", "server");
+    setValue(abIsChecked, "save_debug_log");
 }
 
 bool ServersSettings::getClearDebugLogStatus(bool abDefaultValue)
 {
-    QVariant cbFlushLog = getValue("save_debug_log", "server");
+    QVariant cbFlushLog = getValue("save_debug_log");
     return cbFlushLog == QVariant() ? abDefaultValue : cbFlushLog.toBool();
 }
 

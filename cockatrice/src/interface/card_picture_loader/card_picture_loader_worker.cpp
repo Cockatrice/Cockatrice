@@ -105,9 +105,6 @@ void CardPictureLoaderWorker::resetRequestQuota()
     processQueuedRequests();
 }
 
-/**
- * Keeps processing requests from the queue until it is empty or until the quota runs out.
- */
 void CardPictureLoaderWorker::processQueuedRequests()
 {
     while (requestQuota > 0 && processSingleRequest()) {
@@ -115,10 +112,6 @@ void CardPictureLoaderWorker::processQueuedRequests()
     }
 }
 
-/**
- * Immediately processes a single queued request. No-ops if the load queue is empty
- * @return If a request was processed
- */
 bool CardPictureLoaderWorker::processSingleRequest()
 {
     if (!requestLoadQueue.isEmpty()) {

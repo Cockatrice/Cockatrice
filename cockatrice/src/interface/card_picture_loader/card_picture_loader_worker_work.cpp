@@ -51,10 +51,6 @@ void CardPictureLoaderWorkerWork::startNextPicDownload()
     }
 }
 
-/**
- * Starts another pic download using the next possible url combination for the card.
- * If all possibilities are exhausted, then concludes the image loading with an empty QImage.
- */
 void CardPictureLoaderWorkerWork::picDownloadFailed()
 {
     /* Take advantage of short-circuiting here to call the nextUrl until one
@@ -73,10 +69,6 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
     }
 }
 
-/**
- *
- * @param reply The reply. Takes ownership of the object
- */
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
     QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
@@ -180,10 +172,6 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
     }
 }
 
-/**
- * @param reply The reply to load the image from
- * @return The loaded image, or an empty QImage if loading failed
- */
 QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
 {
     static constexpr int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
@@ -207,10 +195,6 @@ QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
     return imgReader.read();
 }
 
-/**
- * Call this method when the image has finished being loaded.
- * @param image The image that was loaded. Empty QImage indicates failure.
- */
 void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 {
     emit imageLoaded(cardToDownload.getCard(), image);

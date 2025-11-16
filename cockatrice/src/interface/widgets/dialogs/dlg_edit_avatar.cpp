@@ -23,16 +23,16 @@ DlgEditAvatar::DlgEditAvatar(QWidget *parent) : QDialog(parent), image()
     browseButton = new QPushButton(tr("Browse..."));
     connect(browseButton, &QPushButton::clicked, this, &DlgEditAvatar::actBrowse);
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
     grid->addWidget(imageLabel, 0, 0, 1, 2);
     grid->addWidget(textLabel, 1, 0);
     grid->addWidget(browseButton, 1, 1);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditAvatar::actOk);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditAvatar::reject);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);

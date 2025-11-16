@@ -62,7 +62,7 @@ public:
     TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     ~TabLog() override;
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Logs");
     }

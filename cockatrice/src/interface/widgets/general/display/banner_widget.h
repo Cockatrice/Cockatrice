@@ -26,7 +26,7 @@ public:
     void setText(const QString &text) const;
     void setClickable(bool _clickable);
     void setBuddy(QWidget *_buddy);
-    QString getText() const
+    [[nodiscard]] QString getText() const
     {
         return bannerLabel->text();
     }

@@ -35,7 +35,7 @@ void DlgCreateGame::sharedCtor()
     maxPlayersEdit->setValue(2);
     maxPlayersLabel->setBuddy(maxPlayersEdit);
 
-    QGridLayout *generalGrid = new QGridLayout;
+    auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(descriptionLabel, 0, 0);
     generalGrid->addWidget(descriptionEdit, 0, 1);
     generalGrid->addWidget(maxPlayersLabel, 1, 0);
@@ -43,17 +43,17 @@ void DlgCreateGame::sharedCtor()
     generalGroupBox = new QGroupBox(tr("General"));
     generalGroupBox->setLayout(generalGrid);
 
-    QVBoxLayout *gameTypeLayout = new QVBoxLayout;
+    auto *gameTypeLayout = new QVBoxLayout;
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
     while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
-        QRadioButton *gameTypeRadioButton = new QRadioButton(gameTypeIterator.value(), this);
+        auto *gameTypeRadioButton = new QRadioButton(gameTypeIterator.value(), this);
         gameTypeLayout->addWidget(gameTypeRadioButton);
         gameTypeCheckBoxes.insert(gameTypeIterator.key(), gameTypeRadioButton);
         bool isChecked = SettingsCache::instance().getGameTypes().contains(gameTypeIterator.value() + ", ");
         gameTypeCheckBoxes[gameTypeIterator.key()]->setChecked(isChecked);
     }
-    QGroupBox *gameTypeGroupBox = new QGroupBox(tr("Game type"));
+    auto *gameTypeGroupBox = new QGroupBox(tr("Game type"));
     gameTypeGroupBox->setLayout(gameTypeLayout);
 
     passwordLabel = new QLabel(tr("&Password:"));
@@ -70,13 +70,13 @@ void DlgCreateGame::sharedCtor()
         onlyRegisteredCheckBox->setEnabled(false);
     }
 
-    QGridLayout *joinRestrictionsLayout = new QGridLayout;
+    auto *joinRestrictionsLayout = new QGridLayout;
     joinRestrictionsLayout->addWidget(passwordLabel, 0, 0);
     joinRestrictionsLayout->addWidget(passwordEdit, 0, 1);
     joinRestrictionsLayout->addWidget(onlyBuddiesCheckBox, 1, 0, 1, 2);
     joinRestrictionsLayout->addWidget(onlyRegisteredCheckBox, 2, 0, 1, 2);
 
-    QGroupBox *joinRestrictionsGroupBox = new QGroupBox(tr("Joining restrictions"));
+    auto *joinRestrictionsGroupBox = new QGroupBox(tr("Joining restrictions"));
     joinRestrictionsGroupBox->setLayout(joinRestrictionsLayout);
 
     spectatorsAllowedCheckBox = new QCheckBox(tr("&Spectators can watch"));
@@ -86,7 +86,7 @@ void DlgCreateGame::sharedCtor()
     spectatorsCanTalkCheckBox = new QCheckBox(tr("Spectators can &chat"));
     spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &hands"));
     createGameAsSpectatorCheckBox = new QCheckBox(tr("Create game as spectator"));
-    QVBoxLayout *spectatorsLayout = new QVBoxLayout;
+    auto *spectatorsLayout = new QVBoxLayout;
     spectatorsLayout->addWidget(spectatorsAllowedCheckBox);
     spectatorsLayout->addWidget(spectatorsNeedPasswordCheckBox);
     spectatorsLayout->addWidget(spectatorsCanTalkCheckBox);
@@ -106,7 +106,7 @@ void DlgCreateGame::sharedCtor()
     shareDecklistsOnLoadCheckBox = new QCheckBox();
     shareDecklistsOnLoadLabel->setBuddy(shareDecklistsOnLoadCheckBox);
 
-    QGridLayout *gameSetupOptionsLayout = new QGridLayout;
+    auto *gameSetupOptionsLayout = new QGridLayout;
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadLabel, 1, 0);
@@ -136,7 +136,7 @@ void DlgCreateGame::sharedCtor()
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgCreateGame::reject);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
 
@@ -275,7 +275,7 @@ void DlgCreateGame::actOK()
     cmd.set_starting_life_total(startingLifeTotalEdit->value());
     cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
 
-    QString _gameTypes = QString();
+    auto _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
     while (gameTypeCheckBoxIterator.hasNext()) {
         gameTypeCheckBoxIterator.next();

@@ -49,15 +49,15 @@ public:
     }
 
     // expose useful actions/menus if PlayerMenu needs them
-    QMenu *revealLibrary() const
+    [[nodiscard]] QMenu *revealLibrary() const
     {
         return mRevealLibrary;
     }
-    QMenu *lendLibraryMenu() const
+    [[nodiscard]] QMenu *lendLibraryMenu() const
     {
         return mLendLibrary;
     }
-    QMenu *revealTopCardMenu() const
+    [[nodiscard]] QMenu *revealTopCardMenu() const
     {
         return mRevealTopCard;
     }

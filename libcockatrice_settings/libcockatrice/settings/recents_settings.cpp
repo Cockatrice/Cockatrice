@@ -3,22 +3,22 @@
 #define MAX_RECENT_DECK_COUNT 10
 
 RecentsSettings::RecentsSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "recents.ini", parent)
+    : SettingsManager(settingPath + "recents.ini", "deckbuilder", QString(), parent)
 {
 }
 
 QStringList RecentsSettings::getRecentlyOpenedDeckPaths()
 {
-    return getValue("deckpaths", "deckbuilder").toStringList();
+    return getValue("deckpaths").toStringList();
 }
 void RecentsSettings::clearRecentlyOpenedDeckPaths()
 {
-    deleteValue("deckpaths", "deckbuilder");
+    deleteValue("deckpaths");
     emit recentlyOpenedDeckPathsChanged();
 }
 void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
 {
-    auto deckPaths = getValue("deckpaths", "deckbuilder").toStringList();
+    auto deckPaths = getValue("deckpaths").toStringList();
     deckPaths.removeAll(deckPath);
 
     deckPaths.prepend(deckPath);
@@ -27,7 +27,7 @@ void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
         deckPaths.removeLast();
     }
 
-    setValue(deckPaths, "deckpaths", "deckbuilder");
+    setValue(deckPaths, "deckpaths");
     emit recentlyOpenedDeckPathsChanged();
 }
 

@@ -63,7 +63,7 @@ private:
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Server");
     }

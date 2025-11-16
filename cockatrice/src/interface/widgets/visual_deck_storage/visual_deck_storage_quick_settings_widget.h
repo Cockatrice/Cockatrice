@@ -47,14 +47,14 @@ public:
 
     void retranslateUi();
 
-    bool getShowFolders() const;
-    bool getDrawUnusedColorIdentities() const;
-    bool getShowBannerCardComboBox() const;
-    bool getShowTagFilter() const;
-    bool getShowTagsOnDeckPreviews() const;
-    int getUnusedColorIdentitiesOpacity() const;
-    TooltipType getDeckPreviewTooltip() const;
-    int getCardSize() const;
+    [[nodiscard]] bool getShowFolders() const;
+    [[nodiscard]] bool getDrawUnusedColorIdentities() const;
+    [[nodiscard]] bool getShowBannerCardComboBox() const;
+    [[nodiscard]] bool getShowTagFilter() const;
+    [[nodiscard]] bool getShowTagsOnDeckPreviews() const;
+    [[nodiscard]] int getUnusedColorIdentitiesOpacity() const;
+    [[nodiscard]] TooltipType getDeckPreviewTooltip() const;
+    [[nodiscard]] int getCardSize() const;
 
 signals:
     void showFoldersChanged(bool enabled);

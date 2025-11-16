@@ -20,12 +20,6 @@ CardPictureToLoad::CardPictureToLoad(const ExactCard &_card)
     }
 }
 
-/**
- * Extracts a list of all the sets from the card, sorted in priority order.
- * If the card does not contain any sets, then a dummy set will be inserted into the list.
- *
- * @return A list of sets. Will not be empty.
- */
 QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
 {
     QList<CardSetPtr> sortedSets;
@@ -109,11 +103,6 @@ void CardPictureToLoad::populateSetUrls()
     (void)nextUrl();
 }
 
-/**
- * Advances the currentSet to the next set in the list. Then repopulates the url list with the urls from that set.
- * If we are already at the end of the list, then currentSet is set to empty.
- * @return If we are already at the end of the list
- */
 bool CardPictureToLoad::nextSet()
 {
     if (!sortedSets.isEmpty()) {
@@ -125,11 +114,6 @@ bool CardPictureToLoad::nextSet()
     return false;
 }
 
-/**
- * Advances the currentUrl to the next url in the list.
- * If we are already at the end of the list, then currentUrl is set to empty.
- * @return If we are already at the end of the list
- */
 bool CardPictureToLoad::nextUrl()
 {
     if (!currentSetUrls.isEmpty()) {

@@ -23,7 +23,7 @@ private:
 public:
     TabVisualDatabaseDisplay(TabSupervisor *_tabSupervisor);
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Visual Database Display");
     }

@@ -20,6 +20,7 @@ set(oracle_SOURCES
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
+    src/pages.cpp
     src/pagetemplates.cpp
     src/parsehelpers.cpp
     src/qt-json/json.cpp

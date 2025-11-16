@@ -20,15 +20,15 @@ public:
     void toggleSymbol();
     void setColorActive(bool active);
     void updateOpacity();
-    bool isColorActive() const
+    [[nodiscard]] bool isColorActive() const
     {
         return isActive;
     };
-    QString getSymbol() const
+    [[nodiscard]] QString getSymbol() const
     {
         return symbol;
     };
-    QChar getSymbolChar() const
+    [[nodiscard]] QChar getSymbolChar() const
     {
         return symbol[0];
     };

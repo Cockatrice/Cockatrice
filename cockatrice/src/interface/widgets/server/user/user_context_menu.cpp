@@ -110,7 +110,7 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
         gameTypeMap.insert(roomInfo.room_id(), tempMap);
     }
 
-    GameSelector *selector = new GameSelector(client, tabSupervisor, nullptr, roomMap, gameTypeMap, false, false);
+    auto *selector = new GameSelector(client, tabSupervisor, nullptr, roomMap, gameTypeMap, false, false);
     selector->setParent(static_cast<QWidget *>(parent()), Qt::Window);
     const int gameListSize = response.game_list_size();
     for (int i = 0; i < gameListSize; ++i) {
@@ -128,7 +128,7 @@ void UserContextMenu::banUser_processUserInfoResponse(const Response &r)
     const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
 
     // The dialog needs to be non-modal in order to not block the event queue of the client.
-    BanDialog *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
+    auto *dlg = new BanDialog(response.user_info(), static_cast<QWidget *>(parent()));
     connect(dlg, &QDialog::accepted, this, &UserContextMenu::banUser_dialogFinished);
     dlg->show();
 }
@@ -141,7 +141,7 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
     QString clientid = QString::fromStdString(response.user_clientid()).simplified();
 
     // The dialog needs to be non-modal in order to not block the event queue of the client.
-    WarningDialog *dlg = new WarningDialog(user, clientid, static_cast<QWidget *>(parent()));
+    auto *dlg = new WarningDialog(user, clientid, static_cast<QWidget *>(parent()));
     connect(dlg, &QDialog::accepted, this, &UserContextMenu::warnUser_dialogFinished);
 
     if (response.warning_size() > 0) {
@@ -171,7 +171,7 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp)
     if (resp.response_code() == Response::RespOk) {
 
         if (response.ban_list_size() > 0) {
-            QTableWidget *table = new QTableWidget();
+            auto *table = new QTableWidget();
             table->setWindowTitle(tr("Ban History"));
             table->setRowCount(response.ban_list_size());
             table->setColumnCount(5);
@@ -209,7 +209,7 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
     if (resp.response_code() == Response::RespOk) {
 
         if (response.warn_list_size() > 0) {
-            QTableWidget *table = new QTableWidget();
+            auto *table = new QTableWidget();
             table->setWindowTitle(tr("Warning History"));
             table->setRowCount(response.warn_list_size());
             table->setColumnCount(4);
@@ -278,7 +278,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
 
 void UserContextMenu::banUser_dialogFinished()
 {
-    BanDialog *dlg = static_cast<BanDialog *>(sender());
+    auto *dlg = static_cast<BanDialog *>(sender());
 
     Command_BanFromServer cmd;
     cmd.set_user_name(dlg->getBanName().toStdString());
@@ -297,7 +297,7 @@ void UserContextMenu::banUser_dialogFinished()
 
 void UserContextMenu::warnUser_dialogFinished()
 {
-    WarningDialog *dlg = static_cast<WarningDialog *>(sender());
+    auto *dlg = static_cast<WarningDialog *>(sender());
 
     if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty())
         return;
@@ -433,7 +433,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == nullptr) {
     } else if (actionClicked == aDetails) {
-        UserInfoBox *infoWidget =
+        auto *infoWidget =
             new UserInfoBox(client, false, static_cast<QWidget *>(parent()),
                             Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
         infoWidget->setAttribute(Qt::WA_DeleteOnClose);

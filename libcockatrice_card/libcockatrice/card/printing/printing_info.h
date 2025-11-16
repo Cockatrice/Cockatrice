@@ -14,7 +14,7 @@ using SetToPrintingsMap = QMap<QString, QList<PrintingInfo>>;
 
 /**
  * @class PrintingInfo
- * @ingroup Cards
+ * @ingroup CardPrintings
  *
  * @brief Represents metadata for a specific variation of a card within a set.
  *

@@ -47,7 +47,7 @@ void PrintingSelectorCardSelectionWidget::connectSignals()
 
 void PrintingSelectorCardSelectionWidget::selectSetForCards()
 {
-    DlgSelectSetForCards *setSelectionDialog = new DlgSelectSetForCards(nullptr, parent->getDeckModel());
+    auto *setSelectionDialog = new DlgSelectSetForCards(nullptr, parent->getDeckModel());
     if (!setSelectionDialog->exec()) {
         return;
     }

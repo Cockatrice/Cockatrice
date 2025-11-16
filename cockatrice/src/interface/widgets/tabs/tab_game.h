@@ -183,9 +183,9 @@ public:
     void updatePlayerListDockTitle();
     bool closeRequest() override;
 
-    QString getTabText() const override;
+    [[nodiscard]] QString getTabText() const override;
 
-    AbstractGame *getGame() const
+    [[nodiscard]] AbstractGame *getGame() const
     {
         return game;
     }

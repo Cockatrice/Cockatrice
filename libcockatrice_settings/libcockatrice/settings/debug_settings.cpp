@@ -3,7 +3,7 @@
 #include <QtCore/QFile>
 
 DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "debug.ini", parent)
+    : SettingsManager(settingPath + "debug.ini", "debug", QString(), parent)
 {
     // Create the default debug.ini if it doesn't exist yet
     if (!QFile(settingPath + "debug.ini").exists()) {
@@ -13,7 +13,7 @@ DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
 
 bool DebugSettings::getShowCardId()
 {
-    return getValue("showCardId", "debug").toBool();
+    return getValue("showCardId").toBool();
 }
 
 bool DebugSettings::getLocalGameOnStartup()

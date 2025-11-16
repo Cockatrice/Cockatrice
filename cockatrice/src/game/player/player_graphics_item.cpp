@@ -50,8 +50,8 @@ void PlayerGraphicsItem::onPlayerActiveChanged(bool _active)
 void PlayerGraphicsItem::initializeZones()
 {
     deckZoneGraphicsItem = new PileZone(player->getDeckZone(), this);
-    QPointF base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
-                           10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
+    auto base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
+                        10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
     deckZoneGraphicsItem->setPos(base);
 
     qreal h = deckZoneGraphicsItem->boundingRect().width() + 5;
@@ -147,7 +147,7 @@ void PlayerGraphicsItem::rearrangeCounters()
 
 void PlayerGraphicsItem::rearrangeZones()
 {
-    QPointF base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
+    auto base = QPointF(CARD_HEIGHT + counterAreaWidth + 15, 0);
     if (SettingsCache::instance().getHorizontalHand()) {
         if (mirrored) {
             if (player->getHandZone()->contentsKnown()) {

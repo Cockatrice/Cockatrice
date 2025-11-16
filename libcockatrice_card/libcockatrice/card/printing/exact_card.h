@@ -5,7 +5,7 @@
 
 /**
  * @class ExactCard
- * @ingroup Cards
+ * @ingroup CardPrintings
  *
  * @brief Represents a specific card instance, defined by its CardInfo
  *        and a particular printing.
