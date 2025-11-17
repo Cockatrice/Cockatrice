@@ -162,14 +162,14 @@ void DlgSelectSetForCards::actOK()
 
 void DlgSelectSetForCards::actClear()
 {
-    qobject_cast<DeckLoader *>(model->getDeckList())->clearSetNamesAndNumbers();
+    DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
     accept();
 }
 
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
-    qobject_cast<DeckLoader *>(model->getDeckList())->clearSetNamesAndNumbers();
-    qobject_cast<DeckLoader *>(model->getDeckList())->setProviderIdToPreferredPrinting();
+    DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
+    DeckLoader::setProviderIdToPreferredPrinting(model->getDeckList());
     accept();
 }
 
