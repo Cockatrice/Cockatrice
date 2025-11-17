@@ -347,6 +347,8 @@ struct SetProviderIdToPreferred
 /**
  * This function iterates through each card in the decklist and sets the providerId
  * on each card based on its set name and collector number.
+ *
+ * @param deckList The decklist to modify
  */
 void DeckLoader::setProviderIdToPreferredPrinting(const DeckList *deckList)
 {
@@ -359,6 +361,8 @@ void DeckLoader::setProviderIdToPreferredPrinting(const DeckList *deckList)
 
 /**
  * Sets the providerId on each card in the decklist based on its set name and collector number.
+ *
+ * @param deckList The decklist to modify
  */
 void DeckLoader::resolveSetNameAndNumberToProviderID(const DeckList *deckList)
 {
@@ -399,6 +403,8 @@ struct ClearSetNameNumberAndProviderId
 
 /**
  * Clears the set name and numbers on each card in the decklist.
+ *
+ * @param deckList The decklist to modify
  */
 void DeckLoader::clearSetNamesAndNumbers(const DeckList *deckList)
 {
