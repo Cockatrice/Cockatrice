@@ -38,7 +38,6 @@ for each variation that should be displayed.
 Here is an example, that first defines three sets, and then the 'Ace of Hearts' card with three variations.
 
 ```xml
-
 <set rarity="common" uuid="00000000-0000-0000-0000-000000000033" num="51" muid="AH">PKR</set>
 <set rarity="common" uuid="00000000-0000-0000-0001-000000000033" num="51" muid="AHSTD">STD</set>
 <set rarity="common" uuid="00000000-0000-0000-0002-000000000033" num="51" muid="AHNBR">NBR</set>
