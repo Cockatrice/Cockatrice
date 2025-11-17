@@ -48,7 +48,7 @@ public:
         }
 
         loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        loader->resolveSetNameAndNumberToProviderID();
+        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         return loader;
     }
@@ -95,7 +95,7 @@ public:
         }
 
         loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        loader->resolveSetNameAndNumberToProviderID();
+        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {

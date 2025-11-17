@@ -21,13 +21,6 @@ signals:
     void deckLoaded();
     void loadFinished(bool success);
 
-public slots:
-    /**
-     * @brief Prints the decklist to the provided QPrinter.
-     * @param printer The printer to render the decklist to.
-     */
-    void printDeckList(QPrinter *printer);
-
 public:
     enum FileFormat
     {
@@ -84,7 +77,7 @@ public:
         return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
     }
 
-    void clearSetNamesAndNumbers();
+    static void clearSetNamesAndNumbers(const DeckList *deckList);
     static FileFormat getFormatFromName(const QString &fileName);
 
     bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
@@ -92,15 +85,25 @@ public:
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
     bool saveToFile(const QString &fileName, FileFormat fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
-    QString exportDeckToDecklist(DecklistWebsite website);
-    void setProviderIdToPreferredPrinting();
 
-    void resolveSetNameAndNumberToProviderID();
+    static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
 
-    void saveToClipboard(bool addComments = true, bool addSetNameAndNumber = true) const;
+    static void setProviderIdToPreferredPrinting(const DeckList *deckList);
+    static void resolveSetNameAndNumberToProviderID(const DeckList *deckList);
 
-    // overload
-    bool saveToStream_Plain(QTextStream &out, bool addComments = true, bool addSetNameAndNumber = true) const;
+    static void saveToClipboard(const DeckList *deckList, bool addComments = true, bool addSetNameAndNumber = true);
+    static bool saveToStream_Plain(QTextStream &out,
+                                   const DeckList *deckList,
+                                   bool addComments = true,
+                                   bool addSetNameAndNumber = true);
+
+    /**
+     * @brief Prints the decklist to the provided QPrinter.
+     * @param printer The printer to render the decklist to.
+     * @param deckList
+     */
+    static void printDeckList(QPrinter *printer, const DeckList *deckList);
+
     bool convertToCockatriceFormat(QString fileName);
 
     DeckList *getDeckList()
@@ -109,21 +112,21 @@ public:
     }
 
 private:
-    void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
+    static void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
+    static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);
 
-protected:
-    void saveToStream_DeckHeader(QTextStream &out) const;
-    void saveToStream_DeckZone(QTextStream &out,
-                               const InnerDecklistNode *zoneNode,
-                               bool addComments = true,
-                               bool addSetNameAndNumber = true) const;
-    void saveToStream_DeckZoneCards(QTextStream &out,
-                                    const InnerDecklistNode *zoneNode,
-                                    QList<DecklistCardNode *> cards,
-                                    bool addComments = true,
-                                    bool addSetNameAndNumber = true) const;
-    [[nodiscard]] QString getCardZoneFromName(QString cardName, QString currentZoneName);
-    [[nodiscard]] QString getCompleteCardName(const QString &cardName) const;
+    static void saveToStream_DeckZone(QTextStream &out,
+                                      const InnerDecklistNode *zoneNode,
+                                      bool addComments = true,
+                                      bool addSetNameAndNumber = true);
+    static void saveToStream_DeckZoneCards(QTextStream &out,
+                                           const InnerDecklistNode *zoneNode,
+                                           QList<DecklistCardNode *> cards,
+                                           bool addComments = true,
+                                           bool addSetNameAndNumber = true);
+
+    [[nodiscard]] static QString getCardZoneFromName(const QString &cardName, QString currentZoneName);
+    [[nodiscard]] static QString getCompleteCardName(const QString &cardName);
 };
 
 #endif

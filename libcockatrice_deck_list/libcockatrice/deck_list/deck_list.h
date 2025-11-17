@@ -315,7 +315,7 @@ public:
      *
      * @param func Function taking (zone node, card node).
      */
-    void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func);
+    void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const;
 };
 
 #endif
