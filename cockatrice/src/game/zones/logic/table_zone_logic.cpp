@@ -18,7 +18,7 @@ void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
     if (!card->getFaceDown() && card->getPT().isEmpty()) {
         card->setPT(card->getCardInfo().getPowTough());
     }
-    if (card->getCardInfo().getCipt() && card->getCardInfo().getLandscapeOrientation()) {
+    if (card->getCardInfo().getUiAttributes().cipt && card->getCardInfo().getUiAttributes().landscapeOrientation) {
         card->setDoesntUntap(true);
     }
     card->setGridPoint(QPoint(_x, _y));

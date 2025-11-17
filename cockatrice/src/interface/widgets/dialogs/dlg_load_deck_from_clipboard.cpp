@@ -82,9 +82,9 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
 
     if (deckLoader->getDeckList()->loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
-            deckLoader->resolveSetNameAndNumberToProviderID();
+            DeckLoader::resolveSetNameAndNumberToProviderID(deckLoader->getDeckList());
         } else {
-            deckLoader->clearSetNamesAndNumbers();
+            DeckLoader::clearSetNamesAndNumbers(deckLoader->getDeckList());
         }
         return true;
     }
@@ -154,17 +154,17 @@ DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, bool 
  * @param addComments Whether to add annotations
  * @return A QString
  */
-static QString deckListToString(const DeckLoader *deckList, bool addComments)
+static QString deckListToString(const DeckList *deckList, bool addComments)
 {
     QString buffer;
     QTextStream stream(&buffer);
-    deckList->saveToStream_Plain(stream, addComments);
+    DeckLoader::saveToStream_Plain(stream, deckList, addComments);
     return buffer;
 }
 
 void DlgEditDeckInClipboard::actRefresh()
 {
-    setText(deckListToString(deckLoader, annotated));
+    setText(deckListToString(deckLoader->getDeckList(), annotated));
 }
 
 void DlgEditDeckInClipboard::actOK()

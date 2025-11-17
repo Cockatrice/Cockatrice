@@ -37,7 +37,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideIgnoredUserGames = new QCheckBox(tr("Hide 'ignored user' games"));
     hideIgnoredUserGames->setChecked(gamesProxyModel->getHideIgnoredUserGames());
 
-    hideNotBuddyCreatedGames = new QCheckBox(tr("Hide games not created by buddy"));
+    hideNotBuddyCreatedGames = new QCheckBox(tr("Hide games not created by buddies"));
     hideNotBuddyCreatedGames->setChecked(gamesProxyModel->getHideNotBuddyCreatedGames());
 
     hideOpenDecklistGames = new QCheckBox(tr("Hide games with forced open decklists"));
@@ -56,7 +56,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     auto *gameNameFilterLabel = new QLabel(tr("Game &description:"));
     gameNameFilterLabel->setBuddy(gameNameFilterEdit);
     creatorNameFilterEdit = new QLineEdit;
-    creatorNameFilterEdit->setText(gamesProxyModel->getCreatorNameFilter());
+    creatorNameFilterEdit->setText(gamesProxyModel->getCreatorNameFilters().join(", "));
     auto *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
     creatorNameFilterLabel->setBuddy(creatorNameFilterEdit);
 
@@ -232,9 +232,9 @@ QString DlgFilterGames::getGameNameFilter() const
     return gameNameFilterEdit->text();
 }
 
-QString DlgFilterGames::getCreatorNameFilter() const
+QStringList DlgFilterGames::getCreatorNameFilters() const
 {
-    return creatorNameFilterEdit->text();
+    return creatorNameFilterEdit->text().split(",", Qt::SkipEmptyParts);
 }
 
 QSet<int> DlgFilterGames::getGameTypeFilter() const

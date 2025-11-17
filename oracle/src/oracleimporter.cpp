@@ -204,11 +204,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
     bool upsideDown = layout == "flip" && side == "back";
 
     // insert the card and its properties
-    QList<CardRelation *> reverseRelatedCards;
     SetToPrintingsMap setsInfo;
     setsInfo[printingInfo.getSet()->getShortName()].append(printingInfo);
-    CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards,
-                                                setsInfo, cipt, landscapeOrientation, tableRow, upsideDown);
+    CardInfo::UiAttributes attributes = {cipt, landscapeOrientation, tableRow, upsideDown};
+    CardInfoPtr newCard =
+        CardInfo::newInstance(name, text, isToken, properties, relatedCards, {}, setsInfo, attributes);
 
     if (name.isEmpty()) {
         qDebug() << "warning: an empty card was added to set" << printingInfo.getSet()->getShortName();

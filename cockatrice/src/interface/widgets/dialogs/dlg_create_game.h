@@ -46,7 +46,7 @@ private:
     QSpinBox *maxPlayersEdit, *startingLifeTotalEdit;
     QCheckBox *onlyBuddiesCheckBox, *onlyRegisteredCheckBox;
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
-        *spectatorsSeeEverythingCheckBox, *createGameAsSpectatorCheckBox;
+        *spectatorsSeeEverythingCheckBox, *createGameAsJudgeCheckBox, *createGameAsSpectatorCheckBox;
     QCheckBox *shareDecklistsOnLoadCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;

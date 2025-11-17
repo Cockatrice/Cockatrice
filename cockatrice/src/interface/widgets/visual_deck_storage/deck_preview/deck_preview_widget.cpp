@@ -326,13 +326,13 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
-            [this] { deckLoader->saveToClipboard(true, true); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), true, true); });
     connect(saveToClipboardMenu->addAction(tr("Annotated (No set info)")), &QAction::triggered, this,
-            [this] { deckLoader->saveToClipboard(true, false); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), true, false); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated")), &QAction::triggered, this,
-            [this] { deckLoader->saveToClipboard(false, true); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), false, true); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set info)")), &QAction::triggered, this,
-            [this] { deckLoader->saveToClipboard(false, false); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), false, false); });
 
     menu->addSeparator();
 

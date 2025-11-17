@@ -510,32 +510,33 @@ void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 /** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    getDeckLoader()->saveToClipboard(true, true);
+    DeckLoader::saveToClipboard(getDeckList(), true, true);
 }
 
 /** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    getDeckLoader()->saveToClipboard(true, false);
+    DeckLoader::saveToClipboard(getDeckList(), true, false);
 }
 
 /** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    getDeckLoader()->saveToClipboard(false, true);
+    DeckLoader::saveToClipboard(getDeckList(), false, true);
 }
 
 /** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    getDeckLoader()->saveToClipboard(false, false);
+    DeckLoader::saveToClipboard(getDeckList(), false, false);
 }
 
 /** @brief Prints the deck using a QPrintPreviewDialog. */
 void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
-    connect(dlg, &QPrintPreviewDialog::paintRequested, deckDockWidget->getDeckLoader(), &DeckLoader::printDeckList);
+    connect(dlg, &QPrintPreviewDialog::paintRequested, this,
+            [this](QPrinter *printer) { DeckLoader::printDeckList(printer, getDeckList()); });
     dlg->exec();
 }
 
@@ -569,7 +570,7 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
     if (DeckLoader *const deck = getDeckLoader()) {
-        QString decklistUrlString = deck->exportDeckToDecklist(website);
+        QString decklistUrlString = deck->exportDeckToDecklist(getDeckList(), website);
         // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {
             // Show an error if the deck is empty, and return.

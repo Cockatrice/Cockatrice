@@ -722,7 +722,7 @@ void DeckList::refreshDeckHash()
 /**
  * Calls a given function on each card in the deck.
  */
-void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const
 {
     // Support for this is only possible if the internal structure
     // doesn't get more complicated.
