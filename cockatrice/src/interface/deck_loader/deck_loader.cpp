@@ -276,9 +276,11 @@ static QString toDecklistExportString(const DecklistCardNode *card)
 
 /**
  * Export deck to decklist function, called to format the deck in a way to be sent to a server
+ *
+ * @param deckList The decklist to export
  * @param website The website we're sending the deck to
  */
-QString DeckLoader::exportDeckToDecklist(DecklistWebsite website)
+QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website)
 {
     // Add the base url
     QString deckString = "https://" + getDomainForWebsite(website) + "/?";
@@ -346,7 +348,7 @@ struct SetProviderIdToPreferred
  * This function iterates through each card in the decklist and sets the providerId
  * on each card based on its set name and collector number.
  */
-void DeckLoader::setProviderIdToPreferredPrinting()
+void DeckLoader::setProviderIdToPreferredPrinting(const DeckList *deckList)
 {
     // Set up the struct to call.
     SetProviderIdToPreferred setProviderIdToPreferred;
@@ -358,7 +360,7 @@ void DeckLoader::setProviderIdToPreferredPrinting()
 /**
  * Sets the providerId on each card in the decklist based on its set name and collector number.
  */
-void DeckLoader::resolveSetNameAndNumberToProviderID()
+void DeckLoader::resolveSetNameAndNumberToProviderID(const DeckList *deckList)
 {
     auto setProviderId = [](const auto node, const auto card) {
         Q_UNUSED(node);
@@ -398,7 +400,7 @@ struct ClearSetNameNumberAndProviderId
 /**
  * Clears the set name and numbers on each card in the decklist.
  */
-void DeckLoader::clearSetNamesAndNumbers()
+void DeckLoader::clearSetNamesAndNumbers(const DeckList *deckList)
 {
     auto clearSetNameAndNumber = [](const auto node, auto card) {
         Q_UNUSED(node)
@@ -419,19 +421,22 @@ DeckLoader::FileFormat DeckLoader::getFormatFromName(const QString &fileName)
     return PlainTextFormat;
 }
 
-void DeckLoader::saveToClipboard(bool addComments, bool addSetNameAndNumber) const
+void DeckLoader::saveToClipboard(const DeckList *deckList, bool addComments, bool addSetNameAndNumber)
 {
     QString buffer;
     QTextStream stream(&buffer);
-    saveToStream_Plain(stream, addComments, addSetNameAndNumber);
+    saveToStream_Plain(stream, deckList, addComments, addSetNameAndNumber);
     QApplication::clipboard()->setText(buffer, QClipboard::Clipboard);
     QApplication::clipboard()->setText(buffer, QClipboard::Selection);
 }
 
-bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool addSetNameAndNumber) const
+bool DeckLoader::saveToStream_Plain(QTextStream &out,
+                                    const DeckList *deckList,
+                                    bool addComments,
+                                    bool addSetNameAndNumber)
 {
     if (addComments) {
-        saveToStream_DeckHeader(out);
+        saveToStream_DeckHeader(out, deckList);
     }
 
     // loop zones
@@ -447,7 +452,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out, bool addComments, bool add
     return true;
 }
 
-void DeckLoader::saveToStream_DeckHeader(QTextStream &out) const
+void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList)
 {
     if (!deckList->getName().isEmpty()) {
         out << "// " << deckList->getName() << "\n\n";
@@ -465,7 +470,7 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out) const
 void DeckLoader::saveToStream_DeckZone(QTextStream &out,
                                        const InnerDecklistNode *zoneNode,
                                        bool addComments,
-                                       bool addSetNameAndNumber) const
+                                       bool addSetNameAndNumber)
 {
     // group cards by card type and count the subtotals
     QMultiMap<QString, DecklistCardNode *> cardsByType;
@@ -513,7 +518,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
                                             const InnerDecklistNode *zoneNode,
                                             QList<DecklistCardNode *> cards,
                                             bool addComments,
-                                            bool addSetNameAndNumber) const
+                                            bool addSetNameAndNumber)
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
@@ -589,7 +594,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
     return result;
 }
 
-QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneName)
+QString DeckLoader::getCardZoneFromName(const QString &cardName, QString currentZoneName)
 {
     CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
 
@@ -600,7 +605,7 @@ QString DeckLoader::getCardZoneFromName(QString cardName, QString currentZoneNam
     return currentZoneName;
 }
 
-QString DeckLoader::getCompleteCardName(const QString &cardName) const
+QString DeckLoader::getCompleteCardName(const QString &cardName)
 {
     if (CardDatabaseManager::getInstance()) {
         ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
@@ -672,7 +677,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
     cursor->movePosition(QTextCursor::End);
 }
 
-void DeckLoader::printDeckList(QPrinter *printer)
+void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
 {
     QTextDocument doc;
 
