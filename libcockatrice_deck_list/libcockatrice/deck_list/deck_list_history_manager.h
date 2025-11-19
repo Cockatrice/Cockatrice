@@ -20,12 +20,7 @@ public:
     {
     }
 
-    void save(DeckListMemento *memento)
-    {
-        undoStack.push(memento);
-        redoStack.clear();
-        emit undoRedoStateChanged();
-    }
+    void save(DeckListMemento *memento);
 
     bool canUndo() const
     {
@@ -36,47 +31,9 @@ public:
         return !redoStack.isEmpty();
     }
 
-    DeckListMemento *undo(DeckList *deck)
-    {
-        if (undoStack.isEmpty()) {
-            return nullptr;
-        }
+    void undo(DeckList *deck);
 
-        // Peek at the memento we are going to restore
-        DeckListMemento *mementoToRestore = undoStack.top();
-
-        // Save current state for redo using the same reason as the memento we're restoring
-        DeckListMemento *currentState = deck->createMemento(mementoToRestore->getReason());
-        redoStack.push(currentState);
-
-        // Pop the last state from undo stack and restore it
-        DeckListMemento *memento = undoStack.pop();
-        deck->restoreMemento(memento);
-
-        emit undoRedoStateChanged();
-        return memento;
-    }
-
-    DeckListMemento *redo(DeckList *deck)
-    {
-        if (redoStack.isEmpty()) {
-            return nullptr;
-        }
-
-        // Peek at the memento we are going to restore
-        DeckListMemento *mementoToRestore = redoStack.top();
-
-        // Save current state for undo using the same reason as the memento we're restoring
-        DeckListMemento *currentState = deck->createMemento(mementoToRestore->getReason());
-        undoStack.push(currentState);
-
-        // Pop the next state from redo stack and restore it
-        DeckListMemento *memento = redoStack.pop();
-        deck->restoreMemento(memento);
-
-        emit undoRedoStateChanged();
-        return memento;
-    }
+    void redo(DeckList *deck);
 
     QStack<DeckListMemento *> getRedoStack() const
     {

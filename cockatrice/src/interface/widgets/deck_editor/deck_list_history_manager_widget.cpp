@@ -107,7 +107,7 @@ void DeckListHistoryManagerWidget::doUndo()
         return;
     }
 
-    deckListModel->getDeckList()->restoreMemento(historyManager->undo(deckListModel->getDeckList()));
+    historyManager->undo(deckListModel->getDeckList());
     deckListModel->rebuildTree();
     emit deckListModel->layoutChanged();
     emit requestDisplayWidgetSync();
@@ -121,7 +121,7 @@ void DeckListHistoryManagerWidget::doRedo()
         return;
     }
 
-    deckListModel->getDeckList()->restoreMemento(historyManager->redo(deckListModel->getDeckList()));
+    historyManager->redo(deckListModel->getDeckList());
     deckListModel->rebuildTree();
 
     emit deckListModel->layoutChanged();
@@ -144,13 +144,13 @@ void DeckListHistoryManagerWidget::onListClicked(QListWidgetItem *item)
         const auto redoStack = historyManager->getRedoStack();
         int steps = redoStack.size() - index;
         for (int i = 0; i < steps; ++i) {
-            deckListModel->getDeckList()->restoreMemento(historyManager->redo(deckListModel->getDeckList()));
+            historyManager->redo(deckListModel->getDeckList());
         }
     } else if (mode == "undo") {
         const auto undoStack = historyManager->getUndoStack();
         int steps = undoStack.size() - 1 - index;
         for (int i = 0; i < steps + 1; ++i) {
-            deckListModel->getDeckList()->restoreMemento(historyManager->undo(deckListModel->getDeckList()));
+            historyManager->undo(deckListModel->getDeckList());
         }
     }
 

@@ -20,9 +20,13 @@ endif()
 
 add_library(
   libcockatrice_deck_list STATIC
-  ${MOC_SOURCES} libcockatrice/deck_list/abstract_deck_list_card_node.cpp
-  libcockatrice/deck_list/abstract_deck_list_node.cpp libcockatrice/deck_list/deck_list.cpp
-  libcockatrice/deck_list/deck_list_card_node.cpp libcockatrice/deck_list/inner_deck_list_node.cpp
+  ${MOC_SOURCES}
+  libcockatrice/deck_list/abstract_deck_list_card_node.cpp
+  libcockatrice/deck_list/abstract_deck_list_node.cpp
+  libcockatrice/deck_list/deck_list.cpp
+  libcockatrice/deck_list/deck_list_card_node.cpp
+  libcockatrice/deck_list/deck_list_history_manager.cpp
+  libcockatrice/deck_list/inner_deck_list_node.cpp
 )
 
 add_dependencies(libcockatrice_deck_list libcockatrice_protocol)
