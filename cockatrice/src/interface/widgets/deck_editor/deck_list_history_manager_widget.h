@@ -49,6 +49,7 @@ private:
     QAction *aRedo;
     QToolButton *redoButton;
     SettingsButtonWidget *historyButton;
+    QLabel *historyLabel;
     QListWidget *historyList;
 };
 

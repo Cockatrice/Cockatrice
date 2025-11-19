@@ -32,8 +32,11 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
     historyButton = new SettingsButtonWidget(this);
     historyButton->setButtonIcon(QPixmap("theme:icons/arrow_history"));
 
+    historyLabel = new QLabel(this);
+
     historyList = new QListWidget(this);
 
+    historyButton->addSettingsWidget(historyLabel);
     historyButton->addSettingsWidget(historyList);
 
     layout->addWidget(historyButton);
@@ -55,6 +58,7 @@ void DeckListHistoryManagerWidget::retranslateUi()
     undoButton->setToolTip(tr("Undo"));
     redoButton->setToolTip(tr("Redo"));
     historyButton->setToolTip(tr("Undo/Redo history"));
+    historyLabel->setText(tr("Click on an entry to revert to that point in the history."));
 }
 
 void DeckListHistoryManagerWidget::setDeckListModel(DeckListModel *_deckListModel)
