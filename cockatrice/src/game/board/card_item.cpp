@@ -277,7 +277,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
     auto *game = owner->getGame();
     Player *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
-    int phase = 0; // do not set phase
+    int phase = 0; // 0 means to not set the phase
     if (SettingsCache::instance().getDoNotDeleteArrowsInSubPhases()) {
         int currentPhase = game->getGameState()->getCurrentPhase();
         phase = currentPhase + 4;
