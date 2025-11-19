@@ -285,7 +285,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
-    deckLoader->setBannerCard(cardRef);
+    deckLoader->getDeckList()->setBannerCard(cardRef);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
