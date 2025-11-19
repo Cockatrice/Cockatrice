@@ -45,14 +45,14 @@ public:
     };
 
 private:
-    DeckList deckList;
+    DeckList *deckList;
     QString lastFileName;
     FileFormat lastFileFormat;
     int lastRemoteDeckId;
 
 public:
     DeckLoader(QObject *parent);
-    DeckLoader(QObject *parent, const DeckList *_deckList);
+    DeckLoader(QObject *parent, DeckList *_deckList);
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
@@ -80,16 +80,16 @@ public:
 
     void setName(const QString &_name = QString())
     {
-        deckList.setName(_name);
+        deckList->setName(_name);
     }
 
     void setComments(const QString &_comments = QString())
     {
-        deckList.setComments(_comments);
+        deckList->setComments(_comments);
     }
     void setTags(const QStringList &_tags = QStringList())
     {
-        deckList.setTags(_tags);
+        deckList->setTags(_tags);
     }
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);
@@ -116,23 +116,23 @@ public:
     ///@{
     bool loadFromXml(QXmlStreamReader *xml)
     {
-        return deckList.loadFromXml(xml);
+        return deckList->loadFromXml(xml);
     };
     bool loadFromString_Native(const QString &nativeString)
     {
-        return deckList.loadFromString_Native(nativeString);
+        return deckList->loadFromString_Native(nativeString);
     };
     QString writeToString_Native() const
     {
-        return deckList.writeToString_Native();
+        return deckList->writeToString_Native();
     };
     bool loadFromFile_Native(QIODevice *device)
     {
-        return deckList.loadFromFile_Native(device);
+        return deckList->loadFromFile_Native(device);
     };
     bool saveToFile_Native(QIODevice *device)
     {
-        return deckList.saveToFile_Native(device);
+        return deckList->saveToFile_Native(device);
     };
     ///@}
 
@@ -140,23 +140,23 @@ public:
     ///@{
     bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata)
     {
-        return deckList.loadFromStream_Plain(stream, preserveMetadata);
+        return deckList->loadFromStream_Plain(stream, preserveMetadata);
     };
     bool loadFromFile_Plain(QIODevice *device)
     {
-        return deckList.loadFromFile_Plain(device);
+        return deckList->loadFromFile_Plain(device);
     };
     bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
     {
-        return deckList.saveToStream_Plain(stream, prefixSideboardCards, slashTappedOutSplitCards);
+        return deckList->saveToStream_Plain(stream, prefixSideboardCards, slashTappedOutSplitCards);
     };
     bool saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false)
     {
-        return deckList.saveToFile_Plain(device, prefixSideboardCards, slashTappedOutSplitCards);
+        return deckList->saveToFile_Plain(device, prefixSideboardCards, slashTappedOutSplitCards);
     };
     QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false)
     {
-        return deckList.writeToString_Plain(prefixSideboardCards, slashTappedOutSplitCards);
+        return deckList->writeToString_Plain(prefixSideboardCards, slashTappedOutSplitCards);
     };
     ///@}
 
@@ -171,7 +171,7 @@ public:
 
     DeckList *getDeckList()
     {
-        return &deckList;
+        return deckList;
     }
 
     DecklistCardNode *addCard(const QString &cardName,
@@ -181,12 +181,12 @@ public:
                               const QString &cardSetCollectorNumber = QString(),
                               const QString &cardProviderId = QString())
     {
-        return deckList.addCard(cardName, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId);
+        return deckList->addCard(cardName, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId);
     };
 
     void setBannerCard(const CardRef &_bannerCard = {})
     {
-        deckList.setBannerCard(_bannerCard);
+        deckList->setBannerCard(_bannerCard);
     }
 
 private:
