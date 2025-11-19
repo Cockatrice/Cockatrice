@@ -22,6 +22,9 @@ class DeckListHistoryManagerWidget : public QWidget
 signals:
     void requestDisplayWidgetSync();
 
+public slots:
+    void retranslateUi();
+
 public:
     explicit DeckListHistoryManagerWidget(DeckListModel *deckListModel,
                                           DeckListStyleProxy *styleProxy,

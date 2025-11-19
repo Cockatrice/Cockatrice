@@ -47,6 +47,14 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
             &DeckListHistoryManagerWidget::refreshList);
 
     refreshList();
+    retranslateUi();
+}
+
+void DeckListHistoryManagerWidget::retranslateUi()
+{
+    undoButton->setToolTip(tr("Undo"));
+    redoButton->setToolTip(tr("Redo"));
+    historyButton->setToolTip(tr("Undo/Redo history"));
 }
 
 void DeckListHistoryManagerWidget::setDeckListModel(DeckListModel *_deckListModel)
