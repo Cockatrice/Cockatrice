@@ -91,8 +91,9 @@ void DeckListHistoryManagerWidget::refreshList()
 
 void DeckListHistoryManagerWidget::doUndo()
 {
-    if (!historyManager->canUndo())
+    if (!historyManager->canUndo()) {
         return;
+    }
 
     deckListModel->getDeckList()->restoreMemento(historyManager->undo(deckListModel->getDeckList()));
     deckListModel->rebuildTree();
@@ -104,8 +105,9 @@ void DeckListHistoryManagerWidget::doUndo()
 
 void DeckListHistoryManagerWidget::doRedo()
 {
-    if (!historyManager->canRedo())
+    if (!historyManager->canRedo()) {
         return;
+    }
 
     deckListModel->getDeckList()->restoreMemento(historyManager->redo(deckListModel->getDeckList()));
     deckListModel->rebuildTree();
@@ -119,8 +121,9 @@ void DeckListHistoryManagerWidget::doRedo()
 void DeckListHistoryManagerWidget::onListClicked(QListWidgetItem *item)
 {
     // Ignore non-selectable items (like divider)
-    if (!(item->flags() & Qt::ItemIsSelectable))
+    if (!(item->flags() & Qt::ItemIsSelectable)) {
         return;
+    }
 
     const QString mode = item->data(Qt::UserRole).toString();
     int index = item->data(Qt::UserRole + 1).toInt();
