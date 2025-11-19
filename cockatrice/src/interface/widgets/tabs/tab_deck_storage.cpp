@@ -323,9 +323,9 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
             return;
         if (deckName.isEmpty())
             deckName = tr("Unnamed deck");
-        deck.setName(deckName);
+        deck.getDeckList()->setName(deckName);
     } else {
-        deck.setName(deck.getDeckList()->getName().left(MAX_NAME_LENGTH));
+        deck.getDeckList()->setName(deck.getDeckList()->getName().left(MAX_NAME_LENGTH));
     }
 
     QString deckString = deck.getDeckList()->writeToString_Native();

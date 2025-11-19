@@ -75,12 +75,12 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
     QString buffer = contentsEdit->toPlainText();
 
     if (buffer.contains("<cockatrice_deck version=\"1\">")) {
-        return deckLoader->loadFromString_Native(buffer);
+        return deckLoader->getDeckList()->loadFromString_Native(buffer);
     }
 
     QTextStream stream(&buffer);
 
-    if (deckLoader->loadFromStream_Plain(stream, true)) {
+    if (deckLoader->getDeckList()->loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
             DeckLoader::resolveSetNameAndNumberToProviderID(deckLoader->getDeckList());
         } else {

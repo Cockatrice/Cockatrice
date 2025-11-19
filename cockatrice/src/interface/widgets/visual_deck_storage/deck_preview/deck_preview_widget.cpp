@@ -377,7 +377,7 @@ void DeckPreviewWidget::actRenameDeck()
     }
 
     // write change
-    deckLoader->setName(newName);
+    deckLoader->getDeckList()->setName(newName);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
 
     // update VDS

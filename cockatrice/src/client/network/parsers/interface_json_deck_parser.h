@@ -29,8 +29,8 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->setName(deckName);
-        loader->setComments(deckDescription);
+        loader->getDeckList()->setName(deckName);
+        loader->getDeckList()->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -47,7 +47,7 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->loadFromStream_Plain(outStream, false);
+        loader->getDeckList()->loadFromStream_Plain(outStream, false);
         DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         return loader;
@@ -64,8 +64,8 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->setName(deckName);
-        loader->setComments(deckDescription);
+        loader->getDeckList()->setName(deckName);
+        loader->getDeckList()->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -94,7 +94,7 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->loadFromStream_Plain(outStream, false);
+        loader->getDeckList()->loadFromStream_Plain(outStream, false);
         DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();

@@ -78,20 +78,6 @@ public:
         return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
     }
 
-    void setName(const QString &_name = QString())
-    {
-        deckList->setName(_name);
-    }
-
-    void setComments(const QString &_comments = QString())
-    {
-        deckList->setComments(_comments);
-    }
-    void setTags(const QStringList &_tags = QStringList())
-    {
-        deckList->setTags(_tags);
-    }
-
     static void clearSetNamesAndNumbers(const DeckList *deckList);
     static FileFormat getFormatFromName(const QString &fileName);
 
@@ -111,54 +97,6 @@ public:
                                    const DeckList *deckList,
                                    bool addComments = true,
                                    bool addSetNameAndNumber = true);
-
-    /// @name Serialization (XML)
-    ///@{
-    bool loadFromXml(QXmlStreamReader *xml)
-    {
-        return deckList->loadFromXml(xml);
-    };
-    bool loadFromString_Native(const QString &nativeString)
-    {
-        return deckList->loadFromString_Native(nativeString);
-    };
-    QString writeToString_Native() const
-    {
-        return deckList->writeToString_Native();
-    };
-    bool loadFromFile_Native(QIODevice *device)
-    {
-        return deckList->loadFromFile_Native(device);
-    };
-    bool saveToFile_Native(QIODevice *device)
-    {
-        return deckList->saveToFile_Native(device);
-    };
-    ///@}
-
-    /// @name Serialization (Plain text)
-    ///@{
-    bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata)
-    {
-        return deckList->loadFromStream_Plain(stream, preserveMetadata);
-    };
-    bool loadFromFile_Plain(QIODevice *device)
-    {
-        return deckList->loadFromFile_Plain(device);
-    };
-    bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
-    {
-        return deckList->saveToStream_Plain(stream, prefixSideboardCards, slashTappedOutSplitCards);
-    };
-    bool saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false)
-    {
-        return deckList->saveToFile_Plain(device, prefixSideboardCards, slashTappedOutSplitCards);
-    };
-    QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false)
-    {
-        return deckList->writeToString_Plain(prefixSideboardCards, slashTappedOutSplitCards);
-    };
-    ///@}
 
     /**
      * @brief Prints the decklist to the provided QPrinter.

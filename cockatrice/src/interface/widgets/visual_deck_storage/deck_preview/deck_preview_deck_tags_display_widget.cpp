@@ -148,7 +148,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             DeckPreviewTagDialog dialog(knownTags, activeTags);
             if (dialog.exec() == QDialog::Accepted) {
                 QStringList updatedTags = dialog.getActiveTags();
-                deckLoader->setTags(updatedTags);
+                deckLoader->getDeckList()->setTags(updatedTags);
                 deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
             }
         }
@@ -179,7 +179,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             DeckPreviewTagDialog dialog(knownTags, activeTags);
             if (dialog.exec() == QDialog::Accepted) {
                 QStringList updatedTags = dialog.getActiveTags();
-                deckLoader->setTags(updatedTags);
+                deckLoader->getDeckList()->setTags(updatedTags);
                 deckEditor->setModified(true);
             }
         }
