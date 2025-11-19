@@ -112,21 +112,6 @@ public:
         return deckList;
     }
 
-    DecklistCardNode *addCard(const QString &cardName,
-                              const QString &zoneName,
-                              int position,
-                              const QString &cardSetName = QString(),
-                              const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString())
-    {
-        return deckList->addCard(cardName, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId);
-    };
-
-    void setBannerCard(const CardRef &_bannerCard = {})
-    {
-        deckList->setBannerCard(_bannerCard);
-    }
-
 private:
     static void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
     static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);

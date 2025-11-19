@@ -106,8 +106,8 @@ public:
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
 
-                loader->setBannerCard({commanderName, providerId});
-                loader->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+                loader->getDeckList()->setBannerCard({commanderName, providerId});
+                loader->getDeckList()->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
         }
 
