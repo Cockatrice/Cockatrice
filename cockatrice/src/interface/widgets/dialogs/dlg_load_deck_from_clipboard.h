@@ -88,7 +88,7 @@ private:
     bool annotated;
 
 public:
-    explicit DlgEditDeckInClipboard(const DeckLoader &deckList, bool _annotated, QWidget *parent = nullptr);
+    explicit DlgEditDeckInClipboard(DeckLoader *_deckLoader, bool _annotated, QWidget *parent = nullptr);
 
     [[nodiscard]] DeckLoader *getDeckList() const override
     {

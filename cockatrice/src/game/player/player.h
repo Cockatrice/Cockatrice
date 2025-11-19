@@ -130,7 +130,7 @@ public:
         return playerMenu;
     }
 
-    void setDeck(const DeckLoader &_deck);
+    void setDeck(DeckLoader &_deck);
 
     [[nodiscard]] DeckLoader *getDeck() const
     {

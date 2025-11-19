@@ -215,8 +215,9 @@ public slots:
 public:
     /// @brief Construct an empty deck.
     explicit DeckList();
-    /// @brief Deep-copy constructor.
-    DeckList(const DeckList &other);
+    /// @brief Delete copy constructor.
+    DeckList(const DeckList &) = delete;
+    DeckList &operator=(const DeckList &) = delete;
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
     ~DeckList() override;

@@ -533,14 +533,14 @@ void DeckListModel::cleanList()
 }
 
 /**
- * @param _deck The deck. Takes ownership of the object
+ * @param _deck The deck.
  */
 void DeckListModel::setDeckList(DeckList *_deck)
 {
-    deckList->deleteLater();
-    deckList = _deck;
-    deckList->setParent(this);
-    rebuildTree();
+    if (deckList != _deck) {
+        deckList = _deck;
+        rebuildTree();
+    }
 }
 
 QList<ExactCard> DeckListModel::getCards() const

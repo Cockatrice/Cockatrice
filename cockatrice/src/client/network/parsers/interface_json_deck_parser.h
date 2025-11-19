@@ -29,8 +29,8 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->getDeckList()->setName(deckName);
-        loader->getDeckList()->setComments(deckDescription);
+        loader->setName(deckName);
+        loader->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -47,7 +47,7 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->getDeckList()->loadFromStream_Plain(outStream, false);
+        loader->loadFromStream_Plain(outStream, false);
         DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         return loader;
@@ -64,8 +64,8 @@ public:
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->getDeckList()->setName(deckName);
-        loader->getDeckList()->setComments(deckDescription);
+        loader->setName(deckName);
+        loader->setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -94,7 +94,7 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->getDeckList()->loadFromStream_Plain(outStream, false);
+        loader->loadFromStream_Plain(outStream, false);
         DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
@@ -106,8 +106,8 @@ public:
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
 
-                loader->getDeckList()->setBannerCard({commanderName, providerId});
-                loader->getDeckList()->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+                loader->setBannerCard({commanderName, providerId});
+                loader->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
         }
 

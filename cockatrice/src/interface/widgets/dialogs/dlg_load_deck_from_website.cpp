@@ -97,7 +97,7 @@ void DlgLoadDeckFromWebsite::accept()
             // Parse the plain text deck here
             DeckLoader *loader = new DeckLoader(this);
             QTextStream stream(&deckText);
-            loader->getDeckList()->loadFromStream_Plain(stream, false);
+            loader->loadFromStream_Plain(stream, false);
             DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
             deck = loader;
 

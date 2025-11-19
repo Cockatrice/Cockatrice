@@ -82,7 +82,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     setFilePath(deckLoader->getLastFileName());
 
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeckList());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
 
     bannerCardLabel = new QLabel(this);
     bannerCardLabel->setObjectName("bannerCardLabel");
@@ -285,7 +285,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
-    deckLoader->getDeckList()->setBannerCard(cardRef);
+    deckLoader->setBannerCard(cardRef);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
@@ -377,7 +377,7 @@ void DeckPreviewWidget::actRenameDeck()
     }
 
     // write change
-    deckLoader->getDeckList()->setName(newName);
+    deckLoader->setName(newName);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
 
     // update VDS

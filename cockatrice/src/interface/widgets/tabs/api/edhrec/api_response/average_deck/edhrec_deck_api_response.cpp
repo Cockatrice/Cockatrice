@@ -18,7 +18,7 @@ void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
     deckLoader = new DeckLoader(nullptr);
 
     QTextStream stream(&deckList);
-    deckLoader->getDeckList()->loadFromStream_Plain(stream, true);
+    deckLoader->loadFromStream_Plain(stream, true);
 }
 
 void EdhrecDeckApiResponse::debugPrint() const
