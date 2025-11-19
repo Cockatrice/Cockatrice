@@ -274,7 +274,7 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     historyManager->save(deckLoader->getDeckList()->createMemento(
-        QString("Rename deck to \"%1\" from \"%2\"").arg(name).arg(deckLoader->getDeckList()->getName())));
+        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeckList()->getName())));
     deckModel->getDeckList()->setName(name);
     deckEditor->setModified(name.isEmpty());
     emit nameChanged();
@@ -284,7 +284,7 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 void DeckEditorDeckDockWidget::updateComments()
 {
     historyManager->save(
-        deckLoader->getDeckList()->createMemento(QString("Updated comments (was %1 chars, now %2 chars)")
+        deckLoader->getDeckList()->createMemento(QString(tr("Updated comments (was %1 chars, now %2 chars)"))
                                                      .arg(deckLoader->getDeckList()->getComments().size())
                                                      .arg(commentsEdit->toPlainText().size())));
 
@@ -360,7 +360,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
-    historyManager->save(deckLoader->getDeckList()->createMemento("Banner card changed"));
+    historyManager->save(deckLoader->getDeckList()->createMemento(tr("Banner card changed")));
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     deckModel->getDeckList()->setBannerCard({name, id});
     deckEditor->setModified(true);
@@ -618,7 +618,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
         QString cardName = sourceIndex.sibling(sourceIndex.row(), 1).data().toString();
 
         historyManager->save(
-            deckLoader->getDeckList()->createMemento(QString("Removed \"%1\" (all copies)").arg(cardName)));
+            deckLoader->getDeckList()->createMemento(QString(tr("Removed \"%1\" (all copies)")).arg(cardName)));
 
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
         isModified = true;
@@ -647,8 +647,8 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
     const int new_count = count + offset;
 
     const auto reason =
-        QString("%1 %2 × \"%3\" (%4)")
-            .arg(offset > 0 ? "Added" : "Removed")
+        QString(tr("%1 %2 × \"%3\" (%4)"))
+            .arg(offset > 0 ? tr("Added") : tr("Removed"))
             .arg(qAbs(offset))
             .arg(cardName)
             .arg(deckModel->data(sourceIndex.sibling(sourceIndex.row(), 4), Qt::DisplayRole).toString());
