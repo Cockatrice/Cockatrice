@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
+#include "../phase.h"
 #include "../player/player.h"
 #include "../zones/card_zone.h"
 #include "../zones/logic/view_zone_logic.h"
@@ -280,7 +281,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     int phase = 0; // 0 means to not set the phase
     if (SettingsCache::instance().getDoNotDeleteArrowsInSubPhases()) {
         int currentPhase = game->getGameState()->getCurrentPhase();
-        phase = currentPhase + 4;
+        phase = Phases::getLastSubphase(currentPhase) + 1;
     }
     ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
     scene()->addItem(arrow);
