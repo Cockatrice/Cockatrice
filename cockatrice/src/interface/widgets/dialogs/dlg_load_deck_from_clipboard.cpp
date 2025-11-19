@@ -142,7 +142,7 @@ DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, bool 
 {
     setWindowTitle(tr("Edit deck in clipboard"));
 
-    deckLoader = new DeckLoader(deckList);
+    deckLoader = new DeckLoader(this, deckList.getDeckList());
     deckLoader->setParent(this);
 
     DlgEditDeckInClipboard::actRefresh();
