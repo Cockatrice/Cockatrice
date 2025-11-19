@@ -22,6 +22,8 @@ public:
 
     void save(DeckListMemento *memento);
 
+    void clear();
+
     bool canUndo() const
     {
         return !undoStack.isEmpty();

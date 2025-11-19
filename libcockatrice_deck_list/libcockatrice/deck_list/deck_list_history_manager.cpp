@@ -7,6 +7,14 @@ void DeckListHistoryManager::save(DeckListMemento *memento)
     emit undoRedoStateChanged();
 }
 
+void DeckListHistoryManager::clear()
+{
+    undoStack.clear();
+    redoStack.clear();
+
+    emit undoRedoStateChanged();
+}
+
 void DeckListHistoryManager::undo(DeckList *deck)
 {
     if (undoStack.isEmpty()) {
