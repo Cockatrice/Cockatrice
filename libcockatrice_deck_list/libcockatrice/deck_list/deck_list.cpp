@@ -2,6 +2,7 @@
 
 #include "abstract_deck_list_node.h"
 #include "deck_list_card_node.h"
+#include "deck_list_memento.h"
 #include "inner_deck_list_node.h"
 
 #include <QCryptographicHash>
@@ -719,4 +720,15 @@ void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, Decklis
             func(node, card);
         }
     }
+}
+
+DeckListMemento *DeckList::createMemento(QString reason) const
+{
+    return new DeckListMemento(writeToString_Native(), reason);
+}
+
+void DeckList::restoreMemento(const DeckListMemento *m)
+{
+    cleanList();
+    loadFromString_Native(m->getMemento());
 }

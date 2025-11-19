@@ -10,6 +10,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
+#include "deck_list_memento.h"
 #include "inner_deck_list_node.h"
 
 #include <QMap>
@@ -317,6 +318,8 @@ public:
      * @param func Function taking (zone node, card node).
      */
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const;
+    DeckListMemento *createMemento(QString reason) const;
+    void restoreMemento(const DeckListMemento *m);
 };
 
 #endif

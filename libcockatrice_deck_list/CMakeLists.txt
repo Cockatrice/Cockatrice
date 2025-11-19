@@ -3,8 +3,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(HEADERS
-    libcockatrice/deck_list/abstract_deck_list_card_node.h libcockatrice/deck_list/abstract_deck_list_node.h
-    libcockatrice/deck_list/deck_list.h libcockatrice/deck_list/deck_list_card_node.h
+    libcockatrice/deck_list/abstract_deck_list_card_node.h
+    libcockatrice/deck_list/abstract_deck_list_node.h
+    libcockatrice/deck_list/deck_list.h
+    libcockatrice/deck_list/deck_list_card_node.h
+    libcockatrice/deck_list/deck_list_history_manager.h
+    libcockatrice/deck_list/deck_list_memento.h
     libcockatrice/deck_list/inner_deck_list_node.h
 )
 

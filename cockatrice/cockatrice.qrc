@@ -7,11 +7,14 @@
 
         <file>resources/icons/arrow_bottom_green.svg</file>
         <file>resources/icons/arrow_down_green.svg</file>
+        <file>resources/icons/arrow_history.svg</file>
         <file>resources/icons/arrow_left_green.svg</file>
+        <file>resources/icons/arrow_redo.svg</file>
         <file>resources/icons/arrow_right_blue.svg</file>
         <file>resources/icons/arrow_right_green.svg</file>
         <file>resources/icons/arrow_top_green.svg</file>
         <file>resources/icons/arrow_up_green.svg</file>
+        <file>resources/icons/arrow_undo.svg</file>
         <file>resources/icons/clearsearch.svg</file>
         <file>resources/icons/cogwheel.svg</file>
         <file>resources/icons/conceded.svg</file>
