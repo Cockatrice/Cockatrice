@@ -287,8 +287,9 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     QList<DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
-        if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef()))
+        if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
             continue;
+        }
 
         // Insert one entry per distinct card, ignore copies
         bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
