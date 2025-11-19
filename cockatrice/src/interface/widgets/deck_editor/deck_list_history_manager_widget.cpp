@@ -6,7 +6,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
                                                            QWidget *parent)
     : QWidget(parent), deckListModel(_deckListModel), styleProxy(_styleProxy), historyManager(manager)
 {
-    auto *layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout(this);
 
     aUndo = new QAction(QString(), this);
     aUndo->setIcon(QPixmap("theme:icons/arrow_undo"));
@@ -38,8 +38,8 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
 
     layout->addWidget(historyButton);
 
-    connect(undoButton, &QPushButton::clicked, this, &DeckListHistoryManagerWidget::doUndo);
-    connect(redoButton, &QPushButton::clicked, this, &DeckListHistoryManagerWidget::doRedo);
+    connect(undoButton, &QToolButton::clicked, this, &DeckListHistoryManagerWidget::doUndo);
+    connect(redoButton, &QToolButton::clicked, this, &DeckListHistoryManagerWidget::doRedo);
 
     connect(historyList, &QListWidget::itemClicked, this, &DeckListHistoryManagerWidget::onListClicked);
 

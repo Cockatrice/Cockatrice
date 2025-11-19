@@ -283,7 +283,11 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 
 void DeckEditorDeckDockWidget::updateComments()
 {
-    historyManager->save(deckLoader->getDeckList()->createMemento("Comments changed"));
+    historyManager->save(
+        deckLoader->getDeckList()->createMemento(QString("Updated comments (was %1 chars, now %2 chars)")
+                                                     .arg(deckLoader->getDeckList()->getComments().size())
+                                                     .arg(commentsEdit->toPlainText().size())));
+
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     deckEditor->setModified(commentsEdit->toPlainText().isEmpty());
     emit commentsChanged();
@@ -597,8 +601,6 @@ void DeckEditorDeckDockWidget::actDecrementSelection()
 
 void DeckEditorDeckDockWidget::actRemoveCard()
 {
-    historyManager->save(deckLoader->getDeckList()->createMemento("Card removed"));
-
     auto selectedRows = getSelectedCardNodes();
 
     // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
@@ -613,6 +615,11 @@ void DeckEditorDeckDockWidget::actRemoveCard()
             continue;
         }
         QModelIndex sourceIndex = proxy->mapToSource(index);
+        QString cardName = sourceIndex.sibling(sourceIndex.row(), 1).data().toString();
+
+        historyManager->save(
+            deckLoader->getDeckList()->createMemento(QString("Removed \"%1\" (all copies)").arg(cardName)));
+
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
         isModified = true;
     }
@@ -639,7 +646,12 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
 
-    QString reason = QString("%1 %2 %3").arg(offset > 0 ? "Added" : "Removed").arg(qAbs(offset)).arg(cardName);
+    const auto reason =
+        QString("%1 %2 × \"%3\" (%4)")
+            .arg(offset > 0 ? "Added" : "Removed")
+            .arg(qAbs(offset))
+            .arg(cardName)
+            .arg(deckModel->data(sourceIndex.sibling(sourceIndex.row(), 4), Qt::DisplayRole).toString());
 
     historyManager->save(deckLoader->getDeckList()->createMemento(reason));
 
