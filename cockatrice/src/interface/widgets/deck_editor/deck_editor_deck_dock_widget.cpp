@@ -272,8 +272,9 @@ void DeckEditorDeckDockWidget::updateHash()
 
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 {
-    // Store the current text of the combo box
-    QString currentText = bannerCardComboBox->currentText();
+    // Store current banner card identity
+    QString wantedName = deckModel->getDeckList()->getBannerCard().name;
+    QString wantedProvider = deckModel->getDeckList()->getBannerCard().providerId;
 
     // Block signals temporarily
     bool wasBlocked = bannerCardComboBox->blockSignals(true);
@@ -281,49 +282,62 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     // Clear the existing items in the combo box
     bannerCardComboBox->clear();
 
-    // Prepare the new items with deduplication
+    // Collect unique (name, providerId) pairs
     QSet<QPair<QString, QString>> bannerCardSet;
     QList<DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            if (CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
-                bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
-            }
-        }
+        if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef()))
+            continue;
+
+        // Insert one entry per distinct card, ignore copies
+        bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
     }
 
+    // Convert to sorted list
     QList<QPair<QString, QString>> pairList = bannerCardSet.values();
 
     // Sort QList by the first() element of the QPair
-    std::sort(pairList.begin(), pairList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
-        return a.first.toLower() < b.first.toLower();
-    });
+    std::sort(pairList.begin(), pairList.end(),
+              [](const auto &a, const auto &b) { return a.first.toLower() < b.first.toLower(); });
 
+    // Add to combo box
     for (const auto &pair : pairList) {
         bannerCardComboBox->addItem(pair.first, QVariant::fromValue(pair));
     }
 
-    // Try to restore the previous selection by finding the currentText
-    int restoredIndex = bannerCardComboBox->findText(currentText);
-    if (restoredIndex != -1) {
-        bannerCardComboBox->setCurrentIndex(restoredIndex);
-        if (deckModel->getDeckList()->getBannerCard().providerId !=
-            bannerCardComboBox->currentData().value<QPair<QString, QString>>().second) {
-            setBannerCard(restoredIndex);
-        }
-    } else {
-        // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().name);
-        if (bannerIndex != -1) {
-            bannerCardComboBox->setCurrentIndex(bannerIndex);
-        } else {
-            bannerCardComboBox->insertItem(0, "-");
-            bannerCardComboBox->setCurrentIndex(0);
+    // Try restoring by provider ID first (strongest match)
+    int restoreIndex = -1;
+    for (int i = 0; i < bannerCardComboBox->count(); ++i) {
+        auto pair = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
+        if (pair.second == wantedProvider) {
+            restoreIndex = i;
+            break;
         }
     }
 
-    // Restore the previous signal blocking state
+    // If provider ID not found, try matching name
+    if (restoreIndex == -1) {
+        for (int i = 0; i < bannerCardComboBox->count(); ++i) {
+            auto pair = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
+            if (pair.first == wantedName) {
+                restoreIndex = i;
+                break;
+            }
+        }
+    }
+
+    // Handle results
+    if (restoreIndex != -1) {
+        bannerCardComboBox->setCurrentIndex(restoreIndex);
+        setBannerCard(restoreIndex);
+    } else {
+        // Add a placeholder "-" and set it as the current selection
+        bannerCardComboBox->insertItem(0, "-");
+        bannerCardComboBox->setCurrentIndex(0);
+    }
+
+    // Restore signal state
     bannerCardComboBox->blockSignals(wasBlocked);
 }
 
