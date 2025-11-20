@@ -49,10 +49,11 @@ public:
         return activeGroupCriteriaComboBox;
     }
 
+    const static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo);
+
 public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
-    int findRestoreIndex(const CardRef &wanted, const QComboBox *combo) const;
     void setDeck(DeckLoader *_deck);
     DeckLoader *getDeckLoader();
     DeckList *getDeckList();
