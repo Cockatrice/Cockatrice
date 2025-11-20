@@ -30,6 +30,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
 {
     historyManager = new DeckListHistoryManager();
 
+    connect(deckEditor, &AbstractTabDeckEditor::cardAboutToBeAdded, this,
+            &DeckEditorDeckDockWidget::onCardAboutToBeAdded);
+
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
@@ -496,6 +499,14 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
 
     std::reverse(selectedRows.begin(), selectedRows.end());
     return selectedRows;
+}
+
+void DeckEditorDeckDockWidget::onCardAboutToBeAdded(const ExactCard &addedCard, const QString &zoneName)
+{
+    historyManager->save(deckLoader->getDeckList()->createMemento(
+        QString(tr("Added (%1): %2 (%3) %4"))
+            .arg(zoneName, addedCard.getName(), addedCard.getPrinting().getSet()->getCorrectedShortName(),
+                 addedCard.getPrinting().getProperty("num"))));
 }
 
 void DeckEditorDeckDockWidget::actIncrement()

@@ -65,6 +65,7 @@ public slots:
     void actDecrementSelection();
     void actSwapCard();
     void actRemoveCard();
+    void onCardAboutToBeAdded(const ExactCard &card, const QString &zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 signals:

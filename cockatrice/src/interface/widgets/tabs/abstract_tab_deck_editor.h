@@ -180,6 +180,7 @@ public slots:
     virtual void dockTopLevelChanged(bool topLevel) = 0;
 
 signals:
+    void cardAboutToBeAdded(const ExactCard &addedCard, const QString &zoneName);
     /** @brief Emitted when a deck should be opened in a new editor tab. */
     void openDeckEditor(DeckLoader *deckLoader);
 
