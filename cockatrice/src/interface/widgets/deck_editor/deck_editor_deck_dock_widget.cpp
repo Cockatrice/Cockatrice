@@ -323,7 +323,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     bannerCardComboBox->blockSignals(wasBlocked);
 }
 
-int findRestoreIndex(const CardRef &wanted, const QComboBox *combo) const
+int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
 {
     // Try providerId + name (strongest match)
     if (!wanted.providerId.isEmpty()) {
