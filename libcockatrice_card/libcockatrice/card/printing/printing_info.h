@@ -110,6 +110,13 @@ public:
      * @return A string representing the providerID.
      */
     QString getUuid() const;
+
+    /**
+     * @brief Returns the flavorName for this printing.
+     *
+     * @return The flavorName, or empty if it isn't present.
+     */
+    QString getFlavorName() const;
 };
 
 #endif // COCKATRICE_PRINTING_INFO_H

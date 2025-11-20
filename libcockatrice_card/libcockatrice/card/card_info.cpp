@@ -32,7 +32,7 @@ CardInfo::CardInfo(const QString &_name,
 {
     simpleName = CardInfo::simplifyName(name);
 
-    refreshCachedSetNames();
+    refreshCachedSets();
 }
 
 CardInfoPtr CardInfo::newInstance(const QString &_name)
@@ -84,7 +84,7 @@ void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
         setsToPrintings[_set->getShortName()].append(_info);
     }
 
-    refreshCachedSetNames();
+    refreshCachedSets();
 }
 
 void CardInfo::combineLegalities(const QVariantHash &props)
@@ -96,6 +96,12 @@ void CardInfo::combineLegalities(const QVariantHash &props)
             smartThis->setProperty(it.key(), it.value().toString());
         }
     }
+}
+
+void CardInfo::refreshCachedSets()
+{
+    refreshCachedSetNames();
+    refreshCachedAltNames();
 }
 
 void CardInfo::refreshCachedSetNames()
@@ -111,6 +117,21 @@ void CardInfo::refreshCachedSetNames()
         }
     }
     setsNames = setList.join(", ");
+}
+
+void CardInfo::refreshCachedAltNames()
+{
+    altNames.clear();
+
+    // update the altNames with the flavorNames
+    for (const auto &printings : setsToPrintings) {
+        for (const auto &printing : printings) {
+            QString flavorName = printing.getFlavorName();
+            if (!flavorName.isEmpty()) {
+                altNames.insert(flavorName);
+            }
+        }
+    }
 }
 
 QString CardInfo::simplifyName(const QString &name)

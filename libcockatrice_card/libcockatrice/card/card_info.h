@@ -77,8 +77,9 @@ private:
     QList<CardRelation *> reverseRelatedCards;     ///< Cards that refer back to this card.
     QList<CardRelation *> reverseRelatedCardsToMe; ///< Cards that consider this card as related.
     SetToPrintingsMap setsToPrintings;             ///< Mapping from set names to printing variations.
-    QString setsNames;                             ///< Cached, human-readable list of set names.
     UiAttributes uiAttributes;                     ///< Attributes that affect display and game logic
+    QString setsNames;                             ///< Cached, human-readable list of set names.
+    QSet<QString> altNames;                        ///< Cached set of alternate names, used when searching
     ///@}
 
 public:
@@ -114,7 +115,8 @@ public:
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
           isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
-          setsToPrintings(other.setsToPrintings), setsNames(other.setsNames), uiAttributes(other.uiAttributes)
+          setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
+          altNames(other.altNames)
     {
     }
 
@@ -185,6 +187,10 @@ public:
     {
         return simpleName;
     }
+    const QSet<QString> &getAltNames()
+    {
+        return altNames;
+    };
     const QString &getText() const
     {
         return text;
@@ -303,11 +309,11 @@ public:
     void combineLegalities(const QVariantHash &props);
 
     /**
-     * @brief Refreshes the cached, human-readable list of set names.
+     * @brief Refreshes all cached fields that are calculated from the contained sets and printings.
      *
-     * Typically called after adding or modifying set memberships.
+     * Typically called after adding or modifying set memberships or printings.
      */
-    void refreshCachedSetNames();
+    void refreshCachedSets();
 
     /**
      * @brief Simplifies a name for fuzzy matching.
@@ -318,6 +324,21 @@ public:
      * @return Simplified name string.
      */
     static QString simplifyName(const QString &name);
+
+private:
+    /**
+     * @brief Refreshes the cached, human-readable list of set names.
+     *
+     * Typically called after adding or modifying set memberships.
+     */
+    void refreshCachedSetNames();
+
+    /**
+     * @brief Refreshes the cached list of alt names for the card.
+     *
+     * Typically called after adding or modifying the contained printings.
+     */
+    void refreshCachedAltNames();
 
 signals:
     /**

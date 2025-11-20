@@ -194,8 +194,9 @@ void CardDatabase::markAllSetsAsKnown()
 void CardDatabase::notifyEnabledSetsChanged()
 {
     // refresh the list of cached set names
-    for (const CardInfoPtr &card : cards)
-        card->refreshCachedSetNames();
+    for (const CardInfoPtr &card : cards) {
+        card->refreshCachedSets();
+    }
 
     // inform the carddatabasemodels that they need to re-check their list of cards
     emit cardDatabaseEnabledSetsChanged();
