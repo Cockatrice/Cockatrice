@@ -7,8 +7,8 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
+#include "../../game_graphics/board/graphics_item_type.h"
 #include "arrow_target.h"
-#include "graphics_item_type.h"
 
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>

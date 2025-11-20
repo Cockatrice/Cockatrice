@@ -1,7 +1,7 @@
 #include "counter_general.h"
 
+#include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/pixel_map_generator.h"
-#include "abstract_graphics_item.h"
 
 #include <QPainter>
 

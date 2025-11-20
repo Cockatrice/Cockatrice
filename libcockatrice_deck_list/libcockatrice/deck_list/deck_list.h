@@ -10,6 +10,7 @@
 #ifndef DECKLIST_H
 #define DECKLIST_H
 
+#include "deck_list_memento.h"
 #include "inner_deck_list_node.h"
 
 #include <QMap>
@@ -215,8 +216,9 @@ public slots:
 public:
     /// @brief Construct an empty deck.
     explicit DeckList();
-    /// @brief Deep-copy constructor.
-    DeckList(const DeckList &other);
+    /// @brief Delete copy constructor.
+    DeckList(const DeckList &) = delete;
+    DeckList &operator=(const DeckList &) = delete;
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
     ~DeckList() override;
@@ -316,6 +318,8 @@ public:
      * @param func Function taking (zone node, card node).
      */
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const;
+    DeckListMemento createMemento(const QString &reason) const;
+    void restoreMemento(const DeckListMemento &m);
 };
 
 #endif

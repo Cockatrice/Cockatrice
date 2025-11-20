@@ -293,6 +293,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
         }
 
+        // handle flavorNames specially due to double-faced cards
+        QString faceFlavorName = getStringPropertyFromMap(card, "faceFlavorName");
+        QString flavorName = !faceFlavorName.isEmpty() ? faceFlavorName : getStringPropertyFromMap(card, "flavorName");
+        if (!flavorName.isEmpty()) {
+            printingInfo.setProperty("flavorName", flavorName);
+        }
+
         // Identifiers
         for (auto i = identifierProperties.cbegin(), end = identifierProperties.cend(); i != end; ++i) {
             QString mtgjsonProperty = i.key();

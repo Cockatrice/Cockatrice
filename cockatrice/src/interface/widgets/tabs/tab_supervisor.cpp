@@ -869,7 +869,7 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckLoader *deckToOpen)
 {
     auto *tab = new TabDeckEditor(this);
     if (deckToOpen)
-        tab->openDeck(new DeckLoader(this, deckToOpen->getDeckList()));
+        tab->openDeck(deckToOpen);
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -882,7 +882,7 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(DeckLoader *deckToOpe
 {
     auto *tab = new TabDeckEditorVisual(this);
     if (deckToOpen)
-        tab->openDeck(new DeckLoader(this, deckToOpen->getDeckList()));
+        tab->openDeck(deckToOpen);
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);

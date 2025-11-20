@@ -7,8 +7,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
-#include "../board/abstract_graphics_item.h"
 #include "../dialogs/dlg_create_token.h"
 #include "menu/player_menu.h"
 #include "player_actions.h"
@@ -130,7 +130,7 @@ public:
         return playerMenu;
     }
 
-    void setDeck(const DeckLoader &_deck);
+    void setDeck(DeckLoader &_deck);
 
     [[nodiscard]] DeckLoader *getDeck() const
     {

@@ -8,7 +8,7 @@
 #ifndef PHASESTOOLBAR_H
 #define PHASESTOOLBAR_H
 
-#include "board/abstract_graphics_item.h"
+#include "../game_graphics/board/abstract_graphics_item.h"
 
 #include <QFrame>
 #include <QGraphicsObject>

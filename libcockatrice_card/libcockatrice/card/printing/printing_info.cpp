@@ -13,3 +13,8 @@ QString PrintingInfo::getUuid() const
 {
     return properties.value("uuid").toString();
 }
+
+QString PrintingInfo::getFlavorName() const
+{
+    return properties.value("flavorName").toString();
+}

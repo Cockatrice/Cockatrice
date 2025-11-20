@@ -133,16 +133,16 @@ void DlgLoadDeckFromClipboard::actOK()
 /**
  * Creates the dialog window for the "Edit deck in clipboard" action
  *
- * @param deckList The existing deck in the deck editor. Copies the instance
+ * @param _deckLoader The existing deck in the deck editor. Copies the instance
  * @param _annotated Whether to add annotations to the text that is loaded from the deck
  * @param parent The parent widget
  */
-DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckLoader &deckList, bool _annotated, QWidget *parent)
+DlgEditDeckInClipboard::DlgEditDeckInClipboard(DeckLoader *_deckLoader, bool _annotated, QWidget *parent)
     : AbstractDlgDeckTextEdit(parent), annotated(_annotated)
 {
     setWindowTitle(tr("Edit deck in clipboard"));
 
-    deckLoader = new DeckLoader(deckList);
+    deckLoader = new DeckLoader(this, _deckLoader->getDeckList());
     deckLoader->setParent(this);
 
     DlgEditDeckInClipboard::actRefresh();

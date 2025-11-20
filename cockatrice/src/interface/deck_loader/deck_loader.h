@@ -53,8 +53,9 @@ private:
 public:
     DeckLoader(QObject *parent);
     DeckLoader(QObject *parent, DeckList *_deckList);
-    void setDeckList(DeckList *_deckList);
-    DeckLoader(const DeckLoader &other);
+    DeckLoader(const DeckLoader &) = delete;
+    DeckLoader &operator=(const DeckLoader &) = delete;
+
     const QString &getLastFileName() const
     {
         return lastFileName;

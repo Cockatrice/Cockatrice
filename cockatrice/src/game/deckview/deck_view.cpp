@@ -330,7 +330,7 @@ void DeckViewScene::setDeck(const DeckList &_deck)
     if (deck)
         delete deck;
 
-    deck = new DeckList(_deck);
+    deck = new DeckList(_deck.writeToString_Native());
     rebuildTree();
     applySideboardPlan(deck->getCurrentSideboardPlan());
     rearrangeItems();

@@ -13,6 +13,30 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/trice_limits.h>
 
+static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
+{
+    // Try providerId + name (strongest match)
+    if (!wanted.providerId.isEmpty()) {
+        for (int i = 0; i < combo->count(); ++i) {
+            auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+            if (pair.second == wanted.providerId && pair.first == wanted.name) {
+                return i;
+            }
+        }
+    }
+
+    // Try name only
+    for (int i = 0; i < combo->count(); ++i) {
+        auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+        if (pair.first == wanted.name) {
+            return i;
+        }
+    }
+
+    // Not found
+    return -1;
+}
+
 DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)
 {
@@ -28,6 +52,11 @@ DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent
 
 void DeckEditorDeckDockWidget::createDeckDock()
 {
+    historyManager = new DeckListHistoryManager();
+
+    connect(deckEditor, &AbstractTabDeckEditor::cardAboutToBeAdded, this,
+            &DeckEditorDeckDockWidget::onCardAboutToBeAdded);
+
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
@@ -36,6 +65,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);
+
+    historyManagerWidget = new DeckListHistoryManagerWidget(deckModel, proxy, historyManager, this);
+    connect(historyManagerWidget, &DeckListHistoryManagerWidget::requestDisplayWidgetSync, this,
+            &DeckEditorDeckDockWidget::syncDisplayWidgetsToModel);
 
     deckView = new QTreeView();
     deckView->setObjectName("deckView");
@@ -65,7 +98,15 @@ void DeckEditorDeckDockWidget::createDeckDock()
     nameEdit->setMaxLength(MAX_NAME_LENGTH);
     nameEdit->setObjectName("nameEdit");
     nameLabel->setBuddy(nameEdit);
-    connect(nameEdit, &LineEditUnfocusable::textChanged, this, &DeckEditorDeckDockWidget::updateName);
+
+    nameDebounceTimer = new QTimer(this);
+    nameDebounceTimer->setSingleShot(true);
+    nameDebounceTimer->setInterval(300); // debounce duration in ms
+    connect(nameDebounceTimer, &QTimer::timeout, this, [this]() { updateName(nameEdit->text()); });
+
+    connect(nameEdit, &LineEditUnfocusable::textChanged, this, [this]() {
+        nameDebounceTimer->start(); // restart debounce timer
+    });
 
     quickSettingsWidget = new SettingsButtonWidget(this);
 
@@ -95,7 +136,16 @@ void DeckEditorDeckDockWidget::createDeckDock()
     commentsEdit->setMinimumHeight(nameEdit->minimumSizeHint().height());
     commentsEdit->setObjectName("commentsEdit");
     commentsLabel->setBuddy(commentsEdit);
-    connect(commentsEdit, &QTextEdit::textChanged, this, &DeckEditorDeckDockWidget::updateComments);
+
+    commentsDebounceTimer = new QTimer(this);
+    commentsDebounceTimer->setSingleShot(true);
+    commentsDebounceTimer->setInterval(400); // longer debounce for multi-line
+    connect(commentsDebounceTimer, &QTimer::timeout, this, [this]() { updateComments(); });
+
+    connect(commentsEdit, &QTextEdit::textChanged, this, [this]() {
+        commentsDebounceTimer->start(); // restart debounce timer
+    });
+
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
@@ -187,7 +237,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     lowerLayout->addWidget(tbDecrement, 0, 3);
     lowerLayout->addWidget(tbRemoveCard, 0, 4);
     lowerLayout->addWidget(tbSwapCard, 0, 5);
-    lowerLayout->addWidget(deckView, 1, 0, 1, 6);
+    lowerLayout->addWidget(historyManagerWidget, 0, 6);
+    lowerLayout->addWidget(deckView, 1, 0, 1, 7);
 
     // Create widgets for both layouts to make splitter work correctly
     auto *topWidget = new QWidget;
@@ -249,6 +300,8 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
+    historyManager->save(deckLoader->getDeckList()->createMemento(
+        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeckList()->getName())));
     deckModel->getDeckList()->setName(name);
     deckEditor->setModified(name.isEmpty());
     emit nameChanged();
@@ -257,6 +310,11 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 
 void DeckEditorDeckDockWidget::updateComments()
 {
+    historyManager->save(
+        deckLoader->getDeckList()->createMemento(QString(tr("Updated comments (was %1 chars, now %2 chars)"))
+                                                     .arg(deckLoader->getDeckList()->getComments().size())
+                                                     .arg(commentsEdit->toPlainText().size())));
+
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     deckEditor->setModified(commentsEdit->toPlainText().isEmpty());
     emit commentsChanged();
@@ -272,8 +330,8 @@ void DeckEditorDeckDockWidget::updateHash()
 
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 {
-    // Store the current text of the combo box
-    QString currentText = bannerCardComboBox->currentText();
+    // Store current banner card identity
+    CardRef wanted = deckModel->getDeckList()->getBannerCard();
 
     // Block signals temporarily
     bool wasBlocked = bannerCardComboBox->blockSignals(true);
@@ -281,54 +339,51 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     // Clear the existing items in the combo box
     bannerCardComboBox->clear();
 
-    // Prepare the new items with deduplication
+    // Collect unique (name, providerId) pairs
     QSet<QPair<QString, QString>> bannerCardSet;
     QList<DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            if (CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
-                bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
-            }
+        if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
+            continue;
         }
+
+        // Insert one entry per distinct card, ignore copies
+        bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
     }
 
+    // Convert to sorted list
     QList<QPair<QString, QString>> pairList = bannerCardSet.values();
 
     // Sort QList by the first() element of the QPair
-    std::sort(pairList.begin(), pairList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) {
-        return a.first.toLower() < b.first.toLower();
-    });
+    std::sort(pairList.begin(), pairList.end(),
+              [](const auto &a, const auto &b) { return a.first.toLower() < b.first.toLower(); });
 
+    // Add to combo box
     for (const auto &pair : pairList) {
         bannerCardComboBox->addItem(pair.first, QVariant::fromValue(pair));
     }
 
-    // Try to restore the previous selection by finding the currentText
-    int restoredIndex = bannerCardComboBox->findText(currentText);
-    if (restoredIndex != -1) {
-        bannerCardComboBox->setCurrentIndex(restoredIndex);
-        if (deckModel->getDeckList()->getBannerCard().providerId !=
-            bannerCardComboBox->currentData().value<QPair<QString, QString>>().second) {
-            setBannerCard(restoredIndex);
-        }
+    // Try to find an index with a matching card
+    int restoreIndex = findRestoreIndex(wanted, bannerCardComboBox);
+
+    // Handle results
+    if (restoreIndex != -1) {
+        bannerCardComboBox->setCurrentIndex(restoreIndex);
+        setBannerCard(restoreIndex);
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckModel->getDeckList()->getBannerCard().name);
-        if (bannerIndex != -1) {
-            bannerCardComboBox->setCurrentIndex(bannerIndex);
-        } else {
-            bannerCardComboBox->insertItem(0, "-");
-            bannerCardComboBox->setCurrentIndex(0);
-        }
+        bannerCardComboBox->insertItem(0, "-");
+        bannerCardComboBox->setCurrentIndex(0);
     }
 
-    // Restore the previous signal blocking state
+    // Restore signal state
     bannerCardComboBox->blockSignals(wasBlocked);
 }
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
+    historyManager->save(deckLoader->getDeckList()->createMemento(tr("Banner card changed")));
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     deckModel->getDeckList()->setBannerCard({name, id});
     deckEditor->setModified(true);
@@ -372,19 +427,38 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
     connect(deckLoader->getDeckList(), &DeckList::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
-    nameEdit->setText(deckModel->getDeckList()->getName());
-    commentsEdit->setText(deckModel->getDeckList()->getComments());
+    historyManager->clear();
+    historyManagerWidget->setDeckListModel(deckModel);
 
-    syncBannerCardComboBoxSelectionWithDeck();
-    updateBannerCardComboBox();
-    updateHash();
-    deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
-    deckView->expandAll();
-    deckView->expandAll();
-
-    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+    syncDisplayWidgetsToModel();
 
     emit deckChanged();
+}
+
+void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
+{
+    nameEdit->blockSignals(true);
+    nameEdit->setText(deckModel->getDeckList()->getName());
+    nameEdit->blockSignals(false);
+
+    commentsEdit->blockSignals(true);
+    commentsEdit->setText(deckModel->getDeckList()->getComments());
+    commentsEdit->blockSignals(false);
+
+    bannerCardComboBox->blockSignals(true);
+    syncBannerCardComboBoxSelectionWithDeck();
+    updateBannerCardComboBox();
+    bannerCardComboBox->blockSignals(false);
+    updateHash();
+    sortDeckModelToDeckView();
+    expandAll();
+
+    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+}
+
+void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
+{
+    deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
 }
 
 DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
@@ -422,6 +496,12 @@ void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)
     deckView->expand(index);
 }
 
+void DeckEditorDeckDockWidget::expandAll()
+{
+    deckView->expandAll();
+    deckView->expandAll();
+}
+
 /**
  * Gets the index of all the currently selected card nodes in the decklist table.
  * The list is in reverse order of the visual selection, so that rows can be deleted while iterating over them.
@@ -439,6 +519,14 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
 
     std::reverse(selectedRows.begin(), selectedRows.end());
     return selectedRows;
+}
+
+void DeckEditorDeckDockWidget::onCardAboutToBeAdded(const ExactCard &addedCard, const QString &zoneName)
+{
+    historyManager->save(deckLoader->getDeckList()->createMemento(
+        QString(tr("Added (%1): %2 (%3) %4"))
+            .arg(zoneName, addedCard.getName(), addedCard.getPrinting().getSet()->getCorrectedShortName(),
+                 addedCard.getPrinting().getProperty("num"))));
 }
 
 void DeckEditorDeckDockWidget::actIncrement()
@@ -559,6 +647,11 @@ void DeckEditorDeckDockWidget::actRemoveCard()
             continue;
         }
         QModelIndex sourceIndex = proxy->mapToSource(index);
+        QString cardName = sourceIndex.sibling(sourceIndex.row(), 1).data().toString();
+
+        historyManager->save(
+            deckLoader->getDeckList()->createMemento(QString(tr("Removed \"%1\" (all copies)")).arg(cardName)));
+
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
         isModified = true;
     }
@@ -579,8 +672,20 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
     QModelIndex sourceIndex = proxy->mapToSource(idx);
 
     const QModelIndex numberIndex = sourceIndex.sibling(sourceIndex.row(), 0);
+    const QModelIndex nameIndex = sourceIndex.sibling(sourceIndex.row(), 1);
+
+    const QString cardName = deckModel->data(nameIndex, Qt::EditRole).toString();
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
+
+    const auto reason =
+        QString(tr("%1 %2 × \"%3\" (%4)"))
+            .arg(offset > 0 ? tr("Added") : tr("Removed"))
+            .arg(qAbs(offset))
+            .arg(cardName)
+            .arg(deckModel->data(sourceIndex.sibling(sourceIndex.row(), 4), Qt::DisplayRole).toString());
+
+    historyManager->save(deckLoader->getDeckList()->createMemento(reason));
 
     if (new_count <= 0) {
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());

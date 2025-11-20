@@ -2,6 +2,7 @@
 
 #include "abstract_deck_list_node.h"
 #include "deck_list_card_node.h"
+#include "deck_list_memento.h"
 #include "inner_deck_list_node.h"
 
 #include <QCryptographicHash>
@@ -78,20 +79,6 @@ void SideboardPlan::write(QXmlStreamWriter *xml)
 DeckList::DeckList()
 {
     root = new InnerDecklistNode;
-}
-
-// TODO: https://qt-project.org/doc/qt-4.8/qobject.html#no-copy-constructor-or-assignment-operator
-DeckList::DeckList(const DeckList &other)
-    : QObject(), name(other.name), comments(other.comments), bannerCard(other.bannerCard),
-      lastLoadedTimestamp(other.lastLoadedTimestamp), tags(other.tags), cachedDeckHash(other.cachedDeckHash)
-{
-    root = new InnerDecklistNode(other.getRoot());
-
-    QMapIterator<QString, SideboardPlan *> spIterator(other.getSideboardPlans());
-    while (spIterator.hasNext()) {
-        spIterator.next();
-        sideboardPlans.insert(spIterator.key(), new SideboardPlan(spIterator.key(), spIterator.value()->getMoveList()));
-    }
 }
 
 DeckList::DeckList(const QString &nativeString)
@@ -733,4 +720,15 @@ void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, Decklis
             func(node, card);
         }
     }
+}
+
+DeckListMemento DeckList::createMemento(const QString &reason) const
+{
+    return DeckListMemento(writeToString_Native(), reason);
+}
+
+void DeckList::restoreMemento(const DeckListMemento &m)
+{
+    cleanList();
+    loadFromString_Native(m.getMemento());
 }

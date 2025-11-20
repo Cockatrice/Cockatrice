@@ -263,9 +263,10 @@ void Player::deleteCard(CardItem *card)
     }
 }
 
-void Player::setDeck(const DeckLoader &_deck)
+// TODO: Does a player need a DeckLoader?
+void Player::setDeck(DeckLoader &_deck)
 {
-    deck = new DeckLoader(_deck);
+    deck = new DeckLoader(this, _deck.getDeckList());
 
     emit deckChanged();
 }
