@@ -306,30 +306,8 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
         bannerCardComboBox->addItem(pair.first, QVariant::fromValue(pair));
     }
 
-    // Try restoring by provider ID first (strongest match)
-    int restoreIndex = -1;
-    if (!wanted.providerId.isEmpty()) {
-        for (int i = 0; i < bannerCardComboBox->count(); ++i) {
-            auto [name, providerId] = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
-            if (providerId == wanted.providerId) {
-                if (name == wanted.name) {
-                    restoreIndex = i;
-                    break;
-                }
-            }
-        }
-    }
-
-    // If provider ID not found, try matching name
-    if (restoreIndex == -1) {
-        for (int i = 0; i < bannerCardComboBox->count(); ++i) {
-            auto pair = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
-            if (pair.first == wanted.name) {
-                restoreIndex = i;
-                break;
-            }
-        }
-    }
+    // Try to find an index with a matching card
+    int restoreIndex = findRestoreIndex(wanted, bannerCardComboBox);
 
     // Handle results
     if (restoreIndex != -1) {
@@ -343,6 +321,30 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
     // Restore signal state
     bannerCardComboBox->blockSignals(wasBlocked);
+}
+
+int DeckEditorDeckDockWidget::findRestoreIndex(const CardRef &wanted, const QComboBox *combo) const
+{
+    // Try providerId + name (strongest match)
+    if (!wanted.providerId.isEmpty()) {
+        for (int i = 0; i < combo->count(); ++i) {
+            auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+            if (pair.second == wanted.providerId && pair.first == wanted.name) {
+                return i;
+            }
+        }
+    }
+
+    // Try name only
+    for (int i = 0; i < combo->count(); ++i) {
+        auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+        if (pair.first == wanted.name) {
+            return i;
+        }
+    }
+
+    // Not found
+    return -1;
 }
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
