@@ -1,7 +1,8 @@
 #include "dlg_import_precons.h"
 
-#include "../deck/deck_loader.h"
+#include "../../deck_loader/deck_loader.h"
 #include "../settings/cache_settings.h"
+#include "libcockatrice/deck_list/deck_list_card_node.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -11,7 +12,7 @@
 #include <QNetworkReply>
 #include <QPushButton>
 #include <QTemporaryDir>
-#include <decklist.h>
+#include <libcockatrice/deck_list/deck_list.h>
 
 #ifdef HAS_LZMA
 #include "../../src/utility/external/lzma/decompress.h"
@@ -309,7 +310,7 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
 
     qInfo() << "Importing '" << deckName << "' from" << shortName;
 
-    auto *precon = new DeckLoader();
+    auto *precon = new DeckLoader(this);
 
     for (const auto &cardVal : mainBoard) {
         QJsonObject cardObj = cardVal.toObject();
@@ -319,20 +320,20 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
         int count = cardObj.value("count").toInt();
         QString scryfallId = cardObj.value("identifiers").toObject().value("scryfallId").toString();
 
-        DecklistCardNode *addedCard = precon->addCard(name, "main", -1, setCode, number, scryfallId);
+        DecklistCardNode *addedCard = precon->getDeckList()->addCard(name, "main", -1, setCode, number, scryfallId);
         if (count != 1) {
             addedCard->setNumber(count);
         }
     }
 
-    precon->setName(deckName);
+    precon->getDeckList()->setName(deckName);
 
     QJsonArray commanderArray = preconData.value("commander").toArray();
     if (!commanderArray.isEmpty()) {
         QJsonObject commanderObj = commanderArray.first().toObject();
         QString commanderName = commanderObj.value("name").toString();
         QString commanderId = commanderObj.value("identifiers").toObject().value("scryfallId").toString();
-        precon->setBannerCard(QPair<QString, QString>(commanderName, commanderId));
+        precon->getDeckList()->setBannerCard({commanderName, commanderId});
     } else {
         qInfo() << "No commander data found.";
     }
@@ -340,7 +341,7 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
     QString dirPath = QDir::cleanPath(folderPath + QDir::separator() + deckType + QDir::separator() +
                                       QString::number(releaseYear) + QDir::separator() + shortName);
 
-    QString fullPath = QDir(dirPath).filePath(precon->getName());
+    QString fullPath = QDir(dirPath).filePath(precon->getDeckList()->getName());
 
     QDir dir;
     if (!dir.exists(dirPath)) {
@@ -350,7 +351,7 @@ bool LoadPreconsPage::parsePreconsFromByteArray(const QByteArray &data, QString 
         }
     }
 
-    if (precon->getCardList().length() > 1) {
+    if (precon->getDeckList()->getCardList().length() > 1) {
         precon->saveToFile(fullPath + ".cod", DeckLoader::CockatriceFormat);
     }
 

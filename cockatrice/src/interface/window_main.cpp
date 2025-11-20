@@ -39,6 +39,7 @@
 #include "../main.h"
 #include "logger.h"
 #include "version_string.h"
+#include "widgets/dialogs/dlg_import_precons.h"
 #include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>

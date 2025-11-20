@@ -32,7 +32,6 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QtGlobal>
-
 #include <zlib/zlib.h>
 
 class QIODevice;
@@ -48,36 +47,45 @@ class ZipPrivate;
 class OSDAB_ZIP_EXPORT Zip
 {
 public:
-	enum ErrorCode
-	{
-		Ok,
-		ZlibInit,
-		ZlibError,
-		FileExists,
-		OpenFailed,
-		NoOpenArchive,
-		FileNotFound,
-		ReadFailed,
-		WriteFailed,
+    enum ErrorCode
+    {
+        Ok,
+        ZlibInit,
+        ZlibError,
+        FileExists,
+        OpenFailed,
+        NoOpenArchive,
+        FileNotFound,
+        ReadFailed,
+        WriteFailed,
         SeekFailed,
         InternalError
-	};
+    };
 
-	enum CompressionLevel
-	{
-		Store,
-		Deflate1 = 1, Deflate2, Deflate3, Deflate4,
-		Deflate5, Deflate6, Deflate7, Deflate8, Deflate9,
-		AutoCPU, AutoMIME, AutoFull
-	};
+    enum CompressionLevel
+    {
+        Store,
+        Deflate1 = 1,
+        Deflate2,
+        Deflate3,
+        Deflate4,
+        Deflate5,
+        Deflate6,
+        Deflate7,
+        Deflate8,
+        Deflate9,
+        AutoCPU,
+        AutoMIME,
+        AutoFull
+    };
 
-	enum CompressionOption
-	{
+    enum CompressionOption
+    {
         /*! Does not preserve absolute paths in the zip file when adding a
             file or directory (default) */
-		RelativePaths = 0x0001,
+        RelativePaths = 0x0001,
         /*! Preserve absolute paths */
-		AbsolutePaths = 0x0002,
+        AbsolutePaths = 0x0002,
         /*! Do not store paths. All the files are put in the (evtl. user defined)
             root of the zip file */
         IgnorePaths = 0x0004,
@@ -95,60 +103,54 @@ public:
             this flag.
         */
         CheckForDuplicates = 0x0040
-	};
-	Q_DECLARE_FLAGS(CompressionOptions, CompressionOption)
+    };
+    Q_DECLARE_FLAGS(CompressionOptions, CompressionOption)
 
-	Zip();
-	virtual ~Zip();
+    Zip();
+    virtual ~Zip();
 
-	bool isOpen() const;
+    bool isOpen() const;
 
-	void setPassword(const QString& pwd);
-	void clearPassword();
-	QString password() const;
+    void setPassword(const QString &pwd);
+    void clearPassword();
+    QString password() const;
 
-	ErrorCode createArchive(const QString& file, bool overwrite = true);
-	ErrorCode createArchive(QIODevice* device);
+    ErrorCode createArchive(const QString &file, bool overwrite = true);
+    ErrorCode createArchive(QIODevice *device);
 
-	QString archiveComment() const;
-	void setArchiveComment(const QString& comment);
+    QString archiveComment() const;
+    void setArchiveComment(const QString &comment);
 
-    ErrorCode addDirectoryContents(const QString& path,
-        CompressionLevel level = AutoFull);
-    ErrorCode addDirectoryContents(const QString& path, const QString& root,
-        CompressionLevel level = AutoFull);
+    ErrorCode addDirectoryContents(const QString &path, CompressionLevel level = AutoFull);
+    ErrorCode addDirectoryContents(const QString &path, const QString &root, CompressionLevel level = AutoFull);
 
-    ErrorCode addDirectory(const QString& path,
-        CompressionLevel level = AutoFull);
-    ErrorCode addDirectory(const QString& path, const QString& root,
-        CompressionLevel level = AutoFull);
-    ErrorCode addDirectory(const QString& path, const QString& root,
-        CompressionOptions options, CompressionLevel level = AutoFull,
-        int* addedFiles = 0);
+    ErrorCode addDirectory(const QString &path, CompressionLevel level = AutoFull);
+    ErrorCode addDirectory(const QString &path, const QString &root, CompressionLevel level = AutoFull);
+    ErrorCode addDirectory(const QString &path,
+                           const QString &root,
+                           CompressionOptions options,
+                           CompressionLevel level = AutoFull,
+                           int *addedFiles = 0);
 
-    ErrorCode addFile(const QString& path,
-        CompressionLevel level = AutoFull);
-    ErrorCode addFile(const QString& path, const QString& root,
-        CompressionLevel level = AutoFull);
-    ErrorCode addFile(const QString& path, const QString& root,
-        CompressionOptions options,
-        CompressionLevel level = AutoFull);
+    ErrorCode addFile(const QString &path, CompressionLevel level = AutoFull);
+    ErrorCode addFile(const QString &path, const QString &root, CompressionLevel level = AutoFull);
+    ErrorCode
+    addFile(const QString &path, const QString &root, CompressionOptions options, CompressionLevel level = AutoFull);
 
-    ErrorCode addFiles(const QStringList& paths,
-        CompressionLevel level = AutoFull);
-    ErrorCode addFiles(const QStringList& paths, const QString& root,
-        CompressionLevel level = AutoFull);
-    ErrorCode addFiles(const QStringList& paths, const QString& root,
-        CompressionOptions options,
-        CompressionLevel level = AutoFull,
-        int* addedFiles = 0);
+    ErrorCode addFiles(const QStringList &paths, CompressionLevel level = AutoFull);
+    ErrorCode addFiles(const QStringList &paths, const QString &root, CompressionLevel level = AutoFull);
+    ErrorCode addFiles(const QStringList &paths,
+                       const QString &root,
+                       CompressionOptions options,
+                       CompressionLevel level = AutoFull,
+                       int *addedFiles = 0);
 
-	ErrorCode closeArchive();
+    ErrorCode closeArchive();
 
-	QString formatError(ErrorCode c) const;
+    QString formatError(ErrorCode c) const;
 
 private:
-	ZipPrivate* d;
+    ZipPrivate *d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Zip::CompressionOptions)

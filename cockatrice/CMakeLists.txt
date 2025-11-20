@@ -32,6 +32,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_import_precons.cpp
     src/interface/widgets/dialogs/dlg_load_deck.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp

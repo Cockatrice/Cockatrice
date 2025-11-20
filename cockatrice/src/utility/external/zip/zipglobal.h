@@ -39,23 +39,29 @@
 */
 
 #ifndef OSDAB_ZIP_LIB
-# define OSDAB_ZIP_EXPORT
+#define OSDAB_ZIP_EXPORT
 #else
-# if defined(OSDAB_ZIP_BUILD_LIB)
-#   define OSDAB_ZIP_EXPORT Q_DECL_EXPORT
-# else
-#   define OSDAB_ZIP_EXPORT Q_DECL_IMPORT
-# endif
+#if defined(OSDAB_ZIP_BUILD_LIB)
+#define OSDAB_ZIP_EXPORT Q_DECL_EXPORT
+#else
+#define OSDAB_ZIP_EXPORT Q_DECL_IMPORT
+#endif
 #endif
 
 #ifdef OSDAB_NAMESPACE
-#define OSDAB_BEGIN_NAMESPACE(ModuleName) namespace Osdab { namespace ModuleName {
+#define OSDAB_BEGIN_NAMESPACE(ModuleName)                                                                              \
+    namespace Osdab                                                                                                    \
+    {                                                                                                                  \
+    namespace ModuleName                                                                                               \
+    {
 #else
 #define OSDAB_BEGIN_NAMESPACE(ModuleName)
 #endif
 
 #ifdef OSDAB_NAMESPACE
-#define OSDAB_END_NAMESPACE } }
+#define OSDAB_END_NAMESPACE                                                                                            \
+    }                                                                                                                  \
+    }
 #else
 #define OSDAB_END_NAMESPACE
 #endif
@@ -69,8 +75,8 @@
 OSDAB_BEGIN_NAMESPACE(Zip)
 
 OSDAB_ZIP_EXPORT int OSDAB_ZIP_MANGLE(currentUtcOffset)();
-OSDAB_ZIP_EXPORT QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime& dateTime);
-OSDAB_ZIP_EXPORT bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString& fileName, const QDateTime& dateTime);
+OSDAB_ZIP_EXPORT QDateTime OSDAB_ZIP_MANGLE(fromFileTimestamp)(const QDateTime &dateTime);
+OSDAB_ZIP_EXPORT bool OSDAB_ZIP_MANGLE(setFileTimestamp)(const QString &fileName, const QDateTime &dateTime);
 
 OSDAB_END_NAMESPACE
 

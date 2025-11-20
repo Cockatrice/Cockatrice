@@ -26,6 +26,7 @@
 **********************************************************************/
 
 #include "unzip.h"
+
 #include "unzip_p.h"
 #include "zipentry_p.h"
 
@@ -64,7 +65,8 @@
  \value UnZip::CreateDirFailed Could not create a directory.
  \value UnZip::InvalidDevice A null device has been passed as parameter.
  \value UnZip::InvalidArchive This is not a valid (or supported) ZIP archive.
- \value UnZip::HeaderConsistencyError Local header record info does not match with the central directory record info. The archive may be corrupted.
+ \value UnZip::HeaderConsistencyError Local header record info does not match with the central directory record info.
+ The archive may be corrupted.
 
  \value UnZip::Skip Internal use only.
  \value UnZip::SkipAll Internal use only.
@@ -133,10 +135,9 @@
 #define UNZIP_VERSION 0x14
 
 //! CRC32 routine
-#define CRC32(c, b) crcTable[((int)c^b) & 0xff] ^ (c >> 8)
+#define CRC32(c, b) crcTable[((int)c ^ b) & 0xff] ^ (c >> 8)
 
 OSDAB_BEGIN_NAMESPACE(Zip)
-
 
 /************************************************************************
  ZipEntry
@@ -153,39 +154,28 @@ UnZip::ZipEntry::ZipEntry()
     encrypted = false;
 }
 
-
 /************************************************************************
  Private interface
 *************************************************************************/
 
 //! \internal
-UnzipPrivate::UnzipPrivate() :
-    password(),
-    skipAllEncrypted(false),
-    headers(0),
-    device(0),
-    file(0),
-    uBuffer(0),
-    crcTable(0),
-    cdOffset(0),
-    eocdOffset(0),
-    cdEntryCount(0),
-    unsupportedEntryCount(0),
-    comment()
+UnzipPrivate::UnzipPrivate()
+    : password(), skipAllEncrypted(false), headers(0), device(0), file(0), uBuffer(0), crcTable(0), cdOffset(0),
+      eocdOffset(0), cdEntryCount(0), unsupportedEntryCount(0), comment()
 {
-    uBuffer = (unsigned char*) buffer1;
-    crcTable = (quint32*) get_crc_table();
+    uBuffer = (unsigned char *)buffer1;
+    crcTable = (quint32 *)get_crc_table();
 }
 
 //! \internal
-void UnzipPrivate::deviceDestroyed(QObject*)
+void UnzipPrivate::deviceDestroyed(QObject *)
 {
     qDebug("Unexpected device destruction detected.");
     do_closeArchive();
 }
 
 //! \internal Parses a Zip archive.
-UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
+UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice *dev)
 {
     Q_ASSERT(!device);
     Q_ASSERT(dev);
@@ -197,7 +187,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 
     device = dev;
     if (device != file)
-        connect(device, SIGNAL(destroyed(QObject*)), this, SLOT(deviceDestroyed(QObject*)));
+        connect(device, SIGNAL(destroyed(QObject *)), this, SLOT(deviceDestroyed(QObject *)));
 
     UnZip::ErrorCode ec;
 
@@ -228,7 +218,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
             }
         }
 
-        if (! (buffer1[0] == 'P' && buffer1[1] == 'K' && buffer1[2] == 0x01  && buffer1[3] == 0x02) )
+        if (!(buffer1[0] == 'P' && buffer1[1] == 'K' && buffer1[2] == 0x01 && buffer1[3] == 0x02))
             break;
 
         if ((ec = parseCentralDirectoryRecord()) != UnZip::Ok)
@@ -262,7 +252,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
  file name (variable size)
  extra field (variable size)
 */
-UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, const ZipEntryP& entry)
+UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString &path, const ZipEntryP &entry)
 {
     Q_ASSERT(device);
 
@@ -302,8 +292,7 @@ UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, const
         checkFailed = entry.modDate[0] != uBuffer[UNZIP_LH_OFF_MODD];
     if (!checkFailed)
         checkFailed = entry.modDate[1] != uBuffer[UNZIP_LH_OFF_MODD + 1];
-    if (!hasDataDescriptor)
-    {
+    if (!hasDataDescriptor) {
         if (!checkFailed)
             checkFailed = entry.crc != getULong(uBuffer, UNZIP_LH_OFF_CRC32);
         if (!checkFailed)
@@ -361,11 +350,9 @@ UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, const
         }
 
         // DD: crc, compressed size, uncompressed size
-        if (
-        entry.crc != getULong((unsigned char*)buffer2, UNZIP_DD_OFF_CRC32) ||
-        entry.szComp != getULong((unsigned char*)buffer2, UNZIP_DD_OFF_CSIZE) ||
-        entry.szUncomp != getULong((unsigned char*)buffer2, UNZIP_DD_OFF_USIZE)
-        )
+        if (entry.crc != getULong((unsigned char *)buffer2, UNZIP_DD_OFF_CRC32) ||
+            entry.szComp != getULong((unsigned char *)buffer2, UNZIP_DD_OFF_CSIZE) ||
+            entry.szUncomp != getULong((unsigned char *)buffer2, UNZIP_DD_OFF_USIZE))
             return UnZip::HeaderConsistencyError;
     }
 
@@ -403,7 +390,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
     if (length < UNZIP_EOCD_SIZE)
         return UnZip::InvalidArchive;
 
-    if (!device->seek( offset ))
+    if (!device->seek(offset))
         return UnZip::SeekFailed;
 
     if (device->read(buffer1, UNZIP_EOCD_SIZE) != UNZIP_EOCD_SIZE)
@@ -416,22 +403,22 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
         eocdOffset = offset;
     } else {
         qint64 read;
-        char* p = 0;
+        char *p = 0;
 
         offset -= UNZIP_EOCD_SIZE;
 
         if (offset <= 0)
             return UnZip::InvalidArchive;
 
-        if (!device->seek( offset ))
+        if (!device->seek(offset))
             return UnZip::SeekFailed;
 
         while ((read = device->read(buffer1, UNZIP_EOCD_SIZE)) >= 0) {
-            if ( (p = strstr(buffer1, "PK\5\6")) != 0) {
+            if ((p = strstr(buffer1, "PK\5\6")) != 0) {
                 // Seek to the start of the EOCD record so we can read it fully
                 // Yes... we could simply read the missing bytes and append them to the buffer
                 // but this is far easier so heck it!
-                device->seek( offset + (p - buffer1) );
+                device->seek(offset + (p - buffer1));
                 eocdFound = true;
                 eocdOffset = offset + (p - buffer1);
 
@@ -447,7 +434,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
             if (offset <= 0)
                 return UnZip::InvalidArchive;
 
-            if (!device->seek( offset ))
+            if (!device->seek(offset))
                 return UnZip::SeekFailed;
         }
     }
@@ -456,13 +443,13 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
         return UnZip::InvalidArchive;
 
     // Parse EOCD to locate CD offset
-    offset = getULong((const unsigned char*)buffer1, UNZIP_EOCD_OFF_CDOFF + 4);
+    offset = getULong((const unsigned char *)buffer1, UNZIP_EOCD_OFF_CDOFF + 4);
 
     cdOffset = offset;
 
-    cdEntryCount = getUShort((const unsigned char*)buffer1, UNZIP_EOCD_OFF_ENTRIES + 4);
+    cdEntryCount = getUShort((const unsigned char *)buffer1, UNZIP_EOCD_OFF_ENTRIES + 4);
 
-    quint16 commentLength = getUShort((const unsigned char*)buffer1, UNZIP_EOCD_OFF_COMMLEN + 4);
+    quint16 commentLength = getUShort((const unsigned char *)buffer1, UNZIP_EOCD_OFF_COMMLEN + 4);
     if (commentLength != 0) {
         QByteArray c = device->read(commentLength);
         if (c.size() != commentLength)
@@ -472,7 +459,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
     }
 
     // Seek to the start of the CD record
-    if (!device->seek( cdOffset ))
+    if (!device->seek(cdOffset))
         return UnZip::SeekFailed;
 
     return UnZip::Ok;
@@ -561,14 +548,14 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
         if (v.length() == 2)
             v.insert(1, QLatin1Char('.'));
         v = QString::fromLatin1("Unsupported PKZip version (%1). Skipping file: %2")
-            .arg(v, filename.isEmpty() ? QString::fromLatin1("<undefined>") : filename);
+                .arg(v, filename.isEmpty() ? QString::fromLatin1("<undefined>") : filename);
         qDebug() << v.toLatin1().constData();
         skipEntry = true;
     }
 
     if (skipEntry) {
         if (ec == UnZip::Ok) {
-            if (!device->seek( device->pos() + skipLength ))
+            if (!device->seek(device->pos() + skipLength))
                 ec = UnZip::SeekFailed;
             unsupportedEntryCount++;
         }
@@ -576,7 +563,7 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
         return ec;
     }
 
-    ZipEntryP* h = new ZipEntryP;
+    ZipEntryP *h = new ZipEntryP;
     h->compMethod = compMethod;
 
     h->gpFlag[0] = buffer1[UNZIP_CD_OFF_GPFLAG];
@@ -594,7 +581,7 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
 
     // Skip extra field (if any)
     if (szExtra != 0) {
-        if (!device->seek( device->pos() + szExtra )) {
+        if (!device->seek(device->pos() + szExtra)) {
             delete h;
             return UnZip::SeekFailed;
         }
@@ -613,7 +600,7 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
     h->lhOffset = getULong(uBuffer, UNZIP_CD_OFF_LHOFFSET);
 
     if (!headers)
-        headers = new QMap<QString, ZipEntryP*>();
+        headers = new QMap<QString, ZipEntryP *>();
     headers->insert(filename, h);
 
     return UnZip::Ok;
@@ -659,8 +646,10 @@ void UnzipPrivate::do_closeArchive()
 }
 
 //! \internal
-UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP& entry,
-    const QDir& dir, UnZip::ExtractionOptions options)
+UnZip::ErrorCode UnzipPrivate::extractFile(const QString &path,
+                                           const ZipEntryP &entry,
+                                           const QDir &dir,
+                                           UnZip::ExtractionOptions options)
 {
     QString name(path);
     QString dirname;
@@ -742,9 +731,11 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP&
 }
 
 //! \internal
-UnZip::ErrorCode UnzipPrivate::extractStoredFile(
-    const quint32 szComp, quint32** keys, quint32& myCRC, QIODevice* outDev,
-    UnZip::ExtractionOptions options)
+UnZip::ErrorCode UnzipPrivate::extractStoredFile(const quint32 szComp,
+                                                 quint32 **keys,
+                                                 quint32 &myCRC,
+                                                 QIODevice *outDev,
+                                                 UnZip::ExtractionOptions options)
 {
     const bool verify = (options & UnZip::VerifyOnly);
     const bool isEncrypted = keys != 0;
@@ -757,7 +748,7 @@ UnZip::ErrorCode UnzipPrivate::extractStoredFile(
     qint64 read;
     quint64 tot = 0;
 
-    while ( (read = device->read(buffer1, cur < rep ? UNZIP_READ_BUFFER : rem)) > 0 ) {
+    while ((read = device->read(buffer1, cur < rep ? UNZIP_READ_BUFFER : rem)) > 0) {
         if (isEncrypted)
             decryptBytes(*keys, buffer1, read);
 
@@ -773,15 +764,15 @@ UnZip::ErrorCode UnzipPrivate::extractStoredFile(
             break;
     }
 
-    return (read < 0)
-        ? UnZip::ReadFailed
-        : UnZip::Ok;
+    return (read < 0) ? UnZip::ReadFailed : UnZip::Ok;
 }
 
 //! \internal
-UnZip::ErrorCode UnzipPrivate::inflateFile(
-    const quint32 szComp, quint32** keys, quint32& myCRC, QIODevice* outDev,
-    UnZip::ExtractionOptions options)
+UnZip::ErrorCode UnzipPrivate::inflateFile(const quint32 szComp,
+                                           quint32 **keys,
+                                           quint32 &myCRC,
+                                           QIODevice *outDev,
+                                           UnZip::ExtractionOptions options)
 {
     const bool verify = (options & UnZip::VerifyOnly);
     const bool isEncrypted = keys != 0;
@@ -805,7 +796,7 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
     int zret;
 
     // Use inflateInit2 with negative windowBits to get raw decompression
-    if ( (zret = inflateInit2_(&zstr, -MAX_WBITS, ZLIB_VERSION, sizeof(z_stream))) != Z_OK )
+    if ((zret = inflateInit2_(&zstr, -MAX_WBITS, ZLIB_VERSION, sizeof(z_stream))) != Z_OK)
         return UnZip::ZlibError;
 
     int szDecomp;
@@ -826,24 +817,24 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
 
         cur++;
 
-        zstr.avail_in = (uInt) read;
-        zstr.next_in = (Bytef*) buffer1;
+        zstr.avail_in = (uInt)read;
+        zstr.next_in = (Bytef *)buffer1;
 
         // Run inflate() on input until output buffer not full
         do {
             zstr.avail_out = UNZIP_READ_BUFFER;
-            zstr.next_out = (Bytef*) buffer2;;
+            zstr.next_out = (Bytef *)buffer2;
+            ;
 
             zret = inflate(&zstr, Z_NO_FLUSH);
 
             switch (zret) {
-            case Z_NEED_DICT:
-            case Z_DATA_ERROR:
-            case Z_MEM_ERROR:
-                inflateEnd(&zstr);
-                return UnZip::WriteFailed;
-            default:
-                ;
+                case Z_NEED_DICT:
+                case Z_DATA_ERROR:
+                case Z_MEM_ERROR:
+                    inflateEnd(&zstr);
+                    return UnZip::WriteFailed;
+                default:;
             }
 
             szDecomp = UNZIP_READ_BUFFER - zstr.avail_out;
@@ -854,7 +845,7 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
                 }
             }
 
-            myCRC = crc32(myCRC, (const Bytef*) buffer2, szDecomp);
+            myCRC = crc32(myCRC, (const Bytef *)buffer2, szDecomp);
 
         } while (zstr.avail_out == 0);
 
@@ -865,8 +856,10 @@ UnZip::ErrorCode UnzipPrivate::inflateFile(
 }
 
 //! \internal \p outDev is null if the VerifyOnly option is set
-UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP& entry,
-    QIODevice* outDev, UnZip::ExtractionOptions options)
+UnZip::ErrorCode UnzipPrivate::extractFile(const QString &path,
+                                           const ZipEntryP &entry,
+                                           QIODevice *outDev,
+                                           UnZip::ExtractionOptions options)
 {
     const bool verify = (options & UnZip::VerifyOnly);
 
@@ -889,11 +882,10 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP&
     quint32 szComp = entry.szComp;
     if (entry.isEncrypted()) {
         UnZip::ErrorCode e = testPassword(keys, path, entry);
-        if (e != UnZip::Ok)
-        {
+        if (e != UnZip::Ok) {
             qDebug() << QString("Unable to decrypt %1").arg(path);
             return e;
-        }//! Encryption header size
+        } //! Encryption header size
         szComp -= UNZIP_LOCAL_ENC_HEADER_SIZE; // remove encryption header size
     }
 
@@ -904,7 +896,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP&
     }
 
     quint32 myCRC = crc32(0L, Z_NULL, 0);
-    quint32* k = keys;
+    quint32 *k = keys;
 
     UnZip::ErrorCode ec = UnZip::Ok;
     if (entry.compMethod == 0) {
@@ -920,7 +912,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, const ZipEntryP&
 }
 
 //! \internal Creates a new directory and all the needed parent directories.
-bool UnzipPrivate::createDirectory(const QString& path)
+bool UnzipPrivate::createDirectory(const QString &path)
 {
     QDir d(path);
     if (!d.exists() && !d.mkpath(path)) {
@@ -934,12 +926,12 @@ bool UnzipPrivate::createDirectory(const QString& path)
 /*!
  \internal Reads an quint32 (4 bytes) from a byte array starting at given offset.
 */
-quint32 UnzipPrivate::getULong(const unsigned char* data, quint32 offset) const
+quint32 UnzipPrivate::getULong(const unsigned char *data, quint32 offset) const
 {
-    quint32 res = (quint32) data[offset];
-    res |= (((quint32)data[offset+1]) << 8);
-    res |= (((quint32)data[offset+2]) << 16);
-    res |= (((quint32)data[offset+3]) << 24);
+    quint32 res = (quint32)data[offset];
+    res |= (((quint32)data[offset + 1]) << 8);
+    res |= (((quint32)data[offset + 2]) << 16);
+    res |= (((quint32)data[offset + 3]) << 24);
 
     return res;
 }
@@ -947,16 +939,16 @@ quint32 UnzipPrivate::getULong(const unsigned char* data, quint32 offset) const
 /*!
  \internal Reads an quint64 (8 bytes) from a byte array starting at given offset.
 */
-quint64 UnzipPrivate::getULLong(const unsigned char* data, quint32 offset) const
+quint64 UnzipPrivate::getULLong(const unsigned char *data, quint32 offset) const
 {
-    quint64 res = (quint64) data[offset];
-    res |= (((quint64)data[offset+1]) << 8);
-    res |= (((quint64)data[offset+2]) << 16);
-    res |= (((quint64)data[offset+3]) << 24);
-    res |= (((quint64)data[offset+1]) << 32);
-    res |= (((quint64)data[offset+2]) << 40);
-    res |= (((quint64)data[offset+3]) << 48);
-    res |= (((quint64)data[offset+3]) << 56);
+    quint64 res = (quint64)data[offset];
+    res |= (((quint64)data[offset + 1]) << 8);
+    res |= (((quint64)data[offset + 2]) << 16);
+    res |= (((quint64)data[offset + 3]) << 24);
+    res |= (((quint64)data[offset + 1]) << 32);
+    res |= (((quint64)data[offset + 2]) << 40);
+    res |= (((quint64)data[offset + 3]) << 48);
+    res |= (((quint64)data[offset + 3]) << 56);
 
     return res;
 }
@@ -964,9 +956,9 @@ quint64 UnzipPrivate::getULLong(const unsigned char* data, quint32 offset) const
 /*!
  \internal Reads an quint16 (2 bytes) from a byte array starting at given offset.
 */
-quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset) const
+quint16 UnzipPrivate::getUShort(const unsigned char *data, quint32 offset) const
 {
-    return (quint16) data[offset] | (((quint16)data[offset+1]) << 8);
+    return (quint16)data[offset] | (((quint16)data[offset + 1]) << 8);
 }
 
 /*!
@@ -981,7 +973,7 @@ int UnzipPrivate::decryptByte(quint32 key2) const
 /*!
  \internal Update the encryption keys with the next byte of plain text
  */
-void UnzipPrivate::updateKeys(quint32* keys, int c) const
+void UnzipPrivate::updateKeys(quint32 *keys, int c) const
 {
     keys[0] = CRC32(keys[0], c);
     keys[1] += keys[0] & 0xff;
@@ -993,7 +985,7 @@ void UnzipPrivate::updateKeys(quint32* keys, int c) const
  \internal Initialize the encryption keys and the random header according to
  the given password.
  */
-void UnzipPrivate::initKeys(const QString& pwd, quint32* keys) const
+void UnzipPrivate::initKeys(const QString &pwd, quint32 *keys) const
 {
     keys[0] = 305419896L;
     keys[1] = 591751049L;
@@ -1001,7 +993,7 @@ void UnzipPrivate::initKeys(const QString& pwd, quint32* keys) const
 
     QByteArray pwdBytes = pwd.toLatin1();
     int sz = pwdBytes.size();
-    const char* ascii = pwdBytes.data();
+    const char *ascii = pwdBytes.data();
 
     for (int i = 0; i < sz; ++i)
         updateKeys(keys, (int)ascii[i]);
@@ -1012,7 +1004,7 @@ void UnzipPrivate::initKeys(const QString& pwd, quint32* keys) const
  The \p file parameter can be used in the user interface or for debugging purposes
  as it is the name of the encrypted file for wich the password is being tested.
 */
-UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString&_file, const ZipEntryP& header)
+UnZip::ErrorCode UnzipPrivate::testPassword(quint32 *keys, const QString &_file, const ZipEntryP &header)
 {
     Q_UNUSED(_file);
     Q_ASSERT(device);
@@ -1032,7 +1024,7 @@ UnZip::ErrorCode UnzipPrivate::testPassword(quint32* keys, const QString&_file, 
 /*!
  \internal Tests a set of keys on the encryption header.
 */
-bool UnzipPrivate::testKeys(const ZipEntryP& header, quint32* keys)
+bool UnzipPrivate::testKeys(const ZipEntryP &header, quint32 *keys)
 {
     char lastByte;
 
@@ -1051,7 +1043,7 @@ bool UnzipPrivate::testKeys(const ZipEntryP& header, quint32* keys)
 /*!
  \internal Decrypts an array of bytes long \p read.
 */
-void UnzipPrivate::decryptBytes(quint32* keys, char* buffer, qint64 read)
+void UnzipPrivate::decryptBytes(quint32 *keys, char *buffer, qint64 read)
 {
     for (int i = 0; i < (int)read; ++i)
         updateKeys(keys, buffer[i] ^= decryptByte(keys[2]));
@@ -1080,7 +1072,6 @@ QDateTime UnzipPrivate::convertDateTime(const unsigned char date[2], const unsig
     dt.setTime(QTime(hour, minutes, seconds));
     return dt;
 }
-
 
 /************************************************************************
  Public interface
@@ -1113,7 +1104,7 @@ bool UnZip::isOpen() const
 /*!
  Opens a zip archive and reads the files list. Closes any previously opened archive.
 */
-UnZip::ErrorCode UnZip::openArchive(const QString& filename)
+UnZip::ErrorCode UnZip::openArchive(const QString &filename)
 {
     closeArchive();
 
@@ -1140,7 +1131,7 @@ UnZip::ErrorCode UnZip::openArchive(const QString& filename)
  Closes any previously opened archive.
  \warning The class takes DOES NOT take ownership of the device.
 */
-UnZip::ErrorCode UnZip::openArchive(QIODevice* device)
+UnZip::ErrorCode UnZip::openArchive(QIODevice *device)
 {
     closeArchive();
 
@@ -1170,25 +1161,56 @@ QString UnZip::archiveComment() const
 */
 QString UnZip::formatError(UnZip::ErrorCode c) const
 {
-    switch (c)
-    {
-    case Ok: return QCoreApplication::translate("UnZip", "ZIP operation completed successfully."); break;
-    case ZlibInit: return QCoreApplication::translate("UnZip", "Failed to initialize or load zlib library."); break;
-    case ZlibError: return QCoreApplication::translate("UnZip", "zlib library error."); break;
-    case OpenFailed: return QCoreApplication::translate("UnZip", "Unable to create or open file."); break;
-    case PartiallyCorrupted: return QCoreApplication::translate("UnZip", "Partially corrupted archive. Some files might be extracted."); break;
-    case Corrupted: return QCoreApplication::translate("UnZip", "Corrupted archive."); break;
-    case WrongPassword: return QCoreApplication::translate("UnZip", "Wrong password."); break;
-    case NoOpenArchive: return QCoreApplication::translate("UnZip", "No archive has been created yet."); break;
-    case FileNotFound: return QCoreApplication::translate("UnZip", "File or directory does not exist."); break;
-    case ReadFailed: return QCoreApplication::translate("UnZip", "File read error."); break;
-    case WriteFailed: return QCoreApplication::translate("UnZip", "File write error."); break;
-    case SeekFailed: return QCoreApplication::translate("UnZip", "File seek error."); break;
-    case CreateDirFailed: return QCoreApplication::translate("UnZip", "Unable to create a directory."); break;
-    case InvalidDevice: return QCoreApplication::translate("UnZip", "Invalid device."); break;
-    case InvalidArchive: return QCoreApplication::translate("UnZip", "Invalid or incompatible zip archive."); break;
-    case HeaderConsistencyError: return QCoreApplication::translate("UnZip", "Inconsistent headers. Archive might be corrupted."); break;
-    default: ;
+    switch (c) {
+        case Ok:
+            return QCoreApplication::translate("UnZip", "ZIP operation completed successfully.");
+            break;
+        case ZlibInit:
+            return QCoreApplication::translate("UnZip", "Failed to initialize or load zlib library.");
+            break;
+        case ZlibError:
+            return QCoreApplication::translate("UnZip", "zlib library error.");
+            break;
+        case OpenFailed:
+            return QCoreApplication::translate("UnZip", "Unable to create or open file.");
+            break;
+        case PartiallyCorrupted:
+            return QCoreApplication::translate("UnZip", "Partially corrupted archive. Some files might be extracted.");
+            break;
+        case Corrupted:
+            return QCoreApplication::translate("UnZip", "Corrupted archive.");
+            break;
+        case WrongPassword:
+            return QCoreApplication::translate("UnZip", "Wrong password.");
+            break;
+        case NoOpenArchive:
+            return QCoreApplication::translate("UnZip", "No archive has been created yet.");
+            break;
+        case FileNotFound:
+            return QCoreApplication::translate("UnZip", "File or directory does not exist.");
+            break;
+        case ReadFailed:
+            return QCoreApplication::translate("UnZip", "File read error.");
+            break;
+        case WriteFailed:
+            return QCoreApplication::translate("UnZip", "File write error.");
+            break;
+        case SeekFailed:
+            return QCoreApplication::translate("UnZip", "File seek error.");
+            break;
+        case CreateDirFailed:
+            return QCoreApplication::translate("UnZip", "Unable to create a directory.");
+            break;
+        case InvalidDevice:
+            return QCoreApplication::translate("UnZip", "Invalid device.");
+            break;
+        case InvalidArchive:
+            return QCoreApplication::translate("UnZip", "Invalid or incompatible zip archive.");
+            break;
+        case HeaderConsistencyError:
+            return QCoreApplication::translate("UnZip", "Inconsistent headers. Archive might be corrupted.");
+            break;
+        default:;
     }
 
     return QCoreApplication::translate("UnZip", "Unknown error.");
@@ -1197,7 +1219,7 @@ QString UnZip::formatError(UnZip::ErrorCode c) const
 /*!
  Returns true if the archive contains a file with the given path and name.
 */
-bool UnZip::contains(const QString& file) const
+bool UnZip::contains(const QString &file) const
 {
     return d->headers ? d->headers->contains(file) : false;
 }
@@ -1219,9 +1241,8 @@ QList<UnZip::ZipEntry> UnZip::entryList() const
     if (!d->headers)
         return list;
 
-    for (QMap<QString,ZipEntryP*>::ConstIterator it = d->headers->constBegin();
-    it != d->headers->constEnd(); ++it) {
-        const ZipEntryP* entry = it.value();
+    for (QMap<QString, ZipEntryP *>::ConstIterator it = d->headers->constBegin(); it != d->headers->constEnd(); ++it) {
+        const ZipEntryP *entry = it.value();
         Q_ASSERT(entry != 0);
 
         ZipEntry z;
@@ -1256,7 +1277,7 @@ UnZip::ErrorCode UnZip::verifyArchive()
 /*!
  Extracts the whole archive to a directory.
 */
-UnZip::ErrorCode UnZip::extractAll(const QString& dirname, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractAll(const QString &dirname, ExtractionOptions options)
 {
     return extractAll(QDir(dirname), options);
 }
@@ -1265,7 +1286,7 @@ UnZip::ErrorCode UnZip::extractAll(const QString& dirname, ExtractionOptions opt
  Extracts the whole archive to a directory.
  Stops extraction at the first error.
 */
-UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractAll(const QDir &dir, ExtractionOptions options)
 {
     // this should only happen if we didn't call openArchive() yet
     if (!d->device)
@@ -1276,10 +1297,10 @@ UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
 
     ErrorCode ec = Ok;
 
-    QMap<QString,ZipEntryP*>::ConstIterator it = d->headers->constBegin();
-    const QMap<QString,ZipEntryP*>::ConstIterator end = d->headers->constEnd();
+    QMap<QString, ZipEntryP *>::ConstIterator it = d->headers->constBegin();
+    const QMap<QString, ZipEntryP *>::ConstIterator end = d->headers->constEnd();
     while (it != end) {
-        ZipEntryP* entry = it.value();
+        ZipEntryP *entry = it.value();
         Q_ASSERT(entry != 0);
         if ((entry->isEncrypted()) && d->skipAllEncrypted) {
             ++it;
@@ -1289,20 +1310,19 @@ UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
         bool skip = false;
         ec = d->extractFile(it.key(), *entry, dir, options);
         switch (ec) {
-        case Corrupted:
-            qDebug() << "Corrupted entry" << it.key();
-            break;
-        case CreateDirFailed:
-            break;
-        case Skip:
-            skip = true;
-            break;
-        case SkipAll:
-            skip = true;
-            d->skipAllEncrypted = true;
-            break;
-        default:
-            ;
+            case Corrupted:
+                qDebug() << "Corrupted entry" << it.key();
+                break;
+            case CreateDirFailed:
+                break;
+            case Skip:
+                skip = true;
+                break;
+            case SkipAll:
+                skip = true;
+                d->skipAllEncrypted = true;
+                break;
+            default:;
         }
 
         if (ec != Ok && !skip) {
@@ -1318,7 +1338,7 @@ UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
 /*!
  Extracts a single file to a directory.
 */
-UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QString& dirname, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractFile(const QString &filename, const QString &dirname, ExtractionOptions options)
 {
     return extractFile(filename, QDir(dirname), options);
 }
@@ -1326,16 +1346,16 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QString& dirn
 /*!
  Extracts a single file to a directory.
 */
-UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QDir& dir, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractFile(const QString &filename, const QDir &dir, ExtractionOptions options)
 {
     if (!d->device)
         return NoOpenArchive;
     if (!d->headers)
         return FileNotFound;
 
-    QMap<QString,ZipEntryP*>::Iterator itr = d->headers->find(filename);
+    QMap<QString, ZipEntryP *>::Iterator itr = d->headers->find(filename);
     if (itr != d->headers->end()) {
-        ZipEntryP* entry = itr.value();
+        ZipEntryP *entry = itr.value();
         Q_ASSERT(entry != 0);
         return d->extractFile(itr.key(), *entry, dir, options);
     }
@@ -1346,7 +1366,7 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QDir& dir, Ex
 /*!
  Extracts a single file to a directory.
 */
-UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* outDev, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractFile(const QString &filename, QIODevice *outDev, ExtractionOptions options)
 {
     if (!d->device)
         return NoOpenArchive;
@@ -1355,9 +1375,9 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* outDev, 
     if (!outDev)
         return InvalidDevice;
 
-    QMap<QString,ZipEntryP*>::Iterator itr = d->headers->find(filename);
+    QMap<QString, ZipEntryP *>::Iterator itr = d->headers->find(filename);
     if (itr != d->headers->end()) {
-        ZipEntryP* entry = itr.value();
+        ZipEntryP *entry = itr.value();
         Q_ASSERT(entry != 0);
         return d->extractFile(itr.key(), *entry, outDev, options);
     }
@@ -1369,7 +1389,7 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* outDev, 
  Extracts a list of files.
  Stops extraction at the first error (but continues if a file does not exist in the archive).
  */
-UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString& dirname, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractFiles(const QStringList &filenames, const QString &dirname, ExtractionOptions options)
 {
     if (!d->device)
         return NoOpenArchive;
@@ -1394,7 +1414,7 @@ UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QString
  Extracts a list of files.
  Stops extraction at the first error (but continues if a file does not exist in the archive).
  */
-UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QDir& dir, ExtractionOptions options)
+UnZip::ErrorCode UnZip::extractFiles(const QStringList &filenames, const QDir &dir, ExtractionOptions options)
 {
     if (!d->device)
         return NoOpenArchive;
@@ -1417,7 +1437,7 @@ UnZip::ErrorCode UnZip::extractFiles(const QStringList& filenames, const QDir& d
 /*!
  Remove/replace this method to add your own password retrieval routine.
 */
-void UnZip::setPassword(const QString& pwd)
+void UnZip::setPassword(const QString &pwd)
 {
     d->password = pwd;
 }

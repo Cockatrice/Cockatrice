@@ -113,7 +113,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
     else if ((data.typeId() == QMetaType::Type::QVariantList) ||
              (data.typeId() == QMetaType::Type::QStringList)) // variant is a list?
 #else
-    else if ((data.type() == QVariant::List) || (data.type() == QVariant::StringList))  // variant is a list?
+    else if ((data.type() == QVariant::List) || (data.type() == QVariant::StringList)) // variant is a list?
 #endif
     {
         QList<QByteArray> values;
@@ -132,7 +132,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QVariantHash)) // variant is a list?
 #else
-    else if (data.type() == QVariant::Hash)                                             // variant is a hash?
+    else if (data.type() == QVariant::Hash) // variant is a hash?
 #endif
     {
         const QVariantHash vhash = data.toHash();
@@ -158,7 +158,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QVariantMap)) // variant is a list?
 #else
-    else if (data.type() == QVariant::Map)                                              // variant is a map?
+    else if (data.type() == QVariant::Map) // variant is a map?
 #endif
     {
         const QVariantMap vmap = data.toMap();
@@ -189,7 +189,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::Double)
 #else
-    else if (data.type() == QVariant::Double)                                           // double?
+    else if (data.type() == QVariant::Double) // double?
 #endif
     {
         str = QByteArray::number(data.toDouble(), 'g', 20);
@@ -200,7 +200,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::Bool)
 #else
-    else if (data.type() == QVariant::Bool)                                             // boolean value?
+    else if (data.type() == QVariant::Bool) // boolean value?
 #endif
     {
         str = data.toBool() ? "true" : "false";
@@ -208,7 +208,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::ULongLong)
 #else
-    else if (data.type() == QVariant::ULongLong)                                        // large unsigned number?
+    else if (data.type() == QVariant::ULongLong) // large unsigned number?
 #endif
     {
         str = QByteArray::number(data.value<qulonglong>());
