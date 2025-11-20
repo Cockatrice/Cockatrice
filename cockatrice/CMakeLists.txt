@@ -53,7 +53,6 @@ set(cockatrice_SOURCES
     src/game/board/abstract_card_drag_item.cpp
     src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
-    src/game/board/abstract_graphics_item.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
     src/game/board/card_drag_item.cpp
@@ -113,6 +112,7 @@ set(cockatrice_SOURCES
     src/game/zones/table_zone.cpp
     src/game/zones/view_zone.cpp
     src/game/zones/view_zone_widget.cpp
+    src/game_graphics/board/abstract_graphics_item.cpp
     src/interface/card_picture_loader/card_picture_loader.cpp
     src/interface/card_picture_loader/card_picture_loader_local.cpp
     src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
