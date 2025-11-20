@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_PLAYER_AREA_H
 #define COCKATRICE_PLAYER_AREA_H
 
-#include "../board/graphics_item_type.h"
+#include "../../game_graphics/board/graphics_item_type.h"
 #include "QGraphicsItem"
 
 /**

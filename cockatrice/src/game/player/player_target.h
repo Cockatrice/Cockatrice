@@ -7,9 +7,9 @@
 #ifndef PLAYERTARGET_H
 #define PLAYERTARGET_H
 
+#include "../../game_graphics/board/graphics_item_type.h"
 #include "../board/abstract_counter.h"
 #include "../board/arrow_target.h"
-#include "../board/graphics_item_type.h"
 
 #include <QFont>
 #include <QPixmap>
