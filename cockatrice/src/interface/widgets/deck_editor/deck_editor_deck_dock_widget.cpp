@@ -311,7 +311,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     int restoreIndex = -1;
     if (!wantedProvider.isEmpty()) {
         for (int i = 0; i < bannerCardComboBox->count(); ++i) {
-            auto pair = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
+            auto [name, providerId] = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
             if (pair.second == wantedProvider) {
                 if (pair.first == wantedName) {
                     restoreIndex = i;
