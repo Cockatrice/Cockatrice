@@ -722,13 +722,13 @@ void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, Decklis
     }
 }
 
-DeckListMemento *DeckList::createMemento(QString reason) const
+DeckListMemento DeckList::createMemento(const QString &reason) const
 {
-    return new DeckListMemento(writeToString_Native(), reason);
+    return DeckListMemento(writeToString_Native(), reason);
 }
 
-void DeckList::restoreMemento(const DeckListMemento *m)
+void DeckList::restoreMemento(const DeckListMemento &m)
 {
     cleanList();
-    loadFromString_Native(m->getMemento());
+    loadFromString_Native(m.getMemento());
 }

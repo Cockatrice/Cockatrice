@@ -73,7 +73,7 @@ void DeckListHistoryManagerWidget::refreshList()
     // Fill redo section first (oldest redo at top, newest redo closest to divider)
     const auto redoStack = historyManager->getRedoStack();
     for (int i = 0; i < redoStack.size(); ++i) { // iterate forward
-        auto item = new QListWidgetItem(tr("[redo] ") + redoStack[i]->getReason(), historyList);
+        auto item = new QListWidgetItem(tr("[redo] ") + redoStack[i].getReason(), historyList);
         item->setData(Qt::UserRole, QVariant("redo"));
         item->setData(Qt::UserRole + 1, i); // index in redo stack
         item->setForeground(Qt::gray);
@@ -90,7 +90,7 @@ void DeckListHistoryManagerWidget::refreshList()
     // Fill undo section
     const auto undoStack = historyManager->getUndoStack();
     for (int i = undoStack.size() - 1; i >= 0; --i) {
-        auto item = new QListWidgetItem(tr("[undo] ") + undoStack[i]->getReason(), historyList);
+        auto item = new QListWidgetItem(tr("[undo] ") + undoStack[i].getReason(), historyList);
         item->setData(Qt::UserRole, QVariant("undo"));
         item->setData(Qt::UserRole + 1, i); // index in undo stack
         historyList->addItem(item);

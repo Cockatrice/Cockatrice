@@ -5,7 +5,8 @@
 class DeckListMemento
 {
 public:
-    explicit DeckListMemento(QString memento, QString reason = QString()) : memento(memento), reason(reason)
+    explicit DeckListMemento(const QString &memento, const QString &reason = QString())
+        : memento(memento), reason(reason)
     {
     }
 

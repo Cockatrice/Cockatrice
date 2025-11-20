@@ -5,7 +5,6 @@
 #include "deck_list_memento.h"
 
 #include <QObject>
-#include <QSharedPointer>
 #include <QStack>
 
 class DeckListHistoryManager : public QObject
@@ -20,7 +19,7 @@ public:
     {
     }
 
-    void save(DeckListMemento *memento);
+    void save(const DeckListMemento &memento);
 
     void clear();
 
@@ -28,6 +27,7 @@ public:
     {
         return !undoStack.isEmpty();
     }
+
     bool canRedo() const
     {
         return !redoStack.isEmpty();
@@ -37,19 +37,18 @@ public:
 
     void redo(DeckList *deck);
 
-    QStack<DeckListMemento *> getRedoStack() const
+    QStack<DeckListMemento> getRedoStack() const
     {
         return redoStack;
     }
-
-    QStack<DeckListMemento *> getUndoStack() const
+    QStack<DeckListMemento> getUndoStack() const
     {
         return undoStack;
     }
 
 private:
-    QStack<DeckListMemento *> undoStack;
-    QStack<DeckListMemento *> redoStack;
+    QStack<DeckListMemento> undoStack;
+    QStack<DeckListMemento> redoStack;
 };
 
 #endif // COCKATRICE_DECK_LIST_HISTORY_MANAGER_H
