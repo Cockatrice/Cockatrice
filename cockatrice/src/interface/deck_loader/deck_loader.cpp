@@ -25,13 +25,12 @@ const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.d
 const QStringList DeckLoader::FILE_NAME_FILTERS = {
     tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
-DeckLoader::DeckLoader(QObject *parent)
-    : QObject(parent), deckList(new DeckList()), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
+DeckLoader::DeckLoader(QObject *parent) : QObject(parent), deckList(new DeckList())
 {
 }
 
-DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList)
-    : QObject(parent), deckList(_deckList), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
+DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList, const LoadInfo &_lastLoadInfo)
+    : QObject(parent), deckList(_deckList), lastLoadInfo(_lastLoadInfo)
 {
     deckList->setParent(this);
 }
@@ -71,8 +70,8 @@ bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool user
     }
 
     if (result) {
-        lastFileName = fileName;
-        lastFileFormat = fmt;
+        lastLoadInfo.fileName = fileName;
+        lastLoadInfo.fileFormat = fmt;
         if (userRequest) {
             updateLastLoadedTimestamp(fileName, fmt);
         }
@@ -93,8 +92,8 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
         watcher->deleteLater();
 
         if (result) {
-            lastFileName = fileName;
-            lastFileFormat = fmt;
+            lastLoadInfo.fileName = fileName;
+            lastLoadInfo.fileFormat = fmt;
             if (userRequest) {
                 updateLastLoadedTimestamp(fileName, fmt);
             }
@@ -136,9 +135,9 @@ bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
     bool result = deckList->loadFromString_Native(nativeString);
     if (result) {
-        lastFileName = QString();
-        lastFileFormat = CockatriceFormat;
-        lastRemoteDeckId = remoteDeckId;
+        lastLoadInfo.fileName = QString();
+        lastLoadInfo.fileFormat = CockatriceFormat;
+        lastLoadInfo.remoteDeckId = remoteDeckId;
 
         emit deckLoaded();
     }
@@ -163,8 +162,8 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     }
 
     if (result) {
-        lastFileName = fileName;
-        lastFileFormat = fmt;
+        lastLoadInfo.fileName = fileName;
+        lastLoadInfo.fileFormat = fmt;
     }
 
     file.flush();
@@ -206,8 +205,8 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat f
     file.close(); // Close the file to ensure changes are flushed
 
     if (result) {
-        lastFileName = fileName;
-        lastFileFormat = fmt;
+        lastLoadInfo.fileName = fileName;
+        lastLoadInfo.fileFormat = fmt;
 
         // Re-open the file and set the original timestamp
         if (!file.open(QIODevice::ReadWrite)) {
@@ -587,8 +586,8 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
         } else {
             qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
         }
-        lastFileName = newFileName;
-        lastFileFormat = CockatriceFormat;
+        lastLoadInfo.fileName = newFileName;
+        lastLoadInfo.fileFormat = CockatriceFormat;
     }
 
     return result;

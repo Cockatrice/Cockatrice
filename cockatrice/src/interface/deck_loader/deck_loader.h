@@ -44,40 +44,53 @@ public:
         DecklistXyz
     };
 
+    /**
+     * @brief Information about the file or source that the deck was loaded from
+     */
+    struct LoadInfo
+    {
+        QString fileName;
+        FileFormat fileFormat = CockatriceFormat;
+        int remoteDeckId = -1;
+    };
+
 private:
     DeckList *deckList;
-    QString lastFileName;
-    FileFormat lastFileFormat;
-    int lastRemoteDeckId;
+    LoadInfo lastLoadInfo;
 
 public:
     DeckLoader(QObject *parent);
-    DeckLoader(QObject *parent, DeckList *_deckList);
+    DeckLoader(QObject *parent, DeckList *_deckList, const LoadInfo &_lastLoadInfo);
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
     void setDeckList(DeckList *_deckList);
 
+    const LoadInfo &getLastLoadInfo() const
+    {
+        return lastLoadInfo;
+    }
+
     const QString &getLastFileName() const
     {
-        return lastFileName;
+        return lastLoadInfo.fileName;
     }
     void setLastFileName(const QString &_lastFileName)
     {
-        lastFileName = _lastFileName;
+        lastLoadInfo.fileName = _lastFileName;
     }
     FileFormat getLastFileFormat() const
     {
-        return lastFileFormat;
+        return lastLoadInfo.fileFormat;
     }
     int getLastRemoteDeckId() const
     {
-        return lastRemoteDeckId;
+        return lastLoadInfo.remoteDeckId;
     }
 
     bool hasNotBeenLoaded() const
     {
-        return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
+        return lastLoadInfo.fileName.isEmpty() && lastLoadInfo.remoteDeckId == -1;
     }
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);

@@ -32,7 +32,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
 
-    deckLoader = new DeckLoader(this, deckModel->getDeckList());
+    deckLoader = new DeckLoader(this, deckModel->getDeckList(), {});
 
     proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);

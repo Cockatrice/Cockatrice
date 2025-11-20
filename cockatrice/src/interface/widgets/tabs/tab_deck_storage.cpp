@@ -493,7 +493,7 @@ void TabDeckStorage::downloadFinished(const Response &r,
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     QString filePath = extraData.toString();
 
-    DeckLoader deck(this, new DeckList(QString::fromStdString(resp.deck())));
+    DeckLoader deck(this, new DeckList(QString::fromStdString(resp.deck())), {});
     deck.saveToFile(filePath, DeckLoader::CockatriceFormat);
 }
 
