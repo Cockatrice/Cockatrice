@@ -14,8 +14,8 @@
 #include <QLabel>
 #include <QMessageBox>
 
-DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckLoader *_deckLoader)
-    : QWidget(_parent), deckLoader(_deckLoader)
+DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
+    : QWidget(_parent), deckList(nullptr)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -28,20 +28,21 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
-    connectDeckList();
+    if (_deckList) {
+        connectDeckList(_deckList);
+    }
 
     layout->addWidget(flowWidget);
 }
 
-void DeckPreviewDeckTagsDisplayWidget::connectDeckList()
+void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
 {
-    if (deckLoader) {
-        disconnect(deckLoader->getDeckList(), &DeckList::deckTagsChanged, this,
-                   &DeckPreviewDeckTagsDisplayWidget::refreshTags);
+    if (deckList) {
+        disconnect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
     }
 
-    connect(deckLoader->getDeckList(), &DeckList::deckTagsChanged, this,
-            &DeckPreviewDeckTagsDisplayWidget::refreshTags);
+    deckList = _deckList;
+    connect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
 
     refreshTags();
 }
@@ -50,7 +51,7 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
 {
     flowWidget->clearLayout();
 
-    for (const QString &tag : deckLoader->getDeckList()->getTags()) {
+    for (const QString &tag : deckList->getTags()) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
 
@@ -97,7 +98,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
     if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
         auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(parentWidget());
         QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
-        QStringList activeTags = deckLoader->getDeckList()->getTags();
+        QStringList activeTags = deckList->getTags();
 
         bool canAddTags = true;
 
@@ -148,7 +149,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             DeckPreviewTagDialog dialog(knownTags, activeTags);
             if (dialog.exec() == QDialog::Accepted) {
                 QStringList updatedTags = dialog.getActiveTags();
-                deckLoader->getDeckList()->setTags(updatedTags);
+                deckList->setTags(updatedTags);
                 deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
             }
         }
@@ -174,12 +175,12 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                 knownTags.removeDuplicates();
             }
 
-            QStringList activeTags = deckLoader->getDeckList()->getTags();
+            QStringList activeTags = deckList->getTags();
 
             DeckPreviewTagDialog dialog(knownTags, activeTags);
             if (dialog.exec() == QDialog::Accepted) {
                 QStringList updatedTags = dialog.getActiveTags();
-                deckLoader->getDeckList()->setTags(updatedTags);
+                deckList->setTags(updatedTags);
                 deckEditor->setModified(true);
             }
         }

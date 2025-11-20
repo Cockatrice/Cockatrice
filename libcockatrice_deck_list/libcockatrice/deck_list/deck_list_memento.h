@@ -5,6 +5,7 @@
 class DeckListMemento
 {
 public:
+    DeckListMemento() = default;
     explicit DeckListMemento(const QString &memento, const QString &reason = QString())
         : memento(memento), reason(reason)
     {
@@ -13,8 +14,7 @@ public:
     QString getMemento() const
     {
         return memento;
-    };
-
+    }
     QString getReason() const
     {
         return reason;
