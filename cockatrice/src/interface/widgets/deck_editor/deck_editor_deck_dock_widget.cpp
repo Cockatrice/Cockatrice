@@ -308,11 +308,11 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
     // Try restoring by provider ID first (strongest match)
     int restoreIndex = -1;
-    if (!wantedProvider.isEmpty()) {
+    if (!wanted.providerId.isEmpty()) {
         for (int i = 0; i < bannerCardComboBox->count(); ++i) {
             auto [name, providerId] = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
-            if (pair.second == wantedProvider) {
-                if (pair.first == wantedName) {
+            if (providerId == wanted.providerId) {
+                if (name == wanted.name) {
                     restoreIndex = i;
                     break;
                 }
@@ -324,7 +324,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     if (restoreIndex == -1) {
         for (int i = 0; i < bannerCardComboBox->count(); ++i) {
             auto pair = bannerCardComboBox->itemData(i).value<QPair<QString, QString>>();
-            if (pair.first == wantedName) {
+            if (pair.first == wanted.name) {
                 restoreIndex = i;
                 break;
             }
