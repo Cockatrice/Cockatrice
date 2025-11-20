@@ -159,7 +159,7 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
     if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
-        qInfo() << "Deck was saved -" << result;
+        qCInfo(DeckLoaderLog) << "Deck was saved -" << result;
     }
 
     file.flush();
