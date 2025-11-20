@@ -8,6 +8,11 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "../utility/card_completer_utils.h"
+#include "card/card_completer_proxy_model.h"
+#include "card/card_search_model.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"
 
@@ -17,11 +22,14 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSplitter>
+#include <QStringListModel>
 #include <QSystemTrayIcon>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QtCore/qdatetime.h>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/event_join_room.pb.h>
@@ -137,13 +145,27 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
         gameSelector->processGameInfo(info.game_list(i));
     }
 
-    completer = new QCompleter(autocompleteUserList, sayEdit);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setMaxVisibleItems(5);
-    completer->setFilterMode(Qt::MatchStartsWith);
+    mentionModel = new QStringListModel(autocompleteUserList, sayEdit);
+    mentionCompleter = createMentionCompleter(mentionModel, sayEdit);
+    sayEdit->addCompleter(mentionCompleter, "@");
 
-    sayEdit->setCompleter(completer);
+    auto *cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, sayEdit);
+    auto *displayModel = new CardDatabaseDisplayModel(sayEdit);
+    displayModel->setSourceModel(cardDatabaseModel);
+    const CardCompleterSetup cardSetup = createCardCompleter(displayModel, sayEdit);
+    sayEdit->addCompleter(cardSetup.completer, "[[");
+
+    connect(sayEdit, &LineEditCompleter::cardPartialChanged, this, [this, cardSetup](const QString &text) {
+        cardSetup.searchModel->updateSearchResults(text);
+        cardSetup.proxyModel->setFilterRegularExpression(
+            QRegularExpression(QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
+        if (sayEdit->hasFocus()) {
+            cardSetup.completer->complete();
+        }
+    });
+
     actCompleterChanged();
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabRoom::refreshShortcuts);
     refreshShortcuts();
@@ -213,8 +235,8 @@ void TabRoom::sendMessage()
 {
     if (sayEdit->text().isEmpty()) {
         return;
-    } else if (completer->popup()->isVisible()) {
-        completer->popup()->hide();
+    } else if (sayEdit->hasVisibleCompleterPopup()) {
+        sayEdit->hideCompleterPopups();
         return;
     } else {
         Command_RoomSay cmd;
@@ -248,8 +270,8 @@ void TabRoom::actOpenChatSettings()
 
 void TabRoom::actCompleterChanged()
 {
-    SettingsCache::instance().chat().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                               : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? mentionCompleter->setCompletionRole(2)
+                                                               : mentionCompleter->setCompletionRole(1);
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
@@ -285,16 +307,18 @@ void TabRoom::processListGamesEvent(const Event_ListGames &event)
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
-    if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))) {
-        autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
-        sayEdit->setCompletionList(autocompleteUserList);
+    QString mention = "@" + QString::fromStdString(event.user_info().name());
+    if (!autocompleteUserList.contains(mention)) {
+        autocompleteUserList << mention;
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
 void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
-    autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
-    sayEdit->setCompletionList(autocompleteUserList);
+    QString mention = "@" + QString::fromStdString(event.name());
+    autocompleteUserList.removeOne(mention);
+    mentionModel->setStringList(autocompleteUserList);
 }
 
 void TabRoom::processRoomSayEvent(const Event_RoomSay &event)

@@ -1,135 +1,125 @@
 #include "line_edit_completer.h"
 
 #include <QAbstractItemView>
-#include <QCompleter>
 #include <QFocusEvent>
-#include <QScrollBar>
-#include <QStringListModel>
-#include <QTextCursor>
-#include <QWidget>
+#include <QKeyEvent>
 
-LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(parent), c(nullptr)
+LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(parent)
 {
+}
+
+void LineEditCompleter::addCompleter(QCompleter *c, const QString &trigger)
+{
+    c->setWidget(this);
+    c->setCompletionMode(QCompleter::PopupCompletion);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    connect(c, qOverload<const QString &>(&QCompleter::activated), this, &LineEditCompleter::insertCompletion);
+
+    completers.append({c, trigger});
+}
+
+bool LineEditCompleter::hasVisibleCompleterPopup() const
+{
+    for (const auto &info : completers) {
+        if (info.completer->popup()->isVisible()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void LineEditCompleter::hideCompleterPopups()
+{
+    for (const auto &info : completers) {
+        info.completer->popup()->hide();
+    }
 }
 
 void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     LineEditUnfocusable::focusOutEvent(e);
-    if (c->popup()->isVisible()) {
-        // Remove Popup
-        c->popup()->hide();
-        // Truncate the line to last space or whole string
-        QString textValue = text();
-        int lastIndex = textValue.length();
-        int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
-        int leftShift = qMin(lastIndex, lastWordStartIndex);
-        setText(textValue.left(leftShift));
-        // Insert highlighted line from popup
-        insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
-        // Set focus back to the textbox since tab was pressed
-        setFocus();
-    }
+
+    hideCompleterPopups();
 }
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
-        case Qt::Key_Escape:
-            if (c->popup()->isVisible()) {
-                event->ignore();
-                // Remove Popup
-                c->popup()->hide();
-                // Truncate the line to last space or whole string
-                QString textValue = text();
-                int lastIndexof = qMax(0, textValue.lastIndexOf(" "));
-                QString finalString = textValue.left(lastIndexof);
-                // Add a space if there's a word
-                if (finalString != "") {
-                    finalString += " ";
-                }
-                setText(finalString);
-                return;
-            }
-            break;
-        case Qt::Key_Space:
-            if (c->popup()->isVisible()) {
-                event->ignore();
-                // Remove Popup
-                c->popup()->hide();
-                // Truncate the line to last space or whole string
-                QString textValue = text();
-                int lastIndex = textValue.length();
-                int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
-                int leftShift = qMin(lastIndex, lastWordStartIndex);
-                setText(textValue.left(leftShift));
-                // Insert highlighted line from popup
-                insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
-                return;
-            }
-            break;
-        default:
-            break;
-    }
-
     LineEditUnfocusable::keyPressEvent(event);
-    // return if the completer is null or if the most recently typed char was '@'.
-    // Only want the popup AFTER typing the first char of the mention.
-    if (!c || text().right(1).contains("@")) {
-        c->popup()->hide();
+
+    QString textValue = text();
+    int cursorPos = cursorPosition();
+
+    CompleterInfo *active = nullptr;
+    QString prefix;
+
+    for (auto &info : completers) {
+        if (info.trigger == "@") {
+            int triggerPos = textValue.lastIndexOf("@", cursorPos - 1);
+            if (triggerPos != -1 && (triggerPos == 0 || textValue[triggerPos - 1].isSpace())) {
+                active = &info;
+                prefix = textValue.mid(triggerPos + 1, cursorPos - (triggerPos + 1));
+                break;
+            }
+        } else if (info.trigger == "[[") {
+            int triggerPos = textValue.lastIndexOf("[[", cursorPos - 1);
+            int closePos = textValue.indexOf("]]", triggerPos + 2);
+            if (triggerPos != -1 && (closePos == -1 || closePos >= cursorPos)) {
+                active = &info;
+                prefix = textValue.mid(triggerPos + 2, cursorPos - (triggerPos + 2));
+                break;
+            }
+        }
+    }
+
+    if (!active) {
+        for (auto &info : completers) {
+            info.completer->popup()->hide();
+        }
         return;
     }
 
-    // Set new completion prefix
-    c->setCompletionPrefix(cursorWord(text()));
-    if (c->completionPrefix().length() < 1) {
-        c->popup()->hide();
+    active->completer->setCompletionPrefix(prefix);
+
+    if (active->trigger == "[[") {
+        emit cardPartialChanged(prefix);
         return;
     }
 
-    // Draw completion box
-    QRect cr = cursorRect();
-    cr.setWidth(c->popup()->sizeHintForColumn(0) + c->popup()->verticalScrollBar()->sizeHint().width());
-    c->complete(cr);
-
-    // Select first item in the completion popup
-    QItemSelectionModel *sm = new QItemSelectionModel(c->completionModel());
-    c->popup()->setSelectionModel(sm);
-    sm->select(c->completionModel()->index(0, 0), QItemSelectionModel::ClearAndSelect);
-    sm->setCurrentIndex(c->completionModel()->index(0, 0), QItemSelectionModel::NoUpdate);
+    active->completer->complete();
 }
 
-QString LineEditCompleter::cursorWord(const QString &line) const
+void LineEditCompleter::insertCompletion(const QString &completion)
 {
-    return line.mid(line.left(cursorPosition()).lastIndexOf(" ") + 1,
-                    cursorPosition() - line.left(cursorPosition()).lastIndexOf(" ") - 1);
-}
+    QString t = text();
+    int pos = cursorPosition();
 
-void LineEditCompleter::insertCompletion(QString arg)
-{
-    QString s_arg = arg + " ";
-    setText(text().replace(text().left(cursorPosition()).lastIndexOf(" ") + 1,
-                           cursorPosition() - text().left(cursorPosition()).lastIndexOf(" ") - 1, s_arg));
-}
-
-void LineEditCompleter::setCompleter(QCompleter *completer)
-{
-    c = completer;
-    c->setWidget(this);
-    connect(c, qOverload<const QString &>(&QCompleter::activated), this, &LineEditCompleter::insertCompletion);
-}
-
-void LineEditCompleter::setCompletionList(QStringList completionList)
-{
-    if (!c || c->popup()->isVisible()) {
+    CompleterInfo *active = nullptr;
+    for (auto &info : completers) {
+        if (info.completer == sender()) {
+            active = &info;
+            break;
+        }
+    }
+    if (!active) {
         return;
     }
 
-    QStringListModel *model;
-    model = (QStringListModel *)(c->model());
-    if (model == NULL) {
-        model = new QStringListModel();
+    if (active->trigger == "[[") {
+        int triggerPos = t.lastIndexOf("[[", pos - 1);
+        if (triggerPos == -1) {
+            return;
+        }
+        QString after = t.mid(pos);
+        QString replaced = t.left(triggerPos + 2) + completion + "]] ";
+        setText(replaced + after);
+        setCursorPosition(replaced.length());
+        return;
     }
-    model->setStringList(completionList);
+
+    int triggerPos = t.lastIndexOf("@", pos - 1);
+    if (triggerPos == -1) {
+        return;
+    }
+    setText(t.replace(triggerPos, pos - triggerPos, completion + " "));
+    setCursorPosition(triggerPos + completion.length() + 1);
 }

@@ -1,6 +1,7 @@
 /**
  * @file line_edit_completer.h
  * @ingroup UI
+ * @brief Line edit with support for multiple trigger-based completers, e.g., @mention and [[card]].
  */
 //! \todo Document this file.
 
@@ -9,25 +10,41 @@
 
 #include "custom_line_edit.h"
 
+#include <QCompleter>
+#include <QFocusEvent>
 #include <QKeyEvent>
+#include <QList>
+#include <QString>
+#include <QVector>
+
+struct CompleterInfo
+{
+    QCompleter *completer;
+    QString trigger; // e.g., "@" or "[["
+};
 
 class LineEditCompleter : public LineEditUnfocusable
 {
     Q_OBJECT
+signals:
+    void cardPartialChanged(const QString &partial);
+
 private:
-    QString cursorWord(const QString &line) const;
-    QCompleter *c;
+    QList<CompleterInfo> completers;
+
 private slots:
-    void insertCompletion(QString);
+    void insertCompletion(const QString &text);
 
 protected:
-    void keyPressEvent(QKeyEvent *event);
-    void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent(QKeyEvent *event) override;
+    void focusOutEvent(QFocusEvent *e) override;
 
 public:
     explicit LineEditCompleter(QWidget *parent = nullptr);
-    void setCompleter(QCompleter *);
-    void setCompletionList(QStringList);
+    void addCompleter(QCompleter *c, const QString &trigger);
+
+    bool hasVisibleCompleterPopup() const;
+    void hideCompleterPopups();
 };
 
 #endif

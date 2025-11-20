@@ -143,6 +143,10 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_wait_for_database_load.h
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
+    src/interface/widgets/utility/card_completer_delegate.cpp
+    src/interface/widgets/utility/card_completer_styler.cpp
+    src/interface/widgets/utility/card_completer_utils.cpp
+    src/interface/widgets/utility/card_completer_utils.h
     src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp

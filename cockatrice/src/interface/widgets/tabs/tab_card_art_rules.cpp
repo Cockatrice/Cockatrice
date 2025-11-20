@@ -1,5 +1,6 @@
 #include "tab_card_art_rules.h"
 
+#include "../utility/card_completer_utils.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QCompleter>
@@ -194,29 +195,14 @@ void TabCardArtRules::initSearchBar()
     cardDbModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDbDisplayModel = new CardDatabaseDisplayModel(this);
     cardDbDisplayModel->setSourceModel(cardDbModel);
-    cardSearchModel = new CardSearchModel(cardDbDisplayModel, this);
 
-    cardProxyModel = new CardCompleterProxyModel(this);
-    cardProxyModel->setSourceModel(cardSearchModel);
-    cardProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-
-    searchCompleter = new QCompleter(cardProxyModel, this);
-    searchCompleter->setCompletionRole(Qt::DisplayRole);
-    searchCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    searchCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    searchCompleter->setFilterMode(Qt::MatchContains);
-    searchCompleter->setMaxVisibleItems(15);
+    const CardCompleterSetup cardSetup = createCardCompleter(cardDbDisplayModel, this, 15);
+    cardSearchModel = cardSetup.searchModel;
+    cardProxyModel = cardSetup.proxyModel;
+    searchCompleter = cardSetup.completer;
     searchEdit->setCompleter(searchCompleter);
 
-    connect(searchEdit, &QLineEdit::textEdited, cardSearchModel, &CardSearchModel::updateSearchResults);
-    connect(searchEdit, &QLineEdit::textEdited, this, [this](const QString &text) {
-        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        cardProxyModel->setFilterRegularExpression(
-            QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            searchCompleter->complete();
-        }
-    });
+    connectCardCompleterSearch(searchEdit, cardSetup);
     connect(searchCompleter, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [this](const QString &name) { searchEdit->setText(name); });
     connect(searchEdit, &QLineEdit::editingFinished, this,

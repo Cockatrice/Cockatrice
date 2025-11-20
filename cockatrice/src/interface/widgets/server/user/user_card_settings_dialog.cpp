@@ -1,8 +1,7 @@
 #include "user_card_settings_dialog.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
-#include "card/card_completer_proxy_model.h"
-#include "card/card_search_model.h"
+#include "../../utility/card_completer_utils.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
 #include "user_card_art_provider.h"
@@ -19,7 +18,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
-#include <QRegularExpression>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 
@@ -133,29 +131,14 @@ void UserCardArtSettingsDialog::initializeSearchBar()
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
-    searchModel = new CardSearchModel(cardDatabaseDisplayModel, this);
 
-    proxyModel = new CardCompleterProxyModel(this);
-    proxyModel->setSourceModel(searchModel);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel->setFilterRole(Qt::DisplayRole);
-
-    completer = new QCompleter(proxyModel, this);
-    completer->setCompletionRole(Qt::DisplayRole);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setMaxVisibleItems(15);
+    const CardCompleterSetup cardSetup = createCardCompleter(cardDatabaseDisplayModel, this, 15);
+    searchModel = cardSetup.searchModel;
+    proxyModel = cardSetup.proxyModel;
+    completer = cardSetup.completer;
     searchBar->setCompleter(completer);
 
-    connect(searchBar, &QLineEdit::textEdited, searchModel, &CardSearchModel::updateSearchResults);
-    connect(searchBar, &QLineEdit::textEdited, this, [this](const QString &text) {
-        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            completer->complete();
-        }
-    });
+    connectCardCompleterSearch(searchBar, cardSetup);
 
     connect(completer, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [this](const QString &completion) {
