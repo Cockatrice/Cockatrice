@@ -41,9 +41,6 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
 
     layout->addWidget(historyButton);
 
-    connect(undoButton, &QToolButton::clicked, this, &DeckListHistoryManagerWidget::doUndo);
-    connect(redoButton, &QToolButton::clicked, this, &DeckListHistoryManagerWidget::doRedo);
-
     connect(historyList, &QListWidget::itemClicked, this, &DeckListHistoryManagerWidget::onListClicked);
 
     connect(historyManager, &DeckListHistoryManager::undoRedoStateChanged, this,
