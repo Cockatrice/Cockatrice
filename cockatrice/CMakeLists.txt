@@ -145,6 +145,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/mana_base_widget.cpp
     src/interface/widgets/deck_analytics/mana_curve_widget.cpp
     src/interface/widgets/deck_analytics/mana_devotion_widget.cpp
+    src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp

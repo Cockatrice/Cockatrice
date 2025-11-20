@@ -12,7 +12,9 @@
 #include "../../key_signals.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
+#include "libcockatrice/deck_list/deck_list_history_manager.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -53,6 +55,8 @@ public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
     void setDeck(DeckLoader *_deck);
+    void syncDisplayWidgetsToModel();
+    void sortDeckModelToDeckView();
     DeckLoader *getDeckLoader();
     DeckList *getDeckList();
     void actIncrement();
@@ -61,6 +65,7 @@ public slots:
     void actDecrementSelection();
     void actSwapCard();
     void actRemoveCard();
+    void onCardAboutToBeAdded(const ExactCard &card, const QString &zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 signals:
@@ -73,14 +78,18 @@ signals:
 
 private:
     AbstractTabDeckEditor *deckEditor;
+    DeckListHistoryManager *historyManager;
+    DeckListHistoryManagerWidget *historyManagerWidget;
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
     LineEditUnfocusable *nameEdit;
+    QTimer *nameDebounceTimer;
     SettingsButtonWidget *quickSettingsWidget;
     QCheckBox *showBannerCardCheckBox;
     QCheckBox *showTagsWidgetCheckBox;
     QLabel *commentsLabel;
     QTextEdit *commentsEdit;
+    QTimer *commentsDebounceTimer;
     QLabel *bannerCardLabel;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *hashLabel1;
@@ -104,6 +113,7 @@ private slots:
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
+    void expandAll();
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H
