@@ -273,8 +273,7 @@ void DeckEditorDeckDockWidget::updateHash()
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 {
     // Store current banner card identity
-    QString wantedName = deckModel->getDeckList()->getBannerCard().name;
-    QString wantedProvider = deckModel->getDeckList()->getBannerCard().providerId;
+    CardRef wanted = deckModel->getDeckList()->getBannerCard();
 
     // Block signals temporarily
     bool wasBlocked = bannerCardComboBox->blockSignals(true);
