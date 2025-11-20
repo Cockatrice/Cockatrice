@@ -412,6 +412,14 @@ else()
   )
 endif()
 
+if(ZLIB_FOUND)
+  target_link_libraries(cockatrice PRIVATE ${ZLIB_LIBRARIES})
+endif()
+
+if(LIBLZMA_FOUND)
+  target_link_libraries(cockatrice PRIVATE ${LIBLZMA_LIBRARIES})
+endif()
+
 if(UNIX)
   if(APPLE)
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
