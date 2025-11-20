@@ -13,6 +13,30 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/trice_limits.h>
 
+static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
+{
+    // Try providerId + name (strongest match)
+    if (!wanted.providerId.isEmpty()) {
+        for (int i = 0; i < combo->count(); ++i) {
+            auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+            if (pair.second == wanted.providerId && pair.first == wanted.name) {
+                return i;
+            }
+        }
+    }
+
+    // Try name only
+    for (int i = 0; i < combo->count(); ++i) {
+        auto pair = combo->itemData(i).value<QPair<QString, QString>>();
+        if (pair.first == wanted.name) {
+            return i;
+        }
+    }
+
+    // Not found
+    return -1;
+}
+
 DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)
 {
@@ -321,30 +345,6 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
     // Restore signal state
     bannerCardComboBox->blockSignals(wasBlocked);
-}
-
-int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
-{
-    // Try providerId + name (strongest match)
-    if (!wanted.providerId.isEmpty()) {
-        for (int i = 0; i < combo->count(); ++i) {
-            auto pair = combo->itemData(i).value<QPair<QString, QString>>();
-            if (pair.second == wanted.providerId && pair.first == wanted.name) {
-                return i;
-            }
-        }
-    }
-
-    // Try name only
-    for (int i = 0; i < combo->count(); ++i) {
-        auto pair = combo->itemData(i).value<QPair<QString, QString>>();
-        if (pair.first == wanted.name) {
-            return i;
-        }
-    }
-
-    // Not found
-    return -1;
 }
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
