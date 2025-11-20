@@ -56,8 +56,6 @@ public:
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    void setDeckList(DeckList *_deckList);
-
     const QString &getLastFileName() const
     {
         return lastFileName;
@@ -109,7 +107,7 @@ public:
 
     bool convertToCockatriceFormat(QString fileName);
 
-    DeckList *getDeckList() const
+    DeckList *getDeckList()
     {
         return deckList;
     }

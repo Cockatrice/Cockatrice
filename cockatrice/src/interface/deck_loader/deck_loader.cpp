@@ -33,13 +33,6 @@ DeckLoader::DeckLoader(QObject *parent)
 DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList)
     : QObject(parent), deckList(_deckList), lastFileFormat(CockatriceFormat), lastRemoteDeckId(-1)
 {
-    deckList->setParent(this);
-}
-
-void DeckLoader::setDeckList(DeckList *_deckList)
-{
-    deckList = _deckList;
-    deckList->setParent(this);
 }
 
 bool DeckLoader::loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest)
@@ -159,12 +152,14 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
             break;
         case CockatriceFormat:
             result = deckList->saveToFile_Native(&file);
+            qCInfo(DeckLoaderLog) << "Saving to " << fileName << "-" << result;
             break;
     }
 
     if (result) {
         lastFileName = fileName;
         lastFileFormat = fmt;
+        qCInfo(DeckLoaderLog) << "Deck was saved -" << result;
     }
 
     file.flush();

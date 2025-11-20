@@ -20,10 +20,10 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList);
-    void connectDeckList(DeckList *_deckList);
+    explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckLoader *_deckLoader);
+    void connectDeckList();
     void refreshTags();
-    DeckList *deckList;
+    DeckLoader *deckLoader;
     FlowWidget *flowWidget;
 
 public slots:

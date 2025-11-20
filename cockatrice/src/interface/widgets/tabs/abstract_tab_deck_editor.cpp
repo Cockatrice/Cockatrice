@@ -486,7 +486,7 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
  */
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(*getDeckLoader(), annotated, this);
+    DlgEditDeckInClipboard dlg(getDeckLoader(), annotated, this);
     if (!dlg.exec())
         return;
 

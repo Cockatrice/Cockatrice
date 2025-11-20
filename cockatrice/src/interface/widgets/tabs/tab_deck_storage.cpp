@@ -242,11 +242,11 @@ void TabDeckStorage::actOpenLocalDeck()
             continue;
         QString filePath = localDirModel->filePath(curLeft);
 
-        DeckLoader deckLoader(this);
-        if (!deckLoader.loadFromFile(filePath, DeckLoader::CockatriceFormat, true))
+        auto deckLoader = new DeckLoader(this);
+        if (!deckLoader->loadFromFile(filePath, DeckLoader::CockatriceFormat, true))
             continue;
 
-        emit openDeckEditor(&deckLoader);
+        emit openDeckEditor(deckLoader);
     }
 }
 

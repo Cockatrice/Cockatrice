@@ -82,7 +82,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     setFilePath(deckLoader->getLastFileName());
 
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeckList());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader);
 
     bannerCardLabel = new QLabel(this);
     bannerCardLabel->setObjectName("bannerCardLabel");
