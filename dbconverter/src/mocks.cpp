@@ -182,6 +182,9 @@ void SettingsCache::setClickPlaysAllSelected(QT_STATE_CHANGED_T /* _clickPlaysAl
 void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T /* _playToStack */)
 {
 }
+void SettingsCache::setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T /* _doNotDeleteArrowsInSubPhases */)
+{
+}
 void SettingsCache::setStartingHandSize(int /* _startingHandSize */)
 {
 }

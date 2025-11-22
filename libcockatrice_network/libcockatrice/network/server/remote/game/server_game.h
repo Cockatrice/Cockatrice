@@ -198,8 +198,9 @@ public:
     {
         return activePhase;
     }
-    void setActivePlayer(int _activePlayer);
-    void setActivePhase(int _activePhase);
+    void setActivePlayer(int newPlayer);
+    void setActivePhase(int newPhase);
+    void removeArrows(int newPhase, bool force = false);
     void nextTurn();
     int getSecondsElapsed() const
     {

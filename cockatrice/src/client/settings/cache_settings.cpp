@@ -261,6 +261,7 @@ SettingsCache::SettingsCache()
     doubleClickToPlay = settings->value("interface/doubleclicktoplay", true).toBool();
     clickPlaysAllSelected = settings->value("interface/clickPlaysAllSelected", true).toBool();
     playToStack = settings->value("interface/playtostack", true).toBool();
+    doNotDeleteArrowsInSubPhases = settings->value("interface/doNotDeleteArrowsInSubPhases", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
     tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
@@ -662,6 +663,12 @@ void SettingsCache::setPlayToStack(QT_STATE_CHANGED_T _playToStack)
 {
     playToStack = static_cast<bool>(_playToStack);
     settings->setValue("interface/playtostack", playToStack);
+}
+
+void SettingsCache::setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T _doNotDeleteArrowsInSubPhases)
+{
+    doNotDeleteArrowsInSubPhases = static_cast<bool>(_doNotDeleteArrowsInSubPhases);
+    settings->setValue("interface/doNotDeleteArrowsInSubPhases", doNotDeleteArrowsInSubPhases);
 }
 
 void SettingsCache::setStartingHandSize(int _startingHandSize)

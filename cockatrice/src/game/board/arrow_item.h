@@ -82,10 +82,11 @@ class ArrowDragItem : public ArrowItem
 {
     Q_OBJECT
 private:
+    int deleteInPhase;
     QList<ArrowDragItem *> childArrows;
 
 public:
-    ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color);
+    ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
     void addChildArrow(ArrowDragItem *childArrow);
 
 protected:

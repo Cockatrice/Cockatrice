@@ -654,6 +654,8 @@ void Server_Game::setActivePlayer(int _activePlayer)
 {
     QMutexLocker locker(&gameMutex);
 
+    removeArrows(0, true);
+
     activePlayer = _activePlayer;
 
     Event_SetActivePlayer event;
@@ -663,28 +665,33 @@ void Server_Game::setActivePlayer(int _activePlayer)
     setActivePhase(0);
 }
 
-void Server_Game::setActivePhase(int _activePhase)
+void Server_Game::setActivePhase(int newPhase)
 {
     QMutexLocker locker(&gameMutex);
 
-    for (auto *player : getPlayers().values()) {
-        QList<Server_Arrow *> toDelete = player->getArrows().values();
-        for (int i = 0; i < toDelete.size(); ++i) {
-            Server_Arrow *a = toDelete[i];
-
-            Event_DeleteArrow event;
-            event.set_arrow_id(a->getId());
-            sendGameEventContainer(prepareGameEvent(event, player->getPlayerId()));
-
-            player->deleteArrow(a->getId());
-        }
-    }
-
-    activePhase = _activePhase;
+    removeArrows(newPhase);
+    activePhase = newPhase;
 
     Event_SetActivePhase event;
     event.set_phase(activePhase);
     sendGameEventContainer(prepareGameEvent(event, -1));
+}
+
+void Server_Game::removeArrows(int newPhase, bool force)
+{
+    QMutexLocker locker(&gameMutex);
+
+    for (auto *anyPlayer : getPlayers().values()) {
+        for (auto *arrowToDelete : anyPlayer->getArrows().values()) { // values creates a copy
+            if (force || arrowToDelete->checkPhaseDeletion(newPhase)) {
+                Event_DeleteArrow event;
+                event.set_arrow_id(arrowToDelete->getId());
+                sendGameEventContainer(prepareGameEvent(event, anyPlayer->getPlayerId()));
+
+                anyPlayer->deleteArrow(arrowToDelete->getId());
+            }
+        }
+    }
 }
 
 void Server_Game::nextTurn()

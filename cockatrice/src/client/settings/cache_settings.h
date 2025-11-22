@@ -228,6 +228,7 @@ private:
     bool doubleClickToPlay;
     bool clickPlaysAllSelected;
     bool playToStack;
+    bool doNotDeleteArrowsInSubPhases;
     int startingHandSize;
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
@@ -524,6 +525,10 @@ public:
     bool getPlayToStack() const
     {
         return playToStack;
+    }
+    bool getDoNotDeleteArrowsInSubPhases() const
+    {
+        return doNotDeleteArrowsInSubPhases;
     }
     int getStartingHandSize() const
     {
@@ -984,6 +989,7 @@ public slots:
     void setDoubleClickToPlay(QT_STATE_CHANGED_T _doubleClickToPlay);
     void setClickPlaysAllSelected(QT_STATE_CHANGED_T _clickPlaysAllSelected);
     void setPlayToStack(QT_STATE_CHANGED_T _playToStack);
+    void setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T _doNotDeleteArrowsInSubPhases);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);

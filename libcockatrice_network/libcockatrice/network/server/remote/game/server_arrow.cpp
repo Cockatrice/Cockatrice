@@ -6,8 +6,14 @@
 
 #include <libcockatrice/protocol/pb/serverinfo_arrow.pb.h>
 
-Server_Arrow::Server_Arrow(int _id, Server_Card *_startCard, Server_ArrowTarget *_targetItem, const color &_arrowColor)
-    : id(_id), startCard(_startCard), targetItem(_targetItem), arrowColor(_arrowColor)
+Server_Arrow::Server_Arrow(int _id,
+                           Server_Card *_startCard,
+                           Server_ArrowTarget *_targetItem,
+                           const color &_arrowColor,
+                           int _phaseCreated,
+                           int _phaseDeleted)
+    : id(_id), startCard(_startCard), targetItem(_targetItem), arrowColor(_arrowColor), phaseCreated(_phaseCreated),
+      phaseDeleted(_phaseDeleted)
 {
 }
 

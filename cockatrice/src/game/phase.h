@@ -28,8 +28,10 @@ struct Phases
     const static int phaseTypesCount = 11;
     const static Phase unknownPhase;
     const static Phase phases[phaseTypesCount];
+    const static QVector<int> subPhasesEnd;
 
     static Phase getPhase(int);
+    static int getLastSubphase(int phase);
 };
 
 #endif // PHASE_H
