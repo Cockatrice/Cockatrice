@@ -121,7 +121,6 @@
             <enums visible="yes" title=""/>
             <functions visible="yes" title=""/>
             <variables visible="yes" title=""/>
-            <properties visible="yes" title=""/>
             <membergroups visible="yes"/>
         </memberdecl>
         <detaileddescription visible="yes" title=""/>
@@ -133,7 +132,6 @@
             <enums visible="yes" title=""/>
             <functions visible="yes" title=""/>
             <variables visible="yes" title=""/>
-            <properties visible="yes" title=""/>
         </memberdef>
         <authorsection visible="yes"/>
     </namespace>
@@ -169,7 +167,6 @@
             <enums visible="yes" title=""/>
             <functions visible="yes" title=""/>
             <variables visible="yes" title=""/>
-            <properties visible="yes" title=""/>
             <membergroups visible="yes"/>
         </memberdecl>
         <detaileddescription visible="yes" title=""/>
@@ -182,7 +179,6 @@
             <enums visible="yes" title=""/>
             <functions visible="yes" title=""/>
             <variables visible="yes" title=""/>
-            <properties visible="yes" title=""/>
         </memberdef>
         <authorsection/>
     </file>

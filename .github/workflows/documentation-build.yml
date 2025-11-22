@@ -6,9 +6,9 @@ on:
       - '*'   # Only re-generate docs when a new tagged version is pushed
   pull_request:
     paths:
+      - 'doc/doxygen/**'
       - '.github/workflows/documentation-build.yml'
       - 'Doxyfile'
-      - 'doxygen_style.css'
   workflow_dispatch:
 
 env:
