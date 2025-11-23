@@ -56,9 +56,9 @@ jobs:
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
-          publish_branch: master
+          publish_branch: master    # GH Pages branch
           publish_dir: ./docs/html    # Source directory
           destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: Deploy Docs
+          commit_message: Deploy Docs    # ${GITHUB_SHA} will get appended
