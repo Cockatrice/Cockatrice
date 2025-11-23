@@ -1,5 +1,4 @@
 # Doxyfile 1.14.0
-# Doxygen Docs: https://www.doxygen.nl/manual
 
 # This file describes the settings to be used by the documentation system
 # Doxygen (www.doxygen.org) for a project.
@@ -43,7 +42,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "Cockatrice"
+PROJECT_NAME           = Cockatrice
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -55,7 +54,7 @@ PROJECT_NUMBER         = $(COCKATRICE_REF)
 # for a project that appears at the top of each page and should give viewers a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = A cross-platform virtual tabletop for multiplayer card games
+PROJECT_BRIEF          = "A cross-platform virtual tabletop for multiplayer card games"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -1067,7 +1066,11 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which Doxygen is
 # run.
 
-EXCLUDE                = build/ cmake/ vcpkg/ dbconverter/ webclient/
+EXCLUDE                = build/ \
+                         cmake/ \
+                         dbconverter/ \
+                         vcpkg/ \
+                         webclient/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -1083,7 +1086,8 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = .* .*/
+EXCLUDE_PATTERNS       = .* \
+                         .*/
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -1284,6 +1288,46 @@ USE_HTAGS              = NO
 # The default value is: YES.
 
 VERBATIM_HEADERS       = YES
+
+# If the CLANG_ASSISTED_PARSING tag is set to YES then Doxygen will use the
+# clang parser (see:
+# http://clang.llvm.org/) for more accurate parsing at the cost of reduced
+# performance. This can be particularly helpful with template rich C++ code for
+# which Doxygen's built-in parser lacks the necessary type information.
+# Note: The availability of this option depends on whether or not Doxygen was
+# generated with the -Duse_libclang=ON option for CMake.
+# The default value is: NO.
+
+CLANG_ASSISTED_PARSING = NO
+
+# If the CLANG_ASSISTED_PARSING tag is set to YES and the CLANG_ADD_INC_PATHS
+# tag is set to YES then Doxygen will add the directory of each input to the
+# include path.
+# The default value is: YES.
+# This tag requires that the tag CLANG_ASSISTED_PARSING is set to YES.
+
+CLANG_ADD_INC_PATHS    = YES
+
+# If clang assisted parsing is enabled you can provide the compiler with command
+# line options that you would normally use when invoking the compiler. Note that
+# the include paths will already be set by Doxygen for the files and directories
+# specified with INPUT and INCLUDE_PATH.
+# This tag requires that the tag CLANG_ASSISTED_PARSING is set to YES.
+
+CLANG_OPTIONS          =
+
+# If clang assisted parsing is enabled you can provide the clang parser with the
+# path to the directory containing a file called compile_commands.json. This
+# file is the compilation database (see:
+# http://clang.llvm.org/docs/HowToSetupToolingForLLVM.html) containing the
+# options used when the source files were built. This is equivalent to
+# specifying the -p option to a clang tool, such as clang-check. These options
+# will then be passed to the parser. Any options specified with CLANG_OPTIONS
+# will be added as well.
+# Note: The availability of this option depends on whether or not Doxygen was
+# generated with the -Duse_libclang=ON option for CMake.
+
+CLANG_DATABASE_PATH    =
 
 #---------------------------------------------------------------------------
 # Configuration options related to the alphabetical class index
@@ -2579,7 +2623,7 @@ DOT_COMMON_ATTR        = "fontname=Helvetica,fontsize=10"
 # The default value is: labelfontname=Helvetica,labelfontsize=10.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_EDGE_ATTR  = "labelfontname=Helvetica,labelfontsize=10,arrowhead=open, arrowtail=open, arrowsize=0.5"
+DOT_EDGE_ATTR          = "labelfontname=Helvetica,labelfontsize=10,arrowhead=open, arrowtail=open, arrowsize=0.5"
 
 # DOT_NODE_ATTR is concatenated with DOT_COMMON_ATTR. For view without boxes
 # around nodes set 'shape=plain' or 'shape=plaintext' <a
@@ -2587,7 +2631,7 @@ DOT_EDGE_ATTR  = "labelfontname=Helvetica,labelfontsize=10,arrowhead=open, arrow
 # The default value is: shape=box,height=0.2,width=0.4.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_NODE_ATTR  = "shape=box,height=0.2,width=0.4"
+DOT_NODE_ATTR          = "shape=box,height=0.2,width=0.4"
 
 # You can set the path where dot can find font specified with fontname in
 # DOT_COMMON_ATTR and others dot attributes.
