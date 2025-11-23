@@ -23,10 +23,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install Doxygen and Graphviz
-        run: sudo apt-get install -y doxygen graphviz
+      - name: Install Graphviz
+        run: |
+          sudo apt-get install -y graphviz
+          dot -V
+
+      - name: Install Doxygen
+        uses: ssciwr/doxygen-install@v1
+        with:
+          version: "1.14.0"
+
+      - name: Update Doxygen Configuration
+        run: |
+          git diff Doxyfile
+          doxygen -u Doxyfile
+          if git diff --quiet Doxyfile; then
+            echo "::notice::No config changes in Doxyfile detected."
+          else
+            echo "::error::Config changes in Doxyfile detected! Please update the file by running 'doxygen -u Doxyfile'."
+            echo ""
+            git diff --color=always Doxyfile
+            exit 1
+          fi
 
       - name: Generate Documentation
+        if: always()
         run: doxygen Doxyfile
 
       - name: Deploy to cockatrice.github.io
