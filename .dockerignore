@@ -4,6 +4,7 @@ cockatrice/
 doc/
 docs/
 oracle/
+tests/
 webclient/
 .*
 Dockerfile
