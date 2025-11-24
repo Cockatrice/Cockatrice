@@ -8,7 +8,7 @@ void ArchidektApiResponseDeckOwner::fromJson(const QJsonObject &json)
     moderator = json.value("moderator").toBool();
     pledgeLevel = json.value("pledgeLevel").toInt();
     // TODO but not really important
-    roles = {""};
+    //roles = {""};
 }
 
 void ArchidektApiResponseDeckOwner::debugPrint() const
