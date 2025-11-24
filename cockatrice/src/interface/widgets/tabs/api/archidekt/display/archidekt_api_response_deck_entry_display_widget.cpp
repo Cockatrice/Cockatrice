@@ -92,6 +92,7 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
 
 void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
+    QWidget::mousePressEvent(event);
     actRequestNavigationToDeck();
 }
 
