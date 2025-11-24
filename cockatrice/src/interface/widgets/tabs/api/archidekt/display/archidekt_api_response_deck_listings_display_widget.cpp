@@ -23,7 +23,8 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     // Add widgets for deck listings
     auto deckListings = response.results;
     for (const auto &deckListing : deckListings) {
-        auto cardListDisplayWidget = new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
+        auto cardListDisplayWidget =
+            new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
         connect(cardListDisplayWidget, &ArchidektApiResponseDeckEntryDisplayWidget::requestNavigation, this,
                 &ArchidektApiResponseDeckListingsDisplayWidget::requestNavigation);
         flowWidget->addWidget(cardListDisplayWidget);

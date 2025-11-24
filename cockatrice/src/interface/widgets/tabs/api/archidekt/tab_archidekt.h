@@ -62,22 +62,22 @@ private:
     QHBoxLayout *searchOptionsLayout;
 
     // Required / basic fields
-    QLineEdit *nameField;        // Deck name substring
-    QLineEdit *ownerField;       // Owner substring
+    QLineEdit *nameField;  // Deck name substring
+    QLineEdit *ownerField; // Owner substring
 
     // Colors
-    QVector<QCheckBox*> colorChecks;  // White, Blue, Black, Green, Red, Colorless
+    QVector<QCheckBox *> colorChecks; // White, Blue, Black, Green, Red, Colorless
     QCheckBox *logicalAndCheck;       // Require ALL colors instead of ANY
 
     // Formats
-    QVector<QCheckBox*> formatChecks; // Format checkboxes (13 total)
+    QVector<QCheckBox *> formatChecks; // Format checkboxes (13 total)
 
     // Page size
     QSpinBox *pageSizeSpin;
 
     // Cards and Commanders
-    QLineEdit *cardsField;       // comma-separated quoted card names
-    QLineEdit *commandersField;  // comma-separated quoted commander names
+    QLineEdit *cardsField;      // comma-separated quoted card names
+    QLineEdit *commandersField; // comma-separated quoted commander names
 
     SettingsButtonWidget *settingsButton;
     CardSizeWidget *cardSizeSlider;

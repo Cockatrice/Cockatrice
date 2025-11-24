@@ -1,12 +1,13 @@
 #include "archidekt_api_response_deck_entry_display_widget.h"
+
 #include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QHBoxLayout>
-#include <QWidget>
 #include <QPixmap>
+#include <QWidget>
 
 ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplayWidget(
     QWidget *parent,
@@ -36,8 +37,8 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
 
     QNetworkRequest req(QUrl(response.getFeatured()));
     imageNetworkManager->get(req);
-    connect(imageNetworkManager, &QNetworkAccessManager::finished,
-            this, &ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished);
+    connect(imageNetworkManager, &QNetworkAccessManager::finished, this,
+            &ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished);
 
     headerLayout->addWidget(picture);
 

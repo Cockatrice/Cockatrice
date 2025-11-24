@@ -5,9 +5,9 @@
 #include "../../../../cards/card_size_widget.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
-#include <libcockatrice/card/database/card_database_manager.h>
 
 #include <QSortFilterProxyModel>
+#include <libcockatrice/card/database/card_database_manager.h>
 
 ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWidget *parent,
                                                                              ArchidektApiResponseDeck _response,
