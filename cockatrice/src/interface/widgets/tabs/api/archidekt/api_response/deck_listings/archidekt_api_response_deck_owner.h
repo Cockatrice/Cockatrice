@@ -19,6 +19,11 @@ public:
     // Debug method for logging
     void debugPrint() const;
 
+    QString getName() const
+    {
+        return userName;
+    }
+
 private:
     int id;
     QString userName;

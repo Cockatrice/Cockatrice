@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QResizeEvent>
+#include <QUrlQuery>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
@@ -77,6 +78,58 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     searchPushButton = new QPushButton(navigationContainer);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() { doSearch(); });
 
+    searchOptionsContainer = new QWidget(container);
+    searchOptionsLayout = new QHBoxLayout(searchOptionsContainer);
+    mainLayout->addWidget(searchOptionsContainer);
+
+    nameField = new QLineEdit(searchOptionsContainer);
+    nameField->setPlaceholderText(tr("Deck name contains..."));
+    searchOptionsLayout->addWidget(nameField);
+
+    ownerField = new QLineEdit(searchOptionsContainer);
+    ownerField->setPlaceholderText(tr("Owner name contains..."));
+    searchOptionsLayout->addWidget(ownerField);
+
+    QHBoxLayout *colorLayout = new QHBoxLayout();
+    QStringList colors = {"White", "Blue", "Black", "Green", "Red", "Colorless"};
+
+    for (const auto &c : colors) {
+        QCheckBox *chk = new QCheckBox(c, searchOptionsContainer);
+        colorChecks << chk;
+        colorLayout->addWidget(chk);
+    }
+
+    searchOptionsLayout->addLayout(colorLayout);
+
+    logicalAndCheck = new QCheckBox("Require ALL colors", searchOptionsContainer);
+    searchOptionsLayout->addWidget(logicalAndCheck);
+
+    QHBoxLayout *formatLayout = new QHBoxLayout();
+    QStringList formatNames = {"Standard",      "Modern",         "Commander", "Legacy",     "Vintage",
+                               "Pauper",        "Custom",         "Frontier",  "Future Std", "Penny Dreadful",
+                               "1v1 Commander", "Dual Commander", "Brawl"};
+
+    for (int i = 0; i < formatNames.size(); ++i) {
+        QCheckBox *formatCheckBox = new QCheckBox(formatNames[i], searchOptionsContainer);
+        formatChecks << formatCheckBox;
+        formatLayout->addWidget(formatCheckBox);
+    }
+
+    searchOptionsLayout->addLayout(formatLayout);
+
+    pageSizeSpin = new QSpinBox(searchOptionsContainer);
+    pageSizeSpin->setRange(1, 500);
+    pageSizeSpin->setValue(50);
+    searchOptionsLayout->addWidget(pageSizeSpin);
+
+    cardsField = new QLineEdit(searchOptionsContainer);
+    cardsField->setPlaceholderText("Cards (comma separated)");
+    searchOptionsLayout->addWidget(cardsField);
+
+    commandersField = new QLineEdit(searchOptionsContainer);
+    commandersField->setPlaceholderText("Commanders (comma separated)");
+    searchOptionsLayout->addWidget(commandersField);
+
     settingsButton = new SettingsButtonWidget(this);
 
     cardSizeSlider = new CardSizeWidget(this);
@@ -97,7 +150,8 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     // Ensure navigation stays at the top and currentPageDisplay takes remaining space
     mainLayout->setStretch(0, 0); // navigationContainer gets minimum space
-    mainLayout->setStretch(1, 1); // currentPageDisplay expands as much as possible
+    mainLayout->setStretch(1, 0);
+    mainLayout->setStretch(2, 1); // currentPageDisplay expands as much as possible
 
     setCentralWidget(container);
 
@@ -113,14 +167,61 @@ void TabArchidekt::retranslateUi()
     searchPushButton->setText(tr("Search"));
 }
 
+QString TabArchidekt::buildSearchUrl()
+{
+    QUrlQuery query;
+
+    // required
+    query.addQueryItem("name", nameField->text());
+
+    // colors
+    QStringList selectedColors;
+    for (auto *chk : colorChecks)
+        if (chk->isChecked())
+            selectedColors << chk->text();
+    if (!selectedColors.isEmpty())
+        query.addQueryItem("colors", selectedColors.join(","));
+
+    // logicalAnd
+    if (logicalAndCheck->isChecked())
+        query.addQueryItem("logicalAnd", "true");
+
+    // owner
+    if (!ownerField->text().isEmpty())
+        query.addQueryItem("owner", ownerField->text());
+
+    // cards
+    if (!cardsField->text().isEmpty())
+        query.addQueryItem("cards", cardsField->text());
+
+    // commanders
+    if (!commandersField->text().isEmpty())
+        query.addQueryItem("commanders", commandersField->text());
+
+    // formats
+    QStringList formatIds;
+    for (int i = 0; i < formatChecks.size(); ++i)
+        if (formatChecks[i]->isChecked())
+            formatIds << QString::number(i + 1);
+    if (!formatIds.isEmpty())
+        query.addQueryItem("formats", formatIds.join(","));
+
+    // page size
+    if (pageSizeSpin->value() != 50)
+        query.addQueryItem("pageSize", QString::number(pageSizeSpin->value()));
+
+    // build final URL
+    QUrl url("https://archidekt.com/api/decks/v3/");
+    url.setQuery(query);
+
+    return url.toString();
+}
+
 void TabArchidekt::doSearch()
 {
-    CardInfoPtr searchedCard = CardDatabaseManager::query()->getCardInfo(searchBar->text());
-    if (!searchedCard) {
-        return;
-    }
-
-    // setCard(searchedCard, canBeCommander(searchedCard));
+    QString url = buildSearchUrl();
+    QNetworkRequest req{QUrl(url)};
+    networkManager->get(req);
 }
 
 void TabArchidekt::actNavigatePage(QString url)
@@ -160,7 +261,7 @@ void TabArchidekt::processApiJson(QNetworkReply *reply)
     QString responseUrl = reply->url().toString();
 
     // Check if the response URL matches a commander request
-    if (responseUrl == "https://archidekt.com/api/decks/v3/?name=") {
+    if (responseUrl.startsWith("https://archidekt.com/api/decks/v3/")) {
         processTopDecksResponse(jsonObj);
     } else if (responseUrl.startsWith("https://archidekt.com/api/decks/")) {
         processDeckResponse(jsonObj);
@@ -197,7 +298,8 @@ void TabArchidekt::processTopDecksResponse(QJsonObject reply)
 
     // **Ensure layout stays correct**
     mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
+    mainLayout->setStretch(1, 0); // Keep searchOptionsContainer at the top
+    mainLayout->setStretch(2, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabArchidekt::processDeckResponse(QJsonObject reply)
@@ -227,7 +329,8 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 
     // **Ensure layout stays correct**
     mainLayout->setStretch(0, 0); // Keep navigationContainer at the top
-    mainLayout->setStretch(1, 1); // Make sure currentPageDisplay takes remaining space
+    mainLayout->setStretch(1, 0); // Keep searchOptionsContainer at the top
+    mainLayout->setStretch(2, 1); // Make sure currentPageDisplay takes remaining space
 }
 
 void TabArchidekt::prettyPrintJson(const QJsonValue &value, int indentLevel)

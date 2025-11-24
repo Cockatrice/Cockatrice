@@ -13,10 +13,17 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
+    imageNetworkManager = new QNetworkAccessManager(this);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    imageNetworkManager->setTransferTimeout(); // Use Qt's default timeout
+#endif
+
+    imageNetworkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
+
     // Add widgets for deck listings
     auto deckListings = response.results;
     for (const auto &deckListing : deckListings) {
-        auto cardListDisplayWidget = new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing);
+        auto cardListDisplayWidget = new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
         connect(cardListDisplayWidget, &ArchidektApiResponseDeckEntryDisplayWidget::requestNavigation, this,
                 &ArchidektApiResponseDeckListingsDisplayWidget::requestNavigation);
         flowWidget->addWidget(cardListDisplayWidget);

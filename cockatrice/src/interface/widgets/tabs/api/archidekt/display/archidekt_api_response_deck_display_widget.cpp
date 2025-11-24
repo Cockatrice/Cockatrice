@@ -5,9 +5,7 @@
 #include "../../../../cards/card_size_widget.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
-#include "custom_category_grouping_deck_list_proxy_model.h"
-#include "deck_list_model.h"
-#include "libcockatrice/card/database/card_database_manager.h"
+#include <libcockatrice/card/database/card_database_manager.h>
 
 #include <QSortFilterProxyModel>
 
@@ -58,6 +56,8 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     model = new DeckListModel(this);
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
     model->getDeckList()->loadFromStream_Plain(deckStream, false);
+
+    DeckLoader::resolveSetNameAndNumberToProviderID(model->getDeckList());
 
     model->rebuildTree();
 
