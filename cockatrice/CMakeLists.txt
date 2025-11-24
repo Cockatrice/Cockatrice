@@ -315,32 +315,7 @@ if(APPLE)
   set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
-  set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns
-          src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
-          src/interface/widgets/tabs/api/archidekt/tab_archidekt.h
-          src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.h
-          src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_listing_container.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_listing_container.h
-          src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_owner.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_owner.h
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.h
-          src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck.h
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.h
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.h
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.h
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp
-          src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.h
-          src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck_category.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck_category.h
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
-          src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.h
-  )
+  set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
 if(Qt6_FOUND)
