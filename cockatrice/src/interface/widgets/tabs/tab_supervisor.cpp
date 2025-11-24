@@ -5,6 +5,7 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "api/archidekt/tab_archidekt.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
@@ -140,6 +141,9 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabEdhRec = new QAction(this);
     connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
 
+    aTabArchidekt = new QAction(this);
+    connect(aTabArchidekt, &QAction::triggered, this, [this] { addArchidektTab(); });
+
     aTabHome = new QAction(this);
     aTabHome->setCheckable(true);
     connect(aTabHome, &QAction::triggered, this, &TabSupervisor::actTabHome);
@@ -204,6 +208,7 @@ void TabSupervisor::retranslateUi()
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
     aTabEdhRec->setText(tr("EDHRec"));
+    aTabArchidekt->setText(tr("Archidekt"));
     aTabHome->setText(tr("Home"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
@@ -386,6 +391,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addAction(aTabVisualDeckEditor);
     tabsMenu->addAction(aTabEdhRec);
+    tabsMenu->addAction(aTabArchidekt);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabHome);
     tabsMenu->addAction(aTabVisualDeckStorage);
@@ -893,6 +899,15 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(DeckLoader *deckToOpe
 TabEdhRecMain *TabSupervisor::addEdhrecMainTab()
 {
     auto *tab = new TabEdhRecMain(this);
+
+    myAddTab(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabArchidekt *TabSupervisor::addArchidektTab()
+{
+    auto *tab = new TabArchidekt(this);
 
     myAddTab(tab);
     setCurrentWidget(tab);
