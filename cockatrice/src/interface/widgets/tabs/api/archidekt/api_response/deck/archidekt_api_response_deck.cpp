@@ -32,7 +32,7 @@ void ArchidektApiResponseDeck::fromJson(const QJsonObject &json)
         categories.append(categoryEntry);
     }
 
-    deckTags = {};
+    deckTags = {""};
     playgroupDeckUrl = json.value("playgroupDeckUrl").toString();
     cardPackage = json.value("cardPackage").toString();
 
@@ -45,7 +45,7 @@ void ArchidektApiResponseDeck::fromJson(const QJsonObject &json)
     }
 
     // TODO but not really important
-    customCards = {};
+    customCards = {""};
 }
 
 void ArchidektApiResponseDeck::debugPrint() const

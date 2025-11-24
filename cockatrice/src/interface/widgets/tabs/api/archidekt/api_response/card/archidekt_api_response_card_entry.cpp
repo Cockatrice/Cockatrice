@@ -16,7 +16,7 @@ void ArchidektApiResponseCardEntry::fromJson(const QJsonObject &json)
     modifier = json.value("modifier").toString();
     quantity = json.value("quantity").toInt();
     customCmc = json.value("customCmc").toInt();
-    removedCategories = {};
+    removedCategories = {""};
     createdAt = json.value("createdAt").toString();
     updatedAt = json.value("updatedAt").toString();
     deletedAt = json.value("deletedAt").toString();

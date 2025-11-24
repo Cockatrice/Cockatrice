@@ -22,15 +22,15 @@ void ArchidektApiResponseCard::fromJson(const QJsonObject &json)
 
     flavor = json.value("flavor").toString();
     // TODO but not really important
-    games = {};
-    options = {};
+    games = {""};
+    options = {""};
     scryfallImageHash = json.value("scryfallImageHash").toString();
     oracleCard = json.value("oracleCard").toObject();
     owned = json.value("owned").toInt();
     pinnedStatus = json.value("pinnedStatus").toInt();
     rarity = json.value("rarity").toString();
     // TODO but not really important
-    globalCategories = {};
+    globalCategories = {""};
 }
 
 void ArchidektApiResponseCard::debugPrint() const

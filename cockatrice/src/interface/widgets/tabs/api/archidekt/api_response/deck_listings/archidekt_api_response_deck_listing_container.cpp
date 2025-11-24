@@ -24,7 +24,7 @@ void ArchidektApiResponseDeckListingContainer::fromJson(const QJsonObject &json)
     game = json.value("game").toString();
     hasDescription = json.value("hasDescription").toBool();
     // TODO
-    tags = {};
+    tags = {""};
     parentFolderId = json.value("parentFolderId").toInt();
     owner.fromJson(json.value("owner").toObject());
     cardPackage = json.value("cardPackage").toString();
