@@ -218,9 +218,9 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
     currentPageDisplay->setLayout(currentPageLayout);
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(currentPageDisplay, deckData, cardSizeSlider);
-    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this,
-            &TabArchidekt::actNavigatePage);
-    connect(display, &ArchidektApiResponseDeckDisplayWidget::openInDeckEditor, tabSupervisor, &TabSupervisor::openDeckInNewTab);
+    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);
+    connect(display, &ArchidektApiResponseDeckDisplayWidget::openInDeckEditor, tabSupervisor,
+            &TabSupervisor::openDeckInNewTab);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);

@@ -22,7 +22,8 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     openInEditorButton = new QPushButton(this);
     layout->addWidget(openInEditorButton);
 
-    connect(openInEditorButton, &QPushButton::clicked, this, &ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor);
+    connect(openInEditorButton, &QPushButton::clicked, this,
+            &ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor);
 
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
@@ -94,44 +95,44 @@ void ArchidektApiResponseDeckDisplayWidget::decklistModelReset()
     constructZoneWidgetsFromDeckListModel();
 }
 
- void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListModel()
-    {
-        qDebug() << model->rowCount(model->getRoot());
-        QSortFilterProxyModel proxy;
-        proxy.setSourceModel(model);
-        proxy.setSortRole(Qt::EditRole);
-        proxy.sort(1, Qt::AscendingOrder);
+void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListModel()
+{
+    qDebug() << model->rowCount(model->getRoot());
+    QSortFilterProxyModel proxy;
+    proxy.setSourceModel(model);
+    proxy.setSortRole(Qt::EditRole);
+    proxy.sort(1, Qt::AscendingOrder);
 
-        for (int i = 0; i < proxy.rowCount(); ++i) {
-            QModelIndex proxyIndex = proxy.index(i, 0);
-            QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
+    for (int i = 0; i < proxy.rowCount(); ++i) {
+        QModelIndex proxyIndex = proxy.index(i, 0);
+        QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
 
-            // Make a persistent index from the *source* model
-            QPersistentModelIndex persistent(sourceIndex);
+        // Make a persistent index from the *source* model
+        QPersistentModelIndex persistent(sourceIndex);
 
-            if (indexToWidgetMap.contains(persistent)) {
-                continue;
-            }
-
-            DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-                zoneContainer, model, persistent,
-                model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(), "maintype",
-                {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
-            /*connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
-            connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
-                    &VisualDeckEditorWidget::cleanupInvalidZones);
-            connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
-            connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
-            connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
-                    &DeckCardZoneDisplayWidget::refreshDisplayType);*/
-            zoneContainerLayout->addWidget(zoneDisplayWidget);
-
-            indexToWidgetMap.insert(persistent, zoneDisplayWidget);
+        if (indexToWidgetMap.contains(persistent)) {
+            continue;
         }
+
+        DeckCardZoneDisplayWidget *zoneDisplayWidget =
+            new DeckCardZoneDisplayWidget(zoneContainer, model, persistent,
+                                          model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
+                                          "maintype", {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
+        /*connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
+                &VisualDeckEditorWidget::cleanupInvalidZones);
+        connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
+        connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::refreshDisplayType);*/
+        zoneContainerLayout->addWidget(zoneDisplayWidget);
+
+        indexToWidgetMap.insert(persistent, zoneDisplayWidget);
     }
+}
 
 void ArchidektApiResponseDeckDisplayWidget::resizeEvent(QResizeEvent *event)
 {

@@ -60,7 +60,7 @@ private:
     QJsonObject oracleCard;
     int owned;
     int pinnedStatus;
-    //ArchidektApiResponsePrices prices;
+    // ArchidektApiResponsePrices prices;
     QString rarity;
     QStringList globalCategories;
 };

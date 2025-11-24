@@ -48,5 +48,4 @@ private:
     QString mtgoCode;
 };
 
-
 #endif // COCKATRICE_ARCHIDEKT_API_RESPONSE_EDITION_H

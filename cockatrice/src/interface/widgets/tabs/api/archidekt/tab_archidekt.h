@@ -9,9 +9,8 @@
 #include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QPushButton>
-#include <libcockatrice/card/database/card_database.h>
-
 #include <QString>
+#include <libcockatrice/card/database/card_database.h>
 
 inline QString archidektApiLink = "https://archidekt.com/api/decks/v3/?name=";
 
@@ -58,6 +57,5 @@ private:
     CardSizeWidget *cardSizeSlider;
     CardInfoPtr cardToQuery;
 };
-
 
 #endif // COCKATRICE_TAB_ARCHIDEKT_H

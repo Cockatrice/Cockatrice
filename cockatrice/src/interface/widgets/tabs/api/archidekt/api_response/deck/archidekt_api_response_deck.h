@@ -68,5 +68,4 @@ private:
     QStringList customCards;
 };
 
-
 #endif // COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_H
