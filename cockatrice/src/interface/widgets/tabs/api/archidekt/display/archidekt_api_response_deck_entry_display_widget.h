@@ -23,10 +23,12 @@ public:
                                                         ArchidektApiResponseDeckListingContainer response,
                                                         QNetworkAccessManager *imageNetworkManager);
     void onPreviewImageLoadFinished(QNetworkReply *reply);
+    void updateScaledPreview();
     void resizeEvent(QResizeEvent *event) override;
 
 public slots:
     void actRequestNavigationToDeck();
+    void setScaleFactor(int scale);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -37,6 +39,8 @@ private:
     QNetworkAccessManager *imageNetworkManager;
     ArchidektDeckPreviewImageDisplayWidget *previewWidget;
     QLabel *picture;
+    QPixmap originalPixmap;
+    int scaleFactor = 100;
 };
 
 #endif // COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H

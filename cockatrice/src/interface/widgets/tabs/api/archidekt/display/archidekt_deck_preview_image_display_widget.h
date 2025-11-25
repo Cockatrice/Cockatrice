@@ -16,6 +16,9 @@ class ArchidektDeckPreviewImageDisplayWidget : public QWidget
 public:
     explicit ArchidektDeckPreviewImageDisplayWidget(QWidget *parent = nullptr);
 
+    void setAspectRatio(float ratio);
+    void setPreviewWidth(int width);
+
     QLabel *imageLabel;
     OverlayLabel *topLeftLabel;
     OverlayLabel *topRightLabel;
@@ -24,6 +27,9 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+
+private:
+    float aspectRatio = 1.0f;
 };
 
 #endif // COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H

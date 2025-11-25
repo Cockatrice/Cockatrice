@@ -5,8 +5,9 @@
 
 ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsDisplayWidget(
     QWidget *parent,
-    ArchidektDeckListingApiResponse response)
-    : QWidget(parent)
+    ArchidektDeckListingApiResponse response,
+    CardSizeWidget *_cardSizeSlider)
+    : QWidget(parent), cardSizeSlider(_cardSizeSlider)
 {
     layout = new QHBoxLayout(this);
     setLayout(layout);
@@ -27,6 +28,8 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
             new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
         connect(cardListDisplayWidget, &ArchidektApiResponseDeckEntryDisplayWidget::requestNavigation, this,
                 &ArchidektApiResponseDeckListingsDisplayWidget::requestNavigation);
+        connect(cardSizeSlider->getSlider(), &QSlider::valueChanged, cardListDisplayWidget,
+                &ArchidektApiResponseDeckEntryDisplayWidget::setScaleFactor);
         flowWidget->addWidget(cardListDisplayWidget);
     }
 

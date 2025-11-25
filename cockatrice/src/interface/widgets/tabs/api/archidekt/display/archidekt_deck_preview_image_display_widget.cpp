@@ -27,6 +27,20 @@ ArchidektDeckPreviewImageDisplayWidget::ArchidektDeckPreviewImageDisplayWidget(Q
     bottomRightLabel->raise();
 }
 
+void ArchidektDeckPreviewImageDisplayWidget::setAspectRatio(float ratio)
+{
+    aspectRatio = ratio;
+}
+
+void ArchidektDeckPreviewImageDisplayWidget::setPreviewWidth(int width)
+{
+    int height = int(width * aspectRatio);
+
+    setFixedSize(width, height);
+    updateGeometry();
+    update();
+}
+
 void ArchidektDeckPreviewImageDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

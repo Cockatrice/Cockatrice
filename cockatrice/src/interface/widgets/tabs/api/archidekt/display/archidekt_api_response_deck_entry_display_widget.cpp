@@ -126,34 +126,60 @@ void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *ev
     actRequestNavigationToDeck();
 }
 
+void ArchidektApiResponseDeckEntryDisplayWidget::setScaleFactor(int scale)
+{
+    scaleFactor = scale;
+    updateScaledPreview();
+}
+
 void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNetworkReply *reply)
 {
     if (reply->url() != response.getFeatured()) {
         return;
     }
 
-    if (reply->error() != QNetworkReply::NoError) {
-        QPixmap pixmap;
-        CardPictureLoader::getCardBackLoadingFailedPixmap(pixmap, QSize(400, 400));
-        picture->setPixmap(pixmap.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        previewWidget->update();
-        previewWidget->updateGeometry();
+    QPixmap loaded;
 
-        reply->deleteLater();
-        return;
+    if (reply->error() != QNetworkReply::NoError || !loaded.loadFromData(reply->readAll())) {
+        CardPictureLoader::getCardBackLoadingFailedPixmap(loaded, QSize(400, 400));
     }
 
-    QByteArray imageData = reply->readAll();
-    QPixmap pixmap;
+    originalPixmap = loaded;
 
-    if (!pixmap.loadFromData(imageData)) {
-        CardPictureLoader::getCardBackLoadingFailedPixmap(pixmap, QSize(400, 400));
-    }
-    picture->setPixmap(pixmap.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    previewWidget->update();
-    previewWidget->updateGeometry();
+    float ratio = float(originalPixmap.height()) / float(originalPixmap.width());
+    previewWidget->setAspectRatio(ratio);
+    previewWidget->setPreviewWidth(400);
+
+    // Initial scaling
+    updateScaledPreview();
 
     reply->deleteLater();
+}
+
+void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
+{
+    if (originalPixmap.isNull())
+        return;
+
+    int baseWidth = 400;
+    int newWidth = baseWidth * scaleFactor / 100;
+
+    // 1. Resize the preview widget itself (keeps aspect ratio)
+    previewWidget->setPreviewWidth(newWidth);
+
+    // 2. Scale pixmap from the original
+    QPixmap scaled = originalPixmap.scaled(previewWidget->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    picture->setPixmap(scaled);
+    picture->setFixedSize(previewWidget->size());
+
+    // 3. Scale the whole outer widget width (this)
+    setFixedWidth(newWidth);
+
+    layout->invalidate();
+    layout->activate();
+    layout->update();
+    updateGeometry();
 }
 
 void ArchidektApiResponseDeckEntryDisplayWidget::resizeEvent(QResizeEvent *event)
