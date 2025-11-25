@@ -192,12 +192,19 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
     QPixmap scaled =
         originalPixmap.scaled(newWidth, newHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
-    // 2. Crop to exact target size (for safety)
+    // 2. Crop to exact target size
     QRect cropRect((scaled.width() - newWidth) / 2, (scaled.height() - newHeight) / 2, newWidth, newHeight);
     QPixmap cropped = scaled.copy(cropRect);
 
     picture->setPixmap(cropped);
     picture->setFixedSize(newWidth, newHeight);
+
+    // Update the elided deck name based on new width
+    int textMaxWidth = int(newWidth * 0.7); // allow 70% of width for text
+    QFontMetrics fm(previewWidget->topLeftLabel->font());
+    QString elided = fm.elidedText(response.getName(), Qt::ElideRight, textMaxWidth);
+    previewWidget->topLeftLabel->setText(elided);
+    previewWidget->topLeftLabel->setToolTip(response.getName());
 
     setFixedWidth(newWidth);
 
