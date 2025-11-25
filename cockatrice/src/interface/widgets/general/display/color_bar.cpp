@@ -108,9 +108,17 @@ void ColorBar::mouseMoveEvent(QMouseEvent *event)
     if (!isHovered || colors.isEmpty())
         return;
 
-    QString text = tooltipForPosition(event->position().x());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    int x = int(event->position().x());
+    QPoint gp = event->globalPosition().toPoint();
+#else
+    int x = event->pos().x();
+    QPoint gp = event->globalPos();
+#endif
+
+    QString text = tooltipForPosition(x);
     if (!text.isEmpty())
-        QToolTip::showText(event->globalPosition().toPoint(), text, this);
+        QToolTip::showText(gp, text, this);
 }
 
 QString ColorBar::tooltipForPosition(int x) const
