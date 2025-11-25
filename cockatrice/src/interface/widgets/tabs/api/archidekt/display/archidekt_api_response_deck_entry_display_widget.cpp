@@ -164,8 +164,11 @@ void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNet
 
     originalPixmap = loaded;
 
-    float ratio = float(originalPixmap.height()) / float(originalPixmap.width());
-    previewWidget->setAspectRatio(ratio);
+    // universal fallback/design aspect ratio
+    static constexpr float DESIGN_RATIO = 150.0f / 267.0f;
+
+    // Always scale preview widget to this ratio
+    previewWidget->setAspectRatio(DESIGN_RATIO);
     previewWidget->setPreviewWidth(400);
 
     // Initial scaling
@@ -181,22 +184,25 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
 
     int baseWidth = 400;
     int newWidth = baseWidth * scaleFactor / 100;
+    int newHeight = int(newWidth * (150.0 / 267.0));
 
-    // 1. Resize the preview widget itself (keeps aspect ratio)
-    previewWidget->setPreviewWidth(newWidth);
+    previewWidget->setFixedSize(newWidth, newHeight);
 
-    // 2. Scale pixmap from the original
-    QPixmap scaled = originalPixmap.scaled(previewWidget->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    // 1. Scale image to fill the preview area (crop edges)
+    QPixmap scaled =
+        originalPixmap.scaled(newWidth, newHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
-    picture->setPixmap(scaled);
-    picture->setFixedSize(previewWidget->size());
+    // 2. Crop to exact target size (for safety)
+    QRect cropRect((scaled.width() - newWidth) / 2, (scaled.height() - newHeight) / 2, newWidth, newHeight);
+    QPixmap cropped = scaled.copy(cropRect);
 
-    // 3. Scale the whole outer widget width (this)
+    picture->setPixmap(cropped);
+    picture->setFixedSize(newWidth, newHeight);
+
     setFixedWidth(newWidth);
 
     layout->invalidate();
     layout->activate();
-    layout->update();
     updateGeometry();
 }
 
