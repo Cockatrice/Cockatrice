@@ -15,6 +15,7 @@ ArchidektDeckPreviewImageDisplayWidget::ArchidektDeckPreviewImageDisplayWidget(Q
 
     QFont f;
     f.setBold(true);
+    f.setPointSize(16);
     topLeftLabel->setFont(f);
     topRightLabel->setFont(f);
     bottomLeftLabel->setFont(f);

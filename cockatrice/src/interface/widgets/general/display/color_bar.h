@@ -22,13 +22,17 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void enterEvent(QEnterEvent *event) override;
+#else
+    void enterEvent(QEvent *event) override;
+#endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    QMap<QString, int> m_colors;
-    bool m_hover = false;
+    QMap<QString, int> colors;
+    bool isHovered = false;
 
     QColor colorFromName(const QString &name) const;
     QString tooltipForPosition(int x) const;

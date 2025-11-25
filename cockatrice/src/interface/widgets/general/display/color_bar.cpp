@@ -6,14 +6,14 @@
 #include <QPainter>
 #include <QToolTip>
 
-ColorBar::ColorBar(const QMap<QString, int> &colors, QWidget *parent) : QWidget(parent), m_colors(colors)
+ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent) : QWidget(parent), colors(_colors)
 {
     setMouseTracking(true);
 }
 
-void ColorBar::setColors(const QMap<QString, int> &colors)
+void ColorBar::setColors(const QMap<QString, int> &_colors)
 {
-    m_colors = colors;
+    colors = _colors;
     update();
 }
 
@@ -27,11 +27,11 @@ QSize ColorBar::minimumSizeHint() const
 //-------------------------------------------
 void ColorBar::paintEvent(QPaintEvent *)
 {
-    if (m_colors.isEmpty())
+    if (colors.isEmpty())
         return;
 
     int total = 0;
-    for (int v : m_colors.values())
+    for (int v : colors.values())
         total += v;
 
     // Prevent divide-by-zero
@@ -55,12 +55,12 @@ void ColorBar::paintEvent(QPaintEvent *)
     p.setClipRect(bounds.adjusted(2, 2, -2, -2));
 
     // Sort colors by key (this ensures a predictable order)
-    QList<QString> sortedKeys = m_colors.keys();
+    QList<QString> sortedKeys = colors.keys();
     std::sort(sortedKeys.begin(), sortedKeys.end()); // Sort alphabetically
 
     // Draw each color segment in the sorted order
     for (const QString &key : sortedKeys) {
-        int value = m_colors[key];
+        int value = colors[key];
         double ratio = double(value) / total;
         int segmentWidth = int(ratio * w);
 
@@ -84,19 +84,28 @@ void ColorBar::paintEvent(QPaintEvent *)
 //-------------------------------------------
 // Hover + Tooltips
 //-------------------------------------------
-void ColorBar::enterEvent(QEnterEvent *)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void ColorBar::enterEvent(QEnterEvent *event)
 {
-    m_hover = true;
+    Q_UNUSED(event);
+    isHovered = true;
 }
+#else
+void ColorBar::enterEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    isHovered = true;
+}
+#endif
 
 void ColorBar::leaveEvent(QEvent *)
 {
-    m_hover = false;
+    isHovered = false;
 }
 
 void ColorBar::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!m_hover || m_colors.isEmpty())
+    if (!isHovered || colors.isEmpty())
         return;
 
     QString text = tooltipForPosition(event->position().x());
@@ -107,11 +116,11 @@ void ColorBar::mouseMoveEvent(QMouseEvent *event)
 QString ColorBar::tooltipForPosition(int x) const
 {
     int total = 0;
-    for (int v : m_colors.values())
+    for (int v : colors.values())
         total += v;
 
     int pos = 0;
-    for (auto it = m_colors.begin(); it != m_colors.end(); ++it) {
+    for (auto it = colors.begin(); it != colors.end(); ++it) {
         double ratio = double(it.value()) / total;
         int segmentWidth = int(ratio * width());
 
@@ -127,7 +136,7 @@ QString ColorBar::tooltipForPosition(int x) const
 }
 
 //-------------------------------------------
-// Color name mapping (expandable)
+// Color name mapping
 //-------------------------------------------
 QColor ColorBar::colorFromName(const QString &name) const
 {
