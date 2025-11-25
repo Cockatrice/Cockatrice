@@ -27,6 +27,13 @@ void ArchidektApiResponseDeckListingContainer::fromJson(const QJsonObject &json)
     // tags = {""};
     parentFolderId = json.value("parentFolderId").toInt();
     owner.fromJson(json.value("owner").toObject());
+
+    auto colorsJson = json.value("colors").toObject();
+
+    for (auto color : colorsJson.keys()) {
+        colors[color] = colorsJson[color].toInt();
+    }
+
     cardPackage = json.value("cardPackage").toString();
     contest = json.value("contest").toString();
 }

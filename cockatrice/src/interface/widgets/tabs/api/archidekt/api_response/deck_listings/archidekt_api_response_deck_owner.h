@@ -19,7 +19,7 @@ public:
     // Debug method for logging
     void debugPrint() const;
 
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return userName;
     }

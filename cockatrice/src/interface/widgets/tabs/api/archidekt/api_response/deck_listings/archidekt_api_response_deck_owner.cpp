@@ -3,7 +3,7 @@
 void ArchidektApiResponseDeckOwner::fromJson(const QJsonObject &json)
 {
     id = json.value("id").toInt();
-    userName = json.value("userName").toString();
+    userName = json.value("username").toString();
     avatar = QUrl(json.value("avatar").toString());
     moderator = json.value("moderator").toBool();
     pledgeLevel = json.value("pledgeLevel").toInt();
