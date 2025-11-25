@@ -1,6 +1,10 @@
 #include "archidekt_api_response_deck_entry_display_widget.h"
 
+#include "../../../../../card_picture_loader/card_picture_loader.h"
 #include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../../../../general/display/background_plate_widget.h"
+#include "../../../../general/display/color_bar.h"
+#include "archidekt_deck_preview_image_display_widget.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -8,6 +12,30 @@
 #include <QNetworkReply>
 #include <QPixmap>
 #include <QWidget>
+
+QString timeAgo(const QString &timestamp)
+{
+    QDateTime dt = QDateTime::fromString(timestamp, Qt::ISODate);
+
+    if (!dt.isValid())
+        return timestamp; // fallback if parsing fails
+
+    qint64 secs = dt.secsTo(QDateTime::currentDateTimeUtc());
+
+    if (secs < 60)
+        return QString("%1 seconds ago").arg(secs);
+    if (secs < 3600)
+        return QString("%1 minutes ago").arg(secs / 60);
+    if (secs < 86400)
+        return QString("%1 hours ago").arg(secs / 3600);
+    if (secs < 30*86400)
+        return QString("%1 days ago").arg(secs / 86400);
+    if (secs < 365*86400)
+        return QString("%1 months ago").arg(secs / (30*86400));
+
+    return QString("%1 years ago").arg(secs / (365*86400));
+}
+
 
 ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplayWidget(
     QWidget *parent,
@@ -18,69 +46,72 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    this->setMaximumWidth(200);
+    this->setMaximumWidth(400);
     this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     auto headerLayout = new QVBoxLayout();
 
-    QLabel *deckNameLabel = new QLabel(QString("%1 (%2)").arg(response.getName()).arg(response.getSize()));
-    deckNameLabel->setWordWrap(true); // Allow text to wrap
-    deckNameLabel->setStyleSheet("font-size: 14px; font-weight: bold;");
-    deckNameLabel->setMaximumWidth(200);
-    headerLayout->addWidget(deckNameLabel);
+    previewWidget = new ArchidektDeckPreviewImageDisplayWidget(this);
 
-    // Featured image (Deck Preview Image)
-    picture = new QLabel(this);
-    picture->setText("Loading Image...");
-    picture->setAlignment(Qt::AlignCenter);
-    picture->setMaximumWidth(200);
+    previewWidget->setMaximumWidth(400);
+    previewWidget->setMinimumHeight(300); // consistent height
+
+    // Set deck name (ellided)
+    {
+        QFontMetrics fm(previewWidget->topLeftLabel->font());
+        QString elided = fm.elidedText(response.getName(), Qt::ElideRight, 280);
+        previewWidget->topLeftLabel->setText(elided);
+        previewWidget->topLeftLabel->setToolTip(response.getName());
+    }
+
+    // Set count
+    previewWidget->topRightLabel->setText(QString::number(response.getSize()));
+
+    // EDH bracket (skip if 0)
+    if (response.getEDHBracket() != 0)
+        previewWidget->bottomLeftLabel->setText(QString("EDH: %1").arg(response.getEDHBracket()));
+    else
+        previewWidget->bottomLeftLabel->hide();
+
+    // Views
+    previewWidget->bottomRightLabel->setText(QString("Views: %1").arg(response.getViewCount()));
+
+
+    // Use preview->imageLabel for image loading
+    picture = previewWidget->imageLabel;
 
     QNetworkRequest req(QUrl(response.getFeatured()));
     imageNetworkManager->get(req);
     connect(imageNetworkManager, &QNetworkAccessManager::finished, this,
             &ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished);
 
-    headerLayout->addWidget(picture);
+    headerLayout->addWidget(previewWidget);
 
+    auto colors = response.getColors();
+
+    ColorBar *colorBar = new ColorBar(colors, this);
+    colorBar->setFixedHeight(22);
+
+    headerLayout->addWidget(colorBar);
+
+    // Create a shared plate for the labels
+    BackgroundPlateWidget *sharedPlate = new BackgroundPlateWidget(this);
+    sharedPlate->setFixedHeight(120);  // Adjust height to fit all labels
+
+    QVBoxLayout *plateLayout = new QVBoxLayout(sharedPlate);
+
+    // Add labels to the plate layout
     QLabel *ownerLabel = new QLabel(QString("Owner: %1").arg(response.getOwner().getName()));
-    ownerLabel->setWordWrap(true);
-    ownerLabel->setMaximumWidth(200);
-    headerLayout->addWidget(ownerLabel);
+    plateLayout->addWidget(ownerLabel);
 
-    QLabel *edhBracketLabel = new QLabel(QString("EDH Bracket: %1").arg(response.getEDHBracket()));
-    edhBracketLabel->setWordWrap(true);
-    edhBracketLabel->setMaximumWidth(200);
-    headerLayout->addWidget(edhBracketLabel);
+    QLabel *createdAtLabel = new QLabel(QString("Created: %1").arg(timeAgo(response.getCreatedAt())));
+    plateLayout->addWidget(createdAtLabel);
 
-    QLabel *viewCountLabel = new QLabel(QString("Views: %1").arg(response.getViewCount()));
-    viewCountLabel->setWordWrap(true);
-    viewCountLabel->setMaximumWidth(200);
-    headerLayout->addWidget(viewCountLabel);
+    QLabel *updatedAtLabel = new QLabel(QString("Updated: %1").arg(timeAgo(response.getUpdatedAt())));
+    plateLayout->addWidget(updatedAtLabel);
 
-    QLabel *createdAtLabel = new QLabel(QString("Created: %1").arg(response.getCreatedAt()));
-    createdAtLabel->setWordWrap(true);
-    createdAtLabel->setMaximumWidth(200);
-    QLabel *updatedAtLabel = new QLabel(QString("Updated: %1").arg(response.getUpdatedAt()));
-    updatedAtLabel->setWordWrap(true);
-    updatedAtLabel->setMaximumWidth(200);
-    headerLayout->addWidget(createdAtLabel);
-    headerLayout->addWidget(updatedAtLabel);
-
-    QLabel *colorsLabel = new QLabel("Colors: ");
-    QStringList colorNames;
-    for (auto color : response.getColors().keys()) {
-        colorNames << color;
-    }
-
-    if (colorNames.isEmpty()) {
-        colorsLabel->setText("Colors: None");
-    } else {
-        colorsLabel->setText("Colors: " + colorNames.join(", "));
-    }
-
-    colorsLabel->setWordWrap(true);
-    colorsLabel->setMaximumWidth(200);
-    headerLayout->addWidget(colorsLabel);
+    // Add the shared plate to the header layout
+    headerLayout->addWidget(sharedPlate);
 
     layout->addLayout(headerLayout);
 
@@ -104,7 +135,12 @@ void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNet
     }
 
     if (reply->error() != QNetworkReply::NoError) {
-        picture->setText("Error loading");
+        QPixmap pixmap;
+        CardPictureLoader::getCardBackLoadingFailedPixmap(pixmap, QSize(400, 400));
+        picture->setPixmap(pixmap.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        previewWidget->update();
+        previewWidget->updateGeometry();
+
         reply->deleteLater();
         return;
     }
@@ -112,11 +148,12 @@ void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNet
     QByteArray imageData = reply->readAll();
     QPixmap pixmap;
 
-    if (pixmap.loadFromData(imageData)) {
-        picture->setPixmap(pixmap.scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    } else {
-        picture->setText("Invalid image");
+    if (!pixmap.loadFromData(imageData)) {
+        CardPictureLoader::getCardBackLoadingFailedPixmap(pixmap, QSize(400, 400));
     }
+    picture->setPixmap(pixmap.scaled(400, 400, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    previewWidget->update();
+    previewWidget->updateGeometry();
 
     reply->deleteLater();
 }
