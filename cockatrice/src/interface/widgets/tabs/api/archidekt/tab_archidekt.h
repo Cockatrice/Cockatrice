@@ -53,13 +53,8 @@ private:
     QVBoxLayout *mainLayout;
     QHBoxLayout *navigationLayout;
     QVBoxLayout *currentPageLayout;
-    QPushButton *decksPushButton;
-    QLineEdit *searchBar;
+    //QLineEdit *searchBar;
     QPushButton *searchPushButton;
-
-    // --- Search options UI ---
-    QWidget *searchOptionsContainer;
-    QHBoxLayout *searchOptionsLayout;
 
     // Required / basic fields
     QLineEdit *nameField;  // Deck name substring
@@ -70,6 +65,8 @@ private:
     QCheckBox *logicalAndCheck;       // Require ALL colors instead of ANY
 
     // Formats
+    QLabel *formatLabel;
+    SettingsButtonWidget *formatSettingsWidget;
     QVector<QCheckBox *> formatChecks; // Format checkboxes (13 total)
 
     // Page size
