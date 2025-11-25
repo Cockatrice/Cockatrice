@@ -13,6 +13,8 @@
 #include <QPixmap>
 #include <QWidget>
 
+#define ARCHIDEKT_DEFAULT_IMAGE "https://storage.googleapis.com/topdekt-user/images/archidekt_deck_card_shadow.jpg"
+
 QString timeAgo(const QString &timestamp)
 {
     QDateTime dt = QDateTime::fromString(timestamp, Qt::ISODate);
@@ -78,8 +80,15 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     // Use preview->imageLabel for image loading
     picture = previewWidget->imageLabel;
 
-    QNetworkRequest req(QUrl(response.getFeatured()));
-    imageNetworkManager->get(req);
+    imageUrl = response.getFeatured().isEmpty() ? QUrl(ARCHIDEKT_DEFAULT_IMAGE) : QUrl(response.getFeatured());
+
+    QNetworkRequest req(imageUrl);
+    QNetworkReply *reply = imageNetworkManager->get(req);
+
+    // tag the reply with "this" so we know it belongs to us later
+    reply->setProperty("deckWidget", QVariant::fromValue<void *>(this));
+    reply->setProperty("requestedUrl", imageUrl);
+
     connect(imageNetworkManager, &QNetworkAccessManager::finished, this,
             &ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished);
 
@@ -134,7 +143,16 @@ void ArchidektApiResponseDeckEntryDisplayWidget::setScaleFactor(int scale)
 
 void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNetworkReply *reply)
 {
-    if (reply->url() != response.getFeatured()) {
+    // Check if this is our reply
+    void *owner = reply->property("deckWidget").value<void *>();
+    if (owner != this) {
+        return; // not our reply
+    }
+
+    // Check that the requested URL matches what we asked
+    QUrl requestedUrl = reply->property("requestedUrl").toUrl();
+    if (requestedUrl != imageUrl) {
+        reply->deleteLater();
         return;
     }
 

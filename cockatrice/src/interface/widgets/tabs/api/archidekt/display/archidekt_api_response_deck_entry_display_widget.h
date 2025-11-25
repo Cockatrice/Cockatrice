@@ -36,6 +36,7 @@ protected:
 private:
     QVBoxLayout *layout;
     ArchidektApiResponseDeckListingContainer response;
+    QUrl imageUrl;
     QNetworkAccessManager *imageNetworkManager;
     ArchidektDeckPreviewImageDisplayWidget *previewWidget;
     QLabel *picture;
