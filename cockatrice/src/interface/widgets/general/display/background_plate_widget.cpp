@@ -12,6 +12,7 @@ BackgroundPlateWidget::BackgroundPlateWidget(QWidget *parent) : QWidget(parent)
 
 void BackgroundPlateWidget::paintEvent(QPaintEvent *event)
 {
+    QWidget::paintEvent(event);
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
