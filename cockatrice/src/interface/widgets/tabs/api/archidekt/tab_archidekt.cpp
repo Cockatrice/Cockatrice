@@ -1,5 +1,6 @@
 #include "tab_archidekt.h"
 
+#include "../../../cards/additional_info/mana_symbol_widget.h"
 #include "../../tab_supervisor.h"
 #include "api_response/archidekt_deck_listing_api_response.h"
 #include "display/archidekt_api_response_deck_display_widget.h"
@@ -82,21 +83,23 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     searchOptionsLayout = new QHBoxLayout(searchOptionsContainer);
     mainLayout->addWidget(searchOptionsContainer);
 
-    nameField = new QLineEdit(searchOptionsContainer);
-    nameField->setPlaceholderText(tr("Deck name contains..."));
-    searchOptionsLayout->addWidget(nameField);
-
-    ownerField = new QLineEdit(searchOptionsContainer);
-    ownerField->setPlaceholderText(tr("Owner name contains..."));
-    searchOptionsLayout->addWidget(ownerField);
+    // Colors
 
     QHBoxLayout *colorLayout = new QHBoxLayout();
-    QStringList colors = {"White", "Blue", "Black", "Green", "Red", "Colorless"};
+    QString colorIdentity = "WUBRG"; // Optionally include "C" for colorless once we have a symbol for it
 
-    for (const auto &c : colors) {
-        QCheckBox *chk = new QCheckBox(c, searchOptionsContainer);
-        colorChecks << chk;
-        colorLayout->addWidget(chk);
+    for (const QChar &color : colorIdentity) {
+        auto *manaSymbol = new ManaSymbolWidget(searchOptionsContainer, color, false, true);
+        manaSymbol->setFixedWidth(25);
+        colorLayout->addWidget(manaSymbol);
+
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, [=](QChar c, bool active) {
+            if (active) {
+                activeColors.insert(c);
+            } else {
+                activeColors.remove(c);
+            }
+        });
     }
 
     searchOptionsLayout->addLayout(colorLayout);
@@ -104,7 +107,10 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     logicalAndCheck = new QCheckBox("Require ALL colors", searchOptionsContainer);
     searchOptionsLayout->addWidget(logicalAndCheck);
 
-    QHBoxLayout *formatLayout = new QHBoxLayout();
+    // Formats
+
+    auto formatSettingsWidget = new SettingsButtonWidget(this);
+
     QStringList formatNames = {"Standard",      "Modern",         "Commander", "Legacy",     "Vintage",
                                "Pauper",        "Custom",         "Frontier",  "Future Std", "Penny Dreadful",
                                "1v1 Commander", "Dual Commander", "Brawl"};
@@ -112,23 +118,44 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     for (int i = 0; i < formatNames.size(); ++i) {
         QCheckBox *formatCheckBox = new QCheckBox(formatNames[i], searchOptionsContainer);
         formatChecks << formatCheckBox;
-        formatLayout->addWidget(formatCheckBox);
+        formatSettingsWidget->addSettingsWidget(formatCheckBox);
     }
 
-    searchOptionsLayout->addLayout(formatLayout);
+    searchOptionsLayout->addWidget(formatSettingsWidget);
 
-    pageSizeSpin = new QSpinBox(searchOptionsContainer);
-    pageSizeSpin->setRange(1, 500);
-    pageSizeSpin->setValue(50);
-    searchOptionsLayout->addWidget(pageSizeSpin);
+    // Deck Name
+
+    nameField = new QLineEdit(searchOptionsContainer);
+    nameField->setPlaceholderText(tr("Deck name contains..."));
+    searchOptionsLayout->addWidget(nameField);
+
+    // Owner Name
+
+    ownerField = new QLineEdit(searchOptionsContainer);
+    ownerField->setPlaceholderText(tr("Owner name contains..."));
+    searchOptionsLayout->addWidget(ownerField);
+
+    // Contained cards
 
     cardsField = new QLineEdit(searchOptionsContainer);
     cardsField->setPlaceholderText("Cards (comma separated)");
     searchOptionsLayout->addWidget(cardsField);
 
+    // Commanders
+
     commandersField = new QLineEdit(searchOptionsContainer);
     commandersField->setPlaceholderText("Commanders (comma separated)");
     searchOptionsLayout->addWidget(commandersField);
+
+    // Page size
+
+    pageSizeLabel = new QLabel(searchOptionsContainer);
+    searchOptionsLayout->addWidget(pageSizeLabel);
+
+    pageSizeSpin = new QSpinBox(searchOptionsContainer);
+    pageSizeSpin->setRange(1, 200);
+    pageSizeSpin->setValue(50);
+    searchOptionsLayout->addWidget(pageSizeSpin);
 
     settingsButton = new SettingsButtonWidget(this);
 
@@ -165,6 +192,7 @@ void TabArchidekt::retranslateUi()
     decksPushButton->setText(tr("&Decks"));
     searchBar->setPlaceholderText(tr("Search for a card ..."));
     searchPushButton->setText(tr("Search"));
+    pageSizeLabel->setText(tr("Max. Results:"));
 }
 
 QString TabArchidekt::buildSearchUrl()
@@ -176,9 +204,31 @@ QString TabArchidekt::buildSearchUrl()
 
     // colors
     QStringList selectedColors;
-    for (auto *chk : colorChecks)
-        if (chk->isChecked())
-            selectedColors << chk->text();
+    for (QChar c : activeColors) {
+        switch (c.unicode()) {
+            case 'W':
+                selectedColors << "White";
+                break;
+            case 'U':
+                selectedColors << "Blue";
+                break;
+            case 'B':
+                selectedColors << "Black";
+                break;
+            case 'G':
+                selectedColors << "Green";
+                break;
+            case 'R':
+                selectedColors << "Red";
+                break;
+            case 'C':
+                selectedColors << "Colorless";
+                break;
+            default:
+                break;
+        }
+    }
+
     if (!selectedColors.isEmpty())
         query.addQueryItem("colors", selectedColors.join(","));
 

@@ -66,13 +66,14 @@ private:
     QLineEdit *ownerField; // Owner substring
 
     // Colors
-    QVector<QCheckBox *> colorChecks; // White, Blue, Black, Green, Red, Colorless
+    QSet<QChar> activeColors;
     QCheckBox *logicalAndCheck;       // Require ALL colors instead of ANY
 
     // Formats
     QVector<QCheckBox *> formatChecks; // Format checkboxes (13 total)
 
     // Page size
+    QLabel *pageSizeLabel;
     QSpinBox *pageSizeSpin;
 
     // Cards and Commanders
