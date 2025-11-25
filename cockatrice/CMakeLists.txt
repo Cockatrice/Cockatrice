@@ -153,11 +153,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/general/background_sources.cpp
+        src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
     src/interface/widgets/general/display/bar_widget.cpp
+        src/interface/widgets/general/display/color_bar.cpp
     src/interface/widgets/general/display/dynamic_font_size_label.cpp
     src/interface/widgets/general/display/dynamic_font_size_push_button.cpp
     src/interface/widgets/general/display/labeled_input.cpp
+        src/interface/widgets/general/display/overlay_label.cpp
     src/interface/widgets/general/display/percent_bar_widget.cpp
     src/interface/widgets/general/display/shadow_background_label.cpp
     src/interface/widgets/general/home_styled_button.cpp
@@ -232,6 +235,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
+        src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp

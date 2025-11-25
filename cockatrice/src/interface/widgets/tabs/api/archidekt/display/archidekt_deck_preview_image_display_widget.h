@@ -1,0 +1,29 @@
+//
+// Created by Ascor on 25-Nov-25.
+//
+
+#ifndef COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
+#define COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
+
+#include "../../../../general/display/overlay_label.h"
+
+#include <QLabel>
+#include <QWidget>
+
+class ArchidektDeckPreviewImageDisplayWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit ArchidektDeckPreviewImageDisplayWidget(QWidget *parent = nullptr);
+
+    QLabel *imageLabel;
+    OverlayLabel *topLeftLabel;
+    OverlayLabel *topRightLabel;
+    OverlayLabel *bottomLeftLabel;
+    OverlayLabel *bottomRightLabel;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+};
+
+#endif // COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
