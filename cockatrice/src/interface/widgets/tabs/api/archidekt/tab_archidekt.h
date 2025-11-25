@@ -62,7 +62,7 @@ private:
 
     // Colors
     QSet<QChar> activeColors;
-    QCheckBox *logicalAndCheck;       // Require ALL colors instead of ANY
+    QCheckBox *logicalAndCheck; // Require ALL colors instead of ANY
 
     // Formats
     QLabel *formatLabel;
