@@ -34,13 +34,13 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     container = new QWidget(this);
     mainLayout = new QVBoxLayout(container);
-    mainLayout->setContentsMargins(0, 0, 0, 1);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     container->setLayout(mainLayout);
 
     navigationContainer = new QWidget(container);
     navigationContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     navigationLayout = new QHBoxLayout(navigationContainer);
-    navigationLayout->setSpacing(5);
+    navigationLayout->setSpacing(3);
     navigationContainer->setLayout(navigationLayout);
 
     // Colors
@@ -53,12 +53,13 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
         manaSymbol->setFixedWidth(25);
         colorLayout->addWidget(manaSymbol);
 
-        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, [=](QChar c, bool active) {
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, [this](QChar c, bool active) {
             if (active) {
                 activeColors.insert(c);
             } else {
                 activeColors.remove(c);
             }
+            doSearch();
         });
     }
 
@@ -79,6 +80,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     for (int i = 0; i < formatNames.size(); ++i) {
         QCheckBox *formatCheckBox = new QCheckBox(formatNames[i], navigationContainer);
+        connect(formatCheckBox, &QCheckBox::clicked, this, [this]() { doSearch(); });
         formatChecks << formatCheckBox;
         formatSettingsWidget->addSettingsWidget(formatCheckBox);
     }
@@ -143,7 +145,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
         }
     });*/
 
-    //navigationLayout->addWidget(searchBar);
+    // navigationLayout->addWidget(searchBar);
 
     // Do search button
 
@@ -194,7 +196,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
 void TabArchidekt::retranslateUi()
 {
-    //searchBar->setPlaceholderText(tr("Search for a card ..."));
+    // searchBar->setPlaceholderText(tr("Search for a card ..."));
     searchPushButton->setText(tr("Search"));
     formatLabel->setText(tr("Formats"));
     pageSizeLabel->setText(tr("Max. Results:"));
@@ -210,28 +212,7 @@ QString TabArchidekt::buildSearchUrl()
     // colors
     QStringList selectedColors;
     for (QChar c : activeColors) {
-        switch (c.unicode()) {
-            case 'W':
-                selectedColors << "White";
-                break;
-            case 'U':
-                selectedColors << "Blue";
-                break;
-            case 'B':
-                selectedColors << "Black";
-                break;
-            case 'G':
-                selectedColors << "Green";
-                break;
-            case 'R':
-                selectedColors << "Red";
-                break;
-            case 'C':
-                selectedColors << "Colorless";
-                break;
-            default:
-                break;
-        }
+        selectedColors.append(c);
     }
 
     if (!selectedColors.isEmpty())

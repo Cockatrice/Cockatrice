@@ -53,7 +53,7 @@ private:
     QVBoxLayout *mainLayout;
     QHBoxLayout *navigationLayout;
     QVBoxLayout *currentPageLayout;
-    //QLineEdit *searchBar;
+    // QLineEdit *searchBar;
     QPushButton *searchPushButton;
 
     // Required / basic fields
