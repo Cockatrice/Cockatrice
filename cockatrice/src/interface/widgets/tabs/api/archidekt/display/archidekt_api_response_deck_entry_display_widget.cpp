@@ -28,14 +28,13 @@ QString timeAgo(const QString &timestamp)
         return QString("%1 minutes ago").arg(secs / 60);
     if (secs < 86400)
         return QString("%1 hours ago").arg(secs / 3600);
-    if (secs < 30*86400)
+    if (secs < 30 * 86400)
         return QString("%1 days ago").arg(secs / 86400);
-    if (secs < 365*86400)
-        return QString("%1 months ago").arg(secs / (30*86400));
+    if (secs < 365 * 86400)
+        return QString("%1 months ago").arg(secs / (30 * 86400));
 
-    return QString("%1 years ago").arg(secs / (365*86400));
+    return QString("%1 years ago").arg(secs / (365 * 86400));
 }
-
 
 ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplayWidget(
     QWidget *parent,
@@ -76,7 +75,6 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     // Views
     previewWidget->bottomRightLabel->setText(QString("Views: %1").arg(response.getViewCount()));
 
-
     // Use preview->imageLabel for image loading
     picture = previewWidget->imageLabel;
 
@@ -96,7 +94,7 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
 
     // Create a shared plate for the labels
     BackgroundPlateWidget *sharedPlate = new BackgroundPlateWidget(this);
-    sharedPlate->setFixedHeight(120);  // Adjust height to fit all labels
+    sharedPlate->setFixedHeight(120); // Adjust height to fit all labels
 
     QVBoxLayout *plateLayout = new QVBoxLayout(sharedPlate);
 
