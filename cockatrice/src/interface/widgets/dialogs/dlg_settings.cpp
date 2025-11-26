@@ -801,6 +801,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setPlayToStack);
 
+    doNotDeleteArrowsInSubPhasesCheckBox.setChecked(SettingsCache::instance().getDoNotDeleteArrowsInSubPhases());
+    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setDoNotDeleteArrowsInSubPhases);
+
     closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().getCloseEmptyCardView());
     connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setCloseEmptyCardView);
@@ -821,10 +825,11 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
     generalGrid->addWidget(&playToStackCheckBox, 2, 0);
-    generalGrid->addWidget(&closeEmptyCardViewCheckBox, 3, 0);
-    generalGrid->addWidget(&focusCardViewSearchBarCheckBox, 4, 0);
-    generalGrid->addWidget(&annotateTokensCheckBox, 5, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 6, 0);
+    generalGrid->addWidget(&doNotDeleteArrowsInSubPhasesCheckBox, 3, 0);
+    generalGrid->addWidget(&closeEmptyCardViewCheckBox, 4, 0);
+    generalGrid->addWidget(&focusCardViewSearchBarCheckBox, 5, 0);
+    generalGrid->addWidget(&annotateTokensCheckBox, 6, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 7, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -942,6 +947,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     doubleClickToPlayCheckBox.setText(tr("&Double-click cards to play them (instead of single-click)"));
     clickPlaysAllSelectedCheckBox.setText(tr("&Clicking plays all selected cards (instead of just the clicked card)"));
     playToStackCheckBox.setText(tr("&Play all nonlands onto the stack (not the battlefield) by default"));
+    doNotDeleteArrowsInSubPhasesCheckBox.setText(tr("Do not delete &arrows inside of subphases"));
     closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     focusCardViewSearchBarCheckBox.setText(tr("Auto focus search bar when card view window is opened"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
