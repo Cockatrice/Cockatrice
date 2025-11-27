@@ -88,6 +88,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     sortByLabel = new QLabel(this);
     sortColumnCombo = new QComboBox(this);
+    sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
     sortOrderCombo = new QComboBox(this);
 
     sortOrderCombo->addItem("Ascending", Qt::AscendingOrder);
@@ -98,6 +99,9 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
         QString header = databaseDisplayModel->headerData(i, Qt::Horizontal).toString();
         sortColumnCombo->addItem(header, i);
     }
+
+    sortColumnCombo->view()->setMinimumWidth(sortColumnCombo->view()->sizeHintForColumn(0));
+    sortColumnCombo->adjustSize();
 
     connect(sortColumnCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         int column = sortColumnCombo->currentData().toInt();
