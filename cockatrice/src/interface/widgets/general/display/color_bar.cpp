@@ -134,7 +134,7 @@ QString ColorBar::tooltipForPosition(int x) const
 
         if (x >= pos && x < pos + segmentWidth) {
             double percent = (100.0 * it.value()) / total;
-            return QString("%1: %2 cards (%.1f%)").arg(it.key()).arg(it.value()).arg(percent);
+            return QString("%1: %2 cards (%3%)").arg(it.key()).arg(it.value()).arg(QString::number(percent, 'f', 1));
         }
 
         pos += segmentWidth;
