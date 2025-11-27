@@ -98,11 +98,49 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     searchEdit->setTreeView(databaseView);
 
+    sortByLabel = new QLabel(this);
+    sortColumnCombo = new QComboBox(this);
+    sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
+    sortOrderCombo = new QComboBox(this);
+    sortOrderCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
+
+    sortOrderCombo->addItem("Ascending", Qt::AscendingOrder);
+    sortOrderCombo->addItem("Descending", Qt::DescendingOrder);
+    sortOrderCombo->view()->setMinimumWidth(sortOrderCombo->view()->sizeHintForColumn(0));
+    sortOrderCombo->adjustSize();
+
+    // Populate columns dynamically from the model
+    for (int i = 0; i < databaseDisplayModel->columnCount(); ++i) {
+        QString header = databaseDisplayModel->headerData(i, Qt::Horizontal).toString();
+        sortColumnCombo->addItem(header, i);
+    }
+
+    sortColumnCombo->view()->setMinimumWidth(sortColumnCombo->view()->sizeHintForColumn(0));
+    sortColumnCombo->adjustSize();
+
+    connect(sortColumnCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
+        int column = sortColumnCombo->currentData().toInt();
+        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
+        databaseView->sortByColumn(column, order);
+
+        searchModelChanged();
+    });
+
+    connect(sortOrderCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
+        int column = sortColumnCombo->currentData().toInt();
+        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
+        databaseView->sortByColumn(column, order);
+
+        searchModelChanged();
+    });
+
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
     filterContainer = new QWidget(this);
     filterContainerLayout = new QHBoxLayout(filterContainer);
     filterContainer->setLayout(filterContainerLayout);
+
+    filterByLabel = new QLabel(this);
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
@@ -139,6 +177,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
         connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
                 &VisualDatabaseDisplayWidget::initialize);
+        sortByLabel->setVisible(false);
+        filterByLabel->setVisible(false);
         quickFilterSaveLoadWidget->setVisible(false);
         quickFilterNameWidget->setVisible(false);
         quickFilterSubTypeWidget->setVisible(false);
@@ -155,6 +195,8 @@ void VisualDatabaseDisplayWidget::initialize()
 {
     databaseLoadIndicator->setVisible(false);
 
+    sortByLabel->setVisible(true);
+    filterByLabel->setVisible(true);
     quickFilterSaveLoadWidget->setVisible(true);
     quickFilterNameWidget->setVisible(true);
     quickFilterSubTypeWidget->setVisible(true);
@@ -171,6 +213,10 @@ void VisualDatabaseDisplayWidget::initialize()
     quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
 
+    filterContainerLayout->addWidget(sortByLabel);
+    filterContainerLayout->addWidget(sortColumnCombo);
+    filterContainerLayout->addWidget(sortOrderCombo);
+    filterContainerLayout->addWidget(filterByLabel);
     filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
     filterContainerLayout->addWidget(quickFilterNameWidget);
     filterContainerLayout->addWidget(quickFilterSubTypeWidget);
@@ -215,6 +261,9 @@ void VisualDatabaseDisplayWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+
+    sortByLabel->setText(tr("Sort by:"));
+    filterByLabel->setText(tr("Filter by:"));
 
     quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
     quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
