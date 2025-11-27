@@ -27,6 +27,7 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     for (const auto &deckListing : deckListings) {
         auto cardListDisplayWidget =
             new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
+        cardListDisplayWidget->setScaleFactor(cardSizeSlider->getSlider()->value());
         connect(cardListDisplayWidget, &ArchidektApiResponseDeckEntryDisplayWidget::requestNavigation, this,
                 &ArchidektApiResponseDeckListingsDisplayWidget::requestNavigation);
         connect(cardSizeSlider->getSlider(), &QSlider::valueChanged, cardListDisplayWidget,
