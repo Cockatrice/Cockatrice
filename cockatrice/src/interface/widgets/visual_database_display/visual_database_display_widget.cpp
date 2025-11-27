@@ -16,6 +16,7 @@
 
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QStyledItemDelegate>
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -60,28 +61,39 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
 
+    displayModeButton = new QPushButton(tr("Visual"), this);
+    displayModeButton->setCheckable(true); // Toggle button
+
+    connect(displayModeButton, &QPushButton::toggled, this, &VisualDatabaseDisplayWidget::onDisplayModeChanged);
+
+    displayModeButton->setChecked(false); // Start in Visual mode
+
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
 
     searchKeySignals.setObjectName("searchKeySignals");
-    connect(searchEdit, &QLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
-    /*connect(&searchKeySignals, SIGNAL(onEnter()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEqual()), this, SLOT(actAddCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltRBracket()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltMinus()), this, SLOT(actDecrementCard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltLBracket()), this, SLOT(actDecrementCardFromSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlAltEnter()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlEnter()), this, SLOT(actAddCardToSideboard()));
-    connect(&searchKeySignals, SIGNAL(onCtrlC()), this, SLOT(copyDatabaseCellContents()));*/
+    connect(searchEdit, &SearchLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
+    connect(&searchKeySignals, &KeySignals::onEnter, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlEnter, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
+    connect(&searchKeySignals, &KeySignals::onCtrlC, deckEditor->databaseDisplayDockWidget,
+            &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
+    connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
-    databaseView = new QTreeView(this);
-    databaseView->setObjectName("databaseView");
+    databaseView = deckEditor->databaseDisplayDockWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
-    databaseView->setRootIsDecorated(false);
     databaseView->setItemDelegate(nullptr);
-    databaseView->setSortingEnabled(true);
-    databaseView->sortByColumn(0, Qt::AscendingOrder);
-    databaseView->setModel(databaseDisplayModel);
     databaseView->setVisible(false);
 
     searchEdit->setTreeView(databaseView);
@@ -168,10 +180,13 @@ void VisualDatabaseDisplayWidget::initialize()
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);
     searchLayout->addWidget(searchEdit);
+    searchLayout->addWidget(displayModeButton);
 
     mainLayout->addWidget(searchContainer);
 
     mainLayout->addWidget(filterContainer);
+
+    mainLayout->addWidget(databaseView);
 
     mainLayout->addWidget(flowWidget);
 
@@ -213,6 +228,25 @@ void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
     loadCurrentPage();
 }
 
+void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
+{
+    if (checked) {
+        // Table mode
+        displayModeButton->setText(tr("Table"));
+        flowWidget->setVisible(false);
+        cardSizeWidget->setVisible(false);
+        databaseView->setItemDelegate(new QStyledItemDelegate(databaseView));
+        databaseView->setVisible(true);
+    } else {
+        // Visual mode
+        displayModeButton->setText(tr("Visual"));
+        flowWidget->setVisible(true);
+        cardSizeWidget->setVisible(true);
+        databaseView->setVisible(false);
+        populateCards();
+    }
+}
+
 void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
 {
     emit cardClickedDatabaseDisplay(event, instance);
@@ -246,17 +280,19 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 
 void VisualDatabaseDisplayWidget::searchModelChanged()
 {
-    // Clear the current page and prepare for new data
-    flowWidget->clearLayout(); // Clear existing cards
-    cards->clear();            // Clear the card list
-    // Reset scrollbar position to the top after loading new cards
-    if (QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar()) {
-        scrollBar->setValue(0); // Reset scrollbar to top
-    }
+    if (flowWidget->isVisible()) {
+        // Clear the current page and prepare for new data
+        flowWidget->clearLayout(); // Clear existing cards
+        cards->clear();            // Clear the card list
+        // Reset scrollbar position to the top after loading new cards
+        if (QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar()) {
+            scrollBar->setValue(0); // Reset scrollbar to top
+        }
 
-    currentPage = 0;
-    loadCurrentPage();
-    qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
+        currentPage = 0;
+        loadCurrentPage();
+        qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
+    }
 }
 
 void VisualDatabaseDisplayWidget::loadCurrentPage()
