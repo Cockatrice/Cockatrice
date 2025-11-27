@@ -1,10 +1,3 @@
-// NOTE: You must add the following members to tab_archidekt.h:
-// QComboBox* edhBracketCombo;
-// QLineEdit* deckTagNameField;
-// QComboBox* orderByCombo;
-// QCheckBox* packagesCheck;
-// QSpinBox* pageSpin;
-
 #include "tab_archidekt.h"
 
 #include "../../../cards/additional_info/mana_symbol_widget.h"
