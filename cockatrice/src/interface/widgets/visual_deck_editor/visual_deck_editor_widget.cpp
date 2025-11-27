@@ -38,10 +38,6 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     mainLayout->setContentsMargins(9, 0, 9, 5);
     mainLayout->setSpacing(0);
 
-    searchContainer = new QWidget(this);
-    searchLayout = new QHBoxLayout(searchContainer);
-    searchContainer->setLayout(searchLayout);
-
     searchBar = new QLineEdit(this);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
         if (!searchBar->hasFocus())
@@ -114,15 +110,12 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
         }
     });
 
-    searchLayout->addWidget(searchBar);
-    searchLayout->addWidget(searchPushButton);
-
-    mainLayout->addWidget(searchContainer);
-
     groupAndSortContainer = new QWidget(this);
     groupAndSortLayout = new QHBoxLayout(groupAndSortContainer);
     groupAndSortLayout->setAlignment(Qt::AlignLeft);
     groupAndSortContainer->setLayout(groupAndSortLayout);
+
+    groupByLabel = new QLabel(groupAndSortContainer);
 
     groupByComboBox = new QComboBox(this);
     if (auto tabWidget = qobject_cast<TabDeckEditorVisualTabWidget *>(parent)) {
@@ -148,6 +141,8 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
                 &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
         actChangeActiveGroupCriteria();
     }
+
+    sortByLabel = new QLabel(groupAndSortContainer);
 
     sortCriteriaButton = new SettingsButtonWidget(this);
 
@@ -177,9 +172,13 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     displayTypeButton = new QPushButton(this);
     connect(displayTypeButton, &QPushButton::clicked, this, &VisualDeckEditorWidget::updateDisplayType);
 
+    groupAndSortLayout->addWidget(groupByLabel);
     groupAndSortLayout->addWidget(groupByComboBox);
+    groupAndSortLayout->addWidget(sortByLabel);
     groupAndSortLayout->addWidget(sortCriteriaButton);
     groupAndSortLayout->addWidget(displayTypeButton);
+    groupAndSortLayout->addWidget(searchBar);
+    groupAndSortLayout->addWidget(searchPushButton);
 
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
@@ -219,12 +218,16 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
 
 void VisualDeckEditorWidget::retranslateUi()
 {
+    searchBar->setPlaceholderText(tr("Type a card name here for suggestions from the database..."));
+    groupByLabel->setText(tr("Group by:"));
+    groupByComboBox->setToolTip(tr("Change how cards are divided into categories/groups."));
+    sortByLabel->setText(tr("Sort by:"));
     sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     searchPushButton->setText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
     sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
-    displayTypeButton->setText(tr("Overlap Layout"));
+    displayTypeButton->setText(tr("Toggle Layout: Overlap"));
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
@@ -376,10 +379,10 @@ void VisualDeckEditorWidget::updateDisplayType()
     // Update UI and emit signal
     switch (currentDisplayType) {
         case DisplayType::Flat:
-            displayTypeButton->setText(tr("Flat Layout"));
+            displayTypeButton->setText(tr("Toggle Layout: Flat"));
             break;
         case DisplayType::Overlap:
-            displayTypeButton->setText(tr("Overlap Layout"));
+            displayTypeButton->setText(tr("Toggle Layout: Overlap"));
             break;
     }
     emit displayTypeChanged(currentDisplayType);

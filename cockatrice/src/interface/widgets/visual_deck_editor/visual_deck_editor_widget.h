@@ -82,8 +82,6 @@ private:
     DeckListModel *deckListModel;
     QItemSelectionModel *selectionModel;
     QVBoxLayout *mainLayout;
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
@@ -93,9 +91,11 @@ private:
     QPushButton *displayTypeButton;
     QWidget *groupAndSortContainer;
     QHBoxLayout *groupAndSortLayout;
+    QLabel *groupByLabel;
     QComboBox *groupByComboBox;
     QString activeGroupCriteria = "maintype";
     SettingsButtonWidget *sortCriteriaButton;
+    QLabel *sortByLabel;
     QLabel *sortLabel;
     QListWidget *sortByListWidget;
     QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
