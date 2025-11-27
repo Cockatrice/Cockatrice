@@ -202,8 +202,8 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     minDeckSizeLabel = new QLabel(navigationContainer);
 
     minDeckSizeSpin = new QSpinBox(navigationContainer);
-    minDeckSizeSpin->setRange(1, 200);
-    minDeckSizeSpin->setValue(60);
+    minDeckSizeSpin->setRange(0, 200);
+    minDeckSizeSpin->setValue(0);
 
     // Page number
     pageLabel = new QLabel(navigationContainer);
@@ -381,8 +381,9 @@ QString TabArchidekt::buildSearchUrl()
     }
 
     // Min deck size
-    if (minDeckSizeSpin->value() != 50) {
+    if (minDeckSizeSpin->value() != 0) {
         query.addQueryItem("size", QString::number(minDeckSizeSpin->value()));
+        query.addQueryItem("sizeLogic", QString("GTE"));
     }
 
     // build final URL
