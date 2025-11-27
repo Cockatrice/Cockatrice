@@ -6,6 +6,7 @@
 #include "../../tab.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QNetworkAccessManager>
@@ -150,7 +151,7 @@ public slots:
     void getTopDecks();
 
 private:
-    QTimer* searchDebounceTimer; ///< Timer to debounce search requests by spin-boxes etc.
+    QTimer *searchDebounceTimer; ///< Timer to debounce search requests by spin-boxes etc.
 
     // ---------------------------------------------------------------------
     // Layout Containers
