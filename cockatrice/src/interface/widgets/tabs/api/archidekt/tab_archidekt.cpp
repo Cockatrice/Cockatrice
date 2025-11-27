@@ -1,3 +1,10 @@
+// NOTE: You must add the following members to tab_archidekt.h:
+// QComboBox* edhBracketCombo;
+// QLineEdit* deckTagNameField;
+// QComboBox* orderByCombo;
+// QCheckBox* packagesCheck;
+// QSpinBox* pageSpin;
+
 #include "tab_archidekt.h"
 
 #include "../../../cards/additional_info/mana_symbol_widget.h"
@@ -43,8 +50,26 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     navigationLayout->setSpacing(3);
     navigationContainer->setLayout(navigationLayout);
 
-    // Colors
+    // Sort by
 
+    orderByCombo = new QComboBox(navigationContainer);
+    orderByCombo->addItems({"name", "updatedAt", "createdAt", "viewCount", "size", "edhBracket"});
+    orderByCombo->setCurrentText("updatedAt"); // Pre-select updatedAt
+    navigationLayout->addWidget(orderByCombo);
+
+    // Asc/Desc toggle
+    orderDirButton = new QPushButton(tr("Desc."), navigationContainer);
+    orderDirButton->setCheckable(true); // checked = DESC, unchecked = ASC
+    orderDirButton->setChecked(true);
+    navigationLayout->addWidget(orderDirButton);
+
+    connect(orderByCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
+    connect(orderDirButton, &QPushButton::clicked, this, [this](bool checked) {
+        orderDirButton->setText(checked ? tr("Desc.") : tr("Asc."));
+        doSearch();
+    });
+
+    // Colors
     QHBoxLayout *colorLayout = new QHBoxLayout();
     QString colorIdentity = "WUBRG"; // Optionally include "C" for colorless once we have a symbol for it
 
@@ -88,8 +113,30 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     navigationLayout->addWidget(formatSettingsWidget);
     navigationLayout->addWidget(formatLabel);
 
-    // Deck Name
+    // EDH Bracket
+    edhBracketCombo = new QComboBox(navigationContainer);
+    edhBracketCombo->addItem(tr("Any Bracket"));
+    edhBracketCombo->addItems({"1", "2", "3", "4", "5"});
+    navigationLayout->addWidget(edhBracketCombo);
 
+    connect(edhBracketCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
+
+    // Search for Card Packages instead of Decks
+    packagesCheck = new QCheckBox("Packages", navigationContainer);
+    navigationLayout->addWidget(packagesCheck);
+
+    connect(packagesCheck, &QCheckBox::clicked, this, [this]() {
+        bool disable = packagesCheck->isChecked();
+        for (auto *cb : formatChecks)
+            cb->setEnabled(!disable);
+        commandersField->setEnabled(!disable);
+        deckTagNameField->setEnabled(!disable);
+        edhBracketCombo->setCurrentIndex(0);
+        edhBracketCombo->setEnabled(!disable);
+        doSearch();
+    });
+
+    // Deck Name
     nameField = new QLineEdit(navigationContainer);
     nameField->setPlaceholderText(tr("Deck name contains..."));
     navigationLayout->addWidget(nameField);
@@ -113,8 +160,6 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     navigationLayout->addWidget(commandersField);
 
     // DB supplemented card search
-
-    /*searchBar = new QLineEdit(this);
     auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     auto displayModel = new CardDatabaseDisplayModel(this);
     displayModel->setSourceModel(cardDatabaseModel);
@@ -131,50 +176,67 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setFilterMode(Qt::MatchContains);
     completer->setMaxVisibleItems(10);
-    searchBar->setCompleter(completer);
 
-    // Update suggestions dynamically
-    connect(searchBar, &QLineEdit::textChanged, searchModel, &CardSearchModel::updateSearchResults);
-    connect(searchBar, &QLineEdit::textChanged, this, [=](const QString &text) {
-        // Ensure substring matching
+    cardsField->setCompleter(completer);
+    commandersField->setCompleter(completer);
+
+    connect(cardsField, &QLineEdit::textChanged, searchModel, &CardSearchModel::updateSearchResults);
+
+    connect(cardsField, &QLineEdit::textChanged, this, [=](const QString &text) {
         QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
         proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
+        if (!text.isEmpty())
+            completer->complete();
+    });
 
-        if (!text.isEmpty()) {
-            completer->complete(); // Force the dropdown to appear
-        }
-    });*/
+    connect(commandersField, &QLineEdit::textChanged, searchModel, &CardSearchModel::updateSearchResults);
 
-    // navigationLayout->addWidget(searchBar);
+    connect(commandersField, &QLineEdit::textChanged, this, [=](const QString &text) {
+        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
+        if (!text.isEmpty())
+            completer->complete();
+    });
 
-    // Do search button
+    // Tag Name
+    deckTagNameField = new QLineEdit(navigationContainer);
+    deckTagNameField->setPlaceholderText("Deck tag");
+    navigationLayout->addWidget(deckTagNameField);
 
+    connect(deckTagNameField, &QLineEdit::textChanged, this, [this]() { doSearch(); });
+
+    // Search button
     searchPushButton = new QPushButton(navigationContainer);
-    connect(searchPushButton, &QPushButton::clicked, this, [=, this]() { doSearch(); });
-
+    searchPushButton->setText("Search");
     navigationLayout->addWidget(searchPushButton);
 
+    connect(searchPushButton, &QPushButton::clicked, this, [this]() { doSearch(); });
+
     // Card Size settings
-
     settingsButton = new SettingsButtonWidget(this);
-
     cardSizeSlider = new CardSizeWidget(this);
-
     settingsButton->addSettingsWidget(cardSizeSlider);
-
     navigationLayout->addWidget(settingsButton);
 
     // Page size
 
     pageSizeLabel = new QLabel(navigationContainer);
+    navigationLayout->addWidget(pageSizeLabel);
 
     pageSizeSpin = new QSpinBox(navigationContainer);
     pageSizeSpin->setRange(1, 200);
     pageSizeSpin->setValue(50);
-
-    navigationLayout->addWidget(pageSizeLabel);
     navigationLayout->addWidget(pageSizeSpin);
 
+    // Page number
+    pageSpin = new QSpinBox(navigationContainer);
+    pageSpin->setRange(1, 9999);
+    pageSpin->setValue(1);
+    navigationLayout->addWidget(pageSpin);
+
+    connect(pageSpin, &QSpinBox::valueChanged, this, [this]() { doSearch(); });
+
+    // Page display
     currentPageDisplay = new QWidget(container);
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageLayout->setContentsMargins(0, 0, 0, 0);
@@ -196,55 +258,105 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
 void TabArchidekt::retranslateUi()
 {
-    // searchBar->setPlaceholderText(tr("Search for a card ..."));
     searchPushButton->setText(tr("Search"));
     formatLabel->setText(tr("Formats"));
-    pageSizeLabel->setText(tr("Max. Results:"));
+    pageSizeLabel->setText(tr("Min. # of Cards:"));
 }
 
 QString TabArchidekt::buildSearchUrl()
 {
     QUrlQuery query;
 
-    // required
-    query.addQueryItem("name", nameField->text());
+    // Name
+    if (!nameField->text().isEmpty()) {
+        query.addQueryItem("name", nameField->text());
+    }
 
-    // colors
+    // Colors
     QStringList selectedColors;
     for (QChar c : activeColors) {
         selectedColors.append(c);
     }
 
-    if (!selectedColors.isEmpty())
+    if (!selectedColors.isEmpty()) {
         query.addQueryItem("colors", selectedColors.join(","));
+    }
 
     // logicalAnd
-    if (logicalAndCheck->isChecked())
+    if (logicalAndCheck->isChecked()) {
         query.addQueryItem("logicalAnd", "true");
+    }
 
     // owner
-    if (!ownerField->text().isEmpty())
-        query.addQueryItem("owner", ownerField->text());
+    if (!ownerField->text().isEmpty()) {
+        query.addQueryItem("ownerUsername", ownerField->text());
+    }
 
     // cards
-    if (!cardsField->text().isEmpty())
-        query.addQueryItem("cards", cardsField->text());
+    if (!cardsField->text().isEmpty()) {
+        query.addQueryItem("cardName", cardsField->text());
+    }
 
-    // commanders
-    if (!commandersField->text().isEmpty())
-        query.addQueryItem("commanders", commandersField->text());
+    // Commander Name
+    if (!packagesCheck->isChecked()) {
+        if (!commandersField->text().isEmpty()) {
+            query.addQueryItem("commanderName", commandersField->text());
+        }
+    }
 
-    // formats
-    QStringList formatIds;
-    for (int i = 0; i < formatChecks.size(); ++i)
-        if (formatChecks[i]->isChecked())
-            formatIds << QString::number(i + 1);
-    if (!formatIds.isEmpty())
-        query.addQueryItem("formats", formatIds.join(","));
+    // Formats
+    if (!packagesCheck->isChecked()) {
+        QStringList formatIds;
+        for (int i = 0; i < formatChecks.size(); ++i)
+            if (formatChecks[i]->isChecked()) {
+                formatIds << QString::number(i + 1);
+            }
+
+        if (!formatIds.isEmpty()) {
+            query.addQueryItem("deckFormat", formatIds.join(","));
+        }
+    }
+
+    // Search for card packages instead of decks
+    if (packagesCheck->isChecked()) {
+        query.addQueryItem("packages", "true");
+    }
+
+    // edhBracket
+    if (!packagesCheck->isChecked()) {
+        if (!edhBracketCombo->currentText().isEmpty()) {
+            if (edhBracketCombo->currentText() != tr("Any Bracket")) {
+                query.addQueryItem("edhBracket", edhBracketCombo->currentText());
+            }
+        }
+    }
+
+    // deckTagName
+    if (!packagesCheck->isChecked()) {
+        if (!deckTagNameField->text().isEmpty()) {
+            query.addQueryItem("deckTagName", deckTagNameField->text());
+        }
+    }
+
+    // orderBy (field + direction)
+    {
+        QString field = orderByCombo->currentText();
+        if (!field.isEmpty()) {
+            bool desc = orderDirButton->isChecked();
+            QString final = desc ? "-" + field : field;
+            query.addQueryItem("orderBy", final);
+        }
+    }
+
+    // page number
+    if (pageSpin->value() <= 1) {
+        query.addQueryItem("page", QString::number(pageSpin->value()));
+    }
 
     // page size
-    if (pageSizeSpin->value() != 50)
+    if (pageSizeSpin->value() != 50) {
         query.addQueryItem("pageSize", QString::number(pageSizeSpin->value()));
+    }
 
     // build final URL
     QUrl url("https://archidekt.com/api/decks/v3/");
@@ -263,14 +375,12 @@ void TabArchidekt::doSearch()
 void TabArchidekt::actNavigatePage(QString url)
 {
     QNetworkRequest request{QUrl(url)};
-
     networkManager->get(request);
 }
 
 void TabArchidekt::getTopDecks()
 {
     QNetworkRequest request{QUrl(buildSearchUrl())};
-
     networkManager->get(request);
 }
 

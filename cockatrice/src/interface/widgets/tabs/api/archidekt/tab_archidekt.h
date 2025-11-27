@@ -69,6 +69,13 @@ private:
     SettingsButtonWidget *formatSettingsWidget;
     QVector<QCheckBox *> formatChecks; // Format checkboxes (13 total)
 
+    QComboBox *edhBracketCombo;
+    QLineEdit *deckTagNameField;
+    QComboBox *orderByCombo;
+    QPushButton *orderDirButton;
+    QCheckBox *packagesCheck;
+    QSpinBox *pageSpin;
+
     // Page size
     QLabel *pageSizeLabel;
     QSpinBox *pageSizeSpin;
