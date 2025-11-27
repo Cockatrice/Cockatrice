@@ -167,6 +167,10 @@ signals:
     void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
     void visualDeckEditorSampleHandSizeAmountChanged(int amount);
+    void visualDeckEditorCardSizeChanged();
+    void visualDatabaseDisplayCardSizeChanged();
+    void edhRecCardSizeChanged();
+    void archidektPreviewSizeChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -250,6 +254,10 @@ private:
     QStringList visualDeckStorageDefaultTagsList;
     bool visualDeckStorageSearchFolderNames;
     int visualDeckStorageCardSize;
+    int visualDeckEditorCardSize;
+    int visualDatabaseDisplayCardSize;
+    int edhrecCardSize;
+    int archidektPreviewSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
     int visualDeckStorageTooltipType;
@@ -642,6 +650,22 @@ public:
     {
         return visualDeckStorageSelectionAnimation;
     }
+    int getVisualDeckEditorCardSize() const
+    {
+        return visualDeckEditorCardSize;
+    }
+    int getVisualDatabaseDisplayCardSize() const
+    {
+        return visualDatabaseDisplayCardSize;
+    }
+    int getEDHRecCardSize() const
+    {
+        return edhrecCardSize;
+    }
+    int getArchidektPreviewSize() const
+    {
+        return archidektPreviewSize;
+    }
     int getDefaultDeckEditorType() const
     {
         return defaultDeckEditorType;
@@ -1018,6 +1042,10 @@ public slots:
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
+    void setVisualDeckEditorCardSize(int _visualDeckEditorCardSize);
+    void setVisualDatabaseDisplayCardSize(int _visualDatabaseDisplayCardSize);
+    void setEDHRecCardSize(int _EDHRecCardSize);
+    void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setDefaultDeckEditorType(int value);
     void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
     void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);

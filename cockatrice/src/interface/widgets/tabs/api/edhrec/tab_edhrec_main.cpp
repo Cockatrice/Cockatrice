@@ -1,5 +1,6 @@
 #include "tab_edhrec_main.h"
 
+#include "../../../../../client/settings/cache_settings.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
@@ -96,7 +97,9 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
 
     settingsButton = new SettingsButtonWidget(this);
 
-    cardSizeSlider = new CardSizeWidget(this);
+    cardSizeSlider = new CardSizeWidget(this, nullptr, SettingsCache::instance().getEDHRecCardSize());
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setEDHRecCardSize);
 
     settingsButton->addSettingsWidget(cardSizeSlider);
 
