@@ -58,6 +58,8 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 {
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
+    historyManager = new DeckListHistoryManager(this);
+
     databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
@@ -70,6 +72,10 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     // Connect deck signals to this tab
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::requestDeckHistorySave, this,
+            &AbstractTabDeckEditor::onDeckHistorySaveRequested);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::requestDeckHistoryClear, this,
+            &AbstractTabDeckEditor::onDeckHistoryClearRequested);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);
     connect(this, &AbstractTabDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
 
@@ -107,6 +113,7 @@ void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 /** @brief Placeholder: called when the deck changes. */
 void AbstractTabDeckEditor::onDeckChanged()
 {
+    historyManager->clear();
 }
 
 /**
@@ -116,6 +123,22 @@ void AbstractTabDeckEditor::onDeckModified()
 {
     setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());
+}
+
+/**
+ * @brief Marks the tab as modified and updates the save menu status.
+ */
+void AbstractTabDeckEditor::onDeckHistorySaveRequested(const QString &modificationReason)
+{
+    historyManager->save(deckDockWidget->getDeckList()->createMemento(modificationReason));
+}
+
+/**
+ * @brief Marks the tab as modified and updates the save menu status.
+ */
+void AbstractTabDeckEditor::onDeckHistoryClearRequested()
+{
+    historyManager->clear();
 }
 
 /**
@@ -131,7 +154,9 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneNam
     if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    emit cardAboutToBeAdded(card, zoneName);
+    onDeckHistorySaveRequested(QString(tr("Added (%1): %2 (%3) %4"))
+                                   .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
+                                        card.getPrinting().getProperty("num")));
 
     QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
     deckDockWidget->deckView->clearSelection();

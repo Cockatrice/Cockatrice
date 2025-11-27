@@ -14,7 +14,6 @@
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
-#include "libcockatrice/deck_list/deck_list_history_manager.h"
 
 #include <QComboBox>
 #include <QDockWidget>
@@ -70,7 +69,6 @@ public slots:
     void actDecrementSelection();
     void actSwapCard();
     void actRemoveCard();
-    void onCardAboutToBeAdded(const ExactCard &card, const QString &zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 signals:
@@ -79,11 +77,12 @@ signals:
     void hashChanged();
     void deckChanged();
     void deckModified();
+    void requestDeckHistorySave(const QString &modificationReason);
+    void requestDeckHistoryClear();
     void cardChanged(const ExactCard &_card);
 
 private:
     AbstractTabDeckEditor *deckEditor;
-    DeckListHistoryManager *historyManager;
     DeckListHistoryManagerWidget *historyManagerWidget;
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
@@ -113,6 +112,7 @@ private slots:
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);
+    void syncDeckListBannerCardWithComboBox();
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
