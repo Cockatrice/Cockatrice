@@ -226,8 +226,9 @@ private:
     // Minimum Cards in Deck
     // ---------------------------------------------------------------------
 
-    QLabel *minDeckSizeLabel;  ///< Label for minimum number of cards per deck
-    QSpinBox *minDeckSizeSpin; ///< Spinner to select minimum deck size
+    QLabel *minDeckSizeLabel;         ///< Label for minimum number of cards per deck
+    QSpinBox *minDeckSizeSpin;        ///< Spinner to select minimum deck size
+    QComboBox *minDeckSizeLogicCombo; ///< Combo box for the size logic to apply
 
     // ---------------------------------------------------------------------
     // Pagination

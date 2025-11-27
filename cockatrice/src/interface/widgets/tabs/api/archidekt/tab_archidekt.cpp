@@ -202,8 +202,17 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     minDeckSizeLabel = new QLabel(navigationContainer);
 
     minDeckSizeSpin = new QSpinBox(navigationContainer);
+    minDeckSizeSpin->setSpecialValueText(tr("Disabled"));
     minDeckSizeSpin->setRange(0, 200);
     minDeckSizeSpin->setValue(0);
+
+    // Size logic
+    minDeckSizeLogicCombo = new QComboBox(navigationContainer);
+    minDeckSizeLogicCombo->addItems({"Exact", "≥", "≤"}); // Exact = unset, ≥ = GTE, ≤ = LTE
+    minDeckSizeLogicCombo->setCurrentIndex(1);            // default GTE
+
+    connect(minDeckSizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [this]() { doSearch(); });
+    connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
 
     // Page number
     pageLabel = new QLabel(navigationContainer);
@@ -261,9 +270,10 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     // Card size settings
     navigationLayout->addWidget(settingsButton);
 
-    // Page size
+    // Min. # of cards in deck
     navigationLayout->addWidget(minDeckSizeLabel);
     navigationLayout->addWidget(minDeckSizeSpin);
+    navigationLayout->addWidget(minDeckSizeLogicCombo);
 
     // Page number
     navigationLayout->addWidget(pageLabel);
@@ -383,8 +393,21 @@ QString TabArchidekt::buildSearchUrl()
     // Min deck size
     if (minDeckSizeSpin->value() != 0) {
         query.addQueryItem("size", QString::number(minDeckSizeSpin->value()));
-        query.addQueryItem("sizeLogic", QString("GTE"));
+
+        QString logic = "GTE"; // default
+        QString selected = minDeckSizeLogicCombo->currentText();
+        if (selected == "≥")
+            logic = "GTE";
+        else if (selected == "≤")
+            logic = "LTE";
+        else
+            logic = ""; // Exact = unset
+
+        if (!logic.isEmpty()) {
+            query.addQueryItem("sizeLogic", logic);
+        }
     }
+
 
     // build final URL
     QUrl url("https://archidekt.com/api/decks/v3/");
