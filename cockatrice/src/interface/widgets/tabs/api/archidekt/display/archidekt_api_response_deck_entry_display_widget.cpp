@@ -58,21 +58,20 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     previewWidget->setMinimumHeight(300); // consistent height
 
     // Set deck name (ellided)
-    {
-        QFontMetrics fm(previewWidget->topLeftLabel->font());
-        QString elided = fm.elidedText(response.getName(), Qt::ElideRight, 280);
-        previewWidget->topLeftLabel->setText(elided);
-        previewWidget->topLeftLabel->setToolTip(response.getName());
-    }
+    QFontMetrics fm(previewWidget->topLeftLabel->font());
+    QString elided = fm.elidedText(response.getName(), Qt::ElideRight, 280);
+    previewWidget->topLeftLabel->setText(elided);
+    previewWidget->topLeftLabel->setToolTip(response.getName());
 
     // Set count
     previewWidget->topRightLabel->setText(QString::number(response.getSize()));
 
     // EDH bracket (skip if 0)
-    if (response.getEDHBracket() != 0)
+    if (response.getEDHBracket() != 0) {
         previewWidget->bottomLeftLabel->setText(QString("EDH: %1").arg(response.getEDHBracket()));
-    else
+    } else {
         previewWidget->bottomLeftLabel->hide();
+    }
 
     // Views
     previewWidget->bottomRightLabel->setText(QString("Views: %1").arg(response.getViewCount()));
@@ -121,12 +120,6 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     headerLayout->addWidget(sharedPlate);
 
     layout->addLayout(headerLayout);
-
-    /*deckPreviewDisplayWidget = new CardInfoPictureWithTextOverlayWidget(this);
-    deckPreviewDisplayWidget->setOverlayText(QString("%1 (%2)").arg(response.getName()).arg(response.getSize()));
-    connect(deckPreviewDisplayWidget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this,
-            &ArchidektApiResponseDeckEntryDisplayWidget::actRequestNavigationToDeck);
-    layout->addWidget(deckPreviewDisplayWidget);*/
 }
 
 void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *event)
@@ -179,8 +172,9 @@ void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNet
 
 void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
 {
-    if (originalPixmap.isNull())
+    if (originalPixmap.isNull()) {
         return;
+    }
 
     int baseWidth = 400;
     int newWidth = baseWidth * scaleFactor / 100;
