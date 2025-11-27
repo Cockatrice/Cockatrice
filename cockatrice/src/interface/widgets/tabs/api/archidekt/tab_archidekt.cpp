@@ -206,6 +206,8 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     minDeckSizeSpin->setValue(1);
 
     // Page number
+    pageLabel = new QLabel(navigationContainer);
+
     pageSpin = new QSpinBox(navigationContainer);
     pageSpin->setRange(1, 9999);
     pageSpin->setValue(1);
@@ -264,6 +266,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     navigationLayout->addWidget(minDeckSizeSpin);
 
     // Page number
+    navigationLayout->addWidget(pageLabel);
     navigationLayout->addWidget(pageSpin);
 
     mainLayout->addWidget(navigationContainer);
@@ -285,6 +288,7 @@ void TabArchidekt::retranslateUi()
     searchPushButton->setText(tr("Search"));
     formatLabel->setText(tr("Formats"));
     minDeckSizeLabel->setText(tr("Min. # of Cards:"));
+    pageLabel->setText(tr("Page:"));
 }
 
 QString TabArchidekt::buildSearchUrl()

@@ -233,6 +233,7 @@ private:
     // Pagination
     // ---------------------------------------------------------------------
 
+    QLabel *pageLabel;  ///< Label for current page selection
     QSpinBox *pageSpin; ///< Spinner to select the page number for results
 
     // ---------------------------------------------------------------------
