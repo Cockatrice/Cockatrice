@@ -90,9 +90,12 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
     sortOrderCombo = new QComboBox(this);
+    sortOrderCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
     sortOrderCombo->addItem("Ascending", Qt::AscendingOrder);
     sortOrderCombo->addItem("Descending", Qt::DescendingOrder);
+    sortOrderCombo->view()->setMinimumWidth(sortOrderCombo->view()->sizeHintForColumn(0));
+    sortOrderCombo->adjustSize();
 
     // Populate columns dynamically from the model
     for (int i = 0; i < databaseDisplayModel->columnCount(); ++i) {
