@@ -57,6 +57,7 @@ public:
     QWidget *searchContainer;
     QHBoxLayout *searchLayout;
     SearchLineEdit *searchEdit;
+    QPushButton *displayModeButton;
     FilterTreeModel *filterModel;
     VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
 
@@ -76,6 +77,7 @@ protected slots:
     void wheelEvent(QWheelEvent *event) override;
     void modelDirty() const;
     void updateSearch(const QString &search) const;
+    void onDisplayModeChanged(bool checked);
 
 private:
     QLabel *databaseLoadIndicator;
