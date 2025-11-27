@@ -310,7 +310,7 @@ SettingsCache::SettingsCache()
         settings->value("interface/visualdeckstorageselectionanimation", true).toBool();
     defaultDeckEditorType = settings->value("interface/defaultDeckEditorType", 1).toInt();
     visualDatabaseDisplayFilterToMostRecentSetsEnabled =
-        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true).toBool();
+        settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", false).toBool();
     visualDatabaseDisplayFilterToMostRecentSetsAmount =
         settings->value("interface/visualdatabasedisplayfiltertomostrecentsetsamount", 10).toInt();
     visualDeckEditorSampleHandSize = settings->value("interface/visualdeckeditorsamplehandsize", 7).toInt();
