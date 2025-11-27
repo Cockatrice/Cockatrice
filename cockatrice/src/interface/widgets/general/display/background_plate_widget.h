@@ -1,7 +1,3 @@
-//
-// Created by Ascor on 25-Nov-25.
-//
-
 #ifndef COCKATRICE_BACKGROUND_PLATE_WIDGET_H
 #define COCKATRICE_BACKGROUND_PLATE_WIDGET_H
 

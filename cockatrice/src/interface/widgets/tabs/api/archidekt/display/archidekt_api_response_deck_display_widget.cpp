@@ -118,10 +118,7 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
             new DeckCardZoneDisplayWidget(zoneContainer, model, nullptr, persistent,
                                           model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
                                           "maintype", {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
-        /*connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
-        connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
-                &VisualDeckEditorWidget::cleanupInvalidZones);
+        /*
         connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
                 &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
         connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,

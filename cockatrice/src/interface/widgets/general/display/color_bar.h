@@ -1,7 +1,3 @@
-//
-// Created by Ascor on 25-Nov-25.
-//
-
 #ifndef COCKATRICE_COLOR_BAR_H
 #define COCKATRICE_COLOR_BAR_H
 

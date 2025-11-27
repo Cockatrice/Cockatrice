@@ -188,11 +188,11 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
 
     previewWidget->setFixedSize(newWidth, newHeight);
 
-    // 1. Scale image to fill the preview area (crop edges)
+    // Scale image to fill the preview area (crop edges)
     QPixmap scaled =
         originalPixmap.scaled(newWidth, newHeight, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
-    // 2. Crop to exact target size
+    // Crop to exact target size
     QRect cropRect((scaled.width() - newWidth) / 2, (scaled.height() - newHeight) / 2, newWidth, newHeight);
     QPixmap cropped = scaled.copy(cropRect);
 
