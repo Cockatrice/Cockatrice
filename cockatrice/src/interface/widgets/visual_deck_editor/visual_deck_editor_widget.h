@@ -36,12 +36,19 @@ class VisualDeckEditorWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
+    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
     void retranslateUi();
     void clearAllDisplayWidgets();
     void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
+
+    void setSelectionModel(QItemSelectionModel *model);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    QItemSelectionModel *getSelectionModel() const
+    {
+        return selectionModel;
+    }
 
     QLineEdit *searchBar;
     CardSizeWidget *cardSizeWidget;
@@ -53,6 +60,7 @@ public slots:
     void cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget);
     void onCardAddition(const QModelIndex &parent, int first, int last);
     void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void constructZoneWidgetForIndex(QPersistentModelIndex persistent);
     void constructZoneWidgetsFromDeckListModel();
 
 signals:
@@ -72,6 +80,7 @@ protected slots:
 
 private:
     DeckListModel *deckListModel;
+    QItemSelectionModel *selectionModel;
     QVBoxLayout *mainLayout;
     QWidget *searchContainer;
     QHBoxLayout *searchLayout;

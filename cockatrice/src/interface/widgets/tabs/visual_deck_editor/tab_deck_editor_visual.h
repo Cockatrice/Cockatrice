@@ -176,8 +176,9 @@ public slots:
      * @param instance Widget representing the clicked card.
      * @param zoneName Deck zone of the card.
      */
-    void
-    processMainboardCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void processMainboardCardClick(QMouseEvent *event,
+                                   CardInfoPictureWithTextOverlayWidget *instance,
+                                   const QString &zoneName);
 
     /**
      * @brief Handle card clicks in the database visual display.

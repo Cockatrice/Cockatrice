@@ -10,6 +10,7 @@
 
 CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
+                                               QItemSelectionModel *_selectionModel,
                                                QPersistentModelIndex _trackedIndex,
                                                QString _zoneName,
                                                QString _cardGroupCategory,
@@ -17,8 +18,8 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                                                QStringList _activeSortCriteria,
                                                int bannerOpacity,
                                                CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName),
-      cardGroupCategory(_cardGroupCategory), activeGroupCriteria(_activeGroupCriteria),
+    : QWidget(parent), deckListModel(_deckListModel), selectionModel(_selectionModel), trackedIndex(_trackedIndex),
+      zoneName(_zoneName), cardGroupCategory(_cardGroupCategory), activeGroupCriteria(_activeGroupCriteria),
       activeSortCriteria(_activeSortCriteria), cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
@@ -32,7 +33,45 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     CardGroupDisplayWidget::updateCardDisplays();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
+    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &CardGroupDisplayWidget::onSelectionChanged);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+}
+
+void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model());
+
+    for (auto &range : selected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+
+            if (proxyModel) {
+                idx = proxyModel->mapToSource(idx);
+            }
+
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
+                    displayWidget->setHighlighted(true);
+                }
+            }
+        }
+    }
+
+    for (auto &range : deselected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            if (proxyModel)
+                idx = proxyModel->mapToSource(idx);
+
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
+                    displayWidget->setHighlighted(false);
+                }
+            }
+        }
+    }
 }
 
 void CardGroupDisplayWidget::clearAllDisplayWidgets()
@@ -136,6 +175,12 @@ void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSort
 
     clearAllDisplayWidgets();
     updateCardDisplays();
+}
+
+void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    selectionModel->clearSelection();
 }
 
 void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)

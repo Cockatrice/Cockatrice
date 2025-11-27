@@ -32,6 +32,7 @@ public:
     void setOutlineColor(const QColor &color);
     void setFontSize(int size);
     void setTextAlignment(Qt::Alignment alignment);
+    void setHighlighted(bool _highlighted);
 
     [[nodiscard]] QSize sizeHint() const override;
 signals:
@@ -53,6 +54,7 @@ private:
     QColor outlineColor;
     int fontSize;
     Qt::Alignment textAlignment;
+    bool highlighted;
 };
 
 #endif // CARD_PICTURE_WITH_TEXT_OVERLAY_H
