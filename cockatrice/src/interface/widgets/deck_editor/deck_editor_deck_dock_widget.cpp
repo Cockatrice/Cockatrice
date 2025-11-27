@@ -52,11 +52,6 @@ DeckEditorDeckDockWidget::DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent
 
 void DeckEditorDeckDockWidget::createDeckDock()
 {
-    historyManager = new DeckListHistoryManager();
-
-    connect(deckEditor, &AbstractTabDeckEditor::cardAboutToBeAdded, this,
-            &DeckEditorDeckDockWidget::onCardAboutToBeAdded);
-
     deckModel = new DeckListModel(this);
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
@@ -66,7 +61,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);
 
-    historyManagerWidget = new DeckListHistoryManagerWidget(deckModel, proxy, historyManager, this);
+    historyManagerWidget = new DeckListHistoryManagerWidget(deckModel, proxy, deckEditor->getHistoryManager(), this);
     connect(historyManagerWidget, &DeckListHistoryManagerWidget::requestDisplayWidgetSync, this,
             &DeckEditorDeckDockWidget::syncDisplayWidgetsToModel);
 
@@ -300,8 +295,8 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
-    historyManager->save(deckLoader->getDeckList()->createMemento(
-        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeckList()->getName())));
+    emit requestDeckHistorySave(
+        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeckList()->getName()));
     deckModel->getDeckList()->setName(name);
     deckEditor->setModified(name.isEmpty());
     emit nameChanged();
@@ -310,10 +305,9 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 
 void DeckEditorDeckDockWidget::updateComments()
 {
-    historyManager->save(
-        deckLoader->getDeckList()->createMemento(QString(tr("Updated comments (was %1 chars, now %2 chars)"))
-                                                     .arg(deckLoader->getDeckList()->getComments().size())
-                                                     .arg(commentsEdit->toPlainText().size())));
+    emit requestDeckHistorySave(tr("Updated comments (was %1 chars, now %2 chars)")
+                                    .arg(deckLoader->getDeckList()->getComments().size())
+                                    .arg(commentsEdit->toPlainText().size()));
 
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
     deckEditor->setModified(commentsEdit->toPlainText().isEmpty());
@@ -370,7 +364,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     // Handle results
     if (restoreIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoreIndex);
-        setBannerCard(restoreIndex);
+        syncDeckListBannerCardWithComboBox();
     } else {
         // Add a placeholder "-" and set it as the current selection
         bannerCardComboBox->insertItem(0, "-");
@@ -383,11 +377,16 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
 void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
 {
-    historyManager->save(deckLoader->getDeckList()->createMemento(tr("Banner card changed")));
-    auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
-    deckModel->getDeckList()->setBannerCard({name, id});
+    emit requestDeckHistorySave(tr("Banner card changed"));
+    syncDeckListBannerCardWithComboBox();
     deckEditor->setModified(true);
     emit deckModified();
+}
+
+void DeckEditorDeckDockWidget::syncDeckListBannerCardWithComboBox()
+{
+    auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
+    deckModel->getDeckList()->setBannerCard({name, id});
 }
 
 void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
@@ -427,7 +426,7 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
     connect(deckLoader->getDeckList(), &DeckList::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
-    historyManager->clear();
+    emit requestDeckHistoryClear();
     historyManagerWidget->setDeckListModel(deckModel);
 
     syncDisplayWidgetsToModel();
@@ -519,14 +518,6 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
 
     std::reverse(selectedRows.begin(), selectedRows.end());
     return selectedRows;
-}
-
-void DeckEditorDeckDockWidget::onCardAboutToBeAdded(const ExactCard &addedCard, const QString &zoneName)
-{
-    historyManager->save(deckLoader->getDeckList()->createMemento(
-        QString(tr("Added (%1): %2 (%3) %4"))
-            .arg(zoneName, addedCard.getName(), addedCard.getPrinting().getSet()->getCorrectedShortName(),
-                 addedCard.getPrinting().getProperty("num"))));
 }
 
 void DeckEditorDeckDockWidget::actIncrement()
@@ -649,8 +640,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
         QModelIndex sourceIndex = proxy->mapToSource(index);
         QString cardName = sourceIndex.sibling(sourceIndex.row(), 1).data().toString();
 
-        historyManager->save(
-            deckLoader->getDeckList()->createMemento(QString(tr("Removed \"%1\" (all copies)")).arg(cardName)));
+        emit requestDeckHistorySave(QString(tr("Removed \"%1\" (all copies)")).arg(cardName));
 
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
         isModified = true;
@@ -685,7 +675,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
             .arg(cardName)
             .arg(deckModel->data(sourceIndex.sibling(sourceIndex.row(), 4), Qt::DisplayRole).toString());
 
-    historyManager->save(deckLoader->getDeckList()->createMemento(reason));
+    emit requestDeckHistorySave(reason);
 
     if (new_count <= 0) {
         deckModel->removeRow(sourceIndex.row(), sourceIndex.parent());
