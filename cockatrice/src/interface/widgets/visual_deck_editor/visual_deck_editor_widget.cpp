@@ -1,5 +1,6 @@
 #include "visual_deck_editor_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../main.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../../layouts/overlap_layout.h"
@@ -194,7 +195,9 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 
-    cardSizeWidget = new CardSizeWidget(this);
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckEditorCardSize);
 
     mainLayout->addWidget(groupAndSortContainer);
     mainLayout->addWidget(scrollArea);
