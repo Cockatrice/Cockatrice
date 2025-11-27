@@ -61,7 +61,8 @@ public:
      * - EDH bracket
      * - Packages toggle
      * - Sorting field and direction
-     * - Pagination (page and page size)
+     * - Minimum amount of cards in the deck
+     * - Pagination (page)
      */
     QString buildSearchUrl();
 
