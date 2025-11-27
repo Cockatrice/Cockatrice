@@ -203,7 +203,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     minDeckSizeSpin = new QSpinBox(navigationContainer);
     minDeckSizeSpin->setRange(1, 200);
-    minDeckSizeSpin->setValue(1);
+    minDeckSizeSpin->setValue(60);
 
     // Page number
     pageLabel = new QLabel(navigationContainer);
