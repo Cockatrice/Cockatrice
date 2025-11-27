@@ -32,7 +32,10 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     CardGroupDisplayWidget::updateCardDisplays();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
-    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &CardGroupDisplayWidget::onSelectionChanged);
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &CardGroupDisplayWidget::onSelectionChanged);
+    }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
@@ -179,7 +182,9 @@ void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSort
 void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    selectionModel->clearSelection();
+    if (selectionModel) {
+        selectionModel->clearSelection();
+    }
 }
 
 void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)

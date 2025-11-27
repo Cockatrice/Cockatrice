@@ -115,7 +115,7 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
         }
 
         DeckCardZoneDisplayWidget *zoneDisplayWidget =
-            new DeckCardZoneDisplayWidget(zoneContainer, model, persistent,
+            new DeckCardZoneDisplayWidget(zoneContainer, model, nullptr, persistent,
                                           model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
                                           "maintype", {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
         /*connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
