@@ -1,5 +1,6 @@
 #include "tab_archidekt.h"
 
+#include "../../../../../client/settings/cache_settings.h"
 #include "../../../cards/additional_info/mana_symbol_widget.h"
 #include "../../tab_supervisor.h"
 #include "api_response/archidekt_deck_listing_api_response.h"
@@ -194,7 +195,9 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     // Card Size settings
     settingsButton = new SettingsButtonWidget(this);
-    cardSizeSlider = new CardSizeWidget(this);
+    cardSizeSlider = new CardSizeWidget(this, nullptr, SettingsCache::instance().getArchidektPreviewSize());
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setArchidektPreviewCardSize);
     settingsButton->addSettingsWidget(cardSizeSlider);
 
     // Min deck size
