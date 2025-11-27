@@ -51,6 +51,11 @@ public:
         return activeGroupCriteriaComboBox;
     }
 
+    [[nodiscard]] QItemSelectionModel *getSelectionModel() const
+    {
+        return deckView->selectionModel();
+    }
+
 public slots:
     void cleanDeck();
     void updateBannerCardComboBox();

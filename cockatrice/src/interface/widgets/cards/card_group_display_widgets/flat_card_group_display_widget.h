@@ -17,6 +17,7 @@ class FlatCardGroupDisplayWidget : public CardGroupDisplayWidget
 public:
     FlatCardGroupDisplayWidget(QWidget *parent,
                                DeckListModel *deckListModel,
+                               QItemSelectionModel *selectionModel,
                                QPersistentModelIndex trackedIndex,
                                QString zoneName,
                                QString cardGroupCategory,

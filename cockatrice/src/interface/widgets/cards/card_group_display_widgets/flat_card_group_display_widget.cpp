@@ -10,6 +10,7 @@
 
 FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
                                                        DeckListModel *_deckListModel,
+                                                       QItemSelectionModel *_selectionModel,
                                                        QPersistentModelIndex _trackedIndex,
                                                        QString _zoneName,
                                                        QString _cardGroupCategory,
@@ -19,6 +20,7 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
                                                        CardSizeWidget *_cardSizeWidget)
     : CardGroupDisplayWidget(parent,
                              _deckListModel,
+                             _selectionModel,
                              std::move(_trackedIndex),
                              _zoneName,
                              _cardGroupCategory,
