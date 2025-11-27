@@ -148,17 +148,24 @@ void CardZoneLogic::moveAllToZone()
 
 void CardZoneLogic::clearContents()
 {
-    for (int i = 0; i < cards.size(); i++) {
+    // First gather the cards into a safe temporary list.
+    const CardList toClear = cards;
+
+    // Detach and notify attached cards and zones *before* deleting anything.
+    for (CardItem *card : toClear) {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a
         // player, we have to return them to avoid a crash.
-
-        const QList<CardItem *> &attachedCards = cards[i]->getAttachedCards();
-        for (auto attachedCard : attachedCards) {
+        const QList<CardItem *> &attachedCards = card->getAttachedCards();
+        for (CardItem *attachedCard : attachedCards) {
             emit attachedCard->getZone()->cardAdded(attachedCard);
         }
-
-        player->deleteCard(cards.at(i));
     }
+
+    // Now request deletions after all manipulations are done.
+    for (CardItem *card : toClear) {
+        player->deleteCard(card);
+    }
+
     cards.clear();
     emit cardCountChanged();
 }
