@@ -539,8 +539,8 @@ void DeckListModel::setDeckList(DeckList *_deck)
 {
     if (deckList != _deck) {
         deckList = _deck;
-        rebuildTree();
     }
+    rebuildTree();
 }
 
 QList<ExactCard> DeckListModel::getCards() const
