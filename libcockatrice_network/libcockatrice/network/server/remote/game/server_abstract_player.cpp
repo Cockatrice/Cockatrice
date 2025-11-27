@@ -375,20 +375,17 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 
             eventPrivate.set_x(newX);
 
-            // Other players do not get to see the start and/or target position of the card if the respective
-            // part of the zone is being looked at. The information is not needed anyway because in hidden zones,
-            // all cards are equal.
-            if (((startzone->getType() == ServerInfo_Zone::HiddenZone) &&
-                 ((startzone->getCardsBeingLookedAt() > position) || (startzone->getCardsBeingLookedAt() == -1))) ||
-                (startzone->getType() == ServerInfo_Zone::PublicZone)) {
-                eventOthers.set_position(-1);
-            } else {
+            if (
+                // cards from public zones have their id known, their previous position is already known, the event does
+                // not accomodate for previous locations in zones with coordinates (which are always public)
+                (startzone->getType() != ServerInfo_Zone::PublicZone) &&
+                // other players are not allowed to be able to track which card is which in private zones like the hand
+                (startzone->getType() != ServerInfo_Zone::PrivateZone)) {
                 eventOthers.set_position(position);
             }
-            if ((targetzone->getType() == ServerInfo_Zone::HiddenZone) &&
-                ((targetzone->getCardsBeingLookedAt() > newX) || (targetzone->getCardsBeingLookedAt() == -1))) {
-                eventOthers.set_x(-1);
-            } else {
+            if (
+                // other players are not allowed to be able to track which card is which in private zones like the hand
+                (targetzone->getType() != ServerInfo_Zone::PrivateZone)) {
                 eventOthers.set_x(newX);
             }
 
@@ -1210,7 +1207,9 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
         }
     }
 
-    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color());
+    int currentPhase = game->getActivePhase();
+    int deletionPhase = cmd.has_delete_in_phase() ? cmd.delete_in_phase() : currentPhase;
+    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
     addArrow(arrow);
 
     Event_CreateArrow event;

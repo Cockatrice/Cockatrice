@@ -151,8 +151,8 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color)
-    : ArrowItem(_owner, -1, _startItem, 0, _color)
+ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
+    : ArrowItem(_owner, -1, _startItem, 0, _color), deleteInPhase(_deleteInPhase)
 {
 }
 
@@ -231,20 +231,28 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
             cmd.set_target_zone(targetZone->getName().toStdString());
             cmd.set_target_card_id(targetCard->getId());
-        } else {
+        } else { // failed to cast target to card, this means it's a player
             PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
             cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
         }
-        if (startZone->getName().compare("hand") == 0) {
+
+        // if the card is in hand then we will move the card to stack or table as part of drawing the arrow
+        if (startZone->getName() == "hand") {
             startCard->playCard(false);
             CardInfoPtr ci = startCard->getCard().getCardPtr();
-            if (ci && ((!SettingsCache::instance().getPlayToStack() && ci->getUiAttributes().tableRow == 3) ||
-                       (SettingsCache::instance().getPlayToStack() && ci->getUiAttributes().tableRow != 0 &&
-                        startCard->getZone()->getName().toStdString() != "stack")))
+            bool playToStack = SettingsCache::instance().getPlayToStack();
+            if (ci &&
+                ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
+                 (playToStack && ci->getUiAttributes().tableRow != 0 && startCard->getZone()->getName() != "stack")))
                 cmd.set_start_zone("stack");
             else
-                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
+                cmd.set_start_zone(playToStack ? "stack" : "table");
         }
+
+        if (deleteInPhase != 0) {
+            cmd.set_delete_in_phase(deleteInPhase);
+        }
+
         player->getPlayerActions()->sendGameCommand(cmd);
     }
     delArrow();

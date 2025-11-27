@@ -27,4 +27,9 @@ message Command_CreateArrow {
 
     // the color of the arrow
     optional color arrow_color = 7;
+
+    // the phase that this arrow is deleted in, arrows are deleted when this or a later phase is activated and also
+    // when the phase moves back before the current phase or the turn is passed, when not set the arrow is deleted
+    // immediately when the phase is changed
+    optional sint32 delete_in_phase = 8;
 }
