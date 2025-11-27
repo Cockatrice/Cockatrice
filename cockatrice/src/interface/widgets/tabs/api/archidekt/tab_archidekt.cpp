@@ -67,7 +67,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     orderDirButton->setCheckable(true); // checked = DESC, unchecked = ASC
     orderDirButton->setChecked(true);
 
-    connect(orderByCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
+    connect(orderByCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
     connect(orderDirButton, &QPushButton::clicked, this, [this](bool checked) {
         orderDirButton->setText(checked ? tr("Desc.") : tr("Asc."));
         doSearch();
@@ -106,7 +106,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     for (int i = 0; i < formatNames.size(); ++i) {
         QCheckBox *formatCheckBox = new QCheckBox(formatNames[i], navigationContainer);
-        connect(formatCheckBox, &QCheckBox::clicked, this, [this]() { doSearch(); });
+        connect(formatCheckBox, &QCheckBox::clicked, this, &TabArchidekt::doSearch);
         formatChecks << formatCheckBox;
         formatSettingsWidget->addSettingsWidget(formatCheckBox);
     }
@@ -116,7 +116,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     edhBracketCombo->addItem(tr("Any Bracket"));
     edhBracketCombo->addItems({"1", "2", "3", "4", "5"});
 
-    connect(edhBracketCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
+    connect(edhBracketCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
 
     // Search for Card Packages instead of Decks
     packagesCheck = new QCheckBox("Packages", navigationContainer);
@@ -191,13 +191,13 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     deckTagNameField = new QLineEdit(navigationContainer);
     deckTagNameField->setPlaceholderText("Deck tag");
 
-    connect(deckTagNameField, &QLineEdit::textChanged, this, [this]() { doSearch(); });
+    connect(deckTagNameField, &QLineEdit::textChanged, this, &TabArchidekt::doSearch);
 
     // Search button
     searchPushButton = new QPushButton(navigationContainer);
     searchPushButton->setText("Search");
 
-    connect(searchPushButton, &QPushButton::clicked, this, [this]() { doSearch(); });
+    connect(searchPushButton, &QPushButton::clicked, this, &TabArchidekt::doSearch);
 
     // Card Size settings
     settingsButton = new SettingsButtonWidget(this);
@@ -217,8 +217,8 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     minDeckSizeLogicCombo->addItems({"Exact", "≥", "≤"}); // Exact = unset, ≥ = GTE, ≤ = LTE
     minDeckSizeLogicCombo->setCurrentIndex(1);            // default GTE
 
-    connect(minDeckSizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [this]() { doSearch(); });
-    connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, [this]() { doSearch(); });
+    connect(minDeckSizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
+    connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
 
     // Page number
     pageLabel = new QLabel(navigationContainer);
@@ -227,7 +227,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     pageSpin->setRange(1, 9999);
     pageSpin->setValue(1);
 
-    connect(pageSpin, &QSpinBox::valueChanged, this, [this]() { doSearch(); });
+    connect(pageSpin, &QSpinBox::valueChanged, this, &TabArchidekt::doSearch);
 
     // Page display
     currentPageDisplay = new QWidget(container);
