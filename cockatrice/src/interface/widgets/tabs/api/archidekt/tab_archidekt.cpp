@@ -39,6 +39,12 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
 
+    searchDebounceTimer = new QTimer(this);
+    searchDebounceTimer->setSingleShot(true); // We only want it to fire once after inactivity
+    searchDebounceTimer->setInterval(300);    // 300ms debounce
+
+    connect(searchDebounceTimer, &QTimer::timeout, this, [this]() { doSearchImmediate(); });
+
     container = new QWidget(this);
     mainLayout = new QVBoxLayout(container);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -417,6 +423,11 @@ QString TabArchidekt::buildSearchUrl()
 }
 
 void TabArchidekt::doSearch()
+{
+    searchDebounceTimer->start();
+}
+
+void TabArchidekt::doSearchImmediate()
 {
     QString url = buildSearchUrl();
     QNetworkRequest req{QUrl(url)};

@@ -73,6 +73,7 @@ public:
      * Updates the current page display with results asynchronously.
      */
     void doSearch();
+    void doSearchImmediate();
 
     /**
      * @brief Retrieve the tab display text
@@ -149,6 +150,8 @@ public slots:
     void getTopDecks();
 
 private:
+    QTimer* searchDebounceTimer; ///< Timer to debounce search requests by spin-boxes etc.
+
     // ---------------------------------------------------------------------
     // Layout Containers
     // ---------------------------------------------------------------------
