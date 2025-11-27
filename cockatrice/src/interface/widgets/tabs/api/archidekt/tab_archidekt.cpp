@@ -227,7 +227,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     pageSpin->setRange(1, 9999);
     pageSpin->setValue(1);
 
-    connect(pageSpin, &QSpinBox::valueChanged, this, &TabArchidekt::doSearch);
+    connect(pageSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
 
     // Page display
     currentPageDisplay = new QWidget(container);
