@@ -414,7 +414,6 @@ QString TabArchidekt::buildSearchUrl()
         }
     }
 
-
     // build final URL
     QUrl url("https://archidekt.com/api/decks/v3/");
     url.setQuery(query);
