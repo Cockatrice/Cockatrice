@@ -142,11 +142,11 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 
     // Contained cards
     cardsField = new QLineEdit(navigationContainer);
-    cardsField->setPlaceholderText("Cards (comma separated)");
+    cardsField->setPlaceholderText("Deck contains card...");
 
     // Commanders
     commandersField = new QLineEdit(navigationContainer);
-    commandersField->setPlaceholderText("Commanders (comma separated)");
+    commandersField->setPlaceholderText("Deck has commander...");
 
     // DB supplemented card search
     auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
