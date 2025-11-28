@@ -4,15 +4,11 @@
 #include "../../interface/widgets/server/user/user_context_menu.h"
 #include "../../interface/widgets/server/user/user_list_manager.h"
 #include "../../interface/widgets/server/user/user_list_widget.h"
-#include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 
-#include <QAction>
 #include <QHeaderView>
-#include <QMenu>
 #include <QMouseEvent>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>

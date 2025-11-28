@@ -1,7 +1,6 @@
 #include "tab_deck_editor_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
-#include "../../client/network/interfaces/deck_stats_interface.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
@@ -12,27 +11,22 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QCloseEvent>
 #include <QCompleter>
 #include <QDir>
 #include <QDockWidget>
-#include <QFileDialog>
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QMenu>
-#include <QPrintPreviewDialog>
 #include <QProcessEnvironment>
 #include <QSplitter>
 #include <QTextStream>
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
 
 /**
  * @brief Constructs the TabDeckEditorVisual instance.

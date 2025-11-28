@@ -6,7 +6,6 @@
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QMessageBox>
 #include <libcockatrice/filters/filter_tree.h>
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,

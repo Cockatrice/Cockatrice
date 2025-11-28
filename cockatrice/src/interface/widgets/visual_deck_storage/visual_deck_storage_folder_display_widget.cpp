@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_widget.h"
 
 #include <QDirIterator>
 #include <QMouseEvent>

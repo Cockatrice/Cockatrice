@@ -9,10 +9,6 @@
 
 #include "deck_preview_deck_tags_display_widget.h"
 
-#include <QLabel>
-#include <QPushButton>
-#include <QWidget>
-
 class DeckPreviewTagAdditionWidget : public QWidget
 {
     Q_OBJECT

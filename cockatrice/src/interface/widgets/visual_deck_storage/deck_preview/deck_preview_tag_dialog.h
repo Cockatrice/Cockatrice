@@ -8,13 +8,10 @@
 #ifndef DECK_PREVIEW_TAG_DIALOG_H
 #define DECK_PREVIEW_TAG_DIALOG_H
 
-#include <QCheckBox>
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
-#include <QStringList>
 #include <QVBoxLayout>
 
 class DeckPreviewTagDialog : public QDialog

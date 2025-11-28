@@ -11,7 +11,6 @@
 
 #include <QDirIterator>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)

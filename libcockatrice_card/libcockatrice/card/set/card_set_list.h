@@ -4,7 +4,6 @@
 #include "card_set.h"
 
 #include <QList>
-#include <QStringList>
 
 /**
  * @class CardSetList

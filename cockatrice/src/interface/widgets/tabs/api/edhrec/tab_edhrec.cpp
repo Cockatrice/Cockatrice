@@ -4,7 +4,6 @@
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
 
 #include <QDebug>
-#include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>

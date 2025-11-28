@@ -13,7 +13,6 @@
 
 #include <QFocusEvent>
 #include <QGroupBox>
-#include <QKeyEvent>
 #include <QMap>
 
 class UserListProxy;

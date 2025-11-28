@@ -1,6 +1,5 @@
 #include "tab_admin.h"
 
-#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>

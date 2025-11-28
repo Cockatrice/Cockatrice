@@ -10,8 +10,6 @@
 #include "edhrec_api_response_card_list.h"
 #include "edhrec_commander_api_response_commander_details.h"
 
-#include <QDebug>
-#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
 #include <QVector>

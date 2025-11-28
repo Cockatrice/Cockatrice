@@ -6,10 +6,10 @@
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "logic/stack_zone_logic.h"
 
 #include <QPainter>
-#include <QSet>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 
 StackZone::StackZone(StackZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)

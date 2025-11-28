@@ -7,10 +7,7 @@
 #include "user/user_list_widget.h"
 
 #include <QDateTime>
-#include <QDebug>
 #include <QIcon>
-#include <QStringList>
-#include <QTime>
 #include <QTimeZone>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 

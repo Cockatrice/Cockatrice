@@ -10,7 +10,6 @@
 #include "../card_prices/edhrec_api_response_card_prices.h"
 
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QString>
 #include <QVector>
 

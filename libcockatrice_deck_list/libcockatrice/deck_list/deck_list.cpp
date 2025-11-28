@@ -6,7 +6,6 @@
 #include "inner_deck_list_node.h"
 
 #include <QCryptographicHash>
-#include <QDebug>
 #include <QFile>
 #include <QRegularExpression>
 #include <QTextStream>

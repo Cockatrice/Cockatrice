@@ -3,6 +3,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "../player/player_target.h"
 #include "../zones/card_zone.h"
 #include "card_item.h"

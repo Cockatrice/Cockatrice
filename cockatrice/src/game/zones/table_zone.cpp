@@ -6,11 +6,11 @@
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "logic/table_zone_logic.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
-#include <QSet>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>

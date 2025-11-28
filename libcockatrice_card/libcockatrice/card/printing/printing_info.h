@@ -5,7 +5,6 @@
 
 #include <QList>
 #include <QMap>
-#include <QStringList>
 #include <QVariant>
 
 class PrintingInfo;

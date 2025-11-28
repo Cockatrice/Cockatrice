@@ -26,10 +26,8 @@
 #define WINDOW_H
 
 #include <QList>
-#include <QLoggingCategory>
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QProcess>
 #include <QSystemTrayIcon>
 #include <QtNetwork>
 #include <libcockatrice/network/client/abstract/abstract_client.h>

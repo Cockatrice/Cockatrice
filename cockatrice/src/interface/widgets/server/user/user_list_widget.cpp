@@ -5,7 +5,6 @@
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../game_selector.h"
 #include "user_context_menu.h"
-#include "user_list_manager.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -14,21 +13,15 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
-#include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
-#include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
-#include <libcockatrice/protocol/pb/session_commands.pb.h>
-#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)

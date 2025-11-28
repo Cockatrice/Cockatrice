@@ -7,11 +7,9 @@
 #include <QDirIterator>
 #include <QLoggingCategory>
 #include <QMovie>
-#include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
 #include <QThreadPool>
-#include <libcockatrice/card/database/card_database_manager.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};

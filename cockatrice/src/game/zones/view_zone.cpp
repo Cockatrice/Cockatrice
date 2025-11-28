@@ -3,6 +3,7 @@
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "logic/view_zone_logic.h"
 
 #include <QBrush>
@@ -10,7 +11,6 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
 #include <QtMath>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>

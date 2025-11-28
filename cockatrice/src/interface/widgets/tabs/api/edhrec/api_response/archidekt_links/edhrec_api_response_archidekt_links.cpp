@@ -2,7 +2,6 @@
 
 #include <QDebug>
 #include <QJsonArray>
-#include <QJsonDocument>
 #include <QJsonObject>
 
 void EdhrecApiResponseArchidektLink::fromJson(const QJsonObject &json)

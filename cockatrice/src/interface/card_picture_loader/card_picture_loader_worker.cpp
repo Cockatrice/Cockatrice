@@ -9,7 +9,6 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
-#include <libcockatrice/card/database/card_database_manager.h>
 #include <utility>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;

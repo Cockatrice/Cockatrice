@@ -16,7 +16,6 @@
 #include <QLineEdit>
 #include <QRadioButton>
 #include <QTreeView>
-#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>

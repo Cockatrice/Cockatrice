@@ -8,7 +8,6 @@
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H
 
-#include <QAbstractItemModel>
 #include <QDateTime>
 #include <QTreeView>
 

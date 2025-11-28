@@ -1,5 +1,6 @@
 #include "deck_filter_string.h"
 
+#include <QFileInfo>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>

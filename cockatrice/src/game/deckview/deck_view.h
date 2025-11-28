@@ -9,11 +9,8 @@
 
 #include "../board/abstract_card_drag_item.h"
 
-#include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMap>
-#include <QMultiMap>
-#include <QPixmap>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 
 class DeckList;

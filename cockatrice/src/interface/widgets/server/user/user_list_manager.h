@@ -9,7 +9,6 @@
 
 #include "user_list_proxy.h"
 
-#include <QMap>
 #include <QWidget>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 

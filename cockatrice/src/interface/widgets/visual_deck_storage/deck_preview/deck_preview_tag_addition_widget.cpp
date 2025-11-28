@@ -2,7 +2,6 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "deck_preview_tag_dialog.h"
 
 #include <QFontMetrics>
 #include <QHBoxLayout>

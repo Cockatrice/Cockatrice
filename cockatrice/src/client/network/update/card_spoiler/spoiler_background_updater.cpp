@@ -4,13 +4,11 @@
 #include "../../../../main.h"
 #include "../../../settings/cache_settings.h"
 
-#include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
 #include <QFile>
 #include <QLocale>
-#include <QMessageBox>
 #include <QNetworkReply>
 #include <QUrl>
 #include <QtConcurrent>

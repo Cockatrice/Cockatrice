@@ -4,7 +4,6 @@
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,

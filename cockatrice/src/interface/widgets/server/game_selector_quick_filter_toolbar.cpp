@@ -6,7 +6,6 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QLineEdit>
 
 GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,

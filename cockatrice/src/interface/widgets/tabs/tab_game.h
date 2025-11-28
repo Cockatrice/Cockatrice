@@ -14,13 +14,11 @@
 #include "../game/player/player.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/widgets/replay/replay_manager.h"
-#include "../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "tab.h"
 
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
-#include <libcockatrice/protocol/pb/event_leave.pb.h>
 
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
