@@ -1,11 +1,9 @@
 #include "dlg_edit_tokens.h"
 
 #include "../interface/widgets/utility/get_text_with_max.h"
-#include "../main.h"
 
 #include <QAction>
 #include <QComboBox>
-#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -16,7 +14,6 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
-#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>

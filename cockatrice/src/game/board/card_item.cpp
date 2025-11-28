@@ -5,7 +5,6 @@
 #include "../game_scene.h"
 #include "../phase.h"
 #include "../player/player.h"
-#include "../zones/card_zone.h"
 #include "../zones/logic/view_zone_logic.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"

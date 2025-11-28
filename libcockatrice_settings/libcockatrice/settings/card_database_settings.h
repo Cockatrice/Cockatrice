@@ -10,9 +10,6 @@
 
 #include "settings_manager.h"
 
-#include <QObject>
-#include <QSettings>
-#include <QVariant>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 class CardDatabaseSettings : public SettingsManager, public ICardSetPriorityController

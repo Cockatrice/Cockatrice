@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QMessageBox>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 DlgDefaultTagsEditor::DlgDefaultTagsEditor(QWidget *parent) : QDialog(parent)

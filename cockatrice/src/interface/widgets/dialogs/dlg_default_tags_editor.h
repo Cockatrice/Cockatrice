@@ -11,7 +11,6 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 class DlgDefaultTagsEditor : public QDialog

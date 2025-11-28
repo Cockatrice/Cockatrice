@@ -10,10 +10,8 @@
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
-#include <QStringList>
 #include <QVector>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
-#include <libcockatrice/utility/card_ref.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLog, "card_database");

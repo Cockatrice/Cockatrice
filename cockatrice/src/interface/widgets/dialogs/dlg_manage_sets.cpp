@@ -3,11 +3,9 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
-#include "../main.h"
 
 #include <QAction>
 #include <QCheckBox>
-#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -15,7 +13,6 @@
 #include <QHeaderView>
 #include <QItemSelection>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>

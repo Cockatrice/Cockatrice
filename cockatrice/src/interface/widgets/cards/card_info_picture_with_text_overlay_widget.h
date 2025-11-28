@@ -12,7 +12,6 @@
 
 #include <QColor>
 #include <QSize>
-#include <QTextOption>
 
 class CardInfoPictureWithTextOverlayWidget : public CardInfoPictureWidget
 {

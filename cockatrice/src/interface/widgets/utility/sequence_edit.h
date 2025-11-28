@@ -8,7 +8,6 @@
 #define SEQUENCEEDIT_H
 
 #include <QEvent>
-#include <QKeySequence>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QWidget>

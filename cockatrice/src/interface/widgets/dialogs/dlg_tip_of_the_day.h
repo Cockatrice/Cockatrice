@@ -7,20 +7,17 @@
 #ifndef DLG_TIPOFDAY_H
 #define DLG_TIPOFDAY_H
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
-#include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QLoggingCategory>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 inline Q_LOGGING_CATEGORY(DlgTipOfTheDayLog, "dlg_tip_of_the_day");
 
-class QLabel;
-class QPushButton;
-class QCheckBox;
 class TipsOfTheDay;
 
 class DlgTipOfTheDay : public QDialog

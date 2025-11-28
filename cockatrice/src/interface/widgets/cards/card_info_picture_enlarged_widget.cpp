@@ -5,7 +5,6 @@
 
 #include <QPainterPath>
 #include <QStylePainter>
-#include <utility>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.

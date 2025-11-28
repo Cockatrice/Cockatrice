@@ -1,8 +1,6 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include <QLoggingCategory>
-#include <QObject>
 #include <QTimer>
 #include <libcockatrice/card/printing/exact_card.h>
 

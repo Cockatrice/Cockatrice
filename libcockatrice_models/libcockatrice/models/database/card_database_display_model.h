@@ -8,8 +8,6 @@
 #ifndef COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 #define COCKATRICE_CARD_DATABASE_DISPLAY_MODEL_H
 
-#include <QList>
-#include <QSet>
 #include <QSortFilterProxyModel>
 #include <QTimer>
 #include <libcockatrice/filters/filter_string.h>

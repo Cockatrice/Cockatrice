@@ -8,7 +8,6 @@
 #ifndef CARD_PICTURE_ENLARGED_WIDGET_H
 #define CARD_PICTURE_ENLARGED_WIDGET_H
 
-#include <QPixmap>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
 

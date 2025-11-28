@@ -25,7 +25,6 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
-#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -36,7 +35,6 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QRadioButton>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>

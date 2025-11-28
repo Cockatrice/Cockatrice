@@ -9,12 +9,10 @@
 #define CARD_AMOUNT_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../../deck_loader/deck_loader.h"
 #include "../general/display/dynamic_font_size_push_button.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QTreeView>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>

@@ -7,11 +7,9 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QKeyEvent>
 #include <QMenu>
-#include <QPainter>
 #include <QString>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>

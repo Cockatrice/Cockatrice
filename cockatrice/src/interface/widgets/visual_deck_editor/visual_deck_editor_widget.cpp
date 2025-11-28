@@ -7,7 +7,6 @@
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
-#include "../general/layout_containers/overlap_control_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 

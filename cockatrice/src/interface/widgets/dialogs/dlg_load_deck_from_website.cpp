@@ -2,7 +2,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QDialogButtonBox>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
