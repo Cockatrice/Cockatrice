@@ -69,7 +69,7 @@ public:
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    [[const LoadInfo &getLastLoadInfo() const
+    const LoadInfo &getLastLoadInfo() const
     {
         return lastLoadInfo;
     }
