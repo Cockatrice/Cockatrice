@@ -3,6 +3,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QUrl>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
 
