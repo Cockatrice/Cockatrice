@@ -224,8 +224,8 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 {
     setDeck(deck);
 
-    if (!deck->getLastFileName().isEmpty()) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
+    if (!deck->getLastLoadInfo().fileName.isEmpty()) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastLoadInfo().fileName);
     }
 }
 
@@ -411,7 +411,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckLoader();
-    if (deck->getLastRemoteDeckId() != -1) {
+    if (deck->getLastLoadInfo().remoteDeckId != DeckLoader::LoadInfo::NON_REMOTE_ID) {
         QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
@@ -419,7 +419,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         }
 
         Command_DeckUpload cmd;
-        cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastRemoteDeckId()));
+        cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastLoadInfo().remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
@@ -427,9 +427,9 @@ bool AbstractTabDeckEditor::actSaveDeck()
         tabSupervisor->getClient()->sendCommand(pend);
 
         return true;
-    } else if (deck->getLastFileName().isEmpty())
+    } else if (deck->getLastLoadInfo().fileName.isEmpty())
         return actSaveDeckAs();
-    else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat())) {
+    else if (deck->saveToFile(deck->getLastLoadInfo().fileName, deck->getLastLoadInfo().fileFormat)) {
         setModified(false);
         return true;
     }
