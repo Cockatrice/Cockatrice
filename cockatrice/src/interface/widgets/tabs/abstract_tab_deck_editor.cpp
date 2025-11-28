@@ -338,7 +338,7 @@ AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const
  */
 QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
 {
-    QMessageBox *msgBox = new QMessageBox(this);
+    auto *msgBox = new QMessageBox(this);
     msgBox->setIcon(QMessageBox::Warning);
     msgBox->setWindowTitle(tr("Are you sure?"));
     msgBox->setText(tr("The decklist has been modified.\nDo you want to save the changes?"));
@@ -607,7 +607,7 @@ void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite 
 
         // Encode the string recieved from the model to make sure all characters are encoded.
         // first we put it into a qurl object
-        QUrl decklistUrl = QUrl(decklistUrlString);
+        auto decklistUrl = QUrl(decklistUrlString);
         // we get the correctly encoded url.
         decklistUrlString = decklistUrl.toEncoded();
         // We open the url in the user's default browser

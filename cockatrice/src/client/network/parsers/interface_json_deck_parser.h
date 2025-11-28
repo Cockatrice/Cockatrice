@@ -24,7 +24,7 @@ class ArchidektJsonParser : public IJsonDeckParser
 public:
     DeckLoader *parse(const QJsonObject &obj) override
     {
-        DeckLoader *loader = new DeckLoader(nullptr);
+        auto *loader = new DeckLoader(nullptr);
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
@@ -59,7 +59,7 @@ class MoxfieldJsonParser : public IJsonDeckParser
 public:
     DeckLoader *parse(const QJsonObject &obj) override
     {
-        DeckLoader *loader = new DeckLoader(nullptr);
+        auto *loader = new DeckLoader(nullptr);
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();

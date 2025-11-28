@@ -39,7 +39,7 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     realnameLabel->setBuddy(realnameEdit);
     realnameEdit->setText(realName);
 
-    QGridLayout *grid = new QGridLayout;
+    auto *grid = new QGridLayout;
     grid->addWidget(emailLabel, 0, 0);
     grid->addWidget(emailEdit, 0, 1);
     grid->addWidget(countryLabel, 2, 0);
@@ -47,11 +47,11 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     grid->addWidget(realnameLabel, 3, 0);
     grid->addWidget(realnameEdit, 3, 1);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgEditUser::actOk);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgEditUser::reject);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    auto *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(grid);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);

@@ -34,10 +34,10 @@ RoomSelector::RoomSelector(AbstractClient *_client, QWidget *parent) : QGroupBox
 
     joinButton = new QPushButton;
     connect(joinButton, &QPushButton::clicked, this, &RoomSelector::joinClicked);
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     buttonLayout->addWidget(joinButton);
-    QVBoxLayout *vbox = new QVBoxLayout;
+    auto *vbox = new QVBoxLayout;
     vbox->addWidget(roomList);
     vbox->addLayout(buttonLayout);
 
@@ -87,7 +87,7 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
                 return;
             }
         }
-        QTreeWidgetItem *twi = new QTreeWidgetItem;
+        auto *twi = new QTreeWidgetItem;
         twi->setData(0, Qt::UserRole, room.room_id());
         if (room.has_name())
             twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
@@ -147,13 +147,13 @@ TabServer::TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client) : T
 
     connect(client, &AbstractClient::serverMessageEventReceived, this, &TabServer::processServerMessageEvent);
 
-    QVBoxLayout *vbox = new QVBoxLayout;
+    auto *vbox = new QVBoxLayout;
     vbox->addWidget(roomSelector);
     vbox->addWidget(serverInfoBox);
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(vbox);
     setCentralWidget(mainWidget);
 }

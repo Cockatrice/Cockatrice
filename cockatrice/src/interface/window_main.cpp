@@ -244,14 +244,13 @@ void MainWindow::startLocalGame(int numberPlayers)
 
     localServer = new LocalServer(this);
     LocalServerInterface *mainLsi = localServer->newConnection();
-    LocalClient *mainClient =
-        new LocalClient(mainLsi, tr("Player %1").arg(1), SettingsCache::instance().getClientID(), this);
+    auto *mainClient = new LocalClient(mainLsi, tr("Player %1").arg(1), SettingsCache::instance().getClientID(), this);
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
     for (int i = 0; i < numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
-        LocalClient *slaveClient =
+        auto *slaveClient =
             new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), SettingsCache::instance().getClientID(), this);
         localClients.append(slaveClient);
     }
@@ -1222,7 +1221,7 @@ void MainWindow::createCardUpdateProcess(bool background)
     // full "run the update" command; leave empty if not present
     QString updaterCmd;
     QString binaryName;
-    QDir dir = QDir(QApplication::applicationDirPath());
+    auto dir = QDir(QApplication::applicationDirPath());
 
 #if defined(Q_OS_MAC)
     /*

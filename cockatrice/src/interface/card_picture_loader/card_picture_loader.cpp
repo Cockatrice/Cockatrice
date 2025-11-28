@@ -32,7 +32,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
-    QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
+    auto *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
     if (mainWindow) {
         mainWindow->statusBar()->addPermanentWidget(statusBar);
     }

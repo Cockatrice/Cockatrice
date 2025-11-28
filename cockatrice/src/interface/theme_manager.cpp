@@ -15,10 +15,10 @@
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
-static const QColor HANDZONE_BG_DEFAULT = QColor(80, 100, 50);
-static const QColor TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
-static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
-static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
+static constexpr auto HANDZONE_BG_DEFAULT = QColor(80, 100, 50);
+static constexpr auto TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
+static constexpr auto PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
+static constexpr auto STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
@@ -77,7 +77,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    auto tmp = QPixmap("theme:zones/" + fileName);
     if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
@@ -91,7 +91,7 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    auto tmp = QPixmap("theme:zones/" + fileName);
 
     if (tmp.isNull()) {
         brush = fallbackBrush;
