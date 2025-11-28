@@ -62,8 +62,7 @@ void UtilityMenu::populatePredefinedTokensMenu()
         return;
     }
 
-    InnerDecklistNode *tokenZone =
-        dynamic_cast<InnerDecklistNode *>(_deck->getDeckList()->getRoot()->findChild(DECK_ZONE_TOKENS));
+    auto *tokenZone = dynamic_cast<InnerDecklistNode *>(_deck->getDeckList()->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone) {
         if (!tokenZone->empty())

@@ -73,7 +73,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_y(0);
     } else {
         tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-        QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+        auto gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
         cardToMove->set_face_down(faceDown);
         if (!faceDown) {
             cardToMove->set_pt(info.getPowTough().toStdString());
@@ -117,7 +117,7 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
         tableRow = 1;
     }
 
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+    auto gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
     cardToMove->set_face_down(faceDown);
     if (!faceDown) {
         cardToMove->set_pt(info.getPowTough().toStdString());
@@ -162,7 +162,7 @@ static QList<CardList::SortOption> expandSortOption(CardList::SortOption option)
 void PlayerActions::actSortHand()
 {
     auto *action = qobject_cast<QAction *>(sender());
-    CardList::SortOption option = static_cast<CardList::SortOption>(action->data().toInt());
+    auto option = static_cast<CardList::SortOption>(action->data().toInt());
 
     QList<CardList::SortOption> sortOptions = expandSortOption(option);
 
@@ -1080,7 +1080,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
 
     // get the target token's location
     // TODO: Define this QPoint into its own function along with the one below
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow));
+    auto gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow));
 
     // create the token for the related card
     Command_CreateToken cmd;
@@ -1323,7 +1323,7 @@ void PlayerActions::actResetPT()
 
 QVariantList PlayerActions::parsePT(const QString &pt)
 {
-    QVariantList ptList = QVariantList();
+    auto ptList = QVariantList();
     if (!pt.isEmpty()) {
         int sep = pt.indexOf('/');
         if (sep == 0) {
@@ -1380,7 +1380,7 @@ void PlayerActions::actSetPT()
     for (const auto &item : sel) {
         auto *card = static_cast<CardItem *>(item);
         auto *cmd = new Command_SetCardAttr;
-        QString newpt = QString();
+        auto newpt = QString();
         if (!empty) {
             const auto oldpt = parsePT(card->getPT());
             int ptIter = 0;
@@ -1484,7 +1484,7 @@ void PlayerActions::actSetAnnotation()
     }
 
     player->setDialogSemaphore(true);
-    AnnotationDialog *dialog = new AnnotationDialog(player->getGame()->getTab());
+    auto *dialog = new AnnotationDialog(player->getGame()->getTab());
     dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
     dialog->setWindowTitle(tr("Set annotation"));
     dialog->setLabelText(tr("Please enter the new annotation:"));

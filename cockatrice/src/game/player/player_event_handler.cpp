@@ -124,7 +124,7 @@ void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
     }
 
     CardRef cardRef = {QString::fromStdString(event.card_name()), QString::fromStdString(event.card_provider_id())};
-    CardItem *card = new CardItem(player, nullptr, cardRef, event.card_id());
+    auto *card = new CardItem(player, nullptr, cardRef, event.card_id());
     // use db PT if not provided in event and not face-down
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
