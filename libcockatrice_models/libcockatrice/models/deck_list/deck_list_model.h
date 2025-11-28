@@ -101,7 +101,7 @@ public:
         : AbstractDecklistCardNode(_parent, position), dataNode(_dataNode)
     {
     }
-    int getNumber() const override
+    [[nodiscard]] int getNumber() const override
     {
         return dataNode->getNumber();
     }
@@ -109,7 +109,7 @@ public:
     {
         dataNode->setNumber(_number);
     }
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return dataNode->getName();
     }
@@ -117,7 +117,7 @@ public:
     {
         dataNode->setName(_name);
     }
-    QString getCardProviderId() const override
+    [[nodiscard]] QString getCardProviderId() const override
     {
         return dataNode->getCardProviderId();
     }
@@ -125,7 +125,7 @@ public:
     {
         dataNode->setCardProviderId(_cardProviderId);
     }
-    QString getCardSetShortName() const override
+    [[nodiscard]] QString getCardSetShortName() const override
     {
         return dataNode->getCardSetShortName();
     }
@@ -133,7 +133,7 @@ public:
     {
         dataNode->setCardSetShortName(_cardSetShortName);
     }
-    QString getCardCollectorNumber() const override
+    [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return dataNode->getCardCollectorNumber();
     }
@@ -146,7 +146,7 @@ public:
      * @brief Returns the underlying data node.
      * @return Pointer to the DecklistCardNode wrapped by this node.
      */
-    DecklistCardNode *getDataNode() const
+    [[nodiscard]] DecklistCardNode *getDataNode() const
     {
         return dataNode;
     }
@@ -200,7 +200,7 @@ public:
      * @brief Returns the root index of the model.
      * @return QModelIndex representing the root node.
      */
-    QModelIndex getRoot() const
+    [[nodiscard]] QModelIndex getRoot() const
     {
         return nodeToIndex(root);
     };
@@ -210,17 +210,17 @@ public:
      * @param info Pointer to card information.
      * @return String representing the value of the current grouping criteria for the card.
      */
-    QString getGroupCriteriaForCard(CardInfoPtr info) const;
+    [[nodiscard]] QString getGroupCriteriaForCard(CardInfoPtr info) const;
 
     // Qt model overrides
-    int rowCount(const QModelIndex &parent) const override;
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
+    [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     void emitBackgroundUpdates(const QModelIndex &parent);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
-    QModelIndex parent(const QModelIndex &index) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override;
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
 
@@ -232,8 +232,8 @@ public:
      * @param cardNumber Optional collector number.
      * @return QModelIndex of the card, or invalid index if not found.
      */
-    QModelIndex findCard(const QString &cardName,
-                         const QString &zoneName,
+    [[nodiscard]] QModelIndex findCard(const QString &cardName,
+                                       const QString &zoneName,
                          const QString &providerId = "",
                          const QString &cardNumber = "") const;
 
@@ -269,15 +269,15 @@ public:
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
-    DeckList *getDeckList() const
+    [[nodiscard]] DeckList *getDeckList() const
     {
         return deckList;
     }
     void setDeckList(DeckList *_deck);
 
-    QList<ExactCard> getCards() const;
-    QList<ExactCard> getCardsForZone(const QString &zoneName) const;
-    QList<QString> *getZones() const;
+    [[nodiscard]] QList<ExactCard> getCards() const;
+    [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
+    [[nodiscard]] QList<QString> *getZones() const;
 
     /**
      * @brief Sets the criteria used to group cards in the model.
@@ -294,8 +294,8 @@ private:
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
-    DecklistModelCardNode *findCardNode(const QString &cardName,
-                                        const QString &zoneName,
+    [[nodiscard]] DecklistModelCardNode *findCardNode(const QString &cardName,
+                                                      const QString &zoneName,
                                         const QString &providerId = "",
                                         const QString &cardNumber = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);

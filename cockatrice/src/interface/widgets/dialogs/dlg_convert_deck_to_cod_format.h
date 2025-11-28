@@ -22,7 +22,7 @@ public:
     explicit DialogConvertDeckToCodFormat(QWidget *parent);
     void retranslateUi();
 
-    bool dontAskAgain() const;
+    [[nodiscard]] bool dontAskAgain() const;
 
 private:
     QVBoxLayout *layout;

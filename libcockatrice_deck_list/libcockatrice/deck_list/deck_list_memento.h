@@ -11,11 +11,11 @@ public:
     {
     }
 
-    QString getMemento() const
+    [[nodiscard]] QString getMemento() const
     {
         return memento;
     }
-    QString getReason() const
+    [[nodiscard]] QString getReason() const
     {
         return reason;
     }

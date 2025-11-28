@@ -20,31 +20,31 @@ class DlgRegister : public QDialog
     Q_OBJECT
 public:
     explicit DlgRegister(QWidget *parent = nullptr);
-    QString getHost() const
+    [[nodiscard]] QString getHost() const
     {
         return hostEdit->text();
     }
-    int getPort() const
+    [[nodiscard]] int getPort() const
     {
         return portEdit->text().toInt();
     }
-    QString getPlayerName() const
+    [[nodiscard]] QString getPlayerName() const
     {
         return playernameEdit->text();
     }
-    QString getPassword() const
+    [[nodiscard]] QString getPassword() const
     {
         return passwordEdit->text();
     }
-    QString getEmail() const
+    [[nodiscard]] QString getEmail() const
     {
         return emailEdit->text();
     }
-    QString getCountry() const
+    [[nodiscard]] QString getCountry() const
     {
         return countryEdit->currentIndex() == 0 ? "" : countryEdit->currentText();
     }
-    QString getRealName() const
+    [[nodiscard]] QString getRealName() const
     {
         return realnameEdit->text();
     }

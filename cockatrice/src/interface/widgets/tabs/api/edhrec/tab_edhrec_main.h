@@ -27,13 +27,13 @@ public:
 
     void retranslateUi() override;
     void doSearch();
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
         return tr("EDHRec: ") + cardName;
     }
 
-    CardSizeWidget *getCardSizeSlider()
+    CardSizeWidget *getCardSizeSlider() const
     {
         return cardSizeSlider;
     }

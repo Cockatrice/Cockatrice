@@ -39,15 +39,15 @@ private:
 
 public:
     explicit Tab(TabSupervisor *_tabSupervisor);
-    const QList<QMenu *> &getTabMenus() const
+    [[nodiscard]] const QList<QMenu *> &getTabMenus() const
     {
         return tabMenus;
     }
-    TabSupervisor *getTabSupervisor() const
+    [[nodiscard]] TabSupervisor *getTabSupervisor() const
     {
         return tabSupervisor;
     }
-    bool getContentsChanged() const
+    [[nodiscard]] bool getContentsChanged() const
     {
         return contentsChanged;
     }
@@ -55,7 +55,7 @@ public:
     {
         contentsChanged = _contentsChanged;
     }
-    virtual QString getTabText() const = 0;
+    [[nodiscard]] virtual QString getTabText() const = 0;
     virtual void retranslateUi() = 0;
 
     /**

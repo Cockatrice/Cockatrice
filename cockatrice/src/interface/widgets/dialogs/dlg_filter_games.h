@@ -58,32 +58,32 @@ public:
                    const GamesProxyModel *_gamesProxyModel,
                    QWidget *parent = nullptr);
 
-    bool getHideFullGames() const;
-    bool getHideGamesThatStarted() const;
-    bool getHidePasswordProtectedGames() const;
+    [[nodiscard]] bool getHideFullGames() const;
+    [[nodiscard]] bool getHideGamesThatStarted() const;
+    [[nodiscard]] bool getHidePasswordProtectedGames() const;
     void setShowPasswordProtectedGames(bool _passwordProtectedGamesHidden);
-    bool getHideBuddiesOnlyGames() const;
+    [[nodiscard]] bool getHideBuddiesOnlyGames() const;
     void setHideBuddiesOnlyGames(bool _hideBuddiesOnlyGames);
-    bool getHideOpenDecklistGames() const;
+    [[nodiscard]] bool getHideOpenDecklistGames() const;
     void setHideOpenDecklistGames(bool _hideOpenDecklistGames);
-    bool getHideIgnoredUserGames() const;
+    [[nodiscard]] bool getHideIgnoredUserGames() const;
     void setHideIgnoredUserGames(bool _hideIgnoredUserGames);
-    bool getHideNotBuddyCreatedGames() const;
-    QString getGameNameFilter() const;
+    [[nodiscard]] bool getHideNotBuddyCreatedGames() const;
+    [[nodiscard]] QString getGameNameFilter() const;
     void setGameNameFilter(const QString &_gameNameFilter);
-    QStringList getCreatorNameFilters() const;
+    [[nodiscard]] QStringList getCreatorNameFilters() const;
     void setCreatorNameFilter(const QString &_creatorNameFilter);
-    QSet<int> getGameTypeFilter() const;
+    [[nodiscard]] QSet<int> getGameTypeFilter() const;
     void setGameTypeFilter(const QSet<int> &_gameTypeFilter);
-    int getMaxPlayersFilterMin() const;
-    int getMaxPlayersFilterMax() const;
+    [[nodiscard]] int getMaxPlayersFilterMin() const;
+    [[nodiscard]] int getMaxPlayersFilterMax() const;
     void setMaxPlayersFilter(int _maxPlayersFilterMin, int _maxPlayersFilterMax);
-    QTime getMaxGameAge() const;
+    [[nodiscard]] QTime getMaxGameAge() const;
     const QMap<QTime, QString> gameAgeMap;
-    bool getShowOnlyIfSpectatorsCanWatch() const;
-    bool getShowSpectatorPasswordProtected() const;
-    bool getShowOnlyIfSpectatorsCanChat() const;
-    bool getShowOnlyIfSpectatorsCanSeeHands() const;
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanWatch() const;
+    [[nodiscard]] bool getShowSpectatorPasswordProtected() const;
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanChat() const;
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanSeeHands() const;
 };
 
 #endif

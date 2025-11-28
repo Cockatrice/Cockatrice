@@ -23,8 +23,8 @@ private:
     QStringList m_properties; // List of properties to sort by
     Qt::SortOrder m_order;
 
-    QVariant getProperty(const CardInfoPtr &card, const QString &property) const;
-    bool compareVariants(const QVariant &a, const QVariant &b) const;
+    [[nodiscard]] QVariant getProperty(const CardInfoPtr &card, const QString &property) const;
+    [[nodiscard]] bool compareVariants(const QVariant &a, const QVariant &b) const;
 };
 
 #endif // CARD_INFO_COMPARATOR_H

@@ -100,11 +100,11 @@ public:
     {
         QList::operator=(_sequence);
     };
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return QApplication::translate("shortcutsTab", name.toUtf8().data());
     };
-    QString getGroupName() const
+    [[nodiscard]] QString getGroupName() const
     {
         return ShortcutGroup::getGroupName(group);
     };
@@ -120,13 +120,13 @@ class ShortcutsSettings : public QObject
 public:
     explicit ShortcutsSettings(const QString &settingsFilePath, QObject *parent = nullptr);
 
-    ShortcutKey getDefaultShortcut(const QString &name) const;
-    ShortcutKey getShortcut(const QString &name) const;
-    QKeySequence getSingleShortcut(const QString &name) const;
-    QString getDefaultShortcutString(const QString &name) const;
-    QString getShortcutString(const QString &name) const;
-    QString getShortcutFriendlyName(const QString &shortcutName) const;
-    QList<QString> getAllShortcutKeys() const
+    [[nodiscard]] ShortcutKey getDefaultShortcut(const QString &name) const;
+    [[nodiscard]] ShortcutKey getShortcut(const QString &name) const;
+    [[nodiscard]] QKeySequence getSingleShortcut(const QString &name) const;
+    [[nodiscard]] QString getDefaultShortcutString(const QString &name) const;
+    [[nodiscard]] QString getShortcutString(const QString &name) const;
+    [[nodiscard]] QString getShortcutFriendlyName(const QString &shortcutName) const;
+    [[nodiscard]] QList<QString> getAllShortcutKeys() const
     {
         return shortCuts.keys();
     };
@@ -135,9 +135,9 @@ public:
     void setShortcuts(const QString &name, const QKeySequence &Sequence);
     void setShortcuts(const QString &name, const QString &sequences);
 
-    bool isKeyAllowed(const QString &name, const QString &sequences) const;
-    bool isValid(const QString &name, const QString &sequences) const;
-    QStringList findOverlaps(const QString &name, const QString &sequences) const;
+    [[nodiscard]] bool isKeyAllowed(const QString &name, const QString &sequences) const;
+    [[nodiscard]] bool isValid(const QString &name, const QString &sequences) const;
+    [[nodiscard]] QStringList findOverlaps(const QString &name, const QString &sequences) const;
 
     void resetAllShortcuts();
     void clearAllShortcuts();
@@ -152,8 +152,8 @@ private:
     QString settingsFilePath;
     QHash<QString, ShortcutKey> shortCuts;
 
-    QString stringifySequence(const QList<QKeySequence> &Sequence) const;
-    QList<QKeySequence> parseSequenceString(const QString &stringSequence) const;
+    [[nodiscard]] QString stringifySequence(const QList<QKeySequence> &Sequence) const;
+    [[nodiscard]] QList<QKeySequence> parseSequenceString(const QString &stringSequence) const;
 
     const QHash<QString, ShortcutKey> defaultShortCuts = {
         {"MainWindow/aCheckCardUpdates", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Check for Card Updates..."),

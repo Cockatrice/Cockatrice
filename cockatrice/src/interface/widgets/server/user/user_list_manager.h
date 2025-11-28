@@ -60,11 +60,11 @@ public:
         return ignoredUsers;
     }
 
-    bool isOwnUserRegistered() const override;
-    QString getOwnUsername() const override;
-    bool isUserBuddy(const QString &userName) const override;
-    bool isUserIgnored(const QString &userName) const override;
-    const ServerInfo_User *getOnlineUser(const QString &userName) const override;
+    [[nodiscard]] bool isOwnUserRegistered() const override;
+    [[nodiscard]] QString getOwnUsername() const override;
+    [[nodiscard]] bool isUserBuddy(const QString &userName) const override;
+    [[nodiscard]] bool isUserIgnored(const QString &userName) const override;
+    [[nodiscard]] const ServerInfo_User *getOnlineUser(const QString &userName) const override;
 
 public slots:
     void handleConnect();

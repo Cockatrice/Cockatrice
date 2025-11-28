@@ -91,7 +91,7 @@ public:
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 
     /// @return The quantity of this card.
-    int getNumber() const override
+    [[nodiscard]] int getNumber() const override
     {
         return number;
     }
@@ -103,7 +103,7 @@ public:
     }
 
     /// @return The display name of this card.
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return name;
     }
@@ -115,7 +115,7 @@ public:
     }
 
     /// @return The provider identifier for this card.
-    QString getCardProviderId() const override
+    [[nodiscard]] QString getCardProviderId() const override
     {
         return cardProviderId;
     }
@@ -127,7 +127,7 @@ public:
     }
 
     /// @return The short set code (e.g., "NEO").
-    QString getCardSetShortName() const override
+    [[nodiscard]] QString getCardSetShortName() const override
     {
         return cardSetShortName;
     }
@@ -139,7 +139,7 @@ public:
     }
 
     /// @return The collector number of this card within its set.
-    QString getCardCollectorNumber() const override
+    [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return cardSetNumber;
     }
@@ -162,7 +162,7 @@ public:
      * @return A CardRef with the card’s name and provider ID, suitable
      *         for database lookups or comparison with other card sources.
      */
-    CardRef toCardRef() const
+    [[nodiscard]] CardRef toCardRef() const
     {
         return {name, cardProviderId};
     }

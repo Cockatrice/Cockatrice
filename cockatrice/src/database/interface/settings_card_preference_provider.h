@@ -7,12 +7,12 @@
 class SettingsCardPreferenceProvider : public ICardPreferenceProvider
 {
 public:
-    QString getCardPreferenceOverride(const QString &cardName) const override
+    [[nodiscard]] QString getCardPreferenceOverride(const QString &cardName) const override
     {
         return SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);
     }
 
-    bool getIncludeRebalancedCards() const override
+    [[nodiscard]] bool getIncludeRebalancedCards() const override
     {
         return SettingsCache::instance().getIncludeRebalancedCards();
     };
