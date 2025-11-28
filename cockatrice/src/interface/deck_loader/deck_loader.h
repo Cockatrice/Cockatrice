@@ -36,9 +36,11 @@ public:
      */
     struct LoadInfo
     {
+        static constexpr int NON_REMOTE_ID = -1;
+
         QString fileName = "";
         FileFormat fileFormat = CockatriceFormat;
-        int remoteDeckId = -1;
+        int remoteDeckId = NON_REMOTE_ID;
     };
 
     /**
@@ -79,7 +81,7 @@ public:
 
     [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastLoadInfo.fileName.isEmpty() && lastLoadInfo.remoteDeckId == -1;
+        return lastLoadInfo.fileName.isEmpty() && lastLoadInfo.remoteDeckId == LoadInfo::NON_REMOTE_ID;
     }
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);

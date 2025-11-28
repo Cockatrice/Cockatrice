@@ -411,7 +411,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckLoader();
-    if (deck->getLastLoadInfo().remoteDeckId != -1) {
+    if (deck->getLastLoadInfo().remoteDeckId != DeckLoader::LoadInfo::NON_REMOTE_ID) {
         QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
