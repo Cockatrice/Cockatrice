@@ -286,7 +286,7 @@ void Server::externalUserJoined(const ServerInfo_User &userInfo)
     // This function is always called from the main thread via signal/slot.
     clientsLock.lockForWrite();
 
-    Server_RemoteUserInterface *newUser = new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo));
+    auto *newUser = new Server_RemoteUserInterface(this, ServerInfo_User_Container(userInfo));
     externalUsers.insert(QString::fromStdString(userInfo.name()), newUser);
     externalUsersBySessionId.insert(userInfo.session_id(), newUser);
 
