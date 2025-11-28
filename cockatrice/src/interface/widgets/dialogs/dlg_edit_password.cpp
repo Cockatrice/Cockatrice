@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>

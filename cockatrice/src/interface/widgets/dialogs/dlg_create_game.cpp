@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>

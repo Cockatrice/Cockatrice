@@ -5,6 +5,7 @@
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
 
 #include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QLabel>
 #include <QMessageBox>
 #include <QMimeData>

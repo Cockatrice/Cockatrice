@@ -4,6 +4,7 @@
 
 #include <QAction>
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
