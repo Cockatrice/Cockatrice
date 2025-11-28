@@ -335,7 +335,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
                                                    const QString &providerId,
                                                    const QString &cardNumber) const
 {
-    InnerDecklistNode *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
+    auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (!zoneNode) {
         return nullptr;
     }
@@ -346,7 +346,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
     }
 
     QString groupCriteria = getGroupCriteriaForCard(info);
-    InnerDecklistNode *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria));
+    auto *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria));
     if (!groupNode) {
         return nullptr;
     }
@@ -555,15 +555,15 @@ QList<ExactCard> DeckListModel::getCards() const
         return cards;
 
     for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         if (!currentZone)
             continue;
         for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
             for (int k = 0; k < currentCard->getNumber(); ++k) {
-                ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
+                auto card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
                 if (card) {
                     cards.append(card);
                 } else {
@@ -587,12 +587,12 @@ QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
         return cards;
 
     for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         if (!currentZone)
             continue;
         if (currentZone->getName() == zoneName) {
             for (int j = 0; j < currentZone->size(); j++) {
-                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+                auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
                 if (!currentCard)
                     continue;
                 for (int k = 0; k < currentCard->getNumber(); ++k) {
@@ -611,7 +611,7 @@ QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
 
 QList<QString> *DeckListModel::getZones() const
 {
-    QList<QString> *zones = new QList<QString>();
+    auto *zones = new QList<QString>();
     DeckList *decklist = getDeckList();
     if (!decklist) {
         return zones;
@@ -621,7 +621,7 @@ QList<QString> *DeckListModel::getZones() const
         return zones;
 
     for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         if (!currentZone)
             continue;
         zones->append(currentZone->getName());

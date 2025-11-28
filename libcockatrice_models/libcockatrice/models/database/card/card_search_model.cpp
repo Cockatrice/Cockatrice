@@ -44,7 +44,7 @@ void CardSearchModel::updateSearchResults(const QString &query)
     for (int i = 0; i < sourceModel->rowCount(); ++i) {
         QModelIndex modelIndex = sourceModel->index(i, 0);
         QModelIndex sourceIndex = sourceModel->mapToSource(modelIndex);
-        CardDatabaseModel *sourceDbModel = qobject_cast<CardDatabaseModel *>(sourceModel->sourceModel());
+        auto *sourceDbModel = qobject_cast<CardDatabaseModel *>(sourceModel->sourceModel());
 
         if (!sourceDbModel || !sourceIndex.isValid())
             return;
