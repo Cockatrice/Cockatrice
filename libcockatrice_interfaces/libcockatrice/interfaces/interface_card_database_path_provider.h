@@ -9,10 +9,10 @@ class ICardDatabasePathProvider : public QObject
 public:
     virtual ~ICardDatabasePathProvider() = default;
 
-    virtual QString getCardDatabasePath() const = 0;
-    virtual QString getCustomCardDatabasePath() const = 0;
-    virtual QString getTokenDatabasePath() const = 0;
-    virtual QString getSpoilerCardDatabasePath() const = 0;
+    [[nodiscard]] virtual QString getCardDatabasePath() const = 0;
+    [[nodiscard]] virtual QString getCustomCardDatabasePath() const = 0;
+    [[nodiscard]] virtual QString getTokenDatabasePath() const = 0;
+    [[nodiscard]] virtual QString getSpoilerCardDatabasePath() const = 0;
 
 signals:
     void cardDatabasePathChanged();

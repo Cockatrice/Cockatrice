@@ -77,17 +77,17 @@ public:
         dirtyTimer.start(20);
     }
     void clearFilterAll();
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    bool canFetchMore(const QModelIndex &parent) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] bool canFetchMore(const QModelIndex &parent) const override;
     void fetchMore(const QModelIndex &parent) override;
 signals:
     void modelDirty();
 
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
     static int lessThanNumerically(const QString &left, const QString &right);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-    bool rowMatchesCardName(CardInfoPtr info) const;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool rowMatchesCardName(CardInfoPtr info) const;
 
 private slots:
     void filterTreeChanged();

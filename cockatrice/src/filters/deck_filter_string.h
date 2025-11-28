@@ -40,7 +40,7 @@ public:
         return filter(deck, info);
     }
 
-    bool valid() const
+    [[nodiscard]] bool valid() const
     {
         return _error.isEmpty();
     }

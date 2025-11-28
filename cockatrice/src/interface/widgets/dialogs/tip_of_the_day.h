@@ -14,19 +14,19 @@ class TipOfTheDay
 {
 public:
     explicit TipOfTheDay(QString _title, QString _content, QString _imagePath, QDate _date);
-    QString getTitle() const
+    [[nodiscard]] QString getTitle() const
     {
         return title;
     }
-    QString getContent() const
+    [[nodiscard]] QString getContent() const
     {
         return content;
     }
-    QString getImagePath() const
+    [[nodiscard]] QString getImagePath() const
     {
         return imagePath;
     }
-    QDate getDate() const
+    [[nodiscard]] QDate getDate() const
     {
         return date;
     }
@@ -51,8 +51,8 @@ public:
     explicit TipsOfTheDay(QString xmlPath, QObject *parent = nullptr);
     ~TipsOfTheDay() override;
     TipOfTheDay getTip(int tipId);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 
 private:
     QList<TipOfTheDay> *tipList;

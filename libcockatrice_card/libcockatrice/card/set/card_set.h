@@ -105,34 +105,34 @@ public:
      *
      * @return Sanitized short name.
      */
-    QString getCorrectedShortName() const;
+    [[nodiscard]] QString getCorrectedShortName() const;
 
     /// @return Short identifier of the set.
-    QString getShortName() const
+    [[nodiscard]] QString getShortName() const
     {
         return shortName;
     }
 
     /// @return Descriptive name of the set.
-    QString getLongName() const
+    [[nodiscard]] QString getLongName() const
     {
         return longName;
     }
 
     /// @return Type/category string of the set.
-    QString getSetType() const
+    [[nodiscard]] QString getSetType() const
     {
         return setType;
     }
 
     /// @return Release date of the set.
-    QDate getReleaseDate() const
+    [[nodiscard]] QDate getReleaseDate() const
     {
         return releaseDate;
     }
 
     /// @return Priority level of the set.
-    Priority getPriority() const
+    [[nodiscard]] Priority getPriority() const
     {
         return priority;
     }
@@ -182,7 +182,7 @@ public:
     void loadSetOptions();
 
     /// @return The sort key assigned to this set.
-    int getSortKey() const
+    [[nodiscard]] int getSortKey() const
     {
         return sortKey;
     }
@@ -194,7 +194,7 @@ public:
     void setSortKey(unsigned int _sortKey);
 
     /// @return True if the set is enabled.
-    bool getEnabled() const
+    [[nodiscard]] bool getEnabled() const
     {
         return enabled;
     }
@@ -206,7 +206,7 @@ public:
     void setEnabled(bool _enabled);
 
     /// @return True if the set is considered known.
-    bool getIsKnown() const
+    [[nodiscard]] bool getIsKnown() const
     {
         return isknown;
     }
@@ -222,7 +222,7 @@ public:
      *
      * @return True if the long name, type, and release date are all empty.
      */
-    bool getIsKnownIgnored() const
+    [[nodiscard]] bool getIsKnownIgnored() const
     {
         return longName.length() + setType.length() + releaseDate.toString().length() == 0;
     }

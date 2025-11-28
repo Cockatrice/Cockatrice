@@ -29,27 +29,27 @@ public:
     void debugPrint() const;
 
     // Getter methods for deck container
-    const QString &getDescription() const
+    [[nodiscard]] const QString &getDescription() const
     {
         return description;
     }
-    const QVector<QJsonObject> &getBreadcrumb() const
+    [[nodiscard]] const QVector<QJsonObject> &getBreadcrumb() const
     {
         return breadcrumb;
     }
-    const EdhrecCommanderApiResponseCommanderDetails &getCommanderDetails() const
+    [[nodiscard]] const EdhrecCommanderApiResponseCommanderDetails &getCommanderDetails() const
     {
         return card;
     }
-    const QVector<EdhrecApiResponseCardList> &getCardlists() const
+    [[nodiscard]] const QVector<EdhrecApiResponseCardList> &getCardlists() const
     {
         return cardlists;
     }
-    const QString &getKeywords() const
+    [[nodiscard]] const QString &getKeywords() const
     {
         return keywords;
     }
-    const QString &getTitle() const
+    [[nodiscard]] const QString &getTitle() const
     {
         return title;
     }

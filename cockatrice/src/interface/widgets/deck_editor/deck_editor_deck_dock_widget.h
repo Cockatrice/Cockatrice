@@ -104,7 +104,7 @@ private:
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     void recursiveExpand(const QModelIndex &index);
-    QModelIndexList getSelectedCardNodes() const;
+    [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
 
 private slots:
     void decklistCustomMenu(QPoint point);

@@ -22,7 +22,7 @@ public:
     explicit ShortcutFilterProxyModel(QObject *parent = nullptr);
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
 class ShortcutTreeView : public QTreeView

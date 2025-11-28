@@ -56,7 +56,7 @@ public:
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const QString &getLastFileName() const
+    [[nodiscard]] const QString &getLastFileName() const
     {
         return lastFileName;
     }
@@ -64,16 +64,16 @@ public:
     {
         lastFileName = _lastFileName;
     }
-    FileFormat getLastFileFormat() const
+    [[nodiscard]] FileFormat getLastFileFormat() const
     {
         return lastFileFormat;
     }
-    int getLastRemoteDeckId() const
+    [[nodiscard]] int getLastRemoteDeckId() const
     {
         return lastRemoteDeckId;
     }
 
-    bool hasNotBeenLoaded() const
+    [[nodiscard]] bool hasNotBeenLoaded() const
     {
         return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
     }

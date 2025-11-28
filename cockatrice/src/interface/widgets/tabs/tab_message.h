@@ -54,8 +54,8 @@ public:
     ~TabMessage() override;
     void retranslateUi() override;
     void tabActivated() override;
-    QString getUserName() const;
-    QString getTabText() const override;
+    [[nodiscard]] QString getUserName() const;
+    [[nodiscard]] QString getTabText() const override;
 
     void processUserMessageEvent(const Event_UserMessage &event);
 

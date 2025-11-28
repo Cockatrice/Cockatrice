@@ -110,7 +110,7 @@ private:
      * @brief Collects custom card database paths recursively.
      * @return Sorted list of file paths to custom databases.
      */
-    QStringList collectCustomDatabasePaths() const;
+    [[nodiscard]] QStringList collectCustomDatabasePaths() const;
 
 private:
     CardDatabase *database;                        /**< Non-owning pointer to the target CardDatabase. */
