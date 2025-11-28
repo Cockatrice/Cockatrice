@@ -23,6 +23,10 @@
 class CardAmountWidget : public QWidget
 {
     Q_OBJECT
+
+signals:
+    void deckModified(const QString &modificationReason);
+
 public:
     explicit CardAmountWidget(QWidget *parent,
                               AbstractTabDeckEditor *deckEditor,
