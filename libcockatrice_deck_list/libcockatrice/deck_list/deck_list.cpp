@@ -8,6 +8,7 @@
 #include <QCryptographicHash>
 #include <QFile>
 #include <QRegularExpression>
+#include <QSet>
 #include <QTextStream>
 #include <algorithm>
 
