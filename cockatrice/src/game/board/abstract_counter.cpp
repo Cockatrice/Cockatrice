@@ -43,7 +43,7 @@ AbstractCounter::AbstractCounter(Player *_player,
             if (i == 0) {
                 menu->addSeparator();
             } else {
-                QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
+                auto *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
                 if (i == -1)
                     aDec = aIncrement;
                 else if (i == 1)
@@ -215,7 +215,7 @@ bool AbstractCounterDialog::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
     if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        auto *keyEvent = static_cast<QKeyEvent *>(event);
         switch (keyEvent->key()) {
             case Qt::Key_Up:
                 changeValue(+1);

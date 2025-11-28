@@ -9,7 +9,7 @@
 
 static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
 static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
-const QColor GHOST_MASK = QColor(255, 255, 255, 50);
+constexpr auto GHOST_MASK = QColor(255, 255, 255, 50);
 
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
                                            const QPointF &_hotSpot,
