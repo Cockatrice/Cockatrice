@@ -42,7 +42,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     setZValue(2000000006);
     setFlag(ItemIgnoresTransformations);
 
-    QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
+    auto *vbox = new QGraphicsLinearLayout(Qt::Vertical);
     vbox->setSpacing(2);
 
     // If the number is < 0, then it means that we can give the option to make the area sorted
@@ -61,22 +61,22 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
             searchEdit.setFocus();
         }
 
-        QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
+        auto *searchEditProxy = new QGraphicsProxyWidget;
         searchEditProxy->setWidget(&searchEdit);
         searchEditProxy->setZValue(2000000007);
         vbox->addItem(searchEditProxy);
 
         // top row
-        QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
+        auto *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // groupBy options
-        QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
+        auto *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
         groupBySelectorProxy->setZValue(2000000008);
         hTopRow->addItem(groupBySelectorProxy);
 
         // sortBy options
-        QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
+        auto *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
         sortBySelectorProxy->setZValue(2000000007);
         hTopRow->addItem(sortBySelectorProxy);
@@ -84,25 +84,25 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         vbox->addItem(hTopRow);
 
         // line
-        QGraphicsProxyWidget *lineProxy = new QGraphicsProxyWidget;
-        QFrame *line = new QFrame;
+        auto *lineProxy = new QGraphicsProxyWidget;
+        auto *line = new QFrame;
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
         lineProxy->setWidget(line);
         vbox->addItem(lineProxy);
 
         // bottom row
-        QGraphicsLinearLayout *hBottomRow = new QGraphicsLinearLayout(Qt::Horizontal);
+        auto *hBottomRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
         // pile view options
-        QGraphicsProxyWidget *pileViewProxy = new QGraphicsProxyWidget;
+        auto *pileViewProxy = new QGraphicsProxyWidget;
         pileViewProxy->setWidget(&pileViewCheckBox);
         hBottomRow->addItem(pileViewProxy);
 
         // shuffle options
         if (_origZone->getIsShufflable() && numberCards == -1) {
             shuffleCheckBox.setChecked(true);
-            QGraphicsProxyWidget *shuffleProxy = new QGraphicsProxyWidget;
+            auto *shuffleProxy = new QGraphicsProxyWidget;
             shuffleProxy->setWidget(&shuffleCheckBox);
             hBottomRow->addItem(shuffleProxy);
         }
@@ -112,7 +112,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
 
-    QGraphicsLinearLayout *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
+    auto *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
 
     zoneContainer = new QGraphicsWidget(this);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -367,7 +367,7 @@ void ZoneViewWidget::zoneDeleted()
 
 void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 {
-    QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
+    auto *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar)
         titleBar->icon = QPixmap("theme:cockatrice");
 }
