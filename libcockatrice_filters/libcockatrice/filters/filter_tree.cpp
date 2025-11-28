@@ -86,7 +86,7 @@ FilterTreeNode *FilterItemList::termNode(const QString &term)
 {
     int i = termIndex(term);
     if (i < 0) {
-        FilterItem *fi = new FilterItem(term, this);
+        auto *fi = new FilterItem(term, this);
         int count = childNodes.count();
 
         preInsertChild(this, count);
