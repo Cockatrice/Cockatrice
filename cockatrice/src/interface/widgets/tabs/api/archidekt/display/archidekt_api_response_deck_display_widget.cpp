@@ -4,6 +4,7 @@
 #include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../../../cards/card_size_widget.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
+#include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
 
 #include <QSortFilterProxyModel>
@@ -22,6 +23,12 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
 
     connect(openInEditorButton, &QPushButton::clicked, this,
             &ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor);
+
+    displayOptionsWidget = new VisualDeckDisplayOptionsWidget(this);
+    layout->addWidget(displayOptionsWidget);
+
+    connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::groupCriteriaChanged, this,
+            &ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange);
 
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
@@ -73,6 +80,12 @@ void ArchidektApiResponseDeckDisplayWidget::retranslateUi()
     openInEditorButton->setText(tr("Open Deck in Deck Editor"));
 }
 
+void ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange(const QString &activeGroupCriteria)
+{
+    model->setActiveGroupCriteria(DeckListModelGroupCriteria::fromString(activeGroupCriteria));
+    model->sort(1, Qt::AscendingOrder);
+}
+
 void ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor()
 {
     auto loader = new DeckLoader(this);
@@ -122,13 +135,13 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
             new DeckCardZoneDisplayWidget(zoneContainer, model, nullptr, persistent,
                                           model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
                                           "maintype", {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
-        /*
-        connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
+
+        connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, zoneDisplayWidget,
                 &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);
-        connect(this, &VisualDeckEditorWidget::activeGroupCriteriaChanged, zoneDisplayWidget,
+        connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::groupCriteriaChanged, zoneDisplayWidget,
                 &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
-        connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
-                &DeckCardZoneDisplayWidget::refreshDisplayType);*/
+        connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::displayTypeChanged, zoneDisplayWidget,
+                &DeckCardZoneDisplayWidget::refreshDisplayType);
         zoneContainerLayout->addWidget(zoneDisplayWidget);
 
         indexToWidgetMap.insert(persistent, zoneDisplayWidget);

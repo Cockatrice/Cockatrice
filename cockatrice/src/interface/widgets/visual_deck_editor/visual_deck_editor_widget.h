@@ -23,6 +23,7 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qscrollarea.h>
 
+class VisualDeckDisplayOptionsWidget;
 class DeckCardZoneDisplayWidget;
 enum class DisplayType
 {
@@ -55,7 +56,6 @@ public:
 public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void updateZoneWidgets();
-    void updateDisplayType();
     void cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget);
     void onCardAddition(const QModelIndex &parent, int first, int last);
     void onCardRemoval(const QModelIndex &parent, int first, int last);
@@ -73,8 +73,6 @@ signals:
 protected slots:
     void onHover(const ExactCard &hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
-    void actChangeActiveGroupCriteria();
-    void actChangeActiveSortCriteria();
     void decklistModelReset();
 
 private:
@@ -85,19 +83,10 @@ private:
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
     QCompleter *completer;
+    QWidget *displayOptionsAndSearch;
+    QHBoxLayout *displayOptionsAndSearchLayout;
+    VisualDeckDisplayOptionsWidget *displayOptionsWidget;
     QPushButton *searchPushButton;
-    DisplayType currentDisplayType = DisplayType::Overlap;
-    QPushButton *displayTypeButton;
-    QWidget *groupAndSortContainer;
-    QHBoxLayout *groupAndSortLayout;
-    QLabel *groupByLabel;
-    QComboBox *groupByComboBox;
-    QString activeGroupCriteria = "maintype";
-    SettingsButtonWidget *sortCriteriaButton;
-    QLabel *sortByLabel;
-    QLabel *sortLabel;
-    QListWidget *sortByListWidget;
-    QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;

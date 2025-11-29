@@ -9,6 +9,7 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
+#include "visual_deck_display_options_widget.h"
 
 #include <QCheckBox>
 #include <QCompleter>
@@ -109,75 +110,22 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
         }
     });
 
-    groupAndSortContainer = new QWidget(this);
-    groupAndSortLayout = new QHBoxLayout(groupAndSortContainer);
-    groupAndSortLayout->setAlignment(Qt::AlignLeft);
-    groupAndSortContainer->setLayout(groupAndSortLayout);
+    displayOptionsAndSearch = new QWidget(this);
+    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
+    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
+    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
 
-    groupByLabel = new QLabel(groupAndSortContainer);
+    displayOptionsWidget = new VisualDeckDisplayOptionsWidget(this);
+    connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::displayTypeChanged, this,
+            &VisualDeckEditorWidget::displayTypeChanged);
+    connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::groupCriteriaChanged, this,
+            &VisualDeckEditorWidget::activeGroupCriteriaChanged);
+    connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, this,
+            &VisualDeckEditorWidget::activeSortCriteriaChanged);
 
-    groupByComboBox = new QComboBox(this);
-    if (auto tabWidget = qobject_cast<TabDeckEditorVisualTabWidget *>(parent)) {
-        // Inside a central widget QWidget container inside TabDeckEditorVisual
-        if (auto tab = qobject_cast<TabDeckEditorVisual *>(tabWidget->parent()->parent())) {
-            auto originalBox = tab->getDeckDockWidget()->getGroupByComboBox();
-            groupByComboBox->setModel(originalBox->model());
-            groupByComboBox->setModelColumn(originalBox->modelColumn());
-
-            // Original -> clone
-            connect(originalBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                    [this](int index) { groupByComboBox->setCurrentIndex(index); });
-
-            // Clone -> original
-            connect(groupByComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                    [originalBox](int index) { originalBox->setCurrentIndex(index); });
-        }
-    } else {
-        QStringList groupProperties = {"maintype", "colors", "cmc", "name"};
-        groupByComboBox->addItems(groupProperties);
-        groupByComboBox->setMinimumWidth(300);
-        connect(groupByComboBox, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-                &VisualDeckEditorWidget::actChangeActiveGroupCriteria);
-        actChangeActiveGroupCriteria();
-    }
-
-    sortByLabel = new QLabel(groupAndSortContainer);
-
-    sortCriteriaButton = new SettingsButtonWidget(this);
-
-    sortLabel = new QLabel(sortCriteriaButton);
-    sortLabel->setWordWrap(true);
-
-    QStringList sortProperties = {"colors", "cmc", "name", "maintype"};
-    sortByListWidget = new QListWidget();
-    sortByListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    sortByListWidget->setDragDropMode(QAbstractItemView::InternalMove);
-    sortByListWidget->setDefaultDropAction(Qt::MoveAction);
-
-    for (const QString &property : sortProperties) {
-        QListWidgetItem *item = new QListWidgetItem(property, sortByListWidget);
-        item->setFlags(item->flags() | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    }
-
-    connect(sortByListWidget->model(), &QAbstractItemModel::rowsMoved, this,
-            &VisualDeckEditorWidget::actChangeActiveSortCriteria);
-    actChangeActiveSortCriteria();
-
-    sortByListWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-
-    sortCriteriaButton->addSettingsWidget(sortLabel);
-    sortCriteriaButton->addSettingsWidget(sortByListWidget);
-
-    displayTypeButton = new QPushButton(this);
-    connect(displayTypeButton, &QPushButton::clicked, this, &VisualDeckEditorWidget::updateDisplayType);
-
-    groupAndSortLayout->addWidget(groupByLabel);
-    groupAndSortLayout->addWidget(groupByComboBox);
-    groupAndSortLayout->addWidget(sortByLabel);
-    groupAndSortLayout->addWidget(sortCriteriaButton);
-    groupAndSortLayout->addWidget(displayTypeButton);
-    groupAndSortLayout->addWidget(searchBar);
-    groupAndSortLayout->addWidget(searchPushButton);
+    displayOptionsAndSearchLayout->addWidget(displayOptionsWidget);
+    displayOptionsAndSearchLayout->addWidget(searchBar);
+    displayOptionsAndSearchLayout->addWidget(searchPushButton);
 
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
@@ -197,7 +145,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckEditorCardSize);
 
-    mainLayout->addWidget(groupAndSortContainer);
+    mainLayout->addWidget(displayOptionsAndSearch);
     mainLayout->addWidget(scrollArea);
     mainLayout->addWidget(cardSizeWidget);
 
@@ -218,17 +166,9 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
 void VisualDeckEditorWidget::retranslateUi()
 {
     searchBar->setPlaceholderText(tr("Type a card name here for suggestions from the database..."));
-    groupByLabel->setText(tr("Group by:"));
-    groupByComboBox->setToolTip(tr("Change how cards are divided into categories/groups."));
-    sortByLabel->setText(tr("Sort by:"));
-    sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     searchPushButton->setText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
-    sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
-    displayTypeButton->setText(tr("Toggle Layout: Overlap"));
-    displayTypeButton->setToolTip(
-        tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
 
 void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
@@ -326,8 +266,9 @@ void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex p
 {
     DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
         zoneContainer, deckListModel, selectionModel, persistent,
-        deckListModel->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(), activeGroupCriteria,
-        activeSortCriteria, currentDisplayType, 20, 10, cardSizeWidget);
+        deckListModel->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
+        displayOptionsWidget->getActiveGroupCriteria(), displayOptionsWidget->getActiveSortCriteria(),
+        displayOptionsWidget->getDisplayType(), 20, 10, cardSizeWidget);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
@@ -338,7 +279,7 @@ void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex p
             &DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged);
     connect(this, &VisualDeckEditorWidget::displayTypeChanged, zoneDisplayWidget,
             &DeckCardZoneDisplayWidget::refreshDisplayType);
-    zoneDisplayWidget->refreshDisplayType(currentDisplayType);
+    zoneDisplayWidget->refreshDisplayType(displayOptionsWidget->getDisplayType());
     zoneContainerLayout->addWidget(zoneDisplayWidget);
 
     indexToWidgetMap.insert(persistent, zoneDisplayWidget);
@@ -370,46 +311,10 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 {
 }
 
-void VisualDeckEditorWidget::updateDisplayType()
-{
-    // Toggle the display type
-    currentDisplayType = (currentDisplayType == DisplayType::Overlap) ? DisplayType::Flat : DisplayType::Overlap;
-
-    // Update UI and emit signal
-    switch (currentDisplayType) {
-        case DisplayType::Flat:
-            displayTypeButton->setText(tr("Toggle Layout: Flat"));
-            break;
-        case DisplayType::Overlap:
-            displayTypeButton->setText(tr("Toggle Layout: Overlap"));
-            break;
-    }
-    emit displayTypeChanged(currentDisplayType);
-}
-
 void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
-}
-
-void VisualDeckEditorWidget::actChangeActiveGroupCriteria()
-{
-    activeGroupCriteria = groupByComboBox->currentText();
-    emit activeGroupCriteriaChanged(activeGroupCriteria);
-}
-
-void VisualDeckEditorWidget::actChangeActiveSortCriteria()
-{
-    QStringList selectedCriteria;
-    for (int i = 0; i < sortByListWidget->count(); ++i) {
-        QListWidgetItem *item = sortByListWidget->item(i);
-        selectedCriteria.append(item->text()); // Collect user-defined sort order
-    }
-
-    activeSortCriteria = selectedCriteria;
-
-    emit activeSortCriteriaChanged(selectedCriteria);
 }
 
 void VisualDeckEditorWidget::decklistModelReset()

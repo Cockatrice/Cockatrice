@@ -74,6 +74,29 @@ enum Type
     MANA_COST, /**< Group cards by their total mana cost. */
     COLOR      /**< Group cards by their color identity. */
 };
+static inline QString toString(Type t)
+{
+    switch (t) {
+        case MAIN_TYPE:
+            return "Main Type";
+        case MANA_COST:
+            return "Mana Cost";
+        case COLOR:
+            return "Colors";
+    }
+    return {};
+}
+
+static inline Type fromString(const QString &s)
+{
+    if (s == "Main Type")
+        return MAIN_TYPE;
+    if (s == "Mana Cost")
+        return MANA_COST;
+    if (s == "Colors")
+        return COLOR;
+    return MAIN_TYPE; // default
+}
 } // namespace DeckListModelGroupCriteria
 
 /**
