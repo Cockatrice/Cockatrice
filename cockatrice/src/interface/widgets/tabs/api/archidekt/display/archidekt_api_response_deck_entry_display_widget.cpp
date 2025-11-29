@@ -128,11 +128,17 @@ void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *ev
     QWidget::mousePressEvent(event);
     actRequestNavigationToDeck();
 }
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEnterEvent *event)
+#else
+void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEvent *event) override; // Qt5 signature
+#endif
 {
     QWidget::enterEvent(event);
     backgroundPlateWidget->setFocused(true);
 }
+
 void ArchidektApiResponseDeckEntryDisplayWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
