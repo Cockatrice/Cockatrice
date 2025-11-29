@@ -59,7 +59,7 @@ float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, const QStr
     }
 
     /* Only stop when step is small enough and new size is smaller than QWidget */
-    while (step > FONT_PRECISION || (currentHeight > widgetHeight) || (currentWidth > widgetWidth)) {
+    while (step > FONT_PRECISION || currentHeight > widgetHeight || currentWidth > widgetWidth) {
         /* Keep last tested value */
         lastTestedSize = currentSize;
 
@@ -81,7 +81,7 @@ float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, const QStr
         currentWidth = newFontSizeRect.width();
 
         /* If new font size is too big, decrease it */
-        if ((currentHeight > widgetHeight) || (currentWidth > widgetWidth)) {
+        if (currentHeight > widgetHeight || currentWidth > widgetWidth) {
             // qDebug() << "-- contentsRect()" << label->contentsRect() << "rect"<< label->rect() << " newFontSizeRect"
             // << newFontSizeRect << "Tight" << text << currentSize;
             currentSize -= step;

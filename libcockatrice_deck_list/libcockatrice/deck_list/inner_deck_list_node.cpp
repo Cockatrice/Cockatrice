@@ -122,7 +122,7 @@ bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
     if (other2) {
         int n1 = recursiveCount(true);
         int n2 = other2->recursiveCount(true);
-        return (n1 != n2) ? (n1 > n2) : compareName(other);
+        return n1 != n2 ? n1 > n2 : compareName(other);
     } else {
         return false;
     }
@@ -132,7 +132,7 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
 {
     auto *other2 = dynamic_cast<InnerDecklistNode *>(other);
     if (other2) {
-        return (getName() > other2->getName());
+        return getName() > other2->getName();
     } else {
         return false;
     }
@@ -154,7 +154,7 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                     xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());
                 newCard->readElement(xml);
             }
-        } else if (xml->isEndElement() && (childName == "zone"))
+        } else if (xml->isEndElement() && childName == "zone")
             return false;
     }
     return true;
@@ -182,7 +182,7 @@ QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
 
     // Sort temporary list
     auto cmp = [order](const auto &a, const auto &b) {
-        return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
+        return order == Qt::AscendingOrder ? b.second->compare(a.second) : a.second->compare(b.second);
     };
 
     std::sort(tempList.begin(), tempList.end(), cmp);

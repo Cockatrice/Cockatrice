@@ -68,7 +68,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_x(0);
         cmd.set_y(0);
     } else if (!faceDown &&
-               ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != "stack"))) {
+               ((!playToStack && tableRow == 3) || (playToStack && tableRow != 0 && currentZone != "stack"))) {
         cmd.set_target_zone("stack");
         cmd.set_x(-1);
         cmd.set_y(0);
@@ -1189,7 +1189,7 @@ void PlayerActions::setCardAttrHelper(const GameEventContext &context,
             break;
         }
         case AttrDoesntUntap: {
-            bool value = (avalue == "1");
+            bool value = avalue == "1";
             emit logSetDoesntUntap(player, card, value);
             card->setDoesntUntap(value);
             break;

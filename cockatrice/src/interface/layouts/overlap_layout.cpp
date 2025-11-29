@@ -107,7 +107,7 @@ int OverlapLayout::count() const
  */
 QLayoutItem *OverlapLayout::itemAt(const int index) const
 {
-    return (index >= 0 && index < itemList.size()) ? itemList.value(index) : nullptr;
+    return index >= 0 && index < itemList.size() ? itemList.value(index) : nullptr;
 }
 
 /**
@@ -121,7 +121,7 @@ QLayoutItem *OverlapLayout::itemAt(const int index) const
  */
 QLayoutItem *OverlapLayout::takeAt(const int index)
 {
-    return (index >= 0 && index < itemList.size()) ? itemList.takeAt(index) : nullptr;
+    return index >= 0 && index < itemList.size() ? itemList.takeAt(index) : nullptr;
 }
 
 /**
@@ -163,8 +163,8 @@ void OverlapLayout::setGeometry(const QRect &rect)
     }
 
     // Calculate the overlap offsets based on the layout direction and overlap percentage.
-    const int overlapOffsetWidth = (overlapDirection == Qt::Horizontal) ? (maxItemWidth * overlapPercentage / 100) : 0;
-    const int overlapOffsetHeight = (overlapDirection == Qt::Vertical) ? (maxItemHeight * overlapPercentage / 100) : 0;
+    const int overlapOffsetWidth = overlapDirection == Qt::Horizontal ? maxItemWidth * overlapPercentage / 100 : 0;
+    const int overlapOffsetHeight = overlapDirection == Qt::Vertical ? maxItemHeight * overlapPercentage / 100 : 0;
 
     // Determine the number of columns based on layout constraints and available space.
     int columns;
@@ -275,8 +275,8 @@ QSize OverlapLayout::calculatePreferredSize() const
     }
 
     // Calculate the overlap offsets based on the layout direction and overlap percentage.
-    const int overlapOffsetWidth = (overlapDirection == Qt::Horizontal) ? (maxItemWidth * overlapPercentage / 100) : 0;
-    const int overlapOffsetHeight = (overlapDirection == Qt::Vertical) ? (maxItemHeight * overlapPercentage / 100) : 0;
+    const int overlapOffsetWidth = overlapDirection == Qt::Horizontal ? maxItemWidth * overlapPercentage / 100 : 0;
+    const int overlapOffsetHeight = overlapDirection == Qt::Vertical ? maxItemHeight * overlapPercentage / 100 : 0;
 
     // Determine the number of columns based on layout constraints and available space.
     int columns;
@@ -321,11 +321,11 @@ QSize OverlapLayout::calculatePreferredSize() const
     }
 
     if (overlapDirection == Qt::Horizontal) {
-        return QSize(maxItemWidth + ((qCeil(itemList.size() / rows)) * (maxItemWidth - overlapOffsetWidth)),
+        return QSize(maxItemWidth + qCeil(itemList.size() / rows) * (maxItemWidth - overlapOffsetWidth),
                      rows * maxItemHeight);
     } else {
         return QSize(columns * maxItemWidth,
-                     maxItemHeight + ((qCeil(itemList.size() / columns)) * (maxItemHeight - overlapOffsetHeight)));
+                     maxItemHeight + qCeil(itemList.size() / columns) * (maxItemHeight - overlapOffsetHeight));
     }
 }
 
@@ -467,7 +467,7 @@ int OverlapLayout::calculateMaxRows() const
     }
 
     // Calculate the effective height of each item with the overlap applied
-    const int overlapOffsetHeight = (maxItemHeight * (100 - overlapPercentage)) / 100;
+    const int overlapOffsetHeight = maxItemHeight * (100 - overlapPercentage) / 100;
     const int availableHeight = parentWidget() ? parentWidget()->height() : 0;
 
     // Determine the maximum number of rows that can fit

@@ -23,8 +23,9 @@ int SetsModel::rowCount(const QModelIndex &parent) const
 
 QVariant SetsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || (index.column() >= NUM_COLS) || (index.row() >= rowCount()))
+    if (!index.isValid() || index.column() >= NUM_COLS || index.row() >= rowCount()) {
         return QVariant();
+    }
 
     CardSetPtr set = sets[index.row()];
 
@@ -72,7 +73,7 @@ bool SetsModel::setData(const QModelIndex &index, const QVariant &value, int rol
 
 QVariant SetsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal))
+    if (role != Qt::DisplayRole || orientation != Qt::Horizontal)
         return QVariant();
     switch (section) {
         case SortKeyCol:
@@ -289,9 +290,9 @@ bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     const auto filter = filterRegExp();
 #endif
 
-    return (sourceModel()->data(typeIndex).toString().contains(filter) ||
-            sourceModel()->data(nameIndex).toString().contains(filter) ||
-            sourceModel()->data(shortNameIndex).toString().contains(filter));
+    return sourceModel()->data(typeIndex).toString().contains(filter) ||
+           sourceModel()->data(nameIndex).toString().contains(filter) ||
+           sourceModel()->data(shortNameIndex).toString().contains(filter);
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const

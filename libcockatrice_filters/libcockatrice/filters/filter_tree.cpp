@@ -6,7 +6,7 @@
 
 template <class T> FilterTreeNode *FilterTreeBranch<T>::nodeAt(int i) const
 {
-    return (childNodes.size() > i) ? childNodes.at(i) : nullptr;
+    return childNodes.size() > i ? childNodes.at(i) : nullptr;
 }
 
 template <class T> void FilterTreeBranch<T>::deleteAt(int i)
@@ -21,7 +21,7 @@ template <class T> int FilterTreeBranch<T>::childIndex(const FilterTreeNode *nod
 {
     auto *unconst = const_cast<FilterTreeNode *>(node);
     auto downcasted = dynamic_cast<T>(unconst);
-    return (downcasted) ? childNodes.indexOf(downcasted) : -1;
+    return downcasted ? childNodes.indexOf(downcasted) : -1;
 }
 
 template <class T> FilterTreeBranch<T>::~FilterTreeBranch()
@@ -74,7 +74,7 @@ FilterTreeNode *LogicMap::parent() const
 int FilterItemList::termIndex(const QString &term) const
 {
     for (int i = 0; i < childNodes.count(); i++) {
-        if ((childNodes.at(i))->term == term) {
+        if (childNodes.at(i)->term == term) {
             return i;
         }
     }
@@ -365,7 +365,7 @@ bool FilterItem::relationCheck(int cardInfo) const
     bool result, conversion;
 
     // if int conversion fails, there's probably an operator at the start
-    result = (cardInfo == term.toInt(&conversion));
+    result = cardInfo == term.toInt(&conversion);
     if (!conversion) {
         // leading whitespaces could cause indexing to fail
         QString trimmedTerm = term.trimmed();
@@ -373,20 +373,20 @@ bool FilterItem::relationCheck(int cardInfo) const
         if (trimmedTerm[1] == '=') {
             int termInt = trimmedTerm.mid(2).toInt();
             if (trimmedTerm.startsWith('<')) {
-                result = (cardInfo <= termInt);
+                result = cardInfo <= termInt;
             } else if (trimmedTerm.startsWith('>')) {
-                result = (cardInfo >= termInt);
+                result = cardInfo >= termInt;
             } else {
-                result = (cardInfo == termInt);
+                result = cardInfo == termInt;
             }
         } else {
             int termInt = trimmedTerm.mid(1).toInt();
             if (trimmedTerm.startsWith('<')) {
-                result = (cardInfo < termInt);
+                result = cardInfo < termInt;
             } else if (trimmedTerm.startsWith('>')) {
-                result = (cardInfo > termInt);
+                result = cardInfo > termInt;
             } else if (trimmedTerm.startsWith("=")) {
-                result = (cardInfo == termInt);
+                result = cardInfo == termInt;
             } else {
                 // the int conversion hasn't failed due to an operator at the start
                 result = false;

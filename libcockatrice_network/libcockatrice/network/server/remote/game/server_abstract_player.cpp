@@ -209,12 +209,12 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        bool isReversed)
 {
     // Disallow controller change to other zones than the table.
-    if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
+    if ((targetzone->getType() != ServerInfo_Zone::PublicZone || !targetzone->hasCoords()) &&
+        startzone->getPlayer() != targetzone->getPlayer() && !judge) {
         return Response::RespContextError;
     }
 
-    if (!targetzone->hasCoords() && (xCoord <= -1)) {
+    if (!targetzone->hasCoords() && xCoord <= -1) {
         xCoord = targetzone->getCards().size();
     }
 
@@ -284,7 +284,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
             for (auto *player : game->getPlayers().values()) {
                 QList<int> arrowsToDelete;
                 for (Server_Arrow *arrow : player->getArrows()) {
-                    if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
+                    if (arrow->getStartCard() == card || arrow->getTargetItem() == card)
                         arrowsToDelete.append(arrow->getId());
                 }
                 for (int j : arrowsToDelete) {
@@ -334,11 +334,11 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                 targetzone->setCardsBeingLookedAt(targetLookedCards);
             }
 
-            bool targetHiddenToOthers = faceDown || (targetzone->getType() != ServerInfo_Zone::PublicZone);
-            bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
+            bool targetHiddenToOthers = faceDown || targetzone->getType() != ServerInfo_Zone::PublicZone;
+            bool sourceHiddenToOthers = card->getFaceDown() || startzone->getType() != ServerInfo_Zone::PublicZone;
 
             int oldCardId = card->getId();
-            if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer())) {
+            if ((faceDown && startzone != targetzone) || targetzone->getPlayer() != startzone->getPlayer()) {
                 card->setId(targetzone->getPlayer()->newCardId());
             }
             card->setFaceDown(faceDown);
@@ -378,19 +378,19 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
             if (
                 // cards from public zones have their id known, their previous position is already known, the event does
                 // not accomodate for previous locations in zones with coordinates (which are always public)
-                (startzone->getType() != ServerInfo_Zone::PublicZone) &&
+                startzone->getType() != ServerInfo_Zone::PublicZone &&
                 // other players are not allowed to be able to track which card is which in private zones like the hand
-                (startzone->getType() != ServerInfo_Zone::PrivateZone)) {
+                startzone->getType() != ServerInfo_Zone::PrivateZone) {
                 eventOthers.set_position(position);
             }
             if (
                 // other players are not allowed to be able to track which card is which in private zones like the hand
-                (targetzone->getType() != ServerInfo_Zone::PrivateZone)) {
+                targetzone->getType() != ServerInfo_Zone::PrivateZone) {
                 eventOthers.set_x(newX);
             }
 
-            if ((startzone->getType() == ServerInfo_Zone::PublicZone) ||
-                (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
+            if (startzone->getType() == ServerInfo_Zone::PublicZone ||
+                targetzone->getType() == ServerInfo_Zone::PublicZone) {
                 eventOthers.set_card_id(oldCardId);
                 if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
                     QString publicCardName = card->getName();
@@ -628,7 +628,7 @@ Server_AbstractPlayer::cmdConcede(const Command_Concede & /*cmd*/, ResponseConta
     ges.setGameEventContext(Context_Concede());
 
     game->stopGameIfFinished();
-    if (game->getGameStarted() && (game->getActivePlayer() == playerId)) {
+    if (game->getGameStarted() && game->getActivePlayer() == playerId) {
         game->nextTurn();
     }
 
@@ -735,7 +735,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
+    if (startPlayer != this && !startZone->getPlayersWithWritePermission().contains(playerId) && !judge) {
         return Response::RespContextError;
     }
 
@@ -748,7 +748,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (targetPlayer != this) && !judge) {
+    if (startPlayer != this && targetPlayer != this && !judge) {
         return Response::RespContextError;
     }
 
@@ -872,7 +872,7 @@ Server_AbstractPlayer::cmdAttachCard(const Command_AttachCard &cmd, ResponseCont
         QList<Server_Arrow *> toDelete;
         for (auto a : _arrows) {
             auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
-            if ((tCard == card) || (a->getStartCard() == card)) {
+            if (tCard == card || a->getStartCard() == card) {
                 toDelete.append(a);
             }
         }
@@ -1202,7 +1202,7 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
     }
 
     for (Server_Arrow *temp : arrows) {
-        if ((temp->getStartCard() == startCard) && (temp->getTargetItem() == targetItem)) {
+        if (temp->getStartCard() == startCard && temp->getTargetItem() == targetItem) {
             return Response::RespContextError;
         }
     }
@@ -1349,7 +1349,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     if (!zone) {
         return Response::RespNameNotFound;
     }
-    if (!((zone->getType() == ServerInfo_Zone::PublicZone) || (this == otherPlayer))) {
+    if (!(zone->getType() == ServerInfo_Zone::PublicZone || this == otherPlayer)) {
         return Response::RespContextError;
     }
 
@@ -1363,7 +1363,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     zoneInfo->set_with_coords(zone->hasCoords());
     zoneInfo->set_card_count(numberCards < cards.size() ? cards.size() : numberCards);
 
-    for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
+    for (int i = 0; i < cards.size() && (i < numberCards || numberCards == -1); ++i) {
         const auto &findId = cmd.is_reversed() ? cards.size() - numberCards + i : i;
         Server_Card *card = cards[findId];
         QString displayedName = card->getFaceDown() ? QString() : card->getName();

@@ -288,9 +288,9 @@ void AbstractCardItem::setFaceDown(bool _facedown)
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
+    if (event->modifiers() & Qt::AltModifier && event->button() == Qt::LeftButton) {
         emit cardShiftClicked(cardRef.name);
-    } else if ((event->modifiers() & Qt::ControlModifier)) {
+    } else if (event->modifiers() & Qt::ControlModifier) {
         setSelected(!isSelected());
     } else if (!isSelected()) {
         scene()->clearSelection();

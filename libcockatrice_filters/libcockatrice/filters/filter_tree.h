@@ -58,7 +58,7 @@ public:
     }
     [[nodiscard]] virtual int index() const
     {
-        return (parent() != nullptr) ? parent()->childIndex(this) : -1;
+        return parent() != nullptr ? parent()->childIndex(this) : -1;
     }
     [[nodiscard]] virtual const QString text() const
     {

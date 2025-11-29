@@ -373,7 +373,7 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 void VisualDeckEditorWidget::updateDisplayType()
 {
     // Toggle the display type
-    currentDisplayType = (currentDisplayType == DisplayType::Overlap) ? DisplayType::Flat : DisplayType::Overlap;
+    currentDisplayType = currentDisplayType == DisplayType::Overlap ? DisplayType::Flat : DisplayType::Overlap;
 
     // Update UI and emit signal
     switch (currentDisplayType) {

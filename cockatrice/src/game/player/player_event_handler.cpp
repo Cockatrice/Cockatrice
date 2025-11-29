@@ -270,7 +270,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
         card->setCardRef({name, providerId});
     }
 
-    if (card->getAttachedTo() && (startZone != targetZone)) {
+    if (card->getAttachedTo() && startZone != targetZone) {
         CardItem *parentCard = card->getAttachedTo();
         card->setAttachedTo(nullptr);
         parentCard->getZone()->reorganizeCards();
@@ -314,7 +314,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
         QMapIterator<int, ArrowItem *> arrowIterator(p->getArrows());
         while (arrowIterator.hasNext()) {
             ArrowItem *arrow = arrowIterator.next().value();
-            if ((arrow->getStartItem() == card) || (arrow->getTargetItem() == card)) {
+            if (arrow->getStartItem() == card || arrow->getTargetItem() == card) {
                 if (startZone == targetZone) {
                     arrow->updatePath();
                 } else {
@@ -410,7 +410,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
     startCard->setAttachedTo(targetCard);
 
     startZone->reorganizeCards();
-    if ((startZone != targetZone) && targetZone) {
+    if (startZone != targetZone && targetZone) {
         targetZone->reorganizeCards();
     }
     if (oldParent) {

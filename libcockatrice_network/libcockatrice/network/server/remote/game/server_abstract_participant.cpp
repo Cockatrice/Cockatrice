@@ -88,7 +88,7 @@ void Server_AbstractParticipant::getProperties(ServerInfo_PlayerProperties &resu
 {
     result.set_player_id(playerId);
     if (withUserInfo) {
-        copyUserInfo(*(result.mutable_user_info()), true);
+        copyUserInfo(*result.mutable_user_info(), true);
     }
     result.set_spectator(spectator);
     result.set_judge(judge);
@@ -112,7 +112,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdKickFromGame(const Command
                                                                    ResponseContainer & /*rc*/,
                                                                    GameEventStorage & /*ges*/)
 {
-    if ((game->getHostId() != playerId) && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+    if (game->getHostId() != playerId && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -195,7 +195,7 @@ Server_AbstractParticipant::cmdGameSay(const Command_GameSay &cmd, ResponseConta
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
          */
-        bool isModOrJudge = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge));
+        bool isModOrJudge = userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge);
         if (!isModOrJudge && !game->getSpectatorsCanTalk()) {
             return Response::RespFunctionNotAllowed;
         }

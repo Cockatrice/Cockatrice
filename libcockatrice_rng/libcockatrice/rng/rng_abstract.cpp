@@ -8,7 +8,7 @@ QVector<int> RNG_Abstract::makeNumbersVector(int n, int min, int max)
     QVector<int> result(bins);
     for (int i = 0; i < n; ++i) {
         int number = rand(min, max);
-        if ((number < min) || (number > max))
+        if (number < min || number > max)
             qDebug() << "rand(" << min << "," << max << ") returned " << number;
         else
             result[number - min]++;

@@ -110,7 +110,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     QList<CardDragItem *> dragItemList;
     CardZoneLogic *startZone = static_cast<CardItem *>(item)->getZone();
-    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && (startZone == currentZone->getLogic()))) {
+    if (currentZone && !(static_cast<CardItem *>(item)->getAttachedTo() && startZone == currentZone->getLogic())) {
         if (!occupied) {
             dragItemList.append(this);
         }
@@ -118,7 +118,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         for (int i = 0; i < childDrags.size(); i++) {
             CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
             if (!occupied &&
-                !(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone->getLogic())) &&
+                !(static_cast<CardItem *>(c->item)->getAttachedTo() && startZone == currentZone->getLogic()) &&
                 !c->occupied) {
                 dragItemList.append(c);
             }

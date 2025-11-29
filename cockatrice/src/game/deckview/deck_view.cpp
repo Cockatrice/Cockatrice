@@ -289,7 +289,7 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
         std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
         for (int j = 0; j < row.size(); ++j) {
             DeckViewCard *card = row[j];
-            card->setPos(x + (j % tempCols) * CARD_WIDTH, yUntilNow + (j / tempCols) * CARD_HEIGHT);
+            card->setPos(x + j % tempCols * CARD_WIDTH, yUntilNow + j / tempCols * CARD_HEIGHT);
         }
         yUntilNow += tempRows * CARD_HEIGHT + paddingY;
     }

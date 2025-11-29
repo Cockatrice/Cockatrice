@@ -97,7 +97,7 @@ void StackZone::reorganizeCards()
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *card = getLogic()->getCards().at(i);
-            qreal x = (i % 2) ? x2 : x1;
+            qreal x = i % 2 ? x2 : x1;
             qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
                                             getLogic()->getCards().at(0)->boundingRect().height());
             card->setPos(x, y);

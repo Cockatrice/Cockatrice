@@ -189,8 +189,8 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp)
             }
 
             table->resizeColumnsToContents();
-            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
-                                  table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->setMinimumSize(table->horizontalHeader()->length() + table->columnCount() * 5,
+                                  table->verticalHeader()->length() + table->rowCount() * 3);
             table->show();
         } else
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ban History"),
@@ -225,8 +225,8 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
             }
 
             table->resizeColumnsToContents();
-            table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
-                                  table->verticalHeader()->length() + (table->rowCount() * 3));
+            table->setMinimumSize(table->horizontalHeader()->length() + table->columnCount() * 5,
+                                  table->verticalHeader()->length() + table->rowCount() * 3);
             table->show();
         } else
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Warning History"),
@@ -394,20 +394,20 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
-            (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin) {
             menu->addAction(aDemoteFromMod);
 
         } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) &&
-                   (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+                   tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin) {
             menu->addAction(aPromoteToMod);
         }
 
         if (userLevel.testFlag(ServerInfo_User::IsJudge) &&
-            (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+            tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin) {
             menu->addAction(aDemoteFromJudge);
 
         } else if (userLevel.testFlag(ServerInfo_User::IsRegistered) &&
-                   (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin)) {
+                   tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsAdmin) {
             menu->addAction(aPromoteToJudge);
         }
     }

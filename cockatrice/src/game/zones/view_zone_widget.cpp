@@ -386,9 +386,9 @@ void ZoneViewWidget::expandWindow()
     // reset window to initial max height if...
     bool doResetSize =
         // current height is less than that
-        (height < maxInitialHeight) ||
+        height < maxInitialHeight ||
         // current height is at expanded max height
-        (height == maxExpandedHeight) ||
+        height == maxExpandedHeight ||
         // current height is at actual max height, and actual max height is less than expanded max height
         (height == maxHeight && height > maxInitialHeight && height < maxExpandedHeight);
 

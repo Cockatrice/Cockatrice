@@ -38,12 +38,14 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
         qreal yOffset = 20;
         qreal spacing = 2;
         if (position < 2)
-            textRect = QRectF(count == 1 ? ((boundingRect().width() - w) / 2.0)
-                                         : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)),
+            textRect = QRectF(count == 1          ? (boundingRect().width() - w) / 2.0
+                              : position % 2 == 0 ? xOffset
+                                                  : boundingRect().width() - xOffset - w,
                               yOffset, w, h);
         else
-            textRect = QRectF(count == 3 ? ((boundingRect().width() - w) / 2.0)
-                                         : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)),
+            textRect = QRectF(count == 3          ? (boundingRect().width() - w) / 2.0
+                              : position % 2 == 0 ? xOffset
+                                                  : boundingRect().width() - xOffset - w,
                               yOffset + (spacing + h) * (position / 2), w, h);
     }
 

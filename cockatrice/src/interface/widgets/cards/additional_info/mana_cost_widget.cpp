@@ -39,7 +39,7 @@ void ManaCostWidget::resizeEvent(QResizeEvent *event)
         int count = manaSymbols.size();
 
         // Available width minus total spacing
-        int availableWidth = totalWidth - (spacing * (count - 1));
+        int availableWidth = totalWidth - spacing * (count - 1);
         int iconSize = qMin(50, availableWidth / count);
 
         for (ManaSymbolWidget *manaSymbol : manaSymbols) {

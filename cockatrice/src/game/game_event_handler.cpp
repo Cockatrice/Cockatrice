@@ -117,7 +117,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
                     break;
             }
         } else {
-            if ((game->getGameState()->getClients().size() > 1) && (playerId != -1))
+            if (game->getGameState()->getClients().size() > 1 && playerId != -1)
                 if (game->getGameState()->getClients().at(playerId) != client)
                     continue;
 

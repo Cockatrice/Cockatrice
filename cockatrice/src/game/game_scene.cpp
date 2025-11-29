@@ -234,7 +234,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
         playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
         qreal thisColumnHeight = -playerAreaSpacing;
-        int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
+        int rowsInColumn = rows - playersPlaying.size() % columns * col; // Adjust rows for uneven columns
 
         for (int j = 0; j < rowsInColumn; ++j) {
             Player *player = playersIter.next();
@@ -342,9 +342,9 @@ void GameScene::updateHover(const QPointF &scenePos)
 
 void GameScene::updateHoveredCard(CardItem *newCard)
 {
-    if (hoveredCard && (newCard != hoveredCard))
+    if (hoveredCard && newCard != hoveredCard)
         hoveredCard->setHovered(false);
-    if (newCard && (newCard != hoveredCard))
+    if (newCard && newCard != hoveredCard)
         newCard->setHovered(true);
     hoveredCard = newCard;
 }

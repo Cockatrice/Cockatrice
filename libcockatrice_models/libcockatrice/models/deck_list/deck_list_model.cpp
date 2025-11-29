@@ -189,7 +189,7 @@ void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
 
 QVariant DeckListModel::headerData(const int section, const Qt::Orientation orientation, const int role) const
 {
-    if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal)) {
+    if (role != Qt::DisplayRole || orientation != Qt::Horizontal) {
         return {};
     }
 
@@ -258,7 +258,7 @@ void DeckListModel::emitRecursiveUpdates(const QModelIndex &index)
 bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, const int role)
 {
     auto *node = getNode<DecklistModelCardNode *>(index);
-    if (!node || (role != Qt::EditRole)) {
+    if (!node || role != Qt::EditRole) {
         return false;
     }
 
@@ -310,7 +310,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     }
     endRemoveRows();
 
-    if (node->empty() && (node != root)) {
+    if (node->empty() && node != root) {
         removeRows(parent.row(), 1, parent.parent());
     } else {
         emitRecursiveUpdates(parent);

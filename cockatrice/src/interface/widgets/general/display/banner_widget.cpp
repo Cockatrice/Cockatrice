@@ -82,7 +82,7 @@ void BannerWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // Calculate alpha based on transparency percentage
-    int alpha = (255 * transparency) / 100;
+    int alpha = 255 * transparency / 100;
 
     // Determine gradient direction
     QLinearGradient gradient;

@@ -358,7 +358,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         int childIndex = 0;
         for (const auto &item : scene()->selectedItems()) {
             CardItem *card = static_cast<CardItem *>(item);
-            if ((card == this) || (card->getZone() != zone))
+            if (card == this || card->getZone() != zone)
                 continue;
             ++childIndex;
             QPointF childPos;
@@ -436,8 +436,8 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 return;
             }
         }
-    } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-               (!SettingsCache::instance().getDoubleClickToPlay())) {
+    } else if (event->modifiers() != Qt::AltModifier && event->button() == Qt::LeftButton &&
+               !SettingsCache::instance().getDoubleClickToPlay()) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
 
@@ -449,8 +449,8 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
-        (SettingsCache::instance().getDoubleClickToPlay())) {
+    if (event->modifiers() != Qt::AltModifier && event->buttons() == Qt::LeftButton &&
+        SettingsCache::instance().getDoubleClickToPlay()) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
@@ -464,11 +464,11 @@ bool CardItem::animationEvent()
         rotation *= -1;
 
     tapAngle += rotation;
-    if (tapped && (tapAngle > 90)) {
+    if (tapped && tapAngle > 90) {
         tapAngle = 90;
         animationIncomplete = false;
     }
-    if (!tapped && (tapAngle < 0)) {
+    if (!tapped && tapAngle < 0) {
         tapAngle = 0;
         animationIncomplete = false;
     }
@@ -485,7 +485,7 @@ bool CardItem::animationEvent()
 
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if ((change == ItemSelectedHasChanged) && owner != nullptr) {
+    if (change == ItemSelectedHasChanged && owner != nullptr) {
         if (value == true) {
             owner->getGame()->setActiveCard(this);
             owner->getPlayerMenu()->updateCardMenu(this);

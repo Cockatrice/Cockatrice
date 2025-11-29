@@ -26,7 +26,7 @@ public:
     }
     bool operator==(const PlayerReference &other)
     {
-        return ((roomId == other.roomId) && (gameId == other.gameId) && (playerId == other.playerId));
+        return roomId == other.roomId && gameId == other.gameId && playerId == other.playerId;
     }
 };
 

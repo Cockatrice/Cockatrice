@@ -307,8 +307,8 @@ QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsi
     sideBoardCards.chop(3);
     // if after we've called it for each card, and the strings are empty, we know that
     // there were no non-token cards in the deck, so show an error message.
-    if ((QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0) &&
-        (QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0)) {
+    if (QString::compare(mainBoardCards, "", Qt::CaseInsensitive) == 0 &&
+        QString::compare(sideBoardCards, "", Qt::CaseInsensitive) == 0) {
         return "";
     }
     // return a string with the url for decklist export
@@ -672,7 +672,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
 
         QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
         for (int i = 0; i < node->size(); i++) {
-            QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
+            QTextCursor cellCursor = table->cellAt(0, i * totalColumns / node->size()).lastCursorPosition();
             printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
         }
     }

@@ -202,11 +202,11 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                 } else if (xmlName == "tablerow") {
                     tableRow = xml.readElementText(QXmlStreamReader::IncludeChildElements).toInt();
                 } else if (xmlName == "cipt") {
-                    cipt = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                    cipt = xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1";
                 } else if (xmlName == "landscapeOrientation") {
-                    landscapeOrientation = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                    landscapeOrientation = xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1";
                 } else if (xmlName == "upsidedown") {
-                    upsideDown = (xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1");
+                    upsideDown = xml.readElementText(QXmlStreamReader::IncludeChildElements) == "1";
                     // sets
                 } else if (xmlName == "set") {
                     // NOTE: attributes must be read before readElementText()

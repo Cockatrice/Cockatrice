@@ -270,7 +270,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
               << "";
     }
 
-    bool savePasswordStatus = (_data.at(5) == "1");
+    bool savePasswordStatus = _data.at(5) == "1";
 
     saveEdit->setText(_data.at(0));
     hostEdit->setText(_data.at(1));

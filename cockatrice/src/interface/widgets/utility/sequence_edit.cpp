@@ -135,7 +135,7 @@ int SequenceEdit::translateModifiers(Qt::KeyboardModifiers state, const QString 
     int result = 0;
     // The shift modifier only counts when it is not used to type a symbol
     // that is only reachable using the shift key anyway
-    if ((state & Qt::ShiftModifier) &&
+    if (state & Qt::ShiftModifier &&
         (text.isEmpty() || !text.at(0).isPrint() || text.at(0).isLetterOrNumber() || text.at(0).isSpace())) {
         result |= Qt::SHIFT;
     }

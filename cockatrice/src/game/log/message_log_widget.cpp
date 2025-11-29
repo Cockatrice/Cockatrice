@@ -296,7 +296,7 @@ void MessageLogWidget::logMoveCard(Player *player,
         cardStr = cardLink(cardName);
     }
 
-    if (ownerChanged && (startZone->getPlayer() == player)) {
+    if (ownerChanged && startZone->getPlayer() == player) {
         appendHtmlServerMessage(tr("%1 gives %2 control over %3.")
                                     .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                     .arg(sanitizeHtml(targetZone->getPlayer()->getPlayerInfo()->getName()))

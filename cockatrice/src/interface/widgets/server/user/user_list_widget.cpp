@@ -260,7 +260,7 @@ QString BanDialog::getBanIP() const
 int BanDialog::getMinutes() const
 {
     return permanentRadio->isChecked() ? 0
-                                       : (daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value());
+                                       : daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value();
 }
 
 QString BanDialog::getReason() const
@@ -313,7 +313,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
                                        const QStyleOptionViewItem &option,
                                        const QModelIndex &index)
 {
-    if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
+    if (event->type() == QEvent::MouseButtonPress && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -507,7 +507,7 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
 void UserListWidget::updateCount()
 {
     QString str = titleStr;
-    if ((type == BuddyList) || (type == IgnoreList))
+    if (type == BuddyList || type == IgnoreList)
         str = str.arg(onlineCount);
     setTitle(str.arg(userTree->topLevelItemCount()));
 }

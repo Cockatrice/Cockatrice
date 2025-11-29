@@ -73,7 +73,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
         return index.row();
     if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole)
         return QVariant();
-    if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
+    if (index.row() >= gameList.size() || index.column() >= columnCount())
         return QVariant();
 
     const ServerInfo_Game &gameentry = gameList[index.row()];
@@ -209,7 +209,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 
 QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
 {
-    if ((role != Qt::DisplayRole) && (role != Qt::TextAlignmentRole))
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
     switch (section) {
         case ROOM:

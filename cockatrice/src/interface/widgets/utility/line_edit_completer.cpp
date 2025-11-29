@@ -125,7 +125,7 @@ void LineEditCompleter::setCompletionList(QStringList completionList)
         return;
 
     QStringListModel *model;
-    model = (QStringListModel *)(c->model());
+    model = (QStringListModel *)c->model();
     if (model == NULL)
         model = new QStringListModel();
     model->setStringList(completionList);

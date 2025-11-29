@@ -160,7 +160,7 @@ void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
     const auto &preferredProviderId =
         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(rootCard.getName());
     const auto &cardProviderId = rootCard.getPrinting().getUuid();
-    const bool isPinned = (!preferredProviderId.isEmpty() && preferredProviderId == cardProviderId);
+    const bool isPinned = !preferredProviderId.isEmpty() && preferredProviderId == cardProviderId;
 
     // Toggle the badge once; the pixmap was already rasterized in initializePinBadge().
     pinBadge->setVisible(isPinned);

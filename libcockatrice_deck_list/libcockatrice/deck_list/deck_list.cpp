@@ -51,13 +51,13 @@ bool SideboardPlan::readElement(QXmlStreamReader *xml)
                             m.set_start_zone(xml->readElementText().toStdString());
                         else if (childName2 == "target_zone")
                             m.set_target_zone(xml->readElementText().toStdString());
-                    } else if (xml->isEndElement() && (childName2 == "move_card_to_zone")) {
+                    } else if (xml->isEndElement() && childName2 == "move_card_to_zone") {
                         moveList.append(m);
                         break;
                     }
                 }
             }
-        } else if (xml->isEndElement() && (childName == "sideboard_plan"))
+        } else if (xml->isEndElement() && childName == "sideboard_plan")
             return true;
     }
     return false;
@@ -149,7 +149,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
                 delete newSideboardPlan;
             }
         }
-    } else if (xml->isEndElement() && (childName == "cockatrice_deck")) {
+    } else if (xml->isEndElement() && childName == "cockatrice_deck") {
         return false;
     }
     return true;
@@ -675,10 +675,10 @@ static QString computeDeckHash(const InnerDecklistNode *root)
     }
     cardList.sort();
     QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
-    quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
-                     (((quint64)(unsigned char)deckHashArray[1]) << 24) +
-                     (((quint64)(unsigned char)deckHashArray[2] << 16)) +
-                     (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
+    quint64 number = ((quint64)(unsigned char)deckHashArray[0] << 32) +
+                     ((quint64)(unsigned char)deckHashArray[1] << 24) +
+                     ((quint64)(unsigned char)deckHashArray[2] << 16) +
+                     ((quint64)(unsigned char)deckHashArray[3] << 8) + (quint64)(unsigned char)deckHashArray[4];
     return QString::number(number, 32).rightJustified(8, '0');
 }
 
