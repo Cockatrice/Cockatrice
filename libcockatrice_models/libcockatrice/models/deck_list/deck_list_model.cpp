@@ -481,7 +481,7 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
     for (int i = sortResult.size() - 1; i >= 0; --i) {
         const int fromRow = sortResult[i].first;
         const int toRow = sortResult[i].second;
-        const AbstractDecklistNode *temp = node->at(toRow);
+        AbstractDecklistNode *temp = node->at(toRow);
         for (int j = 0; j < columns; ++j) {
             from << createIndex(fromRow, j, temp);
             to << createIndex(toRow, j, temp);
