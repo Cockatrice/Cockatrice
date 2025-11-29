@@ -257,8 +257,8 @@ public:
      */
     [[nodiscard]] QModelIndex findCard(const QString &cardName,
                                        const QString &zoneName,
-                         const QString &providerId = "",
-                         const QString &cardNumber = "") const;
+                                       const QString &providerId = "",
+                                       const QString &cardNumber = "") const;
 
     /**
      * @brief Adds a card using the preferred printing if available.
@@ -319,8 +319,8 @@ private:
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
     [[nodiscard]] DecklistModelCardNode *findCardNode(const QString &cardName,
                                                       const QString &zoneName,
-                                        const QString &providerId = "",
-                                        const QString &cardNumber = "") const;
+                                                      const QString &providerId = "",
+                                                      const QString &cardNumber = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

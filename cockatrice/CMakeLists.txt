@@ -205,7 +205,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp
-        src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp
+    src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
