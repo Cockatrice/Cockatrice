@@ -19,12 +19,9 @@ void ColorBar::setColors(const QMap<QString, int> &_colors)
 
 QSize ColorBar::minimumSizeHint() const
 {
-    return QSize(200, 22); // Slightly taller for rounded look
+    return QSize(200, 22);
 }
 
-//-------------------------------------------
-// Painting
-//-------------------------------------------
 void ColorBar::paintEvent(QPaintEvent *)
 {
     if (colors.isEmpty())
@@ -51,10 +48,10 @@ void ColorBar::paintEvent(QPaintEvent *)
     p.setBrush(Qt::NoBrush);
     p.drawRoundedRect(bounds, 6, 6);
 
-    // Clip to inside of the border
+    // Clip to inside the border
     p.setClipRect(bounds.adjusted(2, 2, -2, -2));
 
-    // Sort colors by key (this ensures a predictable order)
+    // Ensure predictable order
     QList<QString> sortedKeys = colors.keys();
     std::sort(sortedKeys.begin(), sortedKeys.end()); // Sort alphabetically
 
@@ -86,9 +83,6 @@ void ColorBar::paintEvent(QPaintEvent *)
     }
 }
 
-//-------------------------------------------
-// Hover + Tooltips
-//-------------------------------------------
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ColorBar::enterEvent(QEnterEvent *event)
 {
@@ -148,9 +142,6 @@ QString ColorBar::tooltipForPosition(int x) const
     return {};
 }
 
-//-------------------------------------------
-// Color name mapping
-//-------------------------------------------
 QColor ColorBar::colorFromName(const QString &name) const
 {
     static QMap<QString, QColor> map = {
