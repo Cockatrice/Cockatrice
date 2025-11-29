@@ -47,7 +47,7 @@ std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
 
     QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             if (info) {
@@ -81,7 +81,7 @@ void ManaCurveWidget::updateDisplay()
     }
 
     // Convert unordered_map to ordered map to ensure sorting by CMC
-    std::map<int, int> sortedManaCurve(manaCurveMap.begin(), manaCurveMap.end());
+    const std::map<int, int> sortedManaCurve(manaCurveMap.begin(), manaCurveMap.end());
 
     // Add new widgets to the layout in sorted order
     for (const auto &entry : sortedManaCurve) {

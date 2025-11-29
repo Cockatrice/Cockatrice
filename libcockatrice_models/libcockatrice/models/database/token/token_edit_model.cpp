@@ -11,7 +11,7 @@ TokenEditModel::TokenEditModel(QObject *parent) : CardDatabaseDisplayModel(paren
 
 bool TokenEditModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    const CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
     return info->getIsToken() && info->getSets().contains(CardSet::TOKENS_SETNAME) && rowMatchesCardName(info);
 }
 

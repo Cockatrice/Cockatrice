@@ -14,7 +14,7 @@ void SayMenu::initSayMenu()
 {
     clear();
 
-    int count = SettingsCache::instance().messages().getCount();
+    const int count = SettingsCache::instance().messages().getCount();
     setEnabled(count > 0);
 
     for (int i = 0; i < count; ++i) {

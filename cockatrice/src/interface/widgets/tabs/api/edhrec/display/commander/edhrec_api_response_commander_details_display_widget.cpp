@@ -19,7 +19,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
 
     QWidget *currentParent = parentWidget();
-    TabEdhRecMain *parentTab = nullptr;
+    const TabEdhRecMain *parentTab = nullptr;
 
     while (currentParent) {
         if ((parentTab = qobject_cast<TabEdhRecMain *>(currentParent))) {

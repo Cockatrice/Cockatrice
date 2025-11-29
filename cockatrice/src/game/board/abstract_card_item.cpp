@@ -44,7 +44,7 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    const qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -60,8 +60,8 @@ void AbstractCardItem::refreshCardInfo()
     exactCard = CardDatabaseManager::query()->getCard(cardRef);
 
     if (!exactCard && !cardRef.name.isEmpty()) {
-        CardInfo::UiAttributes attributes = {.tableRow = -1};
-        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
+        const CardInfo::UiAttributes attributes = {.tableRow = -1};
+        const auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
         exactCard = ExactCard(info);
     }
     if (exactCard) {
@@ -98,9 +98,9 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     const int MAX_FONT_SIZE = SettingsCache::instance().getMaxFontSize();
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
-    QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
+    const QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 
-    int scale = resetPainterTransform(painter);
+    const int scale = resetPainterTransform(painter);
 
     painter->translate(totalBoundingRect.width() / 2, totalBoundingRect.height() / 2);
     painter->rotate(angle);
@@ -114,7 +114,7 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
 
 void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    qreal scaleFactor = translatedSize.width() / boundingRect().width();
+    const qreal scaleFactor = translatedSize.width() / boundingRect().width();
     QPixmap translatedPixmap;
     bool paintImage = true;
 
@@ -173,7 +173,7 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 {
     painter->save();
 
-    QSizeF translatedSize = getTranslatedSize(painter);
+    const QSizeF translatedSize = getTranslatedSize(painter);
     paintPicture(painter, translatedSize, tapAngle);
 
     painter->setRenderHint(QPainter::Antialiasing, false);

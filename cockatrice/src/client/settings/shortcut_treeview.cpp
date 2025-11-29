@@ -14,13 +14,13 @@ ShortcutFilterProxyModel::ShortcutFilterProxyModel(QObject *parent) : QSortFilte
  */
 bool ShortcutFilterProxyModel::filterAcceptsRow(const int sourceRow, const QModelIndex &sourceParent) const
 {
-    QModelIndex nameIndex = sourceModel()->index(sourceRow, filterKeyColumn(), sourceParent);
-    QModelIndex parentIndex = sourceModel()->index(sourceParent.row(), filterKeyColumn(), sourceParent.parent());
+    const QModelIndex nameIndex = sourceModel()->index(sourceRow, filterKeyColumn(), sourceParent);
+    const QModelIndex parentIndex = sourceModel()->index(sourceParent.row(), filterKeyColumn(), sourceParent.parent());
 
-    QString name = sourceModel()->data(nameIndex).toString();
-    QString parentName = sourceModel()->data(parentIndex).toString();
+    const QString name = sourceModel()->data(nameIndex).toString();
+    const QString parentName = sourceModel()->data(parentIndex).toString();
 
-    QString searchedString = parentName + " " + name;
+    const QString searchedString = parentName + " " + name;
 
     return searchedString.contains(filterRegularExpression());
 }
@@ -136,7 +136,7 @@ void ShortcutTreeView::currentChanged(const QModelIndex &current, const QModelIn
 {
     QTreeView::scrollTo(current, QAbstractItemView::EnsureVisible);
     if (current.parent().isValid()) {
-        auto shortcutName = model()->data(model()->index(current.row(), 2, current.parent())).toString();
+        const auto shortcutName = model()->data(model()->index(current.row(), 2, current.parent())).toString();
         emit currentItemChanged(shortcutName);
     } else {
         // emit empty string if the selection is a category header
@@ -160,7 +160,7 @@ void ShortcutTreeView::updateSearchString(const QString &searchString)
     auto escapeRegex = [](const QString &s) { return QRegularExpression::escape(s); };
     std::transform(searchWords.begin(), searchWords.end(), searchWords.begin(), escapeRegex);
 
-    auto regex = QRegularExpression(searchWords.join(".*"), QRegularExpression::CaseInsensitiveOption);
+    const auto regex = QRegularExpression(searchWords.join(".*"), QRegularExpression::CaseInsensitiveOption);
 
     proxyModel->setFilterRegularExpression(regex);
     expandAll();

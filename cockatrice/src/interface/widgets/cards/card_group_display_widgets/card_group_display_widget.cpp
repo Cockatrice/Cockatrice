@@ -39,7 +39,7 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
 
 void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model());
+    const auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model());
 
     for (auto &range : selected) {
         for (int row = range.top(); row <= range.bottom(); ++row) {
@@ -51,7 +51,7 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
+                if (const auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
                     displayWidget->setHighlighted(true);
                 }
             }
@@ -66,7 +66,7 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
+                if (const auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
                     displayWidget->setHighlighted(false);
                 }
             }
@@ -77,7 +77,7 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 void CardGroupDisplayWidget::clearAllDisplayWidgets()
 {
     for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
+        const auto displayWidget = indexToWidgetMap.value(idx);
         removeFromLayout(displayWidget);
         indexToWidgetMap.remove(idx);
         delete displayWidget;
@@ -89,10 +89,10 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     if (indexToWidgetMap.contains(index)) {
         return indexToWidgetMap[index];
     }
-    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
+    const auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
+    const auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
 
-    auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
+    const auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
     widget->setCard(CardDatabaseManager::query()->getCard({cardName, cardProviderId}));
 
@@ -115,7 +115,7 @@ void CardGroupDisplayWidget::updateCardDisplays()
     proxy.sort(1, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
-    QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
+    const QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
 
     // 2. iterate children under the proxy parent
     for (int i = 0; i < proxy.rowCount(proxyParent); ++i) {
@@ -125,7 +125,7 @@ void CardGroupDisplayWidget::updateCardDisplays()
         QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
 
         // 4. persist the source index
-        QPersistentModelIndex persistent(sourceIndex);
+        const QPersistentModelIndex persistent(sourceIndex);
 
         addToLayout(constructWidgetForIndex(persistent));
     }
@@ -143,7 +143,7 @@ void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first
             QModelIndex child = deckListModel->index(row, 0, parent);
 
             // Persist the index
-            QPersistentModelIndex persistent(child);
+            const QPersistentModelIndex persistent(child);
 
             insertIntoLayout(constructWidgetForIndex(persistent), row);
         }

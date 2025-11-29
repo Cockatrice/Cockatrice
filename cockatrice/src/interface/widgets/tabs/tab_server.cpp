@@ -128,11 +128,11 @@ QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room &room)
 
 void RoomSelector::joinClicked()
 {
-    QTreeWidgetItem *twi = roomList->currentItem();
+    const QTreeWidgetItem *twi = roomList->currentItem();
     if (!twi)
         return;
 
-    int id = twi->data(0, Qt::UserRole).toInt();
+    const int id = twi->data(0, Qt::UserRole).toInt();
 
     emit joinRoomRequest(id, true);
 }

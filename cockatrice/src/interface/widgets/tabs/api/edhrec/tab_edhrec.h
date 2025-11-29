@@ -22,7 +22,7 @@ public:
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {
-        auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
+        const auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
         return tr("EDHREC: ") + cardName;
     }
 

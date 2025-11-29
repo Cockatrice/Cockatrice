@@ -47,7 +47,7 @@ void CardList::sortBy(const QList<SortOption> &option)
     }
 
     auto comparator = [&option](CardItem *a, CardItem *b) {
-        for (auto prop : option) {
+        for (const auto prop : option) {
             auto extractor = getExtractorFor(prop);
             QString t1 = extractor(a);
             QString t2 = extractor(b);
@@ -79,7 +79,7 @@ void CardList::sortBy(const QList<SortOption> &option)
  */
 static QString getColorSortString(const CardInfo &c, bool appendAtEnd)
 {
-    QString colors = c.getColors();
+    const QString colors = c.getColors();
     switch (colors.size()) {
         case 0: {
             if (c.getCardType().contains("Land")) {
@@ -135,7 +135,7 @@ std::function<QString(CardItem *)> CardList::getExtractorFor(SortOption option)
                     return QString();
                 }
 
-                auto info = c->getCardInfo();
+                const auto info = c->getCardInfo();
 
                 // calculation copied from CardDatabaseModel.
                 // we pad the cmc and also append the mana cost to the end so same cmc cards still have a sort order

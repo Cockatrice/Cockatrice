@@ -38,7 +38,7 @@ QRectF PileZone::boundingRect() const
 QPainterPath PileZone::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    const qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -100,8 +100,8 @@ void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (getLogic()->getCards().isEmpty())
         return;
 
-    bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
-    bool bottomCard = event->modifiers().testFlag(Qt::ControlModifier);
+    const bool faceDown = event->modifiers().testFlag(Qt::ShiftModifier);
+    const bool bottomCard = event->modifiers().testFlag(Qt::ControlModifier);
     CardItem *card = bottomCard ? getLogic()->getCards().last() : getLogic()->getCards().first();
     const int cardid =
         getLogic()->contentsKnown() ? card->getId() : (bottomCard ? getLogic()->getCards().size() - 1 : 0);

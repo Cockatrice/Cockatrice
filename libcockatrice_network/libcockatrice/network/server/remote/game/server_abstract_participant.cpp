@@ -111,7 +111,7 @@ bool Server_AbstractParticipant::updatePingTime() // returns true if ping time c
 {
     QMutexLocker locker(&playerMutex);
 
-    int oldPingTime = pingTime;
+    const int oldPingTime = pingTime;
     if (userInterface) {
         pingTime = userInterface->getLastCommandTime();
     } else {
@@ -232,7 +232,7 @@ Server_AbstractParticipant::cmdGameSay(const Command_GameSay &cmd, ResponseConta
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
          */
-        bool isModOrJudge = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge));
+        const bool isModOrJudge = (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge));
         if (!isModOrJudge && !game->getSpectatorsCanTalk()) {
             return Response::RespFunctionNotAllowed;
         }
@@ -447,7 +447,7 @@ Response::ResponseCode Server_AbstractParticipant::cmdReverseTurn(const Command_
         }
     }
 
-    bool reversedTurn = game->reverseTurnOrder();
+    const bool reversedTurn = game->reverseTurnOrder();
 
     Event_ReverseTurn event;
     event.set_reversed(reversedTurn);
@@ -595,7 +595,7 @@ void Server_AbstractParticipant::setUserInterface(Server_AbstractUserInterface *
 
 void Server_AbstractParticipant::disconnectClient()
 {
-    bool isRegistered = userInfo->user_level() & ServerInfo_User::IsRegistered;
+    const bool isRegistered = userInfo->user_level() & ServerInfo_User::IsRegistered;
     if (!isRegistered || spectator) {
         game->removeParticipant(this, Event_Leave::USER_DISCONNECTED);
     } else {

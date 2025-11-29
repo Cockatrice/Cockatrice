@@ -14,7 +14,7 @@ PlayerManager::PlayerManager(AbstractGame *_game,
 
 bool PlayerManager::isMainPlayerConceded() const
 {
-    Player *player = players.value(localPlayerId, nullptr);
+    const Player *player = players.value(localPlayerId, nullptr);
     return player && player->getConceded();
 }
 

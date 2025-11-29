@@ -59,10 +59,10 @@ QString SequenceEdit::getSequence()
 
 void SequenceEdit::removeLastShortcut()
 {
-    QString sequences = lineEdit->text();
+    const QString sequences = lineEdit->text();
     if (!sequences.isEmpty()) {
         if (sequences.lastIndexOf(";") > 0) {
-            QString validText = sequences.left(sequences.lastIndexOf(";"));
+            const QString validText = sequences.left(sequences.lastIndexOf(";"));
             lineEdit->setText(validText);
         } else {
             lineEdit->clear();
@@ -178,7 +178,7 @@ bool SequenceEdit::validateShortcut(const QKeySequence &sequence)
     }
 
     if (!shortcutsSettings.isValid(shortcutName, sequenceString)) {
-        auto overlaps = shortcutsSettings.findOverlaps(shortcutName, sequenceString);
+        const auto overlaps = shortcutsSettings.findOverlaps(shortcutName, sequenceString);
         QToolTip::showText(lineEdit->mapToGlobal(QPoint()),
                            tr("Shortcut already in use by:") + " " + overlaps.join(", "));
         return true;

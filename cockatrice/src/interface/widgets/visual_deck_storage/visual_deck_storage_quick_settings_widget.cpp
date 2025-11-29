@@ -52,7 +52,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
             &SettingsCache::setVisualDeckStorageDrawUnusedColorIdentities);
 
     // color identity opacity selector
-    auto unusedColorIdentityOpacityWidget = new QWidget(this);
+    const auto unusedColorIdentityOpacityWidget = new QWidget(this);
 
     unusedColorIdentitiesOpacityLabel = new QLabel(unusedColorIdentityOpacityWidget);
     unusedColorIdentitiesOpacitySpinBox = new QSpinBox(unusedColorIdentityOpacityWidget);
@@ -68,13 +68,13 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
 
     unusedColorIdentitiesOpacityLabel->setBuddy(unusedColorIdentitiesOpacitySpinBox);
 
-    auto unusedColorIdentityOpacityLayout = new QHBoxLayout(unusedColorIdentityOpacityWidget);
+    const auto unusedColorIdentityOpacityLayout = new QHBoxLayout(unusedColorIdentityOpacityWidget);
     unusedColorIdentityOpacityLayout->setContentsMargins(11, 0, 11, 0);
     unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacityLabel);
     unusedColorIdentityOpacityLayout->addWidget(unusedColorIdentitiesOpacitySpinBox);
 
     // tooltip selector
-    auto deckPreviewTooltipWidget = new QWidget(this);
+    const auto deckPreviewTooltipWidget = new QWidget(this);
 
     deckPreviewTooltipLabel = new QLabel(deckPreviewTooltipWidget);
     deckPreviewTooltipComboBox = new QComboBox(deckPreviewTooltipWidget);
@@ -88,7 +88,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     connect(deckPreviewTooltipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageTooltipType);
 
-    auto deckPreviewTooltipLayout = new QHBoxLayout(deckPreviewTooltipWidget);
+    const auto deckPreviewTooltipLayout = new QHBoxLayout(deckPreviewTooltipWidget);
     deckPreviewTooltipLayout->setContentsMargins(11, 0, 11, 0);
     deckPreviewTooltipLayout->addWidget(deckPreviewTooltipLabel);
     deckPreviewTooltipLayout->addWidget(deckPreviewTooltipComboBox);

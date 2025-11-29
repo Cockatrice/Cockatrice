@@ -77,7 +77,7 @@ void testRNG()
         std::cerr << std::endl;
     }
     std::cerr << std::endl << "Chi^2 =";
-    for (double j : chisq)
+    for (const double j : chisq)
         std::cerr << "\t" << QString::number(j, 'f', 3).toStdString();
     std::cerr << std::endl << "k =";
     for (int j = 0; j < chisq.size(); ++j)
@@ -89,10 +89,10 @@ void testHash()
 {
     const int n = 5000;
     std::cerr << "Benchmarking password hash function (n =" << n << ")..." << std::endl;
-    QDateTime startTime = QDateTime::currentDateTime();
+    const QDateTime startTime = QDateTime::currentDateTime();
     for (int i = 0; i < n; ++i)
         PasswordHasher::computeHash("aaaaaa", "aaaaaaaaaaaaaaaa");
-    QDateTime endTime = QDateTime::currentDateTime();
+    const QDateTime endTime = QDateTime::currentDateTime();
     std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
 
@@ -109,7 +109,7 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    const QCoreApplication app(argc, argv);
     QCoreApplication::setOrganizationName("Cockatrice");
     QCoreApplication::setApplicationName("Servatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
@@ -118,23 +118,23 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
 
-    QCommandLineOption testRandomOpt("test-random", "Test PRNG (chi^2)");
+    const QCommandLineOption testRandomOpt("test-random", "Test PRNG (chi^2)");
     parser.addOption(testRandomOpt);
 
-    QCommandLineOption testHashFunctionOpt("test-hash", "Test password hash function");
+    const QCommandLineOption testHashFunctionOpt("test-hash", "Test password hash function");
     parser.addOption(testHashFunctionOpt);
 
-    QCommandLineOption logToConsoleOpt("log-to-console", "Write server logs to console");
+    const QCommandLineOption logToConsoleOpt("log-to-console", "Write server logs to console");
     parser.addOption(logToConsoleOpt);
 
-    QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
+    const QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
     parser.addOption(configPathOpt);
 
     parser.process(app);
 
-    bool testRandom = parser.isSet(testRandomOpt);
-    bool testHashFunction = parser.isSet(testHashFunctionOpt);
-    bool logToConsole = parser.isSet(logToConsoleOpt);
+    const bool testRandom = parser.isSet(testRandomOpt);
+    const bool testHashFunction = parser.isSet(testHashFunctionOpt);
+    const bool logToConsole = parser.isSet(logToConsoleOpt);
     QString configPath = parser.value(configPathOpt);
 
     qRegisterMetaType<QList<int>>("QList<int>");

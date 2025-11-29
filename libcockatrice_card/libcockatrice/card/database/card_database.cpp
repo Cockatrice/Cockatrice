@@ -74,8 +74,8 @@ void CardDatabase::refreshCachedReverseRelatedCards()
     }
 
     for (const auto &card : cards) {
-        for (auto *rel : card->getReverseRelatedCards()) {
-            if (auto target = cards.value(rel->getName())) {
+        for (const auto *rel : card->getReverseRelatedCards()) {
+            if (const auto target = cards.value(rel->getName())) {
                 auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
                                                 rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent());
                 target->addReverseRelatedCards2Me(newRel);
@@ -91,10 +91,10 @@ void CardDatabase::addCard(CardInfoPtr card)
         return;
     }
 
-    auto name = card->getName();
+    const auto name = card->getName();
 
     // If a card already exists, just add the new set property.
-    if (auto existing = cards.value(name)) {
+    if (const auto existing = cards.value(name)) {
         for (const auto &printings : card->getSets())
             for (const auto &printing : printings)
                 existing->addToSet(printing.getSet(), printing);
@@ -161,8 +161,8 @@ void CardDatabase::checkUnknownSets()
 
     if (_sets.getEnabledSetsNum()) {
         // if some sets are first found on this run, ask the user
-        int numUnknownSets = _sets.getUnknownSetsNum();
-        QStringList unknownSetNames = _sets.getUnknownSetsNames();
+        const int numUnknownSets = _sets.getUnknownSetsNum();
+        const QStringList unknownSetNames = _sets.getUnknownSetsNames();
         if (numUnknownSets > 0) {
             emit cardDatabaseNewSetsFound(numUnknownSets, unknownSetNames);
         } else {

@@ -130,7 +130,7 @@ int Server_CardZone::removeCard(Server_Card *card)
 
 int Server_CardZone::removeCard(Server_Card *card, bool &wasLookedAt)
 {
-    int index = cards.indexOf(card);
+    const int index = cards.indexOf(card);
     wasLookedAt = isCardAtPosLookedAt(index);
     if (wasLookedAt && cardsBeingLookedAt > 0) {
         cardsBeingLookedAt -= 1;
@@ -251,7 +251,7 @@ void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
         return;
 
     QSet<QPair<int, int>> placesToLook;
-    for (auto &card : cards)
+    for (const auto &card : cards)
         placesToLook.insert(QPair<int, int>((card->getX() / 3) * 3, card->getY()));
 
     QSetIterator<QPair<int, int>> placeIterator(placesToLook);
@@ -303,7 +303,7 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 
 void Server_CardZone::clear()
 {
-    for (auto card : cards)
+    for (const auto card : cards)
         delete card;
     cards.clear();
     coordinateMap.clear();

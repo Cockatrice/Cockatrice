@@ -168,8 +168,8 @@ void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
     if (isPinned) {
         // Keep a small margin that scales with the card size to avoid obscuring stuff.
         const int margin = qMax(3, int(cardInfoPicture->width() * 0.03));
-        int x = qMax(0, cardInfoPicture->width() - pinBadge->width() - margin);
-        int y = margin * 3;
+        const int x = qMax(0, cardInfoPicture->width() - pinBadge->width() - margin);
+        const int y = margin * 3;
         pinBadge->move(x, y);
         pinBadge->raise();
     }
@@ -218,14 +218,14 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     const auto &cardProviderId = rootCard.getPrinting().getUuid();
 
     if (preferredProviderId.isEmpty() || preferredProviderId != cardProviderId) {
-        auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
+        const auto *pinAction = preferenceMenu->addAction(tr("Pin Printing"));
         connect(pinAction, &QAction::triggered, this, [this] {
             SettingsCache::instance().cardOverrides().setCardPreferenceOverride(
                 {rootCard.getName(), rootCard.getPrinting().getUuid()});
             emit cardPreferenceChanged();
         });
     } else {
-        auto *unpinAction = preferenceMenu->addAction(tr("Unpin Printing"));
+        const auto *unpinAction = preferenceMenu->addAction(tr("Unpin Printing"));
         connect(unpinAction, &QAction::triggered, this, [this] {
             SettingsCache::instance().cardOverrides().deleteCardPreferenceOverride(rootCard.getName());
             emit cardPreferenceChanged();
@@ -241,7 +241,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     } else {
         for (const CardRelation *rel : relatedCards) {
             const QString &relatedCardName = rel->getName();
-            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+            const QAction *relatedCard = relatedMenu->addAction(relatedCardName);
             connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
                 deckEditor->updateCard(CardDatabaseManager::query()->getCard({relatedCardName}));
                 deckEditor->showPrintingSelector();

@@ -20,7 +20,7 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
     layout->addWidget(searchBox);
 
     connect(searchBox, &QLineEdit::returnPressed, this, [this]() {
-        QString text = searchBox->text().trimmed();
+        const QString text = searchBox->text().trimmed();
         if (!text.isEmpty() && !activeFilters.contains(text)) {
             createNameFilter(text);
             searchBox->clear();
@@ -60,17 +60,17 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
-    DeckListModel *deckListModel = deckEditor->deckDockWidget->deckModel;
+    const DeckListModel *deckListModel = deckEditor->deckDockWidget->deckModel;
 
     if (!deckListModel)
         return;
-    DeckList *decklist = deckListModel->getDeckList();
+    const DeckList *decklist = deckListModel->getDeckList();
     if (!decklist)
         return;
 
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         createNameFilter(currentCard->getName());
     }
 

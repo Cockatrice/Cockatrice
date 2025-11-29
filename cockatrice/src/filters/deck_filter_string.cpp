@@ -112,13 +112,14 @@ static void setupParserRules()
 
     // actual functionality
     search["DeckContentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto cardFilter = FilterString(std::any_cast<QString>(sv[0]));
-        auto numberMatcher = sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
+        const auto cardFilter = FilterString(std::any_cast<QString>(sv[0]));
+        const auto numberMatcher =
+            sv.size() > 1 ? std::any_cast<NumberMatcher>(sv[1]) : [](int count) { return count > 0; };
 
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
             deck->deckLoader->getDeckList()->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
-                auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
+                const auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }
@@ -134,29 +135,29 @@ static void setupParserRules()
     };
 
     search["DeckNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto name = std::any_cast<QString>(sv[0]);
+        const auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
             return deck->deckLoader->getDeckList()->getName().contains(name, Qt::CaseInsensitive);
         };
     };
 
     search["FileNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto name = std::any_cast<QString>(sv[0]);
+        const auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
-            auto filename = QFileInfo(deck->filePath).fileName();
+            const auto filename = QFileInfo(deck->filePath).fileName();
             return filename.contains(name, Qt::CaseInsensitive);
         };
     };
 
     search["PathQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto name = std::any_cast<QString>(sv[0]);
+        const auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *, const ExtraDeckSearchInfo &info) {
             return info.relativeFilePath.contains(name, Qt::CaseInsensitive);
         };
     };
 
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
-        auto name = std::any_cast<QString>(sv[0]);
+        const auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
             return deck->getDisplayName().contains(name, Qt::CaseInsensitive);
         };

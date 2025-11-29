@@ -73,9 +73,9 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     if (!deckLoadSuccess) {
         return;
     }
-    auto bannerCard = deckLoader->getDeckList()->getBannerCard().name.isEmpty()
-                          ? ExactCard()
-                          : CardDatabaseManager::query()->getCard(deckLoader->getDeckList()->getBannerCard());
+    const auto bannerCard = deckLoader->getDeckList()->getBannerCard().name.isEmpty()
+                                ? ExactCard()
+                                : CardDatabaseManager::query()->getCard(deckLoader->getDeckList()->getBannerCard());
 
     bannerCardDisplayWidget->setCard(bannerCard);
     bannerCardDisplayWidget->setFontSize(24);
@@ -207,7 +207,7 @@ void DeckPreviewWidget::refreshBannerCardText()
 
 void DeckPreviewWidget::refreshBannerCardToolTip()
 {
-    auto type = visualDeckStorageWidget->settings()->getDeckPreviewTooltip();
+    const auto type = visualDeckStorageWidget->settings()->getDeckPreviewTooltip();
     switch (type) {
         case VisualDeckStorageQuickSettingsWidget::TooltipType::None:
             bannerCardDisplayWidget->setToolTip("");
@@ -221,10 +221,10 @@ void DeckPreviewWidget::refreshBannerCardToolTip()
 void DeckPreviewWidget::updateBannerCardComboBox()
 {
     // Store the current text of the combo box
-    QString currentText = bannerCardComboBox->currentText();
+    const QString currentText = bannerCardComboBox->currentText();
 
     // Block signals temporarily
-    bool wasBlocked = bannerCardComboBox->blockSignals(true);
+    const bool wasBlocked = bannerCardComboBox->blockSignals(true);
     bannerCardComboBox->setUpdatesEnabled(false);
 
     // Clear the existing items in the combo box
@@ -235,7 +235,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 
     QList<DecklistCardNode *> cardsInDeck = deckLoader->getDeckList()->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             bannerCardSet.insert(QPair<QString, QString>(currentCard->getName(), currentCard->getCardProviderId()));
         }
@@ -262,12 +262,12 @@ void DeckPreviewWidget::updateBannerCardComboBox()
     bannerCardComboBox->setModel(model);
 
     // Try to restore the previous selection by finding the currentText
-    int restoredIndex = bannerCardComboBox->findText(currentText);
+    const int restoredIndex = bannerCardComboBox->findText(currentText);
     if (restoredIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoredIndex);
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckLoader->getDeckList()->getBannerCard().name);
+        const int bannerIndex = bannerCardComboBox->findText(deckLoader->getDeckList()->getBannerCard().name);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
         } else {
@@ -284,7 +284,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
 void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
-    CardRef cardRef = {name, id};
+    const CardRef cardRef = {name, id};
     deckLoader->getDeckList()->setBannerCard(cardRef);
     deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
@@ -323,7 +323,7 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     connect(menu->addAction(tr("Rename Deck")), &QAction::triggered, this, &DeckPreviewWidget::actRenameDeck);
 
-    auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
+    const auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
             [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), true, true); });
@@ -353,10 +353,10 @@ void DeckPreviewWidget::addSetBannerCardMenu(QMenu *menu)
         return;
     }
 
-    auto bannerCardMenu = menu->addMenu(tr("Set Banner Card"));
+    const auto bannerCardMenu = menu->addMenu(tr("Set Banner Card"));
 
     for (int i = 0; i < bannerCardComboBox->count(); ++i) {
-        auto action = bannerCardMenu->addAction(bannerCardComboBox->itemText(i));
+        const auto action = bannerCardMenu->addAction(bannerCardComboBox->itemText(i));
         connect(action, &QAction::triggered, this, [this, i] { bannerCardComboBox->setCurrentIndex(i); });
 
         // the checkability is purely for visuals
@@ -371,7 +371,8 @@ void DeckPreviewWidget::actRenameDeck()
     const QString oldName = deckLoader->getDeckList()->getName();
 
     bool ok;
-    QString newName = QInputDialog::getText(this, "Rename deck", tr("New name:"), QLineEdit::Normal, oldName, &ok);
+    const QString newName =
+        QInputDialog::getText(this, "Rename deck", tr("New name:"), QLineEdit::Normal, oldName, &ok);
     if (!ok || oldName == newName) {
         return;
     }
@@ -391,7 +392,8 @@ void DeckPreviewWidget::actRenameFile()
     const QString oldName = info.baseName();
 
     bool ok;
-    QString newName = QInputDialog::getText(this, "Rename file", tr("New name:"), QLineEdit::Normal, oldName, &ok);
+    const QString newName =
+        QInputDialog::getText(this, "Rename file", tr("New name:"), QLineEdit::Normal, oldName, &ok);
     if (!ok || newName.isEmpty() || oldName == newName) {
         return;
     }
@@ -420,8 +422,9 @@ void DeckPreviewWidget::actRenameFile()
 void DeckPreviewWidget::actDeleteFile()
 {
     // read input
-    auto res = QMessageBox::warning(this, tr("Delete file"), tr("Are you sure you want to delete the selected file?"),
-                                    QMessageBox::Yes | QMessageBox::No);
+    const auto res =
+        QMessageBox::warning(this, tr("Delete file"), tr("Are you sure you want to delete the selected file?"),
+                             QMessageBox::Yes | QMessageBox::No);
     if (res != QMessageBox::Yes) {
         return;
     }

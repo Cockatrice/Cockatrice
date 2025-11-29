@@ -53,7 +53,7 @@ double Expression::eval(const peg::Ast &ast)
     if (ast.name == "NUMBER") {
         return stod(std::string(ast.token));
     } else if (ast.name == "FUNCTION") {
-        QString name = QString::fromStdString(std::string(nodes[0]->token));
+        const QString name = QString::fromStdString(std::string(nodes[0]->token));
         if (!fns.contains(name))
             return 0;
         return fns[name](eval(*nodes[1]));
@@ -62,8 +62,8 @@ double Expression::eval(const peg::Ast &ast)
     } else if (ast.name[0] == 'P') {
         double result = eval(*nodes[0]);
         for (unsigned int i = 1; i < nodes.size(); i += 2) {
-            double arg = eval(*nodes[i + 1]);
-            char operation = nodes[i]->token[0];
+            const double arg = eval(*nodes[i + 1]);
+            const char operation = nodes[i]->token[0];
             switch (operation) {
                 case '+':
                     result += arg;

@@ -36,9 +36,9 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
     // If the user hasn't disabled arts other than their personal preference...
     if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
-        qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
+        const qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
         if (setIndex > 0) { // we don't need to move the set if it's already first
-            CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
+            const CardSetPtr setForCardProviderID = sortedSets.takeAt(setIndex);
             sortedSets.prepend(setForCardProviderID);
         }
     }
@@ -83,7 +83,7 @@ void CardPictureToLoad::populateSetUrls()
     currentSetUrls.clear();
 
     if (card && currentSet) {
-        QString setCustomURL = findPrintingForSet(card, currentSet->getShortName()).getProperty("picurl");
+        const QString setCustomURL = findPrintingForSet(card, currentSet->getShortName()).getProperty("picurl");
 
         if (!setCustomURL.isEmpty()) {
             currentSetUrls.append(setCustomURL);
@@ -191,7 +191,7 @@ static int parse(const QString &urlTemplate,
             }
 
             if (!fillWith.isEmpty()) {
-                int fillLength = fillWith.length();
+                const int fillLength = fillWith.length();
                 if (fillLength < propLength) {
                     qCDebug(CardPictureToLoadLog).nospace()
                         << "PictureLoader: [card: " << cardName << " set: " << setName << "]: Requested " << propType
@@ -217,13 +217,13 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
        for downloading images.  If information is requested by the template that is
        not populated for this specific card/set combination, an empty string is returned.*/
 
-    CardSetPtr set = getCurrentSet();
+    const CardSetPtr set = getCurrentSet();
 
     QMap<QString, QString> transformMap = QMap<QString, QString>();
-    QString setName = getSetName();
+    const QString setName = getSetName();
 
     // name
-    QString cardName = card.getName();
+    const QString cardName = card.getName();
     transformMap["!name!"] = cardName;
     transformMap["!name_lower!"] = card.getName().toLower();
     transformMap["!corrected_name!"] = card.getInfo().getCorrectedName();

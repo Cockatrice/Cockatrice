@@ -113,7 +113,7 @@ void TabDeckEditorVisualTabWidget::addNewTab(QWidget *widget, const QString &tit
  */
 void TabDeckEditorVisualTabWidget::removeCurrentTab()
 {
-    int currentIndex = this->currentIndex();
+    const int currentIndex = this->currentIndex();
     if (currentIndex != -1) {
         this->removeTab(currentIndex);
     }
@@ -157,7 +157,7 @@ int TabDeckEditorVisualTabWidget::getTabCount() const
  */
 void TabDeckEditorVisualTabWidget::handleTabClose(int index)
 {
-    QWidget *tab = this->widget(index);
+    const QWidget *tab = this->widget(index);
     this->removeTab(index);
     delete tab;
 }

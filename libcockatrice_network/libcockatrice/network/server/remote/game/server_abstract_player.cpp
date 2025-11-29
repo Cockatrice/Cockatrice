@@ -81,7 +81,7 @@ int Server_AbstractPlayer::newCardId()
 int Server_AbstractPlayer::newArrowId() const
 {
     int id = 0;
-    for (Server_Arrow *a : arrows) {
+    for (const Server_Arrow *a : arrows) {
         if (a->getId() > id) {
             id = a->getId();
         }
@@ -96,12 +96,12 @@ void Server_AbstractPlayer::setupZones()
 
 void Server_AbstractPlayer::clearZones()
 {
-    for (Server_CardZone *zone : zones) {
+    for (const Server_CardZone *zone : zones) {
         delete zone;
     }
     zones.clear();
 
-    for (Server_Arrow *arrow : arrows) {
+    for (const Server_Arrow *arrow : arrows) {
         delete arrow;
     }
     arrows.clear();
@@ -125,7 +125,7 @@ void Server_AbstractPlayer::updateArrowId(int id)
 
 bool Server_AbstractPlayer::deleteArrow(int arrowId)
 {
-    Server_Arrow *arrow = arrows.value(arrowId, 0);
+    const Server_Arrow *arrow = arrows.value(arrowId, 0);
     if (!arrow) {
         return false;
     }
@@ -449,7 +449,7 @@ void Server_AbstractPlayer::onCardBeingMoved(GameEventStorage &ges,
     }
 
     // set card pt
-    QString ptString = QString::fromStdString(thisCardProperties->pt());
+    const QString ptString = QString::fromStdString(thisCardProperties->pt());
     if (!ptString.isEmpty()) {
         setCardAttrHelper(ges, targetzone->getPlayer()->getPlayerId(), targetzone->getName(), card->getId(), AttrPT,
                           ptString);
@@ -726,7 +726,8 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespContextError;
     }
 
-    Server_AbstractPlayer *startPlayer = game->getPlayer(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
+    const Server_AbstractPlayer *startPlayer =
+        game->getPlayer(cmd.has_start_player_id() ? cmd.start_player_id() : playerId);
     if (!startPlayer) {
         return Response::RespNameNotFound;
     }
@@ -739,7 +740,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespContextError;
     }
 
-    Server_AbstractPlayer *targetPlayer = game->getPlayer(cmd.target_player_id());
+    const Server_AbstractPlayer *targetPlayer = game->getPlayer(cmd.target_player_id());
     if (!targetPlayer) {
         return Response::RespNameNotFound;
     }
@@ -800,7 +801,7 @@ Server_AbstractPlayer::cmdFlipCard(const Command_FlipCard &cmd, ResponseContaine
     event.set_face_down(faceDown);
     ges.enqueueGameEvent(event, playerId);
 
-    QString ptString = nameFromStdString(cmd.pt());
+    const QString ptString = nameFromStdString(cmd.pt());
     if (!ptString.isEmpty() && !faceDown) {
         setCardAttrHelper(ges, playerId, zone->getName(), card->getId(), AttrPT, ptString);
     }
@@ -870,13 +871,13 @@ Server_AbstractPlayer::cmdAttachCard(const Command_AttachCard &cmd, ResponseCont
     for (auto *player : game->getPlayers()) {
         QList<Server_Arrow *> _arrows = player->getArrows().values();
         QList<Server_Arrow *> toDelete;
-        for (auto a : _arrows) {
-            auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
+        for (const auto a : _arrows) {
+            const auto *tCard = qobject_cast<Server_Card *>(a->getTargetItem());
             if ((tCard == card) || (a->getStartCard() == card)) {
                 toDelete.append(a);
             }
         }
-        for (auto &i : toDelete) {
+        for (const auto &i : toDelete) {
             Event_DeleteArrow event;
             event.set_arrow_id(i->getId());
             ges.enqueueGameEvent(event, player->getPlayerId());
@@ -1136,10 +1137,10 @@ void Server_AbstractPlayer::sendCreateTokenEvents(Server_CardZone *zone,
     }
 
     // Token is face-down. We have to send different info to each player
-    auto eventOthers = makeCreateTokenEvent(zone, card, xCoord, yCoord, false);
+    const auto eventOthers = makeCreateTokenEvent(zone, card, xCoord, yCoord, false);
     ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
 
-    auto eventPrivate = makeCreateTokenEvent(zone, card, xCoord, yCoord, true);
+    const auto eventPrivate = makeCreateTokenEvent(zone, card, xCoord, yCoord, true);
     ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
 
     // Event_CreateToken didn't use to have face_down field; send attribute event afterward for backwards compatibility
@@ -1161,14 +1162,14 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
         return Response::RespContextError;
     }
 
-    Server_AbstractPlayer *startPlayer = game->getPlayer(cmd.start_player_id());
+    const Server_AbstractPlayer *startPlayer = game->getPlayer(cmd.start_player_id());
     Server_AbstractPlayer *targetPlayer = game->getPlayer(cmd.target_player_id());
     if (!startPlayer || !targetPlayer) {
         return Response::RespNameNotFound;
     }
-    QString startZoneName = nameFromStdString(cmd.start_zone());
+    const QString startZoneName = nameFromStdString(cmd.start_zone());
     Server_CardZone *startZone = startPlayer->getZones().value(startZoneName);
-    bool playerTarget = !cmd.has_target_zone();
+    const bool playerTarget = !cmd.has_target_zone();
     Server_CardZone *targetZone = nullptr;
     if (!playerTarget) {
         targetZone = targetPlayer->getZones().value(nameFromStdString(cmd.target_zone()));
@@ -1207,9 +1208,10 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
         }
     }
 
-    int currentPhase = game->getActivePhase();
-    int deletionPhase = cmd.has_delete_in_phase() ? cmd.delete_in_phase() : currentPhase;
-    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
+    const int currentPhase = game->getActivePhase();
+    const int deletionPhase = cmd.has_delete_in_phase() ? cmd.delete_in_phase() : currentPhase;
+    const auto arrow =
+        new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
     addArrow(arrow);
 
     Event_CreateArrow event;
@@ -1321,7 +1323,7 @@ Response::ResponseCode Server_AbstractPlayer::cmdIncCardCounter(const Command_In
         return Response::RespNameNotFound;
     }
 
-    int newValue = card->getCounter(cmd.counter_id()) + cmd.counter_delta();
+    const int newValue = card->getCounter(cmd.counter_id()) + cmd.counter_delta();
     card->setCounter(cmd.counter_id(), newValue);
 
     Event_SetCardCounter event;
@@ -1341,7 +1343,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
         return Response::RespGameNotStarted;
     }
 
-    Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
+    const Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
     if (!otherPlayer) {
         return Response::RespNameNotFound;
     }
@@ -1353,7 +1355,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
         return Response::RespContextError;
     }
 
-    int numberCards = cmd.number_cards();
+    const int numberCards = cmd.number_cards();
     const QList<Server_Card *> &cards = zone->getCards();
 
     auto *re = new Response_DumpZone;
@@ -1365,7 +1367,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
 
     for (int i = 0; (i < cards.size()) && (i < numberCards || numberCards == -1); ++i) {
         const auto &findId = cmd.is_reversed() ? cards.size() - numberCards + i : i;
-        Server_Card *card = cards[findId];
+        const Server_Card *card = cards[findId];
         QString displayedName = card->getFaceDown() ? QString() : card->getName();
         ServerInfo_Card *cardInfo = zoneInfo->add_card_list();
         cardInfo->set_provider_id(card->getProviderId().toStdString());
@@ -1554,9 +1556,9 @@ Response::ResponseCode Server_AbstractPlayer::cmdChangeZoneProperties(const Comm
     }
 
     // Neither value changed -> error.
-    bool alwaysRevealChanged =
+    const bool alwaysRevealChanged =
         cmd.has_always_reveal_top_card() && zone->getAlwaysRevealTopCard() != cmd.always_reveal_top_card();
-    bool alwaysLookAtTopChanged =
+    const bool alwaysLookAtTopChanged =
         cmd.has_always_look_at_top_card() && zone->getAlwaysLookAtTopCard() != cmd.always_look_at_top_card();
     if (!alwaysRevealChanged && !alwaysLookAtTopChanged) {
         return Response::RespContextError;

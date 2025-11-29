@@ -19,7 +19,7 @@
 DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
 {
     successfulInit = false;
-    QString xmlPath = "theme:tips/tips_of_the_day.xml";
+    const QString xmlPath = "theme:tips/tips_of_the_day.xml";
     tipDatabase = new TipsOfTheDay(xmlPath, this);
 
     if (tipDatabase->rowCount() == 0) {
@@ -42,7 +42,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    QList<int> seenTips = SettingsCache::instance().getSeenTips();
+    const QList<int> seenTips = SettingsCache::instance().getSeenTips();
     newTipsAvailable = false;
     currentTip = 0;
     for (int i = 0; i < tipDatabase->rowCount(); i++) {
@@ -137,7 +137,7 @@ void DlgTipOfTheDay::updateTip(int tipId)
         SettingsCache::instance().setSeenTips(seenTips);
     }
 
-    TipOfTheDay tip = tipDatabase->getTip(tipId);
+    const TipOfTheDay tip = tipDatabase->getTip(tipId);
     titleText = tip.getTitle();
     contentText = tip.getContent();
     imagePath = tip.getImagePath();
@@ -150,8 +150,8 @@ void DlgTipOfTheDay::updateTip(int tipId)
         qCWarning(DlgTipOfTheDayLog) << "Image failed to load from" << imagePath;
         imageLabel->clear();
     } else {
-        int h = std::min(std::max(imageLabel->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
-        int w = std::min(std::max(imageLabel->width(), MIN_TIP_IMAGE_WIDTH), MAX_TIP_IMAGE_WIDTH);
+        const int h = std::min(std::max(imageLabel->height(), MIN_TIP_IMAGE_HEIGHT), MAX_TIP_IMAGE_HEIGHT);
+        const int w = std::min(std::max(imageLabel->width(), MIN_TIP_IMAGE_WIDTH), MAX_TIP_IMAGE_WIDTH);
         imageLabel->setPixmap(image->scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 

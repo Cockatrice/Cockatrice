@@ -38,9 +38,9 @@ SmtpClient::~SmtpClient()
 
 bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    QString email = settingsCache->value("smtp/email", "").toString();
-    QString name = settingsCache->value("smtp/name", "").toString();
-    QString subject = settingsCache->value("smtp/subject", "").toString();
+    const QString email = settingsCache->value("smtp/email", "").toString();
+    const QString name = settingsCache->value("smtp/name", "").toString();
+    const QString subject = settingsCache->value("smtp/subject", "").toString();
     QString body = settingsCache->value("smtp/body", "").toString();
 
     if (email.isEmpty()) {
@@ -74,16 +74,16 @@ bool SmtpClient::enqueueActivationTokenMail(const QString &nickname, const QStri
     message.setSubject(subject);
     message.setBody(body.replace("%username", nickname).replace("%token", token));
 
-    int id = smtp->send(message);
+    const int id = smtp->send(message);
     qDebug() << "[MAIL] Enqueued mail to" << recipient << "as" << id;
     return true;
 }
 
 bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const QString &recipient, const QString &token)
 {
-    QString email = settingsCache->value("smtp/email", "").toString();
-    QString name = settingsCache->value("smtp/name", "").toString();
-    QString subject = settingsCache->value("forgotpassword/subject", "").toString();
+    const QString email = settingsCache->value("smtp/email", "").toString();
+    const QString name = settingsCache->value("smtp/name", "").toString();
+    const QString subject = settingsCache->value("forgotpassword/subject", "").toString();
     QString body = settingsCache->value("forgotpassword/body", "").toString();
 
     if (email.isEmpty()) {
@@ -117,7 +117,7 @@ bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const Q
     message.setSubject(subject);
     message.setBody(body.replace("%username", nickname).replace("%token", token));
 
-    int id = smtp->send(message);
+    const int id = smtp->send(message);
     qDebug() << "[MAIL] Enqueued mail to" << recipient << "as" << id;
     return true;
 }
@@ -131,12 +131,12 @@ void SmtpClient::sendAllEmails()
     if (smtp->pendingMessages() == 0)
         return;
 
-    QString connectionType = settingsCache->value("smtp/connection", "tcp").toString();
-    QString host = settingsCache->value("smtp/host", "localhost").toString();
-    int port = settingsCache->value("smtp/port", 25).toInt();
-    QByteArray username = settingsCache->value("smtp/username", "").toByteArray();
-    QByteArray password = settingsCache->value("smtp/password", "").toByteArray();
-    bool acceptAllCerts = settingsCache->value("smtp/acceptallcerts", false).toBool();
+    const QString connectionType = settingsCache->value("smtp/connection", "tcp").toString();
+    const QString host = settingsCache->value("smtp/host", "localhost").toString();
+    const int port = settingsCache->value("smtp/port", 25).toInt();
+    const QByteArray username = settingsCache->value("smtp/username", "").toByteArray();
+    const QByteArray password = settingsCache->value("smtp/password", "").toByteArray();
+    const bool acceptAllCerts = settingsCache->value("smtp/acceptallcerts", false).toBool();
 
     smtp->setUsername(username);
     smtp->setPassword(password);

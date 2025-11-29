@@ -81,7 +81,7 @@ void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *
 
 void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
 {
-    auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
+    const auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     if (indexToWidgetMap.contains(index)) {
         return;
     }
@@ -122,7 +122,7 @@ void DeckCardZoneDisplayWidget::displayCards()
     proxy.sort(1, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
-    QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
+    const QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
 
     // 2. iterate children under the proxy parent
     for (int i = 0; i < proxy.rowCount(proxyParent); ++i) {
@@ -132,7 +132,7 @@ void DeckCardZoneDisplayWidget::displayCards()
         QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
 
         // 4. persist the source index
-        QPersistentModelIndex persistent(sourceIndex);
+        const QPersistentModelIndex persistent(sourceIndex);
 
         constructAppropriateWidget(persistent);
     }
@@ -146,7 +146,7 @@ void DeckCardZoneDisplayWidget::onCategoryAddition(const QModelIndex &parent, in
     }
     if (parent == trackedIndex) {
         for (int i = first; i <= last; i++) {
-            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
+            const QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex));
 
             constructAppropriateWidget(index);
         }
@@ -206,7 +206,7 @@ void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayTy
 
     // We gotta wait for all the deleteLater's to finish so we fire after the next event cycle
 
-    auto timer = new QTimer(this);
+    const auto timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, [this]() { displayCards(); });
     timer->start();

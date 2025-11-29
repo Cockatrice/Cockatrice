@@ -8,7 +8,7 @@ TokenDisplayModel::TokenDisplayModel(QObject *parent) : CardDatabaseDisplayModel
 
 bool TokenDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    const CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
     return info->getIsToken() && rowMatchesCardName(info);
 }
 

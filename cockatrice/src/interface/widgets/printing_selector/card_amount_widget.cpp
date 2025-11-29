@@ -89,8 +89,8 @@ void CardAmountWidget::showEvent(QShowEvent *event)
     updateCardCount();
 
     if (parentWidget()) {
-        int width = parentWidget()->size().width();
-        int height = parentWidget()->size().height();
+        const int width = parentWidget()->size().width();
+        const int height = parentWidget()->size().height();
 
         incrementButton->setFixedSize(width / 3, height / 9);
         decrementButton->setFixedSize(width / 3, height / 9);
@@ -145,10 +145,10 @@ void CardAmountWidget::addPrinting(const QString &zone)
     recursiveExpand(newCardIndex);
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
-    QModelIndex find_card = deckModel->findCard(rootCard.getName(), zone);
-    QString foundProviderId = deckModel->data(find_card.sibling(find_card.row(), 4), Qt::DisplayRole).toString();
+    const QModelIndex find_card = deckModel->findCard(rootCard.getName(), zone);
+    const QString foundProviderId = deckModel->data(find_card.sibling(find_card.row(), 4), Qt::DisplayRole).toString();
     if (find_card.isValid() && find_card != newCardIndex && foundProviderId == "") {
-        auto amount = deckModel->data(find_card, Qt::DisplayRole);
+        const auto amount = deckModel->data(find_card, Qt::DisplayRole);
         for (int i = 0; i < amount.toInt() - 1; i++) {
             deckModel->addCard(rootCard, zone);
         }
@@ -239,8 +239,8 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
-                                          rootCard.getPrinting().getProperty("num"));
+    const QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
+                                                rootCard.getPrinting().getProperty("num"));
     offsetCountAtIndex(idx, -1);
     deckEditor->setModified(true);
 }
@@ -261,7 +261,7 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
         return -1;
     }
 
-    DeckList *decklist = deckModel->getDeckList();
+    const DeckList *decklist = deckModel->getDeckList();
     if (!decklist) {
         return -1;
     }
@@ -269,7 +269,7 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes({deckZone});
 
     int count = 0;
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
                 count++;

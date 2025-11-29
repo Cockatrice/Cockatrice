@@ -5,7 +5,7 @@
 
 QString PasswordHasher::computeHash(const QString &password, const QString &salt)
 {
-    QCryptographicHash::Algorithm algo = QCryptographicHash::Sha512;
+    const QCryptographicHash::Algorithm algo = QCryptographicHash::Sha512;
     const int rounds = 1000;
 
     QByteArray hash = (salt + password).toUtf8();
@@ -23,7 +23,7 @@ QString PasswordHasher::generateRandomSalt(const int len)
                                    "abcdefghijklmnopqrstuvwxyz";
 
     QString ret;
-    int size = sizeof(alphanum) - 1;
+    const int size = sizeof(alphanum) - 1;
 
     for (int i = 0; i < len; ++i) {
         ret.append(alphanum[rng->rand(0, size)]);

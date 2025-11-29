@@ -42,7 +42,7 @@ void AbstractGame::setActiveCard(CardItem *card)
 
 CardItem *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
 {
-    Player *player = playerManager->getPlayer(playerId);
+    const Player *player = playerManager->getPlayer(playerId);
     if (!player)
         return nullptr;
 

@@ -54,7 +54,7 @@ void Server_AbstractUserInterface::sendResponseContainer(const ResponseContainer
         Response response;
         response.set_cmd_id(responseContainer.getCmdId());
         response.set_response_code(responseCode);
-        ::google::protobuf::Message *responseExtension = responseContainer.getResponseExtension();
+        const ::google::protobuf::Message *responseExtension = responseContainer.getResponseExtension();
         if (responseExtension)
             response.GetReflection()
                 ->MutableMessage(&response, responseExtension->GetDescriptor()->FindExtensionByName("ext"))
@@ -86,14 +86,14 @@ void Server_AbstractUserInterface::playerAddedToGame(int gameId, int roomId, int
 
 void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
 {
-    QList<PlayerReference> gamesToJoin =
+    const QList<PlayerReference> gamesToJoin =
         server->getPersistentPlayerReferences(QString::fromStdString(userInfo->name()));
 
     server->roomsLock.lockForRead();
     for (int i = 0; i < gamesToJoin.size(); ++i) {
         const PlayerReference &pr = gamesToJoin.at(i);
 
-        Server_Room *room = server->getRooms().value(pr.getRoomId());
+        const Server_Room *room = server->getRooms().value(pr.getRoomId());
         if (!room)
             continue;
         QReadLocker roomGamesLocker(&room->gamesLock);

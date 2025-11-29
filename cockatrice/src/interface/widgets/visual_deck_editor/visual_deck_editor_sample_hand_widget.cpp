@@ -39,7 +39,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout->addWidget(cardSizeWidget);
 
     for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
-        auto displayWidget = new CardInfoPictureWidget(this);
+        const auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
         flowWidget->addWidget(displayWidget);
@@ -65,7 +65,7 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
 {
     flowWidget->clearLayout();
     for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
-        auto displayWidget = new CardInfoPictureWidget(this);
+        const auto displayWidget = new CardInfoPictureWidget(this);
         displayWidget->setCard(card);
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
         connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, displayWidget,
@@ -80,14 +80,14 @@ QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGe
     QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
-    DeckList *decklist = deckListModel->getDeckList();
+    const DeckList *decklist = deckListModel->getDeckList();
     if (!decklist)
         return randomCards;
 
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes({DECK_ZONE_MAIN});
 
     // Collect all cards in the main deck, allowing duplicates based on their count
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
             if (card) {

@@ -95,7 +95,7 @@ public:
 
     void removeSpectator(int spectatorId)
     {
-        ServerInfo_User spectatorInfo = spectators.value(spectatorId);
+        const ServerInfo_User spectatorInfo = spectators.value(spectatorId);
         spectators.remove(spectatorId);
         emit spectatorRemoved(spectatorId, spectatorInfo);
     }

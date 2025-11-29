@@ -77,7 +77,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    const QPixmap tmp = QPixmap("theme:zones/" + fileName);
     if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
@@ -91,7 +91,7 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    const QPixmap tmp = QPixmap("theme:zones/" + fileName);
 
     if (tmp.isNull()) {
         brush = fallbackBrush;
@@ -104,10 +104,10 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 void ThemeManager::themeChangedSlot()
 {
-    QString themeName = SettingsCache::instance().getThemeName();
+    const QString themeName = SettingsCache::instance().getThemeName();
     qCInfo(ThemeManagerLog) << "Theme changed:" << themeName;
 
-    QString dirPath = getAvailableThemes().value(themeName);
+    const QString dirPath = getAvailableThemes().value(themeName);
     QDir dir = dirPath;
 
     // css

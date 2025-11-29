@@ -85,7 +85,7 @@ void DlgDefaultTagsEditor::loadStringList()
 
 void DlgDefaultTagsEditor::addItem()
 {
-    QString newTag = inputField->text().trimmed();
+    const QString newTag = inputField->text().trimmed();
     if (newTag.isEmpty()) {
         QMessageBox::warning(this, tr("Invalid Input"), tr("Tag name cannot be empty!"));
         return;
@@ -93,10 +93,10 @@ void DlgDefaultTagsEditor::addItem()
 
     // Prevent duplicate tags
     for (int i = 0; i < listWidget->count(); ++i) {
-        QWidget *widget = listWidget->itemWidget(listWidget->item(i));
+        const QWidget *widget = listWidget->itemWidget(listWidget->item(i));
         if (!widget)
             continue;
-        QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
+        const QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
         if (lineEdit && lineEdit->text() == newTag) {
             QMessageBox::warning(this, tr("Duplicate Tag"), tr("This tag already exists."));
             return;
@@ -136,10 +136,10 @@ void DlgDefaultTagsEditor::confirmChanges()
 {
     QStringList updatedList;
     for (int i = 0; i < listWidget->count(); ++i) {
-        QWidget *widget = listWidget->itemWidget(listWidget->item(i));
+        const QWidget *widget = listWidget->itemWidget(listWidget->item(i));
         if (!widget)
             continue;
-        QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
+        const QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
         if (lineEdit) {
             updatedList.append(lineEdit->text());
         }

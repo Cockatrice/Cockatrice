@@ -130,10 +130,10 @@ QStringMap &SoundEngine::getAvailableThemes()
 
 void SoundEngine::themeChangedSlot()
 {
-    QString themeName = SettingsCache::instance().getSoundThemeName();
+    const QString themeName = SettingsCache::instance().getSoundThemeName();
     qCInfo(SoundEngineLog) << "Sound theme changed:" << themeName;
 
-    QDir dir = getAvailableThemes().value(themeName);
+    const QDir dir = getAvailableThemes().value(themeName);
 
     audioData.clear();
 

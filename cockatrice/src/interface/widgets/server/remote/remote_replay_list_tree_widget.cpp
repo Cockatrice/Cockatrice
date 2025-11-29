@@ -32,7 +32,7 @@ void RemoteReplayList_TreeModel::MatchNode::updateMatchInfo(const ServerInfo_Rep
 RemoteReplayList_TreeModel::RemoteReplayList_TreeModel(AbstractClient *_client, QObject *parent)
     : QAbstractItemModel(parent), client(_client)
 {
-    QFileIconProvider fip;
+    const QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
     lockIcon = QPixmap("theme:icons/lock");
@@ -48,7 +48,7 @@ int RemoteReplayList_TreeModel::rowCount(const QModelIndex &parent) const
     if (!parent.isValid())
         return replayMatches.size();
 
-    auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
+    const auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
     if (matchNode)
         return matchNode->size();
     else
@@ -170,7 +170,7 @@ QModelIndex RemoteReplayList_TreeModel::index(int row, int column, const QModelI
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
+    const auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
     if (matchNode) {
         if (row >= matchNode->size())
             return QModelIndex();
@@ -231,7 +231,7 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatc
 
     auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node) {
-        auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
+        const auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
         if (!_node)
             return nullptr;
         return &_node->getParent()->getMatchInfo();

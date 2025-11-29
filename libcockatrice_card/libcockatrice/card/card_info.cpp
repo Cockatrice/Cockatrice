@@ -158,7 +158,7 @@ QString CardInfo::simplifyName(const QString &name)
 
 const QChar CardInfo::getColorChar() const
 {
-    QString colors = getColors();
+    const QString colors = getColors();
     switch (colors.size()) {
         case 0:
             return QChar();

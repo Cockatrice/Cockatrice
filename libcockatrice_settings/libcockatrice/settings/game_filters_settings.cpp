@@ -24,7 +24,7 @@ void GameFiltersSettings::setHideBuddiesOnlyGames(bool hide)
 
 bool GameFiltersSettings::isHideBuddiesOnlyGames()
 {
-    QVariant previous = getValue("hide_buddies_only_games");
+    const QVariant previous = getValue("hide_buddies_only_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -35,7 +35,7 @@ void GameFiltersSettings::setHideFullGames(bool hide)
 
 bool GameFiltersSettings::isHideFullGames()
 {
-    QVariant previous = getValue("hide_full_games");
+    const QVariant previous = getValue("hide_full_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -46,7 +46,7 @@ void GameFiltersSettings::setHideGamesThatStarted(bool hide)
 
 bool GameFiltersSettings::isHideGamesThatStarted()
 {
-    QVariant previous = getValue("hide_games_that_started");
+    const QVariant previous = getValue("hide_games_that_started");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -57,7 +57,7 @@ void GameFiltersSettings::setHidePasswordProtectedGames(bool hide)
 
 bool GameFiltersSettings::isHidePasswordProtectedGames()
 {
-    QVariant previous = getValue("hide_password_protected_games");
+    const QVariant previous = getValue("hide_password_protected_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -68,7 +68,7 @@ void GameFiltersSettings::setHideIgnoredUserGames(bool hide)
 
 bool GameFiltersSettings::isHideIgnoredUserGames()
 {
-    QVariant previous = getValue("hide_ignored_user_games");
+    const QVariant previous = getValue("hide_ignored_user_games");
     return previous == QVariant() ? true : previous.toBool();
 }
 
@@ -79,7 +79,7 @@ void GameFiltersSettings::setHideNotBuddyCreatedGames(bool hide)
 
 bool GameFiltersSettings::isHideNotBuddyCreatedGames()
 {
-    QVariant previous = getValue("hide_not_buddy_created_games");
+    const QVariant previous = getValue("hide_not_buddy_created_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -90,7 +90,7 @@ void GameFiltersSettings::setHideOpenDecklistGames(bool hide)
 
 bool GameFiltersSettings::isHideOpenDecklistGames()
 {
-    QVariant previous = getValue("hide_open_decklist_games");
+    const QVariant previous = getValue("hide_open_decklist_games");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -121,7 +121,7 @@ void GameFiltersSettings::setMinPlayers(int min)
 
 int GameFiltersSettings::getMinPlayers()
 {
-    QVariant previous = getValue("min_players");
+    const QVariant previous = getValue("min_players");
     return previous == QVariant() ? 1 : previous.toInt();
 }
 
@@ -132,7 +132,7 @@ void GameFiltersSettings::setMaxPlayers(int max)
 
 int GameFiltersSettings::getMaxPlayers()
 {
-    QVariant previous = getValue("max_players");
+    const QVariant previous = getValue("max_players");
     return previous == QVariant() ? 99 : previous.toInt();
 }
 
@@ -143,7 +143,7 @@ void GameFiltersSettings::setMaxGameAge(const QTime &maxGameAge)
 
 QTime GameFiltersSettings::getMaxGameAge()
 {
-    QVariant previous = getValue("max_game_age_time");
+    const QVariant previous = getValue("max_game_age_time");
     return previous.toTime();
 }
 
@@ -159,7 +159,7 @@ void GameFiltersSettings::setGameHashedTypeEnabled(QString gametypeHASHED, bool 
 
 bool GameFiltersSettings::isGameTypeEnabled(QString gametype)
 {
-    QVariant previous = getValue("game_type/" + hashGameType(gametype));
+    const QVariant previous = getValue("game_type/" + hashGameType(gametype));
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -170,7 +170,7 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanWatch(bool show)
 
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanWatch()
 {
-    QVariant previous = getValue("show_only_if_spectators_can_watch");
+    const QVariant previous = getValue("show_only_if_spectators_can_watch");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -181,7 +181,7 @@ void GameFiltersSettings::setShowSpectatorPasswordProtected(bool show)
 
 bool GameFiltersSettings::isShowSpectatorPasswordProtected()
 {
-    QVariant previous = getValue("show_spectator_password_protected");
+    const QVariant previous = getValue("show_spectator_password_protected");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -192,7 +192,7 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanChat(bool show)
 
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanChat()
 {
-    QVariant previous = getValue("show_only_if_spectators_can_chat");
+    const QVariant previous = getValue("show_only_if_spectators_can_chat");
     return previous == QVariant() ? false : previous.toBool();
 }
 
@@ -203,6 +203,6 @@ void GameFiltersSettings::setShowOnlyIfSpectatorsCanSeeHands(bool show)
 
 bool GameFiltersSettings::isShowOnlyIfSpectatorsCanSeeHands()
 {
-    QVariant previous = getValue("show_only_if_spectators_can_see_hands");
+    const QVariant previous = getValue("show_only_if_spectators_can_see_hands");
     return previous == QVariant() ? false : previous.toBool();
 }

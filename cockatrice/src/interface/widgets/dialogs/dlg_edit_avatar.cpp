@@ -49,7 +49,7 @@ void DlgEditAvatar::actOk()
 
 void DlgEditAvatar::actBrowse()
 {
-    QString fileName =
+    const QString fileName =
         QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
     if (fileName.isEmpty()) {
         imageLabel->setText(tr("No image chosen."));

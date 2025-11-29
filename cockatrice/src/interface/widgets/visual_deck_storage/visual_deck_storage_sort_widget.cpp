@@ -40,7 +40,7 @@ void VisualDeckStorageSortWidget::retranslateUi()
     // Block signals to avoid triggering unnecessary updates while changing text
     sortComboBox->blockSignals(true);
 
-    int oldIndex = sortComboBox->currentIndex();
+    const int oldIndex = sortComboBox->currentIndex();
 
     // Clear and repopulate the ComboBox with translated items
     sortComboBox->clear();
@@ -67,8 +67,8 @@ void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidge
 {
     auto children =
         folderWidget->getFlowWidget()->findChildren<QWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-    for (auto widget : children) {
-        auto deckPreviewWidgets =
+    for (const auto widget : children) {
+        const auto deckPreviewWidgets =
             widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
         auto newOrder = filterFiles(deckPreviewWidgets);
         for (DeckPreviewWidget *previewWidget : newOrder) {
@@ -88,8 +88,8 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
             return false; // Handle null pointers gracefully
         }
 
-        QFileInfo info1(widget1->filePath);
-        QFileInfo info2(widget2->filePath);
+        const QFileInfo info1(widget1->filePath);
+        const QFileInfo info2(widget2->filePath);
 
         switch (sortOrder) {
             case ByName:
@@ -99,8 +99,10 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
             case ByLastLoaded: {
-                QDateTime time1 = QDateTime::fromString(widget1->deckLoader->getDeckList()->getLastLoadedTimestamp());
-                QDateTime time2 = QDateTime::fromString(widget2->deckLoader->getDeckList()->getLastLoadedTimestamp());
+                const QDateTime time1 =
+                    QDateTime::fromString(widget1->deckLoader->getDeckList()->getLastLoadedTimestamp());
+                const QDateTime time2 =
+                    QDateTime::fromString(widget2->deckLoader->getDeckList()->getLastLoadedTimestamp());
                 return time1 > time2;
             }
         }

@@ -27,8 +27,8 @@ bool CardDatabaseDisplayModel::canFetchMore(const QModelIndex &index) const
 
 void CardDatabaseDisplayModel::fetchMore(const QModelIndex &index)
 {
-    int remainder = sourceModel()->rowCount(index) - loadedRowCount;
-    int itemsToFetch = qMin(100, remainder);
+    const int remainder = sourceModel()->rowCount(index) - loadedRowCount;
+    const int itemsToFetch = qMin(100, remainder);
 
     if (itemsToFetch == 0) {
         return;
@@ -49,12 +49,12 @@ int CardDatabaseDisplayModel::rowCount(const QModelIndex &parent) const
 bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
 
-    QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
-    QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
+    const QString leftString = sourceModel()->data(left, CardDatabaseModel::SortRole).toString();
+    const QString rightString = sourceModel()->data(right, CardDatabaseModel::SortRole).toString();
 
     if (!cardName.isEmpty() && left.column() == CardDatabaseModel::NameColumn) {
-        bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
-        bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
+        const bool isLeftType = leftString.startsWith(cardName, Qt::CaseInsensitive);
+        const bool isRightType = rightString.startsWith(cardName, Qt::CaseInsensitive);
 
         // test for an exact match: isLeftType && leftString.size() == cardName.size()
         // or an exclusive start match: isLeftType && !isRightType
@@ -65,13 +65,13 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
         if (isRightType && (!isLeftType || rightString.size() == cardName.size()))
             return false;
     } else if (right.column() == CardDatabaseModel::PTColumn && left.column() == CardDatabaseModel::PTColumn) {
-        QStringList leftList = leftString.split("/");
-        QStringList rightList = rightString.split("/");
+        const QStringList leftList = leftString.split("/");
+        const QStringList rightList = rightString.split("/");
 
         if (leftList.size() == 2 && rightList.size() == 2) {
 
             // cool, have both P/T in list now
-            int lessThanNum = lessThanNumerically(leftList.at(0), rightList.at(0));
+            const int lessThanNum = lessThanNumerically(leftList.at(0), rightList.at(0));
             if (lessThanNum != 0) {
                 return lessThanNum < 0;
             } else {
@@ -153,7 +153,7 @@ int CardDatabaseDisplayModel::lessThanNumerically(const QString &left, const QSt
 }
 bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex & /*sourceParent*/) const
 {
-    CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
+    const CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 
     if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
         return false;

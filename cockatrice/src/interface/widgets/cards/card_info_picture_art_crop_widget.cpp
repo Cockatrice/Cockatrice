@@ -25,16 +25,16 @@ QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &target
 
     const QSize sz = fullResPixmap.size();
 
-    int marginX = sz.width() * 0.07;
-    int topMargin = sz.height() * 0.11;
-    int bottomMargin = sz.height() * 0.45;
+    const int marginX = sz.width() * 0.07;
+    const int topMargin = sz.height() * 0.11;
+    const int bottomMargin = sz.height() * 0.45;
 
     QRect foilRect(marginX, topMargin, sz.width() - 2 * marginX, sz.height() - topMargin - bottomMargin);
 
     foilRect = foilRect.intersected(fullResPixmap.rect()); // always clamp to source bounds
 
     // Crop first, then scale for best quality
-    QPixmap cropped = fullResPixmap.copy(foilRect);
+    const QPixmap cropped = fullResPixmap.copy(foilRect);
     QPixmap scaled = cropped.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
     return scaled;

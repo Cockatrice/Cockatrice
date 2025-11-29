@@ -26,28 +26,28 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
     QRegularExpressionMatch match;
 
     if ((match = rxTappedOut.match(url)).hasMatch()) {
-        QString slug = match.captured(1);
+        const QString slug = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = TAPPEDOUT_BASE,
                                  .deckID = slug,
                                  .fullUrl = TAPPEDOUT_BASE + slug + TAPPEDOUT_SUFFIX,
                                  .provider = DeckProvider::TappedOut};
         return true;
     } else if ((match = rxArchidekt.match(url)).hasMatch()) {
-        QString deckID = match.captured(1);
+        const QString deckID = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = ARCHIDEKT_BASE,
                                  .deckID = deckID,
                                  .fullUrl = ARCHIDEKT_BASE + deckID + ARCHIDEKT_SUFFIX,
                                  .provider = DeckProvider::Archidekt};
         return true;
     } else if ((match = rxMoxfield.match(url)).hasMatch()) {
-        QString deckID = match.captured(1);
+        const QString deckID = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = MOXFIELD_BASE,
                                  .deckID = deckID,
                                  .fullUrl = MOXFIELD_BASE + deckID + MOXFIELD_SUFFIX,
                                  .provider = DeckProvider::Moxfield};
         return true;
     } else if ((match = rxDeckstats.match(url)).hasMatch()) {
-        QString deckPath = match.captured(1);
+        const QString deckPath = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = "https://deckstats.net/decks/",
                                  .deckID = deckPath,
                                  .fullUrl = "https://deckstats.net/decks/" + deckPath + DECKSTATS_SUFFIX,

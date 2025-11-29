@@ -84,13 +84,13 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override
     {
         if (event->type() == QEvent::Wheel) {
-            if (auto *combo = qobject_cast<QComboBox *>(obj)) {
+            if (const auto *combo = qobject_cast<QComboBox *>(obj)) {
                 // If popup is not open, forward event to parent scroll area
                 if (!combo->view()->isVisible()) {
                     // Try to find a scrollable parent and manually send the event
                     QWidget *parent = combo->parentWidget();
                     while (parent) {
-                        if (auto *scroll = qobject_cast<QAbstractScrollArea *>(parent)) {
+                        if (const auto *scroll = qobject_cast<QAbstractScrollArea *>(parent)) {
                             QApplication::sendEvent(scroll->viewport(), event);
                             return true; // Mark event as handled
                         }

@@ -265,7 +265,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
 {
-    QModelIndex current = deckView->selectionModel()->currentIndex();
+    const QModelIndex current = deckView->selectionModel()->currentIndex();
     if (!current.isValid())
         return {};
     const QString cardName = current.sibling(current.row(), 1).data().toString();
@@ -288,7 +288,7 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
 
 void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const QModelIndex & /*previous*/)
 {
-    if (ExactCard card = getCurrentCard()) {
+    if (const ExactCard card = getCurrentCard()) {
         emit cardChanged(card);
     }
 }
@@ -325,10 +325,10 @@ void DeckEditorDeckDockWidget::updateHash()
 void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 {
     // Store current banner card identity
-    CardRef wanted = deckModel->getDeckList()->getBannerCard();
+    const CardRef wanted = deckModel->getDeckList()->getBannerCard();
 
     // Block signals temporarily
-    bool wasBlocked = bannerCardComboBox->blockSignals(true);
+    const bool wasBlocked = bannerCardComboBox->blockSignals(true);
 
     // Clear the existing items in the combo box
     bannerCardComboBox->clear();
@@ -337,7 +337,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     QSet<QPair<QString, QString>> bannerCardSet;
     QList<DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
             continue;
         }
@@ -359,7 +359,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     }
 
     // Try to find an index with a matching card
-    int restoreIndex = findRestoreIndex(wanted, bannerCardComboBox);
+    const int restoreIndex = findRestoreIndex(wanted, bannerCardComboBox);
 
     // Handle results
     if (restoreIndex != -1) {
@@ -576,10 +576,11 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
-    ExactCard card = CardDatabaseManager::query()->getCard({cardName, cardProviderID});
-    QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
-                                    // Third argument (true) says create the card no matter what, even if not in DB
-                                    : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
+    const ExactCard card = CardDatabaseManager::query()->getCard({cardName, cardProviderID});
+    const QModelIndex newCardIndex = card
+                                         ? deckModel->addCard(card, otherZoneName)
+                                         // Third argument (true) says create the card no matter what, even if not in DB
+                                         : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
     recursiveExpand(proxy->mapToSource(newCardIndex));
 
     return true;
@@ -592,10 +593,10 @@ void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString z
     if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    QString providerId = card.getPrinting().getUuid();
-    QString collectorNumber = card.getPrinting().getProperty("num");
+    const QString providerId = card.getPrinting().getUuid();
+    const QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex idx = deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    const QModelIndex idx = deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
     if (!idx.isValid()) {
         return;
     }
@@ -659,7 +660,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
         return;
     }
 
-    QModelIndex sourceIndex = proxy->mapToSource(idx);
+    const QModelIndex sourceIndex = proxy->mapToSource(idx);
 
     const QModelIndex numberIndex = sourceIndex.sibling(sourceIndex.row(), 0);
     const QModelIndex nameIndex = sourceIndex.sibling(sourceIndex.row(), 1);
@@ -691,7 +692,7 @@ void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
     if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         QMenu menu;
 
-        QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+        const QAction *selectPrinting = menu.addAction(tr("Select Printing"));
         connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
         menu.exec(deckView->mapToGlobal(point));
@@ -700,7 +701,7 @@ void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 
 void DeckEditorDeckDockWidget::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aRemoveCard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aRemoveCard"));
     aIncrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aIncrement"));
     aDecrement->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aDecrement"));

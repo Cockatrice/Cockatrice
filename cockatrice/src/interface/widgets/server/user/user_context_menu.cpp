@@ -137,8 +137,8 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
 {
     const Response_WarnList &response = r.GetExtension(Response_WarnList::ext);
 
-    QString user = QString::fromStdString(response.user_name()).simplified();
-    QString clientid = QString::fromStdString(response.user_clientid()).simplified();
+    const QString user = QString::fromStdString(response.user_name()).simplified();
+    const QString clientid = QString::fromStdString(response.user_clientid()).simplified();
 
     // The dialog needs to be non-modal in order to not block the event queue of the client.
     auto *dlg = new WarningDialog(user, clientid, static_cast<QWidget *>(parent()));
@@ -155,7 +155,7 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
 void UserContextMenu::warnUser_processUserInfoResponse(const Response &resp)
 {
     const Response_GetUserInfo &response = resp.GetExtension(Response_GetUserInfo::ext);
-    ServerInfo_User userInfo = response.user_info();
+    const ServerInfo_User userInfo = response.user_info();
 
     Command_GetWarnList cmd;
     cmd.set_user_name(userInfo.name());
@@ -278,7 +278,7 @@ void UserContextMenu::adjustMod_processUserResponse(const Response &resp, const 
 
 void UserContextMenu::banUser_dialogFinished()
 {
-    auto *dlg = static_cast<BanDialog *>(sender());
+    const auto *dlg = static_cast<BanDialog *>(sender());
 
     Command_BanFromServer cmd;
     cmd.set_user_name(dlg->getBanName().toStdString());
@@ -287,7 +287,7 @@ void UserContextMenu::banUser_dialogFinished()
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_visible_reason(dlg->getVisibleReason().toStdString());
     cmd.set_clientid(dlg->getBanId().toStdString());
-    int removeAmount = dlg->getDeleteMessages();
+    const int removeAmount = dlg->getDeleteMessages();
     if (removeAmount != 0) {
         cmd.set_remove_messages(removeAmount);
     }
@@ -297,7 +297,7 @@ void UserContextMenu::banUser_dialogFinished()
 
 void UserContextMenu::warnUser_dialogFinished()
 {
-    auto *dlg = static_cast<WarningDialog *>(sender());
+    const auto *dlg = static_cast<WarningDialog *>(sender());
 
     if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty())
         return;
@@ -306,7 +306,7 @@ void UserContextMenu::warnUser_dialogFinished()
     cmd.set_user_name(dlg->getName().toStdString());
     cmd.set_reason(dlg->getReason().toStdString());
     cmd.set_clientid(dlg->getWarnID().toStdString());
-    int removeAmount = dlg->getDeleteMessages();
+    const int removeAmount = dlg->getDeleteMessages();
     if (removeAmount != 0) {
         cmd.set_remove_messages(removeAmount);
     }
@@ -316,7 +316,7 @@ void UserContextMenu::warnUser_dialogFinished()
 
 void UserContextMenu::updateAdminNotes_dialogFinished()
 {
-    auto *dlg = static_cast<AdminNotesDialog *>(sender());
+    const auto *dlg = static_cast<AdminNotesDialog *>(sender());
 
     Command_UpdateAdminNotes cmd;
     cmd.set_user_name(dlg->getName().toStdString());

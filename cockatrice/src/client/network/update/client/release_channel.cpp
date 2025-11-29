@@ -37,7 +37,7 @@ ReleaseChannel::~ReleaseChannel()
 
 void ReleaseChannel::checkForUpdates()
 {
-    QString releaseChannelUrl = getReleaseChannelUrl();
+    const QString releaseChannelUrl = getReleaseChannelUrl();
     qCInfo(ReleaseChannelLog) << "Searching for updates on the channel: " << releaseChannelUrl;
     response = netMan->get(QNetworkRequest(releaseChannelUrl));
     connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
@@ -113,7 +113,7 @@ void StableReleaseChannel::releaseListFinished()
 {
     auto *reply = static_cast<QNetworkReply *>(sender());
     QJsonParseError parseError{};
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    const QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
         qCWarning(ReleaseChannelLog) << "No reply received from the release update server.";
@@ -141,7 +141,7 @@ void StableReleaseChannel::releaseListFinished()
         for (const auto &rawAsset : rawAssets) {
             QVariantMap asset = rawAsset.toMap();
             QString name = asset["name"].toString();
-            QString url = asset["browser_download_url"].toString();
+            const QString url = asset["browser_download_url"].toString();
 
             if (downloadMatchesCurrentOS(name)) {
                 lastRelease->setDownloadUrl(url);
@@ -150,8 +150,8 @@ void StableReleaseChannel::releaseListFinished()
         }
     }
 
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    const QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
+    const QString myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
     qCInfo(ReleaseChannelLog) << "Got reply from release server, name=" << lastRelease->getName()
@@ -159,7 +159,7 @@ void StableReleaseChannel::releaseListFinished()
                               << "url=" << lastRelease->getDownloadUrl();
 
     const QString &tagName = resultMap["tag_name"].toString();
-    QString url = QString(STABLETAG_URL) + tagName;
+    const QString url = QString(STABLETAG_URL) + tagName;
     qCInfo(ReleaseChannelLog) << "Searching for commit hash corresponding to stable channel tag: " << tagName;
     response = netMan->get(QNetworkRequest(url));
     connect(response, &QNetworkReply::finished, this, &StableReleaseChannel::tagListFinished);
@@ -187,8 +187,8 @@ void StableReleaseChannel::tagListFinished()
     lastRelease->setCommitHash(resultMap["object"].toMap()["sha"].toString());
     qCInfo(ReleaseChannelLog) << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
 
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    const QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
+    const QString myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
     const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
 
@@ -218,11 +218,11 @@ QString BetaReleaseChannel::getReleaseChannelUrl() const
 void BetaReleaseChannel::releaseListFinished()
 {
     auto *reply = static_cast<QNetworkReply *>(sender());
-    QByteArray jsonData = reply->readAll();
+    const QByteArray jsonData = reply->readAll();
     reply->deleteLater();
 
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    QJsonArray array = doc.array();
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+    const QJsonArray array = doc.array();
 
     /*
      * Get the latest release on GitHub
@@ -260,7 +260,7 @@ void BetaReleaseChannel::releaseListFinished()
                               << "name=" << lastRelease->getName() << "desc=" << lastRelease->getDescriptionUrl()
                               << "commit=" << lastRelease->getCommitHash() << "date=" << lastRelease->getPublishDate();
 
-    QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
+    const QString betaBuildDownloadUrl = resultMap["assets_url"].toString();
 
     qCInfo(ReleaseChannelLog) << "Searching for a corresponding file on the beta channel: " << betaBuildDownloadUrl;
     response = netMan->get(QNetworkRequest(betaBuildDownloadUrl));
@@ -271,7 +271,7 @@ void BetaReleaseChannel::fileListFinished()
 {
     auto *reply = static_cast<QNetworkReply *>(sender());
     QJsonParseError parseError{};
-    QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    const QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
     reply->deleteLater();
     if (parseError.error != QJsonParseError::NoError) {
         qCWarning(ReleaseChannelLog) << "No reply received from the file update server.";
@@ -280,11 +280,11 @@ void BetaReleaseChannel::fileListFinished()
     }
 
     QVariantList resultList = jsonResponse.toVariant().toList();
-    QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    const QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
+    const QString myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
-    bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
+    const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
 
     QStringList resultUrlList{};

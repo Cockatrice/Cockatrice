@@ -216,7 +216,7 @@ bool FilterTreeModel::setData(const QModelIndex &index, const QVariant &value, i
     if (node == NULL || node == fTree)
         return false;
 
-    Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+    const Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
     if (state == Qt::Checked)
         node->enable();
     else
@@ -288,7 +288,7 @@ QModelIndex FilterTreeModel::parent(const QModelIndex &ind) const
 
     parent = node->parent();
     if (parent) {
-        int row = parent->index();
+        const int row = parent->index();
         if (row < 0)
             return QModelIndex();
         idx = createIndex(row, 0, parent);

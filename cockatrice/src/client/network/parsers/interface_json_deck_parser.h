@@ -26,8 +26,8 @@ public:
     {
         DeckLoader *loader = new DeckLoader(nullptr);
 
-        QString deckName = obj.value("name").toString();
-        QString deckDescription = obj.value("description").toString();
+        const QString deckName = obj.value("name").toString();
+        const QString deckDescription = obj.value("description").toString();
 
         loader->getDeckList()->setName(deckName);
         loader->getDeckList()->setComments(deckDescription);
@@ -36,7 +36,7 @@ public:
         QTextStream outStream(&outputText);
 
         for (auto entry : obj.value("cards").toArray()) {
-            auto quantity = entry.toObject().value("quantity").toInt();
+            const auto quantity = entry.toObject().value("quantity").toInt();
 
             auto card = entry.toObject().value("card").toObject();
             auto oracleCard = card.value("oracleCard").toObject();

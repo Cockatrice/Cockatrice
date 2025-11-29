@@ -38,10 +38,10 @@ FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filenam
 QSize FilterDisplayWidget::sizeHint() const
 {
     // Calculate the size based on the filter name and the close button
-    QFontMetrics fm(font());
-    int textWidth = fm.horizontalAdvance(filterFilename);
-    int width = textWidth + 30 + 16; // Space for the filename and close button
-    int height = fm.height() + 10;   // Height based on font size + padding
+    const QFontMetrics fm(font());
+    const int textWidth = fm.horizontalAdvance(filterFilename);
+    const int width = textWidth + 30 + 16; // Space for the filename and close button
+    const int height = fm.height() + 10;   // Height based on font size + padding
 
     return QSize(width, height);
 }
@@ -63,12 +63,12 @@ void FilterDisplayWidget::loadFilter()
 void FilterDisplayWidget::deleteFilter()
 {
     // Show confirmation dialog before deleting the filter
-    QMessageBox::StandardButton reply = QMessageBox::question(
+    const QMessageBox::StandardButton reply = QMessageBox::question(
         this, tr("Confirm Delete"), tr("Are you sure you want to delete the filter '%1'?").arg(filterFilename),
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         // If confirmed, delete the filter
-        QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filterFilename;
+        const QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filterFilename;
         QFile file(filePath);
         if (file.remove()) {
             emit filterDeleted(filterFilename); // Emit signal for deletion

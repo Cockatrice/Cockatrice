@@ -9,8 +9,8 @@
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse)
 {
-    qreal cardMinOverlap = cardHeight * SettingsCache::instance().getStackCardOverlapPercent() / 100;
-    qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
+    const qreal cardMinOverlap = cardHeight * SettingsCache::instance().getStackCardOverlapPercent() / 100;
+    const qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
     qreal y;
     if (desiredHeight > totalHeight) {
         if (reverse) {
@@ -19,7 +19,7 @@ qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal
             y = index * (totalHeight - cardHeight) / (cardCount - 1);
         }
     } else {
-        qreal start = (totalHeight - desiredHeight) / 2;
+        const qreal start = (totalHeight - desiredHeight) / 2;
         if (reverse) {
             if (index <= start) {
                 return 0;
@@ -42,7 +42,7 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QPointF pos = event->pos();
         if (pos.x() < 0)
             pos.setX(0);
-        QRectF br = boundingRect();
+        const QRectF br = boundingRect();
         if (pos.x() > br.width())
             pos.setX(br.width());
         if (pos.y() < 0)
@@ -50,13 +50,13 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if (pos.y() > br.height())
             pos.setY(br.height());
 
-        QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
+        const QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
         for (auto card : getLogic()->getCards()) {
             if (card->getAttachedTo() && card->getAttachedTo()->getZone() != getLogic()) {
                 continue;
             }
 
-            bool inRect = selectionRect.intersects(card->mapRectToParent(card->boundingRect()));
+            const bool inRect = selectionRect.intersects(card->mapRectToParent(card->boundingRect()));
             if (inRect && !cardsInSelectionRect.contains(card)) {
                 // selection has just expanded to cover the card
                 cardsInSelectionRect.insert(card);

@@ -17,7 +17,7 @@ HandlePublicServers::HandlePublicServers(QObject *parent)
 
 void HandlePublicServers::downloadPublicServers()
 {
-    QUrl url(QString(PUBLIC_SERVERS_JSON));
+    const QUrl url(QString(PUBLIC_SERVERS_JSON));
     reply = nam->get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &HandlePublicServers::actFinishParsingDownloadedData);
 }
@@ -25,7 +25,7 @@ void HandlePublicServers::downloadPublicServers()
 void HandlePublicServers::actFinishParsingDownloadedData()
 {
     reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
+    const QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
         // Get current saved hosts
@@ -34,9 +34,9 @@ void HandlePublicServers::actFinishParsingDownloadedData()
 
         // Downloaded data from GitHub
         QJsonParseError parseError{};
-        QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
+        const QJsonDocument jsonResponse = QJsonDocument::fromJson(reply->readAll(), &parseError);
         if (parseError.error == QJsonParseError::NoError) {
-            QVariantMap jsonMap = jsonResponse.toVariant().toMap();
+            const QVariantMap jsonMap = jsonResponse.toVariant().toMap();
             updateServerINISettings(jsonMap);
         } else {
             qDebug() << "[PUBLIC SERVER HANDLER]"

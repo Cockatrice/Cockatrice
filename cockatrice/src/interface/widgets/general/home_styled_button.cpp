@@ -92,9 +92,9 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     font.setBold(true);
     painter.setFont(font);
 
-    QFontMetrics fm(font);
-    QSize textSize = fm.size(Qt::TextSingleLine, this->text());
-    QPointF center((width() - textSize.width()) / 2.0, (height() + textSize.height() / 2.0) / 2.0);
+    const QFontMetrics fm(font);
+    const QSize textSize = fm.size(Qt::TextSingleLine, this->text());
+    const QPointF center((width() - textSize.width()) / 2.0, (height() + textSize.height() / 2.0) / 2.0);
 
     QPainterPath path;
     path.addText(center, font, this->text());

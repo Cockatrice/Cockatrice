@@ -49,10 +49,10 @@ void CardPictureLoaderLocal::refreshIndex()
 
 QImage CardPictureLoaderLocal::tryLoad(const ExactCard &toLoad) const
 {
-    PrintingInfo setInstance = toLoad.getPrinting();
+    const PrintingInfo setInstance = toLoad.getPrinting();
 
-    QString cardName = toLoad.getName();
-    QString correctedCardName = toLoad.getInfo().getCorrectedName();
+    const QString cardName = toLoad.getName();
+    const QString correctedCardName = toLoad.getInfo().getCorrectedName();
 
     QString setName, collectorNumber, providerId;
 

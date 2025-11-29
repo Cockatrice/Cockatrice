@@ -171,7 +171,7 @@ void TabDeckEditorVisual::changeModelIndexAndCardInfo(const ExactCard &activeCar
 /** @brief Selects the given card in the deck view, checking main and side zones. */
 void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
 {
-    QString cardName = activeCard.getName();
+    const QString cardName = activeCard.getName();
     QModelIndex index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_MAIN);
     if (!index.isValid()) {
         index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_SIDE);
@@ -185,7 +185,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
                                                     CardInfoPictureWithTextOverlayWidget *instance,
                                                     const QString &zoneName)
 {
-    auto card = instance->getCard();
+    const auto card = instance->getCard();
 
     // Get the model index for the card
     QModelIndex idx = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
@@ -219,7 +219,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 
     // Normal selection behavior
     if (event->button() == Qt::LeftButton) {
-        Qt::KeyboardModifiers mods = event->modifiers();
+        const Qt::KeyboardModifiers mods = event->modifiers();
         QItemSelectionModel::SelectionFlags flags;
 
         if (mods.testFlag(Qt::ControlModifier)) {
@@ -232,7 +232,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
                 anchor = idx;
             }
 
-            QItemSelection range(anchor, idx);
+            const QItemSelection range(anchor, idx);
             sel->select(range, QItemSelectionModel::SelectCurrent);
             sel->setCurrentIndex(idx, QItemSelectionModel::NoUpdate);
             return;
@@ -264,7 +264,7 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
 bool TabDeckEditorVisual::actSaveDeckAs()
 {
     tabContainer->visualDeckView->searchBar->setEnabled(false);
-    auto result = AbstractTabDeckEditor::actSaveDeckAs();
+    const auto result = AbstractTabDeckEditor::actSaveDeckAs();
     tabContainer->visualDeckView->searchBar->setEnabled(true);
     return result;
 }
@@ -298,7 +298,7 @@ void TabDeckEditorVisual::freeDocksSize()
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */
 void TabDeckEditorVisual::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditorVisual/aResetLayout"));
 }
 
@@ -455,7 +455,7 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
 /** @brief Toggles dock visibility based on the corresponding menu action. */
 void TabDeckEditorVisual::dockVisibleTriggered()
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == aCardInfoDockVisible) {
         cardInfoDockWidget->setHidden(!aCardInfoDockVisible->isChecked());
         aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
@@ -484,7 +484,7 @@ void TabDeckEditorVisual::dockVisibleTriggered()
 /** @brief Toggles dock floating state based on the corresponding menu action. */
 void TabDeckEditorVisual::dockFloatingTriggered()
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == aCardInfoDockFloating) {
         cardInfoDockWidget->setFloating(aCardInfoDockFloating->isChecked());
         return;
@@ -509,7 +509,7 @@ void TabDeckEditorVisual::dockFloatingTriggered()
 /** @brief Updates menu checkboxes when a dock's top-level/floating state changes. */
 void TabDeckEditorVisual::dockTopLevelChanged(bool topLevel)
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == cardInfoDockWidget) {
         aCardInfoDockFloating->setChecked(topLevel);
         return;

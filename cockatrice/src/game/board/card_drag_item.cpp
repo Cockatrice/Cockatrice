@@ -29,7 +29,7 @@ void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
-    QList<QGraphicsItem *> colliding =
+    const QList<QGraphicsItem *> colliding =
         scene()->items(cursorScenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder,
                        static_cast<GameScene *>(scene())->getViewTransform());
 
@@ -55,7 +55,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     if (!cursorZone) {
         // Avoid the cards getting stuck visually when not over
         // any zone.
-        QPointF newPos = cursorScenePos - hotSpot;
+        const QPointF newPos = cursorScenePos - hotSpot;
 
         if (newPos != pos()) {
             for (int i = 0; i < childDrags.size(); i++)
@@ -66,8 +66,8 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         return;
     }
 
-    QPointF zonePos = currentZone->scenePos();
-    QPointF cursorPosInZone = cursorScenePos - zonePos;
+    const QPointF zonePos = currentZone->scenePos();
+    const QPointF cursorPosInZone = cursorScenePos - zonePos;
 
     // If we are on a Table, we center the card around the cursor, because we
     // snap it into place and no longer see it being dragged.
@@ -82,7 +82,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     else
         closestGridPoint = cursorPosInZone - hotSpot;
 
-    QPointF newPos = zonePos + closestGridPoint;
+    const QPointF newPos = zonePos + closestGridPoint;
 
     if (newPos != pos()) {
         for (int i = 0; i < childDrags.size(); i++)
@@ -90,7 +90,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         setPos(newPos);
 
         bool newOccupied = false;
-        TableZone *table = qobject_cast<TableZone *>(cursorZone);
+        const TableZone *table = qobject_cast<TableZone *>(cursorZone);
         if (table)
             if (table->getCardFromCoords(closestGridPoint))
                 newOccupied = true;
@@ -105,7 +105,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     setCursor(Qt::OpenHandCursor);
     QGraphicsScene *sc = scene();
-    QPointF sp = pos();
+    const QPointF sp = pos();
     sc->removeItem(this);
 
     QList<CardDragItem *> dragItemList;

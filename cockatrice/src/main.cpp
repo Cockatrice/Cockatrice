@@ -62,12 +62,12 @@ static void CockatriceLogger(QtMsgType type, const QMessageLogContext &ctx, cons
     QString logMessage = qFormatLogMessage(type, ctx, message);
 
     // Regular expression to match the full path in the square brackets and extract only the filename and line number
-    QRegularExpression regex(R"(\[(?:.:)?[\/\\].*[\/\\]([^\/\\]+\:\d+)\])");
-    QRegularExpressionMatch match = regex.match(logMessage);
+    const QRegularExpression regex(R"(\[(?:.:)?[\/\\].*[\/\\]([^\/\\]+\:\d+)\])");
+    const QRegularExpressionMatch match = regex.match(logMessage);
 
     if (match.hasMatch()) {
         // Extract the filename and line number (e.g., "main.cpp:211")
-        QString filenameLine = match.captured(1);
+        const QString filenameLine = match.captured(1);
 
         // Replace the full path in square brackets with just the filename and line number
         logMessage.replace(match.captured(0), QString("[%1]").arg(filenameLine));
@@ -108,7 +108,7 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
     // Create and write crash files
 #ifdef UNICODE
-    HANDLE hDumpFile =
+    const HANDLE hDumpFile =
         CreateFile(path.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 #else
     HANDLE hDumpFile =
@@ -131,16 +131,16 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    const QString lang = SettingsCache::instance().getLang();
 
-    QString qtNameHint = "qt_" + lang;
+    const QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+    const QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
 #else
     QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 #endif
 
-    bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
+    const bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
         qCWarning(QtTranslatorDebug) << "Unable to load qt translation" << qtNameHint << "at" << qtTranslationPath;
     } else {
@@ -148,8 +148,8 @@ void installNewTranslator()
     }
     qApp->installTranslator(qtTranslator);
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
+    const QString appNameHint = translationPrefix + "_" + lang;
+    const bool appTranslationLoaded = qtTranslator->load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
         qCWarning(QtTranslatorDebug) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
                                      << translationPath;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
-    QApplication app(argc, argv);
+    const QApplication app(argc, argv);
 
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 

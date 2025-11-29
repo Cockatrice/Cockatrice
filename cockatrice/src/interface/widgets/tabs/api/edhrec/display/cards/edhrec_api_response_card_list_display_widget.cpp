@@ -18,7 +18,7 @@ EdhrecApiResponseCardListDisplayWidget::EdhrecApiResponseCardListDisplayWidget(Q
     header->setBuddy(flowWidget);
 
     foreach (EdhrecApiResponseCardDetails card_detail, toDisplay.cardViews) {
-        auto widget = new EdhrecApiResponseCardDetailsDisplayWidget(flowWidget, card_detail);
+        const auto widget = new EdhrecApiResponseCardDetailsDisplayWidget(flowWidget, card_detail);
         flowWidget->addWidget(widget);
     }
 

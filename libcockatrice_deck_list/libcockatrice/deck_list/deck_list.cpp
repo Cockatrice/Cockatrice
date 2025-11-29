@@ -98,7 +98,7 @@ DeckList::~DeckList()
 
 QList<MoveCard_ToZone> DeckList::getCurrentSideboardPlan()
 {
-    SideboardPlan *current = sideboardPlans.value(QString(), 0);
+    const SideboardPlan *current = sideboardPlans.value(QString(), 0);
     if (!current)
         return QList<MoveCard_ToZone>();
     else
@@ -127,8 +127,8 @@ bool DeckList::readElement(QXmlStreamReader *xml)
         } else if (childName == "comments") {
             comments = xml->readElementText();
         } else if (childName == "bannerCard") {
-            QString providerId = xml->attributes().value("providerId").toString();
-            QString cardName = xml->readElementText();
+            const QString providerId = xml->attributes().value("providerId").toString();
+            const QString cardName = xml->readElementText();
             bannerCard = {cardName, providerId};
         } else if (childName == "tags") {
             tags.clear(); // Clear existing tags
@@ -513,7 +513,7 @@ void DeckList::cleanList(bool preserveMetadata)
 void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
 {
     for (int i = 0; i < item->size(); ++i) {
-        auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+        const auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
 
         if (node) {
             result.insert(node->getName());
@@ -526,7 +526,7 @@ void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
 void DeckList::getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result)
 {
     for (int i = 0; i < item->size(); ++i) {
-        auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
+        const auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
 
         if (node) {
             result.append(node->toCardRef());
@@ -577,13 +577,13 @@ int DeckList::getSideboardSize() const
 {
     int size = 0;
     for (int i = 0; i < root->size(); ++i) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        const auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
         if (node->getName() != DECK_ZONE_SIDE) {
             continue;
         }
 
         for (int j = 0; j < node->size(); j++) {
-            auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            const auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
             size += card->getNumber();
         }
     }
@@ -621,7 +621,7 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
         updateHash = true;
     }
 
-    int index = rootNode->indexOf(node);
+    const int index = rootNode->indexOf(node);
     if (index != -1) {
         delete rootNode->takeAt(index);
 
@@ -661,11 +661,11 @@ static QString computeDeckHash(const InnerDecklistNode *root)
     optionalZones << DECK_ZONE_TOKENS;             // Optional zones in deck not included in hashing process
 
     for (int i = 0; i < root->size(); i++) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        const auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
         for (int j = 0; j < node->size(); j++) {
             if (hashZones.contains(node->getName())) // Mainboard or Sideboard
             {
-                auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+                const auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
                 for (int k = 0; k < card->getNumber(); ++k) {
                     cardList.append((node->getName() == DECK_ZONE_SIDE ? "SB:" : "") + card->getName().toLower());
                 }
@@ -674,10 +674,10 @@ static QString computeDeckHash(const InnerDecklistNode *root)
     }
     cardList.sort();
     QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
-    quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
-                     (((quint64)(unsigned char)deckHashArray[1]) << 24) +
-                     (((quint64)(unsigned char)deckHashArray[2] << 16)) +
-                     (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
+    const quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
+                           (((quint64)(unsigned char)deckHashArray[1]) << 24) +
+                           (((quint64)(unsigned char)deckHashArray[2] << 16)) +
+                           (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
     return QString::number(number, 32).rightJustified(8, '0');
 }
 

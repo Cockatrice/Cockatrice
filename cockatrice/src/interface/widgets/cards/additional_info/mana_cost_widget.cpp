@@ -19,7 +19,7 @@ ManaCostWidget::ManaCostWidget(QWidget *parent, CardInfoPtr _card) : QWidget(par
     setFixedHeight(50); // Fixed height
 
     if (card) {
-        QString manaCost = card->getManaCost();        // Get mana cost string
+        const QString manaCost = card->getManaCost();  // Get mana cost string
         QStringList symbols = parseManaCost(manaCost); // Parse mana cost string
 
         for (const QString &symbol : symbols) {
@@ -35,13 +35,13 @@ void ManaCostWidget::resizeEvent(QResizeEvent *event)
     QList<ManaSymbolWidget *> manaSymbols = findChildren<ManaSymbolWidget *>();
 
     if (!manaSymbols.isEmpty()) {
-        int totalWidth = event->size().width();
-        int spacing = layout->spacing();
-        int count = manaSymbols.size();
+        const int totalWidth = event->size().width();
+        const int spacing = layout->spacing();
+        const int count = manaSymbols.size();
 
         // Available width minus total spacing
-        int availableWidth = totalWidth - (spacing * (count - 1));
-        int iconSize = qMin(50, availableWidth / count);
+        const int availableWidth = totalWidth - (spacing * (count - 1));
+        const int iconSize = qMin(50, availableWidth / count);
 
         for (ManaSymbolWidget *manaSymbol : manaSymbols) {
             manaSymbol->setFixedSize(iconSize, iconSize);

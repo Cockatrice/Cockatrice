@@ -23,7 +23,7 @@ int CardSetList::getEnabledSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
+        const CardSetPtr set = at(i);
         if (set && set->getEnabled()) {
             ++num;
         }
@@ -35,7 +35,7 @@ int CardSetList::getUnknownSetsNum()
 {
     int num = 0;
     for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
+        const CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             ++num;
         }
@@ -47,7 +47,7 @@ QStringList CardSetList::getUnknownSetsNames()
 {
     QStringList sets = QStringList();
     for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
+        const CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             sets << set->getShortName();
         }
@@ -58,7 +58,7 @@ QStringList CardSetList::getUnknownSetsNames()
 void CardSetList::enableAllUnknown()
 {
     for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
+        const CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(true);
@@ -89,7 +89,7 @@ void CardSetList::enableAll()
 void CardSetList::markAllAsKnown()
 {
     for (int i = 0; i < size(); ++i) {
-        CardSetPtr set = at(i);
+        const CardSetPtr set = at(i);
         if (set && !set->getIsKnown() && !set->getIsKnownIgnored()) {
             set->setIsKnown(true);
             set->setEnabled(false);

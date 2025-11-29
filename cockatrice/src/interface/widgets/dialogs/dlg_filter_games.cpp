@@ -261,7 +261,7 @@ int DlgFilterGames::getMaxPlayersFilterMax() const
 
 QTime DlgFilterGames::getMaxGameAge() const
 {
-    int index = maxGameAgeComboBox->currentIndex();
+    const int index = maxGameAgeComboBox->currentIndex();
     if (index < 0 || index >= gameAgeMap.size()) { // index is out of bounds
         return gamesProxyModel->getMaxGameAge();   // leave the setting unchanged
     }

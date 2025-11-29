@@ -14,8 +14,8 @@ QJsonObject CardFilter::toJson() const
 CardFilter *CardFilter::fromJson(const QJsonObject &obj)
 {
     QString term = obj["term"].toString();
-    QString typeStr = obj["type"].toString();
-    QString attrStr = obj["attr"].toString();
+    const QString typeStr = obj["type"].toString();
+    const QString attrStr = obj["attr"].toString();
 
     Type type = TypeEnd;
     Attr attr = AttrEnd;

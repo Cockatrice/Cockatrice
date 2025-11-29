@@ -17,7 +17,7 @@ ShortcutsSettings::ShortcutsSettings(const QString &settingsPath, QObject *paren
     settingsFilePath = settingsPath;
     settingsFilePath.append("shortcuts.ini");
 
-    bool exists = QFile(settingsFilePath).exists();
+    const bool exists = QFile(settingsFilePath).exists();
 
     QSettings shortCutsFile(settingsFilePath, QSettings::IniFormat);
 
@@ -76,7 +76,7 @@ void ShortcutsSettings::migrateShortcuts()
         if (shortCutsFile.contains("Textbox/unfocusTextBox")) {
             qCInfo(ShortcutsSettingsLog)
                 << "[ShortcutsSettings] Textbox/unfocusTextBox shortcut found. Migrating to Player/unfocusTextBox.";
-            QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
+            const QString unfocusTextBox = shortCutsFile.value("Textbox/unfocusTextBox", "").toString();
             this->setShortcuts("Player/unfocusTextBox", unfocusTextBox);
             shortCutsFile.remove("Textbox/unfocusTextBox");
         }
@@ -84,7 +84,7 @@ void ShortcutsSettings::migrateShortcuts()
         if (shortCutsFile.contains("tab_game/aFocusChat")) {
             qCInfo(ShortcutsSettingsLog)
                 << "[ShortcutsSettings] tab_game/aFocusChat shortcut found. Migrating to Player/aFocusChat.";
-            QString aFocusChat = shortCutsFile.value("tab_game/aFocusChat", "").toString();
+            const QString aFocusChat = shortCutsFile.value("tab_game/aFocusChat", "").toString();
             this->setShortcuts("Player/aFocusChat", aFocusChat);
             shortCutsFile.remove("tab_game/aFocusChat");
         }
@@ -92,7 +92,7 @@ void ShortcutsSettings::migrateShortcuts()
         // PR #5564 changes "MainWindow/aDeckEditor" to "Tabs/aTabDeckEditor"
         if (shortCutsFile.contains("MainWindow/aDeckEditor")) {
             qCInfo(ShortcutsSettingsLog) << "MainWindow/aDeckEditor shortcut found. Migrating to Tabs/aTabDeckEditor.";
-            QString keySequence = shortCutsFile.value("MainWindow/aDeckEditor", "").toString();
+            const QString keySequence = shortCutsFile.value("MainWindow/aDeckEditor", "").toString();
             this->setShortcuts("Tabs/aTabDeckEditor", keySequence);
             shortCutsFile.remove("MainWindow/aDeckEditor");
         }
@@ -217,10 +217,10 @@ bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &sequenc
     if (name.startsWith("Player") || name.startsWith("Replays")) {
         return true;
     }
-    QString checkSequence = sequences.split(sep).last();
-    QStringList forbiddenKeys{"Del",        "Backspace", "Down",  "Up",         "Left",       "Right",
-                              "Return",     "Enter",     "Menu",  "Ctrl+Alt+-", "Ctrl+Alt+=", "Ctrl+Alt+[",
-                              "Ctrl+Alt+]", "Tab",       "Space", "Shift+S",    "Shift+Left", "Shift+Right"};
+    const QString checkSequence = sequences.split(sep).last();
+    const QStringList forbiddenKeys{"Del",        "Backspace", "Down",  "Up",         "Left",       "Right",
+                                    "Return",     "Enter",     "Menu",  "Ctrl+Alt+-", "Ctrl+Alt+=", "Ctrl+Alt+[",
+                                    "Ctrl+Alt+]", "Tab",       "Space", "Shift+S",    "Shift+Left", "Shift+Right"};
     return !forbiddenKeys.contains(checkSequence);
 }
 
@@ -246,8 +246,8 @@ static bool isAlwaysActiveShortcut(const QString &shortcutName)
 
 QStringList ShortcutsSettings::findOverlaps(const QString &name, const QString &sequences) const
 {
-    QString checkSequence = sequences.split(sep).last();
-    QString checkKey = name.left(name.indexOf("/"));
+    const QString checkSequence = sequences.split(sep).last();
+    const QString checkKey = name.left(name.indexOf("/"));
 
     QStringList overlaps;
     for (const auto &key : shortCuts.keys()) {

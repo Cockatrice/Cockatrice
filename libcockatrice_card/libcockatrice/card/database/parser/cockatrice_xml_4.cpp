@@ -31,7 +31,7 @@ bool CockatriceXml4Parser::getCanParseFile(const QString &fileName, QIODevice &d
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::StartElement) {
             if (xml.name().toString() == COCKATRICE_XML4_TAGNAME) {
-                int version = xml.attributes().value("version").toString().toInt();
+                const int version = xml.attributes().value("version").toString().toInt();
                 if (version == COCKATRICE_XML4_TAGVER) {
                     return true;
                 } else {
@@ -73,7 +73,7 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
     }
 
     if (xml.hasError()) {
-        QString preamble = tr("Parse error at line %1 col %2:").arg(xml.lineNumber()).arg(xml.columnNumber());
+        const QString preamble = tr("Parse error at line %1 col %2:").arg(xml.lineNumber()).arg(xml.columnNumber());
         qCWarning(CockatriceXml4Log).noquote() << preamble << xml.errorString();
     }
 }
@@ -331,7 +331,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
 
     // related cards
     const QList<CardRelation *> related = info->getRelatedCards();
-    for (auto i : related) {
+    for (const auto i : related) {
         xml.writeStartElement("related");
         if (i->getDoesAttach()) {
             xml.writeAttribute("attach", i->getAttachTypeAsString());
@@ -355,7 +355,7 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         xml.writeEndElement();
     }
     const QList<CardRelation *> reverseRelated = info->getReverseRelatedCards();
-    for (auto i : reverseRelated) {
+    for (const auto i : reverseRelated) {
         xml.writeStartElement("reverse-related");
         if (i->getDoesAttach()) {
             xml.writeAttribute("attach", i->getAttachTypeAsString());

@@ -166,7 +166,7 @@ void TabDeckEditor::retranslateUi()
 /** @brief Refreshes shortcuts for deck editor menu actions. */
 void TabDeckEditor::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
 }
 
@@ -299,7 +299,7 @@ void TabDeckEditor::freeDocksSize()
 /** @brief Handles dock visibility toggling from menu actions. */
 void TabDeckEditor::dockVisibleTriggered()
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == aCardInfoDockVisible) {
         cardInfoDockWidget->setHidden(!aCardInfoDockVisible->isChecked());
         aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
@@ -318,7 +318,7 @@ void TabDeckEditor::dockVisibleTriggered()
 /** @brief Handles dock floating toggling from menu actions. */
 void TabDeckEditor::dockFloatingTriggered()
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == aCardInfoDockFloating)
         cardInfoDockWidget->setFloating(aCardInfoDockFloating->isChecked());
     else if (o == aDeckDockFloating)
@@ -332,7 +332,7 @@ void TabDeckEditor::dockFloatingTriggered()
 /** @brief Syncs menu state with dock floating changes. */
 void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 {
-    QObject *o = sender();
+    const QObject *o = sender();
     if (o == cardInfoDockWidget)
         aCardInfoDockFloating->setChecked(topLevel);
     else if (o == deckDockWidget)

@@ -11,7 +11,7 @@ CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *p
 
 void CardCounterSettings::setColor(int counterId, const QColor &color)
 {
-    QString key = QString("cards/counters/%1/color").arg(counterId);
+    const QString key = QString("cards/counters/%1/color").arg(counterId);
 
     if (settings.value(key).value<QColor>() == color)
         return;
@@ -29,9 +29,9 @@ QColor CardCounterSettings::color(int counterId) const
         defaultColor = QColor::fromHsv(counterId * 60, 150, 255);
     } else {
         // Future-proof support for more counters with pseudo-random colors
-        int h = (counterId * 37) % 360;
-        int s = 128 + 64 * qSin((counterId * 97) * 0.1);   // 64-192
-        int v = 196 + 32 * qSin((counterId * 101) * 0.07); // 164-228
+        const int h = (counterId * 37) % 360;
+        const int s = 128 + 64 * qSin((counterId * 97) * 0.1);   // 64-192
+        const int v = 196 + 32 * qSin((counterId * 101) * 0.07); // 164-228
 
         defaultColor = QColor::fromHsv(h, s, v);
     }
@@ -43,7 +43,7 @@ QString CardCounterSettings::displayName(int counterId) const
 {
     // Currently, card counters name are fixed to A, B, ..., Z, AA, AB, ...
 
-    auto nChars = 1 + counterId / 26;
+    const auto nChars = 1 + counterId / 26;
     QString str;
     str.resize(nChars);
 

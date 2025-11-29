@@ -23,7 +23,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
 #else
                fm.width(numStr);
 #endif
-    double h = fm.height() * 1.3;
+    const double h = fm.height() * 1.3;
     if (w < h)
         w = h;
 
@@ -34,9 +34,9 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     if (position == -1)
         textRect = QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h);
     else {
-        qreal xOffset = 10;
-        qreal yOffset = 20;
-        qreal spacing = 2;
+        const qreal xOffset = 10;
+        const qreal yOffset = 20;
+        const qreal spacing = 2;
         if (position < 2)
             textRect = QRectF(count == 1 ? ((boundingRect().width() - w) / 2.0)
                                          : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)),
@@ -59,7 +59,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
 int resetPainterTransform(QPainter *painter)
 {
     painter->resetTransform();
-    auto tx = painter->deviceTransform().inverted();
+    const auto tx = painter->deviceTransform().inverted();
     painter->setTransform(tx);
     return tx.isScaling() ? 1.0 / tx.m11() : 1;
 }

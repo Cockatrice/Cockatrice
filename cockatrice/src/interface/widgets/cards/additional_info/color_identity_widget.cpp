@@ -83,14 +83,14 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     QList<ManaSymbolWidget *> manaSymbols = findChildren<ManaSymbolWidget *>();
 
     if (!manaSymbols.isEmpty()) {
-        int totalWidth = event->size().width();
-        int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
+        const int totalWidth = event->size().width();
+        const int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
         setFixedHeight(totalHeight);
 
-        int spacing = layout->spacing();
-        int count = manaSymbols.size();
-        int availableWidth = totalWidth - (spacing * (count - 1));
-        int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
+        const int spacing = layout->spacing();
+        const int count = manaSymbols.size();
+        const int availableWidth = totalWidth - (spacing * (count - 1));
+        const int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
 
         for (ManaSymbolWidget *manaSymbol : manaSymbols) {
             manaSymbol->setFixedSize(iconSize, iconSize);

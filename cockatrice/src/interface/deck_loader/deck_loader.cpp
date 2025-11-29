@@ -99,7 +99,7 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
         emit loadFinished(result);
     });
 
-    QFuture<bool> future = QtConcurrent::run([=, this]() {
+    const QFuture<bool> future = QtConcurrent::run([=, this]() {
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             return false;
@@ -129,7 +129,7 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, FileFormat fmt, bool
 
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
-    bool result = deckList->loadFromString_Native(nativeString);
+    const bool result = deckList->loadFromString_Native(nativeString);
     if (result) {
         lastLoadInfo = {
             .remoteDeckId = remoteDeckId,
@@ -174,13 +174,13 @@ bool DeckLoader::saveToFile(const QString &fileName, FileFormat fmt)
 
 bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt)
 {
-    QFileInfo fileInfo(fileName);
+    const QFileInfo fileInfo(fileName);
     if (!fileInfo.exists()) {
         qCWarning(DeckLoaderLog) << "File does not exist:" << fileName;
         return false;
     }
 
-    QDateTime originalTimestamp = fileInfo.lastModified();
+    const QDateTime originalTimestamp = fileInfo.lastModified();
 
     // Open the file for writing
     QFile file(fileName);
@@ -285,7 +285,7 @@ QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsi
     // Set up the function to call
     auto formatDeckListForExport = [&mainBoardCards, &sideBoardCards](const auto *node, const auto *card) {
         // Get the card name
-        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
+        const CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
         if (!dbCard || dbCard->getIsToken()) {
             // If it's a token, we don't care about the card.
             return;
@@ -328,10 +328,10 @@ struct SetProviderIdToPreferred
     void operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
     {
         Q_UNUSED(node);
-        PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
-        QString providerId = preferredPrinting.getUuid();
-        QString setShortName = preferredPrinting.getSet()->getShortName();
-        QString collectorNumber = preferredPrinting.getProperty("num");
+        const PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
+        const QString providerId = preferredPrinting.getUuid();
+        const QString setShortName = preferredPrinting.getSet()->getShortName();
+        const QString collectorNumber = preferredPrinting.getProperty("num");
 
         card->setCardProviderId(providerId);
         card->setCardCollectorNumber(collectorNumber);
@@ -481,7 +481,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
     for (int j = 0; j < zoneNode->size(); j++) {
         auto *card = dynamic_cast<DecklistCardNode *>(zoneNode->at(j));
 
-        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
+        const CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
         QString cardType = info ? info->getMainCardType() : "unknown";
 
         cardsByType.insert(cardType, card);
@@ -505,7 +505,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
             out << "// " << cardTotalByType[cardType] << " " << cardType << "\n";
         }
 
-        QList<DecklistCardNode *> cards = cardsByType.values(cardType);
+        const QList<DecklistCardNode *> cards = cardsByType.values(cardType);
 
         saveToStream_DeckZoneCards(out, zoneNode, cards, addComments, addSetNameAndNumber);
 
@@ -523,7 +523,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
-        DecklistCardNode *card = cards[i];
+        const DecklistCardNode *card = cards[i];
 
         if (zoneNode->getName() == DECK_ZONE_SIDE && addComments) {
             out << "SB: ";
@@ -551,8 +551,8 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
 bool DeckLoader::convertToCockatriceFormat(QString fileName)
 {
     // Change the file extension to .cod
-    QFileInfo fileInfo(fileName);
-    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
+    const QFileInfo fileInfo(fileName);
+    const QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
     // Open the new file for writing
     QFile file(newFileName);
@@ -599,7 +599,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
 
 QString DeckLoader::getCardZoneFromName(const QString &cardName, QString currentZoneName)
 {
-    CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
+    const CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
 
     if (card && card->getIsToken()) {
         return DECK_ZONE_TOKENS;
@@ -611,7 +611,7 @@ QString DeckLoader::getCardZoneFromName(const QString &cardName, QString current
 QString DeckLoader::getCompleteCardName(const QString &cardName)
 {
     if (CardDatabaseManager::getInstance()) {
-        ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
+        const ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
         if (temp) {
             return temp.getName();
         }
@@ -625,7 +625,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
     const int totalColumns = 2;
 
     if (node->height() == 1) {
-        QTextBlockFormat blockFormat;
+        const QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
         charFormat.setFontPointSize(11);
         charFormat.setFontWeight(QFont::Bold);
@@ -635,9 +635,9 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
         tableFormat.setCellPadding(0);
         tableFormat.setCellSpacing(0);
         tableFormat.setBorder(0);
-        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
+        const QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
         for (int i = 0; i < node->size(); i++) {
-            auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
+            const auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
 
             QTextCharFormat cellCharFormat;
             cellCharFormat.setFontPointSize(9);
@@ -653,7 +653,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
             cellCursor.insertText(card->getName());
         }
     } else if (node->height() == 2) {
-        QTextBlockFormat blockFormat;
+        const QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
         charFormat.setFontPointSize(14);
         charFormat.setFontWeight(QFont::Bold);
@@ -670,7 +670,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
         }
         tableFormat.setColumnWidthConstraints(constraints);
 
-        QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
+        const QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
         for (int i = 0; i < node->size(); i++) {
             QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
             printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
@@ -690,7 +690,7 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
 
     QTextCursor cursor(&doc);
 
-    QTextBlockFormat headerBlockFormat;
+    const QTextBlockFormat headerBlockFormat;
     QTextCharFormat headerCharFormat;
     headerCharFormat.setFontPointSize(16);
     headerCharFormat.setFontWeight(QFont::Bold);

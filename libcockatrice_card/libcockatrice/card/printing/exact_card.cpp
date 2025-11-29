@@ -52,8 +52,8 @@ const CardInfo &ExactCard::getInfo() const
  */
 QString ExactCard::getPixmapCacheKey() const
 {
-    QString uuid = printing.getUuid();
-    QString suffix = uuid.isEmpty() ? "" : "_" + uuid;
+    const QString uuid = printing.getUuid();
+    const QString suffix = uuid.isEmpty() ? "" : "_" + uuid;
     return QLatin1String("card_") + card->getName() + suffix;
 }
 

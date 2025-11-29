@@ -56,7 +56,7 @@ void DlgLoadDeckFromWebsite::accept()
     if (DeckLinkToApiTransformer::parseDeckUrl(urlEdit->text(), info)) {
         qCInfo(DlgLoadDeckFromWebsiteLog) << info.baseUrl << info.deckID << info.fullUrl;
 
-        auto jsonParser = createParserForProvider(info.provider);
+        const auto jsonParser = createParserForProvider(info.provider);
         if (!jsonParser && info.provider != DeckProvider::Deckstats && info.provider != DeckProvider::TappedOut) {
             qCWarning(DlgLoadDeckFromWebsiteLog) << "No parser found for provider";
             QMessageBox::warning(this, tr("Load Deck from Website"),
@@ -66,7 +66,7 @@ void DlgLoadDeckFromWebsite::accept()
             return;
         }
 
-        QNetworkRequest request(QUrl(info.fullUrl));
+        const QNetworkRequest request(QUrl(info.fullUrl));
         QNetworkReply *reply = nam->get(request);
 
         QEventLoop loop;
@@ -81,7 +81,7 @@ void DlgLoadDeckFromWebsite::accept()
             return;
         }
 
-        QByteArray responseData = reply->readAll();
+        const QByteArray responseData = reply->readAll();
         reply->deleteLater();
 
         // Special handling for Deckstats and TappedOut .txt
@@ -107,7 +107,7 @@ void DlgLoadDeckFromWebsite::accept()
 
         // Normal JSON parsing for other providers
         QJsonParseError parseError;
-        QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
+        const QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
             qCWarning(DlgLoadDeckFromWebsiteLog) << "JSON parse error:" << parseError.errorString();
             QMessageBox::warning(this, tr("Load Deck from Website"),

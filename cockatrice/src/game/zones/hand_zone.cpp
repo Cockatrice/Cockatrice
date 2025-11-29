@@ -26,7 +26,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
                                CardZoneLogic *startZone,
                                const QPoint &dropPoint)
 {
-    QPoint point = dropPoint + scenePos().toPoint();
+    const QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
     if (SettingsCache::instance().getHorizontalHand()) {
         for (x = 0; x < getLogic()->getCards().size(); x++)
@@ -62,7 +62,7 @@ QRectF HandZone::boundingRect() const
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Hand, getLogic()->getPlayer()->getZoneId());
+    const QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Hand, getLogic()->getPlayer()->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -71,10 +71,10 @@ void HandZone::reorganizeCards()
     if (!getLogic()->getCards().isEmpty()) {
         const int cardCount = getLogic()->getCards().size();
         if (SettingsCache::instance().getHorizontalHand()) {
-            bool leftJustified = SettingsCache::instance().getLeftJustified();
-            qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
+            const bool leftJustified = SettingsCache::instance().getLeftJustified();
+            const qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
-            qreal totalWidth =
+            const qreal totalWidth =
                 leftJustified ? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
 
             for (int i = 0; i < cardCount; i++) {
@@ -84,7 +84,7 @@ void HandZone::reorganizeCards()
                 if (cardWidth * cardCount > totalWidth)
                     c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
                 else {
-                    qreal xPosition =
+                    const qreal xPosition =
                         leftJustified ? xPadding + ((qreal)i) * cardWidth
                                       : xPadding + ((qreal)i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
                     c->setPos(xPosition, 5);
@@ -92,17 +92,17 @@ void HandZone::reorganizeCards()
                 c->setRealZValue(i);
             }
         } else {
-            qreal totalWidth = boundingRect().width();
-            qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
-            qreal xspace = 5;
-            qreal x1 = xspace;
-            qreal x2 = totalWidth - xspace - cardWidth;
+            const qreal totalWidth = boundingRect().width();
+            const qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
+            const qreal xspace = 5;
+            const qreal x1 = xspace;
+            const qreal x2 = totalWidth - xspace - cardWidth;
 
             for (int i = 0; i < cardCount; i++) {
                 CardItem *card = getLogic()->getCards().at(i);
-                qreal x = (i % 2) ? x2 : x1;
-                qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
-                                                getLogic()->getCards().at(0)->boundingRect().height());
+                const qreal x = (i % 2) ? x2 : x1;
+                const qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
+                                                      getLogic()->getCards().at(0)->boundingRect().height());
                 card->setPos(x, y);
                 card->setRealZValue(i);
             }

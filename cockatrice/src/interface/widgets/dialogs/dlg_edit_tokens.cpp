@@ -162,11 +162,11 @@ void DlgEditTokens::actAddToken()
         }
     }
 
-    QString setName = CardSet::TOKENS_SETNAME;
+    const QString setName = CardSet::TOKENS_SETNAME;
     SetToPrintingsMap sets;
     sets[setName].append(PrintingInfo(databaseModel->getDatabase()->getSet(setName)));
-    CardInfo::UiAttributes attributes = {.tableRow = -1};
-    CardInfoPtr card = CardInfo::newInstance(name, "", true, {}, {}, {}, sets, attributes);
+    const CardInfo::UiAttributes attributes = {.tableRow = -1};
+    const CardInfoPtr card = CardInfo::newInstance(name, "", true, {}, {}, {}, sets, attributes);
     card->setCardType("Token");
 
     databaseModel->getDatabase()->addCard(card);
@@ -175,7 +175,7 @@ void DlgEditTokens::actAddToken()
 void DlgEditTokens::actRemoveToken()
 {
     if (currentCard) {
-        CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
+        const CardInfoPtr cardToRemove = currentCard; // the currentCard property gets modified during db->removeCard()
         currentCard.clear();
         databaseModel->getDatabase()->removeCard(cardToRemove);
     }

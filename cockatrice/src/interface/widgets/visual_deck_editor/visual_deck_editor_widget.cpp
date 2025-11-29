@@ -43,7 +43,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
         if (!searchBar->hasFocus())
             return;
 
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+        const ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
@@ -74,7 +74,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     connect(searchBar, &QLineEdit::textEdited, searchModel, &CardSearchModel::updateSearchResults);
     connect(searchBar, &QLineEdit::textEdited, this, [=, this](const QString &text) {
         // Ensure substring matching
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
         proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
 
         if (!text.isEmpty()) {
@@ -95,7 +95,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     connect(searchBar, &QLineEdit::textEdited, this, [=, this](const QString &text) {
         if (searchBar->hasFocus() && !searchBar->completer()->popup()->isVisible()) {
             // Allow text to change when typing, but not when navigating the completer
-            QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+            const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
             proxyModel->setFilterRegularExpression(
                 QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
         }
@@ -104,7 +104,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     // Search button functionality
     searchPushButton = new QPushButton(this);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+        const ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
@@ -276,7 +276,7 @@ void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, 
 void VisualDeckEditorWidget::clearAllDisplayWidgets()
 {
     for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
+        const auto displayWidget = indexToWidgetMap.value(idx);
         zoneContainerLayout->removeWidget(displayWidget);
         indexToWidgetMap.remove(idx);
         delete displayWidget;
@@ -404,7 +404,7 @@ void VisualDeckEditorWidget::actChangeActiveSortCriteria()
 {
     QStringList selectedCriteria;
     for (int i = 0; i < sortByListWidget->count(); ++i) {
-        QListWidgetItem *item = sortByListWidget->item(i);
+        const QListWidgetItem *item = sortByListWidget->item(i);
         selectedCriteria.append(item->text()); // Collect user-defined sort order
     }
 

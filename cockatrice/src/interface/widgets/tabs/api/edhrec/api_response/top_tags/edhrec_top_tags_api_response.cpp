@@ -7,7 +7,7 @@ void EdhrecTopTagsApiResponse::fromJson(const QJsonObject &json)
 {
     header = json.value("header").toString();
     description = json.value("description").toString();
-    QJsonObject containerJson = json.value("container").toObject();
+    const QJsonObject containerJson = json.value("container").toObject();
     container.fromJson(containerJson);
 }
 

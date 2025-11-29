@@ -82,15 +82,15 @@ void VisualDatabaseDisplaySubTypeFilterWidget::createSubTypeButtons()
 
 void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility()
 {
-    int threshold = spinBox->value();
-    QString filterText = searchBox->text().trimmed().toLower();
+    const int threshold = spinBox->value();
+    const QString filterText = searchBox->text().trimmed().toLower();
 
     // Iterate through buttons and hide/disable those below the threshold
     for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
         QString subType = it.key().toLower();
-        bool isActive = activeSubTypes.value(it.key(), false);
-        bool visible = isActive || (allSubCardTypesWithCount[it.key()] >= threshold &&
-                                    (filterText.isEmpty() || subType.contains(filterText)));
+        const bool isActive = activeSubTypes.value(it.key(), false);
+        const bool visible = isActive || (allSubCardTypesWithCount[it.key()] >= threshold &&
+                                          (filterText.isEmpty() || subType.contains(filterText)));
 
         it.value()->setVisible(visible);
         it.value()->setEnabled(visible);

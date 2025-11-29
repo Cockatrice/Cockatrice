@@ -46,10 +46,10 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     connect(overlayWidget, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
             [this]() { emit cardPreferenceChanged(); });
 
-    CardSetPtr set = rootCard.getPrinting().getSet();
+    const CardSetPtr set = rootCard.getPrinting().getSet();
 
     // Create the widget to display the set name and collector's number
-    QString combinedSetName = QString(set->getLongName() + " (" + set->getShortName() + ")");
+    const QString combinedSetName = QString(set->getLongName() + " (" + set->getShortName() + ")");
     setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
         this, combinedSetName, rootCard.getPrinting().getProperty("num"), cardSizeSlider);
 
