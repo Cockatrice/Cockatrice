@@ -33,14 +33,13 @@ class BackgroundPlateWidget;
  * - Maintains a fixed aspect ratio for the preview image (150:267).
  * - Updates text elision dynamically when resized or scaled.
  * - Integrates with FlowWidget containers for scrollable deck galleries.
- * - Supports Qt5 and Qt6 enterEvent signatures for hover behavior.
  *
  * ### Signals
  * - `requestNavigation(QString url)` — emitted when the widget is clicked to request
  *   navigation to the deck's Archidekt page.
  *
  * ### Slots
- * - `actRequestNavigationToDeck()` — programmatically triggers navigation.
+ * - `actRequestNavigationToDeck()` — triggers navigation.
  * - `setScaleFactor(int scale)` — adjusts preview image scaling.
  */
 class ArchidektApiResponseDeckEntryDisplayWidget : public QWidget
@@ -49,8 +48,8 @@ class ArchidektApiResponseDeckEntryDisplayWidget : public QWidget
 
 signals:
     /**
-     * @brief Emitted when the user requests navigation to this deck.
-     * @param url Full URL to the Archidekt deck page.
+     * @brief Emitted when the user requests navigation.
+     * @param url Full URL to the Archidekt page.
      */
     void requestNavigation(QString url);
 
