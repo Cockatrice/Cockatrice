@@ -160,7 +160,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/display/dynamic_font_size_label.cpp
     src/interface/widgets/general/display/dynamic_font_size_push_button.cpp
     src/interface/widgets/general/display/labeled_input.cpp
-    src/interface/widgets/general/display/overlay_label.cpp
     src/interface/widgets/general/display/percent_bar_widget.cpp
     src/interface/widgets/general/display/shadow_background_label.cpp
     src/interface/widgets/general/home_styled_button.cpp

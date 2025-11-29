@@ -8,10 +8,10 @@ ArchidektDeckPreviewImageDisplayWidget::ArchidektDeckPreviewImageDisplayWidget(Q
     imageLabel = new QLabel(this);
     imageLabel->setAlignment(Qt::AlignCenter);
 
-    topLeftLabel = new OverlayLabel(this);
-    topRightLabel = new OverlayLabel(this);
-    bottomLeftLabel = new OverlayLabel(this);
-    bottomRightLabel = new OverlayLabel(this);
+    topLeftLabel = new ShadowBackgroundLabel(this, "");
+    topRightLabel = new ShadowBackgroundLabel(this, "");
+    bottomLeftLabel = new ShadowBackgroundLabel(this, "");
+    bottomRightLabel = new ShadowBackgroundLabel(this, "");
 
     QFont f;
     f.setBold(true);

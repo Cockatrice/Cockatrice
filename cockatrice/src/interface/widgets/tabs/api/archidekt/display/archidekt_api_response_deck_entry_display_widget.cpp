@@ -60,21 +60,21 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     // Set deck name (ellided)
     QFontMetrics fm(previewWidget->topLeftLabel->font());
     QString elided = fm.elidedText(response.getName(), Qt::ElideRight, 280);
-    previewWidget->topLeftLabel->setText(elided);
+    previewWidget->topLeftLabel->setLabelText(elided);
     previewWidget->topLeftLabel->setToolTip(response.getName());
 
     // Set count
-    previewWidget->topRightLabel->setText(QString::number(response.getSize()));
+    previewWidget->topRightLabel->setLabelText(QString::number(response.getSize()));
 
     // EDH bracket (skip if 0)
     if (response.getEDHBracket() != 0) {
-        previewWidget->bottomLeftLabel->setText(QString("EDH: %1").arg(response.getEDHBracket()));
+        previewWidget->bottomLeftLabel->setLabelText(QString("EDH: %1").arg(response.getEDHBracket()));
     } else {
         previewWidget->bottomLeftLabel->hide();
     }
 
     // Views
-    previewWidget->bottomRightLabel->setText(QString("Views: %1").arg(response.getViewCount()));
+    previewWidget->bottomRightLabel->setLabelText(QString("Views: %1").arg(response.getViewCount()));
 
     // Use preview->imageLabel for image loading
     picture = previewWidget->imageLabel;

@@ -5,7 +5,7 @@
 #ifndef COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
 #define COCKATRICE_ARCHIDEKT_DECK_PREVIEW_IMAGE_DISPLAY_WIDGET_H
 
-#include "../../../../general/display/overlay_label.h"
+#include "../../../../general/display/shadow_background_label.h"
 
 #include <QLabel>
 #include <QWidget>
@@ -20,10 +20,10 @@ public:
     void setPreviewWidth(int width);
 
     QLabel *imageLabel;
-    OverlayLabel *topLeftLabel;
-    OverlayLabel *topRightLabel;
-    OverlayLabel *bottomLeftLabel;
-    OverlayLabel *bottomRightLabel;
+    ShadowBackgroundLabel *topLeftLabel;
+    ShadowBackgroundLabel *topRightLabel;
+    ShadowBackgroundLabel *bottomLeftLabel;
+    ShadowBackgroundLabel *bottomRightLabel;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
