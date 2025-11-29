@@ -46,9 +46,13 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     QTextStream deckStream(&tempDeck);
 
     for (auto card : response.getCards()) {
+        QString fullName = card.getCard().getOracleCard().value("name").toString();
+        // We don't really care about the second card, the card database already has it as a relation
+        QString cleanName = fullName.split("//").first().trimmed();
+
         tempDeck += QString("%1 %2 (%3) %4\n")
                         .arg(card.getQuantity())
-                        .arg(card.getCard().getOracleCard().value("name").toString())
+                        .arg(cleanName)
                         .arg(card.getCard().getEdition().getEditionCode())
                         .arg(card.getCard().getCollectorNumber());
     }
