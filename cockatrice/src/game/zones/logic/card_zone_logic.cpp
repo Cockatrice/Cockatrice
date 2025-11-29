@@ -174,41 +174,40 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
 {
     QString ownerName = player->getPlayerInfo()->getName();
     if (name == "hand")
-        return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
+        return theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName);
     else if (name == "deck")
         switch (gc) {
             case CaseLookAtZone:
-                return (theirOwn ? tr("their library", "look at zone")
-                                 : tr("%1's library", "look at zone").arg(ownerName));
+                return theirOwn ? tr("their library", "look at zone")
+                                : tr("%1's library", "look at zone").arg(ownerName);
             case CaseTopCardsOfZone:
-                return (theirOwn ? tr("of their library", "top cards of zone,")
-                                 : tr("of %1's library", "top cards of zone").arg(ownerName));
+                return theirOwn ? tr("of their library", "top cards of zone,")
+                                : tr("of %1's library", "top cards of zone").arg(ownerName);
             case CaseRevealZone:
-                return (theirOwn ? tr("their library", "reveal zone")
-                                 : tr("%1's library", "reveal zone").arg(ownerName));
+                return theirOwn ? tr("their library", "reveal zone") : tr("%1's library", "reveal zone").arg(ownerName);
             case CaseShuffleZone:
-                return (theirOwn ? tr("their library", "shuffle") : tr("%1's library", "shuffle").arg(ownerName));
+                return theirOwn ? tr("their library", "shuffle") : tr("%1's library", "shuffle").arg(ownerName);
             default:
-                return (theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName));
+                return theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName);
         }
     else if (name == "grave")
-        return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
+        return theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName);
     else if (name == "rfg")
-        return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
+        return theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName);
     else if (name == "sb")
         switch (gc) {
             case CaseLookAtZone:
-                return (theirOwn ? tr("their sideboard", "look at zone")
-                                 : tr("%1's sideboard", "look at zone").arg(ownerName));
+                return theirOwn ? tr("their sideboard", "look at zone")
+                                : tr("%1's sideboard", "look at zone").arg(ownerName);
             case CaseNominative:
-                return (theirOwn ? tr("their sideboard", "nominative")
-                                 : tr("%1's sideboard", "nominative").arg(ownerName));
+                return theirOwn ? tr("their sideboard", "nominative")
+                                : tr("%1's sideboard", "nominative").arg(ownerName);
             default:
                 break;
         }
     else {
-        return (theirOwn ? tr("their custom zone '%1'", "nominative").arg(name)
-                         : tr("%1's custom zone '%2'", "nominative").arg(ownerName).arg(name));
+        return theirOwn ? tr("their custom zone '%1'", "nominative").arg(name)
+                        : tr("%1's custom zone '%2'", "nominative").arg(ownerName).arg(name);
     }
     return QString();
 }

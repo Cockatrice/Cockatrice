@@ -88,7 +88,7 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(pend);
     } else {
         const CardList &c = qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->getCards();
-        int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
+        int number = numberCards == -1 ? c.size() : numberCards < c.size() ? numberCards : c.size();
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
             getLogic()->addCard(new CardItem(getLogic()->getPlayer(), this, card->getCardRef(), card->getId()), false,
@@ -160,8 +160,8 @@ void ZoneViewZone::reorganizeCards()
     // determine bounding rect
     qreal aleft = 0;
     qreal atop = 0;
-    qreal awidth = gridSize.cols * CARD_WIDTH + (CARD_WIDTH / 2) + HORIZONTAL_PADDING;
-    qreal aheight = (gridSize.rows * CARD_HEIGHT) / 3 + CARD_HEIGHT * 1.3;
+    qreal awidth = gridSize.cols * CARD_WIDTH + CARD_WIDTH / 2 + HORIZONTAL_PADDING;
+    qreal aheight = gridSize.rows * CARD_HEIGHT / 3 + CARD_HEIGHT * 1.3;
     optimumRect = QRectF(aleft, atop, awidth, aheight);
 
     updateGeometry();
@@ -232,8 +232,8 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *c = cards.at(i);
-            qreal x = (i / rows) * CARD_WIDTH;
-            qreal y = (i % rows) * CARD_HEIGHT / 3;
+            qreal x = i / rows * CARD_WIDTH;
+            qreal y = i % rows * CARD_HEIGHT / 3;
             c->setPos(HORIZONTAL_PADDING + x, VERTICAL_PADDING + y);
             c->setRealZValue(i);
         }

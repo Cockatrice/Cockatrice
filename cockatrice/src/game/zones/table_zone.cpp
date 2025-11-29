@@ -50,10 +50,10 @@ QRectF TableZone::boundingRect() const
 
 bool TableZone::isInverted() const
 {
-    return ((getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             !SettingsCache::instance().getInvertVerticalCoordinate()) ||
+    return (getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
+            !SettingsCache::instance().getInvertVerticalCoordinate()) ||
             (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             SettingsCache::instance().getInvertVerticalCoordinate()));
+            SettingsCache::instance().getInvertVerticalCoordinate());
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -229,7 +229,7 @@ void TableZone::resizeToContents()
 
     // Minimum width is the rightmost card position plus enough room for
     // another card with padding, then margin.
-    currentMinimumWidth = xMax + (2 * CARD_WIDTH) + PADDING_X + MARGIN_RIGHT;
+    currentMinimumWidth = xMax + 2 * CARD_WIDTH + PADDING_X + MARGIN_RIGHT;
 
     if (currentMinimumWidth < MIN_WIDTH)
         currentMinimumWidth = MIN_WIDTH;
@@ -291,7 +291,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     qreal x, y;
 
     // Start with margin plus stacked card offset
-    x = MARGIN_LEFT + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_X;
+    x = MARGIN_LEFT + gridPoint.x() % 3 * STACKED_CARD_OFFSET_X;
 
     // Add in width of card stack plus padding for each column
     for (int i = 0; i < gridPoint.x() / 3; ++i) {
@@ -303,7 +303,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
         gridPoint.setY(TABLEROWS - 1 - gridPoint.y());
 
     // Start with margin plus stacked card offset
-    y = MARGIN_TOP + (gridPoint.x() % 3) * STACKED_CARD_OFFSET_Y;
+    y = MARGIN_TOP + gridPoint.x() % 3 * STACKED_CARD_OFFSET_Y;
 
     // Add in card size and padding for each row
     for (int i = 0; i < gridPoint.y(); ++i)
@@ -342,7 +342,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     int xStack = 0;
     int xNextStack = 0;
     int nextStackCol = 0;
-    while ((xNextStack <= x) && (xNextStack <= xMax)) {
+    while (xNextStack <= x && xNextStack <= xMax) {
         xStack = xNextStack;
         const int key = getCardStackMapKey(nextStackCol, gridPointY);
         xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
@@ -362,7 +362,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 QPointF TableZone::closestGridPoint(const QPointF &point)
 {
     QPoint gridPoint = mapToGrid(point);
-    gridPoint.setX((gridPoint.x() / 3) * 3);
+    gridPoint.setX(gridPoint.x() / 3 * 3);
     if (getCardFromGrid(gridPoint))
         gridPoint.setX(gridPoint.x() + 1);
     if (getCardFromGrid(gridPoint))

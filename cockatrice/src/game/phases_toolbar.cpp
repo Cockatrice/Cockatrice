@@ -62,7 +62,7 @@ void PhaseButton::setWidth(double _width)
 
 void PhaseButton::setActive(bool _active)
 {
-    if ((active == _active) || !highlightable)
+    if (active == _active || !highlightable)
         return;
 
     active = _active;

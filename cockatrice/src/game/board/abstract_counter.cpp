@@ -136,7 +136,7 @@ void AbstractCounter::setValue(int _value)
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isUnderMouse() && player->getPlayerInfo()->getLocalOrJudge()) {
-        if (event->button() == Qt::MiddleButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
+        if (event->button() == Qt::MiddleButton || QApplication::keyboardModifiers() & Qt::ShiftModifier) {
             if (menu)
                 menu->exec(event->screenPos());
             event->accept();

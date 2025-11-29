@@ -29,8 +29,8 @@
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)
 {
-    return ((cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
-             cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive))) ||
+    return (cardInfo->getCardType().contains("Legendary", Qt::CaseInsensitive) &&
+            cardInfo->getCardType().contains("Creature", Qt::CaseInsensitive)) ||
            cardInfo->getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 

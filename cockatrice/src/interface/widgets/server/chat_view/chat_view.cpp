@@ -103,9 +103,8 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 
-    QString htmlText =
-        "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
-        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+    QString htmlText = "<font color=" + (optionalFontColor.size() > 0 ? optionalFontColor : serverMessageColor.name()) +
+                       ">" + QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
 
     if (optionalIsBold)
         htmlText = "<b>" + htmlText + "</b>";
@@ -326,7 +325,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
     const static auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
 
     int firstSpace = message.indexOf(' ');
-    QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
+    QString fullMentionUpToSpaceOrEnd = firstSpace == -1 ? message.mid(1) : message.mid(1, firstSpace - 1);
     QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
     while (fullMentionUpToSpaceOrEnd.size()) {
@@ -453,8 +452,8 @@ bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> u
     QStringList getAttentionList;
     getAttentionList << "/all"; // Send a message to all users
 
-    return (getAttentionList.contains(message) &&
-            (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin));
+    return getAttentionList.contains(message) &&
+           (userLevel & ServerInfo_User::IsModerator || userLevel & ServerInfo_User::IsAdmin);
 }
 
 void ChatView::actMessageClicked()
@@ -540,7 +539,7 @@ QTextFragment ChatView::getFragmentUnderMouse(const QPoint &pos) const
     QTextCursor cursor(cursorForPosition(pos));
     QTextBlock block(cursor.block());
     QTextBlock::iterator it;
-    for (it = block.begin(); !(it.atEnd()); ++it) {
+    for (it = block.begin(); !it.atEnd(); ++it) {
         QTextFragment frag = it.fragment();
         if (frag.contains(cursor.position()))
             return frag;
@@ -580,7 +579,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
         case HoveredCard: {
-            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
+            if (event->button() == Qt::MiddleButton || event->button() == Qt::LeftButton)
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                 emit showCardInfoPopup(event->globalPosition().toPoint(), {hoveredContent});
 #else
@@ -623,15 +622,16 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
+    if (event->button() == Qt::MiddleButton || event->button() == Qt::LeftButton) {
         emit deleteCardInfoPopup(QString("_"));
+    }
 
     QTextBrowser::mouseReleaseEvent(event);
 }
 
 void ChatView::openLink(const QUrl &link)
 {
-    if ((link.scheme() == "card") || (link.scheme() == "user"))
+    if (link.scheme() == "card" || link.scheme() == "user")
         return;
 
     QDesktopServices::openUrl(link);

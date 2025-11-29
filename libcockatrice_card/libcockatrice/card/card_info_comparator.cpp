@@ -15,7 +15,7 @@ bool CardInfoComparator::operator()(const CardInfoPtr &a, const CardInfoPtr &b) 
         // Compare the current property
         if (valueA != valueB) {
             // If values differ, perform comparison
-            return compareVariants(valueA, valueB) ? (m_order == Qt::AscendingOrder) : (m_order == Qt::DescendingOrder);
+            return compareVariants(valueA, valueB) ? m_order == Qt::AscendingOrder : m_order == Qt::DescendingOrder;
         }
     }
 

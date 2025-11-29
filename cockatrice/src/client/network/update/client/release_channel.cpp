@@ -190,7 +190,7 @@ void StableReleaseChannel::tagListFinished()
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     QString myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
-    const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
+    const bool needToUpdate = QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0;
 
     emit finishedCheck(needToUpdate, lastRelease->isCompatibleVersionFound(), lastRelease);
 }
@@ -284,7 +284,7 @@ void BetaReleaseChannel::fileListFinished()
     QString myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
-    bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
+    bool needToUpdate = QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0;
     bool compatibleVersion = false;
 
     QStringList resultUrlList{};

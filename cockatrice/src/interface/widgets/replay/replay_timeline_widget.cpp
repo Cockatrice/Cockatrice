@@ -152,7 +152,7 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 {
     currentProcessedTime = currentVisualTime;
 
-    while ((currentEvent < replayTimeline.size()) && (replayTimeline[currentEvent] < currentProcessedTime)) {
+    while (currentEvent < replayTimeline.size() && replayTimeline[currentEvent] < currentProcessedTime) {
         EventProcessingOptions options;
 
         // backwards skip => always skip reveal windows

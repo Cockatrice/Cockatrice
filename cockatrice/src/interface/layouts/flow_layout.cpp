@@ -575,7 +575,7 @@ int FlowLayout::count() const
  */
 QLayoutItem *FlowLayout::itemAt(const int index) const
 {
-    return (index >= 0 && index < items.size()) ? items.value(index) : nullptr;
+    return index >= 0 && index < items.size() ? items.value(index) : nullptr;
 }
 
 /**
@@ -585,7 +585,7 @@ QLayoutItem *FlowLayout::itemAt(const int index) const
  */
 QLayoutItem *FlowLayout::takeAt(const int index)
 {
-    return (index >= 0 && index < items.size()) ? items.takeAt(index) : nullptr;
+    return index >= 0 && index < items.size() ? items.takeAt(index) : nullptr;
 }
 
 /**
@@ -594,7 +594,7 @@ QLayoutItem *FlowLayout::takeAt(const int index)
  */
 int FlowLayout::horizontalSpacing() const
 {
-    return (horizontalMargin >= 0) ? horizontalMargin : smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
+    return horizontalMargin >= 0 ? horizontalMargin : smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
 }
 
 /**
@@ -603,7 +603,7 @@ int FlowLayout::horizontalSpacing() const
  */
 int FlowLayout::verticalSpacing() const
 {
-    return (verticalMargin >= 0) ? verticalMargin : smartSpacing(QStyle::PM_LayoutVerticalSpacing);
+    return verticalMargin >= 0 ? verticalMargin : smartSpacing(QStyle::PM_LayoutVerticalSpacing);
 }
 
 /**

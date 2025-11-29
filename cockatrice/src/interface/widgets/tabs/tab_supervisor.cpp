@@ -454,7 +454,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
  */
 void TabSupervisor::stop()
 {
-    if ((!client) && localClients.isEmpty())
+    if (!client && localClients.isEmpty())
         return;
 
     resetTabsMenu();
@@ -655,7 +655,7 @@ void TabSupervisor::actTabAdmin(bool checked)
 
 void TabSupervisor::openTabAdmin()
 {
-    tabAdmin = new TabAdmin(this, client, (userInfo->user_level() & ServerInfo_User::IsAdmin));
+    tabAdmin = new TabAdmin(this, client, userInfo->user_level() & ServerInfo_User::IsAdmin);
     connect(tabAdmin, &TabAdmin::adminLockChanged, this, &TabSupervisor::adminLockChanged);
     myAddTab(tabAdmin, aTabAdmin);
     connect(tabAdmin, &QObject::destroyed, this, [this] {

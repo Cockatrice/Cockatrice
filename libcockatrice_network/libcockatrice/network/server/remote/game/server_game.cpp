@@ -205,7 +205,7 @@ void Server_Game::pingClockTimeout()
             ges.enqueueGameEvent(event, participant->getPlayerId());
         }
 
-        if ((participant->getPingTime() != -1) &&
+        if (participant->getPingTime() != -1 &&
             (!participant->getSpectator() || participant->getPlayerId() == hostId)) {
             allPlayersInactive = false;
         }
@@ -214,7 +214,7 @@ void Server_Game::pingClockTimeout()
 
     const int maxTime = room->getServer()->getMaxGameInactivityTime();
     if (allPlayersInactive) {
-        if (((maxTime > 0) && (++inactivityCounter >= maxTime)) || (playerCount < maxPlayers)) {
+        if ((maxTime > 0 && ++inactivityCounter >= maxTime) || playerCount < maxPlayers) {
             deleteLater();
         }
     } else {
@@ -438,12 +438,12 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
     if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
-    if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
-        if ((_password != password) && !(spectator && !spectatorsNeedPassword))
+    if (!(overrideRestrictions && user->user_level() & ServerInfo_User::IsModerator)) {
+        if (_password != password && !(spectator && !spectatorsNeedPassword))
             return Response::RespWrongPassword;
         if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered)
             return Response::RespUserLevelTooLow;
-        if (onlyBuddies && (user->name() != creatorInfo->name()))
+        if (onlyBuddies && user->name() != creatorInfo->name())
             if (!databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()),
                                                   QString::fromStdString(user->name())))
                 return Response::RespOnlyBuddies;
@@ -455,7 +455,7 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                 return Response::RespSpectatorsNotAllowed;
         }
     }
-    if (!spectator && (gameStarted || (getPlayerCount() >= getMaxPlayers())))
+    if (!spectator && (gameStarted || getPlayerCount() >= getMaxPlayers()))
         return Response::RespGameFull;
 
     return Response::RespOk;
@@ -519,7 +519,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         emit gameInfoChanged(gameInfo);
     }
 
-    if ((newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !spectator)
+    if (newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered && !spectator)
         room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newParticipant->getPlayerId());
 
     userInterface->playerAddedToGame(gameId, room->getId(), newParticipant->getPlayerId());
@@ -770,7 +770,7 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
     cont->set_game_id(gameId);
     for (auto *participant : participants.values()) {
         const bool playerPrivate =
-            (participant->getPlayerId() == privatePlayerId) ||
+            participant->getPlayerId() == privatePlayerId ||
             (participant->getSpectator() && (spectatorsSeeEverything || participant->getJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))

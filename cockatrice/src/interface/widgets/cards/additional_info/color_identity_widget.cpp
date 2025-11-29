@@ -89,7 +89,7 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
 
         int spacing = layout->spacing();
         int count = manaSymbols.size();
-        int availableWidth = totalWidth - (spacing * (count - 1));
+        int availableWidth = totalWidth - spacing * (count - 1);
         int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
 
         for (ManaSymbolWidget *manaSymbol : manaSymbols) {

@@ -371,7 +371,7 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
     else
         finalResponseCode = Response::RespInvalidCommand;
 
-    if ((finalResponseCode != Response::RespNothing))
+    if (finalResponseCode != Response::RespNothing)
         sendResponseContainer(responseContainer, finalResponseCode);
 }
 
@@ -386,10 +386,10 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (interval > 0) {
         if (pingclockinterval > 0) {
             messageSizeOverTime.prepend(0);
-            if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval))
+            if (messageSizeOverTime.size() > msgcountinterval / pingclockinterval)
                 messageSizeOverTime.removeLast();
             messageCountOverTime.prepend(0);
-            if (messageCountOverTime.size() > (msgcountinterval / pingclockinterval))
+            if (messageCountOverTime.size() > msgcountinterval / pingclockinterval)
                 messageCountOverTime.removeLast();
         }
     }
@@ -398,7 +398,7 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (interval > 0) {
         if (pingclockinterval > 0) {
             commandCountOverTime.prepend(0);
-            if (commandCountOverTime.size() > (cmdcountinterval / pingclockinterval))
+            if (commandCountOverTime.size() > cmdcountinterval / pingclockinterval)
                 commandCountOverTime.removeLast();
         }
     }
@@ -409,16 +409,16 @@ void Server_ProtocolHandler::pingClockTimeout()
     // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
     const bool isModOrAdmin =
-        userInfo && (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
+        userInfo && userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin);
     if (!hasPrivLevel && !isModOrAdmin) {
-        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
+        if (server->getIdleClientTimeout() > 0 && idleClientWarningSent) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();
             }
         }
 
-        if (((timeRunning - lastActionReceived) >= qCeil(server->getIdleClientTimeout() * .9)) &&
-            (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+        if (timeRunning - lastActionReceived >= qCeil(server->getIdleClientTimeout() * .9) && !idleClientWarningSent &&
+            server->getIdleClientTimeout() > 0) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
@@ -689,7 +689,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
         return Response::RespNameNotFound;
 
     if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        if (!(room->userMayJoin(*userInfo)))
+        if (!room->userMayJoin(*userInfo))
             return Response::RespUserLevelTooLow;
 
     room->addClient(this);
@@ -837,7 +837,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     }
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
-    bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
+    bool onlyRegisteredUsers = cmd.only_registered() && server->permitUnregisteredUsers();
     auto *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
                                  cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
                                  cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(),

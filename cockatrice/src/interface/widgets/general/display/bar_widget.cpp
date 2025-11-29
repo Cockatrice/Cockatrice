@@ -16,7 +16,7 @@ QSize BarWidget::sizeHint() const
     int valueHeight = metrics.height();
 
     // Calculate the height dynamically based on the total
-    int barHeight = (total > 0) ? (value * 200 / total) : 20;     // Scale height proportionally
+    int barHeight = total > 0 ? value * 200 / total : 20;         // Scale height proportionally
     int totalHeight = barHeight + labelHeight + valueHeight + 30; // Extra space for text
     return QSize(60, totalHeight);                                // Allow width to expand
 }
@@ -32,7 +32,7 @@ void BarWidget::paintEvent(QPaintEvent *event)
     // Calculate bar dimensions
     int barWidth = widgetWidth * 0.8;      // Use 80% of the available width
     int fullBarHeight = widgetHeight - 40; // Leave space for labels
-    int valueBarHeight = (total > 0) ? (value * fullBarHeight / total) : 0;
+    int valueBarHeight = total > 0 ? value * fullBarHeight / total : 0;
 
     // Draw full bar background (gray)
     painter.setBrush(QColor(200, 200, 200));

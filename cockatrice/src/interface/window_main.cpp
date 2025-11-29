@@ -480,18 +480,17 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
         out += tr("Your username must respect these rules:") + "<ul>";
 
         out += "<li>" + tr("is %1 - %2 characters long").arg(rules.at(0)).arg(rules.at(1)) + "</li>";
-        out += "<li>" + tr("can %1 contain lowercase characters").arg((rules.at(2).toInt() > 0) ? "" : tr("NOT")) +
-               "</li>";
-        out += "<li>" + tr("can %1 contain uppercase characters").arg((rules.at(3).toInt() > 0) ? "" : tr("NOT")) +
-               "</li>";
         out +=
-            "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
+            "<li>" + tr("can %1 contain lowercase characters").arg(rules.at(2).toInt() > 0 ? "" : tr("NOT")) + "</li>";
+        out +=
+            "<li>" + tr("can %1 contain uppercase characters").arg(rules.at(3).toInt() > 0 ? "" : tr("NOT")) + "</li>";
+        out += "<li>" + tr("can %1 contain numeric characters").arg(rules.at(4).toInt() > 0 ? "" : tr("NOT")) + "</li>";
 
         if (rules.at(6).size() > 0)
             out += "<li>" + tr("can contain the following punctuation: %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
 
         out += "<li>" +
-               tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) +
+               tr("first character can %1 be a punctuation mark").arg(rules.at(5).toInt() > 0 ? "" : tr("NOT")) +
                "</li>";
 
         if (rules.size() == 9) {

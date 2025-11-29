@@ -16,7 +16,7 @@ int levenshteinDistance(const QString &s1, const QString &s2)
 
     for (int i = 1; i <= len1; i++) {
         for (int j = 1; j <= len2; j++) {
-            int cost = (s1[i - 1] == s2[j - 1]) ? 0 : 1;
+            int cost = s1[i - 1] == s2[j - 1] ? 0 : 1;
             dp[i][j] = std::min({dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost});
         }
     }

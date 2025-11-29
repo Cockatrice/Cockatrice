@@ -18,7 +18,7 @@ bool AbstractDecklistCardNode::compareNumber(AbstractDecklistNode *other) const
     if (other2) {
         int n1 = getNumber();
         int n2 = other2->getNumber();
-        return (n1 != n2) ? (n1 > n2) : compareName(other);
+        return n1 != n2 ? n1 > n2 : compareName(other);
     } else {
         return true;
     }
@@ -28,7 +28,7 @@ bool AbstractDecklistCardNode::compareName(AbstractDecklistNode *other) const
 {
     auto *other2 = dynamic_cast<AbstractDecklistCardNode *>(other);
     if (other2) {
-        return (getName() > other2->getName());
+        return getName() > other2->getName();
     } else {
         return true;
     }

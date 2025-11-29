@@ -26,7 +26,7 @@ bool PlayerListItemDelegate::editorEvent(QEvent *event,
                                          const QStyleOptionViewItem &option,
                                          const QModelIndex &index)
 {
-    if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
+    if (event->type() == QEvent::MouseButtonPress && index.isValid()) {
         auto *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -135,8 +135,9 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
         if (prop.has_ready_start())
             player->setData(2, Qt::UserRole + 1, prop.ready_start());
         if (prop.has_conceded() || prop.has_ready_start())
-            player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon())
-                                           : (prop.ready_start() ? readyIcon : notReadyIcon));
+            player->setIcon(2, gameStarted          ? (prop.conceded() ? concededIcon : QIcon())
+                               : prop.ready_start() ? readyIcon
+                                                    : notReadyIcon);
     }
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());

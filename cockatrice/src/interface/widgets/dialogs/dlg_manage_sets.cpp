@@ -333,7 +333,7 @@ void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelect
     aBottom->setDisabled(emptySelection || setOrderIsSorted);
 
     int rows = view->selectionModel()->selectedRows().size();
-    rebuildMainLayout((rows > 1) ? SOME_SETS_SELECTED : NO_SETS_SELECTED);
+    rebuildMainLayout(rows > 1 ? SOME_SETS_SELECTED : NO_SETS_SELECTED);
 }
 
 void WndSets::selectRows(QSet<int> rows)

@@ -77,7 +77,7 @@ void Server_CardZone::removeCardFromCoordMap(Server_Card *card, int oldX, int ol
     if (oldX < 0)
         return;
 
-    const int baseX = (oldX / 3) * 3;
+    const int baseX = oldX / 3 * 3;
     QMap<int, Server_Card *> &coordMap = coordinateMap[oldY];
 
     if (coordMap.contains(baseX) && coordMap.contains(baseX + 1) && coordMap.contains(baseX + 2))
@@ -117,7 +117,7 @@ void Server_CardZone::insertCardIntoCoordMap(Server_Card *card, int x, int y)
             freeSpaceMap[y] = nextFreeX;
         }
     } else if (!((x - 2) % 3)) {
-        const int baseX = (x / 3) * 3;
+        const int baseX = x / 3 * 3;
         freePilesMap[y].remove(coordinateMap[y].value(baseX)->getName(), baseX);
     }
 }
@@ -161,7 +161,7 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
         }
         return nullptr;
     } else {
-        if ((id >= cards.size()) || (id < 0))
+        if (id >= cards.size() || id < 0)
             return nullptr;
         Server_Card *tmp = cards[id];
         if (position)
@@ -184,7 +184,7 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
     const QMap<int, Server_Card *> &coordMap = coordinateMap.value(y);
     if (x == -1) {
         if (!dontStackSameName && freePilesMap[y].contains(cardName)) {
-            x = (freePilesMap[y].value(cardName) / 3) * 3;
+            x = freePilesMap[y].value(cardName) / 3 * 3;
 
             if (coordMap.contains(x) && (coordMap[x]->getFaceDown() || !coordMap[x]->getAttachedCards().isEmpty())) {
                 // don't pile up on: 1. facedown cards 2. cards with attached cards
@@ -197,7 +197,7 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
         }
     } else if (x >= 0) {
         int resultX = 0;
-        x = (x / 3) * 3;
+        x = x / 3 * 3;
         if (!coordMap.contains(x))
             resultX = x;
         else if (!coordMap.value(x)->getAttachedCards().isEmpty()) {
@@ -226,7 +226,7 @@ bool Server_CardZone::isColumnStacked(int x, int y) const
     if (!has_coords)
         return false;
 
-    return coordinateMap[y].contains((x / 3) * 3 + 1);
+    return coordinateMap[y].contains(x / 3 * 3 + 1);
 }
 
 bool Server_CardZone::isColumnEmpty(int x, int y) const
@@ -234,7 +234,7 @@ bool Server_CardZone::isColumnEmpty(int x, int y) const
     if (!has_coords)
         return true;
 
-    return !coordinateMap[y].contains((x / 3) * 3);
+    return !coordinateMap[y].contains(x / 3 * 3);
 }
 
 void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, int x, int y)
@@ -252,7 +252,7 @@ void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
 
     QSet<QPair<int, int>> placesToLook;
     for (auto &card : cards)
-        placesToLook.insert(QPair<int, int>((card->getX() / 3) * 3, card->getY()));
+        placesToLook.insert(QPair<int, int>(card->getX() / 3 * 3, card->getY()));
 
     QSetIterator<QPair<int, int>> placeIterator(placesToLook);
     while (placeIterator.hasNext()) {

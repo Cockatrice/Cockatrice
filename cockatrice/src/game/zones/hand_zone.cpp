@@ -75,18 +75,18 @@ void HandZone::reorganizeCards()
             qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
-                leftJustified ? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
+                leftJustified ? boundingRect().width() - 1 * xPadding - 5 : boundingRect().width() - 2 * xPadding;
 
             for (int i = 0; i < cardCount; i++) {
                 CardItem *c = getLogic()->getCards().at(i);
                 // If the total width of the cards is smaller than the available width,
                 // the cards do not need to overlap and are displayed in the center of the area.
                 if (cardWidth * cardCount > totalWidth)
-                    c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
+                    c->setPos(xPadding + (qreal)i * (totalWidth - cardWidth) / (cardCount - 1), 5);
                 else {
-                    qreal xPosition =
-                        leftJustified ? xPadding + ((qreal)i) * cardWidth
-                                      : xPadding + ((qreal)i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
+                    qreal xPosition = leftJustified
+                                          ? xPadding + (qreal)i * cardWidth
+                                          : xPadding + (qreal)i * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
                     c->setPos(xPosition, 5);
                 }
                 c->setRealZValue(i);
@@ -100,7 +100,7 @@ void HandZone::reorganizeCards()
 
             for (int i = 0; i < cardCount; i++) {
                 CardItem *card = getLogic()->getCards().at(i);
-                qreal x = (i % 2) ? x2 : x1;
+                qreal x = i % 2 ? x2 : x1;
                 qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
                                                 getLogic()->getCards().at(0)->boundingRect().height());
                 card->setPos(x, y);

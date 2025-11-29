@@ -38,12 +38,13 @@
 #include <QUuid>
 #include <QtDebug>
 
-static bool isASCII(const QString &string) {
-  for(const QChar &chr : string){
-    if(chr.unicode() > 0x7f)
-      return false;
-  }
-  return true;
+static bool isASCII(const QString &string)
+{
+    for (const QChar &chr : string) {
+        if (chr.unicode() > 0x7f)
+            return false;
+    }
+    return true;
 }
 
 struct QxtMailMessagePrivate : public QSharedData
@@ -277,9 +278,9 @@ QByteArray qxt_fold_mime_header(const QString &key, const QString &value, const 
 QByteArray QxtMailMessage::rfc2822() const
 {
     // Use quoted-printable if requested
-    bool useQuotedPrintable = (extraHeader("Content-Transfer-Encoding").toLower() == "quoted-printable");
+    bool useQuotedPrintable = extraHeader("Content-Transfer-Encoding").toLower() == "quoted-printable";
     // Use base64 if requested
-    bool useBase64 = (extraHeader("Content-Transfer-Encoding").toLower() == "base64");
+    bool useBase64 = extraHeader("Content-Transfer-Encoding").toLower() == "base64";
     // Check to see if plain text is ASCII-clean; assume it isn't if QP or base64 was requested
     bool bodyIsAscii = !useQuotedPrintable && !useBase64 && isASCII(body());
 
@@ -465,8 +466,7 @@ QByteArray QxtMailMessage::rfc2822() const
     if (attach.count()) {
         for (const QString &filename : attach.keys()) {
             rv += "--" + qxt_d->boundary + "\r\n";
-            rv +=
-                qxt_fold_mime_header("Content-Disposition", QDir(filename).dirName(), "attachment; filename=");
+            rv += qxt_fold_mime_header("Content-Disposition", QDir(filename).dirName(), "attachment; filename=");
             rv += attach[filename].mimeData();
         }
         rv += "--" + qxt_d->boundary + "--\r\n";

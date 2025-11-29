@@ -125,10 +125,10 @@ QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     QColor color;
-    if ((max == -1) || (value == -1))
+    if (max == -1 || value == -1)
         color = Qt::black;
     else
-        color.setHsv(120 * (1.0 - ((double)value / max)), 255, 255);
+        color.setHsv(120 * (1.0 - (double)value / max), 255, 255);
 
     QRadialGradient g(QPointF((double)pixmap.width() / 2, (double)pixmap.height() / 2),
                       qMin(pixmap.width(), pixmap.height()) / 2.0);

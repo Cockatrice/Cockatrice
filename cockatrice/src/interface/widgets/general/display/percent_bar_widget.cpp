@@ -22,7 +22,7 @@ void PercentBarWidget::paintEvent(QPaintEvent *event)
 
     const double halfWidth = rect.width() / 2.0;
 
-    const int barLength = static_cast<int>((qAbs(valueToDisplay) / 100.0) * halfWidth);
+    const int barLength = static_cast<int>(qAbs(valueToDisplay) / 100.0 * halfWidth);
 
     QRect fillRect;
     if (valueToDisplay > 0.0) {
@@ -40,7 +40,7 @@ void PercentBarWidget::paintEvent(QPaintEvent *event)
     const int tickHeight = 4;
 
     for (int percent = -100; percent <= 100; percent += 10) {
-        int x = midX + static_cast<int>((percent / 100.0) * halfWidth);
+        int x = midX + static_cast<int>(percent / 100.0 * halfWidth);
         painter.drawLine(x, height - tickHeight, x, height);
     }
 }

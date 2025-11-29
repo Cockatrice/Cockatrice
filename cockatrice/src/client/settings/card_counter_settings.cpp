@@ -29,9 +29,9 @@ QColor CardCounterSettings::color(int counterId) const
         defaultColor = QColor::fromHsv(counterId * 60, 150, 255);
     } else {
         // Future-proof support for more counters with pseudo-random colors
-        int h = (counterId * 37) % 360;
-        int s = 128 + 64 * qSin((counterId * 97) * 0.1);   // 64-192
-        int v = 196 + 32 * qSin((counterId * 101) * 0.07); // 164-228
+        int h = counterId * 37 % 360;
+        int s = 128 + 64 * qSin(counterId * 97 * 0.1);   // 64-192
+        int v = 196 + 32 * qSin(counterId * 101 * 0.07); // 164-228
 
         defaultColor = QColor::fromHsv(h, s, v);
     }
@@ -48,7 +48,7 @@ QString CardCounterSettings::displayName(int counterId) const
     str.resize(nChars);
 
     for (auto it = str.rbegin(); it != str.rend(); ++it) {
-        *it = QChar('A' + (counterId) % 26);
+        *it = QChar('A' + counterId % 26);
         counterId /= 26;
     }
 

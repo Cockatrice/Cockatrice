@@ -190,7 +190,7 @@ void QxtSmtpPrivate::socketRead()
             case HeloSent:
             case EhloSent:
             case EhloGreetReceived:
-                parseEhlo(code, (line[3] != ' '), line.mid(4));
+                parseEhlo(code, line[3] != ' ', line.mid(4));
                 break;
             case StartTLSSent:
                 if (code == "220") {
@@ -414,7 +414,7 @@ static QByteArray qxt_extract_address(const QString &address)
                 inQuote = false;
         } else if (addrStart != -1) {
             if (ch == '>')
-                return address.mid(addrStart, (i - addrStart)).toLatin1();
+                return address.mid(addrStart, i - addrStart).toLatin1();
         } else if (ch == '(') {
             parenDepth++;
         } else if (ch == ')') {

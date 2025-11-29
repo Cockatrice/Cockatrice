@@ -182,7 +182,7 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    if ((cursorItem != targetItem) && targetItem) {
+    if (cursorItem != targetItem && targetItem) {
         targetItem->setBeingPointedAt(false);
         targetItem->removeArrowTo(this);
     }
@@ -213,7 +213,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem)
         return;
 
-    if (targetItem && (targetItem != startItem)) {
+    if (targetItem && targetItem != startItem) {
         CardZoneLogic *startZone = static_cast<CardItem *>(startItem)->getZone();
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
@@ -291,7 +291,7 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
-    if ((cursorItem != targetItem) && targetItem) {
+    if (cursorItem != targetItem && targetItem) {
         targetItem->setBeingPointedAt(false);
     }
     if (!cursorItem) {
@@ -349,7 +349,7 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         child->setTargetLocked(true);
     }
 
-    if (targetItem && (targetItem != startItem)) {
+    if (targetItem && targetItem != startItem) {
         auto startCard = qgraphicsitem_cast<CardItem *>(startItem);
         auto targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
         if (startCard && targetCard) {
