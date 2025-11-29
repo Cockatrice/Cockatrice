@@ -62,6 +62,11 @@ void ColorBar::paintEvent(QPaintEvent *)
     for (const QString &key : sortedKeys) {
         int value = colors[key];
         double ratio = double(value) / total;
+
+        if (ratio <= minRatioThreshold) {
+            continue;
+        }
+
         int segmentWidth = int(ratio * w);
 
         // Ensure the segment width is at least 1 to avoid degenerate rectangles

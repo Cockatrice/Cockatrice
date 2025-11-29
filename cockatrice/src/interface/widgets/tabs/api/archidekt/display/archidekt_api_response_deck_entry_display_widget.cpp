@@ -96,6 +96,7 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     auto colors = response.getColors();
 
     ColorBar *colorBar = new ColorBar(colors, this);
+    colorBar->setMinPercentThreshold(3);
     colorBar->setFixedHeight(22);
 
     headerLayout->addWidget(colorBar);

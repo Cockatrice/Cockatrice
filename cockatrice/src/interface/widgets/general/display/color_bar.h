@@ -14,6 +14,10 @@ public:
     explicit ColorBar(const QMap<QString, int> &colors, QWidget *parent = nullptr);
 
     void setColors(const QMap<QString, int> &colors);
+    void setMinPercentThreshold(double treshold)
+    {
+        minRatioThreshold = treshold / 100.0; // store as ratio
+    }
     QSize minimumSizeHint() const override;
 
 protected:
@@ -29,6 +33,7 @@ protected:
 private:
     QMap<QString, int> colors;
     bool isHovered = false;
+    double minRatioThreshold = 0.0; // 0.05 means 5%
 
     QColor colorFromName(const QString &name) const;
     QString tooltipForPosition(int x) const;
