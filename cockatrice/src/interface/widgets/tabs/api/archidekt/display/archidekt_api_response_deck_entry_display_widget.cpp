@@ -132,7 +132,7 @@ void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *ev
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEnterEvent *event)
 #else
-void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEvent *event) override; // Qt5 signature
+void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
