@@ -1,7 +1,9 @@
 #include "utility_menu.h"
 
+#include "../../../interface/deck_loader/deck_loader.h"
 #include "../player.h"
 #include "../player_actions.h"
+#include "libcockatrice/deck_list/inner_deck_list_node.h"
 #include "player_menu.h"
 
 UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)

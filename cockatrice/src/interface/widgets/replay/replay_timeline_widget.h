@@ -9,7 +9,6 @@
 
 #include "../../../game/player/event_processing_options.h"
 
-#include <QList>
 #include <QMouseEvent>
 #include <QWidget>
 

@@ -7,7 +7,8 @@
 #ifndef GETTEXTWITHMAX_H
 #define GETTEXTWITHMAX_H
 
-#include <QInputDialog>
+#include <QLineEdit>
+#include <QWidget>
 #include <libcockatrice/utility/trice_limits.h>
 
 QString getTextWithMax(QWidget *parent,

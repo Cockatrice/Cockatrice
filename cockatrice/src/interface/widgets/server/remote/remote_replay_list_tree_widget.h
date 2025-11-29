@@ -9,7 +9,6 @@
 #ifndef REMOTEREPLAYLIST_TREEWIDGET_H
 #define REMOTEREPLAYLIST_TREEWIDGET_H
 
-#include <QAbstractItemModel>
 #include <QDateTime>
 #include <QTreeView>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>

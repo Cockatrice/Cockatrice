@@ -7,7 +7,6 @@
 #ifndef SHORTCUT_TREEVIEW_H
 #define SHORTCUT_TREEVIEW_H
 
-#include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>

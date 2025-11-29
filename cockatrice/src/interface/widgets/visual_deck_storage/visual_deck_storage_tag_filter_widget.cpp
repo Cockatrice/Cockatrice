@@ -1,12 +1,10 @@
 #include "visual_deck_storage_tag_filter_widget.h"
 
 #include "../general/layout_containers/flow_widget.h"
-#include "deck_preview/deck_preview_tag_addition_widget.h"
 #include "deck_preview/deck_preview_tag_display_widget.h"
-#include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_widget.h"
 
 #include <QHBoxLayout>
-#include <QLabel>
 
 VisualDeckStorageTagFilterWidget::VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent)
     : QWidget(_parent), parent(_parent)

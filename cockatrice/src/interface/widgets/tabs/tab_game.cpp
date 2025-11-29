@@ -13,11 +13,9 @@
 #include "../game/player/player.h"
 #include "../game/player/player_list_widget.h"
 #include "../game/replay.h"
-#include "../game/zones/card_zone.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
-#include "../interface/widgets/replay/replay_timeline_widget.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
@@ -28,15 +26,12 @@
 #include <QCompleter>
 #include <QDebug>
 #include <QDockWidget>
-#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
-#include <QSplitter>
 #include <QStackedWidget>
 #include <QTimer>
-#include <QToolButton>
 #include <QWidget>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>

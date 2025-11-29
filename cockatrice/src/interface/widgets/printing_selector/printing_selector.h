@@ -13,7 +13,6 @@
 
 #include <QCheckBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>

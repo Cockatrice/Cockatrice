@@ -15,11 +15,9 @@
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_visual_database_display.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
-#include <QCommonStyle>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>

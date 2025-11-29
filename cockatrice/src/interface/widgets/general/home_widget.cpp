@@ -6,6 +6,7 @@
 #include "background_sources.h"
 #include "home_styled_button.h"
 
+#include <QGroupBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>

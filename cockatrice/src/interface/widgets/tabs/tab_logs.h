@@ -13,7 +13,6 @@
 
 class AbstractClient;
 class LineEditUnfocusable;
-
 class QGroupBox;
 class QPushButton;
 class QSpinBox;

@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QProgressBar>
-#include <QTimer>
 #include <QWidget>
 
 /**

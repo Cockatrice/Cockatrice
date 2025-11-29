@@ -4,7 +4,6 @@
 #include "../serverinfo_user_container.h"
 #include "server_abstract_participant.h"
 
-#include <QList>
 #include <QMap>
 #include <QString>
 

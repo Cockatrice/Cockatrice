@@ -6,6 +6,7 @@
 #include "../../pixel_map_generator.h"
 
 #include <QAction>
+#include <QFileInfo>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.

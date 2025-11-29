@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QRegularExpression>
+#include <QSet>
 #include <QTextStream>
 #include <algorithm>
 

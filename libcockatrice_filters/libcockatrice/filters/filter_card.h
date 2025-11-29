@@ -9,7 +9,6 @@
 
 #include <QObject>
 #include <QString>
-#include <utility>
 
 class CardFilter : public QObject
 {

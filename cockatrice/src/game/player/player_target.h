@@ -11,7 +11,6 @@
 #include "../board/abstract_counter.h"
 #include "../board/arrow_target.h"
 
-#include <QFont>
 #include <QPixmap>
 
 class Player;

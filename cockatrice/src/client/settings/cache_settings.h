@@ -11,7 +11,6 @@
 
 #include <QDate>
 #include <QLoggingCategory>
-#include <QObject>
 #include <QSize>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>

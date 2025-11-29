@@ -17,7 +17,6 @@
 #ifndef COCKATRICE_ABSTRACT_DECK_LIST_NODE_H
 #define COCKATRICE_ABSTRACT_DECK_LIST_NODE_H
 
-#include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 
 /**

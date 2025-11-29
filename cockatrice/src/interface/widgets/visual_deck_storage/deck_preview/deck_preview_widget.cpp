@@ -6,6 +6,7 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include <QClipboard>
+#include <QDir>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QMenu>

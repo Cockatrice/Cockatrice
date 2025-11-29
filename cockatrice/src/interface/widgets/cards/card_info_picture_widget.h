@@ -10,7 +10,6 @@
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QPropertyAnimation>
-#include <QTimer>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
 

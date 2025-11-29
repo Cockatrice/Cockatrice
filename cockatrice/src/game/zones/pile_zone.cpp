@@ -3,6 +3,7 @@
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "logic/pile_zone_logic.h"
 #include "view_zone.h"
 

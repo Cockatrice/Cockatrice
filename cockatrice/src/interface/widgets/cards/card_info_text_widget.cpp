@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QSizePolicy>
 #include <QTextEdit>
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>

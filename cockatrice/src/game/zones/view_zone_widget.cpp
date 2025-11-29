@@ -6,6 +6,7 @@
 #include "../board/card_item.h"
 #include "../game_scene.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "view_zone.h"
 
 #include <QCheckBox>
@@ -16,7 +17,6 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyleOption>
-#include <QStyleOptionTitleBar>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 
 /**

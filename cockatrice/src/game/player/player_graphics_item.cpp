@@ -1,7 +1,12 @@
 #include "player_graphics_item.h"
 
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../board/abstract_card_item.h"
 #include "../hand_counter.h"
+#include "../zones/hand_zone.h"
+#include "../zones/pile_zone.h"
+#include "../zones/stack_zone.h"
+#include "../zones/table_zone.h"
 
 PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
 {

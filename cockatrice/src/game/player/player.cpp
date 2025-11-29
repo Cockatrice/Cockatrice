@@ -11,7 +11,7 @@
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
+#include "player_actions.h"
 #include "player_target.h"
 
 #include <QDebug>

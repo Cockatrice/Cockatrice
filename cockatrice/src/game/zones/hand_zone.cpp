@@ -5,6 +5,7 @@
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>

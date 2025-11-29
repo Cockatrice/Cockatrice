@@ -1,5 +1,7 @@
 #include "get_text_with_max.h"
 
+#include <QInputDialog>
+
 QString getTextWithMax(QWidget *parent,
                        const QString &title,
                        const QString &label,

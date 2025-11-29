@@ -6,7 +6,6 @@
 #include "../commander/edhrec_commander_api_response_average_deck_statistics.h"
 #include "edhrec_deck_api_response.h"
 
-#include <QDebug>
 #include <QJsonObject>
 #include <QString>
 

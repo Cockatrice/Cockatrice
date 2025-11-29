@@ -4,9 +4,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDebug>
 #include <QDialogButtonBox>
-#include <QEvent>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QKeyEvent>

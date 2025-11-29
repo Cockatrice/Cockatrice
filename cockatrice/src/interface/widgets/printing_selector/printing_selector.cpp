@@ -8,9 +8,8 @@
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 
-#include <QFrame>
+#include <QBoxLayout>
 #include <QScrollBar>
-#include <qboxlayout.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.

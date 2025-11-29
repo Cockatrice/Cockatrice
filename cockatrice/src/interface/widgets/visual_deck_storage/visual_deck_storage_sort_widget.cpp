@@ -2,6 +2,8 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QFileInfo>
+
 /**
  * @brief Constructs a PrintingSelectorCardSortWidget for searching cards by set name or set code.
  *

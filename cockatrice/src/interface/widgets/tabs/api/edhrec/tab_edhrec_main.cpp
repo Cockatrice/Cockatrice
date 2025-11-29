@@ -22,7 +22,6 @@
 #include <QNetworkReply>
 #include <QPushButton>
 #include <QRegularExpression>
-#include <QResizeEvent>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>

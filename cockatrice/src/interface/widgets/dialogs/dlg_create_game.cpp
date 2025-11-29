@@ -15,7 +15,6 @@
 #include <QRadioButton>
 #include <QSet>
 #include <QSpinBox>
-#include <QWizard>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>

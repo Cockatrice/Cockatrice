@@ -8,8 +8,6 @@
 #ifndef BAR_WIDGET_H
 #define BAR_WIDGET_H
 
-#include <QColor>
-#include <QString>
 #include <QWidget>
 
 class BarWidget : public QWidget

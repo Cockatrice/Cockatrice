@@ -11,7 +11,6 @@
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>

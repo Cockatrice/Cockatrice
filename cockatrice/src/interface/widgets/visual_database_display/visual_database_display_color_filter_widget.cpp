@@ -2,7 +2,6 @@
 
 #include "../cards/additional_info/mana_symbol_widget.h"
 
-#include <QSet>
 #include <QTimer>
 #include <libcockatrice/filters/filter_tree.h>
 

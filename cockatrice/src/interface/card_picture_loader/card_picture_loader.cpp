@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include <QMainWindow>
 #include <QMovie>
-#include <QNetworkDiskCache>
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmapCache>

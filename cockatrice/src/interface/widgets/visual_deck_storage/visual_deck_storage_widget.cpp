@@ -11,7 +11,6 @@
 #include <QComboBox>
 #include <QDirIterator>
 #include <QMouseEvent>
-#include <QSpinBox>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 

@@ -4,7 +4,6 @@
 #include "deck_preview_widget.h"
 
 #include <QMouseEvent>
-#include <QPainter>
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent)
     : QWidget(parent), layout(new QHBoxLayout(this))

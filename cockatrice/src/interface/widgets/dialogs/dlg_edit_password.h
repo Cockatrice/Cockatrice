@@ -7,7 +7,6 @@
 #ifndef DLG_EDITPASSWORD_H
 #define DLG_EDITPASSWORD_H
 
-#include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
 

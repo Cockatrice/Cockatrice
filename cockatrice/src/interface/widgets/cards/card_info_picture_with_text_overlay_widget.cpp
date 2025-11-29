@@ -3,7 +3,6 @@
 #include <QFontMetrics>
 #include <QPainterPath>
 #include <QStylePainter>
-#include <QTextOption>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.

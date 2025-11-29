@@ -9,7 +9,6 @@
 
 #include "card_info.h"
 
-#include <QStringList>
 #include <QVariant>
 #include <Qt>
 

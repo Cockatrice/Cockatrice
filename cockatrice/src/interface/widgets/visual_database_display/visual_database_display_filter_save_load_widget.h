@@ -10,10 +10,8 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
-#include <QDir>
 #include <QFile>
 #include <QFileDialog>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QLineEdit>
 #include <QMap>

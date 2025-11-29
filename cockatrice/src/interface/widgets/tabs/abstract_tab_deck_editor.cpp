@@ -14,7 +14,6 @@
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/pixel_map_generator.h"
-#include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
@@ -22,15 +21,11 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QClipboard>
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDesktopServices>
-#include <QDir>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QLineEdit>
-#include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
@@ -38,7 +33,6 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSplitter>
-#include <QTextStream>
 #include <QTreeView>
 #include <QUrl>
 #include <libcockatrice/card/database/card_database_manager.h>

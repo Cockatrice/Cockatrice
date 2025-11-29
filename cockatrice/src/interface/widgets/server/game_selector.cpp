@@ -10,17 +10,12 @@
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
-#include <QApplication>
-#include <QCheckBox>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QHeaderView>
-#include <QInputDialog>
-#include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
-#include <QVBoxLayout>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>

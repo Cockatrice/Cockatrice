@@ -5,7 +5,6 @@
 #include "card_picture_loader_worker.h"
 
 #include <QLoggingCategory>
-#include <libcockatrice/card/card_info.h>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLog, "card_picture_loader");
 inline Q_LOGGING_CATEGORY(CardPictureLoaderCardBackCacheFailLog, "card_picture_loader.card_back_cache_fail");

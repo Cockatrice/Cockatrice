@@ -10,7 +10,6 @@
 #include "filter_card.h"
 
 #include <QList>
-#include <QMap>
 #include <QObject>
 #include <libcockatrice/card/database/card_database.h>
 #include <utility>

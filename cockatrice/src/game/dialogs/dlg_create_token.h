@@ -8,7 +8,6 @@
 #define DLG_CREATETOKEN_H
 
 #include <QDialog>
-#include <QModelIndex>
 
 class QLabel;
 class QLineEdit;

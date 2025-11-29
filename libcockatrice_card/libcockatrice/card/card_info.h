@@ -10,7 +10,6 @@
 #include <QMap>
 #include <QMetaType>
 #include <QSharedPointer>
-#include <QStringList>
 #include <QVariant>
 #include <utility>
 

@@ -3,7 +3,6 @@
 #include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
-#include "dlg_select_set_for_cards.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -14,6 +13,7 @@
 #include <QPushButton>
 #include <QScrollBar>
 #include <QSplitter>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>

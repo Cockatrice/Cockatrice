@@ -4,7 +4,6 @@
 
 #include <QPainter>
 #include <QPainterPath>
-#include <QPalette>
 #include <QTimer>
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)

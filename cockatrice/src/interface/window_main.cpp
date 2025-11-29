@@ -54,7 +54,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPixmapCache>
-#include <QRadioButton>
 #include <QStatusBar>
 #include <QSystemTrayIcon>
 #include <QThread>
