@@ -37,6 +37,7 @@ public:
 signals:
     void widgetOrderChanged();
     void orderChanged();
+    void deckAboutToBeModified(const QString &reason);
     void deckModified();
 
 public slots:

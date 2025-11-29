@@ -145,6 +145,11 @@ void DlgSelectSetForCards::retranslateUi()
 void DlgSelectSetForCards::actOK()
 {
     QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
+
+    if (!modifiedSetsAndCardsMap.isEmpty()) {
+        emit deckAboutToBeModified(tr("Bulk modified printings."));
+    }
+
     for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
         for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
             QModelIndex find_card = model->findCard(card, DECK_ZONE_MAIN);
@@ -165,6 +170,7 @@ void DlgSelectSetForCards::actOK()
 
 void DlgSelectSetForCards::actClear()
 {
+    emit deckAboutToBeModified(tr("Cleared all printing information."));
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
     emit deckModified();
     accept();
@@ -172,6 +178,7 @@ void DlgSelectSetForCards::actClear()
 
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
+    emit deckAboutToBeModified(tr("Set all printings to preferred."));
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
     DeckLoader::setProviderIdToPreferredPrinting(model->getDeckList());
     emit deckModified();
