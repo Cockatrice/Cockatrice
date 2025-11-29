@@ -31,7 +31,7 @@ public:
     [[nodiscard]] FlowWidget *getFlowWidget() const
     {
         return flowWidget;
-    };
+    }
 
 public slots:
     void updateVisibility(bool recursive = true);

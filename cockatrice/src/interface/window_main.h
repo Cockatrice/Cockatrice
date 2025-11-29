@@ -135,7 +135,7 @@ private:
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
-    };
+    }
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
 

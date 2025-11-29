@@ -53,6 +53,6 @@ inline static const QString getNicePropertyName(QString key)
         return QCoreApplication::translate("Mtg", "Color Identity");
     return key;
 }
-}; // namespace Mtg
+} // namespace Mtg
 
 #endif

@@ -15,7 +15,7 @@ public:
     [[nodiscard]] bool getIncludeRebalancedCards() const override
     {
         return SettingsCache::instance().getIncludeRebalancedCards();
-    };
+    }
 };
 
 #endif // COCKATRICE_SETTINGS_CARD_PREFERENCE_PROVIDER_H

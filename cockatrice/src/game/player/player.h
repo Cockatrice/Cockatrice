@@ -113,7 +113,7 @@ public:
     [[nodiscard]] PlayerActions *getPlayerActions() const
     {
         return playerActions;
-    };
+    }
 
     [[nodiscard]] PlayerEventHandler *getPlayerEventHandler() const
     {
@@ -123,7 +123,7 @@ public:
     [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
         return playerInfo;
-    };
+    }
 
     [[nodiscard]] PlayerMenu *getPlayerMenu() const
     {

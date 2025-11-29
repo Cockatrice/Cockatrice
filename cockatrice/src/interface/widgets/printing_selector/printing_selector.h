@@ -39,7 +39,7 @@ public:
     [[nodiscard]] DeckListModel *getDeckModel() const
     {
         return deckModel;
-    };
+    }
 
 public slots:
     void retranslateUi();

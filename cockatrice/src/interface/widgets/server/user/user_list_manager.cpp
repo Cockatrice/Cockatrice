@@ -167,4 +167,4 @@ const ServerInfo_User *UserListManager::getOnlineUser(const QString &userName) c
     }
 
     return nullptr;
-};
+}
