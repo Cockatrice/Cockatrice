@@ -64,13 +64,11 @@ void CardInfoTextWidget::setCard(ExactCard exactCard)
 
     if (exactCard.getPrinting() != PrintingInfo()) {
         QString setShort = exactCard.getPrinting().getSet()->getShortName().toHtmlEscaped();
-        QString cardNum  = exactCard.getPrinting().getProperty("num").toHtmlEscaped();
+        QString cardNum = exactCard.getPrinting().getProperty("num").toHtmlEscaped();
 
-        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>")
-                    .arg(tr("Set:"), setShort);
+        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(tr("Set:"), setShort);
 
-        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>")
-                    .arg(tr("Collector Number:"), cardNum);
+        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(tr("Collector Number:"), cardNum);
     }
 
     QStringList cardProps = card->getProperties();
