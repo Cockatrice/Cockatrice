@@ -46,11 +46,11 @@ public:
      */
     void setPreviewWidth(int width);
 
-    QLabel *imageLabel;                        ///< QLabel to display the deck image
-    ShadowBackgroundLabel *topLeftLabel;       ///< Overlay label at top-left (deck name)
-    ShadowBackgroundLabel *topRightLabel;      ///< Overlay label at top-right (card count)
-    ShadowBackgroundLabel *bottomLeftLabel;    ///< Overlay label at bottom-left (EDH bracket)
-    ShadowBackgroundLabel *bottomRightLabel;   ///< Overlay label at bottom-right (views)
+    QLabel *imageLabel;                      ///< QLabel to display the deck image
+    ShadowBackgroundLabel *topLeftLabel;     ///< Overlay label at top-left (deck name)
+    ShadowBackgroundLabel *topRightLabel;    ///< Overlay label at top-right (card count)
+    ShadowBackgroundLabel *bottomLeftLabel;  ///< Overlay label at bottom-left (EDH bracket)
+    ShadowBackgroundLabel *bottomRightLabel; ///< Overlay label at bottom-right (views)
 
 protected:
     /**
