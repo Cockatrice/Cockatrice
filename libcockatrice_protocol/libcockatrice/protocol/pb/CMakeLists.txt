@@ -165,11 +165,11 @@ set(PROTO_FILES
     session_event.proto
 )
 
-if (MSVC)
+if(MSVC)
   set(unused_warning /wd4100)
-else ()
+else()
   set(unused_warning -Wno-unused-parameter)
-endif ()
+endif()
 
 if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   message(STATUS "Using Protobuf Legacy Mode")
