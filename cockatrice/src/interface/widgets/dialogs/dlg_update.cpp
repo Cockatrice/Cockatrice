@@ -108,7 +108,7 @@ void DlgUpdate::beginUpdateCheck()
     progress->setMaximum(0);
     setLabel(tr("Checking for updates..."));
 
-    auto checker = new ClientUpdateChecker(this);
+    const auto checker = new ClientUpdateChecker(this);
     connect(checker, &ClientUpdateChecker::finishedCheck, this, &DlgUpdate::finishedUpdateCheck);
     connect(checker, &ClientUpdateChecker::error, this, &DlgUpdate::updateCheckError);
     checker->check();

@@ -31,7 +31,7 @@ void UpdateDownloader::downloadError(QNetworkReply::NetworkError)
 void UpdateDownloader::fileFinished()
 {
     // If we finished but there's a redirect, follow it
-    QVariant redirect = response->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    const QVariant redirect = response->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (!redirect.isNull()) {
         beginDownload(redirect.toUrl());
         return;
@@ -44,7 +44,7 @@ void UpdateDownloader::fileFinished()
     }
 
     // Work out the file name of the download
-    QString fileName = QDir::temp().path() + QDir::separator() + originalUrl.toString().section('/', -1);
+    const QString fileName = QDir::temp().path() + QDir::separator() + originalUrl.toString().section('/', -1);
 
     // Save the build in a temporary directory
     QFile file(fileName);

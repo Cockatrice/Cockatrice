@@ -10,7 +10,7 @@ void PercentBarWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
 
     QPainter painter(this);
-    QRect rect = this->rect();
+    const QRect rect = this->rect();
 
     const int midX = rect.width() / 2;
     const int height = rect.height();
@@ -40,7 +40,7 @@ void PercentBarWidget::paintEvent(QPaintEvent *event)
     const int tickHeight = 4;
 
     for (int percent = -100; percent <= 100; percent += 10) {
-        int x = midX + static_cast<int>((percent / 100.0) * halfWidth);
+        const int x = midX + static_cast<int>((percent / 100.0) * halfWidth);
         painter.drawLine(x, height - tickHeight, x, height);
     }
 }

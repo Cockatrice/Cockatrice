@@ -10,8 +10,8 @@ DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 
     layout = new QVBoxLayout(this);
 
-    QDate lastCheckDate = SettingsCache::instance().getLastCardUpdateCheck();
-    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    const QDate lastCheckDate = SettingsCache::instance().getLastCardUpdateCheck();
+    const int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
 
     instructionLabel = new QLabel(
         tr("It has been more than %2 days since you last checked your card database for updates.\nChoose how you would "

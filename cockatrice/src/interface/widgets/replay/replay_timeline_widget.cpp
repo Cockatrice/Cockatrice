@@ -25,7 +25,7 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     histogram.clear();
     int binEndTime = BIN_LENGTH - 1;
     int binValue = 0;
-    for (int i : replayTimeline) {
+    for (const int i : replayTimeline) {
         if (i > binEndTime) {
             histogram.append(binValue);
             if (binValue > maxBinValue)
@@ -51,7 +51,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
     painter.drawRect(0, 0, width() - 1, height() - 1);
 
-    qreal binWidth = (qreal)width() / histogram.size();
+    const qreal binWidth = (qreal)width() / histogram.size();
     QPainterPath path;
     path.moveTo(0, height() - 1);
     for (int i = 0; i < histogram.size(); ++i)
@@ -61,14 +61,14 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     painter.fillPath(path, Qt::black);
 
     const QColor barColor = QColor::fromHsv(120, 255, 255, 100);
-    quint64 w = (quint64)(width() - 1) * (quint64)currentVisualTime / maxTime;
+    const quint64 w = (quint64)(width() - 1) * (quint64)currentVisualTime / maxTime;
     painter.fillRect(0, 0, static_cast<int>(w), height() - 1, barColor);
 }
 
 void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    int newTime = static_cast<int>((qint64)maxTime * (qint64)event->position().x() / width());
+    const int newTime = static_cast<int>((qint64)maxTime * (qint64)event->position().x() / width());
 #else
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
 #endif

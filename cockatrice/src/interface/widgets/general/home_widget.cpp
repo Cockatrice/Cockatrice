@@ -57,7 +57,7 @@ void HomeWidget::initializeBackgroundFromSource()
         return;
     }
 
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    const auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
 
     cardChangeTimer->stop();
 
@@ -80,7 +80,7 @@ void HomeWidget::initializeBackgroundFromSource()
 
 void HomeWidget::updateRandomCard()
 {
-    auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
+    const auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
 
     ExactCard newCard;
 
@@ -95,7 +95,7 @@ void HomeWidget::updateRandomCard()
             break;
         case BackgroundSources::DeckFileArt:
             QList<CardRef> cardRefs = backgroundSourceDeck->getDeckList()->getCardRefList();
-            ExactCard oldCard = backgroundSourceCard->getCard();
+            const ExactCard oldCard = backgroundSourceCard->getCard();
 
             if (!cardRefs.empty()) {
                 if (cardRefs.size() == 1) {
@@ -103,7 +103,7 @@ void HomeWidget::updateRandomCard()
                 } else {
                     // Keep picking until different
                     do {
-                        int idx = QRandomGenerator::global()->bounded(cardRefs.size());
+                        const int idx = QRandomGenerator::global()->bounded(cardRefs.size());
                         newCard = CardDatabaseManager::query()->getCard(cardRefs.at(idx));
                     } while (newCard == oldCard);
                 }
@@ -180,26 +180,26 @@ QGroupBox *HomeWidget::createButtons()
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
     boxLayout->addWidget(connectButton);
 
-    auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
+    const auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->openDeckInNewTab(nullptr); });
     boxLayout->addWidget(visualDeckEditorButton);
-    auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
+    const auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     boxLayout->addWidget(visualDeckStorageButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
+    const auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     boxLayout->addWidget(visualDatabaseDisplayButton);
-    auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
+    const auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
-    auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
+    const auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
     connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replaybutton);
     if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
-        auto exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
+        const auto exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
         connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                 &MainWindow::actExit);
         boxLayout->addWidget(exitButton);
@@ -294,18 +294,18 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     background = background.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
     // Draw already-scaled background centered
-    QSize widgetSize = size();
-    QSize bgSize = background.size();
-    QPoint topLeft((widgetSize.width() - bgSize.width()) / 2, (widgetSize.height() - bgSize.height()) / 2);
+    const QSize widgetSize = size();
+    const QSize bgSize = background.size();
+    const QPoint topLeft((widgetSize.width() - bgSize.width()) / 2, (widgetSize.height() - bgSize.height()) / 2);
 
     painter.drawPixmap(topLeft, background);
 
     // Draw translucent black overlay with rounded corners
-    QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset
+    const QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset
     QPainterPath roundedRectPath;
     roundedRectPath.addRoundedRect(overlayRect, 20, 20); // 20px corner radius
 
-    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
+    const QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillPath(roundedRectPath, semiTransparentBlack);
 

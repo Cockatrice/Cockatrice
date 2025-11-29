@@ -140,7 +140,7 @@ QString Logger::getSystemLocale()
 QString Logger::getClientInstallInfo()
 {
     // don't rely on settingsCache->getIsPortableBuild() since the logger is initialized earlier
-    bool isPortable = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
+    const bool isPortable = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
     QString result(QString("Install Mode: ") + (isPortable ? "Portable" : "Standard"));
     return result;
 }

@@ -32,7 +32,7 @@ void GameState::setGameTime(int _secondsElapsed)
     int seconds = _secondsElapsed;
     int minutes = seconds / 60;
     seconds -= minutes * 60;
-    int hours = minutes / 60;
+    const int hours = minutes / 60;
     minutes -= hours * 60;
 
     emit updateTimeElapsedLabel(QString::number(hours).rightJustified(2, '0') + ":" +

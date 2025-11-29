@@ -57,7 +57,7 @@ OverlapLayout::~OverlapLayout()
 void OverlapLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
 {
     addChildWidget(toInsert);
-    int clampedIndex = qBound(0, index, qMax(0, static_cast<int>(itemList.size())));
+    const int clampedIndex = qBound(0, index, qMax(0, static_cast<int>(itemList.size())));
     itemList.insert(clampedIndex, new QWidgetItem(toInsert));
 
     for (int i = clampedIndex; i < itemList.size(); ++i) {
@@ -154,7 +154,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
     // Determine the maximum item width and height among all layout items.
     int maxItemWidth = 0;
     int maxItemHeight = 0;
-    for (QLayoutItem *item : itemList) {
+    for (const QLayoutItem *item : itemList) {
         if (item != nullptr && item->widget()) {
             QSize itemSize = item->widget()->sizeHint();
             maxItemWidth = qMax(maxItemWidth, itemSize.width());
@@ -266,7 +266,7 @@ QSize OverlapLayout::calculatePreferredSize() const
     // Determine the maximum item width and height among all layout items.
     int maxItemWidth = 0;
     int maxItemHeight = 0;
-    for (QLayoutItem *item : itemList) {
+    for (const QLayoutItem *item : itemList) {
         if (item != nullptr && item->widget()) {
             QSize itemSize = item->widget()->sizeHint();
             maxItemWidth = qMax(maxItemWidth, itemSize.width());
@@ -406,7 +406,7 @@ int OverlapLayout::calculateMaxColumns() const
 
     // Determine maximum item width
     int maxItemWidth = 0;
-    for (QLayoutItem *item : itemList) {
+    for (const QLayoutItem *item : itemList) {
         if (item == nullptr || !item->widget()) {
             continue;
         }
@@ -457,7 +457,7 @@ int OverlapLayout::calculateMaxRows() const
 
     // Determine maximum item height
     int maxItemHeight = 0;
-    for (QLayoutItem *item : itemList) {
+    for (const QLayoutItem *item : itemList) {
         if (item == nullptr || !item->widget()) {
             continue;
         }

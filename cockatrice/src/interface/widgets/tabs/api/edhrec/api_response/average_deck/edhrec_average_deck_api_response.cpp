@@ -9,7 +9,7 @@ void EdhrecAverageDeckApiResponse::fromJson(const QJsonObject &json)
     deckStats.fromJson(json);
 
     // Parse Archidekt section
-    QJsonArray archidektJson = json.value("archidekt").toArray();
+    const QJsonArray archidektJson = json.value("archidekt").toArray();
     archidekt.fromJson(archidektJson);
 
     // Parse other fields
@@ -17,9 +17,9 @@ void EdhrecAverageDeckApiResponse::fromJson(const QJsonObject &json)
     header = json.value("header").toString();
     panels = json.value("panels").toObject();
     description = json.value("description").toString();
-    QJsonObject containerJson = json.value("container").toObject();
+    const QJsonObject containerJson = json.value("container").toObject();
     container.fromJson(containerJson);
-    QJsonArray cardsJson = json.value("deck").toArray();
+    const QJsonArray cardsJson = json.value("deck").toArray();
     deck.fromJson(cardsJson);
 }
 

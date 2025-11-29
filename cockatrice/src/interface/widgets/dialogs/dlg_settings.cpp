@@ -68,8 +68,8 @@ GeneralSettingsPage::GeneralSettingsPage()
         languageBox.addItem(langName, code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox.findText(setLanguage, Qt::MatchExactly);
+    const QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
+    const int index = languageBox.findText(setLanguage, Qt::MatchExactly);
     if (index == -1) {
         qWarning() << "could not find language" << setLanguage;
     } else {
@@ -77,7 +77,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     }
 
     // updates
-    SettingsCache &settings = SettingsCache::instance();
+    const SettingsCache &settings = SettingsCache::instance();
     startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
 
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
@@ -178,7 +178,7 @@ GeneralSettingsPage::GeneralSettingsPage()
     // Required init here to avoid crashing on Portable builds
     resetAllPathsButton = new QPushButton;
 
-    bool isPortable = settings.getIsPortableBuild();
+    const bool isPortable = settings.getIsPortableBuild();
     if (isPortable) {
         deckPathEdit->setEnabled(false);
         filtersPathEdit->setEnabled(false);
@@ -249,7 +249,7 @@ GeneralSettingsPage::GeneralSettingsPage()
 
 QStringList GeneralSettingsPage::findQmFiles()
 {
-    QDir dir(translationPath);
+    const QDir dir(translationPath);
     QStringList fileNames = dir.entryList(QStringList(translationPrefix + "_*.qm"), QDir::Files, QDir::Name);
     fileNames.replaceInStrings(QRegularExpression(translationPrefix + "_(.*)\\.qm"), "\\1");
     return fileNames;
@@ -259,8 +259,8 @@ QString GeneralSettingsPage::languageName(const QString &lang)
 {
     QTranslator qTranslator;
 
-    QString appNameHint = translationPrefix + "_" + lang;
-    bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
+    const QString appNameHint = translationPrefix + "_" + lang;
+    const bool appTranslationLoaded = qTranslator.load(appNameHint, translationPath);
     if (!appTranslationLoaded) {
         qCWarning(DlgSettingsLog) << "Unable to load" << translationPrefix << "translation" << appNameHint << "at"
                                   << translationPath;
@@ -271,7 +271,7 @@ QString GeneralSettingsPage::languageName(const QString &lang)
 
 void GeneralSettingsPage::deckPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -281,7 +281,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
 
 void GeneralSettingsPage::filtersPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -291,7 +291,7 @@ void GeneralSettingsPage::filtersPathButtonClicked()
 
 void GeneralSettingsPage::replaysPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), replaysPathEdit->text());
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), replaysPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -301,7 +301,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
 
 void GeneralSettingsPage::picsPathButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), picsPathEdit->text());
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), picsPathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -311,7 +311,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), cardDatabasePathEdit->text());
+    const QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), cardDatabasePathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -321,7 +321,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), customCardDatabasePathEdit->text());
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), customCardDatabasePathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -331,7 +331,7 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
+    const QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
     if (path.isEmpty())
         return;
 
@@ -393,16 +393,16 @@ void GeneralSettingsPage::retranslateUi()
 
     const auto &settings = SettingsCache::instance();
 
-    QDate lastCheckDate = settings.getLastCardUpdateCheck();
-    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    const QDate lastCheckDate = settings.getLastCardUpdateCheck();
+    const int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
 
     lastCardUpdateCheckDateLabel.setText(
         tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
 
     // We can't change the strings after they're put into the QComboBox, so this is our workaround
-    int oldIndex = updateReleaseChannelBox.currentIndex();
+    const int oldIndex = updateReleaseChannelBox.currentIndex();
     updateReleaseChannelBox.clear();
-    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
+    for (const ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
         updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
     }
     updateReleaseChannelBox.setCurrentIndex(oldIndex);
@@ -410,10 +410,10 @@ void GeneralSettingsPage::retranslateUi()
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {
-    SettingsCache &settings = SettingsCache::instance();
+    const SettingsCache &settings = SettingsCache::instance();
 
     // Theme settings
-    QString themeName = SettingsCache::instance().getThemeName();
+    const QString themeName = SettingsCache::instance().getThemeName();
 
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
@@ -429,15 +429,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
     }
 
-    QString homeTabBackgroundSource = SettingsCache::instance().getHomeTabBackgroundSource();
-    int homeTabBackgroundSourceId =
+    const QString homeTabBackgroundSource = SettingsCache::instance().getHomeTabBackgroundSource();
+    const int homeTabBackgroundSourceId =
         homeTabBackgroundSourceBox.findData(BackgroundSources::fromId(homeTabBackgroundSource));
     if (homeTabBackgroundSourceId != -1) {
         homeTabBackgroundSourceBox.setCurrentIndex(homeTabBackgroundSourceId);
     }
 
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
+        const auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
         SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
     });
 
@@ -545,7 +545,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         connect(pushButton, &QPushButton::clicked, this, [index, this]() {
             auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
-            auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
+            const auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
             if (!newColor.isValid())
                 return;
 
@@ -555,8 +555,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         auto *colorName = new QLabel;
         cardCounterNames.append(colorName);
 
-        int row = index / 3;
-        int column = 2 * (index % 3);
+        const int row = index / 3;
+        const int column = 2 * (index % 3);
 
         cardCounterColorsLayout->addWidget(pushButton, row, column);
         cardCounterColorsLayout->addWidget(colorName, row, column + 1);
@@ -628,14 +628,14 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
 void AppearanceSettingsPage::themeBoxChanged(int index)
 {
-    QStringList themeDirs = themeManager->getAvailableThemes().keys();
+    const QStringList themeDirs = themeManager->getAvailableThemes().keys();
     if (index >= 0 && index < themeDirs.count())
         SettingsCache::instance().setThemeName(themeDirs.at(index));
 }
 
 void AppearanceSettingsPage::openThemeLocation()
 {
-    QString dir = SettingsCache::instance().getThemesPath();
+    const QString dir = SettingsCache::instance().getThemesPath();
     QDir dirDir = dir;
     dirDir.cdUp();
     // open if dir exists, create if parent dir does exist
@@ -673,7 +673,7 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
                "Are you sure you would like to disable this feature?");
     }
 
-    QMessageBox::StandardButton result =
+    const QMessageBox::StandardButton result =
         QMessageBox::question(this, tr("Confirm Change"), message, QMessageBox::Yes | QMessageBox::No);
 
     if (result == QMessageBox::Yes) {
@@ -747,7 +747,7 @@ void AppearanceSettingsPage::retranslateUi()
 
     cardCountersGroupBox->setTitle(tr("Card counters"));
 
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
     for (int index = 0; index < cardCounterNames.size(); ++index) {
         cardCounterNames[index]->setText(tr("Counter %1").arg(cardCounterSettings.displayName(index)));
     }
@@ -1059,17 +1059,17 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkRedirectCacheTtlEdit.setSingleStep(1);
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
 
-    auto networkCacheLayout = new QHBoxLayout;
+    const auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
     networkCacheLayout->addWidget(&networkCacheLabel);
     networkCacheLayout->addWidget(&networkCacheEdit);
 
-    auto networkRedirectCacheLayout = new QHBoxLayout;
+    const auto networkRedirectCacheLayout = new QHBoxLayout;
     networkRedirectCacheLayout->addStretch();
     networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlLabel);
     networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlEdit);
 
-    auto pixmapCacheLayout = new QHBoxLayout;
+    const auto pixmapCacheLayout = new QHBoxLayout;
     pixmapCacheLayout->addStretch();
     pixmapCacheLayout->addWidget(&pixmapCacheLabel);
     pixmapCacheLayout->addWidget(&pixmapCacheEdit);
@@ -1135,7 +1135,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
     // These are not used anymore, but we don't delete them automatically, so
     // we should do it here lest we leave pictures hanging around on users'
     // machines.
-    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
+    const QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
     QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     bool outerSuccessRemove = true;
     for (const auto &dir : dirs) {
@@ -1152,7 +1152,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
         }
 
         if (innerSuccessRemove) {
-            bool success = QDir(picsPath).rmdir(dir);
+            const bool success = QDir(picsPath).rmdir(dir);
             if (!success) {
                 qInfo() << "Failed to remove inner directory" << picsPath;
             } else {
@@ -1171,7 +1171,7 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 void DeckEditorSettingsPage::actAddURL()
 {
     bool ok;
-    QString msg = QInputDialog::getText(this, tr("Add URL"), tr("URL:"), QLineEdit::Normal, QString(), &ok);
+    const QString msg = QInputDialog::getText(this, tr("Add URL"), tr("URL:"), QLineEdit::Normal, QString(), &ok);
     if (ok) {
         urlList->addItem(msg);
         storeSettings();
@@ -1189,9 +1189,9 @@ void DeckEditorSettingsPage::actRemoveURL()
 void DeckEditorSettingsPage::actEditURL()
 {
     if (urlList->currentItem()) {
-        QString oldText = urlList->currentItem()->text();
+        const QString oldText = urlList->currentItem()->text();
         bool ok;
-        QString msg = QInputDialog::getText(this, tr("Edit URL"), tr("URL:"), QLineEdit::Normal, oldText, &ok);
+        const QString msg = QInputDialog::getText(this, tr("Edit URL"), tr("URL:"), QLineEdit::Normal, oldText, &ok);
         if (ok) {
             urlList->currentItem()->setText(msg);
             storeSettings();
@@ -1223,7 +1223,7 @@ void DeckEditorSettingsPage::updateSpoilers()
     updateNowButton->setText(tr("Updating..."));
 
     // Create a new SBU that will act as if the client was just reloaded
-    auto *sbu = new SpoilerBackgroundUpdater();
+    const auto *sbu = new SpoilerBackgroundUpdater();
     connect(sbu, &SpoilerBackgroundUpdater::spoilerCheckerDone, this, &DeckEditorSettingsPage::unlockSettings);
     connect(sbu, &SpoilerBackgroundUpdater::spoilersUpdatedSuccessfully, this, &DeckEditorSettingsPage::unlockSettings);
 }
@@ -1236,10 +1236,10 @@ void DeckEditorSettingsPage::unlockSettings()
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
 {
-    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
-    QFileInfo fi(fileName);
+    const QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
+    const QFileInfo fi(fileName);
     QDir fileDir(fi.path());
-    QFile file(fileName);
+    const QFile file(fileName);
 
     if (file.exists()) {
         return fi.lastModified().toString("MMM d, hh:mm");
@@ -1250,7 +1250,8 @@ QString DeckEditorSettingsPage::getLastUpdateTime()
 
 void DeckEditorSettingsPage::spoilerPathButtonClicked()
 {
-    QString lsPath = QFileDialog::getExistingDirectory(this, tr("Choose path"), mpSpoilerSavePathLineEdit->text());
+    const QString lsPath =
+        QFileDialog::getExistingDirectory(this, tr("Choose path"), mpSpoilerSavePathLineEdit->text());
     if (lsPath.isEmpty()) {
         return;
     }
@@ -1378,7 +1379,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     messageList = new QListWidget;
 
-    int count = SettingsCache::instance().messages().getCount();
+    const int count = SettingsCache::instance().messages().getCount();
     for (int i = 0; i < count; i++)
         messageList->addItem(SettingsCache::instance().messages().getMessageAt(i));
 
@@ -1426,7 +1427,7 @@ MessagesSettingsPage::MessagesSettingsPage()
 void MessagesSettingsPage::updateColor(const QString &value)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor colorToSet = QColor::fromString("#" + value);
+    const QColor colorToSet = QColor::fromString("#" + value);
 #else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
@@ -1440,7 +1441,7 @@ void MessagesSettingsPage::updateColor(const QString &value)
 void MessagesSettingsPage::updateHighlightColor(const QString &value)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor colorToSet = QColor::fromString("#" + value);
+    const QColor colorToSet = QColor::fromString("#" + value);
 #else
     QColor colorToSet;
     colorToSet.setNamedColor("#" + value);
@@ -1488,7 +1489,7 @@ void MessagesSettingsPage::storeSettings()
 void MessagesSettingsPage::actAdd()
 {
     bool ok;
-    QString msg =
+    const QString msg =
         getTextWithMax(this, tr("Add message"), tr("Message:"), QLineEdit::Normal, QString(), &ok, MAX_TEXT_LENGTH);
     if (ok) {
         messageList->addItem(msg);
@@ -1499,9 +1500,9 @@ void MessagesSettingsPage::actAdd()
 void MessagesSettingsPage::actEdit()
 {
     if (messageList->currentItem()) {
-        QString oldText = messageList->currentItem()->text();
+        const QString oldText = messageList->currentItem()->text();
         bool ok;
-        QString msg =
+        const QString msg =
             getTextWithMax(this, tr("Edit message"), tr("Message:"), QLineEdit::Normal, oldText, &ok, MAX_TEXT_LENGTH);
         if (ok) {
             messageList->currentItem()->setText(msg);
@@ -1549,7 +1550,7 @@ SoundSettingsPage::SoundSettingsPage()
     connect(&soundEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setSoundEnabled);
 
-    QString themeName = SettingsCache::instance().getSoundThemeName();
+    const QString themeName = SettingsCache::instance().getSoundThemeName();
 
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
@@ -1602,7 +1603,7 @@ SoundSettingsPage::SoundSettingsPage()
 
 void SoundSettingsPage::themeBoxChanged(int index)
 {
-    QStringList themeDirs = soundEngine->getAvailableThemes().keys();
+    const QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     if (index >= 0 && index < themeDirs.count())
         SettingsCache::instance().setSoundThemeName(themeDirs.at(index));
 }
@@ -1702,8 +1703,8 @@ void ShortcutSettingsPage::currentItemChanged(const QString &key)
         currentActionName->setText("");
         editTextBox->setShortcutName("");
     } else {
-        QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
-        QString action = SettingsCache::instance().shortcuts().getShortcut(key).getName();
+        const QString group = SettingsCache::instance().shortcuts().getShortcut(key).getGroupName();
+        const QString action = SettingsCache::instance().shortcuts().getShortcut(key).getName();
         currentActionGroupName->setText(group);
         currentActionName->setText(action);
         editTextBox->setShortcutName(key);
@@ -1755,7 +1756,7 @@ static QScrollArea *makeScrollable(QWidget *widget)
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 {
-    auto rec = QGuiApplication::primaryScreen()->availableGeometry();
+    const auto rec = QGuiApplication::primaryScreen()->availableGeometry();
     this->setMinimumSize(qMin(700, rec.width()), qMin(700, rec.height()));
 
     connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::updateLanguage);
@@ -1865,7 +1866,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 {
     bool showLoadError = true;
     QString loadErrorMessage = tr("Unknown Error loading card database");
-    LoadStatus loadStatus = CardDatabaseManager::getInstance()->getLoadStatus();
+    const LoadStatus loadStatus = CardDatabaseManager::getInstance()->getLoadStatus();
     qCInfo(DlgSettingsLog) << "Card Database load status: " << loadStatus;
     switch (loadStatus) {
         case Ok:

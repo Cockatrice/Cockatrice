@@ -35,7 +35,7 @@ bool LineEditUnfocusable::isUnfocusShortcut(QKeyEvent *event)
 
     keyNoMod = QKeySequence(event->key()).toString();
 
-    QKeySequence key(modifier + keyNoMod);
+    const QKeySequence key(modifier + keyNoMod);
     QList<QKeySequence> unfocusShortcut = SettingsCache::instance().shortcuts().getShortcut("Player/unfocusTextBox");
 
     for (const auto &unfocusKey : unfocusShortcut) {
@@ -77,7 +77,7 @@ void SearchLineEdit::keyPressEvent(QKeyEvent *event)
     static const QVector<Qt::Key> forwardToTreeView = {Qt::Key_Up, Qt::Key_Down, Qt::Key_PageDown, Qt::Key_PageUp};
     // forward only if the search text is empty
     static const QVector<Qt::Key> forwardWhenEmpty = {Qt::Key_Home, Qt::Key_End};
-    Qt::Key key = static_cast<Qt::Key>(event->key());
+    const Qt::Key key = static_cast<Qt::Key>(event->key());
     if (treeView) {
         if (forwardToTreeView.contains(key))
             QCoreApplication::sendEvent(treeView, event);

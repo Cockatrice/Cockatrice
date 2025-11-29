@@ -38,10 +38,10 @@ DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const 
 QSize DeckPreviewTagDisplayWidget::sizeHint() const
 {
     // Calculate the size based on the tag name and close button
-    QFontMetrics fm(font());
-    int textWidth = fm.horizontalAdvance(tagName);
-    int width = textWidth + 50;    // Add extra padding
-    int height = fm.height() + 10; // Height based on font size + padding
+    const QFontMetrics fm(font());
+    const int textWidth = fm.horizontalAdvance(tagName);
+    const int width = textWidth + 50;    // Add extra padding
+    const int height = fm.height() + 10; // Height based on font size + padding
 
     return QSize(width, height);
 }

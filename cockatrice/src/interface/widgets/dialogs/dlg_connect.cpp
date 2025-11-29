@@ -214,9 +214,9 @@ void DlgConnect::rebuildComboBoxList(int failure)
     savedHostList = uci.getServerInfo();
 
     auto &servers = SettingsCache::instance().servers();
-    bool autoConnectEnabled = servers.getAutoConnect() > 0;
-    QString previousHostName = servers.getPrevioushostName();
-    QString autoConnectSaveName = servers.getSaveName();
+    const bool autoConnectEnabled = servers.getAutoConnect() > 0;
+    const QString previousHostName = servers.getPrevioushostName();
+    const QString autoConnectSaveName = servers.getSaveName();
 
     int index = 0;
 
@@ -272,7 +272,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
               << "";
     }
 
-    bool savePasswordStatus = (_data.at(5) == "1");
+    const bool savePasswordStatus = (_data.at(5) == "1");
 
     saveEdit->setText(_data.at(0));
     hostEdit->setText(_data.at(1));
@@ -285,7 +285,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     }
 
     if (!_data.at(6).isEmpty()) {
-        QString formattedLink = "<a href=\"" + _data.at(6) + "\">" + _data.at(6) + "</a>";
+        const QString formattedLink = "<a href=\"" + _data.at(6) + "\">" + _data.at(6) + "</a>";
         serverContactLabel->setText(tr("Webpage") + ":");
         serverContactLink->setText(formattedLink);
     } else {

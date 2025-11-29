@@ -91,7 +91,7 @@ int InnerDecklistNode::recursiveCount(bool countTotalCards) const
 {
     int result = 0;
     for (int i = 0; i < size(); i++) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(at(i));
+        const auto *node = dynamic_cast<InnerDecklistNode *>(at(i));
 
         if (node) {
             result += node->recursiveCount(countTotalCards);
@@ -118,10 +118,10 @@ bool InnerDecklistNode::compare(AbstractDecklistNode *other) const
 
 bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
 {
-    auto *other2 = dynamic_cast<InnerDecklistNode *>(other);
+    const auto *other2 = dynamic_cast<InnerDecklistNode *>(other);
     if (other2) {
-        int n1 = recursiveCount(true);
-        int n2 = other2->recursiveCount(true);
+        const int n1 = recursiveCount(true);
+        const int n2 = other2->recursiveCount(true);
         return (n1 != n2) ? (n1 > n2) : compareName(other);
     } else {
         return false;
@@ -130,7 +130,7 @@ bool InnerDecklistNode::compareNumber(AbstractDecklistNode *other) const
 
 bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
 {
-    auto *other2 = dynamic_cast<InnerDecklistNode *>(other);
+    const auto *other2 = dynamic_cast<InnerDecklistNode *>(other);
     if (other2) {
         return (getName() > other2->getName());
     } else {

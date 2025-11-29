@@ -44,7 +44,7 @@ void CardSearchModel::updateSearchResults(const QString &query)
     for (int i = 0; i < sourceModel->rowCount(); ++i) {
         QModelIndex modelIndex = sourceModel->index(i, 0);
         QModelIndex sourceIndex = sourceModel->mapToSource(modelIndex);
-        CardDatabaseModel *sourceDbModel = qobject_cast<CardDatabaseModel *>(sourceModel->sourceModel());
+        const CardDatabaseModel *sourceDbModel = qobject_cast<CardDatabaseModel *>(sourceModel->sourceModel());
 
         if (!sourceDbModel || !sourceIndex.isValid())
             return;
@@ -54,7 +54,7 @@ void CardSearchModel::updateSearchResults(const QString &query)
         if (!card)
             continue;
 
-        int distance = levenshteinDistance(query.toLower(), card->getName().toLower());
+        const int distance = levenshteinDistance(query.toLower(), card->getName().toLower());
         searchResults.append({card, distance});
     }
 

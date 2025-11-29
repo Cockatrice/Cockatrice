@@ -49,7 +49,7 @@ std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
 
     QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             if (info) {
@@ -73,7 +73,7 @@ void ManaDevotionWidget::updateDisplay()
     }
 
     int highestEntry = 0;
-    for (auto entry : manaDevotionMap) {
+    for (const auto entry : manaDevotionMap) {
         if (highestEntry < entry.second) {
             highestEntry = entry.second;
         }
@@ -85,7 +85,7 @@ void ManaDevotionWidget::updateDisplay()
                                                    {'G', QColor(0, 115, 62)},    {'C', QColor(150, 150, 150)}};
 
     for (auto entry : manaDevotionMap) {
-        QColor barColor = manaColors.count(entry.first) ? manaColors[entry.first] : Qt::gray;
+        const QColor barColor = manaColors.count(entry.first) ? manaColors[entry.first] : Qt::gray;
         BarWidget *barWidget = new BarWidget(QString(entry.first), entry.second, highestEntry, barColor, this);
         barLayout->addWidget(barWidget);
     }
@@ -97,7 +97,7 @@ std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString
 {
     std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
 
-    int len = manaString.length();
+    const int len = manaString.length();
     for (int i = 0; i < len; ++i) {
         if (manaString[i] == '{') {
             ++i; // Move past '{'

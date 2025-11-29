@@ -74,7 +74,7 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
         aMoveHandToRfg = new QAction(this);
         aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
 
-        auto hand = player->getHandZone();
+        const auto hand = player->getHandZone();
 
         connect(aMoveHandToTopLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
         connect(aMoveHandToBottomLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
@@ -122,7 +122,7 @@ void HandMenu::retranslateUi()
 
 void HandMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aViewHand->setShortcuts(shortcuts.getShortcut("Player/aViewHand"));
     aSortHandByName->setShortcuts(shortcuts.getShortcut("Player/aSortHandByName"));
     aSortHandByType->setShortcuts(shortcuts.getShortcut("Player/aSortHandByType"));
@@ -152,7 +152,7 @@ void HandMenu::populateRevealHandMenuWithActivePlayers()
     mRevealHand->addSeparator();
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
-    for (auto *other : players) {
+    for (const auto *other : players) {
         if (other == player)
             continue;
         QAction *a = mRevealHand->addAction(other->getPlayerInfo()->getName());
@@ -170,7 +170,7 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
     mRevealRandomHandCard->addSeparator();
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
-    for (auto *other : players) {
+    for (const auto *other : players) {
         if (other == player)
             continue;
         QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo()->getName());
@@ -181,7 +181,7 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
 
 void HandMenu::onRevealHandTriggered()
 {
-    auto *action = qobject_cast<QAction *>(sender());
+    const auto *action = qobject_cast<QAction *>(sender());
     if (!action)
         return;
 
@@ -191,7 +191,7 @@ void HandMenu::onRevealHandTriggered()
 
 void HandMenu::onRevealRandomHandCardTriggered()
 {
-    auto *action = qobject_cast<QAction *>(sender());
+    const auto *action = qobject_cast<QAction *>(sender());
     if (!action)
         return;
 

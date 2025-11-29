@@ -23,11 +23,11 @@ void DeckListHistoryManager::undo(DeckList *deck)
     const DeckListMemento &mementoToRestore = undoStack.top();
 
     // Save current state for redo
-    DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
+    const DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
     redoStack.push(currentState);
 
     // Pop the last state from undo stack and restore it
-    DeckListMemento memento = undoStack.pop();
+    const DeckListMemento memento = undoStack.pop();
     deck->restoreMemento(memento);
 
     emit undoRedoStateChanged();
@@ -42,11 +42,11 @@ void DeckListHistoryManager::redo(DeckList *deck)
     const DeckListMemento &mementoToRestore = redoStack.top();
 
     // Save current state for undo
-    DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
+    const DeckListMemento currentState = deck->createMemento(mementoToRestore.getReason());
     undoStack.push(currentState);
 
     // Pop the next state from redo stack and restore it
-    DeckListMemento memento = redoStack.pop();
+    const DeckListMemento memento = redoStack.pop();
     deck->restoreMemento(memento);
 
     emit undoRedoStateChanged();

@@ -91,7 +91,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenFromDeckRadioButton = new QRadioButton(tr("Show tokens from this &deck"));
     connect(chooseTokenFromDeckRadioButton, &QRadioButton::toggled, this, &DlgCreateToken::actChooseTokenFromDeck);
 
-    QByteArray deckHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
+    const QByteArray deckHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     chooseTokenView = new QTreeView;
     chooseTokenView->setModel(cardDatabaseDisplayModel);
     chooseTokenView->setUniformRowHeights(true);

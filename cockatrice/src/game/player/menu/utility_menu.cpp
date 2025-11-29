@@ -6,7 +6,7 @@
 
 UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
-    PlayerActions *playerActions = player->getPlayerActions();
+    const PlayerActions *playerActions = player->getPlayerActions();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aUntapAll = new QAction(this);
@@ -62,7 +62,7 @@ void UtilityMenu::populatePredefinedTokensMenu()
         return;
     }
 
-    InnerDecklistNode *tokenZone =
+    const InnerDecklistNode *tokenZone =
         dynamic_cast<InnerDecklistNode *>(_deck->getDeckList()->getRoot()->findChild(DECK_ZONE_TOKENS));
 
     if (tokenZone) {
@@ -95,7 +95,7 @@ void UtilityMenu::retranslateUi()
 
 void UtilityMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));

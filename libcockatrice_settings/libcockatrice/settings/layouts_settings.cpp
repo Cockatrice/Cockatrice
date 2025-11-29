@@ -27,7 +27,7 @@ void LayoutsSettings::setDeckEditorGeometry(const QByteArray &value)
 
 QSize LayoutsSettings::getDeckEditorCardSize()
 {
-    QVariant previous = getValue("layouts/deckEditor_CardSize");
+    const QVariant previous = getValue("layouts/deckEditor_CardSize");
     return previous == QVariant() ? QSize(250, 500) : previous.toSize();
 }
 
@@ -38,7 +38,7 @@ void LayoutsSettings::setDeckEditorCardSize(const QSize &value)
 
 QSize LayoutsSettings::getDeckEditorDeckSize()
 {
-    QVariant previous = getValue("layouts/deckEditor_DeckSize");
+    const QVariant previous = getValue("layouts/deckEditor_DeckSize");
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
 }
 
@@ -49,7 +49,7 @@ void LayoutsSettings::setDeckEditorDeckSize(const QSize &value)
 
 QSize LayoutsSettings::getDeckEditorPrintingSelectorSize()
 {
-    QVariant previous = getValue("layouts/deckEditor_PrintingSelectorSize");
+    const QVariant previous = getValue("layouts/deckEditor_PrintingSelectorSize");
     return previous == QVariant() ? QSize(525, 250) : previous.toSize();
 }
 
@@ -60,7 +60,7 @@ void LayoutsSettings::setDeckEditorPrintingSelectorSize(const QSize &value)
 
 QSize LayoutsSettings::getDeckEditorFilterSize()
 {
-    QVariant previous = getValue("layouts/deckEditor_FilterSize");
+    const QVariant previous = getValue("layouts/deckEditor_FilterSize");
     return previous == QVariant() ? QSize(250, 250) : previous.toSize();
 }
 
@@ -111,7 +111,7 @@ const QByteArray LayoutsSettings::getGamePlayAreaGeometry()
 
 const QSize LayoutsSettings::getGameCardInfoSize()
 {
-    QVariant previous = getValue("layouts/gameplayarea_CardInfoSize");
+    const QVariant previous = getValue("layouts/gameplayarea_CardInfoSize");
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
 }
 
@@ -122,7 +122,7 @@ void LayoutsSettings::setGameCardInfoSize(const QSize &value)
 
 const QSize LayoutsSettings::getGameMessageLayoutSize()
 {
-    QVariant previous = getValue("layouts/gameplayarea_MessageLayoutSize");
+    const QVariant previous = getValue("layouts/gameplayarea_MessageLayoutSize");
     return previous == QVariant() ? QSize(250, 250) : previous.toSize();
 }
 
@@ -133,7 +133,7 @@ void LayoutsSettings::setGameMessageLayoutSize(const QSize &value)
 
 const QSize LayoutsSettings::getGamePlayerListSize()
 {
-    QVariant previous = getValue("layouts/gameplayarea_PlayerListSize");
+    const QVariant previous = getValue("layouts/gameplayarea_PlayerListSize");
     return previous == QVariant() ? QSize(250, 50) : previous.toSize();
 }
 
@@ -164,7 +164,7 @@ const QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
 
 const QSize LayoutsSettings::getReplayCardInfoSize()
 {
-    QVariant previous = getValue("layouts/replayplayarea_CardInfoSize");
+    const QVariant previous = getValue("layouts/replayplayarea_CardInfoSize");
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
 }
 
@@ -175,7 +175,7 @@ void LayoutsSettings::setReplayCardInfoSize(const QSize &value)
 
 const QSize LayoutsSettings::getReplayMessageLayoutSize()
 {
-    QVariant previous = getValue("layouts/replayplayarea_MessageLayoutSize");
+    const QVariant previous = getValue("layouts/replayplayarea_MessageLayoutSize");
     return previous == QVariant() ? QSize(250, 200) : previous.toSize();
 }
 
@@ -186,7 +186,7 @@ void LayoutsSettings::setReplayMessageLayoutSize(const QSize &value)
 
 const QSize LayoutsSettings::getReplayPlayerListSize()
 {
-    QVariant previous = getValue("layouts/replayplayarea_PlayerListSize");
+    const QVariant previous = getValue("layouts/replayplayarea_PlayerListSize");
     return previous == QVariant() ? QSize(250, 50) : previous.toSize();
 }
 
@@ -197,7 +197,7 @@ void LayoutsSettings::setReplayPlayerListSize(const QSize &value)
 
 const QSize LayoutsSettings::getReplayReplaySize()
 {
-    QVariant previous = getValue("layouts/replayplayarea_ReplaySize");
+    const QVariant previous = getValue("layouts/replayplayarea_ReplaySize");
     return previous == QVariant() ? QSize(900, 100) : previous.toSize();
 }
 

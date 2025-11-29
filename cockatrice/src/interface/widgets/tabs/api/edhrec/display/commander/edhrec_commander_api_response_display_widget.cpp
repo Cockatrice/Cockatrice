@@ -64,13 +64,13 @@ EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget
 
     // Connect the list view to ensure the corresponding widget is visible
     connect(listView, &QListView::clicked, this, [this](const QModelIndex &index) {
-        int widgetIndex = index.row();
+        const int widgetIndex = index.row();
         qDebug() << "clicked: " << widgetIndex;
-        auto targetWidget = cardDisplayLayout->itemAt(widgetIndex)->widget();
+        const auto targetWidget = cardDisplayLayout->itemAt(widgetIndex)->widget();
         if (targetWidget) {
             qDebug() << "Found targetWidget" << targetWidget;
             // Attempt to cast the parent to QScrollArea
-            auto scrollArea = qobject_cast<QScrollArea *>(this->scrollArea); // Use the scroll area instance
+            const auto scrollArea = qobject_cast<QScrollArea *>(this->scrollArea); // Use the scroll area instance
             if (scrollArea) {
                 qDebug() << "ScrollArea" << scrollArea;
                 scrollArea->ensureWidgetVisible(targetWidget);

@@ -10,7 +10,7 @@
 BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency)
     : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
 {
-    auto layout = new QHBoxLayout(this);
+    const auto layout = new QHBoxLayout(this);
 
     iconLabel = new QLabel(this);
     iconLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -82,7 +82,7 @@ void BannerWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // Calculate alpha based on transparency percentage
-    int alpha = (255 * transparency) / 100;
+    const int alpha = (255 * transparency) / 100;
 
     // Determine gradient direction
     QLinearGradient gradient;

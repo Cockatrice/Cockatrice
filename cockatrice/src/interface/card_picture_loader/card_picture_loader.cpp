@@ -32,7 +32,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
-    QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
+    const QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
     if (mainWindow) {
         mainWindow->statusBar()->addPermanentWidget(statusBar);
     }
@@ -50,7 +50,8 @@ CardPictureLoader::~CardPictureLoader()
 
 void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + "x" + QString::number(size.height());
+    const QString backCacheKey =
+        "_trice_card_back_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderLog) << "PictureLoader: cache miss for" << backCacheKey;
         QPixmap tmpPixmap("theme:cardback");
@@ -70,7 +71,7 @@ void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
 
 void CardPictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey =
+    const QString backCacheKey =
         "_trice_card_back_inprogress_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
@@ -92,7 +93,7 @@ void CardPictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSiz
 
 void CardPictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize size)
 {
-    QString backCacheKey =
+    const QString backCacheKey =
         "_trice_card_back_failed_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
@@ -118,8 +119,9 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
         return;
     }
 
-    QString key = card.getPixmapCacheKey();
-    QString sizeKey = key + QLatin1Char('_') + QString::number(size.width()) + "x" + QString::number(size.height());
+    const QString key = card.getPixmapCacheKey();
+    const QString sizeKey =
+        key + QLatin1Char('_') + QString::number(size.width()) + "x" + QString::number(size.height());
 
     if (QPixmapCache::find(sizeKey, &pixmap)) {
         return; // Use cached version
@@ -133,8 +135,8 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
             return;
         }
 
-        QScreen *screen = qApp->primaryScreen();
-        qreal dpr = screen ? screen->devicePixelRatio() : 1.0;
+        const QScreen *screen = qApp->primaryScreen();
+        const qreal dpr = screen ? screen->devicePixelRatio() : 1.0;
         qCDebug(CardPictureLoaderLog) << "Scaling cached image for" << card.getName();
 
         pixmap = bigPixmap.scaled(size * dpr, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -156,7 +158,7 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
     } else {
         if (card.getInfo().getUiAttributes().upsideDownArt) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
-            QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
+            const QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
 #else
             QImage mirrorImage = image.mirrored(true, true);
 #endif
@@ -188,7 +190,7 @@ void CardPictureLoader::clearNetworkCache()
 void CardPictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)
 {
     QPixmap tmp;
-    int max = qMin(cards.size(), CACHED_CARD_PER_DECK_MAX);
+    const int max = qMin(cards.size(), CACHED_CARD_PER_DECK_MAX);
     for (int i = 0; i < max; ++i) {
         const ExactCard &card = cards.at(i);
         if (!card) {
@@ -216,7 +218,7 @@ void CardPictureLoader::picsPathChanged()
 
 bool CardPictureLoader::hasCustomArt()
 {
-    auto picsPath = SettingsCache::instance().getPicsPath();
+    const auto picsPath = SettingsCache::instance().getPicsPath();
     QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
 
     // Check if there is at least one non-directory file in the pics path, other

@@ -25,10 +25,10 @@ QRectF GeneralCounter::boundingRect() const
 
 void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
-    int translatedHeight = mapRect.size().height();
-    qreal scaleFactor = translatedHeight / boundingRect().height();
-    QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
+    const QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
+    const int translatedHeight = mapRect.size().height();
+    const qreal scaleFactor = translatedHeight / boundingRect().height();
+    const QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
 
     painter->save();
     resetPainterTransform(painter);

@@ -64,7 +64,7 @@ CardPictureLoaderWorker::~CardPictureLoaderWorker()
 
 void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker)
 {
-    QUrl cachedRedirect = getCachedRedirect(url);
+    const QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         queueRequest(cachedRedirect, worker);
     } else if (cache->metaData(url).isValid()) {
@@ -80,7 +80,7 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
 QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker)
 {
     // Check for cached redirects
-    QUrl cachedRedirect = getCachedRedirect(url);
+    const QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         emit imageRequestSucceeded(url);
         return makeRequest(cachedRedirect, worker);
@@ -115,7 +115,7 @@ void CardPictureLoaderWorker::processQueuedRequests()
 bool CardPictureLoaderWorker::processSingleRequest()
 {
     if (!requestLoadQueue.isEmpty()) {
-        auto request = requestLoadQueue.takeFirst();
+        const auto request = requestLoadQueue.takeFirst();
         makeRequest(request.first, request.second);
         return true;
     }
@@ -139,7 +139,7 @@ void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
     currentlyLoading.insert(card.getPixmapCacheKey());
 
     // try to load image from local first
-    QImage image = localLoader->tryLoad(card);
+    const QImage image = localLoader->tryLoad(card);
     if (!image.isNull()) {
         handleImageLoaded(card, image);
     } else {
@@ -181,7 +181,7 @@ void CardPictureLoaderWorker::loadRedirectCache()
     QSettings settings(cacheFilePath, QSettings::IniFormat);
 
     redirectCache.clear();
-    int size = settings.beginReadArray(REDIRECT_HEADER_NAME);
+    const int size = settings.beginReadArray(REDIRECT_HEADER_NAME);
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
         QUrl originalUrl = settings.value(REDIRECT_ORIGINAL_URL).toUrl();
@@ -212,7 +212,7 @@ void CardPictureLoaderWorker::saveRedirectCache() const
 
 void CardPictureLoaderWorker::cleanStaleEntries()
 {
-    QDateTime now = QDateTime::currentDateTimeUtc();
+    const QDateTime now = QDateTime::currentDateTimeUtc();
 
     auto it = redirectCache.begin();
     while (it != redirectCache.end()) {

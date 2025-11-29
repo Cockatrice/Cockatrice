@@ -19,7 +19,7 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
     availableParsers << new CockatriceXml4Parser(_preferenceProvider);
     availableParsers << new CockatriceXml3Parser;
 
-    for (auto *p : availableParsers) {
+    for (const auto *p : availableParsers) {
         // connect parser outputs to the database adders
         connect(p, &ICardDatabaseParser::addCard, database, &CardDatabase::addCard, Qt::DirectConnection);
         connect(p, &ICardDatabaseParser::addSet, database, &CardDatabase::addSet, Qt::DirectConnection);
@@ -43,7 +43,7 @@ LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
         return FileError;
     }
 
-    for (auto parser : availableParsers) {
+    for (const auto parser : availableParsers) {
         file.reset();
         if (parser->getCanParseFile(fileName, file)) {
             file.reset();
@@ -57,14 +57,14 @@ LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
 
 LoadStatus CardDatabaseLoader::loadCardDatabase(const QString &path)
 {
-    auto startTime = QTime::currentTime();
+    const auto startTime = QTime::currentTime();
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty()) {
         QMutexLocker locker(loadFromFileMutex);
         tempLoadStatus = loadFromFile(path);
     }
 
-    int msecs = startTime.msecsTo(QTime::currentTime());
+    const int msecs = startTime.msecsTo(QTime::currentTime());
     qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
                                    << "Cards =" << (database ? database->cards.size() : 0)
                                    << "Sets =" << (database ? database->sets.size() : 0) << QString("%1ms").arg(msecs);
@@ -86,9 +86,9 @@ LoadStatus CardDatabaseLoader::loadCardDatabases()
 
     database->clear(); // remove old db
 
-    LoadStatus loadStatus = loadCardDatabase(pathProvider->getCardDatabasePath()); // load main card database
-    loadCardDatabase(pathProvider->getTokenDatabasePath());                        // load tokens database
-    loadCardDatabase(pathProvider->getSpoilerCardDatabasePath());                  // load spoilers database
+    const LoadStatus loadStatus = loadCardDatabase(pathProvider->getCardDatabasePath()); // load main card database
+    loadCardDatabase(pathProvider->getTokenDatabasePath());                              // load tokens database
+    loadCardDatabase(pathProvider->getSpoilerCardDatabasePath());                        // load spoilers database
 
     // find all custom card databases, recursively & following symlinks
     // then load them alphabetically
@@ -136,10 +136,10 @@ bool CardDatabaseLoader::saveCustomTokensToFile()
         return false;
     }
 
-    QString fileName = pathProvider->getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
+    const QString fileName = pathProvider->getCustomCardDatabasePath() + "/" + CardSet::TOKENS_SETNAME + ".xml";
 
     SetNameMap tmpSets;
-    CardSetPtr customTokensSet = database->getSet(CardSet::TOKENS_SETNAME);
+    const CardSetPtr customTokensSet = database->getSet(CardSet::TOKENS_SETNAME);
     tmpSets.insert(CardSet::TOKENS_SETNAME, customTokensSet);
 
     CardNameMap tmpCards;

@@ -128,7 +128,7 @@ void DeckEditorFilterDockWidget::actClearFilterOne()
 
 void DeckEditorFilterDockWidget::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aClearFilterAll->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClearFilterAll"));
     aClearFilterOne->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aClearFilterOne"));

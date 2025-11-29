@@ -52,7 +52,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
         searchEdit.setClearButtonEnabled(true);
         searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-        auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+        const auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
@@ -175,7 +175,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
 void ZoneViewWidget::processGroupBy(int index)
 {
-    auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
+    const auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
     SettingsCache::instance().setZoneViewGroupByIndex(index);
     zone->setGroupBy(option);
 
@@ -191,7 +191,7 @@ void ZoneViewWidget::processGroupBy(int index)
 
 void ZoneViewWidget::processSortBy(int index)
 {
-    auto option = static_cast<CardList::SortOption>(sortBySelector.itemData(index).toInt());
+    const auto option = static_cast<CardList::SortOption>(sortBySelector.itemData(index).toInt());
 
     // set to SortByName instead if it has the same value as groupBy
     if (option != CardList::NoSort &&
@@ -215,7 +215,7 @@ void ZoneViewWidget::retranslateUi()
     setWindowTitle(zone->getLogic()->getTranslatedName(false, CaseNominative));
 
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
-        int oldIndex = groupBySelector.currentIndex();
+        const int oldIndex = groupBySelector.currentIndex();
         groupBySelector.clear();
         groupBySelector.addItem(tr("Ungrouped"), CardList::NoSort);
         groupBySelector.addItem(tr("Group by Type"), CardList::SortByMainType);
@@ -225,7 +225,7 @@ void ZoneViewWidget::retranslateUi()
     }
 
     {
-        int oldIndex = sortBySelector.currentIndex();
+        const int oldIndex = sortBySelector.currentIndex();
         sortBySelector.clear();
         sortBySelector.addItem(tr("Unsorted"), CardList::NoSort);
         sortBySelector.addItem(tr("Sort by Name"), CardList::SortByName);
@@ -246,14 +246,14 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
     if (!scene())
         return;
 
-    int titleBarHeight = 24;
+    const int titleBarHeight = 24;
 
     QPointF scenePos = pos();
 
     if (scenePos.x() < 0) {
         scenePos.setX(0);
     } else {
-        qreal maxw = scene()->sceneRect().width() - 100;
+        const qreal maxw = scene()->sceneRect().width() - 100;
         if (scenePos.x() > maxw)
             scenePos.setX(maxw);
     }
@@ -261,7 +261,7 @@ void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
     if (scenePos.y() < titleBarHeight) {
         scenePos.setY(titleBarHeight);
     } else {
-        qreal maxh = scene()->sceneRect().height() - titleBarHeight;
+        const qreal maxh = scene()->sceneRect().height() - titleBarHeight;
         if (scenePos.y() > maxh)
             scenePos.setY(maxh);
     }
@@ -278,8 +278,8 @@ void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
 
 void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
 {
-    qreal totalZoneHeight = zone->getOptimumRect().height();
-    qreal newMax = qMax(totalZoneHeight - newZoneHeight, 0.0);
+    const qreal totalZoneHeight = zone->getOptimumRect().height();
+    const qreal newMax = qMax(totalZoneHeight - newZoneHeight, 0.0);
     scrollBar->setMaximum(newMax);
 }
 
@@ -320,18 +320,18 @@ static qreal determineNewZoneHeight(qreal oldZoneHeight)
 
 void ZoneViewWidget::resizeToZoneContents(bool forceInitialHeight)
 {
-    QRectF zoneRect = zone->getOptimumRect();
-    qreal totalZoneHeight = zoneRect.height();
+    const QRectF zoneRect = zone->getOptimumRect();
+    const qreal totalZoneHeight = zoneRect.height();
 
-    qreal width = qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
-                       zoneRect.width() + scrollBar->width() + 10);
+    const qreal width = qMax(QGraphicsWidget::layout()->effectiveSizeHint(Qt::MinimumSize, QSizeF()).width(),
+                             zoneRect.width() + scrollBar->width() + 10);
 
-    QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
+    const QSizeF maxSize(width, zoneRect.height() + extraHeight + 10);
 
-    qreal currentZoneHeight = rect().height() - extraHeight - 10;
-    qreal newZoneHeight = forceInitialHeight ? calcMaxInitialHeight() : determineNewZoneHeight(currentZoneHeight);
+    const qreal currentZoneHeight = rect().height() - extraHeight - 10;
+    const qreal newZoneHeight = forceInitialHeight ? calcMaxInitialHeight() : determineNewZoneHeight(currentZoneHeight);
 
-    QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
+    const QSizeF initialSize(width, newZoneHeight + extraHeight + 10);
 
     setMaximumSize(maxSize);
     resize(initialSize);
@@ -378,13 +378,13 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
  */
 void ZoneViewWidget::expandWindow()
 {
-    qreal maxInitialHeight = calcMaxInitialHeight();
-    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
-    qreal height = rect().height() - extraHeight - 10;
-    qreal maxHeight = maximumHeight() - extraHeight - 10;
+    const qreal maxInitialHeight = calcMaxInitialHeight();
+    const qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
+    const qreal height = rect().height() - extraHeight - 10;
+    const qreal maxHeight = maximumHeight() - extraHeight - 10;
 
     // reset window to initial max height if...
-    bool doResetSize =
+    const bool doResetSize =
         // current height is less than that
         (height < maxInitialHeight) ||
         // current height is at expanded max height

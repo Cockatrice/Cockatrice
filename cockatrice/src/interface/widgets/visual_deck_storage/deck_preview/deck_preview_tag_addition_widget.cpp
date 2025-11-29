@@ -25,8 +25,8 @@ DeckPreviewTagAdditionWidget::DeckPreviewTagAdditionWidget(QWidget *_parent, QSt
 QSize DeckPreviewTagAdditionWidget::sizeHint() const
 {
     // Calculate the size based on the tag name
-    QFontMetrics fm(font());
-    int textWidth = fm.horizontalAdvance(tagName_);
+    const QFontMetrics fm(font());
+    const int textWidth = fm.horizontalAdvance(tagName_);
     int width = textWidth + 50;    // Add extra padding
     int height = fm.height() + 10; // Height based on font size + padding
 
@@ -46,7 +46,7 @@ void DeckPreviewTagAdditionWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // Set background color
-    QColor backgroundColor = Qt::lightGray;
+    const QColor backgroundColor = Qt::lightGray;
     painter.setBrush(backgroundColor);
     painter.setPen(Qt::NoPen);
 
@@ -54,20 +54,20 @@ void DeckPreviewTagAdditionWidget::paintEvent(QPaintEvent *event)
     painter.drawRect(rect());
 
     // Draw border
-    QColor borderColor = Qt::gray;
-    QPen borderPen(borderColor, 1);
+    const QColor borderColor = Qt::gray;
+    const QPen borderPen(borderColor, 1);
     painter.setPen(borderPen);
     painter.drawRect(rect().adjusted(0, 0, -1, -1)); // Adjust for pen width
 
     // Calculate font size based on widget height
     QFont font = painter.font();
-    int fontSize = std::max(10, height() / 2); // Ensure a minimum font size of 10
+    const int fontSize = std::max(10, height() / 2); // Ensure a minimum font size of 10
     font.setPointSize(fontSize);
     painter.setFont(font);
 
     // Calculate text rect with margin
-    int margin = 10; // Left and right margins
-    QRect textRect(margin, 0, width() - margin * 2, height());
+    const int margin = 10; // Left and right margins
+    const QRect textRect(margin, 0, width() - margin * 2, height());
 
     // Draw the text with a black border for better legibility
     painter.setPen(Qt::black);

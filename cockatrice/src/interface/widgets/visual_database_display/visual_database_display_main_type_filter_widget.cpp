@@ -78,11 +78,11 @@ void VisualDatabaseDisplayMainTypeFilterWidget::createMainTypeButtons()
 
 void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility()
 {
-    int threshold = spinBox->value(); // Get the current spinbox value
+    const int threshold = spinBox->value(); // Get the current spinbox value
 
     // Iterate through buttons and hide/disable those below the threshold
     for (auto it = typeButtons.begin(); it != typeButtons.end(); ++it) {
-        bool visible = allMainCardTypesWithCount[it.key()] >= threshold;
+        const bool visible = allMainCardTypesWithCount[it.key()] >= threshold;
         it.value()->setVisible(visible);
         it.value()->setEnabled(visible);
     }

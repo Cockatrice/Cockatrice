@@ -21,7 +21,7 @@ DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
 
 void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
-    QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
+    const QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
 
     DeckViewCardContainer *cursorZone = 0;
     for (int i = colliding.size() - 1; i >= 0; i--)
@@ -31,7 +31,7 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
         return;
     currentZone = cursorZone;
 
-    QPointF newPos = cursorScenePos;
+    const QPointF newPos = cursorScenePos;
     if (newPos != pos()) {
         for (int i = 0; i < childDrags.size(); i++)
             childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
@@ -95,7 +95,7 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CARD_WIDTH - 3) : 0.0;
+    const qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CARD_WIDTH - 3) : 0.0;
     painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 3., CARD_HEIGHT - 3.), cardRadius, cardRadius);
     painter->restore();
 }
@@ -115,7 +115,7 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     dragItem->updatePosition(event->scenePos());
     dragItem->grabMouse();
 
-    QList<QGraphicsItem *> sel = scene()->selectedItems();
+    const QList<QGraphicsItem *> sel = scene()->selectedItems();
     int j = 0;
     for (int i = 0; i < sel.size(); i++) {
         auto *c = static_cast<DeckViewCard *>(sel.at(i));
@@ -137,11 +137,11 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton) {
         QList<MoveCard_ToZone> result;
-        QList<QGraphicsItem *> sel = scene()->selectedItems();
+        const QList<QGraphicsItem *> sel = scene()->selectedItems();
 
         for (int i = 0; i < sel.size(); i++) {
-            auto *c = static_cast<DeckViewCard *>(sel.at(i));
-            auto *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
+            const auto *c = static_cast<DeckViewCard *>(sel.at(i));
+            const auto *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
             MoveCard_ToZone m;
             m.set_card_name(c->getName().toStdString());
             m.set_start_zone(zone->getName().toStdString());
@@ -180,7 +180,7 @@ QRectF DeckViewCardContainer::boundingRect() const
 
 void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    qreal totalTextWidth = getCardTypeTextWidth();
+    const qreal totalTextWidth = getCardTypeTextWidth();
 
     painter->fillRect(boundingRect(), themeManager->getBgBrush(ThemeManager::Table));
     painter->setPen(QColor(255, 255, 255, 100));
@@ -204,7 +204,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
             painter->setPen(QColor(255, 255, 255, 100));
             painter->drawLine(QPointF(0, yUntilNow - paddingY / 2), QPointF(width, yUntilNow - paddingY / 2));
         }
-        qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
+        const qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
         QRectF textRect(0, yUntilNow, totalTextWidth, thisRowHeight);
         yUntilNow += thisRowHeight + paddingY;
 
@@ -242,7 +242,7 @@ int DeckViewCardContainer::getCardTypeTextWidth() const
     f.setStyleHint(QFont::Serif);
     f.setPixelSize(16);
     f.setWeight(QFont::Bold);
-    QFontMetrics fm(f);
+    const QFontMetrics fm(f);
 
     int maxCardTypeWidth = 0;
     for (const auto &key : cardsByType.keys()) {
@@ -280,7 +280,7 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
     currentRowsAndCols = rowsAndCols;
 
     qreal yUntilNow = separatorY + paddingY;
-    qreal x = (qreal)getCardTypeTextWidth();
+    const qreal x = (qreal)getCardTypeTextWidth();
     for (int i = 0; i < rowsAndCols.size(); ++i) {
         const int tempRows = rowsAndCols[i].first;
         const int tempCols = rowsAndCols[i].second;
@@ -295,7 +295,7 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
     }
 
     prepareGeometryChange();
-    QSizeF bRect = calculateBoundingRect(rowsAndCols);
+    const QSizeF bRect = calculateBoundingRect(rowsAndCols);
     width = bRect.width();
     height = bRect.height();
 }
@@ -343,9 +343,9 @@ void DeckViewScene::rebuildTree()
     if (!deck)
         return;
 
-    InnerDecklistNode *listRoot = deck->getRoot();
+    const InnerDecklistNode *listRoot = deck->getRoot();
     for (int i = 0; i < listRoot->size(); i++) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        const auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
 
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
@@ -355,7 +355,7 @@ void DeckViewScene::rebuildTree()
         }
 
         for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            const auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard)
                 continue;
 
@@ -469,7 +469,7 @@ QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
     QList<MoveCard_ToZone> result;
     QMapIterator<QString, DeckViewCardContainer *> containerIterator(cardContainers);
     while (containerIterator.hasNext()) {
-        DeckViewCardContainer *cont = containerIterator.next().value();
+        const DeckViewCardContainer *cont = containerIterator.next().value();
         const QList<DeckViewCard *> cardList = cont->getCards();
         for (int i = 0; i < cardList.size(); ++i)
             if (cardList[i]->getOriginZone() != cont->getName()) {

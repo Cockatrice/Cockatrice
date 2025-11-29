@@ -60,8 +60,8 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 
     QSet<int> currentTypes = model->getGameTypeFilter();
     if (currentTypes.size() == 1) {
-        int typeId = *currentTypes.begin();
-        int index = filterToFormatComboBox->findData(typeId);
+        const int typeId = *currentTypes.begin();
+        const int index = filterToFormatComboBox->findData(typeId);
         if (index >= 0)
             filterToFormatComboBox->setCurrentIndex(index);
     } else {
@@ -70,7 +70,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
 
     // Update proxy model on selection change
     connect(filterToFormatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-        QVariant data = filterToFormatComboBox->itemData(index);
+        const QVariant data = filterToFormatComboBox->itemData(index);
         if (!data.isValid()) {
             model->setGameTypeFilter({}); // empty = no filter
         } else {

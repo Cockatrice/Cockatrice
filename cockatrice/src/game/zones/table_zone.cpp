@@ -58,7 +58,7 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
+    const QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
     painter->fillRect(boundingRect(), brush);
 
     if (active) {
@@ -157,11 +157,11 @@ void TableZone::reorganizeCards()
             continue;
 
         QPointF mapPoint = mapFromGrid(gridPoint);
-        qreal x = mapPoint.x();
-        qreal y = mapPoint.y();
+        const qreal x = mapPoint.x();
+        const qreal y = mapPoint.y();
 
-        int numberAttachedCards = getLogic()->getCards()[i]->getAttachedCards().size();
-        qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
+        const int numberAttachedCards = getLogic()->getCards()[i]->getAttachedCards().size();
+        const qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
         qreal actualY = y;
         if (numberAttachedCards)
             actualY += 15;
@@ -174,8 +174,8 @@ void TableZone::reorganizeCards()
         while (attachedCardIterator.hasNext()) {
             ++j;
             CardItem *attachedCard = attachedCardIterator.next();
-            qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
-            qreal childY = y + 5;
+            const qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
+            const qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
             attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
         }
@@ -191,7 +191,7 @@ void TableZone::toggleTapped()
     QList<QGraphicsItem *> selectedItems;
 
     auto isCardOnTable = [](const QGraphicsItem *item) {
-        if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
+        if (const auto card = qgraphicsitem_cast<const CardItem *>(item)) {
             return card->getZone()->getName() == "table";
         }
         return false;
@@ -199,12 +199,12 @@ void TableZone::toggleTapped()
 
     std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
 
-    bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
+    const bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
         return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
     });
     QList<const ::google::protobuf::Message *> cmdList;
     for (const auto &selectedItem : selectedItems) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
+        const CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
         if (temp->getTapped() != tapAll) {
             Command_SetCardAttr *cmd = new Command_SetCardAttr;
             cmd->set_zone(getLogic()->getName().toStdString());
@@ -251,7 +251,7 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 
 CardItem *TableZone::getCardFromCoords(const QPointF &point) const
 {
-    QPoint gridPoint = mapToGrid(point);
+    const QPoint gridPoint = mapToGrid(point);
     return getCardFromGrid(gridPoint);
 }
 
@@ -318,7 +318,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     // used for the x-coordinate.
 
     // Offset point by the margin amount to reference point within grid area.
-    int y = mapPoint.y() - MARGIN_TOP;
+    const int y = mapPoint.y() - MARGIN_TOP;
 
     // Below calculation effectively rounds to the nearest grid point.
     const int gridPointHeight = CARD_HEIGHT + PADDING_Y;
@@ -333,7 +333,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     // widths of each card stack along the row.
 
     // Offset point by the margin amount to reference point within grid area.
-    int x = mapPoint.x() - MARGIN_LEFT + PADDING_X / 2;
+    const int x = mapPoint.x() - MARGIN_LEFT + PADDING_X / 2;
 
     // Maximum value is a card width from the right margin, referenced to the
     // grid area.
@@ -348,13 +348,13 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
         xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
         nextStackCol++;
     }
-    int stackCol = qMax(nextStackCol - 1, 0);
+    const int stackCol = qMax(nextStackCol - 1, 0);
 
     // Have the stack column, need to refine to the grid column.  Take the
     // difference between the point and the stack point and divide by stacked
     // card offsets.
-    int xDiff = x - xStack;
-    int gridPointX = stackCol * 3 + qMin(xDiff / STACKED_CARD_OFFSET_X, 2);
+    const int xDiff = x - xStack;
+    const int gridPointX = stackCol * 3 + qMin(xDiff / STACKED_CARD_OFFSET_X, 2);
 
     return QPoint(gridPointX, gridPointY);
 }

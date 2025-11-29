@@ -122,8 +122,8 @@ void GameScene::rearrange()
     auto playersPlaying = collectActivePlayers(firstPlayerIndex);
     playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
 
-    int columns = determineColumnCount(playersPlaying.size());
-    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+    const int columns = determineColumnCount(playersPlaying.size());
+    const QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
 
     phasesToolbar->setHeight(sceneSize.height());
     setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
@@ -147,9 +147,9 @@ void GameScene::processViewSizeChange(const QSize &newSize)
     viewSize = newSize;
 
     QList<qreal> minWidthByColumn = calculateMinWidthByColumn();
-    qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
+    const qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
 
-    qreal newWidth = calculateNewSceneWidth(newSize, minWidth);
+    const qreal newWidth = calculateNewSceneWidth(newSize, minWidth);
     setSceneRect(0, 0, newWidth, sceneRect().height());
 
     resizeColumnsAndPlayers(minWidthByColumn, newWidth);
@@ -170,7 +170,7 @@ QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
     firstPlayerIndex = 0;
     bool firstPlayerFound = false;
 
-    for (auto *pgItem : players) {
+    for (const auto *pgItem : players) {
         Player *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
@@ -226,7 +226,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
 {
     playersByColumn.clear();
 
-    int rows = qCeil((qreal)playersPlaying.size() / columns);
+    const int rows = qCeil((qreal)playersPlaying.size() / columns);
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
@@ -235,7 +235,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
         playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
         qreal thisColumnHeight = -playerAreaSpacing;
-        int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
+        const int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
 
         for (int j = 0; j < rowsInColumn; ++j) {
             Player *player = playersIter.next();
@@ -244,7 +244,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
             else
                 playersByColumn[col].append(player->getGraphicsItem());
 
-            auto *pgItem = player->getGraphicsItem();
+            const auto *pgItem = player->getGraphicsItem();
             thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
             columnWidth[col] = std::max(columnWidth[col], (int)pgItem->boundingRect().width());
         }
@@ -253,7 +253,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
         sceneWidth += columnWidth[col] + playerAreaSpacing;
     }
 
-    qreal phasesWidth = phasesToolbar->getWidth();
+    const qreal phasesWidth = phasesToolbar->getWidth();
     sceneWidth += phasesWidth;
 
     // Position players horizontally and vertically
@@ -281,7 +281,7 @@ QList<qreal> GameScene::calculateMinWidthByColumn() const
     QList<qreal> minWidthByColumn;
     for (const auto &col : playersByColumn) {
         qreal maxWidth = 0;
-        for (PlayerGraphicsItem *player : col)
+        for (const PlayerGraphicsItem *player : col)
             maxWidth = std::max(maxWidth, player->getMinimumWidth());
         minWidthByColumn.append(maxWidth);
     }
@@ -296,8 +296,8 @@ QList<qreal> GameScene::calculateMinWidthByColumn() const
  */
 qreal GameScene::calculateNewSceneWidth(const QSize &newSize, qreal minWidth) const
 {
-    qreal newRatio = (qreal)newSize.width() / newSize.height();
-    qreal minRatio = minWidth / sceneRect().height();
+    const qreal newRatio = (qreal)newSize.width() / newSize.height();
+    const qreal minRatio = minWidth / sceneRect().height();
 
     if (minRatio > newRatio) {
         return minWidth; // Table dominates width
@@ -316,9 +316,9 @@ qreal GameScene::calculateNewSceneWidth(const QSize &newSize, qreal minWidth) co
  */
 void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qreal newWidth)
 {
-    qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
+    const qreal minWidth = std::accumulate(minWidthByColumn.begin(), minWidthByColumn.end(), phasesToolbar->getWidth());
 
-    qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
+    const qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     qreal newx = phasesToolbar->getWidth();
 
     for (int col = 0; col < playersByColumn.size(); ++col) {
@@ -334,7 +334,7 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
 
 void GameScene::updateHover(const QPointF &scenePos)
 {
-    auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
+    const auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
 
     CardZone *zone = findTopmostZone(itemList);
     CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
@@ -396,8 +396,8 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
  */
 void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
 {
-    for (auto &view : zoneViews) {
-        ZoneViewZone *temp = view->getZone();
+    for (const auto &view : zoneViews) {
+        const ZoneViewZone *temp = view->getZone();
         if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
             qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
             view->close();

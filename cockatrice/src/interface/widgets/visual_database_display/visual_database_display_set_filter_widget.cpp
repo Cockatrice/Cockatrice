@@ -126,14 +126,14 @@ void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
         std::sort(allSets.begin(), allSets.end(),
                   [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
 
-        int setsToPreactivate = SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
+        const int setsToPreactivate = SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
         int setsActivated = 0;
 
         for (const auto &set : allSets) {
             QString shortName = set->getShortName();
             QString longName = set->getLongName();
 
-            auto button = setButtons[shortName];
+            const auto button = setButtons[shortName];
 
             if (setsActivated < setsToPreactivate) {
                 setsActivated++;
@@ -153,14 +153,14 @@ void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
 
 void VisualDatabaseDisplaySetFilterWidget::updateSetButtonsVisibility()
 {
-    QString filterText = searchBox->text().trimmed().toLower();
+    const QString filterText = searchBox->text().trimmed().toLower();
 
     for (const QString &setName : setButtons.keys()) {
         QPushButton *buttonForSet = setButtons[setName];
         QString shortName = setName.toLower();
         QString longName = buttonForSet->text().toLower();
-        bool alwaysVisible = activeSets.contains(setName) && activeSets[setName];
-        bool visible =
+        const bool alwaysVisible = activeSets.contains(setName) && activeSets[setName];
+        const bool visible =
             alwaysVisible || filterText.isEmpty() || shortName.contains(filterText) || longName.contains(filterText);
         buttonForSet->setVisible(visible);
     }
@@ -247,7 +247,7 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
     }
 
     // Determine exact match mode based on filter structure
-    bool newExactMatchMode = !excludedSets.isEmpty();
+    const bool newExactMatchMode = !excludedSets.isEmpty();
 
     if (newExactMatchMode != exactMatchMode) {
         exactMatchMode = newExactMatchMode;
@@ -256,7 +256,7 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
 
     // Sync button states with selected sets
     for (const auto &key : setButtons.keys()) {
-        bool active = selectedSets.contains(key);
+        const bool active = selectedSets.contains(key);
         activeSets[key] = active;
         setButtons[key]->blockSignals(true);
         setButtons[key]->setChecked(active);

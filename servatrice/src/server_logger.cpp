@@ -24,8 +24,8 @@ ServerLogger::~ServerLogger()
 void ServerLogger::startLog(const QString &logFileName)
 {
     if (!logFileName.isEmpty()) {
-        QFileInfo fi(logFileName);
-        QDir fileDir(fi.path());
+        const QFileInfo fi(logFileName);
+        const QDir fileDir(fi.path());
         if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             std::cerr << "ERROR: logfile folder doesn't exist and i can't create it." << std::endl;
             logFile = 0;
@@ -55,8 +55,8 @@ void ServerLogger::logMessage(const QString &message, void *caller)
         callerString = QString::number((qulonglong)caller, 16) + " ";
 
     // filter out all log entries based on values in configuration file
-    bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
-    QString logFilters = settingsCache->value("server/logfilters").toString();
+    const bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
+    const QString logFilters = settingsCache->value("server/logfilters").toString();
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList listlogFilters = logFilters.split(",", Qt::SkipEmptyParts);
 #else

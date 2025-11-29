@@ -45,11 +45,11 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::retranslateUi()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 {
-    QString filename = filenameInput->text().trimmed();
+    const QString filename = filenameInput->text().trimmed();
     if (filename.isEmpty())
         return;
 
-    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename + ".json";
+    const QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename + ".json";
 
     // Serialize the filter model to JSON
     QJsonArray filtersArray;
@@ -74,16 +74,16 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 
 void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filename)
 {
-    QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename;
+    const QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
         return;
 
-    QByteArray jsonData = file.readAll();
+    const QByteArray jsonData = file.readAll();
     file.close();
 
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData);
     if (!doc.isObject())
         return;
 
@@ -100,7 +100,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
     for (const QJsonValue &value : filtersArray) {
         if (value.isObject()) {
             QJsonObject filterObj = value.toObject();
-            CardFilter *filter = CardFilter::fromJson(filterObj);
+            const CardFilter *filter = CardFilter::fromJson(filterObj);
             if (filter) {
                 filterModel->addFilter(filter);
             }
@@ -117,14 +117,14 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
 {
     fileListWidget->clearLayout();
     // Clear existing widgets
-    for (auto buttonPair : fileButtons) {
+    for (const auto buttonPair : fileButtons) {
         buttonPair.first->deleteLater();
         buttonPair.second->deleteLater();
     }
     fileButtons.clear(); // Clear the list of buttons
 
     // Refresh the filter file list
-    QDir dir(SettingsCache::instance().getFiltersPath());
+    const QDir dir(SettingsCache::instance().getFiltersPath());
     QStringList filterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Name);
 
     // Loop through the filter files and create widgets for them

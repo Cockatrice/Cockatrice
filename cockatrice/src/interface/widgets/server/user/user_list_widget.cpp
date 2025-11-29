@@ -321,7 +321,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
                                        const QModelIndex &index)
 {
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
-        QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
+        const QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
@@ -527,7 +527,7 @@ void UserListWidget::userClicked(QTreeWidgetItem *item, int /*column*/)
 void UserListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
     const ServerInfo_User &userInfo = static_cast<UserListTWI *>(userTree->topLevelItem(index.row()))->getUserInfo();
-    bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
+    const bool online = index.sibling(index.row(), 0).data(Qt::UserRole + 1).toBool();
 
     userContextMenu->showContextMenu(pos, QString::fromStdString(userInfo.name()),
                                      UserLevelFlags(userInfo.user_level()), online);

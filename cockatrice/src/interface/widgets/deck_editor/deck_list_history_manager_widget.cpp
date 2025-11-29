@@ -70,7 +70,7 @@ void DeckListHistoryManagerWidget::refreshList()
     // Fill redo section first (oldest redo at top, newest redo closest to divider)
     const auto redoStack = historyManager->getRedoStack();
     for (int i = 0; i < redoStack.size(); ++i) { // iterate forward
-        auto item = new QListWidgetItem(tr("[redo] ") + redoStack[i].getReason(), historyList);
+        const auto item = new QListWidgetItem(tr("[redo] ") + redoStack[i].getReason(), historyList);
         item->setData(Qt::UserRole, QVariant("redo"));
         item->setData(Qt::UserRole + 1, i); // index in redo stack
         item->setForeground(Qt::gray);
@@ -79,7 +79,7 @@ void DeckListHistoryManagerWidget::refreshList()
 
     // Divider
     if (!historyManager->getUndoStack().isEmpty() && !historyManager->getRedoStack().isEmpty()) {
-        auto divider = new QListWidgetItem("──────────", historyList);
+        const auto divider = new QListWidgetItem("──────────", historyList);
         divider->setFlags(Qt::NoItemFlags); // not selectable
         historyList->addItem(divider);
     }
@@ -87,7 +87,7 @@ void DeckListHistoryManagerWidget::refreshList()
     // Fill undo section
     const auto undoStack = historyManager->getUndoStack();
     for (int i = undoStack.size() - 1; i >= 0; --i) {
-        auto item = new QListWidgetItem(tr("[undo] ") + undoStack[i].getReason(), historyList);
+        const auto item = new QListWidgetItem(tr("[undo] ") + undoStack[i].getReason(), historyList);
         item->setData(Qt::UserRole, QVariant("undo"));
         item->setData(Qt::UserRole + 1, i); // index in undo stack
         historyList->addItem(item);
@@ -135,17 +135,17 @@ void DeckListHistoryManagerWidget::onListClicked(QListWidgetItem *item)
     }
 
     const QString mode = item->data(Qt::UserRole).toString();
-    int index = item->data(Qt::UserRole + 1).toInt();
+    const int index = item->data(Qt::UserRole + 1).toInt();
 
     if (mode == "redo") {
         const auto redoStack = historyManager->getRedoStack();
-        int steps = redoStack.size() - index;
+        const int steps = redoStack.size() - index;
         for (int i = 0; i < steps; ++i) {
             historyManager->redo(deckListModel->getDeckList());
         }
     } else if (mode == "undo") {
         const auto undoStack = historyManager->getUndoStack();
-        int steps = undoStack.size() - 1 - index;
+        const int steps = undoStack.size() - 1 - index;
         for (int i = 0; i < steps + 1; ++i) {
             historyManager->undo(deckListModel->getDeckList());
         }

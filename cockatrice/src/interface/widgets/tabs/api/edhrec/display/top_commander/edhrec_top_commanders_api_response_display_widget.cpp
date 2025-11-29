@@ -16,7 +16,7 @@ EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDispl
     // Add card list widgets
     auto edhrec_commander_api_response_card_lists = response.container.getCardlists();
     for (const EdhrecApiResponseCardList &card_list : edhrec_commander_api_response_card_lists) {
-        auto cardListDisplayWidget = new EdhrecApiResponseCardListDisplayWidget(this, card_list);
+        const auto cardListDisplayWidget = new EdhrecApiResponseCardListDisplayWidget(this, card_list);
         cardDisplayLayout->addWidget(cardListDisplayWidget);
     }
 
@@ -27,7 +27,7 @@ EdhrecTopCommandersApiResponseDisplayWidget::EdhrecTopCommandersApiResponseDispl
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Set the cardDisplayLayout inside the scroll area
-    auto scrollWidget = new QWidget(scrollArea);
+    const auto scrollWidget = new QWidget(scrollArea);
     scrollWidget->setLayout(cardDisplayLayout);
     scrollArea->setWidget(scrollWidget);
 

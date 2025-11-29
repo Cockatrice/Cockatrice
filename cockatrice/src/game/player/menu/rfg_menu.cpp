@@ -27,7 +27,7 @@ RfgMenu::RfgMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player
 void RfgMenu::createMoveActions()
 {
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        auto rfg = player->getRfgZone();
+        const auto rfg = player->getRfgZone();
 
         aMoveRfgToTopLibrary = new QAction(this);
         aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
@@ -47,7 +47,7 @@ void RfgMenu::createMoveActions()
 
 void RfgMenu::createViewActions()
 {
-    PlayerActions *playerActions = player->getPlayerActions();
+    const PlayerActions *playerActions = player->getPlayerActions();
 
     aViewRfg = new QAction(this);
     connect(aViewRfg, &QAction::triggered, playerActions, &PlayerActions::actViewRfg);

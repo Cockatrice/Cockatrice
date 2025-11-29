@@ -36,7 +36,7 @@ GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(par
 
 void GraveyardMenu::createMoveActions()
 {
-    auto grave = player->getGraveZone();
+    const auto grave = player->getGraveZone();
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         aMoveGraveToTopLibrary = new QAction(this);
@@ -60,7 +60,7 @@ void GraveyardMenu::createMoveActions()
 
 void GraveyardMenu::createViewActions()
 {
-    PlayerActions *playerActions = player->getPlayerActions();
+    const PlayerActions *playerActions = player->getPlayerActions();
 
     aViewGraveyard = new QAction(this);
     connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
@@ -77,7 +77,7 @@ void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
     mRevealRandomGraveyardCard->addSeparator();
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
-    for (auto *other : players) {
+    for (const auto *other : players) {
         if (other == player)
             continue;
         QAction *a = mRevealRandomGraveyardCard->addAction(other->getPlayerInfo()->getName());
@@ -88,7 +88,7 @@ void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
 
 void GraveyardMenu::onRevealRandomTriggered()
 {
-    if (auto *a = qobject_cast<QAction *>(sender())) {
+    if (const auto *a = qobject_cast<QAction *>(sender())) {
         player->getPlayerActions()->actRevealRandomGraveyardCard(a->data().toInt());
     }
 }
@@ -112,7 +112,7 @@ void GraveyardMenu::retranslateUi()
 
 void GraveyardMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aViewGraveyard->setShortcuts(shortcuts.getShortcut("Player/aViewGraveyard"));
 }
 

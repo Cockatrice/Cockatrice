@@ -26,13 +26,13 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
         return;
     }
 
-    int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    const int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (reply->hasRawHeader("Location")) {
         /*
          * If the reply contains a "Location" header, a relative URL to the deck on TappedOut
          * can be extracted from the header. The http status is a 302 "redirect".
          */
-        QString deckUrl = reply->rawHeader("Location");
+        const QString deckUrl = reply->rawHeader("Location");
         qCInfo(TappedOutInterfaceLog) << "Tappedout: good reply, http status" << httpStatus << "location" << deckUrl;
         QDesktopServices::openUrl("https://tappedout.net" + deckUrl);
     } else {
@@ -40,13 +40,13 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
          * Otherwise, the deck has not been parsed correctly. Error messages can be extracted
          * from the html. Css pseudo selector for errors: $("div.alert-danger > ul > li")
          */
-        QString data(reply->readAll());
+        const QString data(reply->readAll());
         QStringList errorMessageList = {tr("Unable to analyze the deck.")};
 
         static const QRegularExpression rx("<div class=\"alert alert-danger.*?<ul>(.*?)</ul>");
-        auto match = rx.match(data);
+        const auto match = rx.match(data);
         if (match.hasMatch()) {
-            QString errors = match.captured(1);
+            const QString errors = match.captured(1);
             static const QRegularExpression rx2("<li>(.*?)</li>");
             static const QRegularExpression rxremove("<[^>]*>");
             auto matchIterator = rx2.globalMatch(errors);
@@ -56,7 +56,7 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
             }
         }
 
-        QString errorMessage = errorMessageList.join("\n");
+        const QString errorMessage = errorMessageList.join("\n");
         qCWarning(TappedOutInterfaceLog) << "Tappedout: bad reply, http status" << httpStatus << "size" << data.size()
                                          << "message" << errorMessage;
 
@@ -95,7 +95,7 @@ void TappedOutInterface::analyzeDeck(DeckList *deck)
 void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
+        const CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
         if (!dbCard || dbCard->getIsToken())
             return;
 

@@ -62,8 +62,8 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     connect(tagsPushButton, &QPushButton::clicked, this, &TabEdhRecMain::getTopTags);
 
     searchBar = new QLineEdit(this);
-    auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
-    auto displayModel = new CardDatabaseDisplayModel(this);
+    const auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
+    const auto displayModel = new CardDatabaseDisplayModel(this);
     displayModel->setSourceModel(cardDatabaseModel);
     auto *searchModel = new CardSearchModel(displayModel, this);
 
@@ -84,7 +84,7 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
     connect(searchBar, &QLineEdit::textChanged, searchModel, &CardSearchModel::updateSearchResults);
     connect(searchBar, &QLineEdit::textChanged, this, [=](const QString &text) {
         // Ensure substring matching
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
+        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
         proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
 
         if (!text.isEmpty()) {
@@ -139,7 +139,7 @@ void TabEdhRecMain::retranslateUi()
 
 void TabEdhRecMain::doSearch()
 {
-    CardInfoPtr searchedCard = CardDatabaseManager::query()->getCardInfo(searchBar->text());
+    const CardInfoPtr searchedCard = CardDatabaseManager::query()->getCardInfo(searchBar->text());
     if (!searchedCard) {
         return;
     }
@@ -156,8 +156,8 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         return;
     }
 
-    QString cardName = cardToQuery->getName();
-    QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
+    const QString cardName = cardToQuery->getName();
+    const QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
 
     QString url;
     if (isCommander) {
@@ -166,35 +166,35 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         url = QString("https://json.edhrec.com/pages/cards/%1.json").arg(formattedName);
     }
 
-    QNetworkRequest request{QUrl(url)};
+    const QNetworkRequest request{QUrl(url)};
 
     networkManager->get(request);
 }
 
 void TabEdhRecMain::actNavigatePage(QString url)
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
+    const QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
 
     networkManager->get(request);
 }
 
 void TabEdhRecMain::getTopCards()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/top/year.json")};
+    const QNetworkRequest request{QUrl("https://json.edhrec.com/pages/top/year.json")};
 
     networkManager->get(request);
 }
 
 void TabEdhRecMain::getTopCommanders()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
+    const QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
 
     networkManager->get(request);
 }
 
 void TabEdhRecMain::getTopTags()
 {
-    QNetworkRequest request{QUrl("https://json.edhrec.com/pages/tags.json")};
+    const QNetworkRequest request{QUrl("https://json.edhrec.com/pages/tags.json")};
 
     networkManager->get(request);
 }
@@ -207,8 +207,8 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
         return;
     }
 
-    QByteArray responseData = reply->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    const QByteArray responseData = reply->readAll();
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
 
     if (!jsonDoc.isObject()) {
         qDebug() << "Invalid JSON response received.";
@@ -216,10 +216,10 @@ void TabEdhRecMain::processApiJson(QNetworkReply *reply)
         return;
     }
 
-    QJsonObject jsonObj = jsonDoc.object();
+    const QJsonObject jsonObj = jsonDoc.object();
 
     // Get the actual URL from the reply
-    QString responseUrl = reply->url().toString();
+    const QString responseUrl = reply->url().toString();
 
     // Check if the response URL matches a commander request
     if (responseUrl.startsWith("https://json.edhrec.com/pages/commanders/year.json")) {
@@ -264,7 +264,7 @@ void TabEdhRecMain::processTopCardsResponse(QJsonObject reply)
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecTopCardsApiResponseDisplayWidget(currentPageDisplay, deckData);
+    const auto display = new EdhrecTopCardsApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);
@@ -291,7 +291,7 @@ void TabEdhRecMain::processTopTagsResponse(QJsonObject reply)
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecTopTagsApiResponseDisplayWidget(currentPageDisplay, deckData);
+    const auto display = new EdhrecTopTagsApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);
@@ -318,7 +318,7 @@ void TabEdhRecMain::processTopCommandersResponse(QJsonObject reply)
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecTopCommandersApiResponseDisplayWidget(currentPageDisplay, deckData);
+    const auto display = new EdhrecTopCommandersApiResponseDisplayWidget(currentPageDisplay, deckData);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);
@@ -345,7 +345,7 @@ void TabEdhRecMain::processCommanderResponse(QJsonObject reply, QString response
     currentPageLayout = new QVBoxLayout(currentPageDisplay);
     currentPageDisplay->setLayout(currentPageLayout);
 
-    auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, responseUrl);
+    const auto display = new EdhrecCommanderApiResponseDisplayWidget(currentPageDisplay, deckData, responseUrl);
     currentPageLayout->addWidget(display);
 
     mainLayout->addWidget(currentPageDisplay);

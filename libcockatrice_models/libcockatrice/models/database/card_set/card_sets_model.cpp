@@ -26,7 +26,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || (index.column() >= NUM_COLS) || (index.row() >= rowCount()))
         return QVariant();
 
-    CardSetPtr set = sets[index.row()];
+    const CardSetPtr set = sets[index.row()];
 
     if (index.column() == EnabledCol) {
         switch (role) {
@@ -135,7 +135,7 @@ bool SetsModel::dropMimeData(const QMimeData *data,
             return false;
         row = parent.row();
     }
-    int oldRow = qobject_cast<const SetsMimeData *>(data)->getOldRow();
+    const int oldRow = qobject_cast<const SetsMimeData *>(data)->getOldRow();
     if (oldRow < row)
         row--;
 
@@ -146,7 +146,7 @@ bool SetsModel::dropMimeData(const QMimeData *data,
 
 void SetsModel::toggleRow(int row, bool enable)
 {
-    CardSetPtr temp = sets.at(row);
+    const CardSetPtr temp = sets.at(row);
 
     if (enable)
         enabledSets.insert(temp);
@@ -158,7 +158,7 @@ void SetsModel::toggleRow(int row, bool enable)
 
 void SetsModel::toggleRow(int row)
 {
-    CardSetPtr tmp = sets.at(row);
+    const CardSetPtr tmp = sets.at(row);
 
     if (tmp == nullptr)
         return;
@@ -185,7 +185,7 @@ void SetsModel::toggleAll(bool enabled)
 void SetsModel::swapRows(int oldRow, int newRow)
 {
     beginRemoveRows(QModelIndex(), oldRow, oldRow);
-    CardSetPtr temp = sets.takeAt(oldRow);
+    const CardSetPtr temp = sets.takeAt(oldRow);
     endRemoveRows();
 
     beginInsertRows(QModelIndex(), newRow, newRow);
@@ -197,7 +197,7 @@ void SetsModel::swapRows(int oldRow, int newRow)
 
 void SetsModel::restoreOriginalOrder()
 {
-    int numRows = rowCount();
+    const int numRows = rowCount();
     sets.defaultSort();
     emit dataChanged(index(0, 0), index(numRows - 1, columnCount() - 1));
 }
@@ -205,13 +205,13 @@ void SetsModel::restoreOriginalOrder()
 void SetsModel::sort(int column, Qt::SortOrder order)
 {
     QMultiMap<QString, CardSetPtr> setMap;
-    int numRows = rowCount();
+    const int numRows = rowCount();
     int row;
 
     for (row = 0; row < numRows; ++row)
         setMap.insert(index(row, column).data(SetsModel::SortRole).toString(), sets.at(row));
 
-    QList<CardSetPtr> tmp = setMap.values();
+    const QList<CardSetPtr> tmp = setMap.values();
     sets.clear();
     if (order == Qt::AscendingOrder) {
         for (row = 0; row < tmp.size(); row++) {
@@ -270,7 +270,7 @@ SetsDisplayModel::SetsDisplayModel(QObject *parent) : QSortFilterProxyModel(pare
 
 void SetsDisplayModel::fetchMore(const QModelIndex &index)
 {
-    int itemsToFetch = sourceModel()->rowCount(index);
+    const int itemsToFetch = sourceModel()->rowCount(index);
 
     beginInsertRows(QModelIndex(), 0, itemsToFetch - 1);
 
@@ -279,9 +279,9 @@ void SetsDisplayModel::fetchMore(const QModelIndex &index)
 
 bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    auto typeIndex = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
-    auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
-    auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
+    const auto typeIndex = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
+    const auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
+    const auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     const auto filter = filterRegularExpression();
@@ -296,8 +296,8 @@ bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
-    QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
-    QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
+    const QString leftString = sourceModel()->data(left, SetsModel::SortRole).toString();
+    const QString rightString = sourceModel()->data(right, SetsModel::SortRole).toString();
 
     return QString::localeAwareCompare(leftString, rightString) < 0;
 }

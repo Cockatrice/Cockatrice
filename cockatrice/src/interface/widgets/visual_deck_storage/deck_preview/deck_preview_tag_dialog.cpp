@@ -20,7 +20,7 @@ DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
 {
     resize(400, 500);
 
-    QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
+    const QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
 
     // Merge knownTags with defaultTags, ensuring no duplicates
     QStringList combinedTags = defaultTags + knownTags + activeTags;
@@ -115,7 +115,7 @@ void DeckPreviewTagDialog::refreshTagList()
     tagListView->clear();
 
     // Get the updated list of tags from SettingsCache
-    QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
+    const QStringList defaultTags = SettingsCache::instance().getVisualDeckStorageDefaultTagsList();
     QStringList combinedTags = defaultTags + knownTags_ + activeTags;
     combinedTags.removeDuplicates();
 
@@ -137,7 +137,7 @@ QStringList DeckPreviewTagDialog::getActiveTags() const
 
 void DeckPreviewTagDialog::addTag()
 {
-    QString newTag = newTagInput->text().trimmed();
+    const QString newTag = newTagInput->text().trimmed();
     if (newTag.isEmpty()) {
         QMessageBox::warning(this, tr("Invalid Input"), tr("Tag name cannot be empty!"));
         return;
@@ -146,7 +146,7 @@ void DeckPreviewTagDialog::addTag()
     // Prevent duplicate tags
     for (int i = 0; i < tagListView->count(); ++i) {
         auto *item = tagListView->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
+        const auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget && tagWidget->checkBox()->text() == newTag) {
             QMessageBox::warning(this, tr("Duplicate Tag"), tr("This tag already exists."));
             return;
@@ -170,9 +170,9 @@ void DeckPreviewTagDialog::filterTags(const QString &text)
 {
     for (int i = 0; i < tagListView->count(); ++i) {
         auto *item = tagListView->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
+        const auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget) {
-            bool matches = tagWidget->checkBox()->text().contains(text, Qt::CaseInsensitive);
+            const bool matches = tagWidget->checkBox()->text().contains(text, Qt::CaseInsensitive);
             item->setHidden(!matches);
         }
     }
@@ -183,7 +183,7 @@ void DeckPreviewTagDialog::onCheckboxStateChanged()
     activeTags.clear();
     for (int i = 0; i < tagListView->count(); ++i) {
         auto *item = tagListView->item(i);
-        auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
+        const auto *tagWidget = qobject_cast<DeckPreviewTagItemWidget *>(tagListView->itemWidget(item));
         if (tagWidget && tagWidget->checkBox()->isChecked()) {
             activeTags.append(tagWidget->checkBox()->text());
         }

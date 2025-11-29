@@ -88,7 +88,7 @@ QList<ExactCard> CardDatabaseQuerier::getCards(const QList<CardRef> &cardRefs) c
  */
 ExactCard CardDatabaseQuerier::getCard(const CardRef &cardRef) const
 {
-    auto info = getCardInfo(cardRef.name);
+    const auto info = getCardInfo(cardRef.name);
     if (info.isNull()) {
         return {};
     }
@@ -110,8 +110,8 @@ ExactCard CardDatabaseQuerier::getCard(const CardRef &cardRef) const
  */
 ExactCard CardDatabaseQuerier::guessCard(const CardRef &cardRef) const
 {
-    auto card = lookupCardByName(cardRef.name);
-    auto printing =
+    const auto card = lookupCardByName(cardRef.name);
+    const auto printing =
         cardRef.providerId.isEmpty() ? getPreferredPrinting(card) : findPrintingWithId(card, cardRef.providerId);
 
     return ExactCard(card, printing);
@@ -123,9 +123,9 @@ ExactCard CardDatabaseQuerier::getRandomCard() const
         return {};
 
     const auto keys = db->cards.keys();
-    int randomIndex = QRandomGenerator::global()->bounded(keys.size());
+    const int randomIndex = QRandomGenerator::global()->bounded(keys.size());
     const QString &randomKey = keys.at(randomIndex);
-    CardInfoPtr randomCard = getCardInfo(randomKey);
+    const CardInfoPtr randomCard = getCardInfo(randomKey);
 
     return ExactCard{randomCard, getPreferredPrinting(randomCard)};
 }
@@ -138,7 +138,8 @@ ExactCard CardDatabaseQuerier::getCardFromSameSet(const QString &cardName, const
     }
 
     // The source card does have a printing defined, which means we can attempt to get a card from the same set.
-    PrintingInfo relatedPrinting = getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
+    const PrintingInfo relatedPrinting =
+        getSpecificPrinting(cardName, otherPrinting.getSet()->getCorrectedShortName(), "");
     ExactCard relatedCard(guessCard({cardName}).getCardPtr(), relatedPrinting);
 
     // If we didn't find a card from the same set, just try to find any card with the same name.
@@ -167,7 +168,7 @@ PrintingInfo CardDatabaseQuerier::findPrintingWithId(const CardInfoPtr &cardInfo
 
 PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const CardRef &cardRef) const
 {
-    CardInfoPtr cardInfo = getCardInfo(cardRef.name);
+    const CardInfoPtr cardInfo = getCardInfo(cardRef.name);
     if (!cardInfo) {
         return PrintingInfo(nullptr);
     }
@@ -179,7 +180,7 @@ PrintingInfo CardDatabaseQuerier::getSpecificPrinting(const QString &cardName,
                                                       const QString &setShortName,
                                                       const QString &collectorNumber) const
 {
-    CardInfoPtr cardInfo = getCardInfo(cardName);
+    const CardInfoPtr cardInfo = getCardInfo(cardName);
     if (!cardInfo) {
         return PrintingInfo(nullptr);
     }
@@ -240,7 +241,7 @@ bool CardDatabaseQuerier::isPreferredPrinting(const CardRef &cardRef) const
 
 PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const QString &cardName) const
 {
-    CardInfoPtr cardInfo = getCardInfo(cardName);
+    const CardInfoPtr cardInfo = getCardInfo(cardName);
     return getPreferredPrinting(cardInfo);
 }
 
@@ -263,7 +264,7 @@ PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardIn
 
     CardSetPtr preferredSet = nullptr;
     PrintingInfo preferredPrinting;
-    SetPriorityComparator comparator;
+    const SetPriorityComparator comparator;
 
     for (const auto &printings : setMap) {
         for (auto &printing : printings) {
@@ -284,13 +285,13 @@ PrintingInfo CardDatabaseQuerier::getPreferredPrinting(const CardInfoPtr &cardIn
 
 QString CardDatabaseQuerier::getPreferredPrintingProviderId(const QString &cardName) const
 {
-    PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
+    const PrintingInfo preferredPrinting = getPreferredPrinting(cardName);
     QString uuid = preferredPrinting.getUuid();
     if (!uuid.isEmpty()) {
         return uuid;
     }
 
-    CardInfoPtr defaultCardInfo = getCardInfo(cardName);
+    const CardInfoPtr defaultCardInfo = getCardInfo(cardName);
     if (defaultCardInfo.isNull()) {
         return cardName;
     }

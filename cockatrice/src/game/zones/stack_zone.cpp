@@ -32,7 +32,7 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+    const QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -76,7 +76,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_x(index);
     cmd.set_y(0);
 
-    for (CardDragItem *item : dragItems) {
+    for (const CardDragItem *item : dragItems) {
         if (item) {
             cmd.mutable_cards_to_move()->add_card()->set_card_id(item->getId());
         }
@@ -89,17 +89,17 @@ void StackZone::reorganizeCards()
 {
     if (!getLogic()->getCards().isEmpty()) {
         const auto cardCount = static_cast<int>(getLogic()->getCards().size());
-        qreal totalWidth = boundingRect().width();
-        qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
-        qreal xspace = 5;
-        qreal x1 = xspace;
-        qreal x2 = totalWidth - xspace - cardWidth;
+        const qreal totalWidth = boundingRect().width();
+        const qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
+        const qreal xspace = 5;
+        const qreal x1 = xspace;
+        const qreal x2 = totalWidth - xspace - cardWidth;
 
         for (int i = 0; i < cardCount; i++) {
             CardItem *card = getLogic()->getCards().at(i);
-            qreal x = (i % 2) ? x2 : x1;
-            qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
-                                            getLogic()->getCards().at(0)->boundingRect().height());
+            const qreal x = (i % 2) ? x2 : x1;
+            const qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
+                                                  getLogic()->getCards().at(0)->boundingRect().height());
             card->setPos(x, y);
             card->setRealZValue(i);
         }

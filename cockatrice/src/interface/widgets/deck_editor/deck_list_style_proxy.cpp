@@ -7,13 +7,13 @@
 
 QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 {
-    QModelIndex src = mapToSource(index);
+    const QModelIndex src = mapToSource(index);
     if (!src.isValid())
         return {};
 
     QVariant value = QIdentityProxyModel::data(index, role);
 
-    bool isCard = src.data(DeckRoles::IsCardRole).toBool();
+    const bool isCard = src.data(DeckRoles::IsCardRole).toBool();
 
     if (role == Qt::FontRole && !isCard) {
         QFont f;
@@ -25,11 +25,11 @@ QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
         if (isCard) {
             const bool legal =
                 true; // TODO: Not implemented yet. QIdentityProxyModel::data(index, DeckRoles::IsLegalRole).toBool();
-            int base = 255 - (index.row() % 2) * 30;
+            const int base = 255 - (index.row() % 2) * 30;
             return legal ? QBrush(QColor(base, base, base)) : QBrush(QColor(255, base / 3, base / 3));
         } else {
-            int depth = src.data(DeckRoles::DepthRole).toInt();
-            int color = 90 + 60 * depth;
+            const int depth = src.data(DeckRoles::DepthRole).toInt();
+            const int color = 90 + 60 * depth;
             return QBrush(QColor(color, 255, color));
         }
     }

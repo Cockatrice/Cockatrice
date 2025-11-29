@@ -19,7 +19,7 @@ void CustomZoneMenu::retranslateUi()
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
 
-        for (auto aViewZone : actions()) {
+        for (const auto aViewZone : actions()) {
             aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));
         }
     }

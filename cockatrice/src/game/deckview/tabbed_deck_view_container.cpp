@@ -10,7 +10,7 @@ TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     connect(this, &QTabWidget::tabCloseRequested, this, &TabbedDeckViewContainer::closeTab);
 
     playerDeckView = new DeckViewContainer(playerId, parentGame);
-    int playerTabIndex = addTab(playerDeckView, "Your Deck");
+    const int playerTabIndex = addTab(playerDeckView, "Your Deck");
     tabBar()->setTabButton(playerTabIndex, QTabBar::RightSide, nullptr);
     updateTabBarVisibility();
 }

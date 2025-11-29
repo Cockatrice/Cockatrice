@@ -55,7 +55,7 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
 
-    auto tagAdditionWidget = new DeckPreviewTagAdditionWidget(this, tr("Edit tags ..."));
+    const auto tagAdditionWidget = new DeckPreviewTagAdditionWidget(this, tr("Edit tags ..."));
     connect(tagAdditionWidget, &DeckPreviewTagAdditionWidget::tagClicked, this,
             &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
     flowWidget->addWidget(tagAdditionWidget);
@@ -80,11 +80,11 @@ static QStringList getAllFiles(const QString &filePath)
 
 bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
 {
-    QFileInfo fileInfo(filePath);
-    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
+    const QFileInfo fileInfo(filePath);
+    const QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
     if (QFile::exists(newFileName)) {
-        QMessageBox::StandardButton reply =
+        const QMessageBox::StandardButton reply =
             QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
                                   QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
                                   QMessageBox::Yes | QMessageBox::No);

@@ -41,8 +41,8 @@ const QString GamesModel::getGameCreatedString(const int secs)
         return tr(">1 day");
     }
 
-    QTime total = zeroTime.addSecs(secs);
-    QTime totalRounded = total.addSecs(halfMinSecs); // round up
+    const QTime total = zeroTime.addSecs(secs);
+    const QTime totalRounded = total.addSecs(halfMinSecs); // round up
     QString form;
     int amount;
     if (totalRounded.hour()) {
@@ -55,7 +55,7 @@ const QString GamesModel::getGameCreatedString(const int secs)
         form = tr("%1%2 min", "short age in minutes", amount);
     }
 
-    for (int aggregate : {40, 20, 10, 5}) { // floor to values in this list
+    for (const int aggregate : {40, 20, 10, 5}) { // floor to values in this list
         if (amount >= aggregate) {
             return form.arg(">").arg(aggregate);
         }
@@ -87,11 +87,11 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
             switch (role) {
                 case Qt::DisplayRole: {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-                    auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), QTimeZone::UTC);
+                    const auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), QTimeZone::UTC);
 #else
                     auto then = QDateTime::fromSecsSinceEpoch(gameentry.start_time(), Qt::UTC);
 #endif
-                    int secs = then.secsTo(QDateTime::currentDateTimeUtc());
+                    const int secs = then.secsTo(QDateTime::currentDateTimeUtc());
                     return getGameCreatedString(secs);
                 }
                 case SORT_ROLE:
@@ -132,7 +132,7 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 case SORT_ROLE:
                 case Qt::DisplayRole: {
                     QStringList result;
-                    GameTypeMap gameTypeMap = gameTypes.value(gameentry.room_id());
+                    const GameTypeMap gameTypeMap = gameTypes.value(gameentry.room_id());
                     for (int i = gameentry.game_types_size() - 1; i >= 0; --i)
                         result.append(gameTypeMap.value(gameentry.game_types(i)));
                     return result.join(", ");
@@ -333,7 +333,7 @@ void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
 
 int GamesProxyModel::getNumFilteredGames() const
 {
-    auto *model = qobject_cast<GamesModel *>(sourceModel());
+    const auto *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)
         return 0;
 
@@ -401,7 +401,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
         gameTypeIterator.next();
-        bool enabled = gameTypeFilter.contains(gameTypeIterator.key());
+        const bool enabled = gameTypeFilter.contains(gameTypeIterator.key());
         gameFilters.setGameTypeEnabled(gameTypeIterator.value(), enabled);
     }
 
@@ -483,9 +483,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         return false;
 
     if (maxGameAge.isValid()) {
-        QDateTime now = QDateTime::currentDateTimeUtc();
-        qint64 signed_start_time = game.start_time();      // cast to 64 bit value to allow signed value
-        QDateTime total = now.addSecs(-signed_start_time); // a 32 bit value would wrap at 2038-1-19
+        const QDateTime now = QDateTime::currentDateTimeUtc();
+        const qint64 signed_start_time = game.start_time();      // cast to 64 bit value to allow signed value
+        const QDateTime total = now.addSecs(-signed_start_time); // a 32 bit value would wrap at 2038-1-19
         // games shouldn't have negative ages but we'll not filter them
         // because qtime wraps after a day we consider all games older than a day to be too old
         if (total.isValid() && total.date() >= epochDate && (total.date() > epochDate || total.time() > maxGameAge)) {

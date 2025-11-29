@@ -37,13 +37,13 @@ void SettingsPopupWidget::removeSettingsWidget(QWidget *toRemove) const
 
 void SettingsPopupWidget::adjustSizeToFitScreen()
 {
-    QScreen *screen = QApplication::screenAt(this->pos());
-    QRect screenGeom = screen ? screen->availableGeometry() : QApplication::primaryScreen()->availableGeometry();
-    int maxHeight = screenGeom.height() / 2; // Limit height to 50% of screen
+    const QScreen *screen = QApplication::screenAt(this->pos());
+    const QRect screenGeom = screen ? screen->availableGeometry() : QApplication::primaryScreen()->availableGeometry();
+    const int maxHeight = screenGeom.height() / 2; // Limit height to 50% of screen
 
     // Adjust the container widget's size hint to get the actual size of content
     containerWidget->adjustSize();
-    int contentHeight = containerWidget->sizeHint().height();
+    const int contentHeight = containerWidget->sizeHint().height();
 
     // If content height exceeds maxHeight, we need to scroll
     if (contentHeight > maxHeight) {

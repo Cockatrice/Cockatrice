@@ -44,8 +44,8 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
         }
     } else {
         // map x (which is in origZone indexes) to this viewZone's cardList index
-        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
-        int insertionIndex = x - firstId;
+        const int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        const int insertionIndex = x - firstId;
         if (insertionIndex >= 0) {
             // card was put into a portion of the deck that's in the view
             doInsert = true;
@@ -79,8 +79,8 @@ void ZoneViewZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
         cards.insert(x, card);
     } else {
         // map x (which is in origZone indexes) to this viewZone's cardList index
-        int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
-        int insertionIndex = x - firstId;
+        const int firstId = cards.isEmpty() ? origZone->getCards().size() : cards.front()->getId();
+        const int insertionIndex = x - firstId;
         // qMin to prevent out-of-bounds error when bottoming a card that is already in the view
         cards.insert(qMin(insertionIndex, cards.size()), card);
     }
@@ -99,7 +99,7 @@ void ZoneViewZoneLogic::updateCardIds(CardAction action)
         return;
     }
 
-    int cardCount = cards.size();
+    const int cardCount = cards.size();
 
     auto startId = 0;
 

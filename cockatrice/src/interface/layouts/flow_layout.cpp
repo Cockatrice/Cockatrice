@@ -76,7 +76,7 @@ int FlowLayout::heightForWidth(const int width) const
                 continue;
             }
 
-            int itemWidth = item->sizeHint().width() + horizontalSpacing();
+            const int itemWidth = item->sizeHint().width() + horizontalSpacing();
             if (rowWidth + itemWidth > width) {
                 height += rowHeight + verticalSpacing();
                 rowWidth = itemWidth;
@@ -98,7 +98,7 @@ int FlowLayout::heightForWidth(const int width) const
                 continue;
             }
 
-            int itemHeight = item->sizeHint().height();
+            const int itemHeight = item->sizeHint().height();
             if (colHeight + itemHeight > width) {
                 width += colWidth;
                 colHeight = itemHeight;
@@ -163,7 +163,7 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
         }
 
         QSize itemSize = item->sizeHint();                      // The suggested size for the current item
-        int itemWidth = itemSize.width() + horizontalSpacing(); // Item width plus spacing
+        const int itemWidth = itemSize.width() + horizontalSpacing(); // Item width plus spacing
 
         // Check if the current item fits in the remaining width of the current row
         if (currentXPosition + itemWidth > availableWidth) {
@@ -279,7 +279,7 @@ void FlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, cons
         }
 
         // Debugging: Print the item's widget class name and size hint
-        QWidget *widget = item->widget();
+        const QWidget *widget = item->widget();
         if (widget) {
             qCDebug(FlowLayoutLog) << "Widget class:" << widget->metaObject()->className();
             qCDebug(FlowLayoutLog) << "Widget size hint:" << widget->sizeHint();
@@ -290,7 +290,7 @@ void FlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, cons
             const QObjectList &children = widget->children();
             qCDebug(FlowLayoutLog) << "Child widgets:";
             for (QObject *child : children) {
-                if (QWidget *childWidget = qobject_cast<QWidget *>(child)) {
+                if (const QWidget *childWidget = qobject_cast<QWidget *>(child)) {
                     qCDebug(FlowLayoutLog) << "  - Child widget class:" << childWidget->metaObject()->className();
                     qCDebug(FlowLayoutLog) << "    Size hint:" << childWidget->sizeHint();
                     qCDebug(FlowLayoutLog) << "    Maximum size:" << childWidget->maximumSize();
@@ -365,7 +365,7 @@ QSize FlowLayout::calculateSizeHintHorizontal() const
         }
 
         QSize itemSize = item->sizeHint();
-        int itemWidth = itemSize.width() + horizontalSpacing();
+        const int itemWidth = itemSize.width() + horizontalSpacing();
         qCDebug(FlowLayoutLog) << "Processing item. Size:" << itemSize << "Width with spacing:" << itemWidth;
 
         if (currentWidth + itemWidth > availableWidth) {
@@ -413,7 +413,7 @@ QSize FlowLayout::calculateMinimumSizeHorizontal() const
         }
 
         QSize itemMinSize = item->minimumSize();
-        int itemWidth = itemMinSize.width() + horizontalSpacing();
+        const int itemWidth = itemMinSize.width() + horizontalSpacing();
         qCDebug(FlowLayoutLog) << "Processing item. Minimum size:" << itemMinSize << "Width with spacing:" << itemWidth;
 
         if (currentWidth + itemWidth > availableWidth) {
@@ -509,7 +509,7 @@ QSize FlowLayout::calculateMinimumSizeVertical() const
         }
 
         QSize itemMinSize = item->minimumSize();
-        int itemHeight = itemMinSize.height() + verticalSpacing();
+        const int itemHeight = itemMinSize.height() + verticalSpacing();
         qCDebug(FlowLayoutLog) << "Processing item. Minimum size:" << itemMinSize
                                << "Height with spacing:" << itemHeight;
 
@@ -553,7 +553,7 @@ void FlowLayout::insertWidgetAtIndex(QWidget *toInsert, int index)
     addChildWidget(toInsert);
 
     // We don't want to fail on an index that violates the bounds, so we just clamp it.
-    int boundedIndex = qBound(0, index, qMax(0, static_cast<int>(items.size())));
+    const int boundedIndex = qBound(0, index, qMax(0, static_cast<int>(items.size())));
     items.insert(boundedIndex, new QWidgetItem(toInsert));
 
     invalidate();

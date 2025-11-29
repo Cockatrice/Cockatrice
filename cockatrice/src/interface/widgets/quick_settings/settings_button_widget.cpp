@@ -43,11 +43,12 @@ void SettingsButtonWidget::togglePopup()
     } else {
         popup->adjustSizeToFitScreen(); // Ensure proper size
 
-        QSize popupSize = popup->size();
-        QPoint buttonGlobalPos = button->mapToGlobal(QPoint(0, button->height()));
+        const QSize popupSize = popup->size();
+        const QPoint buttonGlobalPos = button->mapToGlobal(QPoint(0, button->height()));
 
-        QScreen *screen = QApplication::screenAt(buttonGlobalPos);
-        QRect screenGeom = screen ? screen->availableGeometry() : QApplication::primaryScreen()->availableGeometry();
+        const QScreen *screen = QApplication::screenAt(buttonGlobalPos);
+        const QRect screenGeom =
+            screen ? screen->availableGeometry() : QApplication::primaryScreen()->availableGeometry();
 
         int x = buttonGlobalPos.x();
         int y = buttonGlobalPos.y();

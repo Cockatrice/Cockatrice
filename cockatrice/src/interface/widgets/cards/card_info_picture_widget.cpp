@@ -192,27 +192,28 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     // Handle DPI scaling
-    qreal dpr = devicePixelRatio();     // Get the actual scaling factor
-    QSize availableSize = size() * dpr; // Convert to physical pixel size
+    const qreal dpr = devicePixelRatio();     // Get the actual scaling factor
+    const QSize availableSize = size() * dpr; // Convert to physical pixel size
 
     // Compute final scaled size
-    QSize pixmapSize = transformedPixmap.size();
-    QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
+    const QSize pixmapSize = transformedPixmap.size();
+    const QSize scaledSize = pixmapSize.scaled(availableSize, Qt::KeepAspectRatio);
 
     // Pre-scale the pixmap once before drawing
     QPixmap finalPixmap = transformedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     finalPixmap.setDevicePixelRatio(dpr); // Ensure correct display on high-DPI screens
 
     // Compute target rectangle with explicit integer conversion
-    int targetX = static_cast<int>((availableSize.width() - scaledSize.width()) / (2 * dpr));
-    int targetY = static_cast<int>((availableSize.height() - scaledSize.height()) / (2 * dpr));
-    int targetW = static_cast<int>(scaledSize.width() / dpr);
-    int targetH = static_cast<int>(scaledSize.height() / dpr);
-    QRect targetRect{targetX, targetY, targetW, targetH};
+    const int targetX = static_cast<int>((availableSize.width() - scaledSize.width()) / (2 * dpr));
+    const int targetY = static_cast<int>((availableSize.height() - scaledSize.height()) / (2 * dpr));
+    const int targetW = static_cast<int>(scaledSize.width() / dpr);
+    const int targetH = static_cast<int>(scaledSize.height() / dpr);
+    const QRect targetRect{targetX, targetY, targetW, targetH};
 
     // Compute rounded corner radius
     // Ensure consistent rounding
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
+    const qreal radius =
+        SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);
@@ -364,7 +365,7 @@ QMenu *CardInfoPictureWidget::createRightClickMenu()
 
 QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
 {
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    const auto viewRelatedCards = new QMenu(tr("View related cards"));
 
     QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
 
@@ -372,7 +373,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
         return CardDatabaseManager::query()->getCardInfo(cardRelation->getName()) != nullptr;
     };
 
-    bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
+    const bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
 
     if (!atLeastOneGoodRelationFound) {
         viewRelatedCards->setEnabled(false);
@@ -397,8 +398,8 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
  */
 static MainWindow *findMainWindow()
 {
-    for (auto widget : QApplication::topLevelWidgets()) {
-        if (auto mainWindow = qobject_cast<MainWindow *>(widget)) {
+    for (const auto widget : QApplication::topLevelWidgets()) {
+        if (const auto mainWindow = qobject_cast<MainWindow *>(widget)) {
             return mainWindow;
         }
     }
@@ -409,9 +410,9 @@ static MainWindow *findMainWindow()
 
 QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
 {
-    auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
+    const auto addToOpenDeckMenu = new QMenu(tr("Add card to deck"));
 
-    auto mainWindow = findMainWindow();
+    const auto mainWindow = findMainWindow();
     QList<AbstractTabDeckEditor *> deckEditorTabs = mainWindow->getTabSupervisor()->getDeckEditorTabs();
 
     if (deckEditorTabs.isEmpty()) {
@@ -422,13 +423,13 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
     for (auto &deckEditorTab : deckEditorTabs) {
         auto *addCardMenu = addToOpenDeckMenu->addMenu(deckEditorTab->getTabText());
 
-        QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
+        const QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCard(exactCard);
             deckEditorTab->actAddCard(exactCard);
         });
 
-        QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
+        const QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
         connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCard(exactCard);
             deckEditorTab->actAddCardToSideboard(exactCard);

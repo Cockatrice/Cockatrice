@@ -26,18 +26,18 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
         return;
     }
 
-    QString data(reply->readAll());
+    const QString data(reply->readAll());
     reply->deleteLater();
 
     static const QRegularExpression rx("<meta property=\"og:url\" content=\"([^\"]+)\"");
-    auto match = rx.match(data);
+    const auto match = rx.match(data);
     if (!match.hasMatch()) {
         QMessageBox::critical(nullptr, tr("Error"), tr("The reply from the server could not be parsed."));
         deleteLater();
         return;
     }
 
-    QString deckUrl = match.captured(1);
+    const QString deckUrl = match.captured(1);
     QDesktopServices::openUrl(deckUrl);
 
     deleteLater();
@@ -70,7 +70,7 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
 void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
 {
     auto copyIfNotAToken = [this, &destination](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
+        const CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
         if (dbCard && !dbCard->getIsToken()) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());

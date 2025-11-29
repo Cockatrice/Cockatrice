@@ -52,7 +52,7 @@ void ShadowBackgroundLabel::paintEvent(QPaintEvent *event)
 
     // Adjust the rectangle to account for margins.
     QRect adjustedRect = this->rect();
-    int margin = contentsMargins().left(); // Assuming equal margins.
+    const int margin = contentsMargins().left(); // Assuming equal margins.
     adjustedRect.adjust(margin, margin, -margin, -margin);
 
     // Draw a rounded rectangle with a corner radius of 5.

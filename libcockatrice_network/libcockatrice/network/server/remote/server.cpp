@@ -98,8 +98,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
 
     Server_DatabaseInterface *databaseInterface = getDatabaseInterface();
 
-    AuthenticationResult authState = databaseInterface->checkUserPassword(session, name, password, clientid, reasonStr,
-                                                                          secondsLeft, passwordNeedsHash);
+    const AuthenticationResult authState = databaseInterface->checkUserPassword(
+        session, name, password, clientid, reasonStr, secondsLeft, passwordNeedsHash);
     if (authState == NotLoggedIn || authState == UserIsBanned || authState == UsernameInvalid ||
         authState == UserIsInactive)
         return authState;
@@ -117,7 +117,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                 event.set_reason_str("You have been logged out due to logging in at another location.");
                 event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
 
-                SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+                const SessionEvent *se = users.value(name)->prepareSessionEvent(event);
                 users.value(name)->sendProtocolItem(*se);
                 delete se;
 
@@ -163,8 +163,8 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
 
     Event_UserJoined event;
     event.mutable_user_info()->CopyFrom(session->copyUserInfo(false));
-    SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
-    for (auto &client : clients)
+    const SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+    for (const auto &client : clients)
         if (client->getAcceptsUserListChanges())
             client->sendProtocolItem(*se);
     delete se;
@@ -227,7 +227,7 @@ void Server::addClient(Server_ProtocolHandler *client)
 
 void Server::removeClient(Server_ProtocolHandler *client)
 {
-    int clientIndex = clients.indexOf(client);
+    const int clientIndex = clients.indexOf(client);
     if (clientIndex == -1) {
         qWarning() << "tried to remove non existing client";
         return;
@@ -241,12 +241,12 @@ void Server::removeClient(Server_ProtocolHandler *client)
 
     QWriteLocker locker(&clientsLock);
     clients.removeAt(clientIndex);
-    ServerInfo_User *data = client->getUserInfo();
+    const ServerInfo_User *data = client->getUserInfo();
     if (data) {
         Event_UserLeft event;
         event.set_name(data->name());
-        SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
-        for (auto &_client : clients)
+        const SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+        for (const auto &_client : clients)
             if (_client->getAcceptsUserListChanges())
                 _client->sendProtocolItem(*se);
         sendIsl_SessionEvent(*se);
@@ -271,7 +271,7 @@ QList<QString> Server::getOnlineModeratorList() const
     // clients list should be locked by calling function prior to iteration otherwise sigfaults may occur
     QList<QString> results;
     for (auto &client : clients) {
-        ServerInfo_User *data = client->getUserInfo();
+        const ServerInfo_User *data = client->getUserInfo();
 
         // TODO: this line should be updated in the event there is any type of new user level created
         if (data &&
@@ -293,8 +293,8 @@ void Server::externalUserJoined(const ServerInfo_User &userInfo)
     Event_UserJoined event;
     event.mutable_user_info()->CopyFrom(userInfo);
 
-    SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
-    for (auto &client : clients)
+    const SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+    for (const auto &client : clients)
         if (client->getAcceptsUserListChanges())
             client->sendProtocolItem(*se);
     delete se;
@@ -310,21 +310,21 @@ void Server::externalUserLeft(const QString &userName)
     // This function is always called from the main thread via signal/slot.
 
     clientsLock.lockForWrite();
-    Server_AbstractUserInterface *user = externalUsers.take(userName);
+    const Server_AbstractUserInterface *user = externalUsers.take(userName);
     externalUsersBySessionId.remove(user->getUserInfo()->session_id());
     clientsLock.unlock();
 
-    QMap<int, QPair<int, int>> userGames(user->getGames());
+    const QMap<int, QPair<int, int>> userGames(user->getGames());
     QMapIterator<int, QPair<int, int>> userGamesIterator(userGames);
     roomsLock.lockForRead();
     while (userGamesIterator.hasNext()) {
         userGamesIterator.next();
-        Server_Room *room = rooms.value(userGamesIterator.value().first);
+        const Server_Room *room = rooms.value(userGamesIterator.value().first);
         if (!room)
             continue;
 
         QReadLocker roomGamesLocker(&room->gamesLock);
-        Server_Game *game = room->getGames().value(userGamesIterator.key());
+        const Server_Game *game = room->getGames().value(userGamesIterator.key());
         if (!game)
             continue;
 
@@ -342,9 +342,9 @@ void Server::externalUserLeft(const QString &userName)
     Event_UserLeft event;
     event.set_name(userName.toStdString());
 
-    SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+    const SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
     clientsLock.lockForRead();
-    for (auto &client : clients)
+    for (const auto &client : clients)
         if (client->getAcceptsUserListChanges())
             client->sendProtocolItem(*se);
     clientsLock.unlock();
@@ -443,7 +443,7 @@ void Server::externalJoinGameCommandReceived(const Command_JoinGame &cmd,
         }
 
         ResponseContainer responseContainer(cmdId);
-        Response::ResponseCode responseCode = room->processJoinGameCommand(cmd, responseContainer, userInterface);
+        const Response::ResponseCode responseCode = room->processJoinGameCommand(cmd, responseContainer, userInterface);
         userInterface->sendResponseContainer(responseContainer, responseCode);
     } catch (Response::ResponseCode &code) {
         Response response;
@@ -466,7 +466,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
         Response::ResponseCode finalResponseCode = Response::RespOk;
 
         QReadLocker roomsLocker(&roomsLock);
-        Server_Room *room = rooms.value(cont.room_id());
+        const Server_Room *room = rooms.value(cont.room_id());
         if (!room) {
             qDebug() << "externalGameCommandContainerReceived: room id=" << cont.room_id() << "not found";
             throw Response::RespNotInRoom;
@@ -491,7 +491,7 @@ void Server::externalGameCommandContainerReceived(const CommandContainer &cont,
             const GameCommand &sc = cont.game_command(i);
             qDebug() << "[ISL]" << getSafeDebugString(sc);
 
-            Response::ResponseCode resp = participant->processGameCommand(sc, responseContainer, ges);
+            const Response::ResponseCode resp = participant->processGameCommand(sc, responseContainer, ges);
 
             if (resp != Response::RespOk)
                 finalResponseCode = resp;
@@ -545,10 +545,10 @@ void Server::broadcastRoomUpdate(const ServerInfo_Room &roomInfo, bool sendToIsl
     Event_ListRooms event;
     event.add_room_list()->CopyFrom(roomInfo);
 
-    SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+    const SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
 
     clientsLock.lockForRead();
-    for (auto &client : clients)
+    for (const auto &client : clients)
         if (client->getAcceptsRoomListChanges())
             client->sendProtocolItem(*se);
     clientsLock.unlock();
@@ -581,7 +581,7 @@ int Server::getGamesCount() const
     QReadLocker locker(&roomsLock);
     QMapIterator<int, Server_Room *> roomIterator(rooms);
     while (roomIterator.hasNext()) {
-        Server_Room *room = roomIterator.next().value();
+        const Server_Room *room = roomIterator.next().value();
         QReadLocker roomLocker(&room->gamesLock);
         result += room->getGames().size();
     }

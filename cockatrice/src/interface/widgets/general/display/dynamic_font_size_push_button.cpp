@@ -16,7 +16,7 @@ void DynamicFontSizePushButton::paintEvent(QPaintEvent *event)
 
     // Adjust the font size dynamically based on the text
     QFont newFont = font();
-    float fontSize = DynamicFontSizeLabel::getWidgetMaximumFontSize(this, this->text());
+    const float fontSize = DynamicFontSizeLabel::getWidgetMaximumFontSize(this, this->text());
     newFont.setPointSizeF(fontSize);
     setFont(newFont);
 

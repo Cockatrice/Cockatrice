@@ -23,7 +23,7 @@ static QTextBrowser *createBrowser(const QString &helpFile)
     file.close();
 
     // --- Remove @page declarations at the top of the file ---
-    auto opts = QRegularExpression::MultilineOption;
+    const auto opts = QRegularExpression::MultilineOption;
     text = text.replace(QRegularExpression(R"(^\s*@page[^\n]*\n)", opts), "");
 
     // Poor Markdown Converter
@@ -33,7 +33,7 @@ static QTextBrowser *createBrowser(const QString &helpFile)
                .replace(QRegularExpression("^------*", opts), "<hr />")
                .replace(QRegularExpression(R"(\[([^[]+)\]\(([^\)]+)\))", opts), R"(<a href='\2'>\1</a>)");
 
-    auto browser = new QTextBrowser();
+    const auto browser = new QTextBrowser();
     browser->setParent(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint |
                                     Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint |
                                     Qt::WindowFullscreenButtonHint);
@@ -41,7 +41,7 @@ static QTextBrowser *createBrowser(const QString &helpFile)
     browser->setReadOnly(true);
     browser->setMinimumSize({500, 600});
 
-    QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
+    const QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
     browser->document()->setDefaultStyleSheet(sheet);
     browser->setHtml(text);
 
@@ -58,7 +58,7 @@ static QTextBrowser *createBrowser(const QString &helpFile)
  */
 QTextBrowser *createSearchSyntaxHelpWindow(QLineEdit *lineEdit)
 {
-    auto browser = createBrowser("theme:help/search.md");
+    const auto browser = createBrowser("theme:help/search.md");
     QObject::connect(browser, &QTextBrowser::anchorClicked,
                      [lineEdit](const QUrl &link) { lineEdit->setText(link.fragment()); });
     QObject::connect(lineEdit, &QObject::destroyed, browser, &QTextBrowser::close);
@@ -73,7 +73,7 @@ QTextBrowser *createSearchSyntaxHelpWindow(QLineEdit *lineEdit)
  */
 QTextBrowser *createDeckSearchSyntaxHelpWindow(QLineEdit *lineEdit)
 {
-    auto browser = createBrowser("theme:help/deck_search.md");
+    const auto browser = createBrowser("theme:help/deck_search.md");
     QObject::connect(browser, &QTextBrowser::anchorClicked, [lineEdit](const QUrl &link) {
         if (link.fragment() == "cardSearchSyntaxHelp") {
             createSearchSyntaxHelpWindow(lineEdit);

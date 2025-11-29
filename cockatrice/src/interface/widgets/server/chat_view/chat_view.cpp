@@ -93,7 +93,7 @@ QTextCursor ChatView::prepareBlock(bool same)
 
 void ChatView::appendHtml(const QString &html)
 {
-    bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
+    const bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
     if (atBottom)
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
@@ -101,7 +101,7 @@ void ChatView::appendHtml(const QString &html)
 
 void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
 {
-    bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
+    const bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
 
     QString htmlText =
         "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
@@ -117,7 +117,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
-    QTextCharFormat oldFormat = cursor.charFormat();
+    const QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
     anchorFormat.setForeground(linkColor);
     anchorFormat.setAnchor(true);
@@ -134,7 +134,7 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     if (!url.contains("://"))
         url.prepend("https://");
 
-    QTextCharFormat oldFormat = cursor.charFormat();
+    const QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
     anchorFormat.setForeground(linkColor);
     anchorFormat.setAnchor(true);
@@ -155,10 +155,10 @@ void ChatView::appendMessage(QString message,
     const QString userName = QString::fromStdString(userInfo.name());
     const UserLevelFlags userLevel = UserLevelFlags(userInfo.user_level());
 
-    bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
+    const bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
-    bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
-    bool sameSender = isUserMessage && userName == lastSender;
+    const bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
+    const bool sameSender = isUserMessage && userName == lastSender;
     QTextCursor cursor = prepareBlock(sameSender);
     lastSender = userName;
 
@@ -189,7 +189,7 @@ void ChatView::appendMessage(QString message,
             cursor.insertText("    ");
         } else {
             const int pixelSize = QFontInfo(cursor.charFormat().font()).pixelSize();
-            bool isBuddy = userListProxy->isUserBuddy(userName);
+            const bool isBuddy = userListProxy->isUserBuddy(userName);
             const QString privLevel = userInfo.has_privlevel() ? QString::fromStdString(userInfo.privlevel()) : "NONE";
             cursor.insertImage(UserLevelPixmapGenerator::generatePixmap(pixelSize, userLevel, userInfo.pawn_colors(),
                                                                         isBuddy, privLevel)
@@ -210,13 +210,13 @@ void ChatView::appendMessage(QString message,
             defaultFormat.setFontWeight(QFont::Light);
             defaultFormat.setFontItalic(true);
             static const QRegularExpression userNameRegex("^(\\[[^\\]]*\\]\\s)(\\S+):\\s");
-            auto match = userNameRegex.match(message);
+            const auto match = userNameRegex.match(message);
             if (match.hasMatch()) {
                 cursor.setCharFormat(defaultFormat);
                 UserMessagePosition pos(cursor);
                 pos.relativePosition = match.captured(0).length(); // set message start
-                auto before = match.captured(1);
-                auto sentBy = match.captured(2);
+                const auto before = match.captured(1);
+                const auto sentBy = match.captured(2);
                 cursor.insertText(before); // add message timestamp
                 QTextCharFormat senderFormat(defaultFormat);
                 senderFormat.setAnchor(true);
@@ -235,7 +235,7 @@ void ChatView::appendMessage(QString message,
     }
     cursor.setCharFormat(defaultFormat);
 
-    bool mentionEnabled = SettingsCache::instance().getChatMention();
+    const bool mentionEnabled = SettingsCache::instance().getChatMention();
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     highlightedWords = SettingsCache::instance().getHighlightWords().split(' ', Qt::SkipEmptyParts);
 #else
@@ -280,8 +280,8 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 {
     if (message.startsWith("[card]")) {
         message = message.mid(6);
-        int closeTagIndex = message.indexOf("[/card]");
-        QString cardName = message.left(closeTagIndex);
+        const int closeTagIndex = message.indexOf("[/card]");
+        const QString cardName = message.left(closeTagIndex);
         if (closeTagIndex == -1)
             message.clear();
         else
@@ -293,8 +293,8 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 
     if (message.startsWith("[[")) {
         message = message.mid(2);
-        int closeTagIndex = message.indexOf("]]");
-        QString cardName = message.left(closeTagIndex);
+        const int closeTagIndex = message.indexOf("]]");
+        const QString cardName = message.left(closeTagIndex);
         if (closeTagIndex == -1)
             message.clear();
         else
@@ -306,8 +306,8 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
 
     if (message.startsWith("[url]")) {
         message = message.mid(5);
-        int closeTagIndex = message.indexOf("[/url]");
-        QString url = message.left(closeTagIndex);
+        const int closeTagIndex = message.indexOf("[/url]");
+        const QString url = message.left(closeTagIndex);
         if (closeTagIndex == -1)
             message.clear();
         else
@@ -325,9 +325,9 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
 {
     const static auto notALetterOrNumber = QRegularExpression("[^a-zA-Z0-9]");
 
-    int firstSpace = message.indexOf(' ');
+    const int firstSpace = message.indexOf(' ');
     QString fullMentionUpToSpaceOrEnd = (firstSpace == -1) ? message.mid(1) : message.mid(1, firstSpace - 1);
-    QString mentionIntact = fullMentionUpToSpaceOrEnd;
+    const QString mentionIntact = fullMentionUpToSpaceOrEnd;
 
     while (fullMentionUpToSpaceOrEnd.size()) {
         const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(fullMentionUpToSpaceOrEnd);
@@ -344,7 +344,7 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
                 message = message.mid(mention.size());
                 showSystemPopup(userName);
             } else {
-                QString correctUserName = QString::fromStdString(onlineUser->name());
+                const QString correctUserName = QString::fromStdString(onlineUser->name());
                 mentionFormatOtherUser.setAnchorHref("user://" + QString::number(onlineUser->user_level()) + "_" +
                                                      correctUserName);
                 cursor.insertText("@" + correctUserName, mentionFormatOtherUser);
@@ -389,13 +389,13 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
 {
     // extract the first word
     QString rest;
-    QString fullWordUpToSpaceOrEnd = extractNextWord(message, rest);
+    const QString fullWordUpToSpaceOrEnd = extractNextWord(message, rest);
 
     // check urls
     if (fullWordUpToSpaceOrEnd.startsWith("http://", Qt::CaseInsensitive) ||
         fullWordUpToSpaceOrEnd.startsWith("https://", Qt::CaseInsensitive) ||
         fullWordUpToSpaceOrEnd.startsWith("www.", Qt::CaseInsensitive)) {
-        QUrl qUrl(fullWordUpToSpaceOrEnd);
+        const QUrl qUrl(fullWordUpToSpaceOrEnd);
         if (qUrl.isValid()) {
             appendUrlTag(cursor, fullWordUpToSpaceOrEnd);
             cursor.insertText(rest, defaultFormat);
@@ -425,7 +425,7 @@ QString ChatView::extractNextWord(QString &message, QString &rest)
 {
     // get the first next space and extract the word
     QString word;
-    int firstSpace = message.indexOf(' ');
+    const int firstSpace = message.indexOf(' ');
     if (firstSpace == -1) {
         word = message;
         message.clear();
@@ -448,7 +448,7 @@ QString ChatView::extractNextWord(QString &message, QString &rest)
 
 bool ChatView::isModeratorSendingGlobal(QFlags<ServerInfo_User::UserLevelFlag> userLevelFlag, QString message)
 {
-    int userLevel = QString::number(userLevelFlag).toInt();
+    const int userLevel = QString::number(userLevelFlag).toInt();
 
     QStringList getAttentionList;
     getAttentionList << "/all"; // Send a message to all users
@@ -473,7 +473,7 @@ void ChatView::showSystemPopup(const QString &userName)
 QColor ChatView::getCustomMentionColor()
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    const QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
 #else
     QColor customColor;
     customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
@@ -484,7 +484,7 @@ QColor ChatView::getCustomMentionColor()
 QColor ChatView::getCustomHighlightColor()
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    const QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
 #else
     QColor customColor;
     customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
@@ -537,8 +537,8 @@ void ChatView::leaveEvent(QEvent * /*event*/)
 
 QTextFragment ChatView::getFragmentUnderMouse(const QPoint &pos) const
 {
-    QTextCursor cursor(cursorForPosition(pos));
-    QTextBlock block(cursor.block());
+    const QTextCursor cursor(cursorForPosition(pos));
+    const QTextBlock block(cursor.block());
     QTextBlock::iterator it;
     for (it = block.begin(); !(it.atEnd()); ++it) {
         QTextFragment frag = it.fragment();
@@ -550,7 +550,7 @@ QTextFragment ChatView::getFragmentUnderMouse(const QPoint &pos) const
 
 void ChatView::mouseMoveEvent(QMouseEvent *event)
 {
-    QString anchorHref = getFragmentUnderMouse(event->pos()).charFormat().anchorHref();
+    const QString anchorHref = getFragmentUnderMouse(event->pos()).charFormat().anchorHref();
     if (!anchorHref.isEmpty()) {
         const int delimiterIndex = anchorHref.indexOf("://");
         if (delimiterIndex != -1) {
@@ -594,7 +594,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 const QString userName = hoveredContent.mid(delimiterIndex + 1);
                 switch (event->button()) {
                     case Qt::RightButton: {
-                        UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
+                        const UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                         userContextMenu->showContextMenu(event->globalPosition().toPoint(), userName, userLevel, this);
 #else

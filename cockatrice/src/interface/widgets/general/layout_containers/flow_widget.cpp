@@ -155,8 +155,8 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 
     // Iterate over all widgets in the flow layout to find the maximum sizeHint
     for (int i = 0; i < flowLayout->count(); ++i) {
-        if (QLayoutItem *item = flowLayout->itemAt(i)) {
-            if (QWidget *widget = item->widget()) {
+        if (const QLayoutItem *item = flowLayout->itemAt(i)) {
+            if (const QWidget *widget = item->widget()) {
                 // Update the max size based on the sizeHint of each widget
                 QSize widgetSizeHint = widget->sizeHint();
                 maxSize.setWidth(qMax(maxSize.width(), widgetSizeHint.width()));
@@ -167,7 +167,7 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 
     // Set the minimum size for all widgets to the max sizeHint
     for (int i = 0; i < flowLayout->count(); ++i) {
-        if (QLayoutItem *item = flowLayout->itemAt(i)) {
+        if (const QLayoutItem *item = flowLayout->itemAt(i)) {
             if (QWidget *widget = item->widget()) {
                 widget->setMinimumSize(maxSize);
             }

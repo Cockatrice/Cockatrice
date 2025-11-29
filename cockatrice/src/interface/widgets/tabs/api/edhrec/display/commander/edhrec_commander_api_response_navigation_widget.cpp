@@ -111,8 +111,8 @@ void EdhrecCommanderApiResponseNavigationWidget::applyOptionsFromUrl(const QStri
     QString gameChangerOpt, budgetOpt;
 
     // Define valid sets
-    QSet<QString> validGameChangers = {"core", "upgraded", "optimized"};
-    QSet<QString> validBudgets = {"budget", "expensive"};
+    const QSet<QString> validGameChangers = {"core", "upgraded", "optimized"};
+    const QSet<QString> validBudgets = {"budget", "expensive"};
 
     // Check remaining parts after commander
     for (int i = 2; i < parts.size(); ++i) {

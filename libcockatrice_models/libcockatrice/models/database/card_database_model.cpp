@@ -34,7 +34,7 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
         (role != Qt::DisplayRole && role != SortRole))
         return QVariant();
 
-    CardInfoPtr card = cardList.at(index.row());
+    const CardInfoPtr card = cardList.at(index.row());
     switch (index.column()) {
         case NameColumn:
             return card->getName();

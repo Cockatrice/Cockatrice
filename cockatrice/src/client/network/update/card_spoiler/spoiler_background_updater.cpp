@@ -34,14 +34,14 @@ SpoilerBackgroundUpdater::SpoilerBackgroundUpdater(QObject *apParent) : QObject(
 
 void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool saveResults)
 {
-    auto spoilerURL = QUrl(url);
+    const auto spoilerURL = QUrl(url);
     downloadFromURL(spoilerURL, saveResults);
 }
 
 void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
 {
     auto *nam = new QNetworkAccessManager(this);
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+    const QNetworkReply *reply = nam->get(QNetworkRequest(url));
 
     if (saveResults) {
         // This will write out to the file (used for spoiler.xml)
@@ -56,7 +56,7 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 {
     // Check for server reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = reply->error();
+    const QNetworkReply::NetworkError errorCode = reply->error();
 
     if (errorCode == QNetworkReply::NoError) {
         spoilerData = reply->readAll();
@@ -74,8 +74,8 @@ void SpoilerBackgroundUpdater::actDownloadFinishedSpoilersFile()
 
 bool SpoilerBackgroundUpdater::deleteSpoilerFile()
 {
-    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
-    QFileInfo fi(fileName);
+    const QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
+    const QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     QFile file(fileName);
 
@@ -91,8 +91,8 @@ bool SpoilerBackgroundUpdater::deleteSpoilerFile()
 
 void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 {
-    auto *response = dynamic_cast<QNetworkReply *>(sender());
-    QNetworkReply::NetworkError errorCode = response->error();
+    const auto *response = dynamic_cast<QNetworkReply *>(sender());
+    const QNetworkReply::NetworkError errorCode = response->error();
 
     if (errorCode == QNetworkReply::ContentNotFoundError) {
         // Spoiler season is offline at this point, so the spoiler.xml file can be safely deleted
@@ -125,9 +125,9 @@ void SpoilerBackgroundUpdater::actCheckIfSpoilerSeasonEnabled()
 
 bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
 {
-    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
-    QFileInfo fi(fileName);
-    QDir fileDir(fi.path());
+    const QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
+    const QFileInfo fi(fileName);
+    const QDir fileDir(fi.path());
 
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
         return false;
@@ -179,7 +179,7 @@ bool SpoilerBackgroundUpdater::saveDownloadedFile(QByteArray data)
                 utcTime.setTimeSpec(Qt::UTC);
 #endif
 
-                QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
+                const QString localTime = utcTime.toLocalTime().toString("MMM d, hh:mm");
 
                 trayIcon->showMessage(tr("Spoilers have been updated!"), tr("Last change:") + " " + localTime);
                 emit spoilersUpdatedSuccessfully();

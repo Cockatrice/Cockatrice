@@ -18,7 +18,7 @@ void PlayerArea::updateBg()
 
 void PlayerArea::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Player, playerZoneId);
+    const QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Player, playerZoneId);
     painter->fillRect(boundingRect(), brush);
 }
 

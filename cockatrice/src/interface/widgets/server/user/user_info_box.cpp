@@ -110,7 +110,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 
     nameLabel.setText(QString::fromStdString(user.name()));
     realNameLabel2.setText(QString::fromStdString(user.real_name()));
-    QString country = QString::fromStdString(user.country());
+    const QString country = QString::fromStdString(user.country());
 
     if (country.length() != 0) {
         countryLabel2.setPixmap(CountryPixmapGenerator::generatePixmap(13, country));
@@ -156,17 +156,17 @@ QString UserInfoBox::getAgeString(int ageSeconds)
         return accountAgeString;
 
     // secsSinceEpoch is in utc
-    auto secsSinceEpoch = QDateTime::currentSecsSinceEpoch() - ageSeconds;
+    const auto secsSinceEpoch = QDateTime::currentSecsSinceEpoch() - ageSeconds;
     // the date is in local time, fromSecsSinceEpoch expects a timestamp from utc and converts it to local time
-    auto date = QDateTime::fromSecsSinceEpoch(secsSinceEpoch).date();
+    const auto date = QDateTime::fromSecsSinceEpoch(secsSinceEpoch).date();
     if (!date.isValid())
         return accountAgeString;
 
     // now can be local time as the date is also local time
-    auto now = QDate::currentDate();
-    auto daysAndYears = getDaysAndYearsBetween(date, now);
+    const auto now = QDate::currentDate();
+    const auto daysAndYears = getDaysAndYearsBetween(date, now);
 
-    QString dateString = QLocale().toString(date, QLocale::ShortFormat);
+    const QString dateString = QLocale().toString(date, QLocale::ShortFormat);
     QString yearString;
     if (daysAndYears.second > 0) {
         yearString = tr("%n Year(s), ", "amount of years (only shown if more than 0)", daysAndYears.second);
@@ -200,7 +200,7 @@ void UserInfoBox::processResponse(const Response &r)
 
 void UserInfoBox::actEdit()
 {
-    Command_GetUserInfo cmd;
+    const Command_GetUserInfo cmd;
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserInfoBox::actEditInternal);
@@ -213,9 +213,9 @@ void UserInfoBox::actEditInternal(const Response &r)
     const Response_GetUserInfo &response = r.GetExtension(Response_GetUserInfo::ext);
     const ServerInfo_User &user = response.user_info();
 
-    QString email = QString::fromStdString(user.email());
-    QString country = QString::fromStdString(user.country());
-    QString realName = QString::fromStdString(user.real_name());
+    const QString email = QString::fromStdString(user.email());
+    const QString country = QString::fromStdString(user.country());
+    const QString realName = QString::fromStdString(user.real_name());
 
     DlgEditUser dlg(this, email, country, realName);
     if (!dlg.exec())
@@ -227,7 +227,7 @@ void UserInfoBox::actEditInternal(const Response &r)
         if (email != dlg.getEmail()) {
             // real password is required to change email
             bool ok = false;
-            QString password =
+            const QString password =
                 getTextWithMax(this, tr("Enter Password"),
                                tr("Password verification is required in order to change your email address"),
                                QLineEdit::Password, "", &ok);
@@ -253,8 +253,8 @@ void UserInfoBox::actPassword()
     if (!dlg.exec())
         return;
 
-    auto oldPassword = dlg.getOldPassword();
-    auto newPassword = dlg.getNewPassword();
+    const auto oldPassword = dlg.getOldPassword();
+    const auto newPassword = dlg.getNewPassword();
 
     if (client->getServerSupportsPasswordHash()) {
         Command_RequestPasswordSalt cmd;
@@ -280,8 +280,8 @@ void UserInfoBox::changePassword(const QString &oldPassword, const QString &newP
     Command_AccountPassword cmd;
     cmd.set_old_password(oldPassword.toStdString());
     if (client->getServerSupportsPasswordHash()) {
-        auto passwordSalt = PasswordHasher::generateRandomSalt();
-        QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
+        const auto passwordSalt = PasswordHasher::generateRandomSalt();
+        const QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
         cmd.set_hashed_new_password(hashedPassword.toStdString());
     } else {
         cmd.set_new_password(newPassword.toStdString());
@@ -376,7 +376,7 @@ void UserInfoBox::resizeEvent(QResizeEvent *event)
     if (hasAvatar) {
         resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     } else {
-        int height = qMin(avatarPic.size().width(), avatarPic.size().height());
+        const int height = qMin(avatarPic.size().width(), avatarPic.size().height());
         resizedPixmap = createDefaultAvatar(height, *currentUserInfo);
     }
     avatarPic.setPixmap(resizedPixmap);

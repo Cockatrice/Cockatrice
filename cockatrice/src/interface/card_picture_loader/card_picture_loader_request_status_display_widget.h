@@ -64,7 +64,7 @@ public:
     int queryElapsedSeconds()
     {
         if (!getFinished()) {
-            int elapsedSeconds = QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
+            const int elapsedSeconds = QDateTime::fromString(startTime->text()).secsTo(QDateTime::currentDateTime());
             elapsedTime->setText(QString::number(elapsedSeconds));
             update();
             repaint();

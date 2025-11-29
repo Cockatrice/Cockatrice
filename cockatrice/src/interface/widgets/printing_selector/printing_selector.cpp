@@ -167,7 +167,7 @@ void PrintingSelector::selectCard(const int changeBy)
     }
 
     // Get the current index of the selected item
-    auto deckViewCurrentIndex = deckView->currentIndex();
+    const auto deckViewCurrentIndex = deckView->currentIndex();
 
     auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
     if (!nextIndex.isValid()) {
@@ -200,7 +200,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         return;
     }
 
-    SetToPrintingsMap setMap = selectedCard->getSets();
+    const SetToPrintingsMap setMap = selectedCard->getSets();
     const QList<PrintingInfo> sortedPrintings = sortToolBar->sortSets(setMap);
     const QList<PrintingInfo> filteredPrintings =
         sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());

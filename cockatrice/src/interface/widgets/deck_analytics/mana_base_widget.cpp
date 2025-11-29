@@ -51,7 +51,7 @@ void ManaBaseWidget::updateDisplay()
     }
 
     int highestEntry = 0;
-    for (auto entry : manaBaseMap) {
+    for (const auto entry : manaBaseMap) {
         if (entry > highestEntry) {
             highestEntry = entry;
         }
@@ -67,7 +67,7 @@ void ManaBaseWidget::updateDisplay()
     manaColors.insert("C", QColor(150, 150, 150));
 
     for (auto manaColor : manaBaseMap.keys()) {
-        QColor barColor = manaColors.value(manaColor, Qt::gray);
+        const QColor barColor = manaColors.value(manaColor, Qt::gray);
         BarWidget *barWidget = new BarWidget(QString(manaColor), manaBaseMap[manaColor], highestEntry, barColor, this);
         barLayout->addWidget(barWidget);
     }
@@ -80,7 +80,7 @@ QHash<QString, int> ManaBaseWidget::analyzeManaBase()
     manaBaseMap.clear();
     QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
             CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
             if (info) {
@@ -98,7 +98,7 @@ QHash<QString, int> ManaBaseWidget::determineManaProduction(const QString &rules
 {
     QHash<QString, int> manaCounts = {{"W", 0}, {"U", 0}, {"B", 0}, {"R", 0}, {"G", 0}, {"C", 0}};
 
-    QString text = rulesText.toLower(); // Normalize case for matching
+    const QString text = rulesText.toLower(); // Normalize case for matching
 
     // Quick keyword-based checks for any color and colorless mana
     if (text.contains("{t}: add one mana of any color") || text.contains("add one mana of any color")) {
@@ -113,7 +113,7 @@ QHash<QString, int> ManaBaseWidget::determineManaProduction(const QString &rules
 
     // Optimized regex for specific mana symbols
     static const QRegularExpression specificColorRegex(R"(\{T\}:\s*Add\s*\{([WUBRG])\})");
-    QRegularExpressionMatch match = specificColorRegex.match(rulesText);
+    const QRegularExpressionMatch match = specificColorRegex.match(rulesText);
     if (match.hasMatch()) {
         manaCounts[match.captured(1)]++;
     }

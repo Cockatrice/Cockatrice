@@ -104,7 +104,7 @@ void DlgMoveTopCardsUntil::validateAndAccept()
 
     // move currently selected text to top of history list
     if (exprComboBox->currentIndex() != 0) {
-        QString currentExpr = exprComboBox->currentText();
+        const QString currentExpr = exprComboBox->currentText();
         exprComboBox->removeItem(exprComboBox->currentIndex());
         exprComboBox->insertItem(0, currentExpr);
         exprComboBox->setCurrentIndex(0);

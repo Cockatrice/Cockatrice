@@ -14,7 +14,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
     playerArea = new PlayerArea(this);
 
     playerTarget = new PlayerTarget(player, playerArea);
-    qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
+    const qreal avatarMargin = (counterAreaWidth + CARD_HEIGHT + 15 - playerTarget->boundingRect().width()) / 2.0;
     playerTarget->setPos(QPointF(avatarMargin, avatarMargin));
 
     initializeZones();
@@ -50,18 +50,18 @@ void PlayerGraphicsItem::onPlayerActiveChanged(bool _active)
 void PlayerGraphicsItem::initializeZones()
 {
     deckZoneGraphicsItem = new PileZone(player->getDeckZone(), this);
-    auto base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
-                        10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
+    const auto base = QPointF(counterAreaWidth + (CARD_HEIGHT - CARD_WIDTH + 15) / 2.0,
+                              10 + playerTarget->boundingRect().height() + 5 - (CARD_HEIGHT - CARD_WIDTH) / 2.0);
     deckZoneGraphicsItem->setPos(base);
 
-    qreal h = deckZoneGraphicsItem->boundingRect().width() + 5;
+    const qreal h = deckZoneGraphicsItem->boundingRect().width() + 5;
 
     sideboardGraphicsItem = new PileZone(player->getSideboardZone(), this);
     player->getSideboardZone()->setGraphicsVisibility(false);
 
     auto *handCounter = new HandCounter(playerArea);
     handCounter->setPos(base + QPointF(0, h + 10));
-    qreal h2 = handCounter->boundingRect().height();
+    const qreal h2 = handCounter->boundingRect().height();
 
     graveyardZoneGraphicsItem = new PileZone(player->getGraveZone(), this);
     graveyardZoneGraphicsItem->setPos(base + QPointF(0, h + h2 + 10));
@@ -127,7 +127,7 @@ void PlayerGraphicsItem::setMirrored(bool _mirrored)
 
 void PlayerGraphicsItem::rearrangeCounters()
 {
-    qreal marginTop = 80;
+    const qreal marginTop = 80;
     const qreal padding = 5;
     qreal ySize = boundingRect().y() + marginTop;
 
@@ -198,9 +198,9 @@ void PlayerGraphicsItem::rearrangeZones()
 void PlayerGraphicsItem::updateBoundingRect()
 {
     prepareGeometryChange();
-    qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stackZoneGraphicsItem->boundingRect().width();
+    const qreal width = CARD_HEIGHT + 15 + counterAreaWidth + stackZoneGraphicsItem->boundingRect().width();
     if (SettingsCache::instance().getHorizontalHand()) {
-        qreal handHeight =
+        const qreal handHeight =
             player->getPlayerInfo()->getHandVisible() ? handZoneGraphicsItem->boundingRect().height() : 0;
         bRect = QRectF(0, 0, width + tableZoneGraphicsItem->boundingRect().width(),
                        tableZoneGraphicsItem->boundingRect().height() + handHeight);

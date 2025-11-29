@@ -90,12 +90,12 @@ void SetNameAndCollectorsNumberDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event); // Ensure the parent class handles the event first
 
-    QFontMetrics fm(setName->font());
-    int labelWidth = setName->width(); // Get the current width of the QLabel
-    QString text = setName->text();    // The text to be rendered
+    const QFontMetrics fm(setName->font());
+    const int labelWidth = setName->width(); // Get the current width of the QLabel
+    const QString text = setName->text();    // The text to be rendered
 
     // Calculate the height required to render the text with word wrapping
-    int textHeight = fm.boundingRect(0, 0, labelWidth, 0, Qt::TextWordWrap, text).height();
+    const int textHeight = fm.boundingRect(0, 0, labelWidth, 0, Qt::TextWordWrap, text).height();
 
     // Set the minimum height to accommodate the required text height
     setName->setMinimumHeight(textHeight);

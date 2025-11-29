@@ -32,7 +32,7 @@ public:
 void LimitedPrinter::PrintString(const std::string &val,
                                  ::google::protobuf::TextFormat::BaseTextGenerator *generator) const
 {
-    auto length = val.length();
+    const auto length = val.length();
     if (length > MAX_TEXT_LENGTH) {
         ::google::protobuf::TextFormat::FastFieldValuePrinter::PrintString(
             val.substr(0, MAX_NAME_LENGTH) + "... ---snip--- (" + std::to_string(length) + " bytes total", generator);
@@ -57,7 +57,7 @@ void SafePrinter::applySafePrinter(const ::google::protobuf::Message &message,
         switch (field->cpp_type()) {
             case ::google::protobuf::FieldDescriptor::CPPTYPE_STRING:
                 if (field->name().find("password") != std::string::npos) { // name contains password
-                    auto *safePrinter = new SafePrinter();
+                    const auto *safePrinter = new SafePrinter();
                     if (!printer.RegisterFieldValuePrinter(field, safePrinter))
                         delete safePrinter; // in case safePrinter has not been taken ownership of
                 }
@@ -81,7 +81,7 @@ void SafePrinter::applySafePrinter(const ::google::protobuf::Message &message,
 QString getSafeDebugString(const ::google::protobuf::Message &message)
 {
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-    auto size = message.ByteSizeLong();
+    const auto size = message.ByteSizeLong();
 #else
     auto size = message.ByteSize();
 #endif

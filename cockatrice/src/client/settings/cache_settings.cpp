@@ -63,7 +63,7 @@ void SettingsCache::translateLegacySettings()
 
     // Sets
     legacySetting.beginGroup("sets");
-    QStringList setsGroups = legacySetting.childGroups();
+    const QStringList setsGroups = legacySetting.childGroups();
     for (int i = 0; i < setsGroups.size(); i++) {
         legacySetting.beginGroup(setsGroups.at(i));
         cardDatabase()->setEnabled(setsGroups.at(i), legacySetting.value("enabled").toBool());
@@ -71,7 +71,7 @@ void SettingsCache::translateLegacySettings()
         cardDatabase()->setSortKey(setsGroups.at(i), legacySetting.value("sortkey").toUInt());
         legacySetting.endGroup();
     }
-    QStringList setsKeys = legacySetting.allKeys();
+    const QStringList setsKeys = legacySetting.allKeys();
     for (int i = 0; i < setsKeys.size(); ++i) {
         usedKeys.append("sets/" + setsKeys.at(i));
     }
@@ -86,7 +86,7 @@ void SettingsCache::translateLegacySettings()
     servers().setFPPort(legacySetting.value("fpport").toString());
     servers().setFPPlayerName(legacySetting.value("fpplayername").toString());
     usedKeys.append(legacySetting.allKeys());
-    QStringList allKeysServer = legacySetting.allKeys();
+    const QStringList allKeysServer = legacySetting.allKeys();
     for (int i = 0; i < allKeysServer.size(); ++i) {
         usedKeys.append("server/" + allKeysServer.at(i));
     }
@@ -94,16 +94,16 @@ void SettingsCache::translateLegacySettings()
 
     // Messages
     legacySetting.beginGroup("messages");
-    QStringList allMessages = legacySetting.allKeys();
+    const QStringList allMessages = legacySetting.allKeys();
     for (int i = 0; i < allMessages.size(); ++i) {
         if (allMessages.at(i) != "count") {
             QString temp = allMessages.at(i);
-            int index = temp.remove("msg").toInt();
+            const int index = temp.remove("msg").toInt();
             messages().setMessageAt(index, legacySetting.value(allMessages.at(i)).toString());
         }
     }
     messages().setCount(legacySetting.value("count").toInt());
-    QStringList allKeysmessages = legacySetting.allKeys();
+    const QStringList allKeysmessages = legacySetting.allKeys();
     for (int i = 0; i < allKeysmessages.size(); ++i) {
         usedKeys.append("messages/" + allKeysmessages.at(i));
     }
@@ -120,19 +120,19 @@ void SettingsCache::translateLegacySettings()
     else
         gameFilters().setMaxPlayers(99); // This prevents a bug where no games will show if max was not set before
 
-    QStringList allFilters = legacySetting.allKeys();
+    const QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
         if (allFilters.at(i).startsWith("game_type")) {
             gameFilters().setGameHashedTypeEnabled(allFilters.at(i), legacySetting.value(allFilters.at(i)).toBool());
         }
     }
-    QStringList allKeysfilter_games = legacySetting.allKeys();
+    const QStringList allKeysfilter_games = legacySetting.allKeys();
     for (int i = 0; i < allKeysfilter_games.size(); ++i) {
         usedKeys.append("filter_games/" + allKeysfilter_games.at(i));
     }
     legacySetting.endGroup();
 
-    QStringList allLegacyKeys = legacySetting.allKeys();
+    const QStringList allLegacyKeys = legacySetting.allKeys();
     for (int i = 0; i < allLegacyKeys.size(); ++i) {
         if (usedKeys.contains(allLegacyKeys.at(i)))
             continue;
@@ -173,7 +173,7 @@ SettingsCache::SettingsCache()
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
-    QString settingsPath = getSettingsPath();
+    const QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
     cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
@@ -234,7 +234,7 @@ SettingsCache::SettingsCache()
     tabLogOpen = settings->value("tabs/log", true).toBool();
 
     // we only want to reset the cache once, then its up to the user
-    bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
+    const bool updateCache = settings->value("revert/pixmapCacheSize", false).toBool();
     if (!updateCache) {
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
@@ -485,7 +485,7 @@ void SettingsCache::setSeenTips(const QList<int> &_seenTips)
 {
     seenTips = _seenTips;
     QList<QVariant> storedTipList;
-    for (auto tipNumber : seenTips) {
+    for (const auto tipNumber : seenTips) {
         storedTipList.append(tipNumber);
     }
     settings->setValue("tipOfDay/seenTips", storedTipList);
@@ -1510,7 +1510,7 @@ void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
 
 void SettingsCache::loadPaths()
 {
-    QString dataPath = getDataPath();
+    const QString dataPath = getDataPath();
     deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
     filtersPath = getSafeConfigPath("paths/filters", dataPath + "/filters/");
     replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
@@ -1532,8 +1532,8 @@ void SettingsCache::loadPaths()
 
 void SettingsCache::resetPaths()
 {
-    QStringList databasePaths{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath};
-    QString picsPath_ = picsPath;
+    const QStringList databasePaths{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath};
+    const QString picsPath_ = picsPath;
     settings->remove("paths"); // removes all keys in paths/*
     loadPaths();
     if (databasePaths !=

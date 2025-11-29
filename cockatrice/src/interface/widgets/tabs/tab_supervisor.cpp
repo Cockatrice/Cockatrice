@@ -94,8 +94,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
         opt.state |= QStyle::State_Sunken;
 
     if (const auto *tb = qobject_cast<const QTabBar *>(parent())) {
-        int index = tb->currentIndex();
-        auto position = (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tb);
+        const int index = tb->currentIndex();
+        const auto position =
+            (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tb);
         if (tb->tabButton(index, position) == this)
             opt.state |= QStyle::State_Selected;
     }
@@ -190,7 +191,7 @@ TabSupervisor::~TabSupervisor()
     // Note: this used to call stop(), but stop() is doing a bunch of stuff including emitting some signals,
     // and we don't want to do that in a destructor.
 
-    for (auto &localClient : localClients) {
+    for (const auto &localClient : localClients) {
         localClient->deleteLater();
     }
     localClients.clear();
@@ -239,10 +240,10 @@ void TabSupervisor::retranslateUi()
     while (messageIterator.hasNext())
         tabs.append(messageIterator.next().value());
 
-    for (auto &tab : tabs) {
+    for (const auto &tab : tabs) {
         if (tab) {
-            int idx = indexOf(tab);
-            QString tabText = tab->getTabText();
+            const int idx = indexOf(tab);
+            const QString tabText = tab->getTabText();
             setTabText(idx, sanitizeTabName(tabText));
             setTabToolTip(idx, sanitizeHtml(tabText));
             tab->retranslateUi();
@@ -252,7 +253,7 @@ void TabSupervisor::retranslateUi()
 
 void TabSupervisor::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
     aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
 
@@ -347,8 +348,8 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
     connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
 
-    QString tabText = tab->getTabText();
-    int idx = addTab(tab, sanitizeTabName(tabText));
+    const QString tabText = tab->getTabText();
+    const int idx = addTab(tab, sanitizeTabName(tabText));
     setTabToolTip(idx, sanitizeHtml(tabText));
 
     addCloseButtonToTab(tab, idx, manager);
@@ -366,7 +367,7 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
  */
 void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager)
 {
-    auto closeSide = static_cast<QTabBar::ButtonPosition>(
+    const auto closeSide = static_cast<QTabBar::ButtonPosition>(
         tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
     auto *closeButton = new CloseButton(tab);
     if (manager) {
@@ -460,7 +461,7 @@ void TabSupervisor::stop()
     resetTabsMenu();
 
     if (!localClients.isEmpty()) {
-        for (auto &localClient : localClients) {
+        for (const auto &localClient : localClients) {
             localClient->deleteLater();
         }
         localClients.clear();
@@ -700,7 +701,7 @@ void TabSupervisor::updatePingTime(int value, int max)
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
 {
     QMap<int, QString> roomGameTypes;
-    TabRoom *room = roomTabs.value(event.game_info().room_id());
+    const TabRoom *room = roomTabs.value(event.game_info().room_id());
     if (room)
         roomGameTypes = room->getGameTypes();
     else
@@ -845,7 +846,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(DeckLoader *deckToOpen)
 {
-    int type = SettingsCache::instance().getDefaultDeckEditorType();
+    const int type = SettingsCache::instance().getDefaultDeckEditorType();
     switch (type) {
         case ClassicDeckEditor:
             addDeckEditorTab(deckToOpen);
@@ -942,7 +943,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 {
-    int idx = indexOf(tab);
+    const int idx = indexOf(tab);
     setTabText(idx, sanitizeTabName(newTabText));
     setTabToolTip(idx, sanitizeHtml(newTabText));
 }
@@ -956,7 +957,7 @@ void TabSupervisor::processRoomEvent(const RoomEvent &event)
 
 void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 {
-    TabGame *tab = gameTabs.value(cont.game_id());
+    const TabGame *tab = gameTabs.value(cont.game_id());
     if (tab)
         tab->getGame()->getGameEventHandler()->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()),
                                                                          {});
@@ -966,14 +967,14 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
-    QString senderName = QString::fromStdString(event.sender_name());
+    const QString senderName = QString::fromStdString(event.sender_name());
     TabMessage *tab = messageTabs.value(senderName);
     if (!tab)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     if (!tab) {
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
-            auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
+            const auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered))
                 // Flags are additive, so reg/mod/admin are all IsRegistered
@@ -1006,12 +1007,12 @@ void TabSupervisor::processUserLeft(const QString &userName)
 
 void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
 {
-    QString userName = QString::fromStdString(userInfoJoined.name());
+    const QString userName = QString::fromStdString(userInfoJoined.name());
     if (userListManager->isUserBuddy(userName)) {
         if (auto *tab = getTabAccount()) {
             if (tab != currentWidget()) {
                 tab->setContentsChanged(true);
-                QIcon avatarIcon = UserLevelPixmapGenerator::generateIcon(
+                const QIcon avatarIcon = UserLevelPixmapGenerator::generateIcon(
                     13, (UserLevelFlags)userInfoJoined.user_level(), userInfoJoined.pawn_colors(), true,
                     QString::fromStdString(userInfoJoined.privlevel()));
                 setTabIcon(indexOf(tab), avatarIcon);
@@ -1108,7 +1109,7 @@ bool TabSupervisor::switchToGameTabIfAlreadyExists(const int gameId)
     bool isGameTabExists = false;
     if (gameTabs.contains(gameId)) {
         isGameTabExists = true;
-        TabGame *tabGame = gameTabs[gameId];
+        const TabGame *tabGame = gameTabs[gameId];
         const int gameTabIndex = indexOf(tabGame);
         setCurrentIndex(gameTabIndex);
     }

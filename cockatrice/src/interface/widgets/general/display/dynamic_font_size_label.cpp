@@ -21,7 +21,7 @@ void DynamicFontSizeLabel::paintEvent(QPaintEvent *event)
     // timer.start();
 
     QFont newFont = font();
-    float fontSize = getWidgetMaximumFontSize(this, this->text());
+    const float fontSize = getWidgetMaximumFontSize(this, this->text());
     newFont.setPointSizeF(fontSize);
     setFont(newFont);
     // qDebug() << "Font size set to" << fontSize;
@@ -70,7 +70,7 @@ float DynamicFontSizeLabel::getWidgetMaximumFontSize(QWidget *widget, const QStr
         QFontMetricsF fm(font);
 
         /* Check if widget is QLabel */
-        QLabel *label = qobject_cast<QLabel *>(widget);
+        const QLabel *label = qobject_cast<QLabel *>(widget);
         if (label) {
             newFontSizeRect =
                 fm.boundingRect(widgetRect, (label->wordWrap() ? Qt::TextWordWrap : 0) | label->alignment(), text);

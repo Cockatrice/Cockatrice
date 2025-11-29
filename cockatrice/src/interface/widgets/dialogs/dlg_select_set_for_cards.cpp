@@ -144,7 +144,7 @@ void DlgSelectSetForCards::retranslateUi()
 
 void DlgSelectSetForCards::actOK()
 {
-    QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
+    const QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
     for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
         for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
             QModelIndex find_card = model->findCard(card, DECK_ZONE_MAIN);
@@ -205,13 +205,13 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
     if (!model)
         return setCounts;
 
-    DeckList *decklist = model->getDeckList();
+    const DeckList *decklist = model->getDeckList();
     if (!decklist)
         return setCounts;
 
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
         if (!infoPtr)
             continue;
@@ -248,13 +248,13 @@ void DlgSelectSetForCards::updateCardLists()
         }
     }
 
-    DeckList *decklist = model->getDeckList();
+    const DeckList *decklist = model->getDeckList();
     if (!decklist)
         return;
 
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         bool found = false;
         QString foundSetName;
 
@@ -298,16 +298,16 @@ void DlgSelectSetForCards::dragEnterEvent(QDragEnterEvent *event)
 
 void DlgSelectSetForCards::dropEvent(QDropEvent *event)
 {
-    QByteArray itemData = event->mimeData()->data("application/x-setentrywidget");
-    QString draggedSetName = QString::fromUtf8(itemData);
+    const QByteArray itemData = event->mimeData()->data("application/x-setentrywidget");
+    const QString draggedSetName = QString::fromUtf8(itemData);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    QPoint adjustedPos = event->position().toPoint() + QPoint(0, scrollArea->verticalScrollBar()->value());
+    const QPoint adjustedPos = event->position().toPoint() + QPoint(0, scrollArea->verticalScrollBar()->value());
 #else
     QPoint adjustedPos = event->pos() + QPoint(0, scrollArea->verticalScrollBar()->value());
 #endif
     int dropIndex = -1;
     for (int i = 0; i < listLayout->count(); ++i) {
-        QWidget *widget = listLayout->itemAt(i)->widget();
+        const QWidget *widget = listLayout->itemAt(i)->widget();
         if (widget && widget->geometry().contains(adjustedPos)) {
             dropIndex = i;
             break;
@@ -337,13 +337,13 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
     if (!model)
         return setCards;
 
-    DeckList *decklist = model->getDeckList();
+    const DeckList *decklist = model->getDeckList();
     if (!decklist)
         return setCards;
 
     QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
-    for (auto currentCard : cardsInDeck) {
+    for (const auto currentCard : cardsInDeck) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
         if (!infoPtr)
             continue;
@@ -362,7 +362,7 @@ QMap<QString, QStringList> DlgSelectSetForCards::getModifiedCards()
     QMap<QString, QStringList> modifiedCards;
     for (int i = 0; i < listLayout->count(); ++i) {
         QWidget *widget = listLayout->itemAt(i)->widget();
-        if (auto entry = qobject_cast<SetEntryWidget *>(widget)) {
+        if (const auto entry = qobject_cast<SetEntryWidget *>(widget)) {
             if (entry->isChecked()) {
                 QStringList cardsInSet = entry->getAllCardsForSet();
 
@@ -388,7 +388,7 @@ void DlgSelectSetForCards::updateLayoutOrder()
     entry_widgets.clear();
     for (int i = 0; i < listLayout->count(); ++i) {
         QWidget *widget = listLayout->itemAt(i)->widget();
-        if (auto entry = qobject_cast<SetEntryWidget *>(widget)) {
+        if (const auto entry = qobject_cast<SetEntryWidget *>(widget)) {
             entry_widgets.append(entry);
         }
     }
@@ -403,7 +403,7 @@ SetEntryWidget::SetEntryWidget(DlgSelectSetForCards *_parent, const QString &_se
     setLayout(layout);
 
     QHBoxLayout *headerLayout = new QHBoxLayout();
-    CardSetPtr set = CardDatabaseManager::getInstance()->getSet(setName);
+    const CardSetPtr set = CardDatabaseManager::getInstance()->getSet(setName);
     checkBox = new QCheckBox("(" + set->getShortName() + ") - " + set->getLongName(), this);
     connect(checkBox, &QCheckBox::toggled, parent, &DlgSelectSetForCards::updateLayoutOrder);
     expandButton = new QPushButton("+", this);
@@ -510,7 +510,7 @@ void SetEntryWidget::dragMoveEvent(QDragMoveEvent *event)
 
         // For now, we will just highlight the widget when dragged.
         QPainter painter(this);
-        QColor highlightColor(255, 255, 255, 128); // Semi-transparent white
+        const QColor highlightColor(255, 255, 255, 128); // Semi-transparent white
         painter.setBrush(QBrush(highlightColor));
         painter.setPen(Qt::NoPen);
         painter.drawRect(this->rect()); // Highlight the widget area
@@ -594,14 +594,16 @@ void SetEntryWidget::updateCardDisplayWidgets()
 
     for (const QString &cardName : possibleCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
-        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        const QString providerId =
+            CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
         picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
         cardListContainer->addWidget(picture_widget);
     }
 
     for (const QString &cardName : unusedCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
-        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        const QString providerId =
+            CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
         picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }

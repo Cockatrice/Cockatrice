@@ -10,8 +10,8 @@ bool CardCompleterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex 
         return true;
     }
 
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    QString data = index.data(Qt::DisplayRole).toString();
+    const QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+    const QString data = index.data(Qt::DisplayRole).toString();
 
     // Ensure substring matching
     return data.contains(filterRegularExpression());

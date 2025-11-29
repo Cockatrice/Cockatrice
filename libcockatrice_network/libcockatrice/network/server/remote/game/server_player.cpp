@@ -103,7 +103,7 @@ int Server_Player::newCounterId() const
     int id = 0;
     QMapIterator<int, Server_Counter *> i(counters);
     while (i.hasNext()) {
-        Server_Counter *c = i.next().value();
+        const Server_Counter *c = i.next().value();
         if (c->getId() > id) {
             id = c->getId();
         }
@@ -141,9 +141,9 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Assign card ids and create deck from deck list
-    InnerDecklistNode *listRoot = deck->getRoot();
+    const InnerDecklistNode *listRoot = deck->getRoot();
     for (int i = 0; i < listRoot->size(); ++i) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+        const auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
         Server_CardZone *z;
         if (currentZone->getName() == DECK_ZONE_MAIN) {
             z = deckZone;
@@ -154,7 +154,7 @@ void Server_Player::setupZones()
         }
 
         for (int j = 0; j < currentZone->size(); ++j) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
+            const auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
             if (!currentCard) {
                 continue;
             }
@@ -200,7 +200,7 @@ void Server_Player::setupZones()
 void Server_Player::clearZones()
 {
     Server_AbstractPlayer::clearZones();
-    for (Server_Counter *counter : counters) {
+    for (const Server_Counter *counter : counters) {
         delete counter;
     }
     counters.clear();
@@ -241,7 +241,7 @@ Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int numbe
 
     if (number > 0) {
         revealTopCardIfNeeded(deckZone, ges);
-        int currentKnownCards = deckZone->getCardsBeingLookedAt();
+        const int currentKnownCards = deckZone->getCardsBeingLookedAt();
         deckZone->setCardsBeingLookedAt(currentKnownCards - number);
     }
 
@@ -256,13 +256,13 @@ void Server_Player::onCardBeingMoved(GameEventStorage &ges,
 {
     Server_AbstractPlayer::onCardBeingMoved(ges, cardStruct, startzone, targetzone, undoingDraw);
 
-    Server_Card *card = cardStruct.card;
+    const Server_Card *card = cardStruct.card;
 
     // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
     // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
     // (Ignore the case where the card is currently being un-drawn.)
     if (startzone->getName() == "hand" && targetzone->getName() != "hand" && !undoingDraw) {
-        int index = lastDrawList.lastIndexOf(card->getId());
+        const int index = lastDrawList.lastIndexOf(card->getId());
         if (index != -1) {
             lastDrawList.erase(lastDrawList.begin(), lastDrawList.begin() + index);
         }
@@ -410,7 +410,7 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
 
     Server_CardZone *hand = zones.value("hand");
     Server_CardZone *_deck = zones.value("deck");
-    int number = cmd.number();
+    const int number = cmd.number();
 
     if (!hand->getCards().isEmpty()) {
         auto cardsToMove = QList<const CardToMove *>();
@@ -558,7 +558,7 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *counter = counters.value(cmd.counter_id(), 0);
+    const Server_Counter *counter = counters.value(cmd.counter_id(), 0);
     if (!counter) {
         return Response::RespNameNotFound;
     }
@@ -614,7 +614,7 @@ Response::ResponseCode Server_Player::cmdChangeZoneProperties(const Command_Chan
                                                               ResponseContainer &rc,
                                                               GameEventStorage &ges)
 {
-    auto ret = Server_AbstractPlayer::cmdChangeZoneProperties(cmd, rc, ges);
+    const auto ret = Server_AbstractPlayer::cmdChangeZoneProperties(cmd, rc, ges);
 
     Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
     if (!zone) {

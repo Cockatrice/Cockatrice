@@ -76,7 +76,7 @@ QVariant TipsOfTheDay::data(const QModelIndex &index, int /*role*/) const
     if (!index.isValid() || index.row() >= tipList->size() || index.column() >= TIPDDBMODEL_COLUMNS)
         return QVariant();
 
-    TipOfTheDay tip = tipList->at(index.row());
+    const TipOfTheDay tip = tipList->at(index.row());
     switch (index.column()) {
         case TitleColumn:
             return tip.getTitle();

@@ -68,7 +68,7 @@ IslInterface::~IslInterface()
     server->roomsLock.lockForRead();
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
     while (roomIterator.hasNext()) {
-        Server_Room *room = roomIterator.next().value();
+        const Server_Room *room = roomIterator.next().value();
         room->usersLock.lockForRead();
         QMapIterator<QString, ServerInfo_User_Container> roomUsers(room->getExternalUsers());
         while (roomUsers.hasNext()) {
@@ -113,7 +113,7 @@ void IslInterface::initServer()
     socket->startServerEncryption();
     if (!socket->waitForEncrypted(5000)) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-        QList<QSslError> sslErrors(socket->sslHandshakeErrors());
+        const QList<QSslError> sslErrors(socket->sslHandshakeErrors());
 #else
         QList<QSslError> sslErrors(socket->sslErrors());
 #endif
@@ -146,7 +146,7 @@ void IslInterface::initServer()
     server->roomsLock.lockForRead();
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
     while (roomIterator.hasNext()) {
-        Server_Room *room = roomIterator.next().value();
+        const Server_Room *room = roomIterator.next().value();
         room->usersLock.lockForRead();
         room->gamesLock.lockForRead();
         room->getInfo(*event.add_room_list(), true, true, false);
@@ -194,7 +194,7 @@ void IslInterface::initClient()
     }
     if (!socket->waitForEncrypted(5000)) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-        QList<QSslError> sslErrors(socket->sslHandshakeErrors());
+        const QList<QSslError> sslErrors(socket->sslHandshakeErrors());
 #else
         QList<QSslError> sslErrors(socket->sslErrors());
 #endif
@@ -230,7 +230,7 @@ void IslInterface::flushOutputBuffer()
 
 void IslInterface::readClient()
 {
-    QByteArray data = socket->readAll();
+    const QByteArray data = socket->readAll();
     server->incRxBytes(data.size());
     inputBuffer.append(data);
 
@@ -273,7 +273,7 @@ void IslInterface::transmitMessage(const IslMessage &item)
 {
     QByteArray buf;
 #if GOOGLE_PROTOBUF_VERSION > 3001000
-    unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
+    const unsigned int size = static_cast<unsigned int>(item.ByteSizeLong());
 #else
     unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif

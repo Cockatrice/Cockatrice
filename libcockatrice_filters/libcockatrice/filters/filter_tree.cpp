@@ -84,10 +84,10 @@ int FilterItemList::termIndex(const QString &term) const
 
 FilterTreeNode *FilterItemList::termNode(const QString &term)
 {
-    int i = termIndex(term);
+    const int i = termIndex(term);
     if (i < 0) {
         FilterItem *fi = new FilterItem(term, this);
-        int count = childNodes.count();
+        const int count = childNodes.count();
 
         preInsertChild(this, count);
         childNodes.append(fi);
@@ -199,7 +199,7 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      * then we should match all of them to the card's colors
      */
     int match_count = 0;
-    for (auto &it : converted_term) {
+    for (const auto &it : converted_term) {
         if (info->getColors().contains(it, Qt::CaseInsensitive))
             match_count++;
     }
@@ -280,7 +280,7 @@ bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
     } else {
         bool success;
         // if loyalty can't be converted to "int" it must be "X"
-        int loyalty = info->getLoyalty().toInt(&success);
+        const int loyalty = info->getLoyalty().toInt(&success);
         if (success) {
             return relationCheck(loyalty);
         } else {
@@ -291,7 +291,7 @@ bool FilterItem::acceptLoyalty(const CardInfoPtr info) const
 
 bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr attr) const
 {
-    int slash = info->getPowTough().indexOf("/");
+    const int slash = info->getPowTough().indexOf("/");
     if (slash == -1) {
         return false;
     }
@@ -306,7 +306,7 @@ bool FilterItem::acceptPowerToughness(const CardInfoPtr info, CardFilter::Attr a
     }
     // advanced filtering should only happen after fast string comparison failed
     bool conversion;
-    int value = valueString.toInt(&conversion);
+    const int value = valueString.toInt(&conversion);
     return conversion ? relationCheck(value) : false;
 }
 
@@ -371,7 +371,7 @@ bool FilterItem::relationCheck(int cardInfo) const
         QString trimmedTerm = term.trimmed();
         // check whether it's a 2 char operator (<=, >=, or ==)
         if (trimmedTerm[1] == '=') {
-            int termInt = trimmedTerm.mid(2).toInt();
+            const int termInt = trimmedTerm.mid(2).toInt();
             if (trimmedTerm.startsWith('<')) {
                 result = (cardInfo <= termInt);
             } else if (trimmedTerm.startsWith('>')) {
@@ -380,7 +380,7 @@ bool FilterItem::relationCheck(int cardInfo) const
                 result = (cardInfo == termInt);
             }
         } else {
-            int termInt = trimmedTerm.mid(1).toInt();
+            const int termInt = trimmedTerm.mid(1).toInt();
             if (trimmedTerm.startsWith('<')) {
                 result = (cardInfo < termInt);
             } else if (trimmedTerm.startsWith('>')) {
@@ -523,7 +523,7 @@ bool FilterTree::acceptsCard(const CardInfoPtr info) const
 void FilterTree::removeFiltersByAttr(CardFilter::Attr filterType)
 {
     for (int i = childNodes.size() - 1; i >= 0; --i) {
-        auto *child = dynamic_cast<LogicMap *>(childNodes.at(i));
+        const auto *child = dynamic_cast<LogicMap *>(childNodes.at(i));
 
         if (child && child->attr == filterType) {
             deleteAt(i);
@@ -542,12 +542,12 @@ void FilterTree::removeFilter(const CardFilter *toRemove)
         if (!typeList)
             continue;
 
-        int termIdx = typeList->termIndex(toRemove->term());
+        const int termIdx = typeList->termIndex(toRemove->term());
         if (termIdx != -1) {
             typeList->deleteAt(termIdx);
             emit typeList->nodeChanged();
             if (typeList->childCount() == 0) {
-                int logicIndex = logicMap->childIndex(typeList);
+                const int logicIndex = logicMap->childIndex(typeList);
                 if (logicIndex != -1) {
                     logicMap->deleteAt(logicIndex);
                 }

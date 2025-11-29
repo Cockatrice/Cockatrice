@@ -30,7 +30,7 @@ void RemoteDeckList_TreeModel::DirectoryNode::clearTree()
 QString RemoteDeckList_TreeModel::DirectoryNode::getPath() const
 {
     if (parent) {
-        QString parentPath = parent->getPath();
+        const QString parentPath = parent->getPath();
         if (parentPath.isEmpty())
             return name;
         else
@@ -63,7 +63,7 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode
 RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::getNodeById(int id) const
 {
     for (int i = 0; i < size(); ++i) {
-        DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
+        const DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
         if (node) {
             FileNode *result = node->getNodeById(id);
             if (result)
@@ -80,7 +80,7 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::get
 RemoteDeckList_TreeModel::RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent)
     : QAbstractItemModel(parent), client(_client)
 {
-    QFileIconProvider fip;
+    const QFileIconProvider fip;
     dirIcon = fip.icon(QFileIconProvider::Folder);
     fileIcon = fip.icon(QFileIconProvider::File);
 
@@ -94,7 +94,7 @@ RemoteDeckList_TreeModel::~RemoteDeckList_TreeModel()
 
 int RemoteDeckList_TreeModel::rowCount(const QModelIndex &parent) const
 {
-    DirectoryNode *node = getNode<DirectoryNode *>(parent);
+    const DirectoryNode *node = getNode<DirectoryNode *>(parent);
     if (node)
         return node->size();
     else
@@ -114,9 +114,9 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
         return QVariant();
 
     Node *temp = static_cast<Node *>(index.internalPointer());
-    FileNode *file = dynamic_cast<FileNode *>(temp);
+    const FileNode *file = dynamic_cast<FileNode *>(temp);
     if (!file) {
-        DirectoryNode *node = dynamic_cast<DirectoryNode *>(temp);
+        const DirectoryNode *node = dynamic_cast<DirectoryNode *>(temp);
         switch (role) {
             case Qt::DisplayRole: {
                 switch (index.column()) {
@@ -184,7 +184,7 @@ QModelIndex RemoteDeckList_TreeModel::index(int row, int column, const QModelInd
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    DirectoryNode *parentNode = getNode<DirectoryNode *>(parent);
+    const DirectoryNode *parentNode = getNode<DirectoryNode *>(parent);
     if (row >= parentNode->size())
         return QModelIndex();
 
@@ -252,7 +252,7 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::addNamedFolde
 
 void RemoteDeckList_TreeModel::removeNode(RemoteDeckList_TreeModel::Node *node)
 {
-    int ind = node->getParent()->indexOf(node);
+    const int ind = node->getParent()->indexOf(node);
     beginRemoveRows(nodeToIndex(node->getParent()), ind, ind);
     node->getParent()->removeAt(ind);
     endRemoveRows();

@@ -165,7 +165,7 @@ void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
 
     QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
-    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+    for (const ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
         handleColorToggled(manaSymbolWidget->getSymbolChar(), manaSymbolWidget->isColorActive());
     }
 
@@ -195,7 +195,7 @@ QList<QChar> VisualDatabaseDisplayColorFilterWidget::getActiveColors()
     QList<QChar> activeColors;
     QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
-    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+    for (const ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
         if (manaSymbolWidget->isColorActive()) {
             activeColors.append(manaSymbolWidget->getSymbolChar());
         }
@@ -210,7 +210,7 @@ void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
 
     QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
-    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+    for (const ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
         bool found = false;
         for (const CardFilter *filter : allColorFilters) {
             if (manaSymbolWidget->getSymbolChar() == filter->term()) {

@@ -37,12 +37,12 @@ CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoader
 
 void CardPictureLoaderWorkerWork::startNextPicDownload()
 {
-    QString picUrl = cardToDownload.getCurrentUrl();
+    const QString picUrl = cardToDownload.getCurrentUrl();
 
     if (picUrl.isEmpty()) {
         picDownloadFailed();
     } else {
-        QUrl url(picUrl);
+        const QUrl url(picUrl);
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getInfo().getCorrectedName()
             << " set: " << cardToDownload.getSetName() << "]: Trying to fetch picture from url "
@@ -71,9 +71,9 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
 
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
-    QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    const QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (redirectTarget.isValid()) {
-        QUrl url = reply->request().url();
+        const QUrl url = reply->request().url();
         QUrl redirectUrl = redirectTarget.toUrl();
         if (redirectUrl.isRelative()) {
             redirectUrl = url.resolved(redirectUrl);
@@ -93,7 +93,7 @@ void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 
 static bool imageIsBlackListed(const QByteArray &picData)
 {
-    QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
+    const QString md5sum = QCryptographicHash::hash(picData, QCryptographicHash::Md5).toHex();
     return MD5_BLACKLIST.contains(md5sum);
 }
 
@@ -102,7 +102,7 @@ void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
         qCWarning(CardPictureLoaderWorkerWorkLog) << "Too many requests.";
     } else {
-        bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+        const bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
         if (isFromCache) {
             qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
@@ -126,13 +126,13 @@ void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
 
 void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
 {
-    bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+    const bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
     // List of status codes from https://doc.qt.io/qt-6/qnetworkreply.html#redirected
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    const int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 305 || statusCode == 307 ||
         statusCode == 308) {
-        QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
+        const QUrl redirectUrl = reply->header(QNetworkRequest::LocationHeader).toUrl();
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
             << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
             << "]: following " << (isFromCache ? "cached redirect" : "redirect") << " to "
@@ -153,7 +153,7 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
         return;
     }
 
-    QImage image = tryLoadImageFromReply(reply);
+    const QImage image = tryLoadImageFromReply(reply);
 
     if (image.isNull()) {
         qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
@@ -175,7 +175,7 @@ void CardPictureLoaderWorkerWork::handleSuccessfulReply(QNetworkReply *reply)
 QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
 {
     static constexpr int riffHeaderSize = 12; // RIFF_HEADER_SIZE from webp/format_constants.h
-    auto replyHeader = reply->peek(riffHeaderSize);
+    const auto replyHeader = reply->peek(riffHeaderSize);
 
     if (replyHeader.startsWith("RIFF") && replyHeader.endsWith("WEBP")) {
         auto imgBuf = QBuffer(this);

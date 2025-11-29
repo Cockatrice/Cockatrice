@@ -20,10 +20,10 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
         // Remove Popup
         c->popup()->hide();
         // Truncate the line to last space or whole string
-        QString textValue = text();
-        int lastIndex = textValue.length();
-        int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
-        int leftShift = qMin(lastIndex, lastWordStartIndex);
+        const QString textValue = text();
+        const int lastIndex = textValue.length();
+        const int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
+        const int leftShift = qMin(lastIndex, lastWordStartIndex);
         setText(textValue.left(leftShift));
         // Insert highlighted line from popup
         insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
@@ -43,8 +43,8 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
                 // Remove Popup
                 c->popup()->hide();
                 // Truncate the line to last space or whole string
-                QString textValue = text();
-                int lastIndexof = qMax(0, textValue.lastIndexOf(" "));
+                const QString textValue = text();
+                const int lastIndexof = qMax(0, textValue.lastIndexOf(" "));
                 QString finalString = textValue.left(lastIndexof);
                 // Add a space if there's a word
                 if (finalString != "")
@@ -59,10 +59,10 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
                 // Remove Popup
                 c->popup()->hide();
                 // Truncate the line to last space or whole string
-                QString textValue = text();
-                int lastIndex = textValue.length();
-                int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
-                int leftShift = qMin(lastIndex, lastWordStartIndex);
+                const QString textValue = text();
+                const int lastIndex = textValue.length();
+                const int lastWordStartIndex = textValue.lastIndexOf(" ") + 1;
+                const int leftShift = qMin(lastIndex, lastWordStartIndex);
                 setText(textValue.left(leftShift));
                 // Insert highlighted line from popup
                 insert(c->completionModel()->index(c->popup()->currentIndex().row(), 0).data().toString() + " ");
@@ -108,7 +108,7 @@ QString LineEditCompleter::cursorWord(const QString &line) const
 
 void LineEditCompleter::insertCompletion(QString arg)
 {
-    QString s_arg = arg + " ";
+    const QString s_arg = arg + " ";
     setText(text().replace(text().left(cursorPosition()).lastIndexOf(" ") + 1,
                            cursorPosition() - text().left(cursorPosition()).lastIndexOf(" ") - 1, s_arg));
 }

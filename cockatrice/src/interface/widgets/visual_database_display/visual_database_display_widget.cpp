@@ -121,16 +121,16 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     sortColumnCombo->adjustSize();
 
     connect(sortColumnCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        int column = sortColumnCombo->currentData().toInt();
-        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
+        const int column = sortColumnCombo->currentData().toInt();
+        const Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
         databaseView->sortByColumn(column, order);
 
         searchModelChanged();
     });
 
     connect(sortOrderCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        int column = sortColumnCombo->currentData().toInt();
-        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
+        const int column = sortColumnCombo->currentData().toInt();
+        const Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
         databaseView->sortByColumn(column, order);
 
         searchModelChanged();
@@ -323,7 +323,7 @@ void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
 void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 {
     databaseDisplayModel->setStringFilter(search);
-    QModelIndexList sel = databaseView->selectionModel()->selectedRows();
+    const QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
@@ -368,9 +368,9 @@ void VisualDatabaseDisplayWidget::populateCards()
 void VisualDatabaseDisplayWidget::loadNextPage()
 {
     // Calculate the start and end indices for the next page
-    int rowCount = databaseDisplayModel->rowCount();
-    int start = currentPage * cardsPerPage;
-    int end = qMin(start + cardsPerPage, rowCount);
+    const int rowCount = databaseDisplayModel->rowCount();
+    const int start = currentPage * cardsPerPage;
+    const int end = qMin(start + cardsPerPage, rowCount);
 
     // Load more cards if we are at the end of the current list and can fetch more
     if (end >= rowCount && databaseDisplayModel->canFetchMore(QModelIndex())) {
@@ -433,8 +433,8 @@ void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft
 
 void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
 {
-    int totalCards = databaseDisplayModel->rowCount(); // Total number of cards
-    int loadedCards = currentPage * cardsPerPage;
+    const int totalCards = databaseDisplayModel->rowCount(); // Total number of cards
+    const int loadedCards = currentPage * cardsPerPage;
 
     // Handle scrolling down
     if (event->angleDelta().y() < 0) {

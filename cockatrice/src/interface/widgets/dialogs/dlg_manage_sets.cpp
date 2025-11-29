@@ -326,19 +326,19 @@ void WndSets::actDisableSortButtons(int index)
 
 void WndSets::actToggleButtons(const QItemSelection &selected, const QItemSelection &)
 {
-    bool emptySelection = selected.empty();
+    const bool emptySelection = selected.empty();
     aTop->setDisabled(emptySelection || setOrderIsSorted);
     aUp->setDisabled(emptySelection || setOrderIsSorted);
     aDown->setDisabled(emptySelection || setOrderIsSorted);
     aBottom->setDisabled(emptySelection || setOrderIsSorted);
 
-    int rows = view->selectionModel()->selectedRows().size();
+    const int rows = view->selectionModel()->selectedRows().size();
     rebuildMainLayout((rows > 1) ? SOME_SETS_SELECTED : NO_SETS_SELECTED);
 }
 
 void WndSets::selectRows(QSet<int> rows)
 {
-    for (auto i : rows) {
+    for (const auto i : rows) {
         QModelIndex idx = model->index(i, 0);
         view->selectionModel()->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
         view->scrollTo(idx, QAbstractItemView::EnsureVisible);
@@ -385,7 +385,7 @@ void WndSets::actUp()
     for (auto i : rows) {
         if (i.row() <= 0)
             continue;
-        int oldRow = displayModel->mapToSource(i).row();
+        const int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() - 1;
 
         model->swapRows(oldRow, displayModel->mapToSource(displayModel->index(newRow, 0)).row());
@@ -408,7 +408,7 @@ void WndSets::actDown()
     for (auto i : rows) {
         if (i.row() >= displayModel->rowCount() - 1)
             continue;
-        int oldRow = displayModel->mapToSource(i).row();
+        const int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() + 1;
 
         model->swapRows(oldRow, displayModel->mapToSource(displayModel->index(newRow, 0)).row());
@@ -429,7 +429,7 @@ void WndSets::actTop()
         return;
 
     for (int i = 0; i < rows.length(); i++) {
-        int oldRow = displayModel->mapToSource(rows.at(i)).row();
+        const int oldRow = displayModel->mapToSource(rows.at(i)).row();
 
         if (oldRow <= 0) {
             newRow++;
@@ -455,7 +455,7 @@ void WndSets::actBottom()
         return;
 
     for (int i = 0; i < rows.length(); i++) {
-        int oldRow = displayModel->mapToSource(rows.at(i)).row();
+        const int oldRow = displayModel->mapToSource(rows.at(i)).row();
 
         if (oldRow >= newRow) {
             newRow--;

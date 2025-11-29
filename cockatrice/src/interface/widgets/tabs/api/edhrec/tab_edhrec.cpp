@@ -37,8 +37,8 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         return;
     }
 
-    QString cardName = cardToQuery->getName();
-    QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
+    const QString cardName = cardToQuery->getName();
+    const QString formattedName = cardName.toLower().replace(" ", "-").remove(QRegularExpression("[^a-z0-9\\-]"));
 
     QString url;
     if (isCommander) {
@@ -47,7 +47,7 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery, bool isCommander)
         url = QString("https://json.edhrec.com/pages/card/%1.json").arg(formattedName);
     }
 
-    QNetworkRequest request{QUrl(url)};
+    const QNetworkRequest request{QUrl(url)};
 
     networkManager->get(request);
 }
@@ -60,8 +60,8 @@ void TabEdhRec::processApiJson(QNetworkReply *reply)
         return;
     }
 
-    QByteArray responseData = reply->readAll();
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    const QByteArray responseData = reply->readAll();
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
 
     if (!jsonDoc.isObject()) {
         qDebug() << "Invalid JSON response received.";
@@ -69,7 +69,7 @@ void TabEdhRec::processApiJson(QNetworkReply *reply)
         return;
     }
 
-    QJsonObject jsonObj = jsonDoc.object();
+    const QJsonObject jsonObj = jsonDoc.object();
 
     // qDebug() << jsonObj;
 

@@ -182,7 +182,7 @@ void DeckEditorMenu::retranslateUi()
 
 void DeckEditorMenu::refreshShortcuts()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aNewDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aNewDeck"));
     aLoadDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeck"));
     aSaveDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aSaveDeck"));

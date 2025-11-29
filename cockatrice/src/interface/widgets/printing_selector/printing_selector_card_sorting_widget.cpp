@@ -219,8 +219,9 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(co
 
     // Prepend sorted sets and remove them from the original list
     for (const auto &pair : countList) {
-        auto it = std::find_if(result.begin(), result.end(),
-                               [&pair](const PrintingInfo &item) { return item.getUuid() == pair.first.getUuid(); });
+        const auto it = std::find_if(result.begin(), result.end(), [&pair](const PrintingInfo &item) {
+            return item.getUuid() == pair.first.getUuid();
+        });
         if (it != result.end()) {
             result.erase(it); // Remove the matching entry
         }

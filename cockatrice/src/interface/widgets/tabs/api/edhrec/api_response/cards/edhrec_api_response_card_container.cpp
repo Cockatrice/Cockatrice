@@ -13,7 +13,7 @@ void EdhrecApiResponseCardContainer::fromJson(const QJsonObject &json)
     }
 
     description = json.value("description").toString();
-    QJsonObject jsonDict = json.value("json_dict").toObject();
+    const QJsonObject jsonDict = json.value("json_dict").toObject();
     card.fromJson(jsonDict.value("card").toObject());
     QJsonArray cardlistsArray = jsonDict.value("cardlists").toArray();
 

@@ -37,7 +37,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    const auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
@@ -83,7 +83,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
             &DeckEditorDatabaseDisplayWidget::updateCard);
     connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
 
-    QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
+    const QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     if (dbHeaderState.isNull()) {
         // first run
         databaseView->setColumnWidth(0, 200);
@@ -122,7 +122,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeck
 void DeckEditorDatabaseDisplayWidget::updateSearch(const QString &search)
 {
     databaseDisplayModel->setStringFilter(search);
-    QModelIndexList sel = databaseView->selectionModel()->selectedRows();
+    const QModelIndexList sel = databaseView->selectionModel()->selectedRows();
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
@@ -214,7 +214,7 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         } else {
             for (const CardRelation *rel : relatedCards) {
                 const QString &relatedCardName = rel->getName();
-                QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+                const QAction *relatedCard = relatedMenu->addAction(relatedCardName);
                 connect(
                     relatedCard, &QAction::triggered, deckEditor->cardInfoDockWidget->cardInfo,
                     [this, relatedCardName] { deckEditor->cardInfoDockWidget->cardInfo->setCard(relatedCardName); });
@@ -226,7 +226,7 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
 
 void DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents()
 {
-    auto _data = databaseView->selectionModel()->currentIndex().data();
+    const auto _data = databaseView->selectionModel()->currentIndex().data();
     QApplication::clipboard()->setText(_data.toString());
 }
 

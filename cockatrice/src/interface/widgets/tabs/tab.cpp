@@ -25,7 +25,7 @@ void Tab::showCardInfoPopup(const QPoint &pos, const CardRef &cardRef)
                                               Qt::WindowStaysOnTopHint);
     infoPopup->setAttribute(Qt::WA_TransparentForMouseEvents);
 
-    auto screenRect = qApp->primaryScreen()->geometry();
+    const auto screenRect = qApp->primaryScreen()->geometry();
     infoPopup->move(qMax(screenRect.left(), qMin(pos.x() - infoPopup->width() / 2,
                                                  screenRect.left() + screenRect.width() - infoPopup->width())),
                     qMax(screenRect.top(), qMin(pos.y() - infoPopup->height() / 2,

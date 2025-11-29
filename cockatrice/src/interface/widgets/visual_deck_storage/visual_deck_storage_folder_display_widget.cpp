@@ -42,7 +42,7 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 void VisualDeckStorageFolderDisplayWidget::refreshUi()
 {
     QString bannerText = tr("Deck Storage");
-    QString deckPath = SettingsCache::instance().getDeckPath();
+    const QString deckPath = SettingsCache::instance().getDeckPath();
     if (filePath != deckPath) {
         QString relativePath = filePath;
 
@@ -69,7 +69,7 @@ static QStringList getAllFiles(const QString &filePath, bool recursive)
     QStringList allFiles;
 
     // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    auto flags =
+    const auto flags =
         recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
     QDirIterator it(filePath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files, flags);
 
@@ -110,7 +110,7 @@ void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
  */
 void VisualDeckStorageFolderDisplayWidget::updateVisibility(bool recursive)
 {
-    bool atLeastOneWidgetVisible = checkVisibility();
+    const bool atLeastOneWidgetVisible = checkVisibility();
     if (atLeastOneWidgetVisible) {
         setVisible(true);
         for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
@@ -131,7 +131,7 @@ bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
     bool atLeastOneWidgetVisible = false;
     if (flowWidget) {
         // Iterate through all DeckPreviewWidgets
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
+        for (const DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             if (display->checkVisibility()) {
                 atLeastOneWidgetVisible = true;
             }
@@ -208,7 +208,7 @@ QStringList VisualDeckStorageFolderDisplayWidget::gatherAllTagsFromFlowWidget() 
 
     if (flowWidget) {
         // Iterate through all DeckPreviewWidgets
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
+        for (const DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
             // Get tags from each DeckPreviewWidget
             QStringList tags = display->deckLoader->getDeckList()->getTags();
 

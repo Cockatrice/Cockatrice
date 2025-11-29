@@ -190,7 +190,7 @@ static void setupParserRules()
     search["StringValue"] = [](const peg::SemanticValues &sv) -> StringMatcher {
         // Helper function for word boundary matching
         auto createWordBoundaryMatcher = [](const QString &target) {
-            QString pattern = QString("\\b%1\\b").arg(QRegularExpression::escape(target));
+            const QString pattern = QString("\\b%1\\b").arg(QRegularExpression::escape(target));
             QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
             return [regex](const QString &s) { return regex.match(s).hasMatch(); };
         };
@@ -286,8 +286,8 @@ static void setupParserRules()
     };
 
     search["RegexMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
-        auto target = std::any_cast<QString>(sv[0]);
-        auto regex = QRegularExpression(target, QRegularExpression::CaseInsensitiveOption);
+        const auto target = std::any_cast<QString>(sv[0]);
+        const auto regex = QRegularExpression(target, QRegularExpression::CaseInsensitiveOption);
         return [=](const QString &s) { return regex.match(s).hasMatch(); };
     };
 

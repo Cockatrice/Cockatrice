@@ -16,11 +16,11 @@
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
-    auto playerActions = player->getPlayerActions();
+    const auto playerActions = player->getPlayerActions();
 
     const QList<Player *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
 
-    for (auto playerToAdd : players) {
+    for (const auto playerToAdd : players) {
         if (playerToAdd == player) {
             continue;
         }
@@ -95,7 +95,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
 
     bool revealedCard = false;
     bool writeableCard = player->getPlayerInfo()->getLocalOrJudge();
-    if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
+    if (const auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
         if (view->getRevealZone()) {
             if (view->getWriteableRevealZone()) {
                 writeableCard = true;
@@ -155,7 +155,7 @@ void CardMenu::removePlayer(Player *playerToRemove)
 void CardMenu::createTableMenu()
 {
     // Card is on the battlefield
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
+    const bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
 
     if (!canModifyCard) {
         addRelatedCardView();
@@ -213,7 +213,7 @@ void CardMenu::createTableMenu()
 
 void CardMenu::createStackMenu()
 {
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
+    const bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
 
     // Card is on the stack
     if (canModifyCard) {
@@ -238,7 +238,7 @@ void CardMenu::createStackMenu()
 
 void CardMenu::createGraveyardOrExileMenu()
 {
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
+    const bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
 
     // Card is in the graveyard or exile
     if (canModifyCard) {
@@ -328,7 +328,7 @@ void CardMenu::addRelatedCardView()
     if (!card) {
         return;
     }
-    auto exactCard = card->getCard();
+    const auto exactCard = card->getCard();
     if (!exactCard) {
         return;
     }
@@ -348,12 +348,12 @@ void CardMenu::addRelatedCardView()
     }
 
     addSeparator();
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    const auto viewRelatedCards = new QMenu(tr("View related cards"));
     addMenu(viewRelatedCards);
     for (const CardRelation *relatedCard : relatedCards) {
         QString relatedCardName = relatedCard->getName();
         CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
-        QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
+        const QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         Q_UNUSED(viewCard);
 
         connect(viewCard, &QAction::triggered, player->getGame(),
@@ -366,7 +366,7 @@ void CardMenu::addRelatedCardActions()
     if (!card) {
         return;
     }
-    auto exactCard = card->getCard();
+    const auto exactCard = card->getCard();
     if (!exactCard) {
         return;
     }
@@ -460,7 +460,7 @@ void CardMenu::retranslateUi()
 
     mCardCounters->setTitle(tr("Ca&rd counters"));
 
-    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
     for (int i = 0; i < aAddCounter.size(); ++i) {
         aAddCounter[i]->setText(tr("&Add counter (%1)").arg(cardCounterSettings.displayName(i)));
@@ -475,7 +475,7 @@ void CardMenu::retranslateUi()
 
 void CardMenu::setShortcutsActive()
 {
-    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    const ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
     aHide->setShortcuts(shortcuts.getShortcut("Player/aHide"));
     aPlay->setShortcuts(shortcuts.getShortcut("Player/aPlay"));
