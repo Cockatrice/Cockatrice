@@ -101,10 +101,10 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     headerLayout->addWidget(colorBar);
 
     // Create a shared plate for the labels
-    BackgroundPlateWidget *sharedPlate = new BackgroundPlateWidget(this);
-    sharedPlate->setFixedHeight(120); // Adjust height to fit all labels
+    backgroundPlateWidget = new BackgroundPlateWidget(this);
+    backgroundPlateWidget->setFixedHeight(120); // Adjust height to fit all labels
 
-    QVBoxLayout *plateLayout = new QVBoxLayout(sharedPlate);
+    QVBoxLayout *plateLayout = new QVBoxLayout(backgroundPlateWidget);
 
     // Add labels to the plate layout
     QLabel *ownerLabel = new QLabel(QString("Owner: %1").arg(response.getOwner().getName()));
@@ -117,7 +117,7 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     plateLayout->addWidget(updatedAtLabel);
 
     // Add the shared plate to the header layout
-    headerLayout->addWidget(sharedPlate);
+    headerLayout->addWidget(backgroundPlateWidget);
 
     layout->addLayout(headerLayout);
 }
@@ -126,6 +126,16 @@ void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *ev
 {
     QWidget::mousePressEvent(event);
     actRequestNavigationToDeck();
+}
+void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEnterEvent *event)
+{
+    QWidget::enterEvent(event);
+    backgroundPlateWidget->setFocused(true);
+}
+void ArchidektApiResponseDeckEntryDisplayWidget::leaveEvent(QEvent *event)
+{
+    QWidget::leaveEvent(event);
+    backgroundPlateWidget->setFocused(false);
 }
 
 void ArchidektApiResponseDeckEntryDisplayWidget::setScaleFactor(int scale)

@@ -11,6 +11,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+class BackgroundPlateWidget;
 class ArchidektApiResponseDeckEntryDisplayWidget : public QWidget
 {
     Q_OBJECT
@@ -32,6 +33,8 @@ public slots:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 
 private:
     QVBoxLayout *layout;
@@ -42,6 +45,7 @@ private:
     QLabel *picture;
     QPixmap originalPixmap;
     int scaleFactor = 100;
+    BackgroundPlateWidget *backgroundPlateWidget;
 };
 
 #endif // COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H

@@ -19,6 +19,16 @@ void BackgroundPlateWidget::paintEvent(QPaintEvent *event)
     // Set the background color to semi-transparent black with rounded corners
     QRect rect = this->rect();
     painter.setPen(Qt::NoPen);              // No border
-    painter.setBrush(QColor(0, 0, 0, 140)); // semi-transparent black
+    if (focused) {
+        painter.setBrush(QColor(85, 190, 75, 140));
+    } else {
+        painter.setBrush(QColor(0, 0, 0, 140)); // semi-transparent black
+    }
     painter.drawRoundedRect(rect, 6, 6);    // rounded corners
+}
+
+void BackgroundPlateWidget::setFocused(bool _focused)
+{
+    focused = _focused;
+    update();
 }

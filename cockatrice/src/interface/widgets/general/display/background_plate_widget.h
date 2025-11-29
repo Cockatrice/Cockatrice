@@ -10,6 +10,11 @@ class BackgroundPlateWidget : public QWidget
 public:
     explicit BackgroundPlateWidget(QWidget *parent = nullptr);
 
+    void setFocused(bool focused);
+
+private:
+    bool focused = false;
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 };
