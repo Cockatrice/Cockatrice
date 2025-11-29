@@ -157,12 +157,16 @@ void DlgSelectSetForCards::actOK()
             model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
         }
     }
+    if (!modifiedSetsAndCardsMap.isEmpty()) {
+        emit deckModified();
+    }
     accept();
 }
 
 void DlgSelectSetForCards::actClear()
 {
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
+    emit deckModified();
     accept();
 }
 
@@ -170,6 +174,7 @@ void DlgSelectSetForCards::actSetAllToPreferred()
 {
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
     DeckLoader::setProviderIdToPreferredPrinting(model->getDeckList());
+    emit deckModified();
     accept();
 }
 

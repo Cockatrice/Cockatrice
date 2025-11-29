@@ -37,6 +37,7 @@ public:
 signals:
     void widgetOrderChanged();
     void orderChanged();
+    void deckModified();
 
 public slots:
     void actOK();
