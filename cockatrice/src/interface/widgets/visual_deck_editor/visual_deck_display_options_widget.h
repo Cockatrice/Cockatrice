@@ -3,12 +3,12 @@
 
 #include "visual_deck_editor_widget.h"
 
-#include <QPushButton>
-#include <QWidget>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QComboBox>
 #include <QListWidget>
+#include <QPushButton>
+#include <QWidget>
 
 /**
  * @class VisualDeckDisplayOptionsWidget
