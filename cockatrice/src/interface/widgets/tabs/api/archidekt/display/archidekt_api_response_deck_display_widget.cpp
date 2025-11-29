@@ -53,7 +53,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
         tempDeck += QString("%1 %2 (%3) %4\n")
                         .arg(card.getQuantity())
                         .arg(cleanName)
-                        .arg(card.getCard().getEdition().getEditionCode())
+                        .arg(card.getCard().getEdition().getEditionCode().toUpper())
                         .arg(card.getCard().getCollectorNumber());
     }
 
