@@ -190,7 +190,7 @@ public:
     const QSet<QString> &getAltNames()
     {
         return altNames;
-    };
+    }
     [[nodiscard]] const QString &getText() const
     {
         return text;

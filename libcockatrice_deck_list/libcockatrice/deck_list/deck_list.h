@@ -158,7 +158,7 @@ protected:
     virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
     {
         return currentZoneName;
-    };
+    }
 
     /**
      * @brief Produce the complete display name of a card.
@@ -169,7 +169,7 @@ protected:
     virtual QString getCompleteCardName(const QString &cardName) const
     {
         return cardName;
-    };
+    }
 
 signals:
     /// Emitted when the deck hash changes.

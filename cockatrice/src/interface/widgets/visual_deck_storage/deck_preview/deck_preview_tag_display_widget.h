@@ -44,7 +44,7 @@ public:
     {
         state = newState;
         update();
-    };
+    }
 
 signals:
     /**

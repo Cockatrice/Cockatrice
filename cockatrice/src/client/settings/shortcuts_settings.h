@@ -99,15 +99,15 @@ public:
     void setSequence(const QList &_sequence)
     {
         QList::operator=(_sequence);
-    };
+    }
     [[nodiscard]] QString getName() const
     {
         return QApplication::translate("shortcutsTab", name.toUtf8().data());
-    };
+    }
     [[nodiscard]] QString getGroupName() const
     {
         return ShortcutGroup::getGroupName(group);
-    };
+    }
 
 private:
     QString name;
@@ -129,7 +129,7 @@ public:
     [[nodiscard]] QList<QString> getAllShortcutKeys() const
     {
         return shortCuts.keys();
-    };
+    }
 
     void setShortcuts(const QString &name, const QList<QKeySequence> &Sequence);
     void setShortcuts(const QString &name, const QKeySequence &Sequence);

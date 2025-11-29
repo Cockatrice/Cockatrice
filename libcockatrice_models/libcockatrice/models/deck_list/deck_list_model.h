@@ -203,7 +203,7 @@ public:
     [[nodiscard]] QModelIndex getRoot() const
     {
         return nodeToIndex(root);
-    };
+    }
 
     /**
      * @brief Returns the value of the grouping category for a card based on the current criteria.
