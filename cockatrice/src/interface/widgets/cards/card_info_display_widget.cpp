@@ -49,7 +49,7 @@ void CardInfoDisplayWidget::setCard(const ExactCard &card)
     if (exactCard)
         connect(exactCard.getCardPtr().data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
 
-    text->setCard(exactCard.getCardPtr());
+    text->setCard(exactCard);
     pic->setCard(exactCard);
 }
 

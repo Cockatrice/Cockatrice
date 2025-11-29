@@ -154,7 +154,7 @@ void CardInfoFrameWidget::setCard(const ExactCard &card)
 
     setViewTransformationButtonVisibility(hasTransformation(exactCard.getInfo()));
 
-    text->setCard(exactCard.getCardPtr());
+    text->setCard(exactCard);
     pic->setCard(exactCard);
 }
 
