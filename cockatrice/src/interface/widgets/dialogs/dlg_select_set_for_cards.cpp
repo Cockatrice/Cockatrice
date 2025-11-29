@@ -156,10 +156,14 @@ void DlgSelectSetForCards::actOK()
             if (!find_card.isValid()) {
                 continue;
             }
+            int amount =
+                model->data(find_card.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
             model->removeRow(find_card.row(), find_card.parent());
             CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(card);
             PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(card, modifiedSet, "");
-            model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
+            for (int i = 0; i < amount; i++) {
+                model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
+            }
         }
     }
     if (!modifiedSetsAndCardsMap.isEmpty()) {
