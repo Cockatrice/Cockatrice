@@ -9,18 +9,21 @@
 
 #include "tab.h"
 
-#include <QCheckBox>
 #include <QDialog>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QLabel>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QSpinBox>
-#include <QTableWidget>
 
 class AbstractClient;
 class LineEditUnfocusable;
+class QGroupBox;
+class QPushButton;
+class QSpinBox;
+class QCheckBox;
+class QRadioButton;
+class QLabel;
+class QDockWidget;
+class QWidget;
+class QGridLayout;
+class QVBoxLayout;
+class QTableWidget;
 class CommandContainer;
 class Response;
 class AbstractClient;
