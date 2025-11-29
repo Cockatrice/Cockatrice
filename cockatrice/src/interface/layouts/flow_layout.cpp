@@ -162,7 +162,7 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
             continue;
         }
 
-        QSize itemSize = item->sizeHint();                      // The suggested size for the current item
+        QSize itemSize = item->sizeHint();                            // The suggested size for the current item
         const int itemWidth = itemSize.width() + horizontalSpacing(); // Item width plus spacing
 
         // Check if the current item fits in the remaining width of the current row

@@ -220,7 +220,7 @@ bool ShortcutsSettings::isKeyAllowed(const QString &name, const QString &sequenc
     const QString checkSequence = sequences.split(sep).last();
     const QStringList forbiddenKeys{"Del",        "Backspace", "Down",  "Up",         "Left",       "Right",
                                     "Return",     "Enter",     "Menu",  "Ctrl+Alt+-", "Ctrl+Alt+=", "Ctrl+Alt+[",
-                              "Ctrl+Alt+]", "Tab",       "Space", "Shift+S",    "Shift+Left", "Shift+Right"};
+                                    "Ctrl+Alt+]", "Tab",       "Space", "Shift+S",    "Shift+Left", "Shift+Right"};
     return !forbiddenKeys.contains(checkSequence);
 }
 
