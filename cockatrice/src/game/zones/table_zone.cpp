@@ -52,7 +52,7 @@ bool TableZone::isInverted() const
 {
     return (getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
             !SettingsCache::instance().getInvertVerticalCoordinate()) ||
-            (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
+           (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
             SettingsCache::instance().getInvertVerticalCoordinate());
 }
 
