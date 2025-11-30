@@ -77,6 +77,11 @@ void SideboardPlan::write(QXmlStreamWriter *xml)
     xml->writeEndElement();
 }
 
+bool DeckList::Metadata::isEmpty() const
+{
+    return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty();
+}
+
 DeckList::DeckList()
 {
     root = new InnerDecklistNode;
@@ -122,20 +127,20 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     const QString childName = xml->name().toString();
     if (xml->isStartElement()) {
         if (childName == "lastLoadedTimestamp") {
-            lastLoadedTimestamp = xml->readElementText();
+            metadata.lastLoadedTimestamp = xml->readElementText();
         } else if (childName == "deckname") {
-            name = xml->readElementText();
+            metadata.name = xml->readElementText();
         } else if (childName == "comments") {
-            comments = xml->readElementText();
+            metadata.comments = xml->readElementText();
         } else if (childName == "bannerCard") {
             QString providerId = xml->attributes().value("providerId").toString();
             QString cardName = xml->readElementText();
-            bannerCard = {cardName, providerId};
+            metadata.bannerCard = {cardName, providerId};
         } else if (childName == "tags") {
-            tags.clear(); // Clear existing tags
+            metadata.tags.clear(); // Clear existing tags
             while (xml->readNextStartElement()) {
                 if (xml->name().toString() == "tag") {
-                    tags.append(xml->readElementText());
+                    metadata.tags.append(xml->readElementText());
                 }
             }
         } else if (childName == "zone") {
@@ -155,24 +160,30 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     return true;
 }
 
+void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
+{
+    xml->writeTextElement("lastLoadedTimestamp", metadata.lastLoadedTimestamp);
+    xml->writeTextElement("deckname", metadata.name);
+    xml->writeStartElement("bannerCard");
+    xml->writeAttribute("providerId", metadata.bannerCard.providerId);
+    xml->writeCharacters(metadata.bannerCard.name);
+    xml->writeEndElement();
+    xml->writeTextElement("comments", metadata.comments);
+
+    // Write tags
+    xml->writeStartElement("tags");
+    for (const QString &tag : metadata.tags) {
+        xml->writeTextElement("tag", tag);
+    }
+    xml->writeEndElement();
+}
+
 void DeckList::write(QXmlStreamWriter *xml) const
 {
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
-    xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
-    xml->writeTextElement("deckname", name);
-    xml->writeStartElement("bannerCard");
-    xml->writeAttribute("providerId", bannerCard.providerId);
-    xml->writeCharacters(bannerCard.name);
-    xml->writeEndElement();
-    xml->writeTextElement("comments", comments);
 
-    // Write tags
-    xml->writeStartElement("tags");
-    for (const QString &tag : tags) {
-        xml->writeTextElement("tag", tag);
-    }
-    xml->writeEndElement();
+    writeMetadata(xml, metadata);
 
     // Write zones
     for (int i = 0; i < root->size(); i++) {
@@ -329,7 +340,7 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
         const auto &current = inputs.at(index++);
         if (!current.contains(reEmpty)) {
             match = reComment.match(current);
-            name = match.captured();
+            metadata.name = match.captured();
             break;
         }
     }
@@ -337,10 +348,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
         const auto &current = inputs.at(index++);
         if (!current.contains(reEmpty)) {
             match = reComment.match(current);
-            comments += match.captured() + '\n';
+            metadata.comments += match.captured() + '\n';
         }
     }
-    comments.chop(1);
+    metadata.comments.chop(1);
 
     // Discard empty lines
     while (index < max_line && inputs.at(index).contains(reEmpty)) {
