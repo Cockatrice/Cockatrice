@@ -1,5 +1,5 @@
 /**
- * @file decklist.h
+ * @file deck_list.h
  * @brief Defines the DeckList class and supporting types for managing a full
  *        deck structure including cards, zones, sideboard plans, and
  *        serialization to/from multiple formats. This is a logic class which
