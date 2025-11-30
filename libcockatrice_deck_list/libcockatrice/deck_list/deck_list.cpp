@@ -515,9 +515,7 @@ void DeckList::cleanList(bool preserveMetadata)
 {
     root->clearTree();
     if (!preserveMetadata) {
-        setName();
-        setComments();
-        setTags();
+        metadata = {};
     }
     refreshDeckHash();
 }
