@@ -123,10 +123,8 @@ public:
  * deck.saveToFile_Native(device);
  * ```
  */
-class DeckList : public QObject
+class DeckList
 {
-    Q_OBJECT
-
 public:
     struct Metadata
     {
@@ -232,7 +230,7 @@ public:
     DeckList &operator=(const DeckList &) = delete;
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
-    ~DeckList() override;
+    virtual ~DeckList();
 
     /// @name Metadata getters
     /// The individual metadata getters still exist for backwards compatibility.
