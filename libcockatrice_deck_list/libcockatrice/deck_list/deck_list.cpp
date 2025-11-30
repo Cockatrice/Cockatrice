@@ -87,6 +87,12 @@ DeckList::DeckList()
     root = new InnerDecklistNode;
 }
 
+DeckList::DeckList(const DeckList &other)
+    : metadata(other.metadata), sideboardPlans(other.sideboardPlans), root(new InnerDecklistNode(other.getRoot())),
+      cachedDeckHash(other.cachedDeckHash)
+{
+}
+
 DeckList::DeckList(const QString &nativeString)
 {
     root = new InnerDecklistNode;

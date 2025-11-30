@@ -93,7 +93,7 @@ public:
  * @brief Represents a complete deck, including metadata, zones, cards,
  *        and sideboard plans.
  *
- * A DeckList is a QObject wrapper around an `InnerDecklistNode` tree,
+ * A DeckList is a wrapper around an `InnerDecklistNode` tree,
  * enriched with metadata like deck name, comments, tags, banner card,
  * and multiple sideboard plans.
  *
@@ -211,9 +211,8 @@ protected:
 public:
     /// @brief Construct an empty deck.
     explicit DeckList();
-    /// @brief Delete copy constructor.
-    DeckList(const DeckList &) = delete;
-    DeckList &operator=(const DeckList &) = delete;
+    /// @brief Copy constructor (deep copies the node tree)
+    DeckList(const DeckList &other);
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
     virtual ~DeckList();
