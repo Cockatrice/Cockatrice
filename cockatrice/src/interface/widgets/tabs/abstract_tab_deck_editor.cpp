@@ -155,6 +155,7 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneNam
     QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
+    deckDockWidget->expandAll();
     setModified(true);
 
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
