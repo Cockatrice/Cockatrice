@@ -126,12 +126,24 @@ public:
 class DeckList : public QObject
 {
     Q_OBJECT
+
+public:
+    struct Metadata
+    {
+        QString name;                ///< User-defined deck name.
+        QString comments;            ///< Free-form comments or notes.
+        CardRef bannerCard;          ///< Optional representative card for the deck.
+        QStringList tags;            ///< User-defined tags for deck classification.
+        QString lastLoadedTimestamp; ///< Timestamp string of last load.
+
+        /**
+         * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
+         */
+        bool isEmpty() const;
+    };
+
 private:
-    QString name;                                  ///< User-defined deck name.
-    QString comments;                              ///< Free-form comments or notes.
-    CardRef bannerCard;                            ///< Optional representative card for the deck.
-    QString lastLoadedTimestamp;                   ///< Timestamp string of last load.
-    QStringList tags;                              ///< User-defined tags for deck classification.
+    Metadata metadata;                             ///< Deck metadata that is stored in the deck file
     QMap<QString, SideboardPlan *> sideboardPlans; ///< Named sideboard plans.
     InnerDecklistNode *root;                       ///< Root of the deck tree (zones + cards).
 
@@ -181,34 +193,34 @@ public slots:
     ///@{
     void setName(const QString &_name = QString())
     {
-        name = _name;
+        metadata.name = _name;
     }
     void setComments(const QString &_comments = QString())
     {
-        comments = _comments;
+        metadata.comments = _comments;
     }
     void setTags(const QStringList &_tags = QStringList())
     {
-        tags = _tags;
+        metadata.tags = _tags;
         emit deckTagsChanged();
     }
     void addTag(const QString &_tag)
     {
-        tags.append(_tag);
+        metadata.tags.append(_tag);
         emit deckTagsChanged();
     }
     void clearTags()
     {
-        tags.clear();
+        metadata.tags.clear();
         emit deckTagsChanged();
     }
     void setBannerCard(const CardRef &_bannerCard = {})
     {
-        bannerCard = _bannerCard;
+        metadata.bannerCard = _bannerCard;
     }
     void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
     {
-        lastLoadedTimestamp = _lastLoadedTimestamp;
+        metadata.lastLoadedTimestamp = _lastLoadedTimestamp;
     }
     ///@}
 
@@ -223,32 +235,38 @@ public:
     ~DeckList() override;
 
     /// @name Metadata getters
+    /// The individual metadata getters still exist for backwards compatibility.
+    /// TODO: Figure out when we can remove them.
     ///@{
+    const Metadata &getMetadata() const
+    {
+        return metadata;
+    }
     QString getName() const
     {
-        return name;
+        return metadata.name;
     }
     QString getComments() const
     {
-        return comments;
+        return metadata.comments;
     }
     QStringList getTags() const
     {
-        return tags;
+        return metadata.tags;
     }
     CardRef getBannerCard() const
     {
-        return bannerCard;
+        return metadata.bannerCard;
     }
     QString getLastLoadedTimestamp() const
     {
-        return lastLoadedTimestamp;
+        return metadata.lastLoadedTimestamp;
     }
     ///@}
 
     bool isBlankDeck() const
     {
-        return name.isEmpty() && comments.isEmpty() && getCardList().isEmpty();
+        return metadata.isEmpty() && getCardList().isEmpty();
     }
 
     /// @name Sideboard plans
@@ -286,7 +304,7 @@ public:
     void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
     {
-        return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();
+        return root->isEmpty() && metadata.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
