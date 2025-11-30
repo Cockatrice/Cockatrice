@@ -12,32 +12,43 @@
 #include <QNetworkReply>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QtGui>
 
 SimpleDownloadFilePage::SimpleDownloadFilePage(QWidget *parent) : OracleWizardPage(parent)
 {
-    urlLabel = new QLabel(this);
+    urlRadioButton = new QRadioButton(this);
+    fileRadioButton = new QRadioButton(this);
+
     urlLineEdit = new QLineEdit(this);
+    fileLineEdit = new QLineEdit(this);
 
     progressLabel = new QLabel(this);
     progressBar = new QProgressBar(this);
 
+    urlRadioButton->setChecked(true);
+
     urlButton = new QPushButton(this);
     connect(urlButton, &QPushButton::clicked, this, &SimpleDownloadFilePage::actRestoreDefaultUrl);
 
-    defaultPathCheckBox = new QCheckBox(this);
+    fileButton = new QPushButton(this);
+    connect(fileButton, &QPushButton::clicked, this, &SimpleDownloadFilePage::actLoadCardFile);
 
+    defaultPathCheckBox = new QCheckBox(this);
     pathLabel = new QLabel(this);
     pathLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(urlLabel, 0, 0);
+    layout->addWidget(urlRadioButton, 0, 0);
     layout->addWidget(urlLineEdit, 0, 1);
     layout->addWidget(urlButton, 1, 1, Qt::AlignRight);
-    layout->addWidget(pathLabel, 2, 0, 1, 2);
-    layout->addWidget(defaultPathCheckBox, 3, 0, 1, 2);
-    layout->addWidget(progressLabel, 4, 0);
-    layout->addWidget(progressBar, 4, 1);
+    layout->addWidget(fileRadioButton, 2, 0);
+    layout->addWidget(fileLineEdit, 2, 1);
+    layout->addWidget(fileButton, 3, 1, Qt::AlignRight);
+    layout->addWidget(pathLabel, 4, 0, 1, 2);
+    layout->addWidget(defaultPathCheckBox, 5, 0, 1, 2);
+    layout->addWidget(progressLabel, 6, 0);
+    layout->addWidget(progressBar, 6, 1);
 
     setLayout(layout);
 }
@@ -56,6 +67,31 @@ void SimpleDownloadFilePage::actRestoreDefaultUrl()
     urlLineEdit->setText(getDefaultUrl());
 }
 
+void SimpleDownloadFilePage::actLoadCardFile()
+{
+    QFileDialog dialog(this, tr("Load %1 file").arg(getFilePromptName()));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    QString extensions = "*.json *.xml";
+#ifdef HAS_ZLIB
+    extensions += " *.zip";
+#endif
+#ifdef HAS_LZMA
+    extensions += " *.xz";
+#endif
+    dialog.setNameFilter(tr("%1 file (%1)").arg(getFilePromptName(), extensions));
+
+    if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
+        dialog.selectFile(fileLineEdit->text());
+    }
+
+    if (!dialog.exec()) {
+        return;
+    }
+
+    fileLineEdit->setText(dialog.selectedFiles().at(0));
+}
+
 bool SimpleDownloadFilePage::validatePage()
 {
     // if data has already been downloaded, pass directly to the "save" step
@@ -68,22 +104,41 @@ bool SimpleDownloadFilePage::validatePage()
         }
     }
 
-    QUrl url = QUrl::fromUserInput(urlLineEdit->text());
-    if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid: ") + url.toString());
-        return false;
+    // else, try to import sets
+    if (urlRadioButton->isChecked()) {
+        QUrl url = QUrl::fromUserInput(urlLineEdit->text());
+        if (!url.isValid()) {
+            QMessageBox::critical(this, tr("Error"), tr("The provided URL is not valid: ") + url.toString());
+            return false;
+        }
+
+        progressLabel->setText(tr("Downloading (0MB)"));
+        // show an infinite progressbar
+        progressBar->setMaximum(0);
+        progressBar->setMinimum(0);
+        progressBar->setValue(0);
+        progressLabel->show();
+        progressBar->show();
+
+        wizard()->disableButtons();
+        downloadFile(url);
+
+    } else if (fileRadioButton->isChecked()) {
+        QFile cardFile(fileLineEdit->text());
+        if (!cardFile.exists()) {
+            QMessageBox::critical(this, tr("Error"), tr("Please choose a file."));
+            return false;
+        }
+
+        if (!cardFile.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(nullptr, tr("Error"), tr("Cannot open file '%1'.").arg(fileLineEdit->text()));
+            return false;
+        }
+
+        downloadData = cardFile.readAll();
+        wizard()->next();
     }
 
-    progressLabel->setText(tr("Downloading (0MB)"));
-    // show an infinite progressbar
-    progressBar->setMaximum(0);
-    progressBar->setMinimum(0);
-    progressBar->setValue(0);
-    progressLabel->show();
-    progressBar->show();
-
-    wizard()->disableButtons();
-    downloadFile(url);
     return false;
 }
 

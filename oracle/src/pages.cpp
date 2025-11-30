@@ -672,13 +672,21 @@ QString LoadTokensPage::getFileType()
     return tr("XML; token database (*.xml)");
 }
 
+QString LoadTokensPage::getFilePromptName()
+{
+    return tr("tokens");
+}
+
 void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens import"));
     setSubTitle(tr("Please specify a compatible source for token data."));
 
-    urlLabel->setText(tr("Download URL:"));
+    urlRadioButton->setText(tr("Download URL:"));
+    fileRadioButton->setText(tr("Local file:"));
     urlButton->setText(tr("Restore default URL"));
+    fileButton->setText(tr("Choose file..."));
+
     pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" +
                        SettingsCache::instance().getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
@@ -709,13 +717,21 @@ QString LoadSpoilersPage::getFileType()
     return tr("XML; spoiler database (*.xml)");
 }
 
+QString LoadSpoilersPage::getFilePromptName()
+{
+    return tr("spoiler");
+}
+
 void LoadSpoilersPage::retranslateUi()
 {
     setTitle(tr("Spoilers import"));
     setSubTitle(tr("Please specify a compatible source for spoiler data."));
 
-    urlLabel->setText(tr("Download URL:"));
+    urlRadioButton->setText(tr("Download URL:"));
+    fileRadioButton->setText(tr("Local file:"));
     urlButton->setText(tr("Restore default URL"));
+    fileButton->setText(tr("Choose file..."));
+
     pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" +
                        SettingsCache::instance().getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
