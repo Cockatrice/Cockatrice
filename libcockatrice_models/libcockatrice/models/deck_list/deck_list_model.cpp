@@ -284,6 +284,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
 
     emitRecursiveUpdates(index);
     deckList->refreshDeckHash();
+    emit deckHashChanged();
 
     emit dataChanged(index, index);
     return true;
@@ -422,6 +423,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         cardNode->setCardCollectorNumber(printingInfo.getProperty("num"));
         cardNode->setCardProviderId(printingInfo.getProperty("uuid"));
         deckList->refreshDeckHash();
+        emit deckHashChanged();
     }
     sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);

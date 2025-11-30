@@ -424,7 +424,6 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     deckLoader->setParent(this);
     deckModel->setDeckList(deckLoader->getDeckList());
     connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
-    connect(deckLoader->getDeckList(), &DeckList::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
     emit requestDeckHistoryClear();
     historyManagerWidget->setDeckListModel(deckModel);

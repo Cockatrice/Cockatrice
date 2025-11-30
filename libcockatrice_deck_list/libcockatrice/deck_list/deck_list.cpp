@@ -714,7 +714,7 @@ QString DeckList::getDeckHash() const
 }
 
 /**
- * Invalidates the cached deckHash and emits the deckHashChanged signal.
+ * Invalidates the cached deckHash.
  */
 void DeckList::refreshDeckHash()
 {
