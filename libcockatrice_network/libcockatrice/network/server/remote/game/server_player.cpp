@@ -14,7 +14,7 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>

@@ -11,7 +11,7 @@
 #define DECKLIST_H
 
 #include "deck_list_memento.h"
-#include "inner_deck_list_node.h"
+#include "tree/inner_deck_list_node.h"
 
 #include <QMap>
 #include <QVector>

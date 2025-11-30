@@ -1,9 +1,9 @@
 #include "deck_list.h"
 
-#include "abstract_deck_list_node.h"
-#include "deck_list_card_node.h"
 #include "deck_list_memento.h"
-#include "inner_deck_list_node.h"
+#include "tree/abstract_deck_list_node.h"
+#include "tree/deck_list_card_node.h"
+#include "tree/inner_deck_list_node.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
