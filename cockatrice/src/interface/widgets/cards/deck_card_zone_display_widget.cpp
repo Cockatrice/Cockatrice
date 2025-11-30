@@ -38,8 +38,10 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     displayCards();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
-    connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-            &DeckCardZoneDisplayWidget::onSelectionChanged);
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &DeckCardZoneDisplayWidget::onSelectionChanged);
+    }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
 }
 
