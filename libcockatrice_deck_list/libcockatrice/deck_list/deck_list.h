@@ -152,7 +152,7 @@ private:
     static void getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result);
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
-protected:
+public:
     /**
      * @brief Map a card name to its zone.
      * Override in subclasses for format-specific logic.
@@ -208,7 +208,6 @@ protected:
     }
     ///@}
 
-public:
     /// @brief Construct an empty deck.
     explicit DeckList();
     /// @brief Copy constructor (deep copies the node tree)
