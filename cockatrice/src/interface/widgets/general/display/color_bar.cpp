@@ -126,13 +126,16 @@ QString ColorBar::tooltipForPosition(int x) const
     for (int v : colors.values())
         total += v;
 
+    if (total == 0)
+        return {};
+
     int pos = 0;
-    for (auto it = colors.begin(); it != colors.end(); ++it) {
-        double ratio = double(it.value()) / total;
-        int segmentWidth = int(ratio * width());
+    for (auto it = colors.cbegin(); it != colors.cend(); ++it) {
+        const double ratio = double(it.value()) / total;
+        const int segmentWidth = int(ratio * width());
 
         if (x >= pos && x < pos + segmentWidth) {
-            double percent = (100.0 * it.value()) / total;
+            const double percent = (100.0 * it.value()) / total;
             return QString("%1: %2 cards (%3%)").arg(it.key()).arg(it.value()).arg(QString::number(percent, 'f', 1));
         }
 

@@ -174,9 +174,6 @@ void ArchidektApiResponseDeckEntryDisplayWidget::onPreviewImageLoadFinished(QNet
 
     originalPixmap = loaded;
 
-    // universal fallback/design aspect ratio
-    static constexpr float DESIGN_RATIO = 150.0f / 267.0f;
-
     // Always scale preview widget to this ratio
     previewWidget->setAspectRatio(DESIGN_RATIO);
     previewWidget->setPreviewWidth(400);
@@ -195,7 +192,7 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
 
     int baseWidth = 400;
     int newWidth = baseWidth * scaleFactor / 100;
-    int newHeight = int(newWidth * (150.0 / 267.0));
+    int newHeight = static_cast<int>(newWidth * DESIGN_RATIO);
 
     previewWidget->setFixedSize(newWidth, newHeight);
 

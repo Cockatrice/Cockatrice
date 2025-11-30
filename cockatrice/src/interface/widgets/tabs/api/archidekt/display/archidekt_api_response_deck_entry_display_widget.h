@@ -115,6 +115,7 @@ private:
     QPixmap originalPixmap;                                ///< Original image for scaling (avoids degradation)
     int scaleFactor = 100;                                 ///< Current scaling percentage
     BackgroundPlateWidget *backgroundPlateWidget;          ///< Plate for metadata labels
+    static constexpr float DESIGN_RATIO = 150.0f / 267.0f; ///< Design aspect ratio
 };
 
 #endif // COCKATRICE_ARCHIDEKT_API_RESPONSE_DECK_ENTRY_DISPLAY_WIDGET_H
