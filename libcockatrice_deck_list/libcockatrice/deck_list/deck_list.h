@@ -153,29 +153,6 @@ private:
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 public:
-    /**
-     * @brief Map a card name to its zone.
-     * Override in subclasses for format-specific logic.
-     * @param cardName Card being placed.
-     * @param currentZoneName Zone candidate.
-     * @return Zone name to use.
-     */
-    virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
-    {
-        return currentZoneName;
-    }
-
-    /**
-     * @brief Produce the complete display name of a card.
-     * Override in subclasses to add set suffixes or annotations.
-     * @param cardName Base name.
-     * @return Full display name.
-     */
-    virtual QString getCompleteCardName(const QString &cardName) const
-    {
-        return cardName;
-    }
-
     /// @name Metadata setters
     ///@{
     void setName(const QString &_name = QString())
