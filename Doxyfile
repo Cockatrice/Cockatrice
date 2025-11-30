@@ -1069,6 +1069,7 @@ RECURSIVE              = YES
 EXCLUDE                = build/ \
                          cmake/ \
                          dbconverter/ \
+                         docs/ \
                          vcpkg/ \
                          webclient/
 
