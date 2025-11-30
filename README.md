@@ -46,8 +46,8 @@ Latest <kbd>beta</kbd> version:
 
 - [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
-- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official webpage of the Cockatrice project
-- [Cockatrice @Flathub](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration for our `flatpak` package
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official Cockatrice webpage
+- [Cockatrice @Flathub](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration for our Linux `flatpak` package
 
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
