@@ -713,7 +713,6 @@ QString DeckList::getDeckHash() const
 void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
-    emit deckHashChanged();
 }
 
 /**

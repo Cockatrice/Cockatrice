@@ -110,10 +110,6 @@ public:
  * - Owns the root `InnerDecklistNode` tree.
  * - Owns `SideboardPlan` instances stored in `sideboardPlans`.
  *
- * ### Signals:
- * - @c deckHashChanged() — emitted when the deck contents change.
- * - @c deckTagsChanged() — emitted when tags are added/removed.
- *
  * ### Example workflow:
  * ```
  * DeckList deck;
@@ -180,13 +176,6 @@ protected:
         return cardName;
     }
 
-signals:
-    /// Emitted when the deck hash changes.
-    void deckHashChanged();
-    /// Emitted when the deck tags are modified.
-    void deckTagsChanged();
-
-public slots:
     /// @name Metadata setters
     ///@{
     void setName(const QString &_name = QString())
@@ -200,17 +189,14 @@ public slots:
     void setTags(const QStringList &_tags = QStringList())
     {
         metadata.tags = _tags;
-        emit deckTagsChanged();
     }
     void addTag(const QString &_tag)
     {
         metadata.tags.append(_tag);
-        emit deckTagsChanged();
     }
     void clearTags()
     {
         metadata.tags.clear();
-        emit deckTagsChanged();
     }
     void setBannerCard(const CardRef &_bannerCard = {})
     {
