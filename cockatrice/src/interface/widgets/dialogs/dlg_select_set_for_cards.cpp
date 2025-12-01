@@ -146,7 +146,9 @@ void DlgSelectSetForCards::actOK()
 {
     QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
 
-    if (!modifiedSetsAndCardsMap.isEmpty()) {
+    if (modifiedSetsAndCardsMap.isEmpty()) {
+        accept(); // Nothing to do
+    } else {
         emit deckAboutToBeModified(tr("Bulk modified printings."));
     }
 
