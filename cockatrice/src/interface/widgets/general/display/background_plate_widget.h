@@ -8,7 +8,7 @@ class BackgroundPlateWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit BackgroundPlateWidget(QWidget *parent = nullptr);
+    explicit BackgroundPlateWidget(QWidget *parent);
 
     void setFocused(bool focused);
 
