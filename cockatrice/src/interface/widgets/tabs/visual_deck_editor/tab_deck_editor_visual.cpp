@@ -84,7 +84,7 @@ void TabDeckEditorVisual::onDeckChanged()
 {
     AbstractTabDeckEditor::onDeckModified();
     tabContainer->visualDeckView->constructZoneWidgetsFromDeckListModel();
-    tabContainer->deckAnalytics->refreshDisplays(deckDockWidget->deckModel);
+    tabContainer->deckAnalytics->refreshDisplays();
     tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
 }
 

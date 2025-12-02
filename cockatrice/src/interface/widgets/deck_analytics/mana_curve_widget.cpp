@@ -10,8 +10,8 @@
 #include <libcockatrice/deck_list/deck_list.h>
 #include <unordered_map>
 
-ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
-    : QWidget(parent), deckListModel(_deckListModel)
+ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListStatisticsAnalyzer *_deckStatAnalyzer)
+    : QWidget(parent), deckStatAnalyzer(_deckStatAnalyzer)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -24,7 +24,7 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
     barLayout = new QHBoxLayout(barContainer);
     layout->addWidget(barContainer);
 
-    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
+    connect(deckStatAnalyzer, &DeckListStatisticsAnalyzer::statsUpdated, this, &ManaCurveWidget::updateDisplay);
 
     retranslateUi();
 }
@@ -32,34 +32,6 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListModel *_deckListModel)
 void ManaCurveWidget::retranslateUi()
 {
     bannerWidget->setText(tr("Mana Curve"));
-}
-
-void ManaCurveWidget::setDeckModel(DeckListModel *deckModel)
-{
-    deckListModel = deckModel;
-    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaCurveWidget::analyzeManaCurve);
-    analyzeManaCurve();
-}
-
-std::unordered_map<int, int> ManaCurveWidget::analyzeManaCurve()
-{
-    manaCurveMap.clear();
-
-    QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            if (info) {
-                int cmc = info->getCmc().toInt();
-                manaCurveMap[cmc]++;
-            }
-        }
-    }
-
-    updateDisplay();
-
-    return manaCurveMap;
 }
 
 void ManaCurveWidget::updateDisplay()
@@ -72,6 +44,8 @@ void ManaCurveWidget::updateDisplay()
             delete item;
         }
     }
+
+    auto manaCurveMap = deckStatAnalyzer->getManaCurve();
 
     int highestEntry = 0;
     for (const auto &entry : manaCurveMap) {

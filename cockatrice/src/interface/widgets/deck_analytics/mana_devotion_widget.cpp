@@ -10,8 +10,8 @@
 #include <regex>
 #include <unordered_map>
 
-ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *_deckListModel)
-    : QWidget(parent), deckListModel(_deckListModel)
+ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListStatisticsAnalyzer *_deckStatAnalyzer)
+    : QWidget(parent), deckStatAnalyzer(_deckStatAnalyzer)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -23,7 +23,7 @@ ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *_deckList
     barLayout = new QHBoxLayout();
     layout->addLayout(barLayout);
 
-    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaDevotionWidget::analyzeManaDevotion);
+    connect(deckStatAnalyzer, &DeckListStatisticsAnalyzer::statsUpdated, this, &ManaDevotionWidget::updateDisplay);
 
     retranslateUi();
 }
@@ -31,33 +31,6 @@ ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListModel *_deckList
 void ManaDevotionWidget::retranslateUi()
 {
     bannerWidget->setText(tr("Mana Devotion"));
-}
-
-void ManaDevotionWidget::setDeckModel(DeckListModel *deckModel)
-{
-    deckListModel = deckModel;
-    connect(deckListModel, &DeckListModel::dataChanged, this, &ManaDevotionWidget::analyzeManaDevotion);
-    analyzeManaDevotion();
-}
-
-std::unordered_map<char, int> ManaDevotionWidget::analyzeManaDevotion()
-{
-    manaDevotionMap.clear();
-
-    QList<DecklistCardNode *> cardsInDeck = deckListModel->getDeckList()->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            if (info) {
-                auto devotion = countManaSymbols(info->getManaCost());
-                mergeManaCounts(manaDevotionMap, devotion);
-            }
-        }
-    }
-
-    updateDisplay();
-    return manaDevotionMap;
 }
 
 void ManaDevotionWidget::updateDisplay()
@@ -68,6 +41,8 @@ void ManaDevotionWidget::updateDisplay()
         item->widget()->deleteLater();
         delete item;
     }
+
+    auto manaDevotionMap = deckStatAnalyzer->getDevotion();
 
     int highestEntry = 0;
     for (auto entry : manaDevotionMap) {
@@ -88,51 +63,4 @@ void ManaDevotionWidget::updateDisplay()
     }
 
     update(); // Update the widget display
-}
-
-std::unordered_map<char, int> ManaDevotionWidget::countManaSymbols(const QString &manaString)
-{
-    std::unordered_map<char, int> manaCounts = {{'W', 0}, {'U', 0}, {'B', 0}, {'R', 0}, {'G', 0}};
-
-    int len = manaString.length();
-    for (int i = 0; i < len; ++i) {
-        if (manaString[i] == '{') {
-            ++i; // Move past '{'
-            if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-                char mana1 = manaString[i].toLatin1();
-                ++i; // Move to next character
-                if (i < len && manaString[i] == '/') {
-                    ++i; // Move past '/'
-                    if (i < len && manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-                        char mana2 = manaString[i].toLatin1();
-                        manaCounts[mana1]++;
-                        manaCounts[mana2]++;
-                    } else {
-                        // Handle cases like "{W/}" where second part is invalid
-                        manaCounts[mana1]++;
-                    }
-                } else {
-                    manaCounts[mana1]++;
-                }
-            }
-            // Ensure we always skip to the closing '}'
-            while (i < len && manaString[i] != '}') {
-                ++i;
-            }
-        }
-        // Check if the character is a standalone mana symbol (not inside {})
-        else if (manaCounts.find(manaString[i].toLatin1()) != manaCounts.end()) {
-            manaCounts[manaString[i].toLatin1()]++;
-        }
-    }
-
-    return manaCounts;
-}
-
-void ManaDevotionWidget::mergeManaCounts(std::unordered_map<char, int> &manaCounts1,
-                                         const std::unordered_map<char, int> &manaCounts2)
-{
-    for (const auto &pair : manaCounts2) {
-        manaCounts1[pair.first] += pair.second; // Add values for matching keys
-    }
 }
