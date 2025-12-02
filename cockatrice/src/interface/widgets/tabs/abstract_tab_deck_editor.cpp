@@ -153,6 +153,7 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneNam
                                         card.getPrinting().getProperty("num")));
 
     QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
+    deckDockWidget->expandAll();
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
     setModified(true);
