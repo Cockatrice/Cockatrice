@@ -34,7 +34,7 @@ public:
 signals:
     void linkActivated(const QString &link);
 public slots:
-    void setCard(ExactCard card);
+    void setCard(const ExactCard &card);
 };
 
 #endif

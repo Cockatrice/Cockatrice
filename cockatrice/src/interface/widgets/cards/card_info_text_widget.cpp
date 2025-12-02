@@ -50,7 +50,7 @@ void CardInfoTextWidget::setTexts(const QString &propsText, const QString &textT
     textLabel->setText(textText);
 }
 
-void CardInfoTextWidget::setCard(ExactCard exactCard)
+void CardInfoTextWidget::setCard(const ExactCard &exactCard)
 {
     auto card = exactCard.getCardPtr();
     if (card == nullptr) {
