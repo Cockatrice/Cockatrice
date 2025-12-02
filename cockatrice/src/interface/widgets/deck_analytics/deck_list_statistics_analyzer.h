@@ -9,18 +9,19 @@
 
 class DeckListModel;
 
+struct DeckListStatisticsAnalyzerConfig
+{
+    bool computeManaBase = true;
+    bool computeManaCurve = true;
+    bool computeDevotion = true;
+};
+
+
 class DeckListStatisticsAnalyzer : public QObject
 {
     Q_OBJECT
 
 public:
-    struct DeckListStatisticsAnalyzerConfig
-    {
-        bool computeManaBase = true;
-        bool computeManaCurve = true;
-        bool computeDevotion = true;
-    };
-
     explicit DeckListStatisticsAnalyzer(QObject *parent,
                                         DeckListModel *model,
                                         DeckListStatisticsAnalyzerConfig cfg = DeckListStatisticsAnalyzerConfig());
