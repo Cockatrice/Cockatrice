@@ -45,8 +45,8 @@ signals:
     void statsUpdated();
 
 private:
-    DeckListStatisticsAnalyzerConfig config;
     DeckListModel *model;
+    DeckListStatisticsAnalyzerConfig config;
 
     // Internal result containers
     QHash<QString, int> manaBaseMap;
