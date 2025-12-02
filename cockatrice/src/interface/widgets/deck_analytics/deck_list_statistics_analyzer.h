@@ -16,7 +16,6 @@ struct DeckListStatisticsAnalyzerConfig
     bool computeDevotion = true;
 };
 
-
 class DeckListStatisticsAnalyzer : public QObject
 {
     Q_OBJECT
