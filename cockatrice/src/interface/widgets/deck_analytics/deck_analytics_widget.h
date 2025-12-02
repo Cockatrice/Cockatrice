@@ -24,10 +24,11 @@ public:
     explicit DeckAnalyticsWidget(QWidget *parent, DeckListModel *deckListModel);
     void setDeckList(const DeckList &_deckListModel);
     std::map<int, int> analyzeManaCurve();
-    void refreshDisplays(DeckListModel *_deckListModel);
+    void refreshDisplays();
 
 private:
     DeckListModel *deckListModel;
+    DeckListStatisticsAnalyzer *deckListStatisticsAnalyzer;
     QVBoxLayout *mainLayout;
 
     QWidget *container;

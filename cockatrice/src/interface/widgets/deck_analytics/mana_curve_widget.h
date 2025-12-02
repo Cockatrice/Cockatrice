@@ -8,6 +8,7 @@
 #define MANA_CURVE_WIDGET_H
 
 #include "../general/display/banner_widget.h"
+#include "deck_list_statistics_analyzer.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
@@ -19,17 +20,14 @@ class ManaCurveWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaCurveWidget(QWidget *parent, DeckListModel *deckListModel);
+    explicit ManaCurveWidget(QWidget *parent, DeckListStatisticsAnalyzer *deckStatAnalyzer);
     void updateDisplay();
 
 public slots:
-    void setDeckModel(DeckListModel *deckModel);
-    std::unordered_map<int, int> analyzeManaCurve();
     void retranslateUi();
 
 private:
-    DeckListModel *deckListModel;
-    std::unordered_map<int, int> manaCurveMap;
+    DeckListStatisticsAnalyzer *deckStatAnalyzer;
     QVBoxLayout *layout;
     BannerWidget *bannerWidget;
     QWidget *barContainer;
