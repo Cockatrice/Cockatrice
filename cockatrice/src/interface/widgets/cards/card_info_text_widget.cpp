@@ -50,8 +50,9 @@ void CardInfoTextWidget::setTexts(const QString &propsText, const QString &textT
     textLabel->setText(textText);
 }
 
-void CardInfoTextWidget::setCard(CardInfoPtr card)
+void CardInfoTextWidget::setCard(const ExactCard &exactCard)
 {
+    auto card = exactCard.getCardPtr();
     if (card == nullptr) {
         setTexts("", "");
         return;
@@ -60,6 +61,15 @@ void CardInfoTextWidget::setCard(CardInfoPtr card)
     QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
     text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
                 .arg(tr("Name:"), card->getName().toHtmlEscaped());
+
+    if (exactCard.getPrinting() != PrintingInfo()) {
+        QString setShort = exactCard.getPrinting().getSet()->getShortName().toHtmlEscaped();
+        QString cardNum = exactCard.getPrinting().getProperty("num").toHtmlEscaped();
+
+        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(tr("Set:"), setShort);
+
+        text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(tr("Collector Number:"), cardNum);
+    }
 
     QStringList cardProps = card->getProperties();
     for (const QString &key : cardProps) {
