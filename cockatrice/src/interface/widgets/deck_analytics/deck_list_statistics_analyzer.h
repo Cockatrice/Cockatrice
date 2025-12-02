@@ -28,15 +28,15 @@ public:
 
     void update();
 
-    const QHash<QString, int> &getManaBase() const
+    [[nodiscard]] const QHash<QString, int> &getManaBase() const
     {
         return manaBaseMap;
     }
-    const std::unordered_map<int, int> &getManaCurve() const
+    [[nodiscard]] const std::unordered_map<int, int> &getManaCurve() const
     {
         return manaCurveMap;
     }
-    const std::unordered_map<char, int> &getDevotion() const
+    [[nodiscard]] const std::unordered_map<char, int> &getDevotion() const
     {
         return manaDevotionMap;
     }
