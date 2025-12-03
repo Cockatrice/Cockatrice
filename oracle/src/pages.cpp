@@ -188,7 +188,7 @@ void LoadSetsPage::initializePage()
     urlLineEdit->setText(wizard()->settings->value("allsetsurl", ALLSETS_URL).toString());
 
     // Memory check because Oracle parsing fails on systems with less than 4GiB for MTGJsons allPrintings.json
-    if (!SystemMemoryQuerier::hasAtLeastGiB(33)) {
+    if (!SystemMemoryQuerier::hasAtLeastGiB(4) && urlLineEdit->text() == ALLSETS_URL) {
         // Ask user whether to switch URL
         QMessageBox msgBox(
             QMessageBox::Question, tr("Low Memory Detected"),
