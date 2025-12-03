@@ -153,7 +153,7 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::refreshFilterList()
     fileButtons.clear();
 
     QDir dir(SettingsCache::instance().getFiltersPath());
-    allFilterFiles = dir.entryList(QStringList() << "*.json", QDir::Files, QDir::Name);
+    allFilterFiles = dir.entryList({"*.json"}, QDir::Files, QDir::Name);
 
     applySearchFilter(searchInput->text());
 }
