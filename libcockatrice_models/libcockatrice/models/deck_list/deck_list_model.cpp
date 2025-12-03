@@ -5,8 +5,11 @@
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
+    // This class will leak the decklist object. We cannot safely delete it in the dtor because the deckList field is a
+    // non-owning pointer and another deckList might have been assigned to it.
+    // `DeckListModel::cleanList` also leaks for the same reason.
+    // TODO: fix the leak
     deckList = new DeckList;
-    deckList->setParent(this);
     root = new InnerDecklistNode;
 }
 
@@ -284,6 +287,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
 
     emitRecursiveUpdates(index);
     deckList->refreshDeckHash();
+    emit deckHashChanged();
 
     emit dataChanged(index, index);
     return true;
@@ -422,6 +426,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         cardNode->setCardCollectorNumber(printingInfo.getProperty("num"));
         cardNode->setCardProviderId(printingInfo.getProperty("uuid"));
         deckList->refreshDeckHash();
+        emit deckHashChanged();
     }
     sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);

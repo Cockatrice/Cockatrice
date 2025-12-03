@@ -424,7 +424,6 @@ void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
     deckLoader->setParent(this);
     deckModel->setDeckList(deckLoader->getDeckList());
     connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
-    connect(deckLoader->getDeckList(), &DeckList::deckHashChanged, deckModel, &DeckListModel::deckHashChanged);
 
     emit requestDeckHistoryClear();
     historyManagerWidget->setDeckListModel(deckModel);
@@ -452,7 +451,7 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     sortDeckModelToDeckView();
     expandAll();
 
-    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+    deckTagsDisplayWidget->setDeckList(deckModel->getDeckList());
 }
 
 void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
@@ -485,7 +484,7 @@ void DeckEditorDeckDockWidget::cleanDeck()
     emit deckModified();
     emit deckChanged();
     updateBannerCardComboBox();
-    deckTagsDisplayWidget->connectDeckList(deckModel->getDeckList());
+    deckTagsDisplayWidget->setDeckList(deckModel->getDeckList());
 }
 
 void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)

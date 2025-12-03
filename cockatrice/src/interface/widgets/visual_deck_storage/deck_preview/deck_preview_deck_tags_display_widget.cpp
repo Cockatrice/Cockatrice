@@ -28,21 +28,15 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     if (_deckList) {
-        connectDeckList(_deckList);
+        setDeckList(_deckList);
     }
 
     layout->addWidget(flowWidget);
 }
 
-void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
+void DeckPreviewDeckTagsDisplayWidget::setDeckList(DeckList *_deckList)
 {
-    if (deckList) {
-        disconnect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
-    }
-
     deckList = _deckList;
-    connect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
-
     refreshTags();
 }
 
@@ -150,6 +144,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                 QStringList updatedTags = dialog.getActiveTags();
                 deckList->setTags(updatedTags);
                 deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
+                refreshTags();
             }
         }
     } else if (parentWidget()) {
@@ -181,6 +176,7 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
                 QStringList updatedTags = dialog.getActiveTags();
                 deckList->setTags(updatedTags);
                 deckEditor->setModified(true);
+                refreshTags();
             }
         }
     }

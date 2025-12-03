@@ -87,6 +87,12 @@ DeckList::DeckList()
     root = new InnerDecklistNode;
 }
 
+DeckList::DeckList(const DeckList &other)
+    : metadata(other.metadata), sideboardPlans(other.sideboardPlans), root(new InnerDecklistNode(other.getRoot())),
+      cachedDeckHash(other.cachedDeckHash)
+{
+}
+
 DeckList::DeckList(const QString &nativeString)
 {
     root = new InnerDecklistNode;
@@ -443,11 +449,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
             cardName.replace(diff.key(), diff.value());
         }
 
-        // Resolve complete card name, this function does nothing if the name is not found
-        cardName = getCompleteCardName(cardName);
-
         // Determine the zone (mainboard/sideboard)
-        QString zoneName = getCardZoneFromName(cardName, sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
+        QString zoneName = sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
         // make new entry in decklist
         new DecklistCardNode(cardName, amount, getZoneObjFromName(zoneName), -1, setCode, collectorNumber);
@@ -708,12 +711,11 @@ QString DeckList::getDeckHash() const
 }
 
 /**
- * Invalidates the cached deckHash and emits the deckHashChanged signal.
+ * Invalidates the cached deckHash.
  */
 void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
-    emit deckHashChanged();
 }
 
 /**
