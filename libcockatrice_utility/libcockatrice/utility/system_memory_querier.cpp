@@ -6,6 +6,7 @@
 
 #ifdef Q_OS_LINUX
 #include <QFile>
+#include <QRegularExpression>
 #include <QTextStream>
 #endif
 
