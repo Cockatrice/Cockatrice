@@ -1,6 +1,7 @@
 #include "pages.h"
 
 #include "client/settings/cache_settings.h"
+#include "libcockatrice/utility/system_memory_querier.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
@@ -43,6 +44,7 @@
 #define MTGJSON_V4_URL_COMPONENT "mtgjson.com/files/"
 #define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/api/v5/AllPrintings.json"
 #define MTGJSON_VERSION_URL "https://www.mtgjson.com/api/v5/Meta.json"
+#define MTGXML_URL "https://github.com/ebbit1q/mtgxml/releases/latest/download/mtg.xml.xz"
 
 #ifdef HAS_LZMA
 #define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json.xz"
@@ -184,6 +186,23 @@ LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
 void LoadSetsPage::initializePage()
 {
     urlLineEdit->setText(wizard()->settings->value("allsetsurl", ALLSETS_URL).toString());
+
+    // Memory check because Oracle parsing fails on systems with less than 4GiB for MTGJsons allPrintings.json
+    if (!SystemMemoryQuerier::hasAtLeastGiB(33)) {
+        // Ask user whether to switch URL
+        QMessageBox msgBox(
+            QMessageBox::Question, tr("Low Memory Detected"),
+            tr("Your system has less than 4 GiB of memory.\n"
+               "Using the default AllPrintings URL may cause high memory usage and is known to fail as a result.\n\n"
+               "Would you like to switch to the direct-download pre-parsed URL instead? (Updated daily)"),
+            QMessageBox::Yes | QMessageBox::No, this);
+
+        msgBox.setDefaultButton(QMessageBox::Yes);
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            urlLineEdit->setText(MTGXML_URL);
+        }
+    }
 
     progressLabel->hide();
     progressBar->hide();
