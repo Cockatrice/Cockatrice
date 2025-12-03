@@ -145,31 +145,49 @@ void DlgSelectSetForCards::retranslateUi()
 void DlgSelectSetForCards::actOK()
 {
     QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
+
+    if (modifiedSetsAndCardsMap.isEmpty()) {
+        accept(); // Nothing to do
+    } else {
+        emit deckAboutToBeModified(tr("Bulk modified printings."));
+    }
+
     for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
         for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
             QModelIndex find_card = model->findCard(card, DECK_ZONE_MAIN);
             if (!find_card.isValid()) {
                 continue;
             }
+            int amount =
+                model->data(find_card.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
             model->removeRow(find_card.row(), find_card.parent());
             CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(card);
             PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(card, modifiedSet, "");
-            model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
+            for (int i = 0; i < amount; i++) {
+                model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
+            }
         }
+    }
+    if (!modifiedSetsAndCardsMap.isEmpty()) {
+        emit deckModified();
     }
     accept();
 }
 
 void DlgSelectSetForCards::actClear()
 {
+    emit deckAboutToBeModified(tr("Cleared all printing information."));
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
+    emit deckModified();
     accept();
 }
 
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
+    emit deckAboutToBeModified(tr("Set all printings to preferred."));
     DeckLoader::clearSetNamesAndNumbers(model->getDeckList());
     DeckLoader::setProviderIdToPreferredPrinting(model->getDeckList());
+    emit deckModified();
     accept();
 }
 

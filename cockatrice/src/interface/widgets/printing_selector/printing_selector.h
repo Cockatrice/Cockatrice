@@ -40,6 +40,11 @@ public:
         return deckModel;
     }
 
+    [[nodiscard]] AbstractTabDeckEditor *getDeckEditor() const
+    {
+        return deckEditor;
+    }
+
 public slots:
     void retranslateUi();
     void updateDisplay();
