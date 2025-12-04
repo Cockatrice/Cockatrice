@@ -168,9 +168,9 @@ signals:
     void showWindowIfHidden();
 
 public slots:
-    void openDeckInNewTab(DeckLoader *deckToOpen);
-    TabDeckEditor *addDeckEditorTab(DeckLoader *deckToOpen);
-    TabDeckEditorVisual *addVisualDeckEditorTab(DeckLoader *deckToOpen);
+    void openDeckInNewTab(const LoadedDeck &deckToOpen);
+    TabDeckEditor *addDeckEditorTab(const LoadedDeck &deckToOpen);
+    TabDeckEditorVisual *addVisualDeckEditorTab(const LoadedDeck &deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRecMain *addEdhrecMainTab();
     TabArchidekt *addArchidektTab();

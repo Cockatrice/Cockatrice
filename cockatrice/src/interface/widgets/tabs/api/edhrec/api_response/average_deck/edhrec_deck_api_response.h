@@ -21,7 +21,7 @@ public:
     // Debug method for logging
     void debugPrint() const;
 
-    DeckLoader *deckLoader;
+    DeckList deck;
 };
 
 #endif // EDHREC_DECK_API_RESPONSE_H

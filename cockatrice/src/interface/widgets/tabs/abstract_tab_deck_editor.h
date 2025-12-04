@@ -114,9 +114,9 @@ public:
     virtual void retranslateUi() override = 0;
 
     /** @brief Opens a deck in this tab.
-     *  @param deck Pointer to a DeckLoader object.
+     *  @param deck The deck to open
      */
-    void openDeck(DeckLoader *deck);
+    void openDeck(const LoadedDeck &deck);
 
     /** @brief Returns the currently active deck loader. */
     DeckLoader *getDeckLoader() const;
@@ -198,7 +198,7 @@ public slots:
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
-    void openDeckEditor(DeckLoader *deckLoader);
+    void openDeckEditor(const LoadedDeck &deck);
 
     /** @brief Emitted before the tab is closed. */
     void deckEditorClosing(AbstractTabDeckEditor *tab);
@@ -286,7 +286,7 @@ private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
      */
-    virtual void setDeck(DeckLoader *_deck);
+    virtual void setDeck(const LoadedDeck &_deck);
 
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);

@@ -41,28 +41,16 @@ public:
     };
 
 private:
-    DeckList *deckList;
-    LoadedDeck::LoadInfo lastLoadInfo;
+    LoadedDeck loadedDeck;
 
 public:
     DeckLoader(QObject *parent);
-    DeckLoader(QObject *parent, DeckList *_deckList);
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const LoadedDeck::LoadInfo &getLastLoadInfo() const
-    {
-        return lastLoadInfo;
-    }
-
-    void setLastLoadInfo(const LoadedDeck::LoadInfo &info)
-    {
-        lastLoadInfo = info;
-    }
-
     [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastLoadInfo.isEmpty();
+        return loadedDeck.lastLoadInfo.isEmpty();
     }
 
     bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
@@ -88,9 +76,17 @@ public:
 
     bool convertToCockatriceFormat(QString fileName);
 
-    DeckList *getDeckList()
+    LoadedDeck &getDeck()
     {
-        return deckList;
+        return loadedDeck;
+    }
+    const LoadedDeck &getDeck() const
+    {
+        return loadedDeck;
+    }
+    void setDeck(const LoadedDeck &deck)
+    {
+        loadedDeck = deck;
     }
 
 private:

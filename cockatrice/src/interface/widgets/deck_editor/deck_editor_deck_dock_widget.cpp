@@ -56,7 +56,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckModel->setObjectName("deckModel");
     connect(deckModel, &DeckListModel::deckHashChanged, this, &DeckEditorDeckDockWidget::updateHash);
 
-    deckLoader = new DeckLoader(this, deckModel->getDeckList());
+    deckLoader = new DeckLoader(this);
 
     proxy = new DeckListStyleProxy(this);
     proxy->setSourceModel(deckModel);
@@ -347,7 +347,7 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
 void DeckEditorDeckDockWidget::updateName(const QString &name)
 {
     emit requestDeckHistorySave(
-        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeckList()->getName()));
+        QString(tr("Rename deck to \"%1\" from \"%2\"")).arg(name).arg(deckLoader->getDeck().deckList.getName()));
     deckModel->getDeckList()->setName(name);
     deckEditor->setModified(name.isEmpty());
     emit nameChanged();
@@ -357,7 +357,7 @@ void DeckEditorDeckDockWidget::updateName(const QString &name)
 void DeckEditorDeckDockWidget::updateComments()
 {
     emit requestDeckHistorySave(tr("Updated comments (was %1 chars, now %2 chars)")
-                                    .arg(deckLoader->getDeckList()->getComments().size())
+                                    .arg(deckLoader->getDeck().deckList.getComments().size())
                                     .arg(commentsEdit->toPlainText().size()));
 
     deckModel->getDeckList()->setComments(commentsEdit->toPlainText());
@@ -474,13 +474,12 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 
 /**
  * Sets the currently active deck for this tab
- * @param _deck The deck. Takes ownership of the object
+ * @param _deck The deck.
  */
-void DeckEditorDeckDockWidget::setDeck(DeckLoader *_deck)
+void DeckEditorDeckDockWidget::setDeck(const LoadedDeck &_deck)
 {
-    deckLoader = _deck;
-    deckLoader->setParent(this);
-    deckModel->setDeckList(deckLoader->getDeckList());
+    deckLoader->setDeck(_deck);
+    deckModel->setDeckList(&deckLoader->getDeck().deckList);
     connect(deckLoader, &DeckLoader::deckLoaded, deckModel, &DeckListModel::rebuildTree);
 
     emit requestDeckHistoryClear();

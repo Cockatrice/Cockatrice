@@ -245,7 +245,7 @@ void TabDeckStorage::actOpenLocalDeck()
         if (!deckLoader->loadFromFile(filePath, DeckFileFormat::Cockatrice, true))
             continue;
 
-        emit openDeckEditor(deckLoader);
+        emit openDeckEditor(deckLoader->getDeck());
     }
 }
 
@@ -307,13 +307,15 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
-    DeckLoader deck(this);
-    if (!deck.loadFromFile(filePath, DeckFileFormat::Cockatrice)) {
+    DeckLoader deckLoader(this);
+    if (!deckLoader.loadFromFile(filePath, DeckFileFormat::Cockatrice)) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
     }
 
-    if (deck.getDeckList()->getName().isEmpty()) {
+    DeckList deck = deckLoader.getDeck().deckList;
+
+    if (deck.getName().isEmpty()) {
         bool ok;
         QString deckName =
             getTextWithMax(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"),
@@ -322,12 +324,12 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
             return;
         if (deckName.isEmpty())
             deckName = tr("Unnamed deck");
-        deck.getDeckList()->setName(deckName);
+        deck.setName(deckName);
     } else {
-        deck.getDeckList()->setName(deck.getDeckList()->getName().left(MAX_NAME_LENGTH));
+        deck.setName(deck.getName().left(MAX_NAME_LENGTH));
     }
 
-    QString deckString = deck.getDeckList()->writeToString_Native();
+    QString deckString = deck.writeToString_Native();
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
@@ -436,7 +438,7 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandCont
     if (!loader.loadFromRemote(QString::fromStdString(resp.deck()), cmd.deck_id()))
         return;
 
-    emit openDeckEditor(&loader);
+    emit openDeckEditor(loader.getDeck());
 }
 
 void TabDeckStorage::actDownload()
@@ -492,8 +494,12 @@ void TabDeckStorage::downloadFinished(const Response &r,
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     QString filePath = extraData.toString();
 
-    DeckLoader deck(this, new DeckList(QString::fromStdString(resp.deck())));
-    deck.saveToFile(filePath, DeckFileFormat::Cockatrice);
+    DeckList deckList = DeckList(QString::fromStdString(resp.deck()));
+
+    DeckLoader deckLoader(this);
+    deckLoader.setDeck({deckList, {}});
+
+    deckLoader.saveToFile(filePath, DeckFileFormat::Cockatrice);
 }
 
 void TabDeckStorage::actNewFolder()

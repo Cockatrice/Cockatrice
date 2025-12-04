@@ -57,7 +57,7 @@ public:
 public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
-    void setDeck(DeckLoader *_deck);
+    void setDeck(const LoadedDeck &_deck);
     void syncDisplayWidgetsToModel();
     void sortDeckModelToDeckView();
     DeckLoader *getDeckLoader();

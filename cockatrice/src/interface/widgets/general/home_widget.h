@@ -40,10 +40,12 @@ private:
     TabSupervisor *tabSupervisor;
     QPixmap background;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
-    DeckLoader *backgroundSourceDeck;
+    DeckList backgroundSourceDeck;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
+
+    void loadBackgroundSourceDeck();
 };
 
 #endif // HOME_WIDGET_H

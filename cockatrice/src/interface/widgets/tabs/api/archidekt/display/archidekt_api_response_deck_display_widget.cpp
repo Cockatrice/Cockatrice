@@ -90,14 +90,14 @@ void ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange(const QString 
 
 void ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor()
 {
-    auto loader = new DeckLoader(this);
-    loader->getDeckList()->loadFromString_Native(model->getDeckList()->writeToString_Native());
-
-    loader->getDeckList()->setName(response.getDeckName());
-    loader->getDeckList()->setGameFormat(
+    DeckList deckList(*model->getDeckList());
+    deckList.setName(response.getDeckName());
+    deckList.setGameFormat(
         ArchidektFormats::formatToCockatriceName(ArchidektFormats::DeckFormat(response.getDeckFormat() - 1)));
 
-    emit openInDeckEditor(loader);
+    LoadedDeck loadedDeck = {deckList, {}};
+
+    emit openInDeckEditor(loadedDeck);
 }
 
 void ArchidektApiResponseDeckDisplayWidget::clearAllDisplayWidgets()

@@ -213,22 +213,22 @@ void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zo
 
 /**
  * @brief Opens a deck in this tab.
- * @param deck DeckLoader object (takes ownership).
+ * @param deck The deck
  */
-void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
+void AbstractTabDeckEditor::openDeck(const LoadedDeck &deck)
 {
     setDeck(deck);
 
-    if (!deck->getLastLoadInfo().fileName.isEmpty()) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastLoadInfo().fileName);
+    if (!deck.lastLoadInfo.fileName.isEmpty()) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck.lastLoadInfo.fileName);
     }
 }
 
 /**
  * @brief Sets the currently active deck.
- * @param _deck DeckLoader object.
+ * @param _deck The deck
  */
-void AbstractTabDeckEditor::setDeck(DeckLoader *_deck)
+void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 {
     deckDockWidget->setDeck(_deck);
     CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
@@ -265,8 +265,8 @@ void AbstractTabDeckEditor::setModified(bool _modified)
  */
 bool AbstractTabDeckEditor::isBlankNewDeck() const
 {
-    DeckLoader *deck = deckDockWidget->getDeckLoader();
-    return !modified && deck->getDeckList()->isBlankDeck() && deck->hasNotBeenLoaded();
+    const LoadedDeck &loadedDeck = deckDockWidget->getDeckLoader()->getDeck();
+    return !modified && loadedDeck.isEmpty();
 }
 
 /** @brief Creates a new deck. Handles opening in new tab if needed. */
@@ -277,7 +277,7 @@ void AbstractTabDeckEditor::actNewDeck()
         return;
 
     if (deckOpenLocation == NEW_TAB) {
-        emit openDeckEditor(nullptr);
+        emit openDeckEditor(LoadedDeck());
         return;
     }
 
@@ -382,17 +382,15 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 {
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
-    auto *l = new DeckLoader(this);
-    if (l->loadFromFile(fileName, fmt, true)) {
+    auto l = DeckLoader(this);
+    if (l.loadFromFile(fileName, fmt, true)) {
         if (deckOpenLocation == NEW_TAB) {
-            emit openDeckEditor(l);
-            l->deleteLater();
+            emit openDeckEditor(l.getDeck());
         } else {
             deckMenu->setSaveStatus(false);
-            openDeck(l);
+            openDeck(l.getDeck());
         }
     } else {
-        l->deleteLater();
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
     }
     deckMenu->setSaveStatus(true);
@@ -405,16 +403,16 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
  */
 bool AbstractTabDeckEditor::actSaveDeck()
 {
-    DeckLoader *const deck = getDeckLoader();
-    if (deck->getLastLoadInfo().remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
-        QString deckString = deck->getDeckList()->writeToString_Native();
+    const LoadedDeck &loadedDeck = getDeckLoader()->getDeck();
+    if (loadedDeck.lastLoadInfo.remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
+        QString deckString = loadedDeck.deckList.writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
             return false;
         }
 
         Command_DeckUpload cmd;
-        cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastLoadInfo().remoteDeckId));
+        cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
@@ -422,9 +420,11 @@ bool AbstractTabDeckEditor::actSaveDeck()
         tabSupervisor->getClient()->sendCommand(pend);
 
         return true;
-    } else if (deck->getLastLoadInfo().fileName.isEmpty())
+    }
+    if (loadedDeck.lastLoadInfo.fileName.isEmpty())
         return actSaveDeckAs();
-    else if (deck->saveToFile(deck->getLastLoadInfo().fileName, deck->getLastLoadInfo().fileFormat)) {
+
+    if (getDeckLoader()->saveToFile(loadedDeck.lastLoadInfo.fileName, loadedDeck.lastLoadInfo.fileFormat)) {
         setModified(false);
         return true;
     }
@@ -493,9 +493,9 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
         return;
 
     if (deckOpenLocation == NEW_TAB) {
-        emit openDeckEditor(dlg.getDeckList());
+        emit openDeckEditor({.deckList = dlg.getDeckList()});
     } else {
-        setDeck(dlg.getDeckList());
+        setDeck({.deckList = dlg.getDeckList()});
         setModified(true);
     }
 
@@ -508,11 +508,11 @@ void AbstractTabDeckEditor::actLoadDeckFromClipboard()
  */
 void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
-    DlgEditDeckInClipboard dlg(getDeckLoader(), annotated, this);
+    DlgEditDeckInClipboard dlg(getDeckLoader()->getDeck().deckList, annotated, this);
     if (!dlg.exec())
         return;
 
-    setDeck(dlg.getDeckList());
+    setDeck({dlg.getDeckList(), getDeckLoader()->getDeck().lastLoadInfo});
     setModified(true);
     deckMenu->setSaveStatus(true);
 }
@@ -576,9 +576,9 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
         return;
 
     if (deckOpenLocation == NEW_TAB) {
-        emit openDeckEditor(dlg.getDeck());
+        emit openDeckEditor({.deckList = dlg.getDeck()});
     } else {
-        setDeck(dlg.getDeck());
+        setDeck({.deckList = dlg.getDeck()});
         setModified(true);
     }
 
@@ -591,8 +591,8 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
  */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    if (DeckLoader *const deck = getDeckLoader()) {
-        QString decklistUrlString = deck->exportDeckToDecklist(getDeckList(), website);
+    if (DeckList *deckList = getDeckList()) {
+        QString decklistUrlString = DeckLoader::exportDeckToDecklist(deckList, website);
         // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {
             // Show an error if the deck is empty, and return.

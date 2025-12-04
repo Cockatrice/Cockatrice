@@ -26,9 +26,9 @@ public:
     explicit DlgLoadDeckFromWebsite(QWidget *parent);
     void retranslateUi();
     bool testValidUrl();
-    DeckLoader *deck;
+    DeckList deck;
 
-    DeckLoader *getDeck()
+    const DeckList &getDeck() const
     {
         return deck;
     }

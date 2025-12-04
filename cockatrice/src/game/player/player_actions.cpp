@@ -218,7 +218,7 @@ void PlayerActions::actAlwaysLookAtTopCard()
 
 void PlayerActions::actOpenDeckInDeckEditor()
 {
-    emit player->openDeckEditor(player->getDeck());
+    emit player->openDeckEditor({.deckList = player->getDeck()});
 }
 
 void PlayerActions::actViewGraveyard()

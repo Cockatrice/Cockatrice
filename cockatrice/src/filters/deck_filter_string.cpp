@@ -119,7 +119,7 @@ static void setupParserRules()
 
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
-            auto cardNodes = deck->deckLoader->getDeckList()->getCardNodes();
+            auto cardNodes = deck->deckLoader->getDeck().deckList.getCardNodes();
             for (auto node : cardNodes) {
                 auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
@@ -139,7 +139,7 @@ static void setupParserRules()
     search["DeckNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
-            return deck->deckLoader->getDeckList()->getName().contains(name, Qt::CaseInsensitive);
+            return deck->deckLoader->getDeck().deckList.getName().contains(name, Qt::CaseInsensitive);
         };
     };
 
@@ -161,7 +161,7 @@ static void setupParserRules()
     search["FormatQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         auto format = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
-            auto gameFormat = deck->deckLoader->getDeckList()->getGameFormat();
+            auto gameFormat = deck->deckLoader->getDeck().deckList.getGameFormat();
             return QString::compare(format, gameFormat, Qt::CaseInsensitive) == 0;
         };
     };

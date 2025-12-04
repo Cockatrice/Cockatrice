@@ -269,12 +269,12 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
         return;
     }
 
-    loadDeckFromDeckLoader(&deck);
+    loadDeckFromDeckList(deck.getDeck().deckList);
 }
 
-void DeckViewContainer::loadDeckFromDeckLoader(DeckLoader *deck)
+void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
 {
-    QString deckString = deck->getDeckList()->writeToString_Native();
+    QString deckString = deck.writeToString_Native();
 
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));
@@ -308,8 +308,8 @@ void DeckViewContainer::loadFromClipboard()
         return;
     }
 
-    DeckLoader *deck = dlg.getDeckList();
-    loadDeckFromDeckLoader(deck);
+    DeckList deck = dlg.getDeckList();
+    loadDeckFromDeckList(deck);
 }
 
 void DeckViewContainer::loadFromWebsite()
@@ -320,16 +320,15 @@ void DeckViewContainer::loadFromWebsite()
         return;
     }
 
-    DeckLoader *deck = dlg.getDeck();
-    loadDeckFromDeckLoader(deck);
+    DeckList deck = dlg.getDeck();
+    loadDeckFromDeckList(deck);
 }
 
 void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
-    DeckLoader newDeck(this, new DeckList(QString::fromStdString(resp.deck())));
-    CardPictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::query()->getCards(newDeck.getDeckList()->getCardRefList()));
+    DeckList newDeck = DeckList(QString::fromStdString(resp.deck()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }
@@ -410,8 +409,8 @@ void DeckViewContainer::setSideboardLocked(bool locked)
         deckView->resetSideboardPlan();
 }
 
-void DeckViewContainer::setDeck(DeckLoader &deck)
+void DeckViewContainer::setDeck(const DeckList &deck)
 {
-    deckView->setDeck(*deck.getDeckList());
+    deckView->setDeck(deck);
     switchToDeckLoadedView();
 }

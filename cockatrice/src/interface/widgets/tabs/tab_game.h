@@ -45,7 +45,6 @@ class ReplayTimelineWidget;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
-class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;
 class GameReplay;
@@ -119,7 +118,7 @@ signals:
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
     void openMessageDialog(const QString &userName, bool focus);
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
     void notIdle();
 
     void phaseChanged(int phase);
