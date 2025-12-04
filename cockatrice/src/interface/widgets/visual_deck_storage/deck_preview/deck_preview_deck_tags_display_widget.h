@@ -27,5 +27,8 @@ public:
 
 public slots:
     void openTagEditDlg();
+
+private:
+    bool promptFileConversionIfRequired(DeckPreviewWidget *deckPreviewWidget);
 };
 #endif // DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
