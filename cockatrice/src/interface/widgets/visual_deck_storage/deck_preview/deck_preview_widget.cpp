@@ -83,7 +83,8 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     setFilePath(deckLoader->getLastLoadInfo().fileName);
 
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeckList());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeckList()->getTags());
+    connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, this, &DeckPreviewWidget::setTags);
 
     bannerCardLabel = new QLabel(this);
     bannerCardLabel->setObjectName("bannerCardLabel");
@@ -305,6 +306,12 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
     Q_UNUSED(event);
     Q_UNUSED(instance);
     emit deckLoadRequested(filePath);
+}
+
+void DeckPreviewWidget::setTags(const QStringList &tags)
+{
+    deckLoader->getDeckList()->setTags(tags);
+    deckLoader->saveToFile(filePath, DeckLoader::CockatriceFormat);
 }
 
 QMenu *DeckPreviewWidget::createRightClickMenu()
