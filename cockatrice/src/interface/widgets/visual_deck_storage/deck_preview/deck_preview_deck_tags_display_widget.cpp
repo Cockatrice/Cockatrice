@@ -71,7 +71,7 @@ static QStringList getAllFiles(const QString &filePath)
     return allFiles;
 }
 
-bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
+static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
