@@ -154,8 +154,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
             &DeckEditorDeckDockWidget::setBannerCard);
     bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
 
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckModel->getDeckList()->getTags());
     deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
+    connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, this,
+            &DeckEditorDeckDockWidget::setTags);
 
     activeGroupCriteriaLabel = new QLabel(this);
 
@@ -383,6 +385,13 @@ void DeckEditorDeckDockWidget::setBannerCard(int /* changedIndex */)
     emit deckModified();
 }
 
+void DeckEditorDeckDockWidget::setTags(const QStringList &tags)
+{
+    deckModel->getDeckList()->setTags(tags);
+    deckEditor->setModified(true);
+    emit deckModified();
+}
+
 void DeckEditorDeckDockWidget::syncDeckListBannerCardWithComboBox()
 {
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
@@ -451,7 +460,7 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     sortDeckModelToDeckView();
     expandAll();
 
-    deckTagsDisplayWidget->setDeckList(deckModel->getDeckList());
+    deckTagsDisplayWidget->setTags(deckModel->getDeckList()->getTags());
 }
 
 void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
@@ -484,7 +493,7 @@ void DeckEditorDeckDockWidget::cleanDeck()
     emit deckModified();
     emit deckChanged();
     updateBannerCardComboBox();
-    deckTagsDisplayWidget->setDeckList(deckModel->getDeckList());
+    deckTagsDisplayWidget->setTags(deckModel->getDeckList()->getTags());
 }
 
 void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)

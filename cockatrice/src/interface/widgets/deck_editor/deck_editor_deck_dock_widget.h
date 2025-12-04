@@ -112,6 +112,7 @@ private slots:
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);
+    void setTags(const QStringList &tags);
     void syncDeckListBannerCardWithComboBox();
     void updateHash();
     void refreshShortcuts();

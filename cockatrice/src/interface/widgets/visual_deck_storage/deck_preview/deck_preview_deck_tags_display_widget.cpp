@@ -13,8 +13,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 
-DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
-    : QWidget(_parent), deckList(nullptr)
+DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags)
+    : QWidget(_parent), currentTags(_tags)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -27,16 +27,14 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
-    if (_deckList) {
-        setDeckList(_deckList);
-    }
-
     layout->addWidget(flowWidget);
+
+    refreshTags();
 }
 
-void DeckPreviewDeckTagsDisplayWidget::setDeckList(DeckList *_deckList)
+void DeckPreviewDeckTagsDisplayWidget::setTags(const QStringList &_tags)
 {
-    deckList = _deckList;
+    currentTags = _tags;
     refreshTags();
 }
 
@@ -44,7 +42,7 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
 {
     flowWidget->clearLayout();
 
-    for (const QString &tag : deckList->getTags()) {
+    for (const QString &tag : currentTags) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
 
@@ -93,46 +91,19 @@ static QStringList findAllKnownTags()
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
     if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
+        // If we're the child of a DeckPreviewWidget, then we need to handle conversion
         auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(parentWidget());
 
         bool canAddTags = promptFileConversionIfRequired(deckPreviewWidget);
 
         if (canAddTags) {
             QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
-            QStringList activeTags = deckList->getTags();
-
-            DeckPreviewTagDialog dialog(knownTags, activeTags);
-            if (dialog.exec() == QDialog::Accepted) {
-                QStringList updatedTags = dialog.getActiveTags();
-                deckList->setTags(updatedTags);
-                deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
-                refreshTags();
-            }
+            execTagDialog(knownTags);
         }
-    } else if (parentWidget()) {
-        // If we're the child of an AbstractTabDeckEditor, we are buried under a ton of childWidgets in the
-        // DeckInfoDock.
-        QWidget *currentParent = parentWidget();
-        while (currentParent) {
-            if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
-                break;
-            }
-            currentParent = currentParent->parentWidget();
-        }
-        if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
-            auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
-
-            QStringList knownTags = findAllKnownTags();
-            QStringList activeTags = deckList->getTags();
-
-            DeckPreviewTagDialog dialog(knownTags, activeTags);
-            if (dialog.exec() == QDialog::Accepted) {
-                QStringList updatedTags = dialog.getActiveTags();
-                deckList->setTags(updatedTags);
-                deckEditor->setModified(true);
-                refreshTags();
-            }
-        }
+    } else {
+        // If we're the child of an AbstractTabDeckEditor, then we don't bother with conversion
+        QStringList knownTags = findAllKnownTags();
+        execTagDialog(knownTags);
     }
 }
 
@@ -205,4 +176,16 @@ bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPrevie
     }
 
     return true;
+}
+
+void DeckPreviewDeckTagsDisplayWidget::execTagDialog(const QStringList &knownTags)
+{
+    DeckPreviewTagDialog dialog(knownTags, currentTags);
+    if (dialog.exec() == QDialog::Accepted) {
+        QStringList updatedTags = dialog.getActiveTags();
+        if (updatedTags != currentTags) {
+            setTags(updatedTags);
+            emit tagsChanged(updatedTags);
+        }
+    }
 }
