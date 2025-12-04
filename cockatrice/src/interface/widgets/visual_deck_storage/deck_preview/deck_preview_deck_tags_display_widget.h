@@ -12,21 +12,23 @@
 
 #include <QWidget>
 
-inline bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath);
-
 class DeckPreviewWidget;
 class DeckPreviewDeckTagsDisplayWidget : public QWidget
 {
     Q_OBJECT
 
+    DeckList *deckList;
+    FlowWidget *flowWidget;
+
 public:
     explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList);
     void setDeckList(DeckList *_deckList);
     void refreshTags();
-    DeckList *deckList;
-    FlowWidget *flowWidget;
 
 public slots:
     void openTagEditDlg();
+
+private:
+    bool promptFileConversionIfRequired(DeckPreviewWidget *deckPreviewWidget);
 };
 #endif // DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H

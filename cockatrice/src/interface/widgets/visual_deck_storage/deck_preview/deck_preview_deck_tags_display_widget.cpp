@@ -71,74 +71,36 @@ static QStringList getAllFiles(const QString &filePath)
     return allFiles;
 }
 
-bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
+/**
+ * Gets all tags that appear in the deck folder
+ */
+static QStringList findAllKnownTags()
 {
-    QFileInfo fileInfo(filePath);
-    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
+    QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
 
-    if (QFile::exists(newFileName)) {
-        QMessageBox::StandardButton reply =
-            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
-                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
-                                  QMessageBox::Yes | QMessageBox::No);
-        return reply == QMessageBox::Yes;
+    QStringList knownTags;
+    auto loader = DeckLoader(nullptr);
+    for (const QString &file : allFiles) {
+        loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
+        QStringList tags = loader.getDeckList()->getTags();
+        knownTags.append(tags);
+        knownTags.removeDuplicates();
     }
-    return true; // Safe to proceed
+
+    return knownTags;
 }
 
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
     if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
         auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(parentWidget());
-        QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
-        QStringList activeTags = deckList->getTags();
 
-        bool canAddTags = true;
-
-        if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) != DeckLoader::CockatriceFormat) {
-            canAddTags = false;
-            // Retrieve saved preference if the prompt is disabled
-            if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
-                if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
-
-                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
-                        return;
-
-                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
-                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastLoadInfo().fileName;
-                    deckPreviewWidget->refreshBannerCardText();
-                    canAddTags = true;
-                }
-            } else {
-                // Show the dialog to the user
-                DialogConvertDeckToCodFormat conversionDialog(parentWidget());
-                if (conversionDialog.exec() == QDialog::Accepted) {
-
-                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
-                        return;
-
-                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
-                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastLoadInfo().fileName;
-                    deckPreviewWidget->refreshBannerCardText();
-                    canAddTags = true;
-
-                    if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
-                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
-                    }
-                } else {
-                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
-
-                    if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
-                    } else {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(true);
-                    }
-                }
-            }
-        }
+        bool canAddTags = promptFileConversionIfRequired(deckPreviewWidget);
 
         if (canAddTags) {
+            QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
+            QStringList activeTags = deckList->getTags();
+
             DeckPreviewTagDialog dialog(knownTags, activeTags);
             if (dialog.exec() == QDialog::Accepted) {
                 QStringList updatedTags = dialog.getActiveTags();
@@ -159,16 +121,8 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
         }
         if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
             auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
-            QStringList knownTags;
-            QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
-            DeckLoader loader(this);
-            for (const QString &file : allFiles) {
-                loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
-                QStringList tags = loader.getDeckList()->getTags();
-                knownTags.append(tags);
-                knownTags.removeDuplicates();
-            }
 
+            QStringList knownTags = findAllKnownTags();
             QStringList activeTags = deckList->getTags();
 
             DeckPreviewTagDialog dialog(knownTags, activeTags);
@@ -180,4 +134,75 @@ void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
             }
         }
     }
+}
+
+static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
+{
+    QFileInfo fileInfo(filePath);
+    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
+
+    if (QFile::exists(newFileName)) {
+        QMessageBox::StandardButton reply =
+            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
+                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
+                                  QMessageBox::Yes | QMessageBox::No);
+        return reply == QMessageBox::Yes;
+    }
+    return true; // Safe to proceed
+}
+
+static void convertFileToCockatriceFormat(DeckPreviewWidget *deckPreviewWidget)
+{
+    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
+    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastLoadInfo().fileName;
+    deckPreviewWidget->refreshBannerCardText();
+}
+
+/**
+ * Checks if the deck's file format supports tags.
+ * If not, then prompt the user for file conversion.
+ * @return whether the resulting file can support adding tags
+ */
+bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPreviewWidget *deckPreviewWidget)
+{
+    if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) == DeckLoader::CockatriceFormat) {
+        return true;
+    }
+
+    // Retrieve saved preference if the prompt is disabled
+    if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+        if (!SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+            return false;
+        }
+
+        if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath)) {
+            return false;
+        }
+
+        convertFileToCockatriceFormat(deckPreviewWidget);
+        return true;
+    }
+
+    // Show the dialog to the user
+    DialogConvertDeckToCodFormat conversionDialog(parentWidget());
+    if (conversionDialog.exec() != QDialog::Accepted) {
+        SettingsCache::instance().setVisualDeckStoragePromptForConversion(!conversionDialog.dontAskAgain());
+        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
+
+        return false;
+    }
+
+    // Try to convert file
+    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath)) {
+        return false;
+    }
+
+    convertFileToCockatriceFormat(deckPreviewWidget);
+
+    if (conversionDialog.dontAskAgain()) {
+        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
+        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
+    }
+
+    return true;
 }
