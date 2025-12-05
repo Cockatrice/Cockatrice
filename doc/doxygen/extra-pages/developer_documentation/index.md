@@ -1,5 +1,7 @@
 @page developer_reference Developer Reference
 
+- @subpage logging
+
 - @subpage primer_cards
 
 - @subpage card_database_schema_and_parsing
