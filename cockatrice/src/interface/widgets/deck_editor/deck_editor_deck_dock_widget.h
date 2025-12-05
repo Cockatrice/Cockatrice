@@ -70,6 +70,8 @@ public slots:
     void actRemoveCard();
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void expandAll();
+    void setCurrentProxyIndex(const QModelIndex &index);
+    void scrollToProxyIndex(const QModelIndex &index);
 
 signals:
     void nameChanged();
