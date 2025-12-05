@@ -23,14 +23,16 @@ For more information, see [Logging Setup](#logging-setup).
 
 # Log Level and Categories
 
-The default log level for the application is info.
+\note The default log level for the application is info.
 
 This means that you should only use qInfo() in production-level code if you are truly sure that this message is
 beneficial to end-users and other developers. As a general rule, if your functionality logs to info more than twice in
 response to a user interaction, you are advised to consider moving some of these logs down to the debug level.
 
-Furthermore, you are strongly advised to avoid the use of the generic logging macros (e.g. qDebug(), qInfo(), qWarn()).
-You should instead use the corresponding category logging macors (qCDebug(), qCInfo(), qCWarn()) and define logging
+\warning You are strongly advised to avoid the use of the generic logging macros (e.g. qDebug(), qInfo(), qWarn()).
+
+\note You should instead use the corresponding category logging macros (qCDebug(), qCInfo(), qCWarn()) and define
+logging
 categories for your log statements.
 
 Example:
