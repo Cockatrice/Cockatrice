@@ -53,7 +53,7 @@ see [Logging Configuration](#logging-configuration).
 # Logging Configuration
 
 For configuring our logging, we use the qtlogging.ini, located under cockatrice/resources/config/qtlogging.ini, which is
-baked into the application in release version and set as the QT_LOGGING_CONF environment variable.
+baked into the application in release version and set as the QT_LOGGING_CONF environment variable in main.cpp.
 
 ```c++
 #ifdef Q_OS_APPLE
@@ -122,6 +122,24 @@ card_picture_loader.debug = true
 *.debug = false
 
 card_picture_loader.worker = true
+```
+
+```
+[Rules]
+# Turn off some noisy and irrelevant startup logging for local development
+*.debug = false
+
+qt_translator = false
+window_main.* = false
+release_channel = false
+spoiler_background_updater = false
+theme_manager = false
+sound_engine = false
+tapped_out_interface = false
+card_database = false
+card_database.loading = false
+card_database.loading.success_or_failure = true
+cockatrice_xml.* = false
 ```
 
 # Logging Setup
