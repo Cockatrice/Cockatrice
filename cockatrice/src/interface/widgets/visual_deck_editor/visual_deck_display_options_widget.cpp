@@ -1,6 +1,7 @@
 #include "visual_deck_display_options_widget.h"
 
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
+
 #include <libcockatrice/utility/qt_utils.h>
 
 VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)
