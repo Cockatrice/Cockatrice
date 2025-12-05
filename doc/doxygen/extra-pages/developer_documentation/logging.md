@@ -42,6 +42,7 @@ inline Q_LOGGING_CATEGORY(ExampleCategory, "cockatrice_example_category");
 inline Q_LOGGING_CATEGORY(ExampleSubCategory, "cockatrice_example_category.sub_category");
 
 in .cpp
+
 qCInfo(ExampleCategory) << "Info level logs are usually sent through the main category"
 qCDebug(ExampleSubCategory) << "Debug level logs are permitted their own category to allow selective silencing"
 ```
