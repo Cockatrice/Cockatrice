@@ -38,7 +38,7 @@ private:
     QLabel *gameChangerLabel;
     QLabel *budgetLabel;
 
-    QStringList gameChangerOptions = {"", "core", "upgraded", "optimized"};
+    QStringList gameChangerOptions = {"", "exhibition", "core", "upgraded", "optimized", "cedh"};
     QStringList budgetOptions = {"", "budget", "expensive"};
 
     QString selectedGameChanger;

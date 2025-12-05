@@ -1,0 +1,33 @@
+#ifndef COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
+#define COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
+
+#include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QWidget>
+
+class EdhrecCommanderApiResponseBracketNavigationWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit EdhrecCommanderApiResponseBracketNavigationWidget(QWidget *parent);
+    void retranslateUi();
+    void applyOptionsFromUrl(const QString &url);
+
+signals:
+    void requestUrl(QString url);
+
+private:
+    QGridLayout *layout;
+    QLabel *gameChangerLabel;
+
+    QStringList gameChangerOptions = {"", "exhibition", "core", "upgraded", "optimized", "cedh"};
+    QString selectedGameChanger;
+
+    QMap<QString, QPushButton *> gameChangerButtons;
+
+    void updateOptionButtonSelection(QMap<QString, QPushButton *> &buttons, const QString &selectedKey);
+    QString buildComboUrl() const;
+};
+
+#endif // COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
