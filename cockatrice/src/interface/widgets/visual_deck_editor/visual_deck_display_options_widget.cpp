@@ -2,7 +2,9 @@
 
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 
-VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent)
+#include <libcockatrice/utility/qt_utils.h>
+
+VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)
 {
     groupAndSortLayout = new QHBoxLayout(this);
     groupAndSortLayout->setAlignment(Qt::AlignLeft);
@@ -11,23 +13,19 @@ VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent)
     groupByLabel = new QLabel(this);
 
     groupByComboBox = new QComboBox(this);
-    if (auto visualDeckEditorWidget = qobject_cast<VisualDeckEditorWidget *>(parent)) {
-        if (auto tabWidget = qobject_cast<TabDeckEditorVisualTabWidget *>(visualDeckEditorWidget)) {
-            // Inside a central widget QWidget container inside TabDeckEditorVisual
-            if (auto tab = qobject_cast<TabDeckEditorVisual *>(tabWidget->parent()->parent())) {
-                auto originalBox = tab->getDeckDockWidget()->getGroupByComboBox();
-                groupByComboBox->setModel(originalBox->model());
-                groupByComboBox->setModelColumn(originalBox->modelColumn());
 
-                // Original -> clone
-                connect(originalBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                        [this](int index) { groupByComboBox->setCurrentIndex(index); });
+    if (auto tab = QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
+        auto originalBox = tab->getDeckDockWidget()->getGroupByComboBox();
+        groupByComboBox->setModel(originalBox->model());
+        groupByComboBox->setModelColumn(originalBox->modelColumn());
 
-                // Clone -> original
-                connect(groupByComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                        [originalBox](int index) { originalBox->setCurrentIndex(index); });
-            }
-        }
+        // Original -> clone
+        connect(originalBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [this](int index) { groupByComboBox->setCurrentIndex(index); });
+
+        // Clone -> original
+        connect(groupByComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [originalBox](int index) { originalBox->setCurrentIndex(index); });
     } else {
         groupByComboBox->addItem(
             tr(qPrintable(DeckListModelGroupCriteria::toString(DeckListModelGroupCriteria::MAIN_TYPE))),
