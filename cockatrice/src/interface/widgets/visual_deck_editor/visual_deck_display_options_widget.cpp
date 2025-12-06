@@ -121,3 +121,60 @@ void VisualDeckDisplayOptionsWidget::updateDisplayType()
     }
     emit displayTypeChanged(currentDisplayType);
 }
+
+TutorialSequence VisualDeckDisplayOptionsWidget::generateTutorialSequence(TutorialSequence sequence)
+{
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("You can change how the deck is displayed, grouped, and sorted here.");
+
+    sequence.addStep(introStep);
+
+    TutorialStep displayTypeStep;
+    displayTypeStep.targetWidget = displayTypeButton;
+    displayTypeStep.text =
+        tr("You can change the layout of the displayed cards by clicking on this button.\n\nThe overlap type will "
+           "stack cards on top of each other, leaving the top exposed for easy skimming.\nYou can always hover your "
+           "mouse over a card to display a zoomed version of it.\n\nThe flat layout will display cards next to each "
+           "other, without any overlap.\n\nLet's switch to flat now!");
+    displayTypeStep.allowClickThrough = true;
+    displayTypeStep.requiresInteraction = true;
+    displayTypeStep.validationTiming = ValidationTiming::OnSignal;
+    displayTypeStep.signalSource = displayTypeButton;
+    displayTypeStep.signalName = SIGNAL(clicked());
+    displayTypeStep.autoAdvanceOnValid = true;
+    displayTypeStep.validator = [] { return true; };
+
+    sequence.addStep(displayTypeStep);
+
+    TutorialStep groupStep;
+    groupStep.targetWidget = groupByComboBox;
+    groupStep.text = tr("You can change how cards are grouped here.\n\nLet's change cards to be grouped by 'Color'");
+    groupStep.allowClickThrough = true;
+    groupStep.requiresInteraction = true;
+    groupStep.validationTiming = ValidationTiming::OnChange;
+    groupStep.autoAdvanceOnValid = true;
+    groupStep.validator = [this]() { return groupByComboBox->currentIndex() == 2; };
+    groupStep.validationHint = tr("Select the 'Color' option");
+
+    sequence.addStep(groupStep);
+
+    TutorialStep sortStep;
+    sortStep.targetWidget = sortCriteriaButton;
+    sortStep.text =
+        tr("Let's check out sorting now. In the visual deck view, sort modifiers are hierarchical,\n meaning "
+           "that the cards will first be sorted using the top-most criteria\nand then, if cards are equal using this "
+           "criteria,\nthe next criteria in the list will be used as a tie-breaker.\n\n"
+           "Change the sorting to be based primarily on converted mana cost (cmc) by dragging it to the top.");
+    sortStep.allowClickThrough = true;
+    sortStep.requiresInteraction = true;
+    sortStep.autoAdvanceOnValid = true;
+    sortStep.validationTiming = ValidationTiming::OnSignal;
+    sortStep.signalSource = this;
+    sortStep.signalName = SIGNAL(sortCriteriaChanged(const QStringList &));
+    sortStep.validator = []() { return true; };
+
+    sequence.addStep(sortStep);
+
+    return sequence;
+}

@@ -5,6 +5,7 @@
 #include "../../window_main.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
+#include "tutorial/tutorial_controller.h"
 
 #include <QGroupBox>
 #include <QPainter>
@@ -13,6 +14,7 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
+#include <libcockatrice/utility/qt_utils.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
@@ -44,8 +46,43 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
+
+    auto mainWindow = QtUtils::findParentOfType<QMainWindow>(this);
+
+    if (mainWindow) {
+        tutorialController = new TutorialController(mainWindow);
+    } else {
+        tutorialController = new TutorialController(this);
+    }
+    auto sequence = TutorialSequence();
+    sequence.addStep({connectButton, "Connect to a server to play here!"});
+    auto vdeStep = TutorialStep(visualDeckEditorButton, "Create a new deck from cards in the database here!");
+    vdeStep.requiresInteraction = true;
+    vdeStep.allowClickThrough = true;
+    vdeStep.validationHint = "Open the deck editor to try it out!";
+    sequence.addStep(vdeStep);
+    sequence.addStep({visualDeckStorageButton, "Browse the decks in your local collection."});
+    sequence.addStep({visualDatabaseDisplayButton, "View the card database here."});
+    sequence.addStep(
+        {edhrecButton, "Browse EDHRec, an external service designed to provide card recommendations for decks."});
+    sequence.addStep({archidektButton, "Browse Archidekt, an external service that allows users to store "
+                                       "decklists and import them to your local collection."});
+    sequence.addStep({replaybutton, "View replays of your past games here."});
+    sequence.addStep({exitButton, "Exit the application."});
+    tutorialController->addSequence(sequence);
+
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
+}
+
+void HomeWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (!tutorialStarted) {
+        tutorialStarted = true;
+        // Start on next event loop iteration so everything is fully painted
+        QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
+    }
 }
 
 void HomeWidget::initializeBackgroundFromSource()
@@ -185,29 +222,29 @@ QGroupBox *HomeWidget::createButtons()
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
     boxLayout->addWidget(connectButton);
 
-    auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
+    visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->openDeckInNewTab(LoadedDeck()); });
     boxLayout->addWidget(visualDeckEditorButton);
-    auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
+    visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     boxLayout->addWidget(visualDeckStorageButton);
-    auto visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
+    visualDatabaseDisplayButton = new HomeStyledButton(tr("Browse Card Database"), gradientColors);
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     boxLayout->addWidget(visualDatabaseDisplayButton);
-    auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
+    edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
-    auto archidektButton = new HomeStyledButton(tr("Browse Archidekt"), gradientColors);
+    archidektButton = new HomeStyledButton(tr("Browse Archidekt"), gradientColors);
     connect(archidektButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addArchidektTab);
     boxLayout->addWidget(archidektButton);
-    auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
+    replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
     connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replaybutton);
     if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
-        auto exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
+        exitButton = new HomeStyledButton(tr("Quit"), gradientColors);
         connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
                 &MainWindow::actExit);
         boxLayout->addWidget(exitButton);
