@@ -58,6 +58,9 @@ class TabGame : public Tab
     Q_OBJECT
 private:
     AbstractGame *game;
+    TutorialController *tutorialController;
+    bool tutorialStarted = false;
+    bool tutorialInitialized = false;
     const UserListProxy *userListProxy;
     ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
@@ -127,6 +130,8 @@ private:
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
 signals:
+    void localPlayerDeckSelected();
+    void localPlayerReadyStateChanged(bool ready);
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
@@ -176,6 +181,8 @@ public:
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
+    void showEvent(QShowEvent *event);
+    void finishTutorialInitialization();
     void connectToGameState();
     void connectToPlayerManager();
     void connectToGameEventHandler();
