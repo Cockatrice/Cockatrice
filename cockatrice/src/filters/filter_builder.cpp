@@ -19,7 +19,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     for (int i = 0; i < CardFilter::TypeEnd; i++)
         typeCombo->addItem(CardFilter::typeName(static_cast<CardFilter::Type>(i)), QVariant(i));
 
-    QPushButton *ok = new QPushButton(QPixmap("theme:icons/increment"), QString());
+    auto *ok = new QPushButton(QPixmap("theme:icons/increment"), QString());
     ok->setObjectName("ok");
     ok->setMaximumSize(20, 20);
 
@@ -29,7 +29,7 @@ FilterBuilder::FilterBuilder(QWidget *parent) : QWidget(parent)
     edit->setClearButtonEnabled(true);
     edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    QGridLayout *layout = new QGridLayout;
+    auto *layout = new QGridLayout;
     layout->setObjectName("layout");
     layout->setContentsMargins(0, 0, 0, 0);
 

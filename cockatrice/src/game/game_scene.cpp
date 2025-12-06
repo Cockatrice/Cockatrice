@@ -363,7 +363,7 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
     qreal maxZ = -1;
 
     for (QGraphicsItem *item : items) {
-        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
         if (!card)
             continue;
 
@@ -403,7 +403,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
         }
     }
 
-    ZoneViewWidget *item =
+    auto *item =
         new ZoneViewWidget(player, player->getZones().value(zoneName), numberCards, false, false, {}, isReversed);
 
     zoneViews.append(item);
@@ -430,7 +430,7 @@ void GameScene::addRevealedZoneView(Player *player,
                                     const QList<const ServerInfo_Card *> &cardList,
                                     bool withWritePermission)
 {
-    ZoneViewWidget *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
+    auto *item = new ZoneViewWidget(player, zone, -2, true, withWritePermission, cardList);
     zoneViews.append(item);
     connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);

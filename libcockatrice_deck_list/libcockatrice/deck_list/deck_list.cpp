@@ -153,7 +153,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             InnerDecklistNode *newZone = getZoneObjFromName(xml->attributes().value("name").toString());
             newZone->readElement(xml);
         } else if (childName == "sideboard_plan") {
-            SideboardPlan *newSideboardPlan = new SideboardPlan;
+            auto *newSideboardPlan = new SideboardPlan;
             if (newSideboardPlan->readElement(xml)) {
                 sideboardPlans.insert(newSideboardPlan->getName(), newSideboardPlan);
             } else {
@@ -726,9 +726,9 @@ void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, Decklis
     // Support for this is only possible if the internal structure
     // doesn't get more complicated.
     for (int i = 0; i < root->size(); i++) {
-        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
         for (int j = 0; j < node->size(); j++) {
-            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
+            auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
             func(node, card);
         }
     }

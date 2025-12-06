@@ -151,7 +151,7 @@ void StableReleaseChannel::releaseListFinished()
     }
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    auto myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
     qCInfo(ReleaseChannelLog) << "Got reply from release server, name=" << lastRelease->getName()
@@ -188,7 +188,7 @@ void StableReleaseChannel::tagListFinished()
     qCInfo(ReleaseChannelLog) << "Got reply from tag server, commit=" << lastRelease->getCommitHash();
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    auto myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
     const bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
 
@@ -281,7 +281,7 @@ void BetaReleaseChannel::fileListFinished()
 
     QVariantList resultList = jsonResponse.toVariant().toList();
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
-    QString myHash = QString(VERSION_COMMIT);
+    auto myHash = QString(VERSION_COMMIT);
     qCInfo(ReleaseChannelLog) << "Current hash=" << myHash << "update hash=" << shortHash;
 
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);

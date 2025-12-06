@@ -118,7 +118,7 @@ QMimeData *SetsModel::mimeData(const QModelIndexList &indexes) const
     if (indexes.isEmpty())
         return 0;
 
-    SetsMimeData *result = new SetsMimeData(indexes[0].row());
+    auto *result = new SetsMimeData(indexes[0].row());
     return qobject_cast<QMimeData *>(result);
 }
 

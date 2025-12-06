@@ -119,7 +119,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
 void ZoneViewZone::reorganizeCards()
 {
     // filter cards
-    CardList cardsToDisplay = CardList(getLogic()->getCards().getContentsKnown());
+    auto cardsToDisplay = CardList(getLogic()->getCards().getContentsKnown());
     for (auto card : getLogic()->getCards()) {
         if (filterString.check(card->getCard().getCardPtr())) {
             card->show();

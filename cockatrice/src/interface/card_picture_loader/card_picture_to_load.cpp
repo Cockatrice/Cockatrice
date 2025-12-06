@@ -219,7 +219,7 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
 
     CardSetPtr set = getCurrentSet();
 
-    QMap<QString, QString> transformMap = QMap<QString, QString>();
+    auto transformMap = QMap<QString, QString>();
     QString setName = getSetName();
 
     // name

@@ -218,8 +218,8 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         CardZoneLogic *startZone = static_cast<CardItem *>(startItem)->getZone();
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
-        CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
-        CardItem *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
+        auto *startCard = qgraphicsitem_cast<CardItem *>(startItem);
+        auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
 
         Command_CreateArrow cmd;
         cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
@@ -233,7 +233,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             cmd.set_target_zone(targetZone->getName().toStdString());
             cmd.set_target_card_id(targetCard->getId());
         } else { // failed to cast target to card, this means it's a player
-            PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
+            auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
             cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
         }
 

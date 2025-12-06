@@ -283,18 +283,18 @@ void CardItem::drawArrow(const QColor &arrowColor)
         int currentPhase = game->getGameState()->getCurrentPhase();
         phase = Phases::getLastSubphase(currentPhase) + 1;
     }
-    ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
+    auto *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
     scene()->addItem(arrow);
     arrow->grabMouse();
 
     for (const auto &item : scene()->selectedItems()) {
-        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
         if (card == nullptr || card == this)
             continue;
         if (card->getZone() != zone)
             continue;
 
-        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor, phase);
+        auto *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor, phase);
         scene()->addItem(childArrow);
         arrow->addChildArrow(childArrow);
     }
@@ -310,13 +310,13 @@ void CardItem::drawAttachArrow()
     arrow->grabMouse();
 
     for (const auto &item : scene()->selectedItems()) {
-        CardItem *card = qgraphicsitem_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
         if (card == nullptr)
             continue;
         if (card->getZone() != zone)
             continue;
 
-        ArrowAttachItem *childArrow = new ArrowAttachItem(card);
+        auto *childArrow = new ArrowAttachItem(card);
         scene()->addItem(childArrow);
         arrow->addChildArrow(childArrow);
     }
@@ -342,7 +342,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
             2 * QApplication::startDragDistance())
             return;
-        if (const ZoneViewZoneLogic *view = qobject_cast<const ZoneViewZoneLogic *>(zone)) {
+        if (const auto *view = qobject_cast<const ZoneViewZoneLogic *>(zone)) {
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
         } else if (!owner->getPlayerInfo()->getLocalOrJudge())
@@ -357,7 +357,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         int childIndex = 0;
         for (const auto &item : scene()->selectedItems()) {
-            CardItem *card = static_cast<CardItem *>(item);
+            auto *card = static_cast<CardItem *>(item);
             if ((card == this) || (card->getZone() != zone))
                 continue;
             ++childIndex;
@@ -366,7 +366,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 childPos = card->pos() - pos();
             else
                 childPos = QPointF(childIndex * CARD_WIDTH / 2, 0);
-            CardDragItem *drag =
+            auto *drag =
                 new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);
             scene()->addItem(drag);
@@ -381,7 +381,7 @@ void CardItem::playCard(bool faceDown)
     if (!owner->getPlayerInfo()->getLocalOrJudge())
         return;
 
-    TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(zone);
+    auto *tz = qobject_cast<TableZoneLogic *>(zone);
     if (tz)
         emit tz->toggleTapped();
     else {

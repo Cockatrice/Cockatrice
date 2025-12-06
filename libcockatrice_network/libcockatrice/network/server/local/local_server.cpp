@@ -22,7 +22,7 @@ LocalServer::~LocalServer()
 
 LocalServerInterface *LocalServer::newConnection()
 {
-    LocalServerInterface *lsi = new LocalServerInterface(this, getDatabaseInterface());
+    auto *lsi = new LocalServerInterface(this, getDatabaseInterface());
     addClient(lsi);
     return lsi;
 }

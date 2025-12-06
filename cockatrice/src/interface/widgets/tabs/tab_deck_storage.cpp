@@ -52,7 +52,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     // Left side layout
     /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
      * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
-    QToolBar *dummyToolBar = new QToolBar(this);
+    auto *dummyToolBar = new QToolBar(this);
     QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
     dummyToolBar->setSizePolicy(sizePolicy);
@@ -62,16 +62,16 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     leftToolBar->setOrientation(Qt::Horizontal);
     leftToolBar->setIconSize(QSize(32, 32));
 
-    QToolBar *leftRightmostToolBar = new QToolBar(this);
+    auto *leftRightmostToolBar = new QToolBar(this);
     leftRightmostToolBar->setOrientation(Qt::Horizontal);
     leftRightmostToolBar->setIconSize(QSize(32, 32));
 
-    QGridLayout *leftToolBarLayout = new QGridLayout;
+    auto *leftToolBarLayout = new QGridLayout;
     leftToolBarLayout->addWidget(dummyToolBar, 0, 0, Qt::AlignLeft);
     leftToolBarLayout->addWidget(leftToolBar, 0, 1, Qt::AlignHCenter);
     leftToolBarLayout->addWidget(leftRightmostToolBar, 0, 2, Qt::AlignRight);
 
-    QVBoxLayout *leftVbox = new QVBoxLayout;
+    auto *leftVbox = new QVBoxLayout;
     leftVbox->addWidget(localDirView);
     leftVbox->addLayout(leftToolBarLayout);
     leftGroupBox = new QGroupBox;
@@ -81,7 +81,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     rightToolBar = new QToolBar;
     rightToolBar->setOrientation(Qt::Horizontal);
     rightToolBar->setIconSize(QSize(32, 32));
-    QHBoxLayout *rightToolBarLayout = new QHBoxLayout;
+    auto *rightToolBarLayout = new QHBoxLayout;
     rightToolBarLayout->addStretch();
     rightToolBarLayout->addWidget(rightToolBar);
     rightToolBarLayout->addStretch();
@@ -90,14 +90,14 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     connect(serverDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actRemoteDoubleClick);
 
-    QVBoxLayout *rightVbox = new QVBoxLayout;
+    auto *rightVbox = new QVBoxLayout;
     rightVbox->addWidget(serverDirView);
     rightVbox->addLayout(rightToolBarLayout);
     rightGroupBox = new QGroupBox;
     rightGroupBox->setLayout(rightVbox);
 
     // combine layouts
-    QHBoxLayout *hbox = new QHBoxLayout;
+    auto *hbox = new QHBoxLayout;
     hbox->addWidget(leftGroupBox);
     hbox->addWidget(rightGroupBox);
 
@@ -152,7 +152,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     retranslateUi();
 
-    QWidget *mainWidget = new QWidget(this);
+    auto *mainWidget = new QWidget(this);
     mainWidget->setLayout(hbox);
     setCentralWidget(mainWidget);
 
@@ -411,7 +411,7 @@ void TabDeckStorage::actRemoteDoubleClick(const QModelIndex &curRight)
 void TabDeckStorage::actOpenRemoteDeck()
 {
     for (const auto &curRight : serverDirView->getCurrentSelection()) {
-        RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
+        auto *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
         if (!node)
             continue;
 

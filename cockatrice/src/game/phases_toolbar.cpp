@@ -110,17 +110,17 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     auto *aDrawCard = new QAction(this);
     connect(aDrawCard, &QAction::triggered, this, &PhasesToolbar::actDrawCard);
 
-    PhaseButton *untapButton = new PhaseButton("untap", this, aUntapAll);
-    PhaseButton *upkeepButton = new PhaseButton("upkeep", this);
-    PhaseButton *drawButton = new PhaseButton("draw", this, aDrawCard);
-    PhaseButton *main1Button = new PhaseButton("main1", this);
-    PhaseButton *combatStartButton = new PhaseButton("combat_start", this);
-    PhaseButton *combatAttackersButton = new PhaseButton("combat_attackers", this);
-    PhaseButton *combatBlockersButton = new PhaseButton("combat_blockers", this);
-    PhaseButton *combatDamageButton = new PhaseButton("combat_damage", this);
-    PhaseButton *combatEndButton = new PhaseButton("combat_end", this);
-    PhaseButton *main2Button = new PhaseButton("main2", this);
-    PhaseButton *cleanupButton = new PhaseButton("cleanup", this);
+    auto *untapButton = new PhaseButton("untap", this, aUntapAll);
+    auto *upkeepButton = new PhaseButton("upkeep", this);
+    auto *drawButton = new PhaseButton("draw", this, aDrawCard);
+    auto *main1Button = new PhaseButton("main1", this);
+    auto *combatStartButton = new PhaseButton("combat_start", this);
+    auto *combatAttackersButton = new PhaseButton("combat_attackers", this);
+    auto *combatBlockersButton = new PhaseButton("combat_blockers", this);
+    auto *combatDamageButton = new PhaseButton("combat_damage", this);
+    auto *combatEndButton = new PhaseButton("combat_end", this);
+    auto *main2Button = new PhaseButton("main2", this);
+    auto *cleanupButton = new PhaseButton("cleanup", this);
 
     buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton << combatAttackersButton
                << combatBlockersButton << combatDamageButton << combatEndButton << main2Button << cleanupButton;

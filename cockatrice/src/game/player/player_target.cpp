@@ -120,7 +120,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     painter->drawPixmap(translatedRect, cachedPixmap, cachedPixmap.rect());
     painter->restore();
 
-    QRectF nameRect = QRectF(0, boundingRect().height() - 20, 110, 20);
+    auto nameRect = QRectF(0, boundingRect().height() - 20, 110, 20);
     painter->fillRect(nameRect, QColor(0, 0, 0, 160));
     QRectF translatedNameRect = painter->combinedTransform().mapRect(nameRect);
 

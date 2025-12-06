@@ -290,7 +290,7 @@ void FlowLayout::layoutSingleColumn(const QVector<QLayoutItem *> &colItems, cons
             const QObjectList &children = widget->children();
             qCDebug(FlowLayoutLog) << "Child widgets:";
             for (QObject *child : children) {
-                if (QWidget *childWidget = qobject_cast<QWidget *>(child)) {
+                if (auto *childWidget = qobject_cast<QWidget *>(child)) {
                     qCDebug(FlowLayoutLog) << "  - Child widget class:" << childWidget->metaObject()->className();
                     qCDebug(FlowLayoutLog) << "    Size hint:" << childWidget->sizeHint();
                     qCDebug(FlowLayoutLog) << "    Maximum size:" << childWidget->maximumSize();

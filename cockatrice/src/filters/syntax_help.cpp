@@ -41,7 +41,7 @@ static QTextBrowser *createBrowser(const QString &helpFile)
     browser->setReadOnly(true);
     browser->setMinimumSize({500, 600});
 
-    QString sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
+    auto sheet = QString("a { text-decoration: underline; color: rgb(71,158,252) };");
     browser->document()->setDefaultStyleSheet(sheet);
     browser->setHtml(text);
 

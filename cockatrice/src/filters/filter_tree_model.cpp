@@ -216,7 +216,7 @@ bool FilterTreeModel::setData(const QModelIndex &index, const QVariant &value, i
     if (node == NULL || node == fTree)
         return false;
 
-    Qt::CheckState state = static_cast<Qt::CheckState>(value.toInt());
+    auto state = static_cast<Qt::CheckState>(value.toInt());
     if (state == Qt::Checked)
         node->enable();
     else
