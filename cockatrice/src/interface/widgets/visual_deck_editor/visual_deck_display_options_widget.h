@@ -88,6 +88,8 @@ public:
         return activeSortCriteria;
     }
 
+    TutorialSequence generateTutorialSequence(TutorialSequence sequence);
+
 private slots:
     /**
      * @brief Slot triggered whenever the sort list is reordered.
