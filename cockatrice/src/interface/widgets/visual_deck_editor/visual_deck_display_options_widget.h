@@ -96,6 +96,8 @@ public:
         return activeSortCriteria;
     }
 
+    TutorialSequence generateTutorialSequence(TutorialSequence sequence);
+
 protected:
     /** @brief Retranslates on QEvent::LanguageChange. */
     void changeEvent(QEvent *event) override;

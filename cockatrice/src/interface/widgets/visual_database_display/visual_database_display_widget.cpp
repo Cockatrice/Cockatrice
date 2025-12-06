@@ -7,7 +7,11 @@
 #include "../../pixel_map_generator.h"
 #include "../cards/card_size_widget.h"
 #include "../deck_editor/card_database_view.h"
+#include "../deck_editor/deck_state_manager.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../utility/custom_line_edit.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
@@ -21,7 +25,9 @@
 #include "libcockatrice/filters/filter_card.h"
 #include "libcockatrice/filters/filter_tree.h"
 #include "visual_database_display_color_filter_widget.h"
+#include "visual_database_display_filter_save_load_widget.h"
 #include "visual_database_display_filter_toolbar_widget.h"
+#include "visual_database_display_set_filter_widget.h"
 
 #include <QAction>
 #include <QIcon>
@@ -42,6 +48,7 @@
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
+#include <utility>
 
 class QMouseEvent;
 
@@ -180,6 +187,87 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     }
 
     retranslateUi();
+}
+
+TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
+{
+    auto sequence = TutorialSequence();
+    sequence.addStep({colorFilterWidget, "Filter the database by colors with these controls"});
+    TutorialStep displayModeStep;
+    displayModeStep.targetWidget = displayModeButton;
+    displayModeStep.text = tr("You can change back to the old table display-style with this button.");
+    displayModeStep.allowClickThrough = true;
+    sequence.addStep(displayModeStep);
+    sequence.addStep({filterContainer, "Use these controls for quick access to common filters."});
+
+    TutorialStep setFilterStep;
+    setFilterStep.targetWidget = filterContainer->getSetFilterWidget();
+    setFilterStep.text = tr("Let's try it out now by selecting a set filter!");
+    setFilterStep.allowClickThrough = true;
+    setFilterStep.requiresInteraction = true;
+    setFilterStep.autoAdvanceOnValid = true;
+    setFilterStep.validationTiming = ValidationTiming::OnSignal;
+    setFilterStep.signalSource = filterModel;
+    setFilterStep.signalName = SIGNAL(layoutChanged());
+    setFilterStep.validator = [] { return true; };
+    sequence.addStep(setFilterStep);
+
+    TutorialStep explorationStep;
+    explorationStep.targetWidget = this;
+    explorationStep.text = tr(
+        "Try it out!\n\nWe've cleared the previous deck. Add 5 different new cards to the deck by clicking on them!");
+    explorationStep.allowClickThrough = true;
+    explorationStep.requiresInteraction = true;
+    explorationStep.autoAdvanceOnValid = true;
+    explorationStep.validationTiming = ValidationTiming::OnSignal;
+    if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
+        explorationStep.onEnter = [this] {
+            QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->clearDeck();
+        };
+        explorationStep.signalSource =
+            QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->getModel();
+        explorationStep.signalName = SIGNAL(cardNodesChanged());
+        explorationStep.validator = [this] {
+            if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
+                return QtUtils::findParentOfType<TabDeckEditorVisual>(this)
+                           ->deckStateManager->getModel()
+                           ->getDeckList()
+                           ->getCardList()
+                           .size() >= 5;
+            }
+            return true;
+        };
+    }
+
+    sequence.addStep(explorationStep);
+
+    TutorialStep conclusionStep;
+    conclusionStep.targetWidget = this;
+    conclusionStep.text = tr(
+        "Great!\n\nLet's look at them in the deck view before we conclude this tutorial with the analytics widgets.");
+    conclusionStep.onExit = [this]() {
+        auto tabWidget = QtUtils::findParentOfType<TabDeckEditorVisualTabWidget>(this);
+        if (tabWidget) {
+            tabWidget->setCurrentWidget(tabWidget->visualDeckView);
+        }
+    };
+
+    sequence.addStep(conclusionStep);
+
+    /*sequence.addStep(
+        {quickFilterSaveLoadWidget, "This button will let you save and load all currently applied filters to files."});
+    sequence.addStep({quickFilterNameWidget,
+                      "This button will let you apply name filters. Optionally, you can import every card in "
+                      "your deck as a name filter and then save this as a filter using the save/load button "
+                      "to make your own quick access collections!"});
+    sequence.addStep({mainTypeFilterWidget, "Use these buttons to quickly filter by card types."});
+    sequence.addStep({quickFilterSubTypeWidget, "This button will let you apply filters for card sub-types."});
+    sequence.addStep(
+        {quickFilterSetWidget,
+         "This button will let you apply filters for card sets. You can also filter to the X most recent sets. "
+         "Filtering to a set will display all printings of a card within that set."});*/
+
+    return sequence;
 }
 
 void VisualDatabaseDisplayWidget::initialize()

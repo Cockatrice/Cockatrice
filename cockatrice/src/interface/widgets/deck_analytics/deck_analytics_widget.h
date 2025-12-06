@@ -7,6 +7,8 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
+
 #include <QJsonObject>
 #include <QList>
 #include <QString>
@@ -35,6 +37,7 @@ public:
     explicit DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
     void retranslateUi();
     void includeSideboardChanged(bool checked);
+    TutorialSequence generateTutorialSequence();
 
 private slots:
     void onAddPanel();

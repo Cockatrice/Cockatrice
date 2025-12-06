@@ -24,6 +24,7 @@ class HomeStyledButton;
 class QGroupBox;
 class QTimer;
 class TabSupervisor;
+class TutorialController;
 
 class HomeWidget : public QWidget
 {
@@ -38,6 +39,7 @@ public:
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
+    void showEvent(QShowEvent *event) override;
     void initializeBackgroundFromSource();
     void onBackgroundShuffleFrequencyChanged();
     void updateBackgroundProperties();
@@ -50,6 +52,8 @@ private:
     QTimer *cardChangeTimer;
     TabSupervisor *tabSupervisor;
     QPixmap background;
+    TutorialController *tutorialController;
+    bool tutorialStarted = false;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
     DeckList backgroundSourceDeck;
     QLabel *logoLabel = nullptr;

@@ -15,6 +15,7 @@ class QWidget;
 class TabDeckEditorVisualTabWidget;
 class TabSupervisor;
 
+class TutorialController;
 /**
  * @class TabDeckEditorVisual
  * @ingroup DeckEditorTabs
@@ -66,7 +67,12 @@ class TabDeckEditorVisual : public AbstractTabDeckEditor
 {
     Q_OBJECT
 
+private:
+    TutorialController *tutorialController = nullptr;
+    bool tutorialStarted = false;
+
 protected slots:
+    void showEvent(QShowEvent *ev) override;
     /**
      * @brief Load the editor layout from settings.
      */

@@ -9,6 +9,7 @@
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
 #include "../../key_signals.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "libcockatrice/card/printing/exact_card.h"
 
 #include <QDockWidget>
@@ -62,6 +63,8 @@ public:
     {
         return deckView->selectionModel();
     }
+
+    TutorialSequence generateTutorialSequence();
 
 public slots:
     void selectPrevCard();

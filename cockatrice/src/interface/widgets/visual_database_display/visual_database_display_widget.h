@@ -7,6 +7,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
 #include "libcockatrice/card/card_info.h"
 
 #include <QString>
@@ -72,6 +73,7 @@ public:
     bool isVisualDisplayMode() const;
 
 public slots:
+    TutorialSequence addTutorialSteps();
     /**
      * @brief Pushes the active set filters to the visual grid.
      *
