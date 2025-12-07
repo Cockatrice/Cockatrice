@@ -42,7 +42,7 @@ public:
 
 private:
     DeckList *deckList;
-    LoadInfo lastLoadInfo;
+    LoadedDeck::LoadInfo lastLoadInfo;
 
 public:
     DeckLoader(QObject *parent);
@@ -50,29 +50,28 @@ public:
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const LoadInfo &getLastLoadInfo() const
+    const LoadedDeck::LoadInfo &getLastLoadInfo() const
     {
         return lastLoadInfo;
     }
 
-    void setLastLoadInfo(const LoadInfo &info)
+    void setLastLoadInfo(const LoadedDeck::LoadInfo &info)
     {
         lastLoadInfo = info;
     }
 
     [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastLoadInfo.fileName.isEmpty() && lastLoadInfo.remoteDeckId == LoadInfo::NON_REMOTE_ID;
+        return lastLoadInfo.isEmpty();
     }
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);
-    static FileFormat getFormatFromName(const QString &fileName);
 
-    bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
-    bool loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest);
+    bool loadFromFile(const QString &fileName, LoadedDeck::FileFormat fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, LoadedDeck::FileFormat fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
-    bool saveToFile(const QString &fileName, FileFormat fmt);
-    bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
+    bool saveToFile(const QString &fileName, LoadedDeck::FileFormat fmt);
+    bool updateLastLoadedTimestamp(const QString &fileName, LoadedDeck::FileFormat fmt);
 
     static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
 
