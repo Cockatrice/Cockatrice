@@ -3,6 +3,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QMap>
 #include <QPushButton>
 #include <QWidget>
 
