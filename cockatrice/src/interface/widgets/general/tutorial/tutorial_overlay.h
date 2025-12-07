@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_TUTORIAL_OVERLAY_H
 #define COCKATRICE_TUTORIAL_OVERLAY_H
 
+#include "tutorial_bubble_widget.h"
+
 #include <QPointer>
 #include <QWidget>
 
@@ -16,22 +18,25 @@ public:
 
 signals:
     void nextStep();
+    void prevStep();
+    void nextSequence();
+    void prevSequence();
     void skipTutorial();
 
 protected:
     void paintEvent(QPaintEvent *) override;
     void resizeEvent(QResizeEvent *) override;
     void showEvent(QShowEvent *) override;
-    void mousePressEvent(QMouseEvent *) override;
 
 private:
     QRect targetRectOnOverlay() const;
-    QRect computeBubbleRect(const QRect &hole) const;
+    QRect computeBubbleRect(const QRect &hole, const QSize &bubbleSize) const;
 
     QPointer<QWidget> targetWidget;
     QString tutorialText;
 
     QRect highlightBubbleRect;
+    BubbleWidget *bubble;
 };
 
 #endif // COCKATRICE_TUTORIAL_OVERLAY_H

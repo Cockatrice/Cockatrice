@@ -168,6 +168,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/layout_containers/flow_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_widget.cpp
+    src/interface/widgets/general/tutorial/tutorial_bubble_widget.cpp
     src/interface/widgets/general/tutorial/tutorial_controller.cpp
     src/interface/widgets/general/tutorial/tutorial_overlay.cpp
     src/interface/widgets/menus/deck_editor_menu.cpp

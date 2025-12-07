@@ -15,7 +15,11 @@ TutorialController::TutorialController(QWidget *_tutorializedWidget)
     tutorialOverlay->hide();
 
     connect(tutorialOverlay, &TutorialOverlay::nextStep, this, &TutorialController::nextStep);
-    connect(tutorialOverlay, &TutorialOverlay::skipTutorial, this, [this]() { tutorialOverlay->hide(); });
+    connect(tutorialOverlay, &TutorialOverlay::prevStep, this, &TutorialController::prevStep);
+    connect(tutorialOverlay, &TutorialOverlay::nextSequence, this, &TutorialController::nextSequence);
+    connect(tutorialOverlay, &TutorialOverlay::prevSequence, this, &TutorialController::prevSequence);
+
+    connect(tutorialOverlay, &TutorialOverlay::skipTutorial, this, &TutorialController::exitTutorial);
 }
 
 void TutorialController::addSequence(const TutorialSequence &seq)
@@ -100,12 +104,13 @@ void TutorialController::prevSequence()
 {
     if (currentSequence <= 0) {
         // already at first sequence -> stay
+        currentStep = 0;
+        showStep();
         return;
     }
 
-    // go to last step of previous sequence
     currentSequence--;
-    currentStep = sequences[currentSequence].steps.size() - 1;
+    currentStep = 0;
     showStep();
 }
 
