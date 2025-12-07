@@ -3,6 +3,7 @@
 #include "../../../../../cards/card_info_picture_widget.h"
 #include "../../tab_edhrec_main.h"
 #include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
+#include "edhrec_commander_api_response_bracket_navigation_widget.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
 
@@ -12,8 +13,13 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     QString baseUrl)
     : QWidget(parent), commanderDetails(_commanderDetails)
 {
-    layout = new QVBoxLayout(this);
+    layout = new QHBoxLayout(this);
     setLayout(layout);
+
+    commanderLayout = new QHBoxLayout();
+    commanderDetailsLayout = new QVBoxLayout();
+    commanderDetailsLayout->setAlignment(Qt::AlignCenter);
+    navigationAndPricesLayout = new QVBoxLayout();
 
     commanderPicture = new CardInfoPictureWidget(this);
     commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
@@ -36,20 +42,35 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
 
     commanderDetails.debugPrint();
 
+    commanderName = new QLabel(this);
+    commanderName->setText(commanderDetails.getName());
+    commanderName->setAlignment(Qt::AlignCenter);
+    commanderName->setStyleSheet("font-size: 28px; font-weight: bold");
+
     label = new QLabel(this);
     label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet("font-size: 16px");
+
     salt = new QLabel(this);
     salt->setAlignment(Qt::AlignCenter);
+    salt->setStyleSheet("font-size: 16px");
 
     cardPricesDisplayWidget = new EdhrecApiResponseCardPricesDisplayWidget(this, commanderDetails.getPrices());
 
     navigationWidget = new EdhrecCommanderApiResponseNavigationWidget(this, commanderDetails, baseUrl);
 
-    layout->addWidget(commanderPicture);
-    layout->addWidget(label);
-    layout->addWidget(salt);
-    layout->addWidget(cardPricesDisplayWidget);
-    layout->addWidget(navigationWidget);
+    commanderLayout->addWidget(commanderPicture);
+    commanderDetailsLayout->addWidget(commanderName);
+    commanderDetailsLayout->addSpacing(1);
+    commanderDetailsLayout->addWidget(label);
+    commanderDetailsLayout->addWidget(salt);
+    commanderDetailsLayout->addWidget(cardPricesDisplayWidget);
+    commanderLayout->addLayout(commanderDetailsLayout);
+    navigationAndPricesLayout->addWidget(navigationWidget);
+    // navigationAndPricesLayout->addWidget(cardPricesDisplayWidget);
+
+    layout->addLayout(commanderLayout);
+    layout->addLayout(navigationAndPricesLayout);
 
     retranslateUi();
 }

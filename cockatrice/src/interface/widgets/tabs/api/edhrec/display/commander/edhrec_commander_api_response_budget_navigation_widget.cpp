@@ -1,6 +1,6 @@
-#include "edhrec_commander_api_response_bracket_navigation_widget.h"
+#include "edhrec_commander_api_response_budget_navigation_widget.h"
 
-EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBracketNavigationWidget(
+EdhrecCommanderApiResponseBudgetNavigationWidget::EdhrecCommanderApiResponseBudgetNavigationWidget(
     QWidget *parent,
     const QString &baseUrl)
     : QWidget(parent)
@@ -8,37 +8,37 @@ EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBra
     layout = new QGridLayout(this);
     setLayout(layout);
 
-    gameChangerLabel = new QLabel(this);
+    budgetLabel = new QLabel(this);
 
-    layout->addWidget(gameChangerLabel, 1, 0, 1, 2);
+    layout->addWidget(budgetLabel, 3, 0, 1, 2);
 
-    for (int i = 0; i < gameChangerOptions.length(); i++) {
-        QString option = gameChangerOptions.at(i);
-        QString label = option.isEmpty() ? "All" : option.at(0).toUpper() + option.mid(1);
-        QPushButton *optionButton = new QPushButton(label, this);
-        optionButton->setMinimumHeight(84);
-        optionButton->setStyleSheet("font-size: 24px");
-        gameChangerButtons[option] = optionButton;
-        layout->addWidget(optionButton, 2, i);
-        connect(optionButton, &QPushButton::clicked, this, [=, this]() {
-            selectedGameChanger = option;
-            updateOptionButtonSelection(gameChangerButtons, option);
+    for (int i = 0; i < budgetOptions.length(); i++) {
+        QString option = budgetOptions.at(i);
+        QString label = option.isEmpty() ? "Any" : option.at(0).toUpper() + option.mid(1);
+        QPushButton *btn = new QPushButton(label, this);
+        btn->setMinimumHeight(84);
+        btn->setStyleSheet("font-size: 24px");
+        budgetButtons[option] = btn;
+        layout->addWidget(btn, 4, i);
+        connect(btn, &QPushButton::clicked, this, [=, this]() {
+            selectedBudget = option;
+            updateOptionButtonSelection(budgetButtons, option);
             emit requestNavigation();
         });
     }
 
-    updateOptionButtonSelection(gameChangerButtons, "");
+    updateOptionButtonSelection(budgetButtons, "");
 
     retranslateUi();
     applyOptionsFromUrl(baseUrl);
 }
 
-void EdhrecCommanderApiResponseBracketNavigationWidget::retranslateUi()
+void EdhrecCommanderApiResponseBudgetNavigationWidget::retranslateUi()
 {
-    gameChangerLabel->setText(tr("Game Changers"));
+    budgetLabel->setText(tr("Budget"));
 }
 
-void EdhrecCommanderApiResponseBracketNavigationWidget::applyOptionsFromUrl(const QString &url)
+void EdhrecCommanderApiResponseBudgetNavigationWidget::applyOptionsFromUrl(const QString &url)
 {
     QString cleanedUrl = url;
 
@@ -62,30 +62,32 @@ void EdhrecCommanderApiResponseBracketNavigationWidget::applyOptionsFromUrl(cons
     }
 
     QString commanderName = parts[1];
-    QString gameChangerOpt;
+    QString gameChangerOpt, budgetOpt;
 
     // Define valid sets
     QSet<QString> validGameChangers = {"exhibition", "core", "upgraded", "optimized", "cedh"};
+    QSet<QString> validBudgets = {"budget", "expensive"};
 
     // Check remaining parts after commander
     for (int i = 2; i < parts.size(); ++i) {
         QString part = parts[i].toLower();
         if (validGameChangers.contains(part)) {
             gameChangerOpt = part;
+        } else if (validBudgets.contains(part)) {
+            budgetOpt = part;
         }
     }
 
-    // Validate and apply
-    if (!gameChangerButtons.contains(gameChangerOpt)) {
-        gameChangerOpt.clear();
+    if (!budgetButtons.contains(budgetOpt)) {
+        budgetOpt.clear();
     }
 
-    selectedGameChanger = gameChangerOpt;
+    selectedBudget = budgetOpt;
 
-    updateOptionButtonSelection(gameChangerButtons, selectedGameChanger);
+    updateOptionButtonSelection(budgetButtons, selectedBudget);
 }
 
-void EdhrecCommanderApiResponseBracketNavigationWidget::updateOptionButtonSelection(
+void EdhrecCommanderApiResponseBudgetNavigationWidget::updateOptionButtonSelection(
     QMap<QString, QPushButton *> &buttons,
     const QString &selectedKey)
 {

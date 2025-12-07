@@ -10,12 +10,16 @@ class EdhrecCommanderApiResponseBracketNavigationWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EdhrecCommanderApiResponseBracketNavigationWidget(QWidget *parent);
+    explicit EdhrecCommanderApiResponseBracketNavigationWidget(QWidget *parent, const QString &baseUrl);
     void retranslateUi();
     void applyOptionsFromUrl(const QString &url);
+    QString getSelectedGameChanger() const
+    {
+        return selectedGameChanger;
+    }
 
 signals:
-    void requestUrl(QString url);
+    void requestNavigation();
 
 private:
     QGridLayout *layout;
@@ -27,7 +31,6 @@ private:
     QMap<QString, QPushButton *> gameChangerButtons;
 
     void updateOptionButtonSelection(QMap<QString, QPushButton *> &buttons, const QString &selectedKey);
-    QString buildComboUrl() const;
 };
 
 #endif // COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
