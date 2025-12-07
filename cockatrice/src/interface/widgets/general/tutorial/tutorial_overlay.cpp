@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent)
+TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent, Qt::Window)
 {
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
     setAttribute(Qt::WA_NoSystemBackground, true);
@@ -16,7 +16,13 @@ TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent)
 
     // This ensures the overlay stays exactly over the parent
     if (parent) {
-        setGeometry(parent->rect());
+        QRect r = parent->rect();
+
+        // convert the parent’s rect to screen coordinates
+        QPoint globalTopLeft = parent->mapToGlobal(QPoint(0, 0));
+        r.moveTopLeft(globalTopLeft);
+
+        setGeometry(r);
     }
 }
 
@@ -99,7 +105,10 @@ QRect TutorialOverlay::computeBubbleRect(const QRect &hole) const
 void TutorialOverlay::parentResized()
 {
     if (parentWidget()) {
-        setGeometry(parentWidget()->rect());
+        QRect r = parentWidget()->rect();
+        QPoint globalTopLeft = parentWidget()->mapToGlobal(QPoint(0, 0));
+        r.moveTopLeft(globalTopLeft);
+        setGeometry(r);
     }
 }
 
