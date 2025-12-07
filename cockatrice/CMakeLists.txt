@@ -347,13 +347,13 @@ set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
 if(Qt6_FOUND)
   qt6_add_executable(
-      cockatrice
-      WIN32
-      MACOSX_BUNDLE
-      ${cockatrice_SOURCES}
-      ${cockatrice_RESOURCES_RCC}
-      ${cockatrice_MOC_SRCS}
-      MANUAL_FINALIZATION
+    cockatrice
+    WIN32
+    MACOSX_BUNDLE
+    ${cockatrice_SOURCES}
+    ${cockatrice_RESOURCES_RCC}
+    ${cockatrice_MOC_SRCS}
+    MANUAL_FINALIZATION
   )
 elseif(Qt5_FOUND)
   # Qt5 Translations need to be linked at executable creation time
@@ -558,13 +558,13 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
-        cockatrice
-        TS_FILES
-        ${cockatrice_TS}
-        SOURCES
-        ${translate_SRCS}
-        QM_FILES_OUTPUT_VARIABLE
-        cockatrice_QM
+      cockatrice
+      TS_FILES
+      ${cockatrice_TS}
+      SOURCES
+      ${translate_SRCS}
+      QM_FILES_OUTPUT_VARIABLE
+      cockatrice_QM
     )
   else()
     qt6_add_translations(cockatrice TS_FILES ${cockatrice_TS} QM_FILES_OUTPUT_VARIABLE cockatrice_QM)
