@@ -7,14 +7,16 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
+#include "loaded_deck.h"
+
 #include <QLoggingCategory>
 #include <QPrinter>
 #include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 
-inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
+inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");
 
-    class DeckLoader : public QObject
+class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
@@ -22,27 +24,6 @@ signals:
     void loadFinished(bool success);
 
 public:
-    enum FileFormat
-    {
-        PlainTextFormat,
-        CockatriceFormat
-    };
-
-    /**
-     * @brief Information about where the deck was loaded from.
-     *
-     * For local decks, the remoteDeckId field will always be -1.
-     * For remote decks, fileName will be empty and fileFormat will always be CockatriceFormat
-     */
-    struct LoadInfo
-    {
-        static constexpr int NON_REMOTE_ID = -1;
-
-        QString fileName = "";
-        FileFormat fileFormat = CockatriceFormat;
-        int remoteDeckId = NON_REMOTE_ID;
-    };
-
     /**
      * Supported file extensions for decklist files
      */
