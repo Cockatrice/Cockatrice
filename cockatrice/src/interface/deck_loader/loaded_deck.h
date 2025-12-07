@@ -1,5 +1,7 @@
 #ifndef COCKATRICE_LOADED_DECK_H
 #define COCKATRICE_LOADED_DECK_H
+
+#include "deck_file_format.h"
 #include "libcockatrice/deck_list/deck_list.h"
 
 #include <QString>
@@ -10,19 +12,6 @@
  */
 struct LoadedDeck
 {
-    enum FileFormat
-    {
-        PlainTextFormat,
-        CockatriceFormat
-    };
-
-    /**
-     * Determines what deck file format the given filename corresponds to.
-     *
-     * @param fileName The filename
-     * @return The deck format
-     */
-    static FileFormat getFormatFromName(const QString &fileName);
 
     /**
      * @brief Information about where the deck was loaded from.
@@ -35,7 +24,7 @@ struct LoadedDeck
         static constexpr int NON_REMOTE_ID = -1;
 
         QString fileName = "";
-        FileFormat fileFormat = CockatriceFormat;
+        DeckFileFormat::Format fileFormat = DeckFileFormat::Cockatrice;
         int remoteDeckId = NON_REMOTE_ID;
 
         bool isEmpty() const;

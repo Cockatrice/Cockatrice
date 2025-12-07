@@ -259,7 +259,7 @@ void DeckViewContainer::loadLocalDeck()
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
-    LoadedDeck::FileFormat fmt = LoadedDeck::getFormatFromName(filePath);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
     DeckLoader deck(this);
 
     bool success = deck.loadFromFile(filePath, fmt, true);

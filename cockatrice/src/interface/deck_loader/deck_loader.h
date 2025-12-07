@@ -67,11 +67,11 @@ public:
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);
 
-    bool loadFromFile(const QString &fileName, LoadedDeck::FileFormat fmt, bool userRequest = false);
-    bool loadFromFileAsync(const QString &fileName, LoadedDeck::FileFormat fmt, bool userRequest);
+    bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
-    bool saveToFile(const QString &fileName, LoadedDeck::FileFormat fmt);
-    bool updateLastLoadedTimestamp(const QString &fileName, LoadedDeck::FileFormat fmt);
+    bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
+    bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
     static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
 

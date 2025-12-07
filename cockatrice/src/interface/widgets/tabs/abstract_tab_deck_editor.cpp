@@ -380,7 +380,7 @@ void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
  */
 void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
-    LoadedDeck::FileFormat fmt = LoadedDeck::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     auto *l = new DeckLoader(this);
     if (l->loadFromFile(fileName, fmt, true)) {
@@ -452,7 +452,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
         return false;
 
     QString fileName = dialog.selectedFiles().at(0);
-    LoadedDeck::FileFormat fmt = LoadedDeck::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(
