@@ -1,5 +1,7 @@
 #include "edhrec_commander_api_response_budget_navigation_widget.h"
 
+#include <QSet>
+
 EdhrecCommanderApiResponseBudgetNavigationWidget::EdhrecCommanderApiResponseBudgetNavigationWidget(
     QWidget *parent,
     const QString &baseUrl)

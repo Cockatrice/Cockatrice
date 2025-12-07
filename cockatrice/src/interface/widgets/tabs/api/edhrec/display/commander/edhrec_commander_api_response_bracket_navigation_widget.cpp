@@ -1,5 +1,7 @@
 #include "edhrec_commander_api_response_bracket_navigation_widget.h"
 
+#include <QSet>
+
 EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBracketNavigationWidget(
     QWidget *parent,
     const QString &baseUrl)
