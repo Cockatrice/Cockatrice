@@ -380,7 +380,7 @@ void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
  */
 void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     auto *l = new DeckLoader(this);
     if (l->loadFromFile(fileName, fmt, true)) {
@@ -406,7 +406,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckLoader();
-    if (deck->getLastLoadInfo().remoteDeckId != DeckLoader::LoadInfo::NON_REMOTE_ID) {
+    if (deck->getLastLoadInfo().remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
         QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
@@ -452,7 +452,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
         return false;
 
     QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(

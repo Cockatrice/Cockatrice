@@ -23,7 +23,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     backgroundSourceDeck = new DeckLoader(this);
 
     backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                       DeckLoader::CockatriceFormat, false);
+                                       DeckFileFormat::Cockatrice, false);
 
     gradientColors = extractDominantColors(background);
 
@@ -73,7 +73,7 @@ void HomeWidget::initializeBackgroundFromSource()
             break;
         case BackgroundSources::DeckFileArt:
             backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                               DeckLoader::CockatriceFormat, false);
+                                               DeckFileFormat::Cockatrice, false);
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
     }

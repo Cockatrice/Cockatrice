@@ -79,7 +79,7 @@ static QStringList findAllKnownTags()
     QStringList knownTags;
     auto loader = DeckLoader(nullptr);
     for (const QString &file : allFiles) {
-        loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
+        loader.loadFromFile(file, DeckFileFormat::getFormatFromName(file), false);
         QStringList tags = loader.getDeckList()->getTags();
         knownTags.append(tags);
         knownTags.removeDuplicates();
@@ -136,7 +136,7 @@ static void convertFileToCockatriceFormat(DeckPreviewWidget *deckPreviewWidget)
  */
 bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPreviewWidget *deckPreviewWidget)
 {
-    if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) == DeckLoader::CockatriceFormat) {
+    if (DeckFileFormat::getFormatFromName(deckPreviewWidget->filePath) == DeckFileFormat::Cockatrice) {
         return true;
     }
 

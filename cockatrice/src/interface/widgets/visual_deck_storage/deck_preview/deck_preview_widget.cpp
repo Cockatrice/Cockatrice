@@ -32,7 +32,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
      many deck loads have finished already and if we've loaded all decks and THEN load all the tags at once. */
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
-    deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
+    deckLoader->loadFromFileAsync(filePath, DeckFileFormat::getFormatFromName(filePath), false);
 
     bannerCardDisplayWidget =
         new DeckPreviewCardPictureWidget(this, false, visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
@@ -288,7 +288,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
     deckLoader->getDeckList()->setBannerCard(cardRef);
-    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
@@ -311,7 +311,7 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
 void DeckPreviewWidget::setTags(const QStringList &tags)
 {
     deckLoader->getDeckList()->setTags(tags);
-    deckLoader->saveToFile(filePath, DeckLoader::CockatriceFormat);
+    deckLoader->saveToFile(filePath, DeckFileFormat::Cockatrice);
 }
 
 QMenu *DeckPreviewWidget::createRightClickMenu()
@@ -386,7 +386,7 @@ void DeckPreviewWidget::actRenameDeck()
 
     // write change
     deckLoader->getDeckList()->setName(newName);
-    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
 
     // update VDS
     refreshBannerCardText();
@@ -416,7 +416,7 @@ void DeckPreviewWidget::actRenameFile()
         return;
     }
 
-    DeckLoader::LoadInfo lastLoadInfo = deckLoader->getLastLoadInfo();
+    LoadedDeck::LoadInfo lastLoadInfo = deckLoader->getLastLoadInfo();
     lastLoadInfo.fileName = newFilePath;
     deckLoader->setLastLoadInfo(lastLoadInfo);
 

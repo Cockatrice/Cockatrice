@@ -7,14 +7,16 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
+#include "loaded_deck.h"
+
 #include <QLoggingCategory>
 #include <QPrinter>
 #include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 
-inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
+inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");
 
-    class DeckLoader : public QObject
+class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
@@ -22,27 +24,6 @@ signals:
     void loadFinished(bool success);
 
 public:
-    enum FileFormat
-    {
-        PlainTextFormat,
-        CockatriceFormat
-    };
-
-    /**
-     * @brief Information about where the deck was loaded from.
-     *
-     * For local decks, the remoteDeckId field will always be -1.
-     * For remote decks, fileName will be empty and fileFormat will always be CockatriceFormat
-     */
-    struct LoadInfo
-    {
-        static constexpr int NON_REMOTE_ID = -1;
-
-        QString fileName = "";
-        FileFormat fileFormat = CockatriceFormat;
-        int remoteDeckId = NON_REMOTE_ID;
-    };
-
     /**
      * Supported file extensions for decklist files
      */
@@ -61,7 +42,7 @@ public:
 
 private:
     DeckList *deckList;
-    LoadInfo lastLoadInfo;
+    LoadedDeck::LoadInfo lastLoadInfo;
 
 public:
     DeckLoader(QObject *parent);
@@ -69,29 +50,28 @@ public:
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const LoadInfo &getLastLoadInfo() const
+    const LoadedDeck::LoadInfo &getLastLoadInfo() const
     {
         return lastLoadInfo;
     }
 
-    void setLastLoadInfo(const LoadInfo &info)
+    void setLastLoadInfo(const LoadedDeck::LoadInfo &info)
     {
         lastLoadInfo = info;
     }
 
     [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastLoadInfo.fileName.isEmpty() && lastLoadInfo.remoteDeckId == LoadInfo::NON_REMOTE_ID;
+        return lastLoadInfo.isEmpty();
     }
 
     static void clearSetNamesAndNumbers(const DeckList *deckList);
-    static FileFormat getFormatFromName(const QString &fileName);
 
-    bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
-    bool loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest);
+    bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
-    bool saveToFile(const QString &fileName, FileFormat fmt);
-    bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
+    bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
+    bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
     static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
 
