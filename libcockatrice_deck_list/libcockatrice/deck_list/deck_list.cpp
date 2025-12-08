@@ -548,12 +548,9 @@ QList<DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZo
 {
     QList<DecklistCardNode *> result;
 
-    for (auto *node : *root) {
-        auto *zoneNode = dynamic_cast<InnerDecklistNode *>(node);
-        if (zoneNode == nullptr) {
-            continue;
-        }
-        if (!restrictToZones.isEmpty() && !restrictToZones.contains(node->getName())) {
+    auto zoneNodes = getZoneNodes();
+    for (auto *zoneNode : zoneNodes) {
+        if (!restrictToZones.isEmpty() && !restrictToZones.contains(zoneNode->getName())) {
             continue;
         }
         for (auto *cardNode : *zoneNode) {
@@ -565,6 +562,19 @@ QList<DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZo
     }
 
     return result;
+}
+
+QList<InnerDecklistNode *> DeckList::getZoneNodes() const
+{
+    QList<InnerDecklistNode *> zones;
+    for (auto *node : *root) {
+        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(node);
+        if (!currentZone)
+            continue;
+        zones.append(currentZone);
+    }
+
+    return zones;
 }
 
 int DeckList::getSideboardSize() const
