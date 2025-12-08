@@ -335,9 +335,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     }
 
     // loop zones
-    for (int i = 0; i < deckList->getRoot()->size(); i++) {
-        const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i));
-
+    for (auto zoneNode : deckList->getZoneNodes()) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
@@ -597,12 +595,11 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
     cursor.insertText(deckList->getComments());
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-    for (int i = 0; i < deckList->getRoot()->size(); i++) {
+    for (auto zoneNode : deckList->getZoneNodes()) {
         cursor.insertHtml("<br><img src=theme:hr.jpg>");
-        // cursor.insertHtml("<hr>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-        printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i)));
+        printDeckListNode(&cursor, zoneNode);
     }
 
     doc.print(printer);

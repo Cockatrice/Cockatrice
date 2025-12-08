@@ -300,7 +300,7 @@ public:
 
     [[nodiscard]] QList<ExactCard> getCards() const;
     [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
-    [[nodiscard]] QList<QString> *getZones() const;
+    [[nodiscard]] QList<QString> getZones() const;
 
     /**
      * @brief Sets the criteria used to group cards in the model.

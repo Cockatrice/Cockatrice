@@ -550,86 +550,49 @@ void DeckListModel::setDeckList(DeckList *_deck)
 
 QList<ExactCard> DeckListModel::getCards() const
 {
-    QList<ExactCard> cards;
-    DeckList *decklist = getDeckList();
-    if (!decklist) {
-        return cards;
-    }
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return cards;
+    auto nodes = deckList->getCardNodes();
 
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        for (int j = 0; j < currentZone->size(); j++) {
-            DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
-                continue;
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
-                if (card) {
-                    cards.append(card);
-                } else {
-                    qDebug() << "Card not found in database!";
-                }
+    QList<ExactCard> cards;
+    for (auto node : nodes) {
+        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        if (card) {
+            for (int k = 0; k < node->getNumber(); ++k) {
+                cards.append(card);
             }
+        } else {
+            qDebug() << "Card not found in database!";
         }
     }
+
     return cards;
 }
 
 QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
 {
-    QList<ExactCard> cards;
-    DeckList *decklist = getDeckList();
-    if (!decklist) {
-        return cards;
-    }
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return cards;
+    auto nodes = deckList->getCardNodes({zoneName});
 
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        if (currentZone->getName() == zoneName) {
-            for (int j = 0; j < currentZone->size(); j++) {
-                DecklistCardNode *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-                if (!currentCard)
-                    continue;
-                for (int k = 0; k < currentCard->getNumber(); ++k) {
-                    ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
-                    if (card) {
-                        cards.append(card);
-                    } else {
-                        qDebug() << "Card not found in database!";
-                    }
-                }
+    QList<ExactCard> cards;
+    for (auto node : nodes) {
+        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        if (card) {
+            for (int k = 0; k < node->getNumber(); ++k) {
+                cards.append(card);
             }
+        } else {
+            qDebug() << "Card not found in database!";
         }
     }
+
     return cards;
 }
 
-QList<QString> *DeckListModel::getZones() const
+QList<QString> DeckListModel::getZones() const
 {
-    QList<QString> *zones = new QList<QString>();
-    DeckList *decklist = getDeckList();
-    if (!decklist) {
-        return zones;
-    }
-    InnerDecklistNode *listRoot = decklist->getRoot();
-    if (!listRoot)
-        return zones;
+    auto zoneNodes = deckList->getZoneNodes();
 
-    for (int i = 0; i < listRoot->size(); i++) {
-        InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        if (!currentZone)
-            continue;
-        zones->append(currentZone->getName());
-    }
+    QList<QString> zones;
+    std::transform(zoneNodes.cbegin(), zoneNodes.cend(), std::back_inserter(zones),
+                   [](auto zoneNode) { return zoneNode->getName(); });
+
     return zones;
 }

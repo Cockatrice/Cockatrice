@@ -579,18 +579,13 @@ QList<InnerDecklistNode *> DeckList::getZoneNodes() const
 
 int DeckList::getSideboardSize() const
 {
-    int size = 0;
-    for (int i = 0; i < root->size(); ++i) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        if (node->getName() != DECK_ZONE_SIDE) {
-            continue;
-        }
+    auto cards = getCardNodes({DECK_ZONE_SIDE});
 
-        for (int j = 0; j < node->size(); j++) {
-            auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-            size += card->getNumber();
-        }
+    int size = 0;
+    for (auto card : cards) {
+        size += card->getNumber();
     }
+
     return size;
 }
 
@@ -656,26 +651,18 @@ bool DeckList::deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNod
     return false;
 }
 
-static QString computeDeckHash(const InnerDecklistNode *root)
+static QString computeDeckHash(const DeckList &deckList)
 {
+    auto mainDeckNodes = deckList.getCardNodes({DECK_ZONE_MAIN});
+    auto sideDeckNodes = deckList.getCardNodes({DECK_ZONE_SIDE});
+
     QStringList cardList;
-    QSet<QString> hashZones, optionalZones;
 
-    hashZones << DECK_ZONE_MAIN << DECK_ZONE_SIDE; // Zones in deck to be included in hashing process
-    optionalZones << DECK_ZONE_TOKENS;             // Optional zones in deck not included in hashing process
+    std::transform(mainDeckNodes.cbegin(), mainDeckNodes.cend(), std::back_inserter(cardList),
+                   [](auto node) { return node->getName().toLower(); });
+    std::transform(sideDeckNodes.cbegin(), sideDeckNodes.cend(), std::back_inserter(cardList),
+                   [](auto node) { return "SB:" + node->getName().toLower(); });
 
-    for (int i = 0; i < root->size(); i++) {
-        auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        for (int j = 0; j < node->size(); j++) {
-            if (hashZones.contains(node->getName())) // Mainboard or Sideboard
-            {
-                auto *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-                for (int k = 0; k < card->getNumber(); ++k) {
-                    cardList.append((node->getName() == DECK_ZONE_SIDE ? "SB:" : "") + card->getName().toLower());
-                }
-            }
-        }
-    }
     cardList.sort();
     QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
     quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
@@ -697,7 +684,7 @@ QString DeckList::getDeckHash() const
         return cachedDeckHash;
     }
 
-    cachedDeckHash = computeDeckHash(root);
+    cachedDeckHash = computeDeckHash(*this);
     return cachedDeckHash;
 }
 
