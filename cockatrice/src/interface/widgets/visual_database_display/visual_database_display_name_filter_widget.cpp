@@ -68,7 +68,7 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
     if (!decklist)
         return;
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         createNameFilter(currentCard->getName());

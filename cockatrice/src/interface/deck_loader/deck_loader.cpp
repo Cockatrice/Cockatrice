@@ -272,7 +272,7 @@ static QString toDecklistExportString(const DecklistCardNode *card)
 /**
  * Converts all cards in the list to their decklist export string and joins them into one string
  */
-static QString toDecklistExportString(const QList<DecklistCardNode *> &cardNodes)
+static QString toDecklistExportString(const QList<const DecklistCardNode *> &cardNodes)
 {
     QString cardsString;
     for (auto card : cardNodes) {
@@ -511,7 +511,7 @@ QString DeckLoader::getCompleteCardName(const QString &cardName)
     return cardName;
 }
 
-void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
+void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
 {
     const int totalColumns = 2;
 

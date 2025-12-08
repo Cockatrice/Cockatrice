@@ -544,9 +544,9 @@ QList<CardRef> DeckList::getCardRefList() const
     return result;
 }
 
-QList<DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZones) const
+QList<const DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZones) const
 {
-    QList<DecklistCardNode *> result;
+    QList<const DecklistCardNode *> result;
 
     auto zoneNodes = getZoneNodes();
     for (auto *zoneNode : zoneNodes) {
@@ -564,9 +564,9 @@ QList<DecklistCardNode *> DeckList::getCardNodes(const QStringList &restrictToZo
     return result;
 }
 
-QList<InnerDecklistNode *> DeckList::getZoneNodes() const
+QList<const InnerDecklistNode *> DeckList::getZoneNodes() const
 {
-    QList<InnerDecklistNode *> zones;
+    QList<const InnerDecklistNode *> zones;
     for (auto *node : *root) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(node);
         if (!currentZone)

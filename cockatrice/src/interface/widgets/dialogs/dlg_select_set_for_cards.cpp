@@ -228,7 +228,7 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
     if (!decklist)
         return setCounts;
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
@@ -271,7 +271,7 @@ void DlgSelectSetForCards::updateCardLists()
     if (!decklist)
         return;
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         bool found = false;
@@ -360,7 +360,7 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
     if (!decklist)
         return setCards;
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
