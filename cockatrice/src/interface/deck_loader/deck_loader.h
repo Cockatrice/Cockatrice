@@ -65,8 +65,6 @@ public:
         return lastLoadInfo.isEmpty();
     }
 
-    static void clearSetNamesAndNumbers(const DeckList *deckList);
-
     bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
     bool loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
@@ -74,9 +72,6 @@ public:
     bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
     static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
-
-    static void setProviderIdToPreferredPrinting(const DeckList *deckList);
-    static void resolveSetNameAndNumberToProviderID(const DeckList *deckList);
 
     static void saveToClipboard(const DeckList *deckList, bool addComments = true, bool addSetNameAndNumber = true);
     static bool saveToStream_Plain(QTextStream &out,
