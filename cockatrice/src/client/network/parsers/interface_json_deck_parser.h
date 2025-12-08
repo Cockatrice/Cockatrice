@@ -6,6 +6,8 @@
 
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
+
+#include "../../../interface/deck_loader/card_node_function.h"
 #include "../../../interface/deck_loader/deck_loader.h"
 
 #include <QJsonArray>
@@ -48,7 +50,7 @@ public:
         }
 
         loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
+        loader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
 
         return loader;
     }
@@ -95,7 +97,7 @@ public:
         }
 
         loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
+        loader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
