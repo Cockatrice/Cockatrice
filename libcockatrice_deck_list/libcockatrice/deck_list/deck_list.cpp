@@ -523,43 +523,24 @@ void DeckList::cleanList(bool preserveMetadata)
     refreshDeckHash();
 }
 
-void DeckList::getCardListHelper(InnerDecklistNode *item, QSet<QString> &result)
-{
-    for (int i = 0; i < item->size(); ++i) {
-        auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
-
-        if (node) {
-            result.insert(node->getName());
-        } else {
-            getCardListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
-        }
-    }
-}
-
-void DeckList::getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result)
-{
-    for (int i = 0; i < item->size(); ++i) {
-        auto *node = dynamic_cast<DecklistCardNode *>(item->at(i));
-
-        if (node) {
-            result.append(node->toCardRef());
-        } else {
-            getCardRefListHelper(dynamic_cast<InnerDecklistNode *>(item->at(i)), result);
-        }
-    }
-}
-
 QStringList DeckList::getCardList() const
 {
-    QSet<QString> result;
-    getCardListHelper(root, result);
-    return result.values();
+    auto nodes = getCardNodes();
+
+    QStringList result;
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result), [](auto node) { return node->getName(); });
+
+    return result;
 }
 
 QList<CardRef> DeckList::getCardRefList() const
 {
+    auto nodes = getCardNodes();
+
     QList<CardRef> result;
-    getCardRefListHelper(root, result);
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result),
+                   [](auto node) { return node->toCardRef(); });
+
     return result;
 }
 
