@@ -33,6 +33,7 @@ public:
         AttrLoyalty,
         AttrManaCost,
         AttrName,
+        AttrNameExact,
         AttrPow,
         AttrRarity,
         AttrSet,

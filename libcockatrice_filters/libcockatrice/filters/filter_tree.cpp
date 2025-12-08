@@ -153,6 +153,11 @@ bool FilterItem::acceptName(const CardInfoPtr info) const
     return info->getName().contains(term, Qt::CaseInsensitive);
 }
 
+bool FilterItem::acceptNameExact(const CardInfoPtr info) const
+{
+    return info->getName() == term;
+}
+
 bool FilterItem::acceptType(const CardInfoPtr info) const
 {
     return info->getCardType().contains(term, Qt::CaseInsensitive);
@@ -401,6 +406,8 @@ bool FilterItem::acceptCardAttr(const CardInfoPtr info, CardFilter::Attr attr) c
     switch (attr) {
         case CardFilter::AttrName:
             return acceptName(info);
+        case CardFilter::AttrNameExact:
+            return acceptNameExact(info);
         case CardFilter::AttrType:
             return acceptType(info);
         case CardFilter::AttrColor:
