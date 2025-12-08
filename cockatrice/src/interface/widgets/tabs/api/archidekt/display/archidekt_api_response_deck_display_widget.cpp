@@ -1,5 +1,6 @@
 #include "archidekt_api_response_deck_display_widget.h"
 
+#include "../../../../../deck_loader/card_node_function.h"
 #include "../../../../../deck_loader/deck_loader.h"
 #include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../../../cards/card_size_widget.h"
@@ -68,7 +69,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
     model->getDeckList()->loadFromStream_Plain(deckStream, false);
 
-    DeckLoader::resolveSetNameAndNumberToProviderID(model->getDeckList());
+    model->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
 
     model->rebuildTree();
 

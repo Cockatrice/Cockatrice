@@ -98,7 +98,7 @@ void DlgLoadDeckFromWebsite::accept()
             DeckLoader *loader = new DeckLoader(this);
             QTextStream stream(&deckText);
             loader->getDeckList()->loadFromStream_Plain(stream, false);
-            DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
+            loader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
             deck = loader;
 
             QDialog::accept();
