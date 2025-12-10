@@ -274,16 +274,8 @@ static QString toDecklistExportString(const DecklistCardNode *card)
  */
 static QString toDecklistExportString(const QList<const DecklistCardNode *> &cardNodes)
 {
-    QString cardsString;
-    for (auto card : cardNodes) {
-        // Get the card name
-        // If it's a token, we don't care about the card.
-        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (dbCard && !dbCard->getIsToken()) {
-            cardsString += toDecklistExportString(card);
-        }
-    }
-    return cardsString;
+    return std::transform_reduce(cardNodes.cbegin(), cardNodes.cend(), QString(), std::plus(),
+                                 [](auto cardNode) { return toDecklistExportString(cardNode); });
 }
 
 /**
