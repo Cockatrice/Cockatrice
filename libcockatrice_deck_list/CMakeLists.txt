@@ -27,6 +27,8 @@ add_library(
   libcockatrice/deck_list/tree/inner_deck_list_node.cpp
   libcockatrice/deck_list/deck_list.cpp
   libcockatrice/deck_list/deck_list_history_manager.cpp
+  libcockatrice/deck_list/deck_list_node_tree.cpp
+  libcockatrice/deck_list/deck_list_node_tree.h
 )
 
 add_dependencies(libcockatrice_deck_list libcockatrice_protocol)
