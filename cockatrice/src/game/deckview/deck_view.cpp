@@ -343,10 +343,7 @@ void DeckViewScene::rebuildTree()
     if (!deck)
         return;
 
-    InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-
+    for (auto *currentZone : deck->getZoneNodes()) {
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
             container = new DeckViewCardContainer(currentZone->getName());
