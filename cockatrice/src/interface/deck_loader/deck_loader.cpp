@@ -274,8 +274,13 @@ static QString toDecklistExportString(const DecklistCardNode *card)
  */
 static QString toDecklistExportString(const QList<const DecklistCardNode *> &cardNodes)
 {
-    return std::transform_reduce(cardNodes.cbegin(), cardNodes.cend(), QString(), std::plus(),
-                                 [](auto cardNode) { return toDecklistExportString(cardNode); });
+    QString result;
+
+    for (auto cardNode : cardNodes) {
+        result += toDecklistExportString(cardNode);
+    }
+
+    return result;
 }
 
 /**
