@@ -168,7 +168,7 @@ void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
             break;
         }
 
-        if (xml.name() == "format") {
+        if (xml.name().toString() == "format") {
             auto rulesPtr = parseFormat(xml);
             emit addFormat(rulesPtr);
         }
