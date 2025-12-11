@@ -14,7 +14,7 @@ add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
 add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
-add_executable(deck_hash_performance_test ../common/deck_list.cpp deck_hash_performance_test.cpp)
+add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 
 find_package(GTest)
 
@@ -56,7 +56,7 @@ target_link_libraries(
   password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(
-  deck_hash_performance_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 
 add_subdirectory(carddatabase)
