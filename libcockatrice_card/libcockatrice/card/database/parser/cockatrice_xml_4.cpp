@@ -164,23 +164,13 @@ static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
 void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
-        auto token = xml.readNext();
-
-        // Stop when we hit </formats>
-        if (token == QXmlStreamReader::EndElement && xml.name() == "formats") {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
         }
-
-        // Only handle start elements
-        if (token != QXmlStreamReader::StartElement)
-            continue;
 
         if (xml.name() == "format") {
             auto rulesPtr = parseFormat(xml);
             emit addFormat(rulesPtr);
-        } else {
-            qCInfo(CockatriceXml4Log) << "Unknown format child" << xml.name() << ", skipping";
-            xml.skipCurrentElement();
         }
     }
 }
