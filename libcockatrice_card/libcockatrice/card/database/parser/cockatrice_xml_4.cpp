@@ -92,7 +92,7 @@ static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
     while (!xml.atEnd()) {
         auto token = xml.readNext();
 
-        if (token == QXmlStreamReader::EndElement && xml.name() == "format") {
+        if (token == QXmlStreamReader::EndElement && xml.name().toString() == "format") {
             break;
         }
 
@@ -117,17 +117,17 @@ static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
             while (!xml.atEnd()) {
                 token = xml.readNext();
 
-                if (token == QXmlStreamReader::EndElement && xml.name() == "exceptions") {
+                if (token == QXmlStreamReader::EndElement && xml.name().toString() == "exceptions") {
                     break;
                 }
 
-                if (token == QXmlStreamReader::StartElement && xml.name() == "exception") {
+                if (token == QXmlStreamReader::StartElement && xml.name().toString() == "exception") {
                     ExceptionRule ex;
 
                     while (!xml.atEnd()) {
                         token = xml.readNext();
 
-                        if (token == QXmlStreamReader::EndElement && xml.name() == "exception") {
+                        if (token == QXmlStreamReader::EndElement && xml.name().toString() == "exception") {
                             break;
                         }
 
