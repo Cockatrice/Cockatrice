@@ -12,6 +12,7 @@
 #include <QNetworkReply>
 #include <QPixmap>
 #include <QWidget>
+#include <version_string.h>
 
 #define ARCHIDEKT_DEFAULT_IMAGE "https://storage.googleapis.com/topdekt-user/images/archidekt_deck_card_shadow.jpg"
 
@@ -82,6 +83,7 @@ ArchidektApiResponseDeckEntryDisplayWidget::ArchidektApiResponseDeckEntryDisplay
     imageUrl = response.getFeatured().isEmpty() ? QUrl(ARCHIDEKT_DEFAULT_IMAGE) : QUrl(response.getFeatured());
 
     QNetworkRequest req(imageUrl);
+    req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     QNetworkReply *reply = imageNetworkManager->get(req);
 
     // tag the reply with "this" so we know it belongs to us later

@@ -25,6 +25,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <version_string.h>
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)
 {
@@ -166,6 +167,7 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
     }
 
     QNetworkRequest request{QUrl(url)};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     networkManager->get(request);
 }
@@ -173,6 +175,7 @@ void TabEdhRecMain::setCard(CardInfoPtr _cardToQuery, bool isCommander)
 void TabEdhRecMain::actNavigatePage(QString url)
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages" + url + ".json")};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     networkManager->get(request);
 }
@@ -180,6 +183,7 @@ void TabEdhRecMain::actNavigatePage(QString url)
 void TabEdhRecMain::getTopCards()
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages/top/year.json")};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     networkManager->get(request);
 }
@@ -187,6 +191,7 @@ void TabEdhRecMain::getTopCards()
 void TabEdhRecMain::getTopCommanders()
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages/commanders/year.json")};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     networkManager->get(request);
 }
@@ -194,7 +199,7 @@ void TabEdhRecMain::getTopCommanders()
 void TabEdhRecMain::getTopTags()
 {
     QNetworkRequest request{QUrl("https://json.edhrec.com/pages/tags.json")};
-
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     networkManager->get(request);
 }
 

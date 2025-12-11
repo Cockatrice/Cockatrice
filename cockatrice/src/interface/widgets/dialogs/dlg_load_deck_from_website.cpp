@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkReply>
+#include <version_string.h>
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
 {
@@ -67,6 +68,7 @@ void DlgLoadDeckFromWebsite::accept()
         }
 
         QNetworkRequest request(QUrl(info.fullUrl));
+        request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
         QNetworkReply *reply = nam->get(request);
 
         QEventLoop loop;
