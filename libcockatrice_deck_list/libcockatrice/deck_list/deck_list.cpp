@@ -658,10 +658,13 @@ static QString computeDeckHash(const DeckList &deckList)
 
     QStringList cardList;
 
+    static auto repeatName = [](const DecklistCardNode *node, const QString &prefix = {}) {
+        return (prefix + node->getName().toLower()).repeated(node->getNumber());
+    };
     std::transform(mainDeckNodes.cbegin(), mainDeckNodes.cend(), std::back_inserter(cardList),
-                   [](auto node) { return node->getName().toLower(); });
+                   [](auto node) { return repeatName(node); });
     std::transform(sideDeckNodes.cbegin(), sideDeckNodes.cend(), std::back_inserter(cardList),
-                   [](auto node) { return "SB:" + node->getName().toLower(); });
+                   [](auto node) { return repeatName(node, "SB:"); });
 
     cardList.sort();
     QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
