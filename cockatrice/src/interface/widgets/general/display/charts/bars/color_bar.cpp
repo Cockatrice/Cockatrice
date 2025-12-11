@@ -1,4 +1,3 @@
-
 #include "color_bar.h"
 
 #include <QLinearGradient>

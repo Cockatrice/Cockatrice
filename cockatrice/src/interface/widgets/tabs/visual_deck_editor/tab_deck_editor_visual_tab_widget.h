@@ -78,7 +78,8 @@ public:
     /// Get the total number of tabs.
     [[nodiscard]] int getTabCount() const;
 
-    VisualDeckEditorWidget *visualDeckView;             ///< Visual deck editor widget.
+    VisualDeckEditorWidget *visualDeckView; ///< Visual deck editor widget.
+    DeckListStatisticsAnalyzer *statsAnalyzer;
     DeckAnalyticsWidget *deckAnalytics;                 ///< Deck analytics widget.
     VisualDatabaseDisplayWidget *visualDatabaseDisplay; ///< Database display widget.
     PrintingSelector *printingSelector;                 ///< Printing selector widget.
