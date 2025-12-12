@@ -5,7 +5,14 @@
 bool cardMatchesCondition(const CardInfo &card, const CardCondition &cond)
 {
     CardMatchType type = matchTypeFromString(cond.matchType);
-    QString fieldValue = card.getProperty(cond.field);
+    QString fieldValue;
+    if (cond.field == "name") {
+        fieldValue = card.getName();
+    } else if (cond.field == "text") {
+        fieldValue = card.getText();
+    } else {
+        fieldValue = card.getProperty(cond.field);
+    }
 
     switch (type) {
         case CardMatchType::Equals:
