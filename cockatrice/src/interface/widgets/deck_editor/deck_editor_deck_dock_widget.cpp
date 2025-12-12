@@ -289,8 +289,9 @@ void DeckEditorDeckDockWidget::initializeFormats()
     formatComboBox->setEnabled(true);
 
     // Populate with formats
+    formatComboBox->addItem("", "");
     for (auto it = allFormats.constBegin(); it != allFormats.constEnd(); ++it) {
-        QString displayText = QString("%1 (%2)").arg(it.key()).arg(it.value());
+        QString displayText = QString("%1").arg(it.key());
         formatComboBox->addItem(displayText, it.key()); // store the raw key in itemData
     }
 
