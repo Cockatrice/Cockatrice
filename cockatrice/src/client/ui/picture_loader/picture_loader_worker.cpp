@@ -9,6 +9,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
+#include <version_string.h>
 
 // Card back returned by gatherer when card is not found
 QStringList PictureLoaderWorker::md5Blacklist = QStringList() << "db0c48db407a907c16ade38de048a441";
@@ -263,6 +264,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     // In the end, just do the simple thing and disable HTTP compression.
     req.setRawHeader("accept-encoding", "identity");
 
+    req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }

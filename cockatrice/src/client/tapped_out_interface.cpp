@@ -9,6 +9,7 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
+#include <version_string.h>
 
 TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)
@@ -88,6 +89,7 @@ void TappedOutInterface::analyzeDeck(DeckList *deck)
 
     QNetworkRequest request(QUrl("https://tappedout.net/mtg-decks/paste/"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     manager->post(request, data);
 }

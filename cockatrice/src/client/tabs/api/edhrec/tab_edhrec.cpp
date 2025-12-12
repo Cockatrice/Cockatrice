@@ -12,6 +12,7 @@
 #include <QNetworkReply>
 #include <QRegularExpression>
 #include <QResizeEvent>
+#include <version_string.h>
 
 TabEdhRec::TabEdhRec(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
@@ -49,6 +50,7 @@ void TabEdhRec::setCard(CardInfoPtr _cardToQuery, bool isCommander)
 
     QNetworkRequest request{QUrl(url)};
 
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     networkManager->get(request);
 }
 

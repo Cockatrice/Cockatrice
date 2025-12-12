@@ -16,6 +16,7 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QtConcurrent>
+#include <version_string.h>
 
 #define SPOILERS_STATUS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/SpoilerSeasonEnabled"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
@@ -41,7 +42,9 @@ void SpoilerBackgroundUpdater::startSpoilerDownloadProcess(QString url, bool sav
 void SpoilerBackgroundUpdater::downloadFromURL(QUrl url, bool saveResults)
 {
     auto *nam = new QNetworkAccessManager(this);
-    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+    auto request = QNetworkRequest(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    QNetworkReply *reply = nam->get(request);
 
     if (saveResults) {
         // This will write out to the file (used for spoiler.xml)
