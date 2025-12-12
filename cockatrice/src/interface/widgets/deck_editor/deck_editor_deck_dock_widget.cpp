@@ -310,6 +310,7 @@ void DeckEditorDeckDockWidget::initializeFormats()
         } else {
             deckModel->setActiveFormat(QString()); // clear format if deselected
         }
+        emit deckModified();
     });
 }
 
