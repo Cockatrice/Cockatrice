@@ -235,7 +235,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
     // Prepare the new items with deduplication
     QSet<QPair<QString, QString>> bannerCardSet;
 
-    QList<DecklistCardNode *> cardsInDeck = deckLoader->getDeckList()->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = deckLoader->getDeckList()->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {

@@ -94,7 +94,7 @@ public:
     }
 
 private:
-    static void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
+    static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
     static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);
 
     static void saveToStream_DeckZone(QTextStream &out,

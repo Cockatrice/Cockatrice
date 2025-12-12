@@ -270,6 +270,20 @@ static QString toDecklistExportString(const DecklistCardNode *card)
 }
 
 /**
+ * Converts all cards in the list to their decklist export string and joins them into one string
+ */
+static QString toDecklistExportString(const QList<const DecklistCardNode *> &cardNodes)
+{
+    QString result;
+
+    for (auto cardNode : cardNodes) {
+        result += toDecklistExportString(cardNode);
+    }
+
+    return result;
+}
+
+/**
  * Export deck to decklist function, called to format the deck in a way to be sent to a server
  *
  * @param deckList The decklist to export
@@ -279,29 +293,11 @@ QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsi
 {
     // Add the base url
     QString deckString = "https://" + getDomainForWebsite(website) + "/?";
-    // Create two strings to pass to function
-    QString mainBoardCards, sideBoardCards;
 
-    // Set up the function to call
-    auto formatDeckListForExport = [&mainBoardCards, &sideBoardCards](const auto *node, const auto *card) {
-        // Get the card name
-        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
-        if (!dbCard || dbCard->getIsToken()) {
-            // If it's a token, we don't care about the card.
-            return;
-        }
+    // export all cards in zone
+    QString mainBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_MAIN}));
+    QString sideBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_SIDE}));
 
-        // Check if it's a sideboard card.
-        if (node->getName() == DECK_ZONE_SIDE) {
-            sideBoardCards += toDecklistExportString(card);
-        } else {
-            // If it's a mainboard card, do the same thing, but for the mainboard card string
-            mainBoardCards += toDecklistExportString(card);
-        }
-    };
-
-    // call our struct function for each card in the deck
-    deckList->forEachCard(formatDeckListForExport);
     // Remove the extra return at the end of the last cards
     mainBoardCards.chop(3);
     sideBoardCards.chop(3);
@@ -335,9 +331,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     }
 
     // loop zones
-    for (int i = 0; i < deckList->getRoot()->size(); i++) {
-        const auto *zoneNode = dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i));
-
+    for (auto zoneNode : deckList->getZoneNodes()) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
@@ -514,7 +508,7 @@ QString DeckLoader::getCompleteCardName(const QString &cardName)
     return cardName;
 }
 
-void DeckLoader::printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node)
+void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
 {
     const int totalColumns = 2;
 
@@ -597,12 +591,11 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
     cursor.insertText(deckList->getComments());
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-    for (int i = 0; i < deckList->getRoot()->size(); i++) {
+    for (auto zoneNode : deckList->getZoneNodes()) {
         cursor.insertHtml("<br><img src=theme:hr.jpg>");
-        // cursor.insertHtml("<hr>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-        printDeckListNode(&cursor, dynamic_cast<InnerDecklistNode *>(deckList->getRoot()->at(i)));
+        printDeckListNode(&cursor, zoneNode);
     }
 
     doc.print(printer);

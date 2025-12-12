@@ -102,28 +102,16 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Assign card ids and create deck from deck list
-    InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); ++i) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        Server_CardZone *z;
-        if (currentZone->getName() == DECK_ZONE_MAIN) {
-            z = deckZone;
-        } else if (currentZone->getName() == DECK_ZONE_SIDE) {
-            z = sbZone;
-        } else {
-            continue;
+    auto insertCardsIntoZone = [this](auto cards, auto *zone) {
+        for (auto card : cards) {
+            for (int k = 0; k < card->getNumber(); ++k) {
+                zone->insertCard(new Server_Card(card->toCardRef(), nextCardId++, 0, 0, zone), -1, 0);
+            }
         }
+    };
 
-        for (int j = 0; j < currentZone->size(); ++j) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
-            }
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                z->insertCard(new Server_Card(currentCard->toCardRef(), nextCardId++, 0, 0, z), -1, 0);
-            }
-        }
-    }
+    insertCardsIntoZone(deck->getCardNodes({DECK_ZONE_MAIN}), deckZone);
+    insertCardsIntoZone(deck->getCardNodes({DECK_ZONE_SIDE}), sbZone);
 
     const QList<MoveCard_ToZone> &sideboardPlan = deck->getCurrentSideboardPlan();
     for (const auto &m : sideboardPlan) {

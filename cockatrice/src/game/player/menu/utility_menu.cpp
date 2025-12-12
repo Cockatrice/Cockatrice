@@ -5,6 +5,7 @@
 #include "../player_actions.h"
 #include "player_menu.h"
 
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 
 UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
@@ -65,15 +66,13 @@ void UtilityMenu::populatePredefinedTokensMenu()
         return;
     }
 
-    InnerDecklistNode *tokenZone =
-        dynamic_cast<InnerDecklistNode *>(_deck->getDeckList()->getRoot()->findChild(DECK_ZONE_TOKENS));
+    auto tokenCardNodes = _deck->getDeckList()->getCardNodes({DECK_ZONE_TOKENS});
 
-    if (tokenZone) {
-        if (!tokenZone->empty())
-            setEnabled(true);
+    if (!tokenCardNodes.isEmpty()) {
+        setEnabled(true);
 
-        for (int i = 0; i < tokenZone->size(); ++i) {
-            const QString tokenName = tokenZone->at(i)->getName();
+        for (int i = 0; i < tokenCardNodes.size(); ++i) {
+            const QString tokenName = tokenCardNodes[i]->getName();
             predefinedTokens.append(tokenName);
             QAction *a = addAction(tokenName);
             if (i < 10) {

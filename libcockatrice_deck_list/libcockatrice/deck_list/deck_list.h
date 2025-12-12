@@ -148,8 +148,6 @@ private:
     mutable QString cachedDeckHash;
 
     // Helpers for traversing the tree
-    static void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result);
-    static void getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result);
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 public:
@@ -267,7 +265,8 @@ public:
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
-    QList<DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
+    QList<const DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
+    QList<const InnerDecklistNode *> getZoneNodes() const;
     int getSideboardSize() const;
     InnerDecklistNode *getRoot() const
     {
