@@ -203,6 +203,7 @@ public:
     }
 
     [[nodiscard]] bool acceptName(CardInfoPtr info) const;
+    [[nodiscard]] bool acceptNameExact(CardInfoPtr info) const;
     [[nodiscard]] bool acceptType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptMainType(CardInfoPtr info) const;
     [[nodiscard]] bool acceptSubType(CardInfoPtr info) const;
