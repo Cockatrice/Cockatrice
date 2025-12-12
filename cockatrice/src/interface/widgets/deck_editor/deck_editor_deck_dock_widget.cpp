@@ -214,13 +214,13 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(commentsLabel, 1, 0);
     upperLayout->addWidget(commentsEdit, 1, 1);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 2, 1);
+    upperLayout->addWidget(formatLabel, 2, 0);
+    upperLayout->addWidget(formatComboBox, 2, 1);
 
-    upperLayout->addWidget(formatLabel, 3, 0);
-    upperLayout->addWidget(formatComboBox, 3, 1);
+    upperLayout->addWidget(bannerCardLabel, 3, 0);
+    upperLayout->addWidget(bannerCardComboBox, 3, 1);
 
-    upperLayout->addWidget(bannerCardLabel, 4, 0);
-    upperLayout->addWidget(bannerCardComboBox, 4, 1);
+    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
 
     upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
     upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
