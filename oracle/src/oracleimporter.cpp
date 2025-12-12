@@ -477,7 +477,7 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     CardCondition anyNumberAllowed;
     anyNumberAllowed.field = "text";
     anyNumberAllowed.matchType = "contains";
-    anyNumberAllowed.value = "may contain any number of";
+    anyNumberAllowed.value = "A deck can have any number of";
 
     ExceptionRule mayContainAnyNumber;
     mayContainAnyNumber.conditions.append(anyNumberAllowed);
