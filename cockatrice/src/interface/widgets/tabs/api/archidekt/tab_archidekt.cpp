@@ -22,6 +22,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
@@ -426,18 +427,21 @@ void TabArchidekt::doSearchImmediate()
 {
     QString url = buildSearchUrl();
     QNetworkRequest req{QUrl(url)};
+    req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     networkManager->get(req);
 }
 
 void TabArchidekt::actNavigatePage(QString url)
 {
     QNetworkRequest request{QUrl(url)};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     networkManager->get(request);
 }
 
 void TabArchidekt::getTopDecks()
 {
     QNetworkRequest request{QUrl(buildSearchUrl())};
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     networkManager->get(request);
 }
 
