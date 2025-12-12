@@ -61,9 +61,9 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     unusedColorIdentitiesOpacitySpinBox->setMaximum(100);
     unusedColorIdentitiesOpacitySpinBox->setValue(
         SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity());
-    connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+    connect(unusedColorIdentitiesOpacitySpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDeckStorageQuickSettingsWidget::unusedColorIdentitiesOpacityChanged);
-    connect(unusedColorIdentitiesOpacitySpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+    connect(unusedColorIdentitiesOpacitySpinBox, qOverload<int>(&QSpinBox::valueChanged),
             &SettingsCache::instance(), &SettingsCache::setVisualDeckStorageUnusedColorIdentitiesOpacity);
 
     unusedColorIdentitiesOpacityLabel->setBuddy(unusedColorIdentitiesOpacitySpinBox);
