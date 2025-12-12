@@ -302,7 +302,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
     const auto urlString = url.toString();
     if (urlString == ALLSETS_URL || urlString == ALLSETS_URL_FALLBACK) {
         const auto versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
-        auto *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
+        QNetworkRequest request = QNetworkRequest(versionUrl);
+        request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+        auto *versionReply = wizard()->nam->get(request);
         connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
                 auto data = versionReply->readAll();
@@ -326,7 +328,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
     wizard()->setCardSourceUrl(url.toString());
 
-    auto *reply = wizard()->nam->get(QNetworkRequest(url));
+    QNetworkRequest request = QNetworkRequest(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    auto *reply = wizard()->nam->get(request);
 
     connect(reply, &QNetworkReply::finished, this, &LoadSetsPage::actDownloadFinishedSetsFile);
     connect(reply, &QNetworkReply::downloadProgress, this, &LoadSetsPage::actDownloadProgressSetsFile);
