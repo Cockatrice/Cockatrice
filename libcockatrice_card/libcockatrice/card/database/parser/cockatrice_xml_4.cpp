@@ -120,7 +120,7 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
 
 QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
 {
-    QVariantHash properties = QVariantHash();
+    auto properties = QVariantHash();
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -145,9 +145,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
         auto xmlName = xml.name().toString();
 
         if (xmlName == "card") {
-            QString name = QString("");
-            QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            auto name = QString("");
+            auto text = QString("");
+            auto properties = QVariantHash();
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -210,7 +210,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     }
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
-                    CardRelationType attachType = CardRelationType::DoesNotAttach;
+                    auto attachType = CardRelationType::DoesNotAttach;
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;

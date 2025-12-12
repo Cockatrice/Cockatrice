@@ -34,7 +34,7 @@ void GameView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
 
-    GameScene *s = dynamic_cast<GameScene *>(scene());
+    auto *s = dynamic_cast<GameScene *>(scene());
     if (s)
         s->processViewSizeChange(event->size());
 

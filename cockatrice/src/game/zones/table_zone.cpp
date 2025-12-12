@@ -204,9 +204,9 @@ void TableZone::toggleTapped()
     });
     QList<const ::google::protobuf::Message *> cmdList;
     for (const auto &selectedItem : selectedItems) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
+        auto *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
         if (temp->getTapped() != tapAll) {
-            Command_SetCardAttr *cmd = new Command_SetCardAttr;
+            auto *cmd = new Command_SetCardAttr;
             cmd->set_zone(getLogic()->getName().toStdString());
             cmd->set_card_id(temp->getId());
             cmd->set_attribute(AttrTapped);

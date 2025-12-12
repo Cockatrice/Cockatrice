@@ -36,7 +36,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     CardZone *cardZone = 0;
     ZoneViewZone *zoneViewZone = 0;
     for (int i = colliding.size() - 1; i >= 0; i--) {
-        CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
+        auto *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
         if (!cardZone)
             cardZone = temp;
         if (!zoneViewZone)
@@ -75,7 +75,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     // For other zones (where we do display the card under the cursor), we use
     // the hotspot to feel like the card was dragged at the corresponding
     // position.
-    TableZone *tableZone = qobject_cast<TableZone *>(cursorZone);
+    auto *tableZone = qobject_cast<TableZone *>(cursorZone);
     QPointF closestGridPoint;
     if (tableZone)
         closestGridPoint = tableZone->closestGridPoint(cursorPosInZone);
@@ -90,7 +90,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         setPos(newPos);
 
         bool newOccupied = false;
-        TableZone *table = qobject_cast<TableZone *>(cursorZone);
+        auto *table = qobject_cast<TableZone *>(cursorZone);
         if (table)
             if (table->getCardFromCoords(closestGridPoint))
                 newOccupied = true;
@@ -116,7 +116,7 @@ void CardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
 
         for (int i = 0; i < childDrags.size(); i++) {
-            CardDragItem *c = static_cast<CardDragItem *>(childDrags[i]);
+            auto *c = static_cast<CardDragItem *>(childDrags[i]);
             if (!occupied &&
                 !(static_cast<CardItem *>(c->item)->getAttachedTo() && (startZone == currentZone->getLogic())) &&
                 !c->occupied) {
