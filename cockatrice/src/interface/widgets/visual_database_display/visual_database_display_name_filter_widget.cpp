@@ -51,7 +51,7 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
 
 void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 {
-    searchBox->setPlaceholderText(tr("Filter by name ... (Exact match)"));
+    searchBox->setPlaceholderText(tr("Filter by name... (Exact match)"));
     loadFromDeckButton->setText(tr("Load from Deck"));
     loadFromDeckButton->setToolTip(tr("Apply all card names in currently loaded deck as exact match name filters"));
     loadFromClipboardButton->setText(tr("Load from Clipboard"));
