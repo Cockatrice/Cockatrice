@@ -232,8 +232,8 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
             return;
         } else {
             // Normal click = clear selection, select this, set current
-            deckDockWidget->deckView->setCurrentIndex(idx);
-            deckDockWidget->deckView->scrollTo(idx);
+            deckDockWidget->setCurrentProxyIndex(idx);
+            deckDockWidget->scrollToProxyIndex(idx);
             return;
         }
 

@@ -185,7 +185,7 @@ void PrintingSelector::selectCard(const int changeBy)
     }
 
     if (nextIndex.isValid()) {
-        deckView->setCurrentIndex(nextIndex);
+        deckEditor->deckDockWidget->setCurrentProxyIndex(nextIndex);
         deckView->setFocus(Qt::FocusReason::MouseFocusReason);
     }
 }

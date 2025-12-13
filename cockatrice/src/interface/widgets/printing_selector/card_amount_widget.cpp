@@ -190,7 +190,7 @@ void CardAmountWidget::addPrinting(const QString &zone)
     newCardIndex = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
                                        rootCard.getPrinting().getProperty("num"));
 
-    deckView->setCurrentIndex(newCardIndex);
+    deckEditor->deckDockWidget->setCurrentProxyIndex(newCardIndex);
     deckView->setFocus(Qt::FocusReason::MouseFocusReason);
     deckEditor->setModified(true);
 }
@@ -256,7 +256,7 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
     const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
     const int new_count = count + offset;
 
-    deckView->setCurrentIndex(numberIndex);
+    deckEditor->deckDockWidget->setCurrentProxyIndex(numberIndex);
 
     if (new_count <= 0) {
         deckModel->removeRow(idx.row(), idx.parent());

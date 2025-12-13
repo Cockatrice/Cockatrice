@@ -71,6 +71,8 @@ public slots:
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void initializeFormats();
     void expandAll();
+    void setCurrentProxyIndex(const QModelIndex &index);
+    void scrollToProxyIndex(const QModelIndex &index);
 
 signals:
     void nameChanged();
