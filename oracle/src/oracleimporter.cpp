@@ -13,9 +13,9 @@
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
-static const QList<AllowedCount> kConstructedCounts = {{4, "legal"}, {1, "restricted"}, {0, "banned"}};
+static const QList<AllowedCount> kConstructedCounts = {{4, "legal"}, {0, "banned"}};
 
-static const QList<AllowedCount> kSingletonCounts = {{1, "legal"}, {1, "restricted"}, {0, "banned"}};
+static const QList<AllowedCount> kSingletonCounts = {{1, "legal"}, {0, "banned"}};
 
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
@@ -508,7 +508,6 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     makeFormat("Standard");
     makeFormat("Modern");
     makeFormat("Legacy");
-    makeFormat("Vintage");
     makeFormat("Pioneer");
     makeFormat("Historic");
     makeFormat("Timeless");
@@ -526,6 +525,9 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     makeFormat("Oathbreaker", 60, 60, 15, kSingletonCounts);
     makeFormat("PauperCommander", 100, 100, 15, kSingletonCounts);
     makeFormat("Predh", 100, 100, 15, kSingletonCounts);
+
+    // ----------------- Restricted formats -----------------
+    makeFormat("Vintage", 60, -1, 15, {{4, "legal"}, {1, "restricted"}, {0, "banned"}});
 
     return defaultFormatRulesNameMap;
 }
