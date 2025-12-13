@@ -622,6 +622,17 @@ bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
     return true;
 }
 
+int maxAllowedForLegality(const FormatRules &format, const QString &legality)
+{
+    for (const AllowedCount &c : format.allowedCounts) {
+        if (c.label == legality) {
+            return c.max;
+        }
+    }
+    return -1; // unknown legality → treat as illegal
+}
+
+
 bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
 {
     auto formatRules = CardDatabaseManager::query()->getFormat(deckList->getGameFormat());
@@ -630,24 +641,29 @@ bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardIn
         return true;
     }
 
-    if (cardHasAnyException(*cardInfo.data(), *formatRules.data())) {
+    // Exceptions always win
+    if (cardHasAnyException(*cardInfo, *formatRules)) {
         return true;
     }
 
-    if (cardInfo->getProperties().contains("format-" + deckList->getGameFormat())) {
-        QString formatLegality = cardInfo->getProperty("format-" + deckList->getGameFormat());
-        if (formatLegality == "legal") {
-            if (quantity <= formatRules->maxCopies) {
-                return true;
-            }
-        } else if (formatLegality == "restricted") {
-            if (quantity <= formatRules->maxRestrictedCopies) {
-                return true;
-            }
-        }
+    const QString legalityProp = "format-" + deckList->getGameFormat();
+    if (!cardInfo->getProperties().contains(legalityProp)) {
+        return false;
     }
 
-    return false;
+    const QString legality = cardInfo->getProperty(legalityProp);
+
+    int maxAllowed = maxAllowedForLegality(*formatRules, legality);
+
+    if (maxAllowed == -1) {
+        return false;
+    }
+
+    if (maxAllowed < 0) { // unlimited
+        return true;
+    }
+
+    return quantity <= maxAllowed;
 }
 
 void DeckListModel::refreshCardFormatLegalities()

@@ -13,6 +13,10 @@
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
+static const QList<AllowedCount> kConstructedCounts = {{4, "legal"}, {1, "restricted"}, {0, "banned"}};
+
+static const QList<AllowedCount> kSingletonCounts = {{1, "legal"}, {1, "restricted"}, {0, "banned"}};
+
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QVariantHash &_properties,
@@ -486,11 +490,11 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     FormatRulesNameMap defaultFormatRulesNameMap;
 
     // ----------------- Helper lambda to create format -----------------
-    auto makeFormat = [&](const QString &name, int maxCopies = 4, int minDeck = 60, int maxDeck = -1,
-                          int maxSideboardSize = 15) -> FormatRulesPtr {
+    auto makeFormat = [&](const QString &name, int minDeck = 60, int maxDeck = -1, int maxSideboardSize = 15,
+                          const QList<AllowedCount> &allowedCounts = kConstructedCounts) -> FormatRulesPtr {
         FormatRulesPtr f(new FormatRules);
         f->formatName = name;
-        f->maxCopies = maxCopies;
+        f->allowedCounts = allowedCounts;
         f->minDeckSize = minDeck;
         f->maxDeckSize = maxDeck;
         f->maxSideboardSize = maxSideboardSize;
@@ -501,27 +505,27 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     };
 
     // ----------------- Standard formats -----------------
-    makeFormat("Alchemy", 4, 60);
-    makeFormat("Brawl", 1, 60, 60);
-    makeFormat("Commander", 1, 100, 100);
-    makeFormat("Duel", 1, 100, 100);
-    makeFormat("Future");
-    makeFormat("Gladiator", 4, 60, 60, 0);
-    makeFormat("Historic");
-    makeFormat("Legacy");
-    makeFormat("Modern");
-    makeFormat("Oathbreaker", 1, 60, 60);
-    makeFormat("OldSchool");
-    makeFormat("Pauper");
-    makeFormat("PauperCommander", 1, 100, 100);
-    makeFormat("Penny");
-    makeFormat("Pioneer");
-    makeFormat("Predh", 1, 100, 100);
-    makeFormat("Premodern");
     makeFormat("Standard");
-    makeFormat("StandardBrawl", 1, 60, 60);
-    makeFormat("Timeless");
+    makeFormat("Modern");
+    makeFormat("Legacy");
     makeFormat("Vintage");
+    makeFormat("Pioneer");
+    makeFormat("Historic");
+    makeFormat("Timeless");
+    makeFormat("Future");
+    makeFormat("OldSchool");
+    makeFormat("Premodern");
+    makeFormat("Pauper");
+    makeFormat("Penny");
+
+    // ----------------- Singleton formats -----------------
+    makeFormat("Commander", 100, 100, 15, kSingletonCounts);
+    makeFormat("Duel", 100, 100, 15, kSingletonCounts);
+    makeFormat("Brawl", 60, 60, 15, kSingletonCounts);
+    makeFormat("StandardBrawl", 60, 60, 15, kSingletonCounts);
+    makeFormat("Oathbreaker", 60, 60, 15, kSingletonCounts);
+    makeFormat("PauperCommander", 100, 100, 15, kSingletonCounts);
+    makeFormat("Predh", 100, 100, 15, kSingletonCounts);
 
     return defaultFormatRulesNameMap;
 }

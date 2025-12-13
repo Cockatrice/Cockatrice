@@ -109,10 +109,26 @@ static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
             rulesPtr->maxDeckSize = text.toInt();
         } else if (xmlName == "maxSideboardSize") {
             rulesPtr->maxSideboardSize = xml.readElementText().toInt();
-        } else if (xmlName == "maxCopies") {
-            rulesPtr->maxCopies = xml.readElementText().toInt();
-        } else if (xmlName == "maxRestrictedCopies") {
-            rulesPtr->maxRestrictedCopies = xml.readElementText().toInt();
+        } else if (xmlName == "allowedCounts") {
+            while (!xml.atEnd()) {
+                token = xml.readNext();
+
+                if (token == QXmlStreamReader::EndElement && xml.name().toString() == "allowedCounts") {
+                    break;
+                }
+
+                if (token == QXmlStreamReader::StartElement && xml.name().toString() == "count") {
+
+                    AllowedCount c;
+
+                    QString maxAttr = xml.attributes().value("max").toString();
+                    c.max = (maxAttr == "unlimited") ? -1 : maxAttr.toInt();
+
+                    c.label = xml.readElementText().trimmed();
+
+                    rulesPtr->allowedCounts.append(c);
+                }
+            }
         } else if (xmlName == "exceptions") {
             while (!xml.atEnd()) {
                 token = xml.readNext();
@@ -387,8 +403,18 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const QSharedPointer<
     xml.writeTextElement("minDeckSize", QString::number(rules.minDeckSize));
     xml.writeTextElement("maxDeckSize", rules.maxDeckSize >= 0 ? QString::number(rules.maxDeckSize) : "0");
     xml.writeTextElement("maxSideboardSize", QString::number(rules.maxSideboardSize));
-    xml.writeTextElement("maxCopies", QString::number(rules.maxCopies));
-    xml.writeTextElement("maxRestrictedCopies", QString::number(rules.maxRestrictedCopies));
+    if (!rules.allowedCounts.isEmpty()) {
+        xml.writeStartElement("allowedCounts");
+
+        for (const AllowedCount &c : rules.allowedCounts) {
+            xml.writeStartElement("count");
+            xml.writeAttribute("max", c.max == -1 ? "unlimited" : QString::number(c.max));
+            xml.writeCharacters(c.label);
+            xml.writeEndElement(); // count
+        }
+
+        xml.writeEndElement(); // allowedCounts
+    }
 
     if (!rules.exceptions.isEmpty()) {
         xml.writeStartElement("exceptions");

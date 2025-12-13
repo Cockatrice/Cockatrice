@@ -15,6 +15,12 @@ struct CardCondition
     QString value;     // e.g. "Basic Land"
 };
 
+struct AllowedCount
+{
+    int max = 0;   // 4, 1, 0, or -1 for unlimited
+    QString label; // "legal", "restricted", "banned"
+};
+
 struct ExceptionRule
 {
     QList<CardCondition> conditions; // All must match
@@ -28,8 +34,7 @@ struct FormatRules
     int maxDeckSize = -1; // -1 = unlimited
     int maxSideboardSize = 15;
 
-    int maxCopies = 4;           // default constructed rule
-    int maxRestrictedCopies = 1; // Used for "restricted" legality tags
+    QList<AllowedCount> allowedCounts;
 
     QList<ExceptionRule> exceptions; // Cards allowed to break maxCopies
 };
