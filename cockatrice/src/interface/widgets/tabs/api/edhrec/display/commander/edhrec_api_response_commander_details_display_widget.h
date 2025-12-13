@@ -29,8 +29,12 @@ public:
 
 private:
     EdhrecCommanderApiResponseCommanderDetails commanderDetails;
-    QVBoxLayout *layout;
+    QHBoxLayout *layout;
+    QHBoxLayout *commanderLayout;
+    QVBoxLayout *commanderDetailsLayout;
+    QVBoxLayout *navigationAndPricesLayout;
     CardInfoPictureWidget *commanderPicture;
+    QLabel *commanderName;
     QLabel *label;
     QLabel *salt;
     EdhrecApiResponseCardPricesDisplayWidget *cardPricesDisplayWidget;
