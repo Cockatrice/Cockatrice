@@ -136,6 +136,8 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             metadata.lastLoadedTimestamp = xml->readElementText();
         } else if (childName == "deckname") {
             metadata.name = xml->readElementText();
+        } else if (childName == "format") {
+            metadata.gameFormat = xml->readElementText();
         } else if (childName == "comments") {
             metadata.comments = xml->readElementText();
         } else if (childName == "bannerCard") {
@@ -170,6 +172,7 @@ void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
 {
     xml->writeTextElement("lastLoadedTimestamp", metadata.lastLoadedTimestamp);
     xml->writeTextElement("deckname", metadata.name);
+    xml->writeTextElement("format", metadata.gameFormat);
     xml->writeStartElement("bannerCard");
     xml->writeAttribute("providerId", metadata.bannerCard.providerId);
     xml->writeCharacters(metadata.bannerCard.name);
@@ -594,15 +597,16 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const int position,
                                     const QString &cardSetName,
                                     const QString &cardSetCollectorNumber,
-                                    const QString &cardProviderId)
+                                    const QString &cardProviderId,
+                                    const bool formatLegal)
 {
     auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     if (zoneNode == nullptr) {
         zoneNode = new InnerDecklistNode(zoneName, root);
     }
 
-    auto *node =
-        new DecklistCardNode(cardName, 1, zoneNode, position, cardSetName, cardSetCollectorNumber, cardProviderId);
+    auto *node = new DecklistCardNode(cardName, 1, zoneNode, position, cardSetName, cardSetCollectorNumber,
+                                      cardProviderId, formatLegal);
     refreshDeckHash();
 
     return node;

@@ -46,7 +46,8 @@ public:
     /**
      * @brief Save sets and cards back to an XML3 file.
      */
-    bool saveToFile(SetNameMap _sets,
+    bool saveToFile(FormatRulesNameMap _formats,
+                    SetNameMap _sets,
                     CardNameMap cards,
                     const QString &fileName,
                     const QString &sourceUrl = "unknown",

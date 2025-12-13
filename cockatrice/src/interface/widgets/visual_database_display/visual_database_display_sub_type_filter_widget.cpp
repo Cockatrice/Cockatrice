@@ -26,7 +26,7 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     spinBox->setMaximum(getMaxSubTypeCount());
     spinBox->setValue(150);
     layout->addWidget(spinBox);
-    connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility);
 
     // Create search box

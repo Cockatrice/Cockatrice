@@ -23,6 +23,7 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
         // connect parser outputs to the database adders
         connect(p, &ICardDatabaseParser::addCard, database, &CardDatabase::addCard, Qt::DirectConnection);
         connect(p, &ICardDatabaseParser::addSet, database, &CardDatabase::addSet, Qt::DirectConnection);
+        connect(p, &ICardDatabaseParser::addFormat, database, &CardDatabase::addFormat, Qt::DirectConnection);
     }
 
     // when SettingsCache's path changes, trigger reloads
@@ -149,6 +150,6 @@ bool CardDatabaseLoader::saveCustomTokensToFile()
         }
     }
 
-    availableParsers.first()->saveToFile(tmpSets, tmpCards, fileName);
+    availableParsers.first()->saveToFile(FormatRulesNameMap(), tmpSets, tmpCards, fileName);
     return true;
 }

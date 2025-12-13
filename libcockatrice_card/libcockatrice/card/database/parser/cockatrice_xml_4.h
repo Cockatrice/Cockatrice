@@ -49,7 +49,8 @@ public:
     /**
      * @brief Save sets and cards back to an XML4 file.
      */
-    bool saveToFile(SetNameMap _sets,
+    bool saveToFile(FormatRulesNameMap _formats,
+                    SetNameMap _sets,
                     CardNameMap cards,
                     const QString &fileName,
                     const QString &sourceUrl = "unknown",
@@ -72,6 +73,7 @@ private:
      */
     void loadCardsFromXml(QXmlStreamReader &xml);
 
+    void loadFormats(QXmlStreamReader &xml);
     /**
      * @brief Load all <set> elements from the XML stream.
      * @param xml The open QXmlStreamReader positioned at the <sets> element.

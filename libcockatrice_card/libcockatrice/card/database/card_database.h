@@ -42,6 +42,8 @@ protected:
     /// Sets indexed by short name
     SetNameMap sets;
 
+    FormatRulesNameMap formats;
+
     /// Loader responsible for file discovery and parsing
     CardDatabaseLoader *loader;
 
@@ -140,6 +142,8 @@ public slots:
      * @param set Pointer to CardSet to add.
      */
     void addSet(CardSetPtr set);
+
+    void addFormat(FormatRulesPtr format);
 
     /** @brief Loads card databases from configured paths. */
     void loadCardDatabases();

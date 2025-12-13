@@ -124,6 +124,12 @@ void DeckEditorDeckDockWidget::createDeckDock()
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
     quickSettingsWidget->addSettingsWidget(showTagsWidgetCheckBox);
 
+    formatLabel = new QLabel(this);
+
+    formatComboBox = new QComboBox(this);
+    formatComboBox->addItem(tr("Loading Database..."));
+    formatComboBox->setEnabled(false); // Disable until loaded
+
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
@@ -208,13 +214,16 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(commentsLabel, 1, 0);
     upperLayout->addWidget(commentsEdit, 1, 1);
 
-    upperLayout->addWidget(bannerCardLabel, 2, 0);
-    upperLayout->addWidget(bannerCardComboBox, 2, 1);
+    upperLayout->addWidget(formatLabel, 2, 0);
+    upperLayout->addWidget(formatComboBox, 2, 1);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 3, 1);
+    upperLayout->addWidget(bannerCardLabel, 3, 0);
+    upperLayout->addWidget(bannerCardComboBox, 3, 1);
 
-    upperLayout->addWidget(activeGroupCriteriaLabel, 4, 0);
-    upperLayout->addWidget(activeGroupCriteriaComboBox, 4, 1);
+    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
+
+    upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -263,6 +272,46 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     refreshShortcuts();
     retranslateUi();
+
+    connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
+            &DeckEditorDeckDockWidget::initializeFormats);
+
+    if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
+        initializeFormats();
+    }
+}
+
+void DeckEditorDeckDockWidget::initializeFormats()
+{
+    QMap<QString, int> allFormats = CardDatabaseManager::query()->getAllFormatsWithCount();
+
+    formatComboBox->clear(); // Remove "Loading Database..."
+    formatComboBox->setEnabled(true);
+
+    // Populate with formats
+    formatComboBox->addItem("", "");
+    for (auto it = allFormats.constBegin(); it != allFormats.constEnd(); ++it) {
+        QString displayText = QString("%1").arg(it.key());
+        formatComboBox->addItem(displayText, it.key()); // store the raw key in itemData
+    }
+
+    if (!deckModel->getDeckList()->getGameFormat().isEmpty()) {
+        deckModel->setActiveFormat(deckModel->getDeckList()->getGameFormat());
+        formatComboBox->setCurrentIndex(formatComboBox->findData(deckModel->getDeckList()->getGameFormat()));
+    } else {
+        // Ensure no selection is visible initially
+        formatComboBox->setCurrentIndex(-1);
+    }
+
+    connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        if (index >= 0) {
+            QString formatKey = formatComboBox->itemData(index).toString();
+            deckModel->setActiveFormat(formatKey);
+        } else {
+            deckModel->setActiveFormat(QString()); // clear format if deselected
+        }
+        emit deckModified();
+    });
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -466,6 +515,12 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
 void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
 {
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
+    deckModel->setActiveFormat(deckModel->getDeckList()->getGameFormat());
+    formatComboBox->setCurrentIndex(formatComboBox->findData(deckModel->getDeckList()->getGameFormat()));
+    deckView->expandAll();
+    deckView->expandAll();
+
+    emit deckChanged();
 }
 
 DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
@@ -724,6 +779,8 @@ void DeckEditorDeckDockWidget::retranslateUi()
     showTagsWidgetCheckBox->setText(tr("Show tags selection menu"));
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
+    formatLabel->setText(tr("Format:"));
+
     hashLabel1->setText(tr("Hash:"));
 
     aIncrement->setText(tr("&Increment number"));

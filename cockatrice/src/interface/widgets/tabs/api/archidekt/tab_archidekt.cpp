@@ -214,7 +214,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     minDeckSizeLogicCombo->addItems({"Exact", "≥", "≤"}); // Exact = unset, ≥ = GTE, ≤ = LTE
     minDeckSizeLogicCombo->setCurrentIndex(1);            // default GTE
 
-    connect(minDeckSizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
+    connect(minDeckSizeSpin, qOverload<int>(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
     connect(minDeckSizeLogicCombo, &QComboBox::currentTextChanged, this, &TabArchidekt::doSearch);
 
     // Page number
@@ -224,7 +224,7 @@ TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
     pageSpin->setRange(1, 9999);
     pageSpin->setValue(1);
 
-    connect(pageSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
+    connect(pageSpin, qOverload<int>(&QSpinBox::valueChanged), this, &TabArchidekt::doSearch);
 
     // Page display
     currentPageDisplay = new QWidget(container);

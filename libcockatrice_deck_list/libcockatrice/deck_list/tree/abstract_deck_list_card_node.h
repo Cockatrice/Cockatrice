@@ -88,6 +88,12 @@ public:
     /// @param _cardSetNumber Set the collector number.
     virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
 
+    /// @return The format legality of the card
+    virtual bool getFormatLegality() const = 0;
+
+    /// @param _formatLegal If the card is considered legal
+    virtual void setFormatLegality(const bool _formatLegal) = 0;
+
     /**
      * @brief Get the height of this node in the tree.
      *
