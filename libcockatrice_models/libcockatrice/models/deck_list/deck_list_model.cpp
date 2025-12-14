@@ -41,7 +41,7 @@ void DeckListModel::rebuildTree()
     beginResetModel();
     root->clearTree();
 
-    InnerDecklistNode *listRoot = deckList->getRoot();
+    InnerDecklistNode *listRoot = deckList->getTree()->getRoot();
 
     for (int i = 0; i < listRoot->size(); i++) {
         auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
@@ -313,7 +313,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
     for (int i = 0; i < count; i++) {
         AbstractDecklistNode *toDelete = node->takeAt(row);
         if (auto *temp = dynamic_cast<DecklistModelCardNode *>(toDelete)) {
-            deckList->deleteNode(temp->getDataNode());
+            deckList->getTree()->deleteNode(temp->getDataNode());
         }
         delete toDelete;
     }
@@ -668,7 +668,7 @@ bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardIn
 
 void DeckListModel::refreshCardFormatLegalities()
 {
-    InnerDecklistNode *listRoot = deckList->getRoot();
+    InnerDecklistNode *listRoot = deckList->getTree()->getRoot();
 
     for (int i = 0; i < listRoot->size(); i++) {
         auto *currentZone = static_cast<InnerDecklistNode *>(listRoot->at(i));
