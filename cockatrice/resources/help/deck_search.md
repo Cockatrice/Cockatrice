@@ -15,10 +15,10 @@ searches are case insensitive.
 <dd>[n:red n:deck n:wins](#n:red n:deck n:wins) <small>(Any deck with a name containing the words red, deck, and wins)</small></dd>
 <dd>[n:"red deck wins"](#n:%22red deck wins%22) <small>(Any deck with a name containing the exact phrase "red deck wins")</small></dd>
 
-<dt><u>F</u>ile Name:</dt>
-<dd>[f:aggro](#f:aggro) <small>(Any deck with a filename containing the word aggro)</small></dd>
-<dd>[f:red f:deck f:wins](#f:red f:deck f:wins) <small>(Any deck with a filename containing the words red, deck, and wins)</small></dd>
-<dd>[f:"red deck wins"](#f:%22red deck wins%22) <small>(Any deck with a filename containing the exact phrase "red deck wins")</small></dd>
+<dt><u>F</u>ile <u>N</u>ame:</dt>
+<dd>[fn:aggro](#fn:aggro) <small>(Any deck with a filename containing the word aggro)</small></dd>
+<dd>[fn:red fn:deck fn:wins](#fn:red fn:deck fn:wins) <small>(Any deck with a filename containing the words red, deck, and wins)</small></dd>
+<dd>[fn:"red deck wins"](#fn:%22red deck wins%22) <small>(Any deck with a filename containing the exact phrase "red deck wins")</small></dd>
 
 <dt>Relative <u>P</u>ath (starting from the deck folder):</dt>
 <dd>[p:aggro](#p:aggro) <small>(Any deck that has "aggro" somewhere in its relative path)</small></dd>
