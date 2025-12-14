@@ -263,7 +263,7 @@ void Player::deleteCard(CardItem *card)
     }
 }
 
-// TODO: Does a player need a DeckLoader?
+//! \todo Does a player need a DeckLoader?
 void Player::setDeck(DeckLoader &_deck)
 {
     deck = new DeckLoader(this, _deck.getDeckList());

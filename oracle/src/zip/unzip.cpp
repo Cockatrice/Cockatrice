@@ -245,7 +245,6 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
  \internal Parses a local header record and makes some consistency check
  with the information stored in the Central Directory record for this entry
  that has been previously parsed.
- \todo Optional consistency check (as a ExtractionOptions flag)
 
  local file header signature     4 bytes  (0x04034b50)
  version needed to extract       2 bytes
@@ -262,6 +261,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
  file name (variable size)
  extra field (variable size)
 */
+//! \todo Optional consistency check (as a ExtractionOptions flag)
 UnZip::ErrorCode UnzipPrivate::parseLocalHeaderRecord(const QString& path, const ZipEntryP& entry)
 {
     Q_ASSERT(device);
