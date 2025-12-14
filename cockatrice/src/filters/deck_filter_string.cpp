@@ -13,7 +13,7 @@ QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / GenericQuery
+QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / FormatQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 
@@ -24,6 +24,7 @@ CardFilterString <- (!']]'.)*
 DeckNameQuery <- ([Dd] 'eck')? [Nn] 'ame'? [:] String
 FileNameQuery <- [Ff] ([Nn] / 'ile' ([Nn] 'ame')?) [:] String
 PathQuery <- [Pp] 'ath'? [:] String
+FormatQuery <- [Ff] 'ormat'? [:] String
 
 GenericQuery <- String
 
@@ -154,6 +155,14 @@ static void setupParserRules()
         auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *, const ExtraDeckSearchInfo &info) {
             return info.relativeFilePath.contains(name, Qt::CaseInsensitive);
+        };
+    };
+
+    search["FormatQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto format = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            auto gameFormat = deck->deckLoader->getDeckList()->getGameFormat();
+            return QString::compare(format, gameFormat, Qt::CaseInsensitive) == 0;
         };
     };
 
