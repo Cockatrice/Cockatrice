@@ -38,6 +38,7 @@
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
+#include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
 #include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
@@ -661,6 +662,7 @@ void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 
     actCheckCardUpdates();
     actCheckServerUpdates();
+    actCheckCommanderBracketDefinitionUpdates();
 }
 
 MainWindow::~MainWindow()
@@ -1003,6 +1005,16 @@ void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompati
         DlgUpdate dlg(this);
         dlg.exec();
     }
+}
+
+void MainWindow::actCheckCommanderBracketDefinitionUpdates()
+{
+    auto *handler = new HandleCommanderBrackets(this);
+
+    connect(handler, &HandleCommanderBrackets::sigBracketDefinitionsDownloaded, this,
+            []() { qDebug() << "Bracket definitions loaded"; });
+
+    handler->downloadBracketDefinitions();
 }
 
 void MainWindow::refreshShortcuts()
