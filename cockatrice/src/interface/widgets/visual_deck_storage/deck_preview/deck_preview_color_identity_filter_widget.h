@@ -9,9 +9,7 @@
 
 #include "../visual_deck_storage_widget.h"
 
-#include <QChar>
 #include <QHBoxLayout>
-#include <QList>
 #include <QPushButton>
 #include <QWidget>
 

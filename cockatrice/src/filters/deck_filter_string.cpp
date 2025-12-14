@@ -1,5 +1,6 @@
 #include "deck_filter_string.h"
 
+#include <QFileInfo>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
@@ -117,12 +118,13 @@ static void setupParserRules()
 
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
-            deck->deckLoader->getDeckList()->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
+            auto cardNodes = deck->deckLoader->getDeckList()->getCardNodes();
+            for (auto node : cardNodes) {
                 auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }
-            });
+            }
             return numberMatcher(count);
         };
     };

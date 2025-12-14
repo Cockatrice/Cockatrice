@@ -11,11 +11,10 @@
 
 #include <QDirIterator>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QMessageBox>
 
-DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, DeckList *_deckList)
-    : QWidget(_parent), deckList(nullptr)
+DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags)
+    : QWidget(_parent), currentTags(_tags)
 {
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -28,22 +27,14 @@ DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_par
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
-    if (_deckList) {
-        connectDeckList(_deckList);
-    }
-
     layout->addWidget(flowWidget);
+
+    refreshTags();
 }
 
-void DeckPreviewDeckTagsDisplayWidget::connectDeckList(DeckList *_deckList)
+void DeckPreviewDeckTagsDisplayWidget::setTags(const QStringList &_tags)
 {
-    if (deckList) {
-        disconnect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
-    }
-
-    deckList = _deckList;
-    connect(deckList, &DeckList::deckTagsChanged, this, &DeckPreviewDeckTagsDisplayWidget::refreshTags);
-
+    currentTags = _tags;
     refreshTags();
 }
 
@@ -51,7 +42,7 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
 {
     flowWidget->clearLayout();
 
-    for (const QString &tag : deckList->getTags()) {
+    for (const QString &tag : currentTags) {
         flowWidget->addWidget(new DeckPreviewTagDisplayWidget(this, tag));
     }
 
@@ -78,7 +69,45 @@ static QStringList getAllFiles(const QString &filePath)
     return allFiles;
 }
 
-bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
+/**
+ * Gets all tags that appear in the deck folder
+ */
+static QStringList findAllKnownTags()
+{
+    QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
+
+    QStringList knownTags;
+    auto loader = DeckLoader(nullptr);
+    for (const QString &file : allFiles) {
+        loader.loadFromFile(file, DeckFileFormat::getFormatFromName(file), false);
+        QStringList tags = loader.getDeckList()->getTags();
+        knownTags.append(tags);
+        knownTags.removeDuplicates();
+    }
+
+    return knownTags;
+}
+
+void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
+{
+    if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
+        // If we're the child of a DeckPreviewWidget, then we need to handle conversion
+        auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(parentWidget());
+
+        bool canAddTags = promptFileConversionIfRequired(deckPreviewWidget);
+
+        if (canAddTags) {
+            QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
+            execTagDialog(knownTags);
+        }
+    } else {
+        // If we're the child of an AbstractTabDeckEditor, then we don't bother with conversion
+        QStringList knownTags = findAllKnownTags();
+        execTagDialog(knownTags);
+    }
+}
+
+static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
 {
     QFileInfo fileInfo(filePath);
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
@@ -93,96 +122,70 @@ bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
     return true; // Safe to proceed
 }
 
-void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
+static void convertFileToCockatriceFormat(DeckPreviewWidget *deckPreviewWidget)
 {
-    if (qobject_cast<DeckPreviewWidget *>(parentWidget())) {
-        auto *deckPreviewWidget = qobject_cast<DeckPreviewWidget *>(parentWidget());
-        QStringList knownTags = deckPreviewWidget->visualDeckStorageWidget->tagFilterWidget->getAllKnownTags();
-        QStringList activeTags = deckList->getTags();
+    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
+    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastLoadInfo().fileName;
+    deckPreviewWidget->refreshBannerCardText();
+}
 
-        bool canAddTags = true;
+/**
+ * Checks if the deck's file format supports tags.
+ * If not, then prompt the user for file conversion.
+ * @return whether the resulting file can support adding tags
+ */
+bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPreviewWidget *deckPreviewWidget)
+{
+    if (DeckFileFormat::getFormatFromName(deckPreviewWidget->filePath) == DeckFileFormat::Cockatrice) {
+        return true;
+    }
 
-        if (DeckLoader::getFormatFromName(deckPreviewWidget->filePath) != DeckLoader::CockatriceFormat) {
-            canAddTags = false;
-            // Retrieve saved preference if the prompt is disabled
-            if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
-                if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
-
-                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
-                        return;
-
-                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
-                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
-                    deckPreviewWidget->refreshBannerCardText();
-                    canAddTags = true;
-                }
-            } else {
-                // Show the dialog to the user
-                DialogConvertDeckToCodFormat conversionDialog(parentWidget());
-                if (conversionDialog.exec() == QDialog::Accepted) {
-
-                    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath))
-                        return;
-
-                    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
-                    deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getLastFileName();
-                    deckPreviewWidget->refreshBannerCardText();
-                    canAddTags = true;
-
-                    if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
-                        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
-                    }
-                } else {
-                    SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
-
-                    if (conversionDialog.dontAskAgain()) {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
-                    } else {
-                        SettingsCache::instance().setVisualDeckStoragePromptForConversion(true);
-                    }
-                }
-            }
+    // Retrieve saved preference if the prompt is disabled
+    if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+        if (!SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+            return false;
         }
 
-        if (canAddTags) {
-            DeckPreviewTagDialog dialog(knownTags, activeTags);
-            if (dialog.exec() == QDialog::Accepted) {
-                QStringList updatedTags = dialog.getActiveTags();
-                deckList->setTags(updatedTags);
-                deckPreviewWidget->deckLoader->saveToFile(deckPreviewWidget->filePath, DeckLoader::CockatriceFormat);
-            }
+        if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath)) {
+            return false;
         }
-    } else if (parentWidget()) {
-        // If we're the child of an AbstractTabDeckEditor, we are buried under a ton of childWidgets in the
-        // DeckInfoDock.
-        QWidget *currentParent = parentWidget();
-        while (currentParent) {
-            if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
-                break;
-            }
-            currentParent = currentParent->parentWidget();
-        }
-        if (qobject_cast<AbstractTabDeckEditor *>(currentParent)) {
-            auto *deckEditor = qobject_cast<AbstractTabDeckEditor *>(currentParent);
-            QStringList knownTags;
-            QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
-            DeckLoader loader(this);
-            for (const QString &file : allFiles) {
-                loader.loadFromFile(file, DeckLoader::getFormatFromName(file), false);
-                QStringList tags = loader.getDeckList()->getTags();
-                knownTags.append(tags);
-                knownTags.removeDuplicates();
-            }
 
-            QStringList activeTags = deckList->getTags();
+        convertFileToCockatriceFormat(deckPreviewWidget);
+        return true;
+    }
 
-            DeckPreviewTagDialog dialog(knownTags, activeTags);
-            if (dialog.exec() == QDialog::Accepted) {
-                QStringList updatedTags = dialog.getActiveTags();
-                deckList->setTags(updatedTags);
-                deckEditor->setModified(true);
-            }
+    // Show the dialog to the user
+    DialogConvertDeckToCodFormat conversionDialog(parentWidget());
+    if (conversionDialog.exec() != QDialog::Accepted) {
+        SettingsCache::instance().setVisualDeckStoragePromptForConversion(!conversionDialog.dontAskAgain());
+        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
+
+        return false;
+    }
+
+    // Try to convert file
+    if (!confirmOverwriteIfExists(this, deckPreviewWidget->filePath)) {
+        return false;
+    }
+
+    convertFileToCockatriceFormat(deckPreviewWidget);
+
+    if (conversionDialog.dontAskAgain()) {
+        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
+        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
+    }
+
+    return true;
+}
+
+void DeckPreviewDeckTagsDisplayWidget::execTagDialog(const QStringList &knownTags)
+{
+    DeckPreviewTagDialog dialog(knownTags, currentTags);
+    if (dialog.exec() == QDialog::Accepted) {
+        QStringList updatedTags = dialog.getActiveTags();
+        if (updatedTags != currentTags) {
+            setTags(updatedTags);
+            emit tagsChanged(updatedTags);
         }
     }
 }

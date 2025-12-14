@@ -4,11 +4,11 @@
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      DeckListModel *_deckListModel,
+                                                     QItemSelectionModel *_selectionModel,
                                                      QPersistentModelIndex _trackedIndex,
                                                      QString _zoneName,
                                                      QString _activeGroupCriteria,
@@ -17,9 +17,10 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                                                      int bannerOpacity,
                                                      int subBannerOpacity,
                                                      CardSizeWidget *_cardSizeWidget)
-    : QWidget(parent), deckListModel(_deckListModel), trackedIndex(_trackedIndex), zoneName(_zoneName),
-      activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria), displayType(_displayType),
-      bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity), cardSizeWidget(_cardSizeWidget)
+    : QWidget(parent), deckListModel(_deckListModel), selectionModel(_selectionModel), trackedIndex(_trackedIndex),
+      zoneName(_zoneName), activeGroupCriteria(_activeGroupCriteria), activeSortCriteria(_activeSortCriteria),
+      displayType(_displayType), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity),
+      cardSizeWidget(_cardSizeWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -37,7 +38,34 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     displayCards();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &DeckCardZoneDisplayWidget::onSelectionChanged);
+    }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
+}
+
+void DeckCardZoneDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    for (auto &range : selected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(true);
+            }
+        }
+    }
+
+    for (auto &range : deselected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(false);
+            }
+        }
+    }
 }
 
 void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget)
@@ -60,8 +88,8 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
     }
     if (displayType == DisplayType::Overlap) {
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
-            cardGroupContainer, deckListModel, index, zoneName, categoryName, activeGroupCriteria, activeSortCriteria,
-            subBannerOpacity, cardSizeWidget);
+            cardGroupContainer, deckListModel, selectionModel, index, zoneName, categoryName, activeGroupCriteria,
+            activeSortCriteria, subBannerOpacity, cardSizeWidget);
         connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardClicked, this,
                 &DeckCardZoneDisplayWidget::onClick);
         connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardHovered, this,
@@ -73,9 +101,9 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
         cardGroupLayout->addWidget(displayWidget);
         indexToWidgetMap.insert(index, displayWidget);
     } else if (displayType == DisplayType::Flat) {
-        auto *displayWidget =
-            new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, index, zoneName, categoryName,
-                                           activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
+        auto *displayWidget = new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, selectionModel, index,
+                                                             zoneName, categoryName, activeGroupCriteria,
+                                                             activeSortCriteria, subBannerOpacity, cardSizeWidget);
         connect(displayWidget, &FlatCardGroupDisplayWidget::cardClicked, this, &DeckCardZoneDisplayWidget::onClick);
         connect(displayWidget, &FlatCardGroupDisplayWidget::cardHovered, this, &DeckCardZoneDisplayWidget::onHover);
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,

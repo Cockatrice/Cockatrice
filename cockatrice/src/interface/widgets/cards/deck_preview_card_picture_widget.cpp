@@ -8,7 +8,6 @@
 #include <QMouseEvent>
 #include <QPainterPath>
 #include <QStylePainter>
-#include <QTextOption>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.

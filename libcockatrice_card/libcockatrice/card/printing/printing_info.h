@@ -5,7 +5,6 @@
 
 #include <QList>
 #include <QMap>
-#include <QStringList>
 #include <QVariant>
 
 class PrintingInfo;
@@ -65,7 +64,7 @@ public:
      *
      * @return Pointer to the associated CardSet.
      */
-    CardSetPtr getSet() const
+    [[nodiscard]] CardSetPtr getSet() const
     {
         return set;
     }
@@ -75,7 +74,7 @@ public:
      *
      * @return List of keys stored in the properties map.
      */
-    QStringList getProperties() const
+    [[nodiscard]] QStringList getProperties() const
     {
         return properties.keys();
     }
@@ -86,7 +85,7 @@ public:
      * @param propertyName The key name of the property to query.
      * @return The property value as a string, or an empty string if not set.
      */
-    QString getProperty(const QString &propertyName) const
+    [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -109,14 +108,14 @@ public:
      *
      * @return A string representing the providerID.
      */
-    QString getUuid() const;
+    [[nodiscard]] QString getUuid() const;
 
     /**
      * @brief Returns the flavorName for this printing.
      *
      * @return The flavorName, or empty if it isn't present.
      */
-    QString getFlavorName() const;
+    [[nodiscard]] QString getFlavorName() const;
 };
 
 #endif // COCKATRICE_PRINTING_INFO_H

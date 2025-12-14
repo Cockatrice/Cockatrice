@@ -8,7 +8,6 @@
 #ifndef PERCENT_BAR_WIDGET_H
 #define PERCENT_BAR_WIDGET_H
 
-#include <QColor>
 #include <QPainter>
 #include <QWidget>
 

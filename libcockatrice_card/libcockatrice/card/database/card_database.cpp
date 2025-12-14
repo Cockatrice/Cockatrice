@@ -1,12 +1,10 @@
 #include "card_database.h"
 
 #include "../relation/card_relation.h"
-#include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QRegularExpression>
@@ -200,4 +198,9 @@ void CardDatabase::notifyEnabledSetsChanged()
 
     // inform the carddatabasemodels that they need to re-check their list of cards
     emit cardDatabaseEnabledSetsChanged();
+}
+
+void CardDatabase::addFormat(FormatRulesPtr format)
+{
+    formats.insert(format->formatName.toLower(), format);
 }

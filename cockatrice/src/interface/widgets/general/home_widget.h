@@ -12,7 +12,6 @@
 #include "home_styled_button.h"
 
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 

@@ -1,11 +1,9 @@
 #include "printing_selector_card_display_widget.h"
 
-#include "card_amount_widget.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
 #include <QGraphicsEffect>
-#include <QStackedWidget>
 #include <QVBoxLayout>
 #include <utility>
 

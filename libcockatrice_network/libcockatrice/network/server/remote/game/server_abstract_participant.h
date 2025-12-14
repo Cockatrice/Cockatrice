@@ -76,7 +76,7 @@ public:
     virtual void prepareDestroy()
     {
         removeFromGame();
-    };
+    }
     void removeFromGame();
     Server_AbstractUserInterface *getUserInterface() const
     {

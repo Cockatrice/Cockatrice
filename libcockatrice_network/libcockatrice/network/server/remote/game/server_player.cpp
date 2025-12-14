@@ -4,7 +4,6 @@
 #include "../server_abstractuserinterface.h"
 #include "../server_database_interface.h"
 #include "../server_room.h"
-#include "server_arrow.h"
 #include "server_card.h"
 #include "server_cardzone.h"
 #include "server_counter.h"
@@ -15,67 +14,29 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
-#include <libcockatrice/protocol/get_pb_extension.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
-#include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_create_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_del_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
-#include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
-#include <libcockatrice/protocol/pb/command_flip_card.pb.h>
-#include <libcockatrice/protocol/pb/command_game_say.pb.h>
-#include <libcockatrice/protocol/pb/command_inc_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
-#include <libcockatrice/protocol/pb/command_leave_game.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
-#include <libcockatrice/protocol/pb/command_next_turn.pb.h>
-#include <libcockatrice/protocol/pb/command_ready_start.pb.h>
-#include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
-#include <libcockatrice/protocol/pb/command_reverse_turn.pb.h>
-#include <libcockatrice/protocol/pb/command_roll_die.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
-#include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
-#include <libcockatrice/protocol/pb/context_concede.pb.h>
-#include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
-#include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
-#include <libcockatrice/protocol/pb/context_ready_start.pb.h>
 #include <libcockatrice/protocol/pb/context_set_sideboard_lock.pb.h>
-#include <libcockatrice/protocol/pb/context_undo_draw.pb.h>
-#include <libcockatrice/protocol/pb/event_attach_card.pb.h>
-#include <libcockatrice/protocol/pb/event_change_zone_properties.pb.h>
-#include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/event_create_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_create_token.pb.h>
 #include <libcockatrice/protocol/pb/event_del_counter.pb.h>
-#include <libcockatrice/protocol/pb/event_delete_arrow.pb.h>
-#include <libcockatrice/protocol/pb/event_destroy_card.pb.h>
 #include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
-#include <libcockatrice/protocol/pb/event_dump_zone.pb.h>
-#include <libcockatrice/protocol/pb/event_flip_card.pb.h>
-#include <libcockatrice/protocol/pb/event_game_say.pb.h>
-#include <libcockatrice/protocol/pb/event_move_card.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
-#include <libcockatrice/protocol/pb/event_reveal_cards.pb.h>
-#include <libcockatrice/protocol/pb/event_reverse_turn.pb.h>
-#include <libcockatrice/protocol/pb/event_roll_die.pb.h>
-#include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
-#include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -141,28 +102,16 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Assign card ids and create deck from deck list
-    InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); ++i) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-        Server_CardZone *z;
-        if (currentZone->getName() == DECK_ZONE_MAIN) {
-            z = deckZone;
-        } else if (currentZone->getName() == DECK_ZONE_SIDE) {
-            z = sbZone;
-        } else {
-            continue;
+    auto insertCardsIntoZone = [this](auto cards, auto *zone) {
+        for (auto card : cards) {
+            for (int k = 0; k < card->getNumber(); ++k) {
+                zone->insertCard(new Server_Card(card->toCardRef(), nextCardId++, 0, 0, zone), -1, 0);
+            }
         }
+    };
 
-        for (int j = 0; j < currentZone->size(); ++j) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
-            }
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                z->insertCard(new Server_Card(currentCard->toCardRef(), nextCardId++, 0, 0, z), -1, 0);
-            }
-        }
-    }
+    insertCardsIntoZone(deck->getCardNodes({DECK_ZONE_MAIN}), deckZone);
+    insertCardsIntoZone(deck->getCardNodes({DECK_ZONE_SIDE}), sbZone);
 
     const QList<MoveCard_ToZone> &sideboardPlan = deck->getCurrentSideboardPlan();
     for (const auto &m : sideboardPlan) {

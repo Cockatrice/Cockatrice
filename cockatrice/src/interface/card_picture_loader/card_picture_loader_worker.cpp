@@ -9,8 +9,8 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
-#include <libcockatrice/card/database/card_database_manager.h>
 #include <utility>
+#include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
 
@@ -87,6 +87,7 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     }
 
     QNetworkRequest req(url);
+    req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }

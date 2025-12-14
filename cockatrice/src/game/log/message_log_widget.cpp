@@ -6,12 +6,10 @@
 #include "../board/translate_counter_name.h"
 #include "../phase.h"
 #include "../player/player.h"
-#include "../zones/card_zone.h"
 
 #include <../../client/settings/card_counter_settings.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <utility>
 
 static const QString TABLE_ZONE_NAME = "table";

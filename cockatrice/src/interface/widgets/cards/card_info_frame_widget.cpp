@@ -10,7 +10,6 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
-#include <utility>
 
 CardInfoFrameWidget::CardInfoFrameWidget(QWidget *parent)
     : QTabWidget(parent), viewTransformationButton(nullptr), cardTextOnly(false)
@@ -155,7 +154,7 @@ void CardInfoFrameWidget::setCard(const ExactCard &card)
 
     setViewTransformationButtonVisibility(hasTransformation(exactCard.getInfo()));
 
-    text->setCard(exactCard.getCardPtr());
+    text->setCard(exactCard);
     pic->setCard(exactCard);
 }
 

@@ -10,7 +10,6 @@
 #include "../../deck_loader/deck_loader.h"
 #include "card_amount_widget.h"
 
-#include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 

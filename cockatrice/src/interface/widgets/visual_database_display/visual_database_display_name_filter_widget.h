@@ -14,7 +14,6 @@
 #include <QLineEdit>
 #include <QMap>
 #include <QPushButton>
-#include <QVBoxLayout>
 #include <QWidget>
 
 class VisualDatabaseDisplayNameFilterWidget : public QWidget

@@ -5,7 +5,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPixmap>
 #include <QRegularExpression>
 #include <QResizeEvent>
 #include <QSize>

@@ -11,7 +11,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QMainWindow>
-#include <QSet>
 
 class CardDatabase;
 class LineEditUnfocusable;

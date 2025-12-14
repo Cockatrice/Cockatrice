@@ -7,7 +7,6 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include <QObject>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/deck_list/deck_list.h>
 

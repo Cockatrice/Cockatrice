@@ -14,9 +14,7 @@
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
-#include "libcockatrice/deck_list/deck_list_history_manager.h"
 
-#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
 #include <QTextEdit>
@@ -51,6 +49,11 @@ public:
         return activeGroupCriteriaComboBox;
     }
 
+    [[nodiscard]] QItemSelectionModel *getSelectionModel() const
+    {
+        return deckView->selectionModel();
+    }
+
 public slots:
     void cleanDeck();
     void updateBannerCardComboBox();
@@ -65,8 +68,9 @@ public slots:
     void actDecrementSelection();
     void actSwapCard();
     void actRemoveCard();
-    void onCardAboutToBeAdded(const ExactCard &card, const QString &zoneName);
     void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void initializeFormats();
+    void expandAll();
 
 signals:
     void nameChanged();
@@ -74,11 +78,12 @@ signals:
     void hashChanged();
     void deckChanged();
     void deckModified();
+    void requestDeckHistorySave(const QString &modificationReason);
+    void requestDeckHistoryClear();
     void cardChanged(const ExactCard &_card);
 
 private:
     AbstractTabDeckEditor *deckEditor;
-    DeckListHistoryManager *historyManager;
     DeckListHistoryManagerWidget *historyManagerWidget;
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
@@ -96,11 +101,13 @@ private:
     LineEditUnfocusable *hashLabel;
     QLabel *activeGroupCriteriaLabel;
     QComboBox *activeGroupCriteriaComboBox;
+    QLabel *formatLabel;
+    QComboBox *formatComboBox;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     void recursiveExpand(const QModelIndex &index);
-    QModelIndexList getSelectedCardNodes() const;
+    [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
 
 private slots:
     void decklistCustomMenu(QPoint point);
@@ -108,12 +115,13 @@ private slots:
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);
+    void setTags(const QStringList &tags);
+    void syncDeckListBannerCardWithComboBox();
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
-    void expandAll();
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H

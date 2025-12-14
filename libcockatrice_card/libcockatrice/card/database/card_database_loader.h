@@ -4,7 +4,6 @@
 #include <QBasicMutex>
 #include <QList>
 #include <QLoggingCategory>
-#include <QObject>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
 
@@ -110,7 +109,7 @@ private:
      * @brief Collects custom card database paths recursively.
      * @return Sorted list of file paths to custom databases.
      */
-    QStringList collectCustomDatabasePaths() const;
+    [[nodiscard]] QStringList collectCustomDatabasePaths() const;
 
 private:
     CardDatabase *database;                        /**< Non-owning pointer to the target CardDatabase. */

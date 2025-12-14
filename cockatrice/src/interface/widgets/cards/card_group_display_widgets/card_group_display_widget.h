@@ -11,10 +11,10 @@
 #include "../card_info_picture_with_text_overlay_widget.h"
 #include "../card_size_widget.h"
 
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class CardGroupDisplayWidget : public QWidget
@@ -24,6 +24,7 @@ class CardGroupDisplayWidget : public QWidget
 public:
     CardGroupDisplayWidget(QWidget *parent,
                            DeckListModel *deckListModel,
+                           QItemSelectionModel *selectionModel,
                            QPersistentModelIndex trackedIndex,
                            QString zoneName,
                            QString cardGroupCategory,
@@ -31,9 +32,11 @@ public:
                            QStringList activeSortCriteria,
                            int bannerOpacity,
                            CardSizeWidget *cardSizeWidget);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     void clearAllDisplayWidgets();
 
     DeckListModel *deckListModel;
+    QItemSelectionModel *selectionModel;
     QPersistentModelIndex trackedIndex;
     QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
     QString zoneName;
@@ -43,6 +46,7 @@ public:
     CardSizeWidget *cardSizeWidget;
 
 public slots:
+    void mousePressEvent(QMouseEvent *event) override;
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
     void onHover(const ExactCard &card);
     virtual QWidget *constructWidgetForIndex(QPersistentModelIndex index);

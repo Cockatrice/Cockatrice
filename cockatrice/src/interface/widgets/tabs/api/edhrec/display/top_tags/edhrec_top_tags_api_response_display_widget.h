@@ -9,7 +9,6 @@
 
 #include "../../api_response/top_tags/edhrec_top_tags_api_response.h"
 
-#include <QResizeEvent>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QWidget>

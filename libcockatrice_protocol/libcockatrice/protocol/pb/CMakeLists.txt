@@ -165,6 +165,12 @@ set(PROTO_FILES
     session_event.proto
 )
 
+if(MSVC)
+  set(unused_warning /wd4100)
+else()
+  set(unused_warning -Wno-unused-parameter)
+endif()
+
 if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   message(STATUS "Using Protobuf Legacy Mode")
   include_directories(${PROTOBUF_INCLUDE_DIRS})
@@ -172,6 +178,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 
   add_library(libcockatrice_protocol_pb ${PROTO_SRCS} ${PROTO_HDRS})
+  target_compile_options(libcockatrice_protocol_pb PRIVATE ${unused_warning})
   set(libcockatrice_protocol_pb_LIBS ${PROTOBUF_LIBRARIES})
   if(UNIX)
     set(libcockatrice_protocol_pb_LIBS ${libcockatrice_protocol_pb_LIBS} -lpthread)
@@ -189,6 +196,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0")
   endif()
 else()
   add_library(libcockatrice_protocol_pb ${PROTO_FILES})
+  target_compile_options(libcockatrice_protocol_pb PRIVATE ${unused_warning})
   target_link_libraries(libcockatrice_protocol_pb PUBLIC protobuf::libprotobuf)
   set(PROTO_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
   target_include_directories(libcockatrice_protocol_pb PUBLIC "${PROTOBUF_INCLUDE_DIRS}")

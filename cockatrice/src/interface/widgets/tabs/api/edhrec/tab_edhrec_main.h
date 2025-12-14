@@ -8,7 +8,6 @@
 #define TAB_EDHREC_MAIN_H
 
 #include "../../interface/widgets/cards/card_size_widget.h"
-#include "../../interface/widgets/general/layout_containers/flow_widget.h"
 #include "../../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab.h"
 #include "display/commander/edhrec_commander_api_response_display_widget.h"
@@ -27,13 +26,13 @@ public:
 
     void retranslateUi() override;
     void doSearch();
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
         return tr("EDHRec: ") + cardName;
     }
 
-    CardSizeWidget *getCardSizeSlider()
+    CardSizeWidget *getCardSizeSlider() const
     {
         return cardSizeSlider;
     }

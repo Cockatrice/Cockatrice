@@ -25,7 +25,7 @@ public:
     QString getConnectionType() const override
     {
         return "local";
-    };
+    }
     void transmitProtocolItem(const ServerMessage &item) override;
 signals:
     void itemToClient(const ServerMessage &item);

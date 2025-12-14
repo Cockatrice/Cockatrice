@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -343,10 +343,7 @@ void DeckViewScene::rebuildTree()
     if (!deck)
         return;
 
-    InnerDecklistNode *listRoot = deck->getRoot();
-    for (int i = 0; i < listRoot->size(); i++) {
-        auto *currentZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
-
+    for (auto *currentZone : deck->getZoneNodes()) {
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
             container = new DeckViewCardContainer(currentZone->getName());

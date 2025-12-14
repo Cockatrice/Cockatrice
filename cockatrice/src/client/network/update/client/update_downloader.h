@@ -7,9 +7,7 @@
 #ifndef COCKATRICE_UPDATEDOWNLOADER_H
 #define COCKATRICE_UPDATEDOWNLOADER_H
 
-#include <QDate>
 #include <QObject>
-#include <QUrl>
 #include <QtNetwork>
 
 class UpdateDownloader : public QObject

@@ -10,7 +10,6 @@
 #include "../card_prices/edhrec_api_response_card_prices.h"
 
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QString>
 #include <QVector>
 
@@ -27,119 +26,119 @@ public:
     void debugPrint() const;
 
     // Getters for the card data
-    const QString &getAetherhubUri() const
+    [[nodiscard]] const QString &getAetherhubUri() const
     {
         return aetherhubUri;
     }
-    const QString &getArchidektUri() const
+    [[nodiscard]] const QString &getArchidektUri() const
     {
         return archidektUri;
     }
-    int getCmc() const
+    [[nodiscard]] int getCmc() const
     {
         return cmc;
     }
-    const QJsonArray &getColorIdentity() const
+    [[nodiscard]] const QJsonArray &getColorIdentity() const
     {
         return colorIdentity;
     }
-    bool isCombos() const
+    [[nodiscard]] bool isCombos() const
     {
         return combos;
     }
-    const QString &getDeckstatsUri() const
+    [[nodiscard]] const QString &getDeckstatsUri() const
     {
         return deckstatsUri;
     }
-    const QVector<QString> &getImageUris() const
+    [[nodiscard]] const QVector<QString> &getImageUris() const
     {
         return imageUris;
     }
-    int getInclusion() const
+    [[nodiscard]] int getInclusion() const
     {
         return inclusion;
     }
-    bool getIsCommander() const
+    [[nodiscard]] bool getIsCommander() const
     {
         return isCommander;
     }
-    const QString &getLabel() const
+    [[nodiscard]] const QString &getLabel() const
     {
         return label;
     }
-    const QString &getLayout() const
+    [[nodiscard]] const QString &getLayout() const
     {
         return layout;
     }
-    bool getLegalCommander() const
+    [[nodiscard]] bool getLegalCommander() const
     {
         return legalCommander;
     }
-    const QString &getMoxfieldUri() const
+    [[nodiscard]] const QString &getMoxfieldUri() const
     {
         return moxfieldUri;
     }
-    const QString &getMtggoldfishUri() const
+    [[nodiscard]] const QString &getMtggoldfishUri() const
     {
         return mtggoldfishUri;
     }
-    const QString &getName() const
+    [[nodiscard]] const QString &getName() const
     {
         return name;
     }
-    const QJsonArray &getNames() const
+    [[nodiscard]] const QJsonArray &getNames() const
     {
         return names;
     }
-    int getNumDecks() const
+    [[nodiscard]] int getNumDecks() const
     {
         return numDecks;
     }
-    int getPotentialDecks() const
+    [[nodiscard]] int getPotentialDecks() const
     {
         return potentialDecks;
     }
-    const QString &getPrecon() const
+    [[nodiscard]] const QString &getPrecon() const
     {
         return precon;
     }
-    const CardPrices &getPrices() const
+    [[nodiscard]] const CardPrices &getPrices() const
     {
         return prices;
     }
-    const QString &getPrimaryType() const
+    [[nodiscard]] const QString &getPrimaryType() const
     {
         return primaryType;
     }
-    const QString &getRarity() const
+    [[nodiscard]] const QString &getRarity() const
     {
         return rarity;
     }
-    double getSalt() const
+    [[nodiscard]] double getSalt() const
     {
         return salt;
     }
-    const QString &getSanitized() const
+    [[nodiscard]] const QString &getSanitized() const
     {
         return sanitized;
     }
-    const QString &getSanitizedWo() const
+    [[nodiscard]] const QString &getSanitizedWo() const
     {
         return sanitizedWo;
     }
-    const QString &getScryfallUri() const
+    [[nodiscard]] const QString &getScryfallUri() const
     {
         return scryfallUri;
     }
-    const QString &getSpellbookUri() const
+    [[nodiscard]] const QString &getSpellbookUri() const
     {
         return spellbookUri;
     }
-    const QString &getType() const
+    [[nodiscard]] const QString &getType() const
     {
         return type;
     }
-    const QString &getUrl() const
+    [[nodiscard]] const QString &getUrl() const
     {
         return url;
     }

@@ -10,10 +10,8 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
-#include <QDir>
 #include <QFile>
 #include <QFileDialog>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QLineEdit>
 #include <QMap>
@@ -29,6 +27,7 @@ public:
 
     void saveFilter();
     void loadFilter(const QString &filename);
+    void applySearchFilter(const QString &text);
     void refreshFilterList();
     void deleteFilter(const QString &filename, QPushButton *deleteButton);
 
@@ -39,9 +38,11 @@ private:
     FilterTreeModel *filterModel;
 
     QVBoxLayout *layout;
+    QLineEdit *searchInput;
+    FlowWidget *fileListWidget;
     QLineEdit *filenameInput;
     QPushButton *saveButton;
-    FlowWidget *fileListWidget;
+    QStringList allFilterFiles;
 
     QMap<QString, QPair<QPushButton *, QPushButton *>> fileButtons;
 };

@@ -302,7 +302,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
     const auto urlString = url.toString();
     if (urlString == ALLSETS_URL || urlString == ALLSETS_URL_FALLBACK) {
         const auto versionUrl = QUrl::fromUserInput(MTGJSON_VERSION_URL);
-        auto *versionReply = wizard()->nam->get(QNetworkRequest(versionUrl));
+        QNetworkRequest request = QNetworkRequest(versionUrl);
+        request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+        auto *versionReply = wizard()->nam->get(request);
         connect(versionReply, &QNetworkReply::finished, [this, versionReply]() {
             if (versionReply->error() == QNetworkReply::NoError) {
                 auto data = versionReply->readAll();
@@ -326,7 +328,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
     wizard()->setCardSourceUrl(url.toString());
 
-    auto *reply = wizard()->nam->get(QNetworkRequest(url));
+    QNetworkRequest request = QNetworkRequest(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    auto *reply = wizard()->nam->get(request);
 
     connect(reply, &QNetworkReply::finished, this, &LoadSetsPage::actDownloadFinishedSetsFile);
     connect(reply, &QNetworkReply::downloadProgress, this, &LoadSetsPage::actDownloadProgressSetsFile);
@@ -672,13 +676,21 @@ QString LoadTokensPage::getFileType()
     return tr("XML; token database (*.xml)");
 }
 
+QString LoadTokensPage::getFilePromptName()
+{
+    return tr("tokens");
+}
+
 void LoadTokensPage::retranslateUi()
 {
     setTitle(tr("Tokens import"));
     setSubTitle(tr("Please specify a compatible source for token data."));
 
-    urlLabel->setText(tr("Download URL:"));
+    urlRadioButton->setText(tr("Download URL:"));
+    fileRadioButton->setText(tr("Local file:"));
     urlButton->setText(tr("Restore default URL"));
+    fileButton->setText(tr("Choose file..."));
+
     pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" +
                        SettingsCache::instance().getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
@@ -709,13 +721,21 @@ QString LoadSpoilersPage::getFileType()
     return tr("XML; spoiler database (*.xml)");
 }
 
+QString LoadSpoilersPage::getFilePromptName()
+{
+    return tr("spoiler");
+}
+
 void LoadSpoilersPage::retranslateUi()
 {
     setTitle(tr("Spoilers import"));
     setSubTitle(tr("Please specify a compatible source for spoiler data."));
 
-    urlLabel->setText(tr("Download URL:"));
+    urlRadioButton->setText(tr("Download URL:"));
+    fileRadioButton->setText(tr("Local file:"));
     urlButton->setText(tr("Restore default URL"));
+    fileButton->setText(tr("Choose file..."));
+
     pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" +
                        SettingsCache::instance().getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));

@@ -29,10 +29,23 @@ public:
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
 
+    QTreeView *getDatabaseView()
+    {
+        return databaseView;
+    }
+
 public slots:
     ExactCard currentCard() const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();
+    void updateSearch(const QString &search);
+    void updateCard(const QModelIndex &current, const QModelIndex &);
+    void actAddCardToMainDeck();
+    void actAddCardToSideboard();
+    void actDecrementCardFromMainDeck();
+    void actDecrementCardFromSideboard();
+    void databaseCustomMenu(QPoint point);
+    void copyDatabaseCellContents();
 
 signals:
     void addCardToMainDeck(const ExactCard &card);
@@ -51,14 +64,6 @@ private:
 
 private slots:
     void retranslateUi();
-    void updateSearch(const QString &search);
-    void updateCard(const QModelIndex &current, const QModelIndex &);
-    void actAddCardToMainDeck();
-    void actAddCardToSideboard();
-    void actDecrementCardFromMainDeck();
-    void actDecrementCardFromSideboard();
-    void databaseCustomMenu(QPoint point);
-    void copyDatabaseCellContents();
     void saveDbHeaderState();
 };
 

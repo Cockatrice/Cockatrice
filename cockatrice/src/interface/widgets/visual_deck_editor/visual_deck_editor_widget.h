@@ -9,7 +9,6 @@
 
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
-#include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
 
@@ -24,6 +23,7 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qscrollarea.h>
 
+class VisualDeckDisplayOptionsWidget;
 class DeckCardZoneDisplayWidget;
 enum class DisplayType
 {
@@ -36,12 +36,19 @@ class VisualDeckEditorWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel);
+    explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
     void retranslateUi();
     void clearAllDisplayWidgets();
     void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
+
+    void setSelectionModel(QItemSelectionModel *model);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    QItemSelectionModel *getSelectionModel() const
+    {
+        return selectionModel;
+    }
 
     QLineEdit *searchBar;
     CardSizeWidget *cardSizeWidget;
@@ -49,10 +56,10 @@ public:
 public slots:
     void decklistDataChanged(QModelIndex topLeft, QModelIndex bottomRight);
     void updateZoneWidgets();
-    void updateDisplayType();
     void cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget);
     void onCardAddition(const QModelIndex &parent, int first, int last);
     void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void constructZoneWidgetForIndex(QPersistentModelIndex persistent);
     void constructZoneWidgetsFromDeckListModel();
 
 signals:
@@ -66,30 +73,20 @@ signals:
 protected slots:
     void onHover(const ExactCard &hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
-    void actChangeActiveGroupCriteria();
-    void actChangeActiveSortCriteria();
     void decklistModelReset();
 
 private:
     DeckListModel *deckListModel;
+    QItemSelectionModel *selectionModel;
     QVBoxLayout *mainLayout;
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
     QCompleter *completer;
+    QWidget *displayOptionsAndSearch;
+    QHBoxLayout *displayOptionsAndSearchLayout;
+    VisualDeckDisplayOptionsWidget *displayOptionsWidget;
     QPushButton *searchPushButton;
-    DisplayType currentDisplayType = DisplayType::Overlap;
-    QPushButton *displayTypeButton;
-    QWidget *groupAndSortContainer;
-    QHBoxLayout *groupAndSortLayout;
-    QComboBox *groupByComboBox;
-    QString activeGroupCriteria = "maintype";
-    SettingsButtonWidget *sortCriteriaButton;
-    QLabel *sortLabel;
-    QListWidget *sortByListWidget;
-    QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;

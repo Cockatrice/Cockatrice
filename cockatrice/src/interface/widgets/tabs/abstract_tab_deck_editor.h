@@ -17,6 +17,8 @@
 #include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "tab.h"
 
+#include <libcockatrice/deck_list/deck_list_history_manager.h>
+
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
@@ -132,6 +134,13 @@ public:
         return deckDockWidget;
     }
 
+    DeckListHistoryManager *getHistoryManager() const
+    {
+        return historyManager;
+    }
+
+    DeckListHistoryManager *historyManager;
+
     // UI Elements
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;       ///< Database dock
@@ -146,6 +155,14 @@ public slots:
 
     /** @brief Called when the deck is modified. */
     virtual void onDeckModified();
+
+    /** @brief Called when a widget is about to modify the state of the DeckList.
+     *  @param modificationReason The reason for the state modification
+     */
+    virtual void onDeckHistorySaveRequested(const QString &modificationReason);
+
+    /** @brief Called when a widget would like to clear the history. */
+    virtual void onDeckHistoryClearRequested();
 
     /** @brief Updates the card info panel.
      *  @param card The card to display.
@@ -180,7 +197,6 @@ public slots:
     virtual void dockTopLevelChanged(bool topLevel) = 0;
 
 signals:
-    void cardAboutToBeAdded(const ExactCard &addedCard, const QString &zoneName);
     /** @brief Emitted when a deck should be opened in a new editor tab. */
     void openDeckEditor(DeckLoader *deckLoader);
 

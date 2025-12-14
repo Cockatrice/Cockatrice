@@ -8,7 +8,6 @@
 #define ABSTRACTCLIENT_H
 
 #include <QMutex>
-#include <QObject>
 #include <QVariant>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>

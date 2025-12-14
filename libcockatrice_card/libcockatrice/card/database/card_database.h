@@ -10,10 +10,8 @@
 #include <QHash>
 #include <QList>
 #include <QLoggingCategory>
-#include <QStringList>
 #include <QVector>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
-#include <libcockatrice/utility/card_ref.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLog, "card_database");
@@ -43,6 +41,8 @@ protected:
 
     /// Sets indexed by short name
     SetNameMap sets;
+
+    FormatRulesNameMap formats;
 
     /// Loader responsible for file discovery and parsing
     CardDatabaseLoader *loader;
@@ -142,6 +142,8 @@ public slots:
      * @param set Pointer to CardSet to add.
      */
     void addSet(CardSetPtr set);
+
+    void addFormat(FormatRulesPtr format);
 
     /** @brief Loads card databases from configured paths. */
     void loadCardDatabases();

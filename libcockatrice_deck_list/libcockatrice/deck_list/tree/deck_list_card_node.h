@@ -51,6 +51,7 @@ class DecklistCardNode : public AbstractDecklistCardNode
     QString cardSetShortName; ///< Short set code (e.g., "NEO").
     QString cardSetNumber;    ///< Collector number within the set.
     QString cardProviderId;   ///< External provider identifier (e.g., UUID).
+    bool formatLegal;         ///< Format legality
 
 public:
     /**
@@ -63,6 +64,7 @@ public:
      * @param _cardSetShortName Short set code (e.g., "NEO").
      * @param _cardSetNumber Collector number within the set.
      * @param _cardProviderId External provider ID (e.g., UUID).
+     * @param _formatLegality If the card is legal in the format
      *
      * On construction, if a parent is provided, this node is inserted into
      * the parent’s children list automatically.
@@ -73,10 +75,11 @@ public:
                               int position = -1,
                               QString _cardSetShortName = QString(),
                               QString _cardSetNumber = QString(),
-                              QString _cardProviderId = QString())
+                              QString _cardProviderId = QString(),
+                              bool _formatLegality = true)
         : AbstractDecklistCardNode(_parent, position), name(std::move(_name)), number(_number),
           cardSetShortName(std::move(_cardSetShortName)), cardSetNumber(std::move(_cardSetNumber)),
-          cardProviderId(std::move(_cardProviderId))
+          cardProviderId(std::move(_cardProviderId)), formatLegal(_formatLegality)
     {
     }
 
@@ -91,7 +94,7 @@ public:
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 
     /// @return The quantity of this card.
-    int getNumber() const override
+    [[nodiscard]] int getNumber() const override
     {
         return number;
     }
@@ -103,7 +106,7 @@ public:
     }
 
     /// @return The display name of this card.
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return name;
     }
@@ -115,7 +118,7 @@ public:
     }
 
     /// @return The provider identifier for this card.
-    QString getCardProviderId() const override
+    [[nodiscard]] QString getCardProviderId() const override
     {
         return cardProviderId;
     }
@@ -127,7 +130,7 @@ public:
     }
 
     /// @return The short set code (e.g., "NEO").
-    QString getCardSetShortName() const override
+    [[nodiscard]] QString getCardSetShortName() const override
     {
         return cardSetShortName;
     }
@@ -139,7 +142,7 @@ public:
     }
 
     /// @return The collector number of this card within its set.
-    QString getCardCollectorNumber() const override
+    [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return cardSetNumber;
     }
@@ -148,6 +151,18 @@ public:
     void setCardCollectorNumber(const QString &_cardSetNumber) override
     {
         cardSetNumber = _cardSetNumber;
+    }
+
+    /// @return The format legality of the card
+    [[nodiscard]] bool getFormatLegality() const override
+    {
+        return formatLegal;
+    }
+
+    /// @param _formatLegal If the card is considered legal
+    void setFormatLegality(const bool _formatLegal) override
+    {
+        formatLegal = _formatLegal;
     }
 
     /// @return Always false; card nodes are not deck headers.
@@ -162,7 +177,7 @@ public:
      * @return A CardRef with the card’s name and provider ID, suitable
      *         for database lookups or comparison with other card sources.
      */
-    CardRef toCardRef() const
+    [[nodiscard]] CardRef toCardRef() const
     {
         return {name, cardProviderId};
     }

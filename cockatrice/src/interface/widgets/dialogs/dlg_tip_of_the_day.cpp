@@ -7,7 +7,6 @@
 #include <QDate>
 #include <QDebug>
 #include <QDialogButtonBox>
-#include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 

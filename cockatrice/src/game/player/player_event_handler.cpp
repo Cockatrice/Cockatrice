@@ -6,6 +6,7 @@
 #include "../board/card_list.h"
 #include "../zones/view_zone.h"
 #include "player.h"
+#include "player_actions.h"
 
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>

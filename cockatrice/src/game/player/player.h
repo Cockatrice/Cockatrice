@@ -9,9 +9,11 @@
 
 #include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
-#include "../dialogs/dlg_create_token.h"
+#include "../zones/logic/hand_zone_logic.h"
+#include "../zones/logic/pile_zone_logic.h"
+#include "../zones/logic/stack_zone_logic.h"
+#include "../zones/logic/table_zone_logic.h"
 #include "menu/player_menu.h"
-#include "player_actions.h"
 #include "player_area.h"
 #include "player_event_handler.h"
 #include "player_graphics_item.h"
@@ -20,9 +22,7 @@
 #include <QInputDialog>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QPoint>
 #include <QTimer>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
@@ -113,7 +113,7 @@ public:
     [[nodiscard]] PlayerActions *getPlayerActions() const
     {
         return playerActions;
-    };
+    }
 
     [[nodiscard]] PlayerEventHandler *getPlayerEventHandler() const
     {
@@ -123,7 +123,7 @@ public:
     [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
         return playerInfo;
-    };
+    }
 
     [[nodiscard]] PlayerMenu *getPlayerMenu() const
     {

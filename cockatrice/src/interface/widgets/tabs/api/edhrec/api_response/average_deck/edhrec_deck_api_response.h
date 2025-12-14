@@ -9,12 +9,6 @@
 
 #include "../../../../../../deck_loader/deck_loader.h"
 
-#include <QDebug>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QString>
-#include <QVector>
-
 class EdhrecDeckApiResponse
 {
 public:

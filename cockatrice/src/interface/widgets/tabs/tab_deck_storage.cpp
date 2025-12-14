@@ -11,7 +11,6 @@
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
@@ -243,7 +242,7 @@ void TabDeckStorage::actOpenLocalDeck()
         QString filePath = localDirModel->filePath(curLeft);
 
         auto deckLoader = new DeckLoader(this);
-        if (!deckLoader->loadFromFile(filePath, DeckLoader::CockatriceFormat, true))
+        if (!deckLoader->loadFromFile(filePath, DeckFileFormat::Cockatrice, true))
             continue;
 
         emit openDeckEditor(deckLoader);
@@ -309,7 +308,7 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     QFileInfo deckFileInfo(deckFile);
 
     DeckLoader deck(this);
-    if (!deck.loadFromFile(filePath, DeckLoader::CockatriceFormat)) {
+    if (!deck.loadFromFile(filePath, DeckFileFormat::Cockatrice)) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
     }
@@ -494,7 +493,7 @@ void TabDeckStorage::downloadFinished(const Response &r,
     QString filePath = extraData.toString();
 
     DeckLoader deck(this, new DeckList(QString::fromStdString(resp.deck())));
-    deck.saveToFile(filePath, DeckLoader::CockatriceFormat);
+    deck.saveToFile(filePath, DeckFileFormat::Cockatrice);
 }
 
 void TabDeckStorage::actNewFolder()

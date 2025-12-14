@@ -1,12 +1,12 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
+#include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/abstract_deck_list_card_node.h>
+#include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QAbstractItemModel>
 #include <QList>
 #include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/deck_list/abstract_deck_list_card_node.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
 
 class CardDatabase;
 class QPrinter;
@@ -74,6 +74,29 @@ enum Type
     MANA_COST, /**< Group cards by their total mana cost. */
     COLOR      /**< Group cards by their color identity. */
 };
+static inline QString toString(Type t)
+{
+    switch (t) {
+        case MAIN_TYPE:
+            return "Main Type";
+        case MANA_COST:
+            return "Mana Cost";
+        case COLOR:
+            return "Colors";
+    }
+    return {};
+}
+
+static inline Type fromString(const QString &s)
+{
+    if (s == "Main Type")
+        return MAIN_TYPE;
+    if (s == "Mana Cost")
+        return MANA_COST;
+    if (s == "Colors")
+        return COLOR;
+    return MAIN_TYPE; // default
+}
 } // namespace DeckListModelGroupCriteria
 
 /**
@@ -101,7 +124,7 @@ public:
         : AbstractDecklistCardNode(_parent, position), dataNode(_dataNode)
     {
     }
-    int getNumber() const override
+    [[nodiscard]] int getNumber() const override
     {
         return dataNode->getNumber();
     }
@@ -109,7 +132,7 @@ public:
     {
         dataNode->setNumber(_number);
     }
-    QString getName() const override
+    [[nodiscard]] QString getName() const override
     {
         return dataNode->getName();
     }
@@ -117,7 +140,7 @@ public:
     {
         dataNode->setName(_name);
     }
-    QString getCardProviderId() const override
+    [[nodiscard]] QString getCardProviderId() const override
     {
         return dataNode->getCardProviderId();
     }
@@ -125,7 +148,7 @@ public:
     {
         dataNode->setCardProviderId(_cardProviderId);
     }
-    QString getCardSetShortName() const override
+    [[nodiscard]] QString getCardSetShortName() const override
     {
         return dataNode->getCardSetShortName();
     }
@@ -133,7 +156,7 @@ public:
     {
         dataNode->setCardSetShortName(_cardSetShortName);
     }
-    QString getCardCollectorNumber() const override
+    [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return dataNode->getCardCollectorNumber();
     }
@@ -141,12 +164,20 @@ public:
     {
         dataNode->setCardCollectorNumber(_cardSetNumber);
     }
+    bool getFormatLegality() const override
+    {
+        return dataNode->getFormatLegality();
+    }
+    void setFormatLegality(const bool _formatLegal) override
+    {
+        dataNode->setFormatLegality(_formatLegal);
+    }
 
     /**
      * @brief Returns the underlying data node.
      * @return Pointer to the DecklistCardNode wrapped by this node.
      */
-    DecklistCardNode *getDataNode() const
+    [[nodiscard]] DecklistCardNode *getDataNode() const
     {
         return dataNode;
     }
@@ -186,6 +217,9 @@ public slots:
      */
     void rebuildTree();
 
+public slots:
+    void setActiveFormat(const QString &_format);
+
 signals:
     /**
      * @brief Emitted whenever the deck hash changes due to modifications in the model.
@@ -200,27 +234,27 @@ public:
      * @brief Returns the root index of the model.
      * @return QModelIndex representing the root node.
      */
-    QModelIndex getRoot() const
+    [[nodiscard]] QModelIndex getRoot() const
     {
         return nodeToIndex(root);
-    };
+    }
 
     /**
      * @brief Returns the value of the grouping category for a card based on the current criteria.
      * @param info Pointer to card information.
      * @return String representing the value of the current grouping criteria for the card.
      */
-    QString getGroupCriteriaForCard(CardInfoPtr info) const;
+    [[nodiscard]] QString getGroupCriteriaForCard(CardInfoPtr info) const;
 
     // Qt model overrides
-    int rowCount(const QModelIndex &parent) const override;
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
+    [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     void emitBackgroundUpdates(const QModelIndex &parent);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
-    QModelIndex parent(const QModelIndex &index) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    [[nodiscard]] QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override;
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
 
@@ -232,10 +266,10 @@ public:
      * @param cardNumber Optional collector number.
      * @return QModelIndex of the card, or invalid index if not found.
      */
-    QModelIndex findCard(const QString &cardName,
-                         const QString &zoneName,
-                         const QString &providerId = "",
-                         const QString &cardNumber = "") const;
+    [[nodiscard]] QModelIndex findCard(const QString &cardName,
+                                       const QString &zoneName,
+                                       const QString &providerId = "",
+                                       const QString &cardNumber = "") const;
 
     /**
      * @brief Adds a card using the preferred printing if available.
@@ -269,15 +303,18 @@ public:
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
-    DeckList *getDeckList() const
+    [[nodiscard]] DeckList *getDeckList() const
     {
         return deckList;
     }
     void setDeckList(DeckList *_deck);
 
-    QList<ExactCard> getCards() const;
-    QList<ExactCard> getCardsForZone(const QString &zoneName) const;
-    QList<QString> *getZones() const;
+    [[nodiscard]] QList<ExactCard> getCards() const;
+    [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
+    [[nodiscard]] QList<QString> getZones() const;
+    bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
+    bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);
+    void refreshCardFormatLegalities();
 
     /**
      * @brief Sets the criteria used to group cards in the model.
@@ -294,10 +331,10 @@ private:
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;
-    DecklistModelCardNode *findCardNode(const QString &cardName,
-                                        const QString &zoneName,
-                                        const QString &providerId = "",
-                                        const QString &cardNumber = "") const;
+    [[nodiscard]] DecklistModelCardNode *findCardNode(const QString &cardName,
+                                                      const QString &zoneName,
+                                                      const QString &providerId = "",
+                                                      const QString &cardNumber = "") const;
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 

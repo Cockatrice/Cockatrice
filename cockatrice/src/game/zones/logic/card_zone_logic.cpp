@@ -2,7 +2,7 @@
 
 #include "../../board/card_item.h"
 #include "../../player/player.h"
-#include "../pile_zone.h"
+#include "../../player/player_actions.h"
 #include "../view_zone.h"
 #include "view_zone_logic.h"
 
@@ -10,7 +10,6 @@
 #include <QDebug>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 /**
  * @param _player the player that the zone belongs to
@@ -148,17 +147,24 @@ void CardZoneLogic::moveAllToZone()
 
 void CardZoneLogic::clearContents()
 {
-    for (int i = 0; i < cards.size(); i++) {
+    // First gather the cards into a safe temporary list.
+    const CardList toClear = cards;
+
+    // Detach and notify attached cards and zones *before* deleting anything.
+    for (CardItem *card : toClear) {
         // If an incorrectly implemented server doesn't return attached cards to whom they belong before dropping a
         // player, we have to return them to avoid a crash.
-
-        const QList<CardItem *> &attachedCards = cards[i]->getAttachedCards();
-        for (auto attachedCard : attachedCards) {
+        const QList<CardItem *> &attachedCards = card->getAttachedCards();
+        for (CardItem *attachedCard : attachedCards) {
             emit attachedCard->getZone()->cardAdded(attachedCard);
         }
-
-        player->deleteCard(cards.at(i));
     }
+
+    // Now request deletions after all manipulations are done.
+    for (CardItem *card : toClear) {
+        player->deleteCard(card);
+    }
+
     cards.clear();
     emit cardCountChanged();
 }

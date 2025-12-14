@@ -11,7 +11,6 @@
 
 #include <QDate>
 #include <QLoggingCategory>
-#include <QObject>
 #include <QSize>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
@@ -167,6 +166,10 @@ signals:
     void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
     void visualDeckEditorSampleHandSizeAmountChanged(int amount);
+    void visualDeckEditorCardSizeChanged();
+    void visualDatabaseDisplayCardSizeChanged();
+    void edhRecCardSizeChanged();
+    void archidektPreviewSizeChanged();
     void horizontalHandChanged();
     void handJustificationChanged();
     void invertVerticalCoordinateChanged();
@@ -250,6 +253,10 @@ private:
     QStringList visualDeckStorageDefaultTagsList;
     bool visualDeckStorageSearchFolderNames;
     int visualDeckStorageCardSize;
+    int visualDeckEditorCardSize;
+    int visualDatabaseDisplayCardSize;
+    int edhrecCardSize;
+    int archidektPreviewSize;
     bool visualDeckStorageDrawUnusedColorIdentities;
     int visualDeckStorageUnusedColorIdentitiesOpacity;
     int visualDeckStorageTooltipType;
@@ -317,8 +324,8 @@ private:
     int keepalive;
     int timeout;
     void translateLegacySettings();
-    QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
-    QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
+    [[nodiscard]] QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
+    [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     void loadPaths();
     bool rememberGameSettings;
     QList<ReleaseChannel *> releaseChannels;
@@ -330,137 +337,137 @@ public:
     SettingsCache();
     QString getDataPath();
     QString getSettingsPath();
-    QString getCachePath() const;
-    QString getNetworkCachePath() const;
-    const QByteArray &getMainWindowGeometry() const
+    [[nodiscard]] QString getCachePath() const;
+    [[nodiscard]] QString getNetworkCachePath() const;
+    [[nodiscard]] const QByteArray &getMainWindowGeometry() const
     {
         return mainWindowGeometry;
     }
-    const QByteArray &getTokenDialogGeometry() const
+    [[nodiscard]] const QByteArray &getTokenDialogGeometry() const
     {
         return tokenDialogGeometry;
     }
-    const QByteArray &getSetsDialogGeometry() const
+    [[nodiscard]] const QByteArray &getSetsDialogGeometry() const
     {
         return setsDialogGeometry;
     }
-    QString getLang() const
+    [[nodiscard]] QString getLang() const
     {
         return lang;
     }
-    QString getDeckPath() const
+    [[nodiscard]] QString getDeckPath() const
     {
         return deckPath;
     }
-    QString getFiltersPath() const
+    [[nodiscard]] QString getFiltersPath() const
     {
         return filtersPath;
     }
-    QString getReplaysPath() const
+    [[nodiscard]] QString getReplaysPath() const
     {
         return replaysPath;
     }
-    QString getThemesPath() const
+    [[nodiscard]] QString getThemesPath() const
     {
         return themesPath;
     }
-    QString getPicsPath() const
+    [[nodiscard]] QString getPicsPath() const
     {
         return picsPath;
     }
-    QString getRedirectCachePath() const
+    [[nodiscard]] QString getRedirectCachePath() const
     {
         return redirectCachePath;
     }
-    QString getCustomPicsPath() const
+    [[nodiscard]] QString getCustomPicsPath() const
     {
         return customPicsPath;
     }
-    QString getCustomCardDatabasePath() const override
+    [[nodiscard]] QString getCustomCardDatabasePath() const override
     {
         return customCardDatabasePath;
     }
-    QString getCardDatabasePath() const override
+    [[nodiscard]] QString getCardDatabasePath() const override
     {
         return cardDatabasePath;
     }
-    QString getSpoilerCardDatabasePath() const override
+    [[nodiscard]] QString getSpoilerCardDatabasePath() const override
     {
         return spoilerDatabasePath;
     }
-    QString getTokenDatabasePath() const override
+    [[nodiscard]] QString getTokenDatabasePath() const override
     {
         return tokenDatabasePath;
     }
-    QString getThemeName() const
+    [[nodiscard]] QString getThemeName() const
     {
         return themeName;
     }
-    QString getHomeTabBackgroundSource() const
+    [[nodiscard]] QString getHomeTabBackgroundSource() const
     {
         return homeTabBackgroundSource;
     }
-    int getHomeTabBackgroundShuffleFrequency() const
+    [[nodiscard]] int getHomeTabBackgroundShuffleFrequency() const
     {
         return homeTabBackgroundShuffleFrequency;
     }
-    bool getTabVisualDeckStorageOpen() const
+    [[nodiscard]] bool getTabVisualDeckStorageOpen() const
     {
         return tabVisualDeckStorageOpen;
     }
-    bool getTabServerOpen() const
+    [[nodiscard]] bool getTabServerOpen() const
     {
         return tabServerOpen;
     }
-    bool getTabAccountOpen() const
+    [[nodiscard]] bool getTabAccountOpen() const
     {
         return tabAccountOpen;
     }
-    bool getTabDeckStorageOpen() const
+    [[nodiscard]] bool getTabDeckStorageOpen() const
     {
         return tabDeckStorageOpen;
     }
-    bool getTabReplaysOpen() const
+    [[nodiscard]] bool getTabReplaysOpen() const
     {
         return tabReplaysOpen;
     }
-    bool getTabAdminOpen() const
+    [[nodiscard]] bool getTabAdminOpen() const
     {
         return tabAdminOpen;
     }
-    bool getTabLogOpen() const
+    [[nodiscard]] bool getTabLogOpen() const
     {
         return tabLogOpen;
     }
-    QString getChatMentionColor() const
+    [[nodiscard]] QString getChatMentionColor() const
     {
         return chatMentionColor;
     }
-    QString getChatHighlightColor() const
+    [[nodiscard]] QString getChatHighlightColor() const
     {
         return chatHighlightColor;
     }
-    bool getPicDownload() const
+    [[nodiscard]] bool getPicDownload() const
     {
         return picDownload;
     }
-    bool getShowStatusBar() const
+    [[nodiscard]] bool getShowStatusBar() const
     {
         return showStatusBar;
     }
-    bool getNotificationsEnabled() const
+    [[nodiscard]] bool getNotificationsEnabled() const
     {
         return notificationsEnabled;
     }
-    bool getSpectatorNotificationsEnabled() const
+    [[nodiscard]] bool getSpectatorNotificationsEnabled() const
     {
         return spectatorNotificationsEnabled;
     }
-    bool getBuddyConnectNotificationsEnabled() const
+    [[nodiscard]] bool getBuddyConnectNotificationsEnabled() const
     {
         return buddyConnectNotificationsEnabled;
     }
-    bool getCheckUpdatesOnStartup() const
+    [[nodiscard]] bool getCheckUpdatesOnStartup() const
     {
         return checkUpdatesOnStartup;
     }
@@ -472,247 +479,263 @@ public:
     {
         return startupCardUpdateCheckAlwaysUpdate;
     }
-    int getCardUpdateCheckInterval() const
+    [[nodiscard]] int getCardUpdateCheckInterval() const
     {
         return cardUpdateCheckInterval;
     }
-    QDate getLastCardUpdateCheck() const
+    [[nodiscard]] QDate getLastCardUpdateCheck() const
     {
         return lastCardUpdateCheck;
     }
-    bool getCardUpdateCheckRequired() const
+    [[nodiscard]] bool getCardUpdateCheckRequired() const
     {
         return getLastCardUpdateCheck().daysTo(QDateTime::currentDateTime().date()) >= getCardUpdateCheckInterval() &&
                getLastCardUpdateCheck() != QDateTime::currentDateTime().date();
     }
-    bool getNotifyAboutUpdates() const override
+    [[nodiscard]] bool getNotifyAboutUpdates() const override
     {
         return notifyAboutUpdates;
     }
-    bool getNotifyAboutNewVersion() const
+    [[nodiscard]] bool getNotifyAboutNewVersion() const
     {
         return notifyAboutNewVersion;
     }
-    bool getShowTipsOnStartup() const
+    [[nodiscard]] bool getShowTipsOnStartup() const
     {
         return showTipsOnStartup;
     }
-    QList<int> getSeenTips() const
+    [[nodiscard]] QList<int> getSeenTips() const
     {
         return seenTips;
     }
-    int getUpdateReleaseChannelIndex() const
+    [[nodiscard]] int getUpdateReleaseChannelIndex() const
     {
         return updateReleaseChannel;
     }
-    ReleaseChannel *getUpdateReleaseChannel() const
+    [[nodiscard]] ReleaseChannel *getUpdateReleaseChannel() const
     {
         return releaseChannels.at(qMax(0, updateReleaseChannel));
     }
-    QList<ReleaseChannel *> getUpdateReleaseChannels() const
+    [[nodiscard]] QList<ReleaseChannel *> getUpdateReleaseChannels() const
     {
         return releaseChannels;
     }
 
-    bool getDoubleClickToPlay() const
+    [[nodiscard]] bool getDoubleClickToPlay() const
     {
         return doubleClickToPlay;
     }
-    bool getClickPlaysAllSelected() const
+    [[nodiscard]] bool getClickPlaysAllSelected() const
     {
         return clickPlaysAllSelected;
     }
-    bool getPlayToStack() const
+    [[nodiscard]] bool getPlayToStack() const
     {
         return playToStack;
     }
-    bool getDoNotDeleteArrowsInSubPhases() const
+    [[nodiscard]] bool getDoNotDeleteArrowsInSubPhases() const
     {
         return doNotDeleteArrowsInSubPhases;
     }
-    int getStartingHandSize() const
+    [[nodiscard]] int getStartingHandSize() const
     {
         return startingHandSize;
     }
-    bool getAnnotateTokens() const
+    [[nodiscard]] bool getAnnotateTokens() const
     {
         return annotateTokens;
     }
-    QByteArray getTabGameSplitterSizes() const
+    [[nodiscard]] QByteArray getTabGameSplitterSizes() const
     {
         return tabGameSplitterSizes;
     }
-    bool getShowShortcuts() const
+    [[nodiscard]] bool getShowShortcuts() const
     {
         return showShortcuts;
     }
-    bool getDisplayCardNames() const
+    [[nodiscard]] bool getDisplayCardNames() const
     {
         return displayCardNames;
     }
-    bool getOverrideAllCardArtWithPersonalPreference() const
+    [[nodiscard]] bool getOverrideAllCardArtWithPersonalPreference() const
     {
         return overrideAllCardArtWithPersonalPreference;
     }
-    bool getBumpSetsWithCardsInDeckToTop() const
+    [[nodiscard]] bool getBumpSetsWithCardsInDeckToTop() const
     {
         return bumpSetsWithCardsInDeckToTop;
     }
-    int getPrintingSelectorSortOrder() const
+    [[nodiscard]] int getPrintingSelectorSortOrder() const
     {
         return printingSelectorSortOrder;
     }
-    int getPrintingSelectorCardSize() const
+    [[nodiscard]] int getPrintingSelectorCardSize() const
     {
         return printingSelectorCardSize;
     }
-    bool getIncludeRebalancedCards() const
+    [[nodiscard]] bool getIncludeRebalancedCards() const
     {
         return includeRebalancedCards;
     }
-    bool getPrintingSelectorNavigationButtonsVisible() const
+    [[nodiscard]] bool getPrintingSelectorNavigationButtonsVisible() const
     {
         return printingSelectorNavigationButtonsVisible;
     }
-    bool getDeckEditorBannerCardComboBoxVisible() const
+    [[nodiscard]] bool getDeckEditorBannerCardComboBoxVisible() const
     {
         return deckEditorBannerCardComboBoxVisible;
     }
-    bool getDeckEditorTagsWidgetVisible() const
+    [[nodiscard]] bool getDeckEditorTagsWidgetVisible() const
     {
         return deckEditorTagsWidgetVisible;
     }
-    int getVisualDeckStorageSortingOrder() const
+    [[nodiscard]] int getVisualDeckStorageSortingOrder() const
     {
         return visualDeckStorageSortingOrder;
     }
-    bool getVisualDeckStorageShowFolders() const
+    [[nodiscard]] bool getVisualDeckStorageShowFolders() const
     {
         return visualDeckStorageShowFolders;
     }
-    bool getVisualDeckStorageShowTagFilter() const
+    [[nodiscard]] bool getVisualDeckStorageShowTagFilter() const
     {
         return visualDeckStorageShowTagFilter;
     }
-    QStringList getVisualDeckStorageDefaultTagsList() const
+    [[nodiscard]] QStringList getVisualDeckStorageDefaultTagsList() const
     {
         return visualDeckStorageDefaultTagsList;
     }
-    bool getVisualDeckStorageSearchFolderNames() const
+    [[nodiscard]] bool getVisualDeckStorageSearchFolderNames() const
     {
         return visualDeckStorageSearchFolderNames;
     }
-    bool getVisualDeckStorageShowBannerCardComboBox() const
+    [[nodiscard]] bool getVisualDeckStorageShowBannerCardComboBox() const
     {
         return visualDeckStorageShowBannerCardComboBox;
     }
-    bool getVisualDeckStorageShowTagsOnDeckPreviews() const
+    [[nodiscard]] bool getVisualDeckStorageShowTagsOnDeckPreviews() const
     {
         return visualDeckStorageShowTagsOnDeckPreviews;
     }
-    int getVisualDeckStorageCardSize() const
+    [[nodiscard]] int getVisualDeckStorageCardSize() const
     {
         return visualDeckStorageCardSize;
     }
-    bool getVisualDeckStorageDrawUnusedColorIdentities() const
+    [[nodiscard]] bool getVisualDeckStorageDrawUnusedColorIdentities() const
     {
         return visualDeckStorageDrawUnusedColorIdentities;
     }
-    int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
+    [[nodiscard]] int getVisualDeckStorageUnusedColorIdentitiesOpacity() const
     {
         return visualDeckStorageUnusedColorIdentitiesOpacity;
     }
-    int getVisualDeckStorageTooltipType() const
+    [[nodiscard]] int getVisualDeckStorageTooltipType() const
     {
         return visualDeckStorageTooltipType;
     }
-    bool getVisualDeckStoragePromptForConversion() const
+    [[nodiscard]] bool getVisualDeckStoragePromptForConversion() const
     {
         return visualDeckStoragePromptForConversion;
     }
-    bool getVisualDeckStorageAlwaysConvert() const
+    [[nodiscard]] bool getVisualDeckStorageAlwaysConvert() const
     {
         return visualDeckStorageAlwaysConvert;
     }
-    bool getVisualDeckStorageInGame() const
+    [[nodiscard]] bool getVisualDeckStorageInGame() const
     {
         return visualDeckStorageInGame;
     }
-    bool getVisualDeckStorageSelectionAnimation() const
+    [[nodiscard]] bool getVisualDeckStorageSelectionAnimation() const
     {
         return visualDeckStorageSelectionAnimation;
     }
-    int getDefaultDeckEditorType() const
+    [[nodiscard]] int getVisualDeckEditorCardSize() const
+    {
+        return visualDeckEditorCardSize;
+    }
+    [[nodiscard]] int getVisualDatabaseDisplayCardSize() const
+    {
+        return visualDatabaseDisplayCardSize;
+    }
+    [[nodiscard]] int getEDHRecCardSize() const
+    {
+        return edhrecCardSize;
+    }
+    [[nodiscard]] int getArchidektPreviewSize() const
+    {
+        return archidektPreviewSize;
+    }
+    [[nodiscard]] int getDefaultDeckEditorType() const
     {
         return defaultDeckEditorType;
     }
-    bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const
+    [[nodiscard]] bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const
     {
         return visualDatabaseDisplayFilterToMostRecentSetsEnabled;
     }
-    int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const
+    [[nodiscard]] int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const
     {
         return visualDatabaseDisplayFilterToMostRecentSetsAmount;
     }
-    int getVisualDeckEditorSampleHandSize() const
+    [[nodiscard]] int getVisualDeckEditorSampleHandSize() const
     {
         return visualDeckEditorSampleHandSize;
     }
-    bool getHorizontalHand() const
+    [[nodiscard]] bool getHorizontalHand() const
     {
         return horizontalHand;
     }
-    bool getInvertVerticalCoordinate() const
+    [[nodiscard]] bool getInvertVerticalCoordinate() const
     {
         return invertVerticalCoordinate;
     }
-    int getMinPlayersForMultiColumnLayout() const
+    [[nodiscard]] int getMinPlayersForMultiColumnLayout() const
     {
         return minPlayersForMultiColumnLayout;
     }
-    bool getTapAnimation() const
+    [[nodiscard]] bool getTapAnimation() const
     {
         return tapAnimation;
     }
-    bool getAutoRotateSidewaysLayoutCards() const
+    [[nodiscard]] bool getAutoRotateSidewaysLayoutCards() const
     {
         return autoRotateSidewaysLayoutCards;
     }
-    bool getOpenDeckInNewTab() const
+    [[nodiscard]] bool getOpenDeckInNewTab() const
     {
         return openDeckInNewTab;
     }
-    int getRewindBufferingMs() const
+    [[nodiscard]] int getRewindBufferingMs() const
     {
         return rewindBufferingMs;
     }
-    bool getChatMention() const
+    [[nodiscard]] bool getChatMention() const
     {
         return chatMention;
     }
-    bool getChatMentionCompleter() const
+    [[nodiscard]] bool getChatMentionCompleter() const
     {
         return chatMentionCompleter;
     }
-    bool getChatMentionForeground() const
+    [[nodiscard]] bool getChatMentionForeground() const
     {
         return chatMentionForeground;
     }
-    bool getChatHighlightForeground() const
+    [[nodiscard]] bool getChatHighlightForeground() const
     {
         return chatHighlightForeground;
     }
     /**
      * Currently selected index for the `Group by X` QComboBox
      */
-    int getZoneViewGroupByIndex() const
+    [[nodiscard]] int getZoneViewGroupByIndex() const
     {
         return zoneViewGroupByIndex;
     }
     /**
      * Currently selected index for the `Sort by X` QComboBox
      */
-    int getZoneViewSortByIndex() const
+    [[nodiscard]] int getZoneViewSortByIndex() const
     {
         return zoneViewSortByIndex;
     }
@@ -720,136 +743,136 @@ public:
        Returns if the view should be sorted into pile view.
        @return zoneViewPileView if the view should be sorted into pile view.
      */
-    bool getZoneViewPileView() const
+    [[nodiscard]] bool getZoneViewPileView() const
     {
         return zoneViewPileView;
     }
-    bool getSoundEnabled() const
+    [[nodiscard]] bool getSoundEnabled() const
     {
         return soundEnabled;
     }
-    QString getSoundThemeName() const
+    [[nodiscard]] QString getSoundThemeName() const
     {
         return soundThemeName;
     }
-    bool getIgnoreUnregisteredUsers() const
+    [[nodiscard]] bool getIgnoreUnregisteredUsers() const
     {
         return ignoreUnregisteredUsers;
     }
-    bool getIgnoreUnregisteredUserMessages() const
+    [[nodiscard]] bool getIgnoreUnregisteredUserMessages() const
     {
         return ignoreUnregisteredUserMessages;
     }
-    int getPixmapCacheSize() const
+    [[nodiscard]] int getPixmapCacheSize() const
     {
         return pixmapCacheSize;
     }
-    int getNetworkCacheSizeInMB() const
+    [[nodiscard]] int getNetworkCacheSizeInMB() const
     {
         return networkCacheSize;
     }
-    int getRedirectCacheTtl() const
+    [[nodiscard]] int getRedirectCacheTtl() const
     {
         return redirectCacheTtl;
     }
-    bool getScaleCards() const
+    [[nodiscard]] bool getScaleCards() const
     {
         return scaleCards;
     }
-    int getStackCardOverlapPercent() const
+    [[nodiscard]] int getStackCardOverlapPercent() const
     {
         return verticalCardOverlapPercent;
     }
-    bool getShowMessagePopup() const
+    [[nodiscard]] bool getShowMessagePopup() const
     {
         return showMessagePopups;
     }
-    bool getShowMentionPopup() const
+    [[nodiscard]] bool getShowMentionPopup() const
     {
         return showMentionPopups;
     }
-    bool getRoomHistory() const
+    [[nodiscard]] bool getRoomHistory() const
     {
         return roomHistory;
     }
-    bool getLeftJustified() const
+    [[nodiscard]] bool getLeftJustified() const
     {
         return leftJustified;
     }
-    int getMasterVolume() const
+    [[nodiscard]] int getMasterVolume() const
     {
         return masterVolume;
     }
-    int getCardInfoViewMode() const
+    [[nodiscard]] int getCardInfoViewMode() const
     {
         return cardInfoViewMode;
     }
-    QStringList getCountries() const;
-    QString getHighlightWords() const
+    [[nodiscard]] QStringList getCountries() const;
+    [[nodiscard]] QString getHighlightWords() const
     {
         return highlightWords;
     }
-    QString getGameDescription() const
+    [[nodiscard]] QString getGameDescription() const
     {
         return gameDescription;
     }
-    int getMaxPlayers() const
+    [[nodiscard]] int getMaxPlayers() const
     {
         return maxPlayers;
     }
-    QString getGameTypes() const
+    [[nodiscard]] QString getGameTypes() const
     {
         return gameTypes;
     }
-    bool getOnlyBuddies() const
+    [[nodiscard]] bool getOnlyBuddies() const
     {
         return onlyBuddies;
     }
-    bool getOnlyRegistered() const
+    [[nodiscard]] bool getOnlyRegistered() const
     {
         return onlyRegistered;
     }
-    bool getSpectatorsAllowed() const
+    [[nodiscard]] bool getSpectatorsAllowed() const
     {
         return spectatorsAllowed;
     }
-    bool getSpectatorsNeedPassword() const
+    [[nodiscard]] bool getSpectatorsNeedPassword() const
     {
         return spectatorsNeedPassword;
     }
-    bool getSpectatorsCanTalk() const
+    [[nodiscard]] bool getSpectatorsCanTalk() const
     {
         return spectatorsCanTalk;
     }
-    bool getSpectatorsCanSeeEverything() const
+    [[nodiscard]] bool getSpectatorsCanSeeEverything() const
     {
         return spectatorsCanSeeEverything;
     }
-    int getDefaultStartingLifeTotal() const
+    [[nodiscard]] int getDefaultStartingLifeTotal() const
     {
         return defaultStartingLifeTotal;
     }
-    bool getShareDecklistsOnLoad() const
+    [[nodiscard]] bool getShareDecklistsOnLoad() const
     {
         return shareDecklistsOnLoad;
     }
-    bool getCreateGameAsSpectator() const
+    [[nodiscard]] bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
     }
-    bool getRememberGameSettings() const
+    [[nodiscard]] bool getRememberGameSettings() const
     {
         return rememberGameSettings;
     }
-    int getKeepAlive() const override
+    [[nodiscard]] int getKeepAlive() const override
     {
         return keepalive;
     }
-    int getTimeOut() const override
+    [[nodiscard]] int getTimeOut() const override
     {
         return timeout;
     }
-    int getMaxFontSize() const
+    [[nodiscard]] int getMaxFontSize() const
     {
         return maxFontSize;
     }
@@ -877,73 +900,73 @@ public:
     {
         return useTearOffMenus;
     }
-    int getCardViewInitialRowsMax() const
+    [[nodiscard]] int getCardViewInitialRowsMax() const
     {
         return cardViewInitialRowsMax;
     }
-    int getCardViewExpandedRowsMax() const
+    [[nodiscard]] int getCardViewExpandedRowsMax() const
     {
         return cardViewExpandedRowsMax;
     }
-    bool getCloseEmptyCardView() const
+    [[nodiscard]] bool getCloseEmptyCardView() const
     {
         return closeEmptyCardView;
     }
-    bool getFocusCardViewSearchBar() const
+    [[nodiscard]] bool getFocusCardViewSearchBar() const
     {
         return focusCardViewSearchBar;
     }
-    ShortcutsSettings &shortcuts() const
+    [[nodiscard]] ShortcutsSettings &shortcuts() const
     {
         return *shortcutsSettings;
     }
-    CardDatabaseSettings *cardDatabase() const
+    [[nodiscard]] CardDatabaseSettings *cardDatabase() const
     {
         return cardDatabaseSettings;
     }
-    ServersSettings &servers() const
+    [[nodiscard]] ServersSettings &servers() const
     {
         return *serversSettings;
     }
-    MessageSettings &messages() const
+    [[nodiscard]] MessageSettings &messages() const
     {
         return *messageSettings;
     }
-    GameFiltersSettings &gameFilters() const
+    [[nodiscard]] GameFiltersSettings &gameFilters() const
     {
         return *gameFiltersSettings;
     }
-    LayoutsSettings &layouts() const
+    [[nodiscard]] LayoutsSettings &layouts() const
     {
         return *layoutsSettings;
     }
-    DownloadSettings &downloads() const
+    [[nodiscard]] DownloadSettings &downloads() const
     {
         return *downloadSettings;
     }
-    RecentsSettings &recents() const
+    [[nodiscard]] RecentsSettings &recents() const
     {
         return *recentsSettings;
     }
-    CardOverrideSettings &cardOverrides() const
+    [[nodiscard]] CardOverrideSettings &cardOverrides() const
     {
         return *cardOverrideSettings;
     }
-    DebugSettings &debug() const
+    [[nodiscard]] DebugSettings &debug() const
     {
         return *debugSettings;
     }
-    CardCounterSettings &cardCounters() const;
+    [[nodiscard]] CardCounterSettings &cardCounters() const;
 
-    bool getIsPortableBuild() const
+    [[nodiscard]] bool getIsPortableBuild() const
     {
         return isPortableBuild;
     }
-    bool getDownloadSpoilersStatus() const
+    [[nodiscard]] bool getDownloadSpoilersStatus() const
     {
         return mbDownloadSpoilers;
     }
-    bool getRoundCardCorners() const
+    [[nodiscard]] bool getRoundCardCorners() const
     {
         return roundCardCorners;
     }
@@ -1018,6 +1041,10 @@ public slots:
     void setVisualDeckStorageAlwaysConvert(bool _visualDeckStorageAlwaysConvert);
     void setVisualDeckStorageInGame(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageSelectionAnimation(QT_STATE_CHANGED_T value);
+    void setVisualDeckEditorCardSize(int _visualDeckEditorCardSize);
+    void setVisualDatabaseDisplayCardSize(int _visualDatabaseDisplayCardSize);
+    void setEDHRecCardSize(int _EDHRecCardSize);
+    void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setDefaultDeckEditorType(int value);
     void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(QT_STATE_CHANGED_T _enabled);
     void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);

@@ -10,8 +10,6 @@
 #include "../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "tab.h"
 
-#include <QVBoxLayout>
-
 class TabVisualDatabaseDisplay : public Tab
 {
     Q_OBJECT
@@ -25,7 +23,8 @@ public:
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {
-        return tr("Visual Database Display");
+        return visualDatabaseDisplayWidget->displayModeButton->isChecked() ? tr("Database Display")
+                                                                           : tr("Visual Database Display");
     }
 };
 

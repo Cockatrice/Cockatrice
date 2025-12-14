@@ -3,7 +3,6 @@
 #include <QAbstractItemView>
 #include <QCompleter>
 #include <QFocusEvent>
-#include <QKeyEvent>
 #include <QScrollBar>
 #include <QStringListModel>
 #include <QTextCursor>

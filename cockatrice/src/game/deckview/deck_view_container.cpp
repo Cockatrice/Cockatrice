@@ -8,13 +8,9 @@
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
 #include "../../interface/widgets/tabs/tab_game.h"
-#include "../game_scene.h"
 #include "deck_view.h"
 
 #include <QMessageBox>
-#include <QMouseEvent>
-#include <QToolButton>
-#include <google/protobuf/descriptor.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
@@ -263,7 +259,7 @@ void DeckViewContainer::loadLocalDeck()
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
     DeckLoader deck(this);
 
     bool success = deck.loadFromFile(filePath, fmt, true);

@@ -46,7 +46,8 @@ Latest <kbd>beta</kbd> version:
 
 - [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
-- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official webpage of the Cockatrice project
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official Cockatrice webpage
+- [Cockatrice @Flathub](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration for our Linux `flatpak` package
 
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
@@ -54,6 +55,7 @@ Latest <kbd>beta</kbd> version:
 Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
 - [Official Website](https://cockatrice.github.io)
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+- [Official Code Documentation](https://cockatrice.github.io/docs)
 - [Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 

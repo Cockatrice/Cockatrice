@@ -19,7 +19,10 @@ set(cockatrice_SOURCES
     src/client/settings/card_counter_settings.cpp
     src/client/settings/shortcut_treeview.cpp
     src/client/settings/shortcuts_settings.cpp
+    src/interface/deck_loader/card_node_function.cpp
+    src/interface/deck_loader/deck_file_format.cpp
     src/interface/deck_loader/deck_loader.cpp
+    src/interface/deck_loader/loaded_deck.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
@@ -142,6 +145,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/deck_card_zone_display_widget.cpp
     src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
     src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
     src/interface/widgets/deck_analytics/mana_base_widget.cpp
     src/interface/widgets/deck_analytics/mana_curve_widget.cpp
     src/interface/widgets/deck_analytics/mana_devotion_widget.cpp
@@ -153,8 +157,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/general/background_sources.cpp
+    src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
     src/interface/widgets/general/display/bar_widget.cpp
+    src/interface/widgets/general/display/color_bar.cpp
     src/interface/widgets/general/display/dynamic_font_size_label.cpp
     src/interface/widgets/general/display/dynamic_font_size_push_button.cpp
     src/interface/widgets/general/display/labeled_input.cpp
@@ -196,12 +202,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_set_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp
+    src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
@@ -220,6 +228,19 @@ set(cockatrice_SOURCES
     src/interface/window_main.cpp
     src/main.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
+    src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck_category.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_listing_container.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_owner.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp

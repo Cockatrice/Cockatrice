@@ -24,7 +24,7 @@ public:
     [[nodiscard]] QString getBannerText() const
     {
         return header->getText();
-    };
+    }
 
 private:
     QVBoxLayout *layout;

@@ -30,31 +30,31 @@ private:
 public:
     UserConnection_Information();
     UserConnection_Information(QString, QString, QString, QString, QString, bool, QString);
-    QString getSaveName() const
+    [[nodiscard]] QString getSaveName() const
     {
         return saveName;
     }
-    QString getServer() const
+    [[nodiscard]] QString getServer() const
     {
         return server;
     }
-    QString getPort() const
+    [[nodiscard]] QString getPort() const
     {
         return port;
     }
-    QString getUsername() const
+    [[nodiscard]] QString getUsername() const
     {
         return username;
     }
-    QString getPassword() const
+    [[nodiscard]] QString getPassword() const
     {
         return password;
     }
-    bool getSavePassword() const
+    [[nodiscard]] bool getSavePassword() const
     {
         return savePassword;
     }
-    QString getSite() const
+    [[nodiscard]] QString getSite() const
     {
         return site;
     }

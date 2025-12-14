@@ -5,7 +5,6 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QToolTip>
-#include <utility>
 
 SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWidget(parent)
 {

@@ -15,6 +15,7 @@ class ShadowBackgroundLabel : public QLabel
 
 public:
     explicit ShadowBackgroundLabel(QWidget *parent, const QString &text);
+    void setLabelText(const QString &text);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

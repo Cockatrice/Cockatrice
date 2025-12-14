@@ -12,10 +12,16 @@
  */
 ShadowBackgroundLabel::ShadowBackgroundLabel(QWidget *parent, const QString &text) : QLabel(parent)
 {
-    setAttribute(Qt::WA_TranslucentBackground);                // Allows transparency.
-    setText("<font color='white'>" + text + "</font>");        ///< Ensures the text is rendered in white.
+    setAttribute(Qt::WA_TranslucentBackground); // Allows transparency.
+    setLabelText(text);
     setAlignment(Qt::AlignCenter);                             ///< Centers the text within the label.
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum); ///< Ensures minimum size constraints.
+}
+
+void ShadowBackgroundLabel::setLabelText(const QString &text)
+{
+    setText("<font color='white'>" + text + "</font>"); ///< Ensures the text is rendered in white.
+    update();
 }
 
 /**

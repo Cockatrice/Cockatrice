@@ -19,6 +19,11 @@ struct CardRef
     {
         return name == other.name && providerId == other.providerId;
     }
+
+    bool isEmpty() const
+    {
+        return name.isEmpty() && providerId.isEmpty();
+    }
 };
 
 #endif // CARD_REF_H

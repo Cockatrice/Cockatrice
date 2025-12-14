@@ -3,7 +3,6 @@
 #include <QBuffer>
 #include <QDebug>
 #include <QDialogButtonBox>
-#include <QDir>
 #include <QFileDialog>
 #include <QImageReader>
 #include <QLabel>

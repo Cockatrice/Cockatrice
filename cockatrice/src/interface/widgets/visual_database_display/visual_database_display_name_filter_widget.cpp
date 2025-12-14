@@ -51,7 +51,7 @@ VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWi
 
 void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 {
-    searchBox->setPlaceholderText(tr("Filter by name..."));
+    searchBox->setPlaceholderText(tr("Filter by name... (Exact match)"));
     loadFromDeckButton->setText(tr("Load from Deck"));
     loadFromDeckButton->setToolTip(tr("Apply all card names in currently loaded deck as exact match name filters"));
     loadFromClipboardButton->setText(tr("Load from Clipboard"));
@@ -68,7 +68,7 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
     if (!decklist)
         return;
 
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         createNameFilter(currentCard->getName());
@@ -123,14 +123,14 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
 {
     // Clear existing name filters
     emit filterModel->layoutAboutToBeChanged();
-    filterModel->clearFiltersOfType(CardFilter::Attr::AttrName);
+    filterModel->clearFiltersOfType(CardFilter::Attr::AttrNameExact);
 
     filterModel->blockSignals(true);
     filterModel->filterTree()->blockSignals(true);
 
     for (const auto &name : activeFilters.keys()) {
         QString nameString = name;
-        filterModel->addFilter(new CardFilter(nameString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrName));
+        filterModel->addFilter(new CardFilter(nameString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrNameExact));
     }
 
     filterModel->blockSignals(false);
@@ -146,7 +146,7 @@ void VisualDatabaseDisplayNameFilterWidget::updateFilterModel()
 void VisualDatabaseDisplayNameFilterWidget::syncWithFilterModel()
 {
     QStringList currentFilters;
-    for (const auto &filter : filterModel->getFiltersOfType(CardFilter::Attr::AttrName)) {
+    for (const auto &filter : filterModel->getFiltersOfType(CardFilter::Attr::AttrNameExact)) {
         if (filter->type() == CardFilter::Type::TypeOr) {
             currentFilters.append(filter->term());
         }

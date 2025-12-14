@@ -1,6 +1,7 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
 #include "dlg_settings.h"
 
@@ -82,9 +83,9 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
 
     if (deckLoader->getDeckList()->loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
-            DeckLoader::resolveSetNameAndNumberToProviderID(deckLoader->getDeckList());
+            deckLoader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
         } else {
-            DeckLoader::clearSetNamesAndNumbers(deckLoader->getDeckList());
+            deckLoader->getDeckList()->forEachCard(CardNodeFunction::ClearPrintingData());
         }
         return true;
     }

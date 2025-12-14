@@ -7,10 +7,8 @@
 #include "../../pixel_map_generator.h"
 
 #include <QClipboard>
-#include <QFile>
 #include <QHeaderView>
 #include <QMenu>
-#include <QTextBrowser>
 #include <QToolButton>
 #include <QTreeView>
 #include <libcockatrice/card/database/card_database_manager.h>

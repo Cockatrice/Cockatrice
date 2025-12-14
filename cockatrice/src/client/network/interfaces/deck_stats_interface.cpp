@@ -2,13 +2,13 @@
 
 #include <QDesktopServices>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <version_string.h>
 
 DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)
@@ -63,6 +63,7 @@ void DeckStatsInterface::analyzeDeck(DeckList *deck)
 
     QNetworkRequest request(QUrl("https://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     manager->post(request, data);
 }

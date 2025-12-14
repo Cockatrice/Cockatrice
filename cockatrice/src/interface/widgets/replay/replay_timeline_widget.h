@@ -9,7 +9,6 @@
 
 #include "../../../game/player/event_processing_options.h"
 
-#include <QList>
 #include <QMouseEvent>
 #include <QWidget>
 
@@ -60,10 +59,10 @@ public:
 
     explicit ReplayTimelineWidget(QWidget *parent = nullptr);
     void setTimeline(const QList<int> &_replayTimeline);
-    QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
+    [[nodiscard]] QSize sizeHint() const override;
+    [[nodiscard]] QSize minimumSizeHint() const override;
     void setTimeScaleFactor(qreal _timeScaleFactor);
-    int getCurrentEvent() const
+    [[nodiscard]] int getCurrentEvent() const
     {
         return currentEvent;
     }

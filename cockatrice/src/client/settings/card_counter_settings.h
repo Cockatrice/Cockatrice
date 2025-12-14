@@ -7,7 +7,6 @@
 #ifndef CARD_COUNTER_SETTINGS_H
 #define CARD_COUNTER_SETTINGS_H
 
-#include <QObject>
 #include <libcockatrice/settings/settings_manager.h>
 
 class QSettings;
@@ -20,9 +19,9 @@ class CardCounterSettings : public SettingsManager
 public:
     CardCounterSettings(const QString &settingsPath, QObject *parent = nullptr);
 
-    QColor color(int counterId) const;
+    [[nodiscard]] QColor color(int counterId) const;
 
-    QString displayName(int counterId) const;
+    [[nodiscard]] QString displayName(int counterId) const;
 
 public slots:
     void setColor(int counterId, const QColor &color);

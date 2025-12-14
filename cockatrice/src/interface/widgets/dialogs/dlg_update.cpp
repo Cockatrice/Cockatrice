@@ -5,12 +5,10 @@
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
 
-#include <QApplication>
 #include <QDesktopServices>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
-#include <QProgressDialog>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QtNetwork>

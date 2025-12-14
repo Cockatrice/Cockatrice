@@ -13,7 +13,6 @@
 #include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
 

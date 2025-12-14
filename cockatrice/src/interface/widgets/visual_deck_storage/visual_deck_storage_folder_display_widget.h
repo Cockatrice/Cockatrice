@@ -9,11 +9,8 @@
 
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/flow_widget.h"
-#include "visual_deck_storage_widget.h"
 
-#include <QVBoxLayout>
-#include <QWidget>
-
+class VisualDeckStorageWidget;
 class VisualDeckStorageFolderDisplayWidget : public QWidget
 {
     Q_OBJECT
@@ -31,7 +28,7 @@ public:
     [[nodiscard]] FlowWidget *getFlowWidget() const
     {
         return flowWidget;
-    };
+    }
 
 public slots:
     void updateVisibility(bool recursive = true);

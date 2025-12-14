@@ -14,7 +14,6 @@
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/pixel_map_generator.h"
-#include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
@@ -22,15 +21,11 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QClipboard>
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDesktopServices>
-#include <QDir>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QLineEdit>
-#include <QMenuBar>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
@@ -38,7 +33,6 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSplitter>
-#include <QTextStream>
 #include <QTreeView>
 #include <QUrl>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -58,6 +52,8 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 {
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
+    historyManager = new DeckListHistoryManager(this);
+
     databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
@@ -70,6 +66,10 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     // Connect deck signals to this tab
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckChanged, this, &AbstractTabDeckEditor::onDeckChanged);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::deckModified, this, &AbstractTabDeckEditor::onDeckModified);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::requestDeckHistorySave, this,
+            &AbstractTabDeckEditor::onDeckHistorySaveRequested);
+    connect(deckDockWidget, &DeckEditorDeckDockWidget::requestDeckHistoryClear, this,
+            &AbstractTabDeckEditor::onDeckHistoryClearRequested);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::cardChanged, this, &AbstractTabDeckEditor::updateCard);
     connect(this, &AbstractTabDeckEditor::decrementCard, deckDockWidget, &DeckEditorDeckDockWidget::actDecrementCard);
 
@@ -107,6 +107,7 @@ void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 /** @brief Placeholder: called when the deck changes. */
 void AbstractTabDeckEditor::onDeckChanged()
 {
+    historyManager->clear();
 }
 
 /**
@@ -116,6 +117,22 @@ void AbstractTabDeckEditor::onDeckModified()
 {
     setModified(!isBlankNewDeck());
     deckMenu->setSaveStatus(!isBlankNewDeck());
+}
+
+/**
+ * @brief Marks the tab as modified and updates the save menu status.
+ */
+void AbstractTabDeckEditor::onDeckHistorySaveRequested(const QString &modificationReason)
+{
+    historyManager->save(deckDockWidget->getDeckList()->createMemento(modificationReason));
+}
+
+/**
+ * @brief Marks the tab as modified and updates the save menu status.
+ */
+void AbstractTabDeckEditor::onDeckHistoryClearRequested()
+{
+    historyManager->clear();
 }
 
 /**
@@ -131,9 +148,12 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneNam
     if (card.getInfo().getIsToken())
         zoneName = DECK_ZONE_TOKENS;
 
-    emit cardAboutToBeAdded(card, zoneName);
+    onDeckHistorySaveRequested(QString(tr("Added (%1): %2 (%3) %4"))
+                                   .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
+                                        card.getPrinting().getProperty("num")));
 
     QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
+    deckDockWidget->expandAll();
     deckDockWidget->deckView->clearSelection();
     deckDockWidget->deckView->setCurrentIndex(newCardIndex);
     setModified(true);
@@ -199,8 +219,8 @@ void AbstractTabDeckEditor::openDeck(DeckLoader *deck)
 {
     setDeck(deck);
 
-    if (!deck->getLastFileName().isEmpty()) {
-        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastFileName());
+    if (!deck->getLastLoadInfo().fileName.isEmpty()) {
+        SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(deck->getLastLoadInfo().fileName);
     }
 }
 
@@ -360,7 +380,7 @@ void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
  */
 void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation)
 {
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     auto *l = new DeckLoader(this);
     if (l->loadFromFile(fileName, fmt, true)) {
@@ -386,7 +406,7 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 bool AbstractTabDeckEditor::actSaveDeck()
 {
     DeckLoader *const deck = getDeckLoader();
-    if (deck->getLastRemoteDeckId() != -1) {
+    if (deck->getLastLoadInfo().remoteDeckId != LoadedDeck::LoadInfo::NON_REMOTE_ID) {
         QString deckString = deck->getDeckList()->writeToString_Native();
         if (deckString.length() > MAX_FILE_LENGTH) {
             QMessageBox::critical(this, tr("Error"), tr("Could not save remote deck"));
@@ -394,7 +414,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         }
 
         Command_DeckUpload cmd;
-        cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastRemoteDeckId()));
+        cmd.set_deck_id(static_cast<google::protobuf::uint32>(deck->getLastLoadInfo().remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
@@ -402,9 +422,9 @@ bool AbstractTabDeckEditor::actSaveDeck()
         tabSupervisor->getClient()->sendCommand(pend);
 
         return true;
-    } else if (deck->getLastFileName().isEmpty())
+    } else if (deck->getLastLoadInfo().fileName.isEmpty())
         return actSaveDeckAs();
-    else if (deck->saveToFile(deck->getLastFileName(), deck->getLastFileFormat())) {
+    else if (deck->saveToFile(deck->getLastLoadInfo().fileName, deck->getLastLoadInfo().fileFormat)) {
         setModified(false);
         return true;
     }
@@ -432,7 +452,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
         return false;
 
     QString fileName = dialog.selectedFiles().at(0);
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(fileName);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
     if (!getDeckLoader()->saveToFile(fileName, fmt)) {
         QMessageBox::critical(

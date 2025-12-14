@@ -11,15 +11,14 @@
 #include "../../deck_loader/deck_loader.h"
 #include "../interface/widgets/server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
+#include "api/archidekt/tab_archidekt.h"
 #include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_visual_database_display.h"
 #include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QAbstractButton>
-#include <QCommonStyle>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>
@@ -112,7 +111,7 @@ private:
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
-    QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabVisualDeckStorage,
+    QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabArchidekt, *aTabVisualDeckStorage,
         *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
@@ -174,6 +173,7 @@ public slots:
     TabDeckEditorVisual *addVisualDeckEditorTab(DeckLoader *deckToOpen);
     TabVisualDatabaseDisplay *addVisualDatabaseDisplayTab();
     TabEdhRecMain *addEdhrecMainTab();
+    TabArchidekt *addArchidektTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void switchToFirstAvailableNetworkTab();

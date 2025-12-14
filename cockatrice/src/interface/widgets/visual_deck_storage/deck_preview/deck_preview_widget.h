@@ -72,6 +72,8 @@ private:
     void addSetBannerCardMenu(QMenu *menu);
 
 private slots:
+    void setTags(const QStringList &tags);
+
     void actRenameDeck();
     void actRenameFile();
     void actDeleteFile();

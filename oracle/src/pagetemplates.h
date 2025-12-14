@@ -3,6 +3,8 @@
 
 #include <QWizardPage>
 
+class QFile;
+class QRadioButton;
 class OracleWizard;
 class QCheckBox;
 class QLabel;
@@ -43,15 +45,19 @@ protected:
     virtual QString getDefaultSavePath() = 0;
     virtual QString getWindowTitle() = 0;
     virtual QString getFileType() = 0;
+    virtual QString getFilePromptName() = 0;
     bool saveToFile();
     bool internalSaveToFile(const QString &fileName);
 
 protected:
     QByteArray downloadData;
-    QLabel *urlLabel;
-    QLabel *pathLabel;
+    QRadioButton *urlRadioButton;
+    QRadioButton *fileRadioButton;
     QLineEdit *urlLineEdit;
+    QLineEdit *fileLineEdit;
     QPushButton *urlButton;
+    QPushButton *fileButton;
+    QLabel *pathLabel;
     QLabel *progressLabel;
     QProgressBar *progressBar;
     QCheckBox *defaultPathCheckBox;
@@ -60,6 +66,7 @@ signals:
     void parsedDataReady();
 private slots:
     void actRestoreDefaultUrl();
+    void actLoadCardFile();
     void actDownloadProgress(qint64 received, qint64 total);
     void actDownloadFinished();
 };

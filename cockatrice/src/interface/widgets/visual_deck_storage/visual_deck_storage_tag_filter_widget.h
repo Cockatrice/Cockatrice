@@ -7,7 +7,7 @@
 #ifndef VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 #define VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 
-#include "visual_deck_storage_widget.h"
+#include "deck_preview/deck_preview_widget.h"
 
 #include <QWidget>
 

@@ -8,7 +8,6 @@
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H
 
-#include <QAbstractItemModel>
 #include <QDateTime>
 #include <QTreeView>
 
@@ -34,11 +33,11 @@ public:
         {
         }
         virtual ~Node() = default;
-        DirectoryNode *getParent() const
+        [[nodiscard]] DirectoryNode *getParent() const
         {
             return parent;
         }
-        QString getName() const
+        [[nodiscard]] QString getName() const
         {
             return name;
         }
@@ -49,9 +48,9 @@ public:
         explicit DirectoryNode(const QString &_name = QString(), DirectoryNode *_parent = nullptr);
         ~DirectoryNode() override;
         void clearTree();
-        QString getPath() const;
+        [[nodiscard]] QString getPath() const;
         DirectoryNode *getNodeByPath(QStringList path);
-        FileNode *getNodeById(int id) const;
+        [[nodiscard]] FileNode *getNodeById(int id) const;
     };
     class FileNode : public Node
     {
@@ -64,17 +63,17 @@ public:
             : Node(_name, _parent), id(_id), uploadTime(_uploadTime)
         {
         }
-        int getId() const
+        [[nodiscard]] int getId() const
         {
             return id;
         }
-        QDateTime getUploadTime() const
+        [[nodiscard]] QDateTime getUploadTime() const
         {
             return uploadTime;
         }
     };
 
-    template <typename T> T getNode(const QModelIndex &index) const
+    template <typename T> [[nodiscard]] T getNode(const QModelIndex &index) const
     {
         if (!index.isValid())
             return dynamic_cast<T>(root);
@@ -96,15 +95,16 @@ private slots:
 public:
     explicit RemoteDeckList_TreeModel(AbstractClient *_client, QObject *parent = nullptr);
     ~RemoteDeckList_TreeModel() override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex &index) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] QVariant
+    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] QModelIndex parent(const QModelIndex &index) const override;
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    DirectoryNode *getRoot() const
+    [[nodiscard]] DirectoryNode *getRoot() const
     {
         return root;
     }
@@ -124,11 +124,11 @@ private:
 
 public:
     explicit RemoteDeckList_TreeWidget(AbstractClient *_client, QWidget *parent = nullptr);
-    RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
-    RemoteDeckList_TreeModel::Node *getCurrentItem() const;
-    QList<RemoteDeckList_TreeModel::Node *> getCurrentSelection() const;
-    RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;
-    RemoteDeckList_TreeModel::FileNode *getNodeById(int id) const;
+    [[nodiscard]] RemoteDeckList_TreeModel::Node *getNode(const QModelIndex &ind) const;
+    [[nodiscard]] RemoteDeckList_TreeModel::Node *getCurrentItem() const;
+    [[nodiscard]] QList<RemoteDeckList_TreeModel::Node *> getCurrentSelection() const;
+    [[nodiscard]] RemoteDeckList_TreeModel::DirectoryNode *getNodeByPath(const QString &path) const;
+    [[nodiscard]] RemoteDeckList_TreeModel::FileNode *getNodeById(int id) const;
     void addFileToTree(const ServerInfo_DeckStorage_TreeItem &file, RemoteDeckList_TreeModel::DirectoryNode *parent);
     void addFolderToTree(const ServerInfo_DeckStorage_TreeItem &folder,
                          RemoteDeckList_TreeModel::DirectoryNode *parent);

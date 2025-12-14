@@ -3,17 +3,13 @@
 
 #include "server_player_reference.h"
 
-#include <QMap>
 #include <QMultiMap>
 #include <QMutex>
 #include <QObject>
 #include <QReadWriteLock>
-#include <QStringList>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
 
 class Server_DatabaseInterface;
 class Server_Game;

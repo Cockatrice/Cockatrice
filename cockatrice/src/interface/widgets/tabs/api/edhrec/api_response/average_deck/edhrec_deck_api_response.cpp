@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QMainWindow>
 
 void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
 {

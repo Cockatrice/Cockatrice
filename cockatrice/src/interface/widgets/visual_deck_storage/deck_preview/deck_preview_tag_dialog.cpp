@@ -11,7 +11,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTimer>
-#include <QVBoxLayout>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
                                            const QStringList &_activeTags,

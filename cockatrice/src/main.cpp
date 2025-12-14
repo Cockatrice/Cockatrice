@@ -20,7 +20,6 @@
 
 #include "main.h"
 
-#include "QtNetwork/QNetworkInterface"
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
@@ -36,16 +35,11 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
-#include <QDir>
-#include <QFile>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QSystemTrayIcon>
-#include <QTextStream>
 #include <QTranslator>
-#include <QtPlugin>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 
 QTranslator *translator, *qtTranslator;

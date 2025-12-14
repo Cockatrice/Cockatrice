@@ -7,7 +7,6 @@
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H
 
-#include <QObject>
 #include <QSettings>
 #include <QStringList>
 #include <QVariant>

@@ -15,7 +15,6 @@
 #include <QRadioButton>
 #include <QSet>
 #include <QSpinBox>
-#include <QWizard>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
@@ -110,7 +109,7 @@ void DlgCreateGame::sharedCtor()
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
-    if (room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
+    if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
         gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
     } else {
         createGameAsJudgeCheckBox->setChecked(false);

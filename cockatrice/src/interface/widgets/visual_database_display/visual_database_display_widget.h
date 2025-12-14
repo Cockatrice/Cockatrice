@@ -10,7 +10,6 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
-#include "../../layouts/flow_layout.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
@@ -18,17 +17,16 @@
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
+#include "visual_database_display_format_legality_filter_widget.h"
 #include "visual_database_display_main_type_filter_widget.h"
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
 
 #include <QLoggingCategory>
-#include <QTreeView>
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qscrollarea.h>
@@ -57,6 +55,7 @@ public:
     QWidget *searchContainer;
     QHBoxLayout *searchLayout;
     SearchLineEdit *searchEdit;
+    QPushButton *displayModeButton;
     FilterTreeModel *filterModel;
     VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
 
@@ -76,9 +75,15 @@ protected slots:
     void wheelEvent(QWheelEvent *event) override;
     void modelDirty() const;
     void updateSearch(const QString &search) const;
+    void onDisplayModeChanged(bool checked);
 
 private:
     QLabel *databaseLoadIndicator;
+
+    QLabel *sortByLabel;
+    QComboBox *sortColumnCombo, *sortOrderCombo;
+
+    QLabel *filterByLabel;
     QToolButton *clearFilterWidget;
     QWidget *filterContainer;
     QHBoxLayout *filterContainerLayout;
@@ -87,6 +92,7 @@ private:
     SettingsButtonWidget *quickFilterNameWidget;
     VisualDatabaseDisplayNameFilterWidget *nameFilterWidget;
     VisualDatabaseDisplayMainTypeFilterWidget *mainTypeFilterWidget;
+    VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
     SettingsButtonWidget *quickFilterSubTypeWidget;
     VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
     SettingsButtonWidget *quickFilterSetWidget;

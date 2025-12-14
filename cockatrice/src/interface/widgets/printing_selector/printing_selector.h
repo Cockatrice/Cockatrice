@@ -13,7 +13,6 @@
 
 #include <QCheckBox>
 #include <QLabel>
-#include <QPushButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -39,7 +38,12 @@ public:
     [[nodiscard]] DeckListModel *getDeckModel() const
     {
         return deckModel;
-    };
+    }
+
+    [[nodiscard]] AbstractTabDeckEditor *getDeckEditor() const
+    {
+        return deckEditor;
+    }
 
 public slots:
     void retranslateUi();

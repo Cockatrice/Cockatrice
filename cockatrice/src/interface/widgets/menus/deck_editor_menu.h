@@ -7,8 +7,6 @@
 #ifndef DECK_EDITOR_MENU_H
 #define DECK_EDITOR_MENU_H
 
-#include "../interface/widgets/tabs/abstract_tab_deck_editor.h"
-
 #include <QMenu>
 
 class AbstractTabDeckEditor;

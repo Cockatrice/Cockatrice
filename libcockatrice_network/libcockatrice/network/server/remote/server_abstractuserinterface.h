@@ -5,7 +5,6 @@
 
 #include <QMap>
 #include <QMutex>
-#include <QPair>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 

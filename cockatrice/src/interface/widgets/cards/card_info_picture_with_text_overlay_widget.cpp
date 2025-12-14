@@ -3,7 +3,6 @@
 #include <QFontMetrics>
 #include <QPainterPath>
 #include <QStylePainter>
-#include <QTextOption>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.
@@ -25,7 +24,7 @@ CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidg
                                                                            const int fontSize,
                                                                            const Qt::Alignment alignment)
     : CardInfoPictureWidget(parent, hoverToZoomEnabled, raiseOnEnter), textColor(textColor), outlineColor(outlineColor),
-      fontSize(fontSize), textAlignment(alignment)
+      fontSize(fontSize), textAlignment(alignment), highlighted(false)
 {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -82,6 +81,16 @@ void CardInfoPictureWithTextOverlayWidget::setTextAlignment(const Qt::Alignment 
     update();
 }
 
+void CardInfoPictureWithTextOverlayWidget::setHighlighted(bool _highlighted)
+{
+    if (highlighted == _highlighted) {
+        return;
+    }
+
+    highlighted = _highlighted;
+    update();
+}
+
 void CardInfoPictureWithTextOverlayWidget::mousePressEvent(QMouseEvent *event)
 {
     emit imageClicked(event, this);
@@ -98,11 +107,6 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     // Call the base class's paintEvent to draw the card image
     CardInfoPictureWidget::paintEvent(event);
 
-    // If no overlay text, skip drawing the text
-    if (overlayText.isEmpty()) {
-        return;
-    }
-
     QStylePainter painter(this);
 
     // Get the pixmap from the base class using the getter
@@ -115,6 +119,36 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     const QSize scaledSize = pixmap.size().scaled(size(), Qt::KeepAspectRatio);
     const QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
     const QRect pixmapRect(topLeft, scaledSize);
+
+    if (highlighted) {
+        painter.save();
+        painter.setRenderHint(QPainter::Antialiasing, true);
+
+        // Soft glow and border around the pixmap
+        const int padding = 4; // glow extends a little beyond image
+        QRect glowRect = pixmapRect.adjusted(-padding, -padding, padding, padding);
+
+        QPainterPath path;
+        int radius = 8; // rounded corners
+        path.addRoundedRect(glowRect, radius, radius);
+
+        // Soft outer glow
+        QColor glowColor(0, 150, 255, 80); // subtle blu
+        painter.setPen(QPen(glowColor, 6));
+        painter.drawPath(path);
+
+        // Thin inner border for crispness
+        QColor borderColor(0, 150, 255, 200);
+        painter.setPen(QPen(borderColor, 2));
+        painter.drawRoundedRect(pixmapRect, radius, radius);
+
+        painter.restore();
+    }
+
+    // If no overlay text, skip drawing the text
+    if (overlayText.isEmpty()) {
+        return;
+    }
 
     // Calculate the optimal font size
     QFont font = painter.font();

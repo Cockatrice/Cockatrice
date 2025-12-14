@@ -1,5 +1,5 @@
 /**
- * @file decklist.h
+ * @file deck_list.h
  * @brief Defines the DeckList class and supporting types for managing a full
  *        deck structure including cards, zones, sideboard plans, and
  *        serialization to/from multiple formats. This is a logic class which
@@ -11,12 +11,11 @@
 #define DECKLIST_H
 
 #include "deck_list_memento.h"
-#include "inner_deck_list_node.h"
+#include "tree/inner_deck_list_node.h"
 
 #include <QMap>
 #include <QVector>
 #include <QtCore/QXmlStreamReader>
-#include <QtCore/QXmlStreamWriter>
 #include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 #include <libcockatrice/utility/card_ref.h>
 
@@ -94,7 +93,7 @@ public:
  * @brief Represents a complete deck, including metadata, zones, cards,
  *        and sideboard plans.
  *
- * A DeckList is a QObject wrapper around an `InnerDecklistNode` tree,
+ * A DeckList is a wrapper around an `InnerDecklistNode` tree,
  * enriched with metadata like deck name, comments, tags, banner card,
  * and multiple sideboard plans.
  *
@@ -111,10 +110,6 @@ public:
  * - Owns the root `InnerDecklistNode` tree.
  * - Owns `SideboardPlan` instances stored in `sideboardPlans`.
  *
- * ### Signals:
- * - @c deckHashChanged() — emitted when the deck contents change.
- * - @c deckTagsChanged() — emitted when tags are added/removed.
- *
  * ### Example workflow:
  * ```
  * DeckList deck;
@@ -124,15 +119,26 @@ public:
  * deck.saveToFile_Native(device);
  * ```
  */
-class DeckList : public QObject
+class DeckList
 {
-    Q_OBJECT
+public:
+    struct Metadata
+    {
+        QString name;                ///< User-defined deck name.
+        QString comments;            ///< Free-form comments or notes.
+        QString gameFormat;          ///< The name of the game format this deck contains legal cards for
+        CardRef bannerCard;          ///< Optional representative card for the deck.
+        QStringList tags;            ///< User-defined tags for deck classification.
+        QString lastLoadedTimestamp; ///< Timestamp string of last load.
+
+        /**
+         * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
+         */
+        bool isEmpty() const;
+    };
+
 private:
-    QString name;                                  ///< User-defined deck name.
-    QString comments;                              ///< Free-form comments or notes.
-    CardRef bannerCard;                            ///< Optional representative card for the deck.
-    QString lastLoadedTimestamp;                   ///< Timestamp string of last load.
-    QStringList tags;                              ///< User-defined tags for deck classification.
+    Metadata metadata;                             ///< Deck metadata that is stored in the deck file
     QMap<QString, SideboardPlan *> sideboardPlans; ///< Named sideboard plans.
     InnerDecklistNode *root;                       ///< Root of the deck tree (zones + cards).
 
@@ -143,113 +149,90 @@ private:
     mutable QString cachedDeckHash;
 
     // Helpers for traversing the tree
-    static void getCardListHelper(InnerDecklistNode *node, QSet<QString> &result);
-    static void getCardRefListHelper(InnerDecklistNode *item, QList<CardRef> &result);
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
-protected:
-    /**
-     * @brief Map a card name to its zone.
-     * Override in subclasses for format-specific logic.
-     * @param cardName Card being placed.
-     * @param currentZoneName Zone candidate.
-     * @return Zone name to use.
-     */
-    virtual QString getCardZoneFromName(const QString /*cardName*/, QString currentZoneName)
-    {
-        return currentZoneName;
-    };
-
-    /**
-     * @brief Produce the complete display name of a card.
-     * Override in subclasses to add set suffixes or annotations.
-     * @param cardName Base name.
-     * @return Full display name.
-     */
-    virtual QString getCompleteCardName(const QString &cardName) const
-    {
-        return cardName;
-    };
-
-signals:
-    /// Emitted when the deck hash changes.
-    void deckHashChanged();
-    /// Emitted when the deck tags are modified.
-    void deckTagsChanged();
-
-public slots:
+public:
     /// @name Metadata setters
     ///@{
     void setName(const QString &_name = QString())
     {
-        name = _name;
+        metadata.name = _name;
     }
     void setComments(const QString &_comments = QString())
     {
-        comments = _comments;
+        metadata.comments = _comments;
     }
     void setTags(const QStringList &_tags = QStringList())
     {
-        tags = _tags;
-        emit deckTagsChanged();
+        metadata.tags = _tags;
     }
     void addTag(const QString &_tag)
     {
-        tags.append(_tag);
-        emit deckTagsChanged();
+        metadata.tags.append(_tag);
     }
     void clearTags()
     {
-        tags.clear();
-        emit deckTagsChanged();
+        metadata.tags.clear();
     }
     void setBannerCard(const CardRef &_bannerCard = {})
     {
-        bannerCard = _bannerCard;
+        metadata.bannerCard = _bannerCard;
     }
     void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
     {
-        lastLoadedTimestamp = _lastLoadedTimestamp;
+        metadata.lastLoadedTimestamp = _lastLoadedTimestamp;
+    }
+    void setGameFormat(const QString &_gameFormat = QString())
+    {
+        metadata.gameFormat = _gameFormat;
     }
     ///@}
 
-public:
     /// @brief Construct an empty deck.
     explicit DeckList();
-    /// @brief Delete copy constructor.
-    DeckList(const DeckList &) = delete;
-    DeckList &operator=(const DeckList &) = delete;
+    /// @brief Copy constructor (deep copies the node tree)
+    DeckList(const DeckList &other);
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
-    ~DeckList() override;
+    virtual ~DeckList();
 
     /// @name Metadata getters
+    /// The individual metadata getters still exist for backwards compatibility.
+    /// TODO: Figure out when we can remove them.
     ///@{
+    const Metadata &getMetadata() const
+    {
+        return metadata;
+    }
     QString getName() const
     {
-        return name;
+        return metadata.name;
     }
     QString getComments() const
     {
-        return comments;
+        return metadata.comments;
     }
     QStringList getTags() const
     {
-        return tags;
+        return metadata.tags;
     }
     CardRef getBannerCard() const
     {
-        return bannerCard;
+        return metadata.bannerCard;
     }
     QString getLastLoadedTimestamp() const
     {
-        return lastLoadedTimestamp;
+        return metadata.lastLoadedTimestamp;
+    }
+    QString getGameFormat() const
+    {
+        return metadata.gameFormat;
     }
     ///@}
 
     bool isBlankDeck() const
     {
-        return name.isEmpty() && comments.isEmpty() && getCardList().isEmpty();
+        return metadata.isEmpty() && getCardList().isEmpty();
     }
 
     /// @name Sideboard plans
@@ -287,11 +270,12 @@ public:
     void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
     {
-        return root->isEmpty() && name.isEmpty() && comments.isEmpty() && sideboardPlans.isEmpty();
+        return root->isEmpty() && metadata.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
-    QList<DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
+    QList<const DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
+    QList<const InnerDecklistNode *> getZoneNodes() const;
     int getSideboardSize() const;
     InnerDecklistNode *getRoot() const
     {
@@ -302,7 +286,8 @@ public:
                               int position,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString());
+                              const QString &cardProviderId = QString(),
+                              const bool formatLegal = true);
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
     ///@}
 

@@ -16,7 +16,6 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class DeckCardZoneDisplayWidget : public QWidget
@@ -26,6 +25,7 @@ class DeckCardZoneDisplayWidget : public QWidget
 public:
     DeckCardZoneDisplayWidget(QWidget *parent,
                               DeckListModel *deckListModel,
+                              QItemSelectionModel *selectionModel,
                               QPersistentModelIndex trackedIndex,
                               QString zoneName,
                               QString activeGroupCriteria,
@@ -34,7 +34,9 @@ public:
                               int bannerOpacity,
                               int subBannerOpacity,
                               CardSizeWidget *_cardSizeWidget);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
     DeckListModel *deckListModel;
+    QItemSelectionModel *selectionModel;
     QPersistentModelIndex trackedIndex;
     QString zoneName;
     void addCardsToOverlapWidget();

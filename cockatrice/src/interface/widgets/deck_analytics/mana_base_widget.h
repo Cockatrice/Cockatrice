@@ -8,6 +8,7 @@
 #define MANA_BASE_WIDGET_H
 
 #include "../general/display/banner_widget.h"
+#include "deck_list_statistics_analyzer.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
@@ -20,21 +21,15 @@ class ManaBaseWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaBaseWidget(QWidget *parent, DeckListModel *deckListModel);
-    QHash<QString, int> analyzeManaBase();
+    explicit ManaBaseWidget(QWidget *parent, DeckListStatisticsAnalyzer *deckStatAnalyzer);
     void updateDisplay();
 
-    QHash<QString, int> determineManaProduction(const QString &manaString);
-    void mergeManaCounts(QHash<QString, int> &manaCounts1, const QHash<QString, int> &manaCounts2);
-
 public slots:
-    void setDeckModel(DeckListModel *deckModel);
     void retranslateUi();
 
 private:
-    DeckListModel *deckListModel;
+    DeckListStatisticsAnalyzer *deckStatAnalyzer;
     BannerWidget *bannerWidget;
-    QHash<QString, int> manaBaseMap;
     QVBoxLayout *layout;
     QWidget *barContainer;
     QHBoxLayout *barLayout;

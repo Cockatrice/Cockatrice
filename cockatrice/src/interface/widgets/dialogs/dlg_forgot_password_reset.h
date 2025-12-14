@@ -20,23 +20,23 @@ class DlgForgotPasswordReset : public QDialog
     Q_OBJECT
 public:
     explicit DlgForgotPasswordReset(QWidget *parent = nullptr);
-    QString getHost() const
+    [[nodiscard]] QString getHost() const
     {
         return hostEdit->text();
     }
-    int getPort() const
+    [[nodiscard]] int getPort() const
     {
         return portEdit->text().toInt();
     }
-    QString getPlayerName() const
+    [[nodiscard]] QString getPlayerName() const
     {
         return playernameEdit->text();
     }
-    QString getToken() const
+    [[nodiscard]] QString getToken() const
     {
         return tokenEdit->text();
     }
-    QString getPassword() const
+    [[nodiscard]] QString getPassword() const
     {
         return newpasswordEdit->text();
     }

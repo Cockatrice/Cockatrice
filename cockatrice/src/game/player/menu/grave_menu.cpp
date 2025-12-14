@@ -3,7 +3,6 @@
 #include "../../abstract_game.h"
 #include "../player.h"
 #include "../player_actions.h"
-#include "grave_menu.h"
 
 #include <QAction>
 #include <QMenu>

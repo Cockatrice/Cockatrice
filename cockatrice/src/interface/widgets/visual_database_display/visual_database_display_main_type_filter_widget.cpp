@@ -33,7 +33,7 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     spinBox->setMaximum(getMaxMainTypeCount()); // Set the max value dynamically
     spinBox->setValue(150);
     layout->addWidget(spinBox);
-    connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility);
 
     // Create the toggle button for Exact Match/Includes mode

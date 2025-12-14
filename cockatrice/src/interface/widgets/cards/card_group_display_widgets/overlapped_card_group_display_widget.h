@@ -17,6 +17,7 @@ class OverlappedCardGroupDisplayWidget : public CardGroupDisplayWidget
 public:
     OverlappedCardGroupDisplayWidget(QWidget *parent,
                                      DeckListModel *deckListModel,
+                                     QItemSelectionModel *selectionModel,
                                      QPersistentModelIndex trackedIndex,
                                      QString zoneName,
                                      QString cardGroupCategory,

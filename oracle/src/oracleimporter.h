@@ -154,6 +154,7 @@ public:
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList);
+    FormatRulesNameMap createDefaultMagicFormats();
     const CardNameMap &getCardList() const
     {
         return cards;

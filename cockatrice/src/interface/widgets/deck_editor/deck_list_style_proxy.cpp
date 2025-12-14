@@ -23,8 +23,7 @@ QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 
     if (role == Qt::BackgroundRole) {
         if (isCard) {
-            const bool legal =
-                true; // TODO: Not implemented yet. QIdentityProxyModel::data(index, DeckRoles::IsLegalRole).toBool();
+            const bool legal = QIdentityProxyModel::data(index, DeckRoles::IsLegalRole).toBool();
             int base = 255 - (index.row() % 2) * 30;
             return legal ? QBrush(QColor(base, base, base)) : QBrush(QColor(255, base / 3, base / 3));
         } else {

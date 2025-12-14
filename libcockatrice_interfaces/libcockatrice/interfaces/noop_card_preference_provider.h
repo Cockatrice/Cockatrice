@@ -5,12 +5,12 @@
 class NoopCardPreferenceProvider : public ICardPreferenceProvider
 {
 public:
-    QString getCardPreferenceOverride(const QString &) const override
+    [[nodiscard]] QString getCardPreferenceOverride(const QString &) const override
     {
         return {};
     }
 
-    bool getIncludeRebalancedCards() const override
+    [[nodiscard]] bool getIncludeRebalancedCards() const override
     {
         return true;
     }
