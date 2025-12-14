@@ -108,7 +108,7 @@ public:
  * - Provide hashing for deck identity (deck hash).
  *
  * ### Ownership:
- * - Owns the root `InnerDecklistNode` tree.
+ * - Owns the `DecklistNodeTree`.
  * - Owns `SideboardPlan` instances stored in `sideboardPlans`.
  *
  * ### Example workflow:

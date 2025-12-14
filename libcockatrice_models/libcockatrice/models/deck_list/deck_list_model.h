@@ -202,7 +202,7 @@ public:
  *   affects its hash.
  *
  * Slots:
- * - rebuildTree(): rebuilds the model structure from the underlying DeckLoader.
+ * - rebuildTree(): rebuilds the model structure from the underlying node tree.
  */
 class DeckListModel : public QAbstractItemModel
 {
@@ -210,7 +210,7 @@ class DeckListModel : public QAbstractItemModel
 
 public slots:
     /**
-     * @brief Rebuilds the model tree from the underlying DeckLoader.
+     * @brief Rebuilds the model tree from the underlying node tree.
      *
      * This updates all indices and ensures the model reflects the current
      * state of the deck.
