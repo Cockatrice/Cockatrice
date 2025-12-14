@@ -22,7 +22,7 @@ CardSearch <- '[[' CardFilterString ']]'
 CardFilterString <- (!']]'.)*
 
 DeckNameQuery <- ([Dd] 'eck')? [Nn] 'ame'? [:] String
-FileNameQuery <- [Ff] ('ile' 'name'?)? [:] String
+FileNameQuery <- [Ff] ([Nn] / 'ile' ([Nn] 'ame')?) [:] String
 PathQuery <- [Pp] 'ath'? [:] String
 
 GenericQuery <- String
