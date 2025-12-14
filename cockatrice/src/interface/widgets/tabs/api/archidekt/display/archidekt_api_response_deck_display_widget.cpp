@@ -93,6 +93,8 @@ void ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor()
     loader->getDeckList()->loadFromString_Native(model->getDeckList()->writeToString_Native());
 
     loader->getDeckList()->setName(response.getDeckName());
+    loader->getDeckList()->setGameFormat(
+        ArchidektFormats::formatToCockatriceName(ArchidektFormats::DeckFormat(response.getDeckFormat() - 1)));
 
     emit openInDeckEditor(loader);
 }
