@@ -77,6 +77,8 @@ This tag is used for issues that we are looking for somebody to pick up. Often t
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code reviews for submitted changes.<br>
 We'll happily advice on how best to implement a feature, or we can show you where the codebase is doing something similar before you get too far along - put a note on an issue you want to discuss more on!
 
+You can also have a look at our `Todo List` in our [Code Documentation](https://cockatrice.github.io/docs) or search the repo for [`\todo` comments](https://github.com/search?q=repo%3ACockatrice%2FCockatrice%20%5Ctodo&type=code).
+
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
 <details>
