@@ -485,29 +485,6 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
     return result;
 }
 
-QString DeckLoader::getCardZoneFromName(const QString &cardName, QString currentZoneName)
-{
-    CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
-
-    if (card && card->getIsToken()) {
-        return DECK_ZONE_TOKENS;
-    }
-
-    return currentZoneName;
-}
-
-QString DeckLoader::getCompleteCardName(const QString &cardName)
-{
-    if (CardDatabaseManager::getInstance()) {
-        ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
-        if (temp) {
-            return temp.getName();
-        }
-    }
-
-    return cardName;
-}
-
 void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
 {
     const int totalColumns = 2;
