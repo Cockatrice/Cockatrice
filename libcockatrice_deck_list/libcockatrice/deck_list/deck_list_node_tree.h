@@ -68,7 +68,8 @@ public:
                               int position,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString());
+                              const QString &cardProviderId = QString(),
+                              const bool formatLegal = true);
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
     /**

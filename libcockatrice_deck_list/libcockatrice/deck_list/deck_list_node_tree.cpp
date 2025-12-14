@@ -115,11 +115,12 @@ DecklistCardNode *DecklistNodeTree::addCard(const QString &cardName,
                                             int position,
                                             const QString &cardSetName,
                                             const QString &cardSetCollectorNumber,
-                                            const QString &cardProviderId)
+                                            const QString &cardProviderId,
+                                            const bool formatLegal)
 {
     auto *zoneNode = getZoneObjFromName(zoneName);
-    auto *node =
-        new DecklistCardNode(cardName, amount, zoneNode, position, cardSetName, cardSetCollectorNumber, cardProviderId);
+    auto *node = new DecklistCardNode(cardName, amount, zoneNode, position, cardSetName, cardSetCollectorNumber,
+                                      cardProviderId, formatLegal);
     return node;
 }
 

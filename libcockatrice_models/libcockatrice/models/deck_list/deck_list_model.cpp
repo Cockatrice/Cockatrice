@@ -668,7 +668,7 @@ bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardIn
 
 void DeckListModel::refreshCardFormatLegalities()
 {
-    InnerDecklistNode *listRoot = deckList->getRoot();
+    InnerDecklistNode *listRoot = deckList->getTree()->getRoot();
 
     for (int i = 0; i < listRoot->size(); i++) {
         auto *currentZone = static_cast<InnerDecklistNode *>(listRoot->at(i));

@@ -556,9 +556,11 @@ DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     int position,
                                     const QString &cardSetName,
                                     const QString &cardSetCollectorNumber,
-                                    const QString &cardProviderId)
+                                    const QString &cardProviderId,
+                                    bool formatLegal)
 {
-    auto node = tree.addCard(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId);
+    auto node =
+        tree.addCard(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId, formatLegal);
     refreshDeckHash();
     return node;
 }

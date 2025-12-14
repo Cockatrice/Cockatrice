@@ -293,7 +293,8 @@ public:
                               int position = -1,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString());
+                              const QString &cardProviderId = QString(),
+                              const bool formatLegal = true);
     ///@}
 
     /// @name Deck identity
