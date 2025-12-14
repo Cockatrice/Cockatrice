@@ -24,6 +24,9 @@ searches are case insensitive.
 <dd>[p:aggro](#p:aggro) <small>(Any deck that has "aggro" somewhere in its relative path)</small></dd>
 <dd>[p:edh/](#p:edh/) <small>(Any deck with "edh/" in its relative path, A.K.A. decks in the "edh" folder)</small></dd>
 
+<dt><u>F</u>ormat:</dt>
+<dd>[f:standard](#f:standard) <small>(Any deck with format set to standard)</small></dd>
+
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>
 <dd><a href="#[[t:legendary]]">[[t:legendary]]</a> <small>(Any deck that contains at least one legendary)</small></dd>
