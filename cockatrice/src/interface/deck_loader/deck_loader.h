@@ -106,9 +106,6 @@ private:
                                            QList<DecklistCardNode *> cards,
                                            bool addComments = true,
                                            bool addSetNameAndNumber = true);
-
-    [[nodiscard]] static QString getCardZoneFromName(const QString &cardName, QString currentZoneName);
-    [[nodiscard]] static QString getCompleteCardName(const QString &cardName);
 };
 
 #endif
