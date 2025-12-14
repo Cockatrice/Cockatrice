@@ -28,6 +28,7 @@ class CardDatabaseSettings;
 class CardOverrideSettings;
 class CardsDisplaySettings;
 class ChatSettings;
+class CommanderBracketSettings;
 class DebugSettings;
 class DownloadSettings;
 class GameFiltersSettings;
@@ -77,6 +78,7 @@ private:
     InterfaceSettings *interfaceSettings;
     PathsSettings *pathsSettings;
     VisualDeckStorageSettings *visualDeckStorageSettings;
+    CommanderBracketSettings *commanderBracketSettings;
 
     QString themeName;
 
@@ -141,6 +143,10 @@ public:
     [[nodiscard]] InterfaceSettings &interface() const;
     [[nodiscard]] PathsSettings &paths() const;
     [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const;
+    [[nodiscard]] CommanderBracketSettings &commanderBrackets() const
+    {
+        return *commanderBracketSettings;
+    }
 
     [[nodiscard]] bool getIsPortableBuild() const
     {

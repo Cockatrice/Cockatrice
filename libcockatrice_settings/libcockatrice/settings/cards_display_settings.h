@@ -5,6 +5,14 @@
 
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
 
+enum deckEditorCommanderSpellbookIntegrationEnabledIndex
+{
+    deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled,
+    deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled,
+    deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic,
+    deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted,
+};
+
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
 {
     Q_OBJECT
@@ -39,6 +47,11 @@ public:
     void setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible);
     void setDeckEditorBannerCardComboBoxVisible(bool _deckEditorBannerCardComboBoxVisible);
     void setDeckEditorTagsWidgetVisible(bool _deckEditorTagsWidgetVisible);
+    [[nodiscard]] int getDeckEditorCommanderSpellbookIntegrationEnabled() const;
+    [[nodiscard]] bool getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const;
+    void setDeckEditorCommanderSpellbookIntegrationEnabled(int _deckEditorCommanderSpellbookIntegrationEnabled);
+    void setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
+        bool _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
     void setTapAnimation(bool _tapAnimation);
     void setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards);
     void setCardScaling(bool _scaleCards);
@@ -58,6 +71,8 @@ signals:
     void printingSelectorNavigationButtonsVisibleChanged();
     void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
+    void deckEditorCommanderSpellbookIntegrationEnabledChanged(int _enabled);
+    void deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(bool _useOfficialBracketNames);
     void showGameSelectorFilterToolbarChanged(bool state);
 
 private:

@@ -16,6 +16,7 @@
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/commander_bracket_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
@@ -137,6 +138,7 @@ SettingsCache::SettingsCache()
     interfaceSettings = new InterfaceSettings(settingsPath, this);
     pathsSettings = new PathsSettings(settingsPath, this);
     visualDeckStorageSettings = new VisualDeckStorageSettings(settingsPath, this);
+    commanderBracketSettings = new CommanderBracketSettings(settingsPath, this);
 
     // Forward ICardDatabasePathProvider signal from PathsSettings
     connect(pathsSettings, &PathsSettings::cardDatabasePathChanged, this,
@@ -148,6 +150,12 @@ SettingsCache::SettingsCache()
     releaseChannels << new BetaReleaseChannel();
 
     themeName = personalSettings->getThemeName();
+
+    auto definitions = commanderBracketSettings->loadDefinitions();
+    if (definitions.isEmpty()) {
+        definitions = CommanderBracketSettings::defaultDefinitions();
+    }
+    commanderBracketSettings->reloadDefinitions(definitions);
 
     loadPaths();
 }

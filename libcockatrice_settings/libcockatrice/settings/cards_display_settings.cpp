@@ -156,6 +156,32 @@ void CardsDisplaySettings::setDeckEditorTagsWidgetVisible(bool _deckEditorTagsWi
     emit deckEditorTagsWidgetVisibleChanged(_deckEditorTagsWidgetVisible);
 }
 
+int CardsDisplaySettings::getDeckEditorCommanderSpellbookIntegrationEnabled() const
+{
+    return getValue("deckeditorcommanderspellbookintegrationenabled", "interface", QString(),
+                    deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted)
+        .toInt();
+}
+
+bool CardsDisplaySettings::getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const
+{
+    return getValue("deckeditorcommanderspellbookintegrationuseofficialbracketnames", "interface", QString(), false)
+        .toBool();
+}
+
+void CardsDisplaySettings::setDeckEditorCommanderSpellbookIntegrationEnabled(int _enabled)
+{
+    setValue(_enabled, "deckeditorcommanderspellbookintegrationenabled", "interface");
+    emit deckEditorCommanderSpellbookIntegrationEnabledChanged(_enabled);
+}
+
+void CardsDisplaySettings::setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
+    bool _useOfficialBracketNames)
+{
+    setValue(_useOfficialBracketNames, "deckeditorcommanderspellbookintegrationuseofficialbracketnames", "interface");
+    emit deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(_useOfficialBracketNames);
+}
+
 void CardsDisplaySettings::setTapAnimation(bool _tapAnimation)
 {
     setValue(_tapAnimation, "tapanimation");
