@@ -198,8 +198,8 @@ public:
 
     /// @name Metadata getters
     /// The individual metadata getters still exist for backwards compatibility.
-    /// TODO: Figure out when we can remove them.
     ///@{
+    //! \todo Figure out when we can remove them.
     const Metadata &getMetadata() const
     {
         return metadata;

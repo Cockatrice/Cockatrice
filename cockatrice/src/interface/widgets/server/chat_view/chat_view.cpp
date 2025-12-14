@@ -206,7 +206,7 @@ void ChatView::appendMessage(QString message,
     defaultFormat = QTextCharFormat();
     if (!isUserMessage) {
         if (messageType == Event_RoomSay::ChatHistory) {
-            defaultFormat.setForeground(Qt::gray); // FIXME : hardcoded color
+            defaultFormat.setForeground(Qt::gray); //! \todo hardcoded color
             defaultFormat.setFontWeight(QFont::Light);
             defaultFormat.setFontItalic(true);
             static const QRegularExpression userNameRegex("^(\\[[^\\]]*\\]\\s)(\\S+):\\s");
@@ -229,7 +229,7 @@ void ChatView::appendMessage(QString message,
                 message.remove(0, pos.relativePosition - 2); // do not remove semicolon
             }
         } else {
-            defaultFormat.setForeground(Qt::darkGreen); // FIXME : hardcoded color
+            defaultFormat.setForeground(Qt::darkGreen); //! \todo hardcoded color
             defaultFormat.setFontWeight(QFont::Bold);
         }
     }

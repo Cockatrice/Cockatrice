@@ -1913,7 +1913,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     }
 
     if (!QDir(SettingsCache::instance().getDeckPath()).exists() || SettingsCache::instance().getDeckPath().isEmpty()) {
-        // TODO: Prompt to create it
+        //! \todo Prompt to create it
         if (QMessageBox::critical(
                 this, tr("Error"),
                 tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"),
@@ -1924,7 +1924,7 @@ void DlgSettings::closeEvent(QCloseEvent *event)
     }
 
     if (!QDir(SettingsCache::instance().getPicsPath()).exists() || SettingsCache::instance().getPicsPath().isEmpty()) {
-        // TODO: Prompt to create it
+        //! \todo Prompt to create it
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "
                                      "and set the correct path?"),

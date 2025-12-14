@@ -501,7 +501,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         allPlayersEver.insert(playerName);
 
         // if the original creator of the game joins, give them host status back
-        // FIXME: transferring host to spectators has side effects
+        //! \todo transferring host to spectators has side effects
         if (newParticipant->getUserInfo()->name() == creatorInfo->name()) {
             hostId = newParticipant->getPlayerId();
             sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));

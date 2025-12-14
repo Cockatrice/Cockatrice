@@ -1207,7 +1207,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespEmailBlackListed;
     }
 
-    // TODO: Move this method outside of the db interface
+    //! \todo Move this method outside of the db interface
     QString errorString;
     if (!sqlInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit())
@@ -1330,7 +1330,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
 {
-    // TODO: implement
+    //! \todo implement
     Q_UNUSED(ipAddress);
     return false;
 }

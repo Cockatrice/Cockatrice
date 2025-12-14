@@ -27,9 +27,8 @@
  * \class QxtMailMessage
  * \inmodule QxtNetwork
  * \brief The QxtMailMessage class encapsulates an e-mail according to RFC 2822 and related specifications
- * TODO: {implicitshared}
  */
-
+//! \todo {implicitshared}
 #include "qxtmailmessage.h"
 
 #include "qxtmail_p.h"
