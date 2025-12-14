@@ -1,6 +1,8 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../tabs/api/commander_spellbook/commander_spellbook_api_accessor.h"
+#include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
 
@@ -131,6 +133,24 @@ void DeckEditorDeckDockWidget::createDeckDock()
     formatComboBox->addItem(tr("Loading Database..."));
     formatComboBox->setEnabled(false); // Disable until loaded
 
+    // --- Commander bracket row (hidden, unless format is 'commander') ---
+    bracketLabel = new QLabel(tr("Bracket:"), this);
+
+    bracketValueLabel = new QLabel(this);
+    bracketValueLabel->setText("-");
+    bracketValueLabel->setObjectName("bracketValueLabel");
+
+    bracketInfoButton = new QToolButton(this);
+    bracketInfoButton->setText("?");
+    bracketInfoButton->setAutoRaise(true);
+    bracketInfoButton->setEnabled(false);
+
+    bracketRefreshButton = new QToolButton(this);
+    bracketRefreshButton->setIcon(QPixmap("theme:icons/reload"));
+    bracketRefreshButton->setAutoRaise(true);
+
+    connect(bracketRefreshButton, &QToolButton::clicked, this, &DeckEditorDeckDockWidget::requestBracketEstimate);
+
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
     commentsEdit = new QTextEdit;
@@ -216,13 +236,23 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(formatLabel, 2, 0);
     upperLayout->addWidget(formatComboBox, 2, 1);
 
-    upperLayout->addWidget(bannerCardLabel, 3, 0);
-    upperLayout->addWidget(bannerCardComboBox, 3, 1);
+    upperLayout->addWidget(bracketLabel, 3, 0);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
+    auto *bracketRow = new QHBoxLayout;
+    bracketRow->addWidget(bracketValueLabel);
+    bracketRow->addWidget(bracketInfoButton);
+    bracketRow->addWidget(bracketRefreshButton);
+    bracketRow->addStretch();
 
-    upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
-    upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
+    upperLayout->addLayout(bracketRow, 3, 1);
+
+    upperLayout->addWidget(bannerCardLabel, 4, 0);
+    upperLayout->addWidget(bannerCardComboBox, 4, 1);
+
+    upperLayout->addWidget(deckTagsDisplayWidget, 5, 1);
+
+    upperLayout->addWidget(activeGroupCriteriaLabel, 6, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 6, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -280,6 +310,47 @@ void DeckEditorDeckDockWidget::createDeckDock()
     }
 }
 
+void DeckEditorDeckDockWidget::requestBracketEstimate()
+{
+    bracketRefreshButton->setEnabled(false);
+    bracketInfoButton->setEnabled(false);
+    bracketValueLabel->setText(tr("Calculating…"));
+
+    requestId = CommanderSpellbookApiAccessor::instance().estimateBracket(*deckModel->getDeckList(), this);
+
+    connect(&CommanderSpellbookApiAccessor::instance(), &CommanderSpellbookApiAccessor::estimateBracketFinished, this,
+            &DeckEditorDeckDockWidget::onEstimateBracketFinished);
+}
+
+void DeckEditorDeckDockWidget::onEstimateBracketFinished(CommanderSpellbookApiAccessor::RequestId id,
+                                                         QObject *requester,
+                                                         const EstimateBracketResult &result)
+{
+    if (requester != this || static_cast<int>(id) != requestId) {
+        return;
+    }
+
+    BracketExplainer explainer;
+    lastBracketExplanation = explainer.explain(result);
+
+    // Display bracket
+    bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToOfficialString(result.bracketTag));
+    bracketRefreshButton->setEnabled(true);
+
+    // Build tooltip
+    QString tooltip;
+    for (const auto &section : lastBracketExplanation.sections) {
+        tooltip += "<b>" + section.title + "</b><br>";
+        for (const auto &line : section.bulletPoints) {
+            tooltip += "• " + line + "<br>";
+        }
+        tooltip += "<br>";
+    }
+
+    bracketInfoButton->setToolTip(tooltip);
+    bracketInfoButton->setEnabled(!tooltip.isEmpty());
+}
+
 void DeckEditorDeckDockWidget::initializeFormats()
 {
     QStringList allFormats = CardDatabaseManager::query()->getAllFormatsWithCount().keys();
@@ -300,15 +371,55 @@ void DeckEditorDeckDockWidget::initializeFormats()
         // Ensure no selection is visible initially
         formatComboBox->setCurrentIndex(-1);
     }
-
     connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        QString formatKey;
         if (index >= 0) {
             QString formatKey = formatComboBox->itemData(index).toString();
             deckStateManager->setFormat(formatKey);
         } else {
             deckStateManager->setFormat(""); // clear format if deselected
         }
+
+        emit deckModified();
+
+        const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
+
+        bracketLabel->setVisible(isCommander);
+        bracketValueLabel->setVisible(isCommander);
+        bracketInfoButton->setVisible(isCommander);
+        bracketRefreshButton->setVisible(isCommander);
+
+        if (!isCommander) {
+            bracketValueLabel->setText("-");
+            bracketInfoButton->setToolTip({});
+            bracketInfoButton->setEnabled(false);
+            bracketRefreshButton->setEnabled(false);
+        } else {
+            bracketRefreshButton->setEnabled(true);
+            maybeAutoEstimateBracket();
+        }
     });
+
+    maybeAutoEstimateBracket();
+}
+
+void DeckEditorDeckDockWidget::maybeAutoEstimateBracket()
+{
+    const QString formatKey = deckModel->getDeckList()->getGameFormat();
+
+    const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
+
+    if (!isCommander) {
+        return;
+    }
+
+    // Avoid firing if we already have a result or a request in flight
+    if (!bracketRefreshButton->isEnabled()) {
+        return;
+    }
+
+    // Defer to avoid races during init / model rebuild
+    QTimer::singleShot(0, this, &DeckEditorDeckDockWidget::requestBracketEstimate);
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -740,6 +851,8 @@ void DeckEditorDeckDockWidget::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
     formatLabel->setText(tr("Format:"));
+    bracketInfoButton->setToolTip(tr("Why this bracket?"));
+    bracketRefreshButton->setToolTip(tr("Recalculate bracket"));
 
     hashLabel1->setText(tr("Hash:"));
 

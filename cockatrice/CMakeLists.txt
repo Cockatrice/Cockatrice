@@ -275,6 +275,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/card_in_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_card_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_variant_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_estimate_bracket_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_api_accessor.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
