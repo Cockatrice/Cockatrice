@@ -81,8 +81,11 @@ You can also have a look at our `Todo List` in our [Code Documentation](https://
 
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
+#### Repository Activity
+![Cockatrice Repo Analytics](https://repobeats.axiom.co/api/embed/c7cec938789a5bbaeb4182a028b4dbb96db8f181.svg "Cockatrice Repo Analytics by Repobeats")
+
 <details>
-<summary><b>Kudos to our amazing contributors ❤️</b></summary>
+<summary><b>Kudos to all our amazing contributors ❤️</b></summary>
 <br>
    <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
       <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
