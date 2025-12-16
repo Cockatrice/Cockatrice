@@ -164,7 +164,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     return true;
 }
 
-void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
+static void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
 {
     xml->writeTextElement("lastLoadedTimestamp", metadata.lastLoadedTimestamp);
     xml->writeTextElement("deckname", metadata.name);
