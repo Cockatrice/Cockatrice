@@ -20,8 +20,7 @@ class PrintingSelectorCardOverlayWidget : public QWidget
 public:
     explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                AbstractTabDeckEditor *_deckEditor,
-                                               DeckListModel *_deckModel,
-                                               QTreeView *_deckView,
+                                               DeckStateManager *_deckStateManager,
                                                QSlider *_cardSizeSlider,
                                                const ExactCard &_rootCard);
 

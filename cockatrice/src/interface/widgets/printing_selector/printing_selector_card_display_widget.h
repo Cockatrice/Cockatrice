@@ -21,8 +21,7 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
                                       AbstractTabDeckEditor *deckEditor,
-                                      DeckListModel *deckModel,
-                                      QTreeView *deckView,
+                                      DeckStateManager *deckStateManager,
                                       QSlider *cardSizeSlider,
                                       const ExactCard &rootCard);
 
