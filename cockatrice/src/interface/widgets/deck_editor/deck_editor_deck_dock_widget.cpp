@@ -8,6 +8,7 @@
 #include "deck_state_manager.h"
 
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFormLayout>
 #include <QHeaderView>
