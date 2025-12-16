@@ -153,6 +153,19 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bracketRefreshButton->setAutoRaise(true);
 
     connect(bracketRefreshButton, &QToolButton::clicked, this, &DeckEditorDeckDockWidget::requestBracketEstimate);
+    if (SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled() !=
+        deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted) {
+        connect(&SettingsCache::instance(), &SettingsCache::deckEditorCommanderSpellbookIntegrationEnabledChanged, this,
+                &DeckEditorDeckDockWidget::maybeAutoEstimateBracket);
+        connect(&SettingsCache::instance(),
+                &SettingsCache::deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged, this,
+                &DeckEditorDeckDockWidget::maybeAutoEstimateBracket);
+    }
+
+    bracketLabel->setVisible(false);
+    bracketValueLabel->setVisible(false);
+    bracketInfoButton->setVisible(false);
+    bracketRefreshButton->setVisible(false);
 
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
@@ -379,6 +392,12 @@ bool DeckEditorDeckDockWidget::promptCommanderSpellbookIntegration()
         SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(useOfficial);
     }
 
+    connect(&SettingsCache::instance(), &SettingsCache::deckEditorCommanderSpellbookIntegrationEnabledChanged, this,
+            &DeckEditorDeckDockWidget::maybeAutoEstimateBracket);
+    connect(&SettingsCache::instance(),
+            &SettingsCache::deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged, this,
+            &DeckEditorDeckDockWidget::maybeAutoEstimateBracket);
+
     // Persist integration mode
     if (clickedButton == disableBtn) {
         SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationEnabled(
@@ -397,6 +416,14 @@ bool DeckEditorDeckDockWidget::promptCommanderSpellbookIntegration()
     }
 
     return false;
+}
+
+void DeckEditorDeckDockWidget::updateBracketVisibility(bool visible)
+{
+    bracketLabel->setVisible(visible);
+    bracketValueLabel->setVisible(visible);
+    bracketInfoButton->setVisible(visible);
+    bracketRefreshButton->setVisible(visible);
 }
 
 void DeckEditorDeckDockWidget::requestBracketEstimate()
@@ -482,10 +509,7 @@ void DeckEditorDeckDockWidget::initializeFormats()
 
         const bool bracketVisible = isCommander && commanderSpellbookIntegrationEnabled;
 
-        bracketLabel->setVisible(bracketVisible);
-        bracketValueLabel->setVisible(bracketVisible);
-        bracketInfoButton->setVisible(bracketVisible);
-        bracketRefreshButton->setVisible(bracketVisible);
+        updateBracketVisibility(bracketVisible);
 
         if (!isCommander) {
             bracketValueLabel->setText("-");
@@ -507,22 +531,20 @@ void DeckEditorDeckDockWidget::maybeAutoEstimateBracket()
 
     const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
 
-    if (!isCommander) {
+    int mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
+
+    if (!isCommander || mode == deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled) {
+        updateBracketVisibility(false);
         return;
     }
 
-    int mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
-
     if (mode == deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted) {
         if (!promptCommanderSpellbookIntegration()) {
-            bracketLabel->setVisible(false);
-            bracketValueLabel->setVisible(false);
-            bracketInfoButton->setVisible(false);
-            bracketRefreshButton->setVisible(false);
-            return; // user chose Disabled
+            updateBracketVisibility(false);
+            return;
         }
-        // user chose Enabled or Automatic → fall through
     }
+    updateBracketVisibility(true);
     mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
     if (mode != deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic) {
         return;

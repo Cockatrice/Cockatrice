@@ -36,6 +36,7 @@ public:
     QComboBox *bannerCardComboBox;
     void createDeckDock();
     bool promptCommanderSpellbookIntegration();
+    void updateBracketVisibility(bool visible);
     void requestBracketEstimate();
     ExactCard getCurrentCard();
     void retranslateUi();
