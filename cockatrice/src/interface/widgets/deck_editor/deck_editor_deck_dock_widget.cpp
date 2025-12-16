@@ -1,6 +1,7 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../dialogs/dlg_settings.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_api_accessor.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 #include "deck_list_style_proxy.h"
@@ -8,8 +9,10 @@
 
 #include <QComboBox>
 #include <QDockWidget>
+#include <QFormLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMessageBox>
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -310,6 +313,92 @@ void DeckEditorDeckDockWidget::createDeckDock()
     }
 }
 
+bool DeckEditorDeckDockWidget::promptCommanderSpellbookIntegration()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("CommanderSpellbook integration"));
+
+    auto *mainLayout = new QVBoxLayout(&dialog);
+
+    // Main text
+    auto *label = new QLabel(tr("CommanderSpellbook can analyze your deck and estimate its Commander bracket.\n\n"
+                                "This sends your deck list to an external service.\n\n"
+                                "CommanderSpellbook uses its own bracket naming system based on their own algorithm. "
+                                "These names can be mapped to the official Commander brackets, but the mapping "
+                                "is only an approximation."));
+    label->setWordWrap(true);
+    mainLayout->addWidget(label);
+
+    // Naming selector
+    auto *formLayout = new QFormLayout;
+    auto *namingCombo = new QComboBox(&dialog);
+    namingCombo->addItem(tr("CommanderSpellbook bracket names"));
+    namingCombo->addItem(tr("Official Commander bracket names (approximate)"));
+    namingCombo->setCurrentIndex(
+        SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() ? 1 : 0);
+
+    // Create label + explainer button
+    auto *labelWidget = new QWidget(&dialog);
+    auto *labelLayout = new QHBoxLayout(labelWidget);
+    labelLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto *namingLabel = new QLabel(tr("Bracket naming:"), labelWidget);
+    auto *explainerButton = new QToolButton(labelWidget);
+    explainerButton->setText("?");
+    explainerButton->setAutoRaise(true);
+    explainerButton->setEnabled(false);
+    explainerButton->setToolTip(CommanderBracketNames::Explainer);
+
+    labelLayout->addWidget(namingLabel);
+    labelLayout->addWidget(explainerButton);
+    labelLayout->addStretch(); // push the button next to label, combo stays aligned
+
+    // Add row with the custom label widget
+    formLayout->addRow(labelWidget, namingCombo);
+    mainLayout->addLayout(formLayout);
+
+    // Buttons
+    auto *buttonBox = new QDialogButtonBox(&dialog);
+    auto *enableBtn = buttonBox->addButton(tr("Enable"), QDialogButtonBox::AcceptRole);
+    auto *automaticBtn = buttonBox->addButton(tr("Automatic"), QDialogButtonBox::ApplyRole);
+    auto *disableBtn = buttonBox->addButton(tr("Disable"), QDialogButtonBox::RejectRole);
+    mainLayout->addWidget(buttonBox);
+
+    // Track which button was clicked
+    QAbstractButton *clickedButton = nullptr;
+    QObject::connect(buttonBox, &QDialogButtonBox::clicked, &dialog, [&](QAbstractButton *btn) {
+        clickedButton = btn;
+        dialog.accept();
+    });
+
+    dialog.exec();
+
+    // Persist naming choice (if not disabled)
+    if (clickedButton != disableBtn) {
+        bool useOfficial = namingCombo->currentIndex() == 1;
+        SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(useOfficial);
+    }
+
+    // Persist integration mode
+    if (clickedButton == disableBtn) {
+        SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationEnabled(
+            deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled);
+        return false;
+    }
+    if (clickedButton == enableBtn) {
+        SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationEnabled(
+            deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled);
+        return true;
+    }
+    if (clickedButton == automaticBtn) {
+        SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationEnabled(
+            deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic);
+        return true;
+    }
+
+    return false;
+}
+
 void DeckEditorDeckDockWidget::requestBracketEstimate()
 {
     bracketRefreshButton->setEnabled(false);
@@ -334,7 +423,11 @@ void DeckEditorDeckDockWidget::onEstimateBracketFinished(CommanderSpellbookApiAc
     lastBracketExplanation = explainer.explain(result);
 
     // Display bracket
-    bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToOfficialString(result.bracketTag));
+    if (SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames()) {
+        bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToOfficialString(result.bracketTag));
+    } else {
+        bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToString(result.bracketTag));
+    }
     bracketRefreshButton->setEnabled(true);
 
     // Build tooltip
@@ -383,11 +476,16 @@ void DeckEditorDeckDockWidget::initializeFormats()
         emit deckModified();
 
         const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
+        const bool commanderSpellbookIntegrationEnabled =
+            SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled() !=
+            deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled;
 
-        bracketLabel->setVisible(isCommander);
-        bracketValueLabel->setVisible(isCommander);
-        bracketInfoButton->setVisible(isCommander);
-        bracketRefreshButton->setVisible(isCommander);
+        const bool bracketVisible = isCommander && commanderSpellbookIntegrationEnabled;
+
+        bracketLabel->setVisible(bracketVisible);
+        bracketValueLabel->setVisible(bracketVisible);
+        bracketInfoButton->setVisible(bracketVisible);
+        bracketRefreshButton->setVisible(bracketVisible);
 
         if (!isCommander) {
             bracketValueLabel->setText("-");
@@ -410,6 +508,23 @@ void DeckEditorDeckDockWidget::maybeAutoEstimateBracket()
     const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
 
     if (!isCommander) {
+        return;
+    }
+
+    int mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
+
+    if (mode == deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted) {
+        if (!promptCommanderSpellbookIntegration()) {
+            bracketLabel->setVisible(false);
+            bracketValueLabel->setVisible(false);
+            bracketInfoButton->setVisible(false);
+            bracketRefreshButton->setVisible(false);
+            return; // user chose Disabled
+        }
+        // user chose Enabled or Automatic → fall through
+    }
+    mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
+    if (mode != deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic) {
         return;
     }
 

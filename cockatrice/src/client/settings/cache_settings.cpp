@@ -1,5 +1,6 @@
 #include "cache_settings.h"
 
+#include "../../interface/widgets/dialogs/dlg_settings.h"
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
 #include "version_string.h"
@@ -303,6 +304,14 @@ SettingsCache::SettingsCache()
     deckEditorBannerCardComboBoxVisible =
         settings->value("interface/deckeditorbannercardcomboboxvisible", true).toBool();
     deckEditorTagsWidgetVisible = settings->value("interface/deckeditortagswidgetvisible", true).toBool();
+    deckEditorCommanderSpellbookIntegrationEnabled =
+        settings
+            ->value("interface/deck_editor/commander_spellbook_integration/enabled",
+                    deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted)
+            .toInt();
+    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames =
+        settings->value("interface/deck_editor/commander_spellbook_integration/use_official_bracket_names", false)
+            .toBool();
     visualDeckStorageCardSize = settings->value("interface/visualdeckstoragecardsize", 100).toInt();
     visualDeckStorageSortingOrder = settings->value("interface/visualdeckstoragesortingorder", 0).toInt();
     visualDeckStorageShowFolders = settings->value("interface/visualdeckstorageshowfolders", true).toBool();
@@ -796,6 +805,26 @@ void SettingsCache::setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEdito
     deckEditorTagsWidgetVisible = _deckEditorTagsWidgetVisible;
     settings->setValue("interface/deckeditortagswidgetvisible", deckEditorTagsWidgetVisible);
     emit deckEditorTagsWidgetVisibleChanged(deckEditorTagsWidgetVisible);
+}
+
+void SettingsCache::setDeckEditorCommanderSpellbookIntegrationEnabled(
+    int _deckEditorCommanderSpellbookIntegrationEnabled)
+{
+    deckEditorCommanderSpellbookIntegrationEnabled = _deckEditorCommanderSpellbookIntegrationEnabled;
+    settings->setValue("interface/deck_editor/commander_spellbook_integration/enabled",
+                       deckEditorCommanderSpellbookIntegrationEnabled);
+    emit deckEditorCommanderSpellbookIntegrationEnabledChanged(deckEditorCommanderSpellbookIntegrationEnabled);
+}
+
+void SettingsCache::setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
+    bool _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames)
+{
+    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames =
+        _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames;
+    settings->setValue("interface/deck_editor/commander_spellbook_integration/use_official_bracket_names",
+                       deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
+    emit deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(
+        deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
 }
 
 void SettingsCache::setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder)

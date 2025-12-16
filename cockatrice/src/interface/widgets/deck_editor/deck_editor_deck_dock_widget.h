@@ -35,6 +35,7 @@ public:
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
     void createDeckDock();
+    bool promptCommanderSpellbookIntegration();
     void requestBracketEstimate();
     ExactCard getCurrentCard();
     void retranslateUi();
