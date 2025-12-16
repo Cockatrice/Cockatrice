@@ -6,6 +6,7 @@
 #include "../../../../cards/card_size_widget.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
+#include "../api_response/archidekt_formats.h"
 #include "../api_response/deck/archidekt_api_response_deck.h"
 
 #include <QSortFilterProxyModel>
@@ -93,6 +94,8 @@ void ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor()
     loader->getDeckList()->loadFromString_Native(model->getDeckList()->writeToString_Native());
 
     loader->getDeckList()->setName(response.getDeckName());
+    loader->getDeckList()->setGameFormat(
+        ArchidektFormats::formatToCockatriceName(ArchidektFormats::DeckFormat(response.getDeckFormat() - 1)));
 
     emit openInDeckEditor(loader);
 }

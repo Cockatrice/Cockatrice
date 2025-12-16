@@ -39,6 +39,11 @@ public:
         return name;
     };
 
+    int getDeckFormat() const
+    {
+        return deckFormat;
+    }
+
 private:
     int id;
     QString name;

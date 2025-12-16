@@ -230,6 +230,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_formats.h
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
