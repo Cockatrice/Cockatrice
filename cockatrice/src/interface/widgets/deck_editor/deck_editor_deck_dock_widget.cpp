@@ -8,6 +8,7 @@
 #include "deck_list_style_proxy.h"
 
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFormLayout>
 #include <QHeaderView>
