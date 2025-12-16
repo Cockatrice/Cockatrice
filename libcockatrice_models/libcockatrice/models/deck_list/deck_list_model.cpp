@@ -622,7 +622,7 @@ bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
     return true;
 }
 
-int maxAllowedForLegality(const FormatRules &format, const QString &legality)
+static int maxAllowedForLegality(const FormatRules &format, const QString &legality)
 {
     for (const AllowedCount &c : format.allowedCounts) {
         if (c.label == legality) {
