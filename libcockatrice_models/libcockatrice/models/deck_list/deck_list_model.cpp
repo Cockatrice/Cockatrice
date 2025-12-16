@@ -561,10 +561,8 @@ void DeckListModel::setDeckList(DeckList *_deck)
     rebuildTree();
 }
 
-QList<ExactCard> DeckListModel::getCards() const
+static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
 {
-    auto nodes = deckList->getCardNodes();
-
     QList<ExactCard> cards;
     for (auto node : nodes) {
         ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
@@ -580,23 +578,16 @@ QList<ExactCard> DeckListModel::getCards() const
     return cards;
 }
 
+QList<ExactCard> DeckListModel::getCards() const
+{
+    auto nodes = deckList->getCardNodes();
+    return cardNodesToExactCards(nodes);
+}
+
 QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
 {
     auto nodes = deckList->getCardNodes({zoneName});
-
-    QList<ExactCard> cards;
-    for (auto node : nodes) {
-        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
-        if (card) {
-            for (int k = 0; k < node->getNumber(); ++k) {
-                cards.append(card);
-            }
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-
-    return cards;
+    return cardNodesToExactCards(nodes);
 }
 
 QList<QString> DeckListModel::getCardNames() const
