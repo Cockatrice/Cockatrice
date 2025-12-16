@@ -63,7 +63,8 @@ protected:
     {
         return resizedPixmap;
     }
-    void showEnlargedPixmap() const;
+    void showEnlargedPixmap();
+    void destroyEnlargedPixmapWidget();
 
 private:
     ExactCard exactCard;
