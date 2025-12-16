@@ -311,6 +311,7 @@ public:
 
     [[nodiscard]] QList<ExactCard> getCards() const;
     [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
+    [[nodiscard]] QList<QString> getCardNames() const;
     [[nodiscard]] QList<QString> getZones() const;
     bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
     bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);

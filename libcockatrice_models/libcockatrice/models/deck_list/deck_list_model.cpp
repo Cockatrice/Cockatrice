@@ -599,6 +599,16 @@ QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
     return cards;
 }
 
+QList<QString> DeckListModel::getCardNames() const
+{
+    auto nodes = deckList->getCardNodes();
+
+    QList<QString> names;
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(names), [](auto node) { return node->getName(); });
+
+    return names;
+}
+
 QList<QString> DeckListModel::getZones() const
 {
     auto zoneNodes = deckList->getZoneNodes();
@@ -631,7 +641,6 @@ int maxAllowedForLegality(const FormatRules &format, const QString &legality)
     }
     return -1; // unknown legality → treat as illegal
 }
-
 
 bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
 {
