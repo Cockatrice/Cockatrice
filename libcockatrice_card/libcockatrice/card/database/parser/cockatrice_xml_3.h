@@ -26,7 +26,7 @@ class CockatriceXml3Parser : public ICardDatabaseParser
 {
     Q_OBJECT
 public:
-    CockatriceXml3Parser() = default;
+    CockatriceXml3Parser(ICardSetPriorityController *cardSetPriorityController);
     ~CockatriceXml3Parser() override = default;
 
     /**

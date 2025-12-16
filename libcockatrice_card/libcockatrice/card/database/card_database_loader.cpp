@@ -12,12 +12,13 @@
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
                                        CardDatabase *db,
                                        ICardDatabasePathProvider *_pathProvider,
-                                       ICardPreferenceProvider *_preferenceProvider)
+                                       ICardPreferenceProvider *_preferenceProvider,
+                                       ICardSetPriorityController *_priorityController)
     : QObject(parent), database(db), pathProvider(_pathProvider)
 {
     // instantiate available parsers here and connect them to the database
-    availableParsers << new CockatriceXml4Parser(_preferenceProvider);
-    availableParsers << new CockatriceXml3Parser;
+    availableParsers << new CockatriceXml4Parser(_preferenceProvider, _priorityController);
+    availableParsers << new CockatriceXml3Parser(_priorityController);
 
     for (auto *p : availableParsers) {
         // connect parser outputs to the database adders

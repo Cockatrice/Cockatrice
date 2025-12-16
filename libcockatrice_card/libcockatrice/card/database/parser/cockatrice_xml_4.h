@@ -29,7 +29,8 @@ class CockatriceXml4Parser : public ICardDatabaseParser
 {
     Q_OBJECT
 public:
-    explicit CockatriceXml4Parser(ICardPreferenceProvider *cardPreferenceProvider);
+    explicit CockatriceXml4Parser(ICardPreferenceProvider *cardPreferenceProvider,
+                                  ICardSetPriorityController *cardSetPriorityController);
     ~CockatriceXml4Parser() override = default;
 
     /**
