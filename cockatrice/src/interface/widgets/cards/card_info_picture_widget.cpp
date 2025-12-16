@@ -450,8 +450,7 @@ void CardInfoPictureWidget::showEnlargedPixmap()
     if (!enlargedPixmapWidget) {
         enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(const_cast<CardInfoPictureWidget *>(this)->window());
         enlargedPixmapWidget->hide();
-        connect(const_cast<CardInfoPictureWidget *>(this), &QObject::destroyed, enlargedPixmapWidget,
-                &CardInfoPictureEnlargedWidget::deleteLater);
+        connect(this, &QObject::destroyed, enlargedPixmapWidget, &CardInfoPictureEnlargedWidget::deleteLater);
     }
 
     const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * aspectRatio * 2));
