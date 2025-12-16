@@ -1,0 +1,8 @@
+#ifndef COCKATRICE_DECK_STATE_MANAGER_H
+#define COCKATRICE_DECK_STATE_MANAGER_H
+
+class DeckStateManager
+{
+};
+
+#endif // COCKATRICE_DECK_STATE_MANAGER_H
