@@ -14,6 +14,7 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
@@ -31,6 +32,7 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qscrollarea.h>
 
+class TutorialController;
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
 
 class VisualDatabaseDisplayWidget : public QWidget
@@ -60,6 +62,7 @@ public:
     VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
 
 public slots:
+    TutorialSequence addTutorialSteps();
     void searchModelChanged();
 
 signals:
