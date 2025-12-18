@@ -6,25 +6,25 @@
 class NoopCardSetPriorityController : public ICardSetPriorityController
 {
 public:
-    void setSortKey(QString /* shortName */, unsigned int /* sortKey */)
+    void setSortKey(QString /* shortName */, unsigned int /* sortKey */) override
     {
     }
-    void setEnabled(QString /* shortName */, bool /* enabled */)
+    void setEnabled(QString /* shortName */, bool /* enabled */) override
     {
     }
-    void setIsKnown(QString /* shortName */, bool /* isknown */)
+    void setIsKnown(QString /* shortName */, bool /* isknown */) override
     {
     }
 
-    unsigned int getSortKey(QString /* shortName */)
+    unsigned int getSortKey(QString /* shortName */) override
     {
         return 0;
     }
-    bool isEnabled(QString /* shortName */)
+    bool isEnabled(QString /* shortName */) override
     {
         return true;
     }
-    bool isKnown(QString /* shortName */)
+    bool isKnown(QString /* shortName */) override
     {
         return true;
     }

@@ -20,6 +20,7 @@ class ICardDatabaseParser : public QObject
 {
     Q_OBJECT
 public:
+    ICardDatabaseParser(ICardSetPriorityController *cardSetPriorityController);
     ~ICardDatabaseParser() override = default;
 
     /**
@@ -59,6 +60,7 @@ public:
 protected:
     /** @brief Cached global list of sets shared between all parsers. */
     static SetNameMap sets;
+    ICardSetPriorityController *cardSetPriorityController;
 
     /**
      * @brief Internal helper to add a set to the global set cache.

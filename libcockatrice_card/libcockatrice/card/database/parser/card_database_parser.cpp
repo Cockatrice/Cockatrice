@@ -4,6 +4,10 @@
 
 SetNameMap ICardDatabaseParser::sets;
 
+ICardDatabaseParser::ICardDatabaseParser(ICardSetPriorityController *_cardSetPriorityController)
+    : cardSetPriorityController(_cardSetPriorityController)
+{
+}
 void ICardDatabaseParser::clearSetlist()
 {
     sets.clear();
@@ -19,7 +23,7 @@ CardSetPtr ICardDatabaseParser::internalAddSet(const QString &setName,
         return sets.value(setName);
     }
 
-    CardSetPtr newSet = CardSet::newInstance(new NoopCardSetPriorityController(), setName);
+    CardSetPtr newSet = CardSet::newInstance(cardSetPriorityController, setName);
     newSet->setLongName(longName);
     newSet->setSetType(setType);
     newSet->setReleaseDate(releaseDate);
