@@ -636,7 +636,7 @@ HIDE_IN_BODY_DOCS      = NO
 # will be excluded. Set it to YES to include the internal documentation.
 # The default value is: NO.
 
-INTERNAL_DOCS          = YES
+INTERNAL_DOCS          = NO
 
 # With the correct setting of option CASE_SENSE_NAMES Doxygen will better be
 # able to match the capabilities of the underlying filesystem. In case the
