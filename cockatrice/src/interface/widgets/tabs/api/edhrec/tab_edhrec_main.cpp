@@ -363,7 +363,7 @@ void TabEdhRecMain::processAverageDeckResponse(QJsonObject reply)
 {
     EdhrecAverageDeckApiResponse deckData;
     deckData.fromJson(reply);
-    tabSupervisor->openDeckInNewTab(deckData.deck.deckLoader);
+    tabSupervisor->openDeckInNewTab({deckData.deck.deck, {}});
 }
 
 void TabEdhRecMain::prettyPrintJson(const QJsonValue &value, int indentLevel)

@@ -60,13 +60,13 @@ void UtilityMenu::populatePredefinedTokensMenu()
     clear();
     setEnabled(false);
     predefinedTokens.clear();
-    DeckLoader *_deck = player->getDeck();
+    const DeckList &deckList = player->getDeck();
 
-    if (!_deck) {
+    if (deckList.isEmpty()) {
         return;
     }
 
-    auto tokenCardNodes = _deck->getDeckList()->getCardNodes({DECK_ZONE_TOKENS});
+    auto tokenCardNodes = deckList.getCardNodes({DECK_ZONE_TOKENS});
 
     if (!tokenCardNodes.isEmpty()) {
         setEnabled(true);

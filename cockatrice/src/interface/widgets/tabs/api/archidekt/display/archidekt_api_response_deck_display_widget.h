@@ -31,7 +31,7 @@
  *
  * ### Signals
  * - `requestNavigation(QString url)` — triggered when navigation to a deck URL is requested.
- * - `openInDeckEditor(DeckLoader *loader)` — emitted when the user chooses to open the deck
+ * - `openInDeckEditor(const LoadedDeck &deck)` — emitted when the user chooses to open the deck
  *   in the deck editor.
  *
  * ### Features
@@ -52,9 +52,9 @@ signals:
 
     /**
      * @brief Emitted when the deck should be opened in the deck editor.
-     * @param loader Initialized DeckLoader containing the deck data.
+     * @param deck LoadedDeck containing the deck data.
      */
-    void openInDeckEditor(DeckLoader *loader);
+    void openInDeckEditor(const LoadedDeck &deck);
 
 public:
     /**
@@ -75,7 +75,7 @@ public:
     void retranslateUi();
 
     /**
-     * @brief Opens the deck in the deck editor via DeckLoader.
+     * @brief Opens the deck in the deck editor.
      */
     void actOpenInDeckEditor();
 

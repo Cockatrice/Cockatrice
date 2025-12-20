@@ -85,12 +85,12 @@ public:
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
-    void setDeck(DeckLoader &deck);
+    void setDeck(const DeckList &deck);
     void setVisualDeckStorageExists(bool exists);
 
 public slots:
     void loadDeckFromFile(const QString &filePath);
-    void loadDeckFromDeckLoader(DeckLoader *deck);
+    void loadDeckFromDeckList(const DeckList &deck);
 };
 
 #endif // DECK_VIEW_CONTAINER_H

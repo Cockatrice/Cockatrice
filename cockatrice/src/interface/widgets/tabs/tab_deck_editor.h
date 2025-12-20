@@ -12,7 +12,6 @@ class CardDatabaseDisplayModel;
 class DeckListModel;
 
 class QLabel;
-class DeckLoader;
 
 /**
  * @class TabDeckEditor

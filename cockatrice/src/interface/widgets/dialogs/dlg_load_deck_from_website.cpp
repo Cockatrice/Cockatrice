@@ -97,11 +97,11 @@ void DlgLoadDeckFromWebsite::accept()
             }
 
             // Parse the plain text deck here
-            DeckLoader *loader = new DeckLoader(this);
+            DeckList deckList;
             QTextStream stream(&deckText);
-            loader->getDeckList()->loadFromStream_Plain(stream, false);
-            loader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
-            deck = loader;
+            deckList.loadFromStream_Plain(stream, false);
+            deckList.forEachCard(CardNodeFunction::ResolveProviderId());
+            deck = deckList;
 
             QDialog::accept();
             return;

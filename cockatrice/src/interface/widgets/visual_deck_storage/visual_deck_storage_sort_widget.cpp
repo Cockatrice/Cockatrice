@@ -95,14 +95,17 @@ QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPr
 
         switch (sortOrder) {
             case ByName:
-                return widget1->deckLoader->getDeckList()->getName() < widget2->deckLoader->getDeckList()->getName();
+                return widget1->deckLoader->getDeck().deckList.getName() <
+                       widget2->deckLoader->getDeck().deckList.getName();
             case Alphabetical:
                 return QString::localeAwareCompare(info1.fileName(), info2.fileName()) <= 0;
             case ByLastModified:
                 return info1.lastModified() > info2.lastModified();
             case ByLastLoaded: {
-                QDateTime time1 = QDateTime::fromString(widget1->deckLoader->getDeckList()->getLastLoadedTimestamp());
-                QDateTime time2 = QDateTime::fromString(widget2->deckLoader->getDeckList()->getLastLoadedTimestamp());
+                QDateTime time1 =
+                    QDateTime::fromString(widget1->deckLoader->getDeck().deckList.getLastLoadedTimestamp());
+                QDateTime time2 =
+                    QDateTime::fromString(widget2->deckLoader->getDeck().deckList.getLastLoadedTimestamp());
                 return time1 > time2;
             }
         }

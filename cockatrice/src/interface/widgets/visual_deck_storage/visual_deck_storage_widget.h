@@ -53,7 +53,7 @@ public slots:
 signals:
     void bannerCardsRefreshed();
     void deckLoadRequested(const QString &filePath);
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
 
 private:
     QVBoxLayout *layout;

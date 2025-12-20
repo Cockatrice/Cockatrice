@@ -14,10 +14,8 @@ void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
         deckList += cardlistValue.toString() + "\n";
     }
 
-    deckLoader = new DeckLoader(nullptr);
-
     QTextStream stream(&deckList);
-    deckLoader->getDeckList()->loadFromStream_Plain(stream, true);
+    deck.loadFromStream_Plain(stream, true);
 }
 
 void EdhrecDeckApiResponse::debugPrint() const

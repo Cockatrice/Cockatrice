@@ -8,10 +8,11 @@
 #ifndef DLG_LOAD_DECK_FROM_CLIPBOARD_H
 #define DLG_LOAD_DECK_FROM_CLIPBOARD_H
 
+#include "../../deck_loader/loaded_deck.h"
+
 #include <QCheckBox>
 #include <QDialog>
 
-class DeckLoader;
 class QPlainTextEdit;
 class QPushButton;
 
@@ -35,15 +36,13 @@ public:
     /**
      * Gets the loaded deck. Only call this method after this dialog window has been successfully exec'd.
      *
-     * The returned DeckLoader is parented to this object; make sure to take ownership of the DeckLoader if you intend
-     * to use it, since otherwise it will get destroyed once this dlg is destroyed
-     * @return The DeckLoader
+     * @return The loaded decklist
      */
-    [[nodiscard]] virtual DeckLoader *getDeckList() const = 0;
+    [[nodiscard]] virtual const DeckList &getDeckList() = 0;
 
 protected:
     void setText(const QString &text);
-    bool loadIntoDeck(DeckLoader *deckLoader) const;
+    bool loadIntoDeck(DeckList &deckList) const;
     void keyPressEvent(QKeyEvent *event) override;
 
 protected slots:
@@ -62,12 +61,12 @@ protected slots:
     void actRefresh() override;
 
 private:
-    DeckLoader *deckList;
+    DeckList deckList;
 
 public:
     explicit DlgLoadDeckFromClipboard(QWidget *parent = nullptr);
 
-    [[nodiscard]] DeckLoader *getDeckList() const override
+    [[nodiscard]] const DeckList &getDeckList() override
     {
         return deckList;
     }
@@ -84,15 +83,15 @@ protected slots:
     void actRefresh() override;
 
 private:
-    DeckLoader *deckLoader;
+    DeckList deckList;
     bool annotated;
 
 public:
-    explicit DlgEditDeckInClipboard(DeckLoader *_deckLoader, bool _annotated, QWidget *parent = nullptr);
+    explicit DlgEditDeckInClipboard(const DeckList &_deckList, bool _annotated, QWidget *parent = nullptr);
 
-    [[nodiscard]] DeckLoader *getDeckList() const override
+    [[nodiscard]] const DeckList &getDeckList() override
     {
-        return deckLoader;
+        return deckList;
     }
 };
 

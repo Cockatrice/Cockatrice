@@ -20,10 +20,6 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
-    backgroundSourceDeck = new DeckLoader(this);
-
-    backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                       DeckFileFormat::Cockatrice, false);
 
     gradientColors = extractDominantColors(background);
 
@@ -72,11 +68,18 @@ void HomeWidget::initializeBackgroundFromSource()
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
         case BackgroundSources::DeckFileArt:
-            backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                               DeckFileFormat::Cockatrice, false);
+            loadBackgroundSourceDeck();
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
     }
+}
+
+void HomeWidget::loadBackgroundSourceDeck()
+{
+    DeckLoader deckLoader = DeckLoader(this);
+    deckLoader.loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice,
+                            false);
+    backgroundSourceDeck = deckLoader.getDeck().deckList;
 }
 
 void HomeWidget::updateRandomCard()
@@ -95,7 +98,7 @@ void HomeWidget::updateRandomCard()
                      newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
         case BackgroundSources::DeckFileArt:
-            QList<CardRef> cardRefs = backgroundSourceDeck->getDeckList()->getCardRefList();
+            QList<CardRef> cardRefs = backgroundSourceDeck.getCardRefList();
             ExactCard oldCard = backgroundSourceCard->getCard();
 
             if (!cardRefs.empty()) {
@@ -183,7 +186,7 @@ QGroupBox *HomeWidget::createButtons()
 
     auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
-            [this] { tabSupervisor->openDeckInNewTab(nullptr); });
+            [this] { tabSupervisor->openDeckInNewTab(LoadedDeck()); });
     boxLayout->addWidget(visualDeckEditorButton);
     auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,

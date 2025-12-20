@@ -25,11 +25,7 @@ const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.d
 const QStringList DeckLoader::FILE_NAME_FILTERS = {
     tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
-DeckLoader::DeckLoader(QObject *parent) : QObject(parent), deckList(new DeckList())
-{
-}
-
-DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList) : QObject(parent), deckList(_deckList)
+DeckLoader::DeckLoader(QObject *parent) : QObject(parent)
 {
 }
 
@@ -41,17 +37,18 @@ bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fm
     }
 
     bool result = false;
+    DeckList deckList = DeckList();
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->loadFromFile_Plain(&file);
+            result = deckList.loadFromFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice: {
-            result = deckList->loadFromFile_Native(&file);
+            result = deckList.loadFromFile_Native(&file);
             qCInfo(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
                 qCInfo(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
-                result = deckList->loadFromFile_Plain(&file);
+                result = deckList.loadFromFile_Plain(&file);
                 fmt = DeckFileFormat::PlainText;
             }
             break;
@@ -62,7 +59,8 @@ bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fm
     }
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.deckList = deckList;
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -86,7 +84,7 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
         watcher->deleteLater();
 
         if (result) {
-            lastLoadInfo = {
+            loadedDeck.lastLoadInfo = {
                 .fileName = fileName,
                 .fileFormat = fmt,
             };
@@ -107,13 +105,13 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
 
         switch (fmt) {
             case DeckFileFormat::PlainText:
-                return deckList->loadFromFile_Plain(&file);
+                return loadedDeck.deckList.loadFromFile_Plain(&file);
             case DeckFileFormat::Cockatrice: {
                 bool result = false;
-                result = deckList->loadFromFile_Native(&file);
+                result = loadedDeck.deckList.loadFromFile_Native(&file);
                 if (!result) {
                     file.seek(0);
-                    return deckList->loadFromFile_Plain(&file);
+                    return loadedDeck.deckList.loadFromFile_Plain(&file);
                 }
                 return result;
             }
@@ -129,9 +127,9 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
 
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
-    bool result = deckList->loadFromString_Native(nativeString);
+    bool result = loadedDeck.deckList.loadFromString_Native(nativeString);
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .remoteDeckId = remoteDeckId,
         };
 
@@ -150,16 +148,16 @@ bool DeckLoader::saveToFile(const QString &fileName, DeckFileFormat::Format fmt)
     bool result = false;
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->saveToFile_Plain(&file);
+            result = loadedDeck.deckList.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            result = deckList->saveToFile_Native(&file);
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             qCInfo(DeckLoaderLog) << "Saving to " << fileName << "-" << result;
             break;
     }
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -194,18 +192,18 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, DeckFileForm
     // Perform file modifications
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->saveToFile_Plain(&file);
+            result = loadedDeck.deckList.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            deckList->setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-            result = deckList->saveToFile_Native(&file);
+            loadedDeck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             break;
     }
 
     file.close(); // Close the file to ensure changes are flushed
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -455,7 +453,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
     switch (DeckFileFormat::getFormatFromName(fileName)) {
         case DeckFileFormat::PlainText:
             // Save in Cockatrice's native format
-            result = deckList->saveToFile_Native(&file);
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             break;
         case DeckFileFormat::Cockatrice:
             qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
@@ -476,7 +474,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
         } else {
             qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
         }
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = newFileName,
             .fileFormat = DeckFileFormat::Cockatrice,
         };

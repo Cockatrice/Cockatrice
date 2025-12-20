@@ -51,7 +51,7 @@ public:
 
 signals:
     void deckLoadRequested(const QString &filePath);
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
 
 public slots:
     void setFilePath(const QString &filePath);
