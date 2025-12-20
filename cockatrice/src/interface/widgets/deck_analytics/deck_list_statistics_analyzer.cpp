@@ -21,32 +21,26 @@ void DeckListStatisticsAnalyzer::update()
     manaCurveMap.clear();
     manaDevotionMap.clear();
 
-    auto nodes = model->getDeckList()->getCardNodes();
+    QList<ExactCard> cards = model->getCards();
 
-    for (auto *node : nodes) {
-        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
-        if (!info)
-            continue;
+    for (const ExactCard &card : cards) {
+        // ---- Mana curve ----
+        if (config.computeManaCurve) {
+            manaCurveMap[card.getInfo().getCmc().toInt()]++;
+        }
 
-        for (int i = 0; i < node->getNumber(); ++i) {
-            // ---- Mana curve ----
-            if (config.computeManaCurve) {
-                manaCurveMap[info->getCmc().toInt()]++;
-            }
+        // ---- Mana base ----
+        if (config.computeManaBase) {
+            auto mana = determineManaProduction(card.getInfo().getText());
+            for (auto it = mana.begin(); it != mana.end(); ++it)
+                manaBaseMap[it.key()] += it.value();
+        }
 
-            // ---- Mana base ----
-            if (config.computeManaBase) {
-                auto mana = determineManaProduction(info->getText());
-                for (auto it = mana.begin(); it != mana.end(); ++it)
-                    manaBaseMap[it.key()] += it.value();
-            }
-
-            // ---- Devotion ----
-            if (config.computeDevotion) {
-                auto devo = countManaSymbols(info->getManaCost());
-                for (auto &d : devo)
-                    manaDevotionMap[d.first] += d.second;
-            }
+        // ---- Devotion ----
+        if (config.computeDevotion) {
+            auto devo = countManaSymbols(card.getInfo().getManaCost());
+            for (auto &d : devo)
+                manaDevotionMap[d.first] += d.second;
         }
     }
 

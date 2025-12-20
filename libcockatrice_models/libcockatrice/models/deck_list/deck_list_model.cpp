@@ -561,10 +561,8 @@ void DeckListModel::setDeckList(DeckList *_deck)
     rebuildTree();
 }
 
-QList<ExactCard> DeckListModel::getCards() const
+static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
 {
-    auto nodes = deckList->getCardNodes();
-
     QList<ExactCard> cards;
     for (auto node : nodes) {
         ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
@@ -580,23 +578,26 @@ QList<ExactCard> DeckListModel::getCards() const
     return cards;
 }
 
+QList<ExactCard> DeckListModel::getCards() const
+{
+    auto nodes = deckList->getCardNodes();
+    return cardNodesToExactCards(nodes);
+}
+
 QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
 {
     auto nodes = deckList->getCardNodes({zoneName});
+    return cardNodesToExactCards(nodes);
+}
 
-    QList<ExactCard> cards;
-    for (auto node : nodes) {
-        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
-        if (card) {
-            for (int k = 0; k < node->getNumber(); ++k) {
-                cards.append(card);
-            }
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
+QList<QString> DeckListModel::getCardNames() const
+{
+    auto nodes = deckList->getCardNodes();
 
-    return cards;
+    QList<QString> names;
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(names), [](auto node) { return node->getName(); });
+
+    return names;
 }
 
 QList<QString> DeckListModel::getZones() const
@@ -631,7 +632,6 @@ static int maxAllowedForLegality(const FormatRules &format, const QString &legal
     }
     return -1; // unknown legality → treat as illegal
 }
-
 
 bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
 {

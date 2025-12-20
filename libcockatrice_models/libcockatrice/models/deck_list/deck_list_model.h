@@ -309,9 +309,25 @@ public:
     }
     void setDeckList(DeckList *_deck);
 
+    /**
+     * @brief Creates a list consisting of the entries of the model mapped into ExactCards (with each entry looked up
+     * in the card database).
+     * If a card node has number > 1, it will be added that many times to the list.
+     * If an entry's card is not found in the card database, that entry will be left out of the list.
+     * @return An ordered list of ExactCards
+     */
     [[nodiscard]] QList<ExactCard> getCards() const;
     [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
+
+    /**
+     * @brief Gets a deduplicated list of all card names that appear in the model
+     */
+    [[nodiscard]] QList<QString> getCardNames() const;
+    /**
+     * @brief Gets a list of all zone names that appear in the model
+     */
     [[nodiscard]] QList<QString> getZones() const;
+
     bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
     bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);
     void refreshCardFormatLegalities();

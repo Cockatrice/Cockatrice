@@ -306,19 +306,12 @@ int CardAmountWidget::countCardsInZone(const QString &deckZone)
         return -1;
     }
 
-    DeckList *decklist = deckModel->getDeckList();
-    if (!decklist) {
-        return -1;
-    }
-
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes({deckZone});
+    QList<ExactCard> cards = deckModel->getCardsForZone(deckZone);
 
     int count = 0;
-    for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
-                count++;
-            }
+    for (auto currentCard : cards) {
+        if (currentCard.getPrinting().getUuid() == rootCard.getPrinting().getProperty("uuid")) {
+            count++;
         }
     }
 

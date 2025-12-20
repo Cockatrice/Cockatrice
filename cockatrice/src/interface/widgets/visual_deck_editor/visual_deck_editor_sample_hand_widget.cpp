@@ -76,25 +76,11 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
 
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
-    QList<ExactCard> mainDeckCards;
     QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
-    DeckList *decklist = deckListModel->getDeckList();
-    if (!decklist)
-        return randomCards;
 
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes({DECK_ZONE_MAIN});
-
-    // Collect all cards in the main deck, allowing duplicates based on their count
-    for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            ExactCard card = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
-            if (card) {
-                mainDeckCards.append(card);
-            }
-        }
-    }
+    QList<ExactCard> mainDeckCards = deckListModel->getCardsForZone(DECK_ZONE_MAIN);
 
     if (mainDeckCards.isEmpty())
         return randomCards;

@@ -224,14 +224,10 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
     if (!model)
         return setCounts;
 
-    DeckList *decklist = model->getDeckList();
-    if (!decklist)
-        return setCounts;
+    QList<QString> cardNames = model->getCardNames();
 
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
-        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+    for (auto cardName : cardNames) {
+        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
         if (!infoPtr)
             continue;
 
@@ -267,19 +263,15 @@ void DlgSelectSetForCards::updateCardLists()
         }
     }
 
-    DeckList *decklist = model->getDeckList();
-    if (!decklist)
-        return;
+    QList<QString> cardNames = model->getCardNames();
 
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
+    for (auto cardName : cardNames) {
         bool found = false;
         QString foundSetName;
 
         // Check across all sets if the card is present
         for (auto it = selectedCardsBySet.begin(); it != selectedCardsBySet.end(); ++it) {
-            if (it.value().contains(currentCard->getName())) {
+            if (it.value().contains(cardName)) {
                 found = true;
                 foundSetName = it.key(); // Store the set name where it was found
                 break;                   // Stop at the first match
@@ -288,16 +280,16 @@ void DlgSelectSetForCards::updateCardLists()
 
         if (!found) {
             // The card was not in any selected set
-            ExactCard card = CardDatabaseManager::query()->getCard({currentCard->getName()});
+            ExactCard card = CardDatabaseManager::query()->getCard({cardName});
             CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
             picture_widget->setCard(card);
             uneditedCardsFlowWidget->addWidget(picture_widget);
         } else {
-            ExactCard card = CardDatabaseManager::query()->getCard(
-                {currentCard->getName(), CardDatabaseManager::getInstance()
-                                             ->query()
-                                             ->getSpecificPrinting(currentCard->getName(), foundSetName, "")
-                                             .getUuid()});
+            ExactCard card =
+                CardDatabaseManager::query()->getCard({cardName, CardDatabaseManager::getInstance()
+                                                                     ->query()
+                                                                     ->getSpecificPrinting(cardName, foundSetName, "")
+                                                                     .getUuid()});
             CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
             picture_widget->setCard(card);
             modifiedCardsFlowWidget->addWidget(picture_widget);
@@ -356,20 +348,16 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
     if (!model)
         return setCards;
 
-    DeckList *decklist = model->getDeckList();
-    if (!decklist)
-        return setCards;
+    QList<QString> cardNames = model->getCardNames();
 
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
-        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+    for (auto cardName : cardNames) {
+        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
         if (!infoPtr)
             continue;
 
         SetToPrintingsMap setMap = infoPtr->getSets();
         for (auto it = setMap.begin(); it != setMap.end(); ++it) {
-            setCards[it.key()].append(currentCard->getName());
+            setCards[it.key()].append(cardName);
         }
     }
 
