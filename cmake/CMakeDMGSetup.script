@@ -42,7 +42,6 @@ tell disk image_name
       set position of item "Cockatrice.app" to { 139, 214 }
       set position of item "Oracle.app" to { 139, 414 }
       set position of item "Servatrice.app" to { 139, 614 }
-      set position of item "dbconverter.app" to { 1400, 1400 }
       set position of item "Applications" to { 861, 414 }
     end tell
     update without registering applications
