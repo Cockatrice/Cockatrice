@@ -38,6 +38,32 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     mainLayout->setContentsMargins(9, 0, 9, 5);
     mainLayout->setSpacing(0);
 
+    initializeDisplayOptionsAndSearchWidget();
+
+    initializeScrollAreaAndZoneContainer();
+
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckEditorCardSize);
+
+    mainLayout->addWidget(displayOptionsAndSearch);
+    mainLayout->addWidget(scrollArea);
+    mainLayout->addWidget(cardSizeWidget);
+
+    connectDeckListModel();
+
+    constructZoneWidgetsFromDeckListModel();
+
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &VisualDeckEditorWidget::onSelectionChanged);
+    }
+
+    retranslateUi();
+}
+
+void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
+{
     searchBar = new QLineEdit(this);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
         if (!searchBar->hasFocus())
@@ -109,12 +135,10 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
             emit cardAdditionRequested(card);
         }
     });
+}
 
-    displayOptionsAndSearch = new QWidget(this);
-    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
-    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
-    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
-
+void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
+{
     displayOptionsWidget = new VisualDeckDisplayOptionsWidget(this);
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::displayTypeChanged, this,
             &VisualDeckEditorWidget::displayTypeChanged);
@@ -122,11 +146,26 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
             &VisualDeckEditorWidget::activeGroupCriteriaChanged);
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, this,
             &VisualDeckEditorWidget::activeSortCriteriaChanged);
+}
+
+void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
+{
+    initializeSearchBarAndCompleter();
+
+    initializeDisplayOptionsWidget();
+
+    displayOptionsAndSearch = new QWidget(this);
+    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
+    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
+    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
 
     displayOptionsAndSearchLayout->addWidget(displayOptionsWidget);
     displayOptionsAndSearchLayout->addWidget(searchBar);
     displayOptionsAndSearchLayout->addWidget(searchPushButton);
+}
 
+void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
+{
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setMinimumSize(0, 0);
@@ -140,27 +179,14 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     zoneContainer->setLayout(zoneContainerLayout);
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
+}
 
-    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckEditorCardSize);
-
-    mainLayout->addWidget(displayOptionsAndSearch);
-    mainLayout->addWidget(scrollArea);
-    mainLayout->addWidget(cardSizeWidget);
-
+void VisualDeckEditorWidget::connectDeckListModel()
+{
     connect(deckListModel, &DeckListModel::modelReset, this, &VisualDeckEditorWidget::decklistModelReset);
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &VisualDeckEditorWidget::onCardAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &VisualDeckEditorWidget::onCardRemoval);
-    constructZoneWidgetsFromDeckListModel();
-
-    if (selectionModel) {
-        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-                &VisualDeckEditorWidget::onSelectionChanged);
-    }
-
-    retranslateUi();
 }
 
 void VisualDeckEditorWidget::retranslateUi()

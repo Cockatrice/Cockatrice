@@ -37,6 +37,11 @@ class VisualDeckEditorWidget : public QWidget
 
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
+    void initializeSearchBarAndCompleter();
+    void initializeDisplayOptionsWidget();
+    void initializeDisplayOptionsAndSearchWidget();
+    void initializeScrollAreaAndZoneContainer();
+    void connectDeckListModel();
     void retranslateUi();
     void clearAllDisplayWidgets();
     void resizeEvent(QResizeEvent *event) override;
