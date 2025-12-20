@@ -57,8 +57,8 @@ Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other p
 - [Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
->[!IMPORTANT]
->For support regarding specific servers, please contact that server's admin/mods and use their dedicated communication channels rather than contacting the team building the software.
+> [!IMPORTANT]
+> For support regarding specific servers, please contact that server's admin/mods and use their dedicated communication channels rather than contacting the team building the software.
 
 
 # Contribute
@@ -124,8 +124,8 @@ You can then
     make package
     ```
 
->[!NOTE]
->Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)
+> [!NOTE]
+> Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)
 
 <br>
 
