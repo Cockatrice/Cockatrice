@@ -97,7 +97,7 @@ You can also have a look at our `Todo List` in our [Code Documentation](https://
 
 ### Documentation [![CI Docs](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml/badge.svg?event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml?query=event%3Apush)
 
-There are various places where useful information for different needs is maintained
+There are various places where useful information for different needs are maintained:
 - [Official Code Documentation](https://cockatrice.github.io/docs/) 
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
 - [Official Webpage](https://cockatrice.github.io/)
