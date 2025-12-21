@@ -561,6 +561,11 @@ void DeckListModel::setDeckList(DeckList *_deck)
     rebuildTree();
 }
 
+void DeckListModel::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+{
+    deckList->forEachCard(func);
+}
+
 static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
 {
     QList<ExactCard> cards;

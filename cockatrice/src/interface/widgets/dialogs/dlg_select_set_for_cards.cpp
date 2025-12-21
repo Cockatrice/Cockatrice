@@ -178,7 +178,7 @@ void DlgSelectSetForCards::actOK()
 void DlgSelectSetForCards::actClear()
 {
     emit deckAboutToBeModified(tr("Cleared all printing information."));
-    model->getDeckList()->forEachCard(CardNodeFunction::ClearPrintingData());
+    model->forEachCard(CardNodeFunction::ClearPrintingData());
     emit deckModified();
     accept();
 }
@@ -186,8 +186,8 @@ void DlgSelectSetForCards::actClear()
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
     emit deckAboutToBeModified(tr("Set all printings to preferred."));
-    model->getDeckList()->forEachCard(CardNodeFunction::ClearPrintingData());
-    model->getDeckList()->forEachCard(CardNodeFunction::SetProviderIdToPreferred());
+    model->forEachCard(CardNodeFunction::ClearPrintingData());
+    model->forEachCard(CardNodeFunction::SetProviderIdToPreferred());
     emit deckModified();
     accept();
 }

@@ -310,6 +310,13 @@ public:
     void setDeckList(DeckList *_deck);
 
     /**
+     * @brief Apply a function to every card in the deck tree.
+     *
+     * @param func Function taking (zone node, card node).
+     */
+    void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func);
+
+    /**
      * @brief Creates a list consisting of the entries of the model mapped into ExactCards (with each entry looked up
      * in the card database).
      * If a card node has number > 1, it will be added that many times to the list.

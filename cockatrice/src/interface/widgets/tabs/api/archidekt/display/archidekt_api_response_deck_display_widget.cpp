@@ -70,9 +70,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
     model->getDeckList()->loadFromStream_Plain(deckStream, false);
 
-    model->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
-
-    model->rebuildTree();
+    model->forEachCard(CardNodeFunction::ResolveProviderId());
 
     retranslateUi();
 }
