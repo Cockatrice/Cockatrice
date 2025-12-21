@@ -338,12 +338,6 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 {
 }
 
-void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
-}
-
 void VisualDeckEditorWidget::decklistModelReset()
 {
     clearAllDisplayWidgets();

@@ -37,14 +37,8 @@ class VisualDeckEditorWidget : public QWidget
 
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
-    void initializeSearchBarAndCompleter();
-    void initializeDisplayOptionsWidget();
-    void initializeDisplayOptionsAndSearchWidget();
-    void initializeScrollAreaAndZoneContainer();
-    void connectDeckListModel();
     void retranslateUi();
     void clearAllDisplayWidgets();
-    void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
 
@@ -75,6 +69,13 @@ signals:
     void cardAdditionRequested(const ExactCard &card);
     void displayTypeChanged(DisplayType displayType);
 
+protected:
+    void initializeSearchBarAndCompleter();
+    void initializeDisplayOptionsWidget();
+    void initializeDisplayOptionsAndSearchWidget();
+    void initializeScrollAreaAndZoneContainer();
+    void connectDeckListModel();
+
 protected slots:
     void onHover(const ExactCard &hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
@@ -96,7 +97,6 @@ private:
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;
     // OverlapControlWidget *overlapControlWidget;
-    QWidget *container;
     QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
 };
 
