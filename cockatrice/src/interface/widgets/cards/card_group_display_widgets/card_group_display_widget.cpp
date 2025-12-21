@@ -39,6 +39,34 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
+// Just here so it can get overwritten in subclasses.
+void CardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+}
+
+// =====================================================================================================================
+//                                                    User Interaction
+// =====================================================================================================================
+
+void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    if (selectionModel) {
+        selectionModel->clearSelection();
+    }
+}
+
+void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
+{
+    emit cardClicked(event, card);
+}
+
+void CardGroupDisplayWidget::onHover(const ExactCard &card)
+{
+    emit cardHovered(card);
+}
+
 void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model());
@@ -76,15 +104,9 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
     }
 }
 
-void CardGroupDisplayWidget::clearAllDisplayWidgets()
-{
-    for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
-        removeFromLayout(displayWidget);
-        indexToWidgetMap.remove(idx);
-        delete displayWidget;
-    }
-}
+// =====================================================================================================================
+//                                             Display Widget Management
+// =====================================================================================================================
 
 QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex index)
 {
@@ -133,6 +155,20 @@ void CardGroupDisplayWidget::updateCardDisplays()
     }
 }
 
+void CardGroupDisplayWidget::clearAllDisplayWidgets()
+{
+    for (auto idx : indexToWidgetMap.keys()) {
+        auto displayWidget = indexToWidgetMap.value(idx);
+        removeFromLayout(displayWidget);
+        indexToWidgetMap.remove(idx);
+        delete displayWidget;
+    }
+}
+
+// =====================================================================================================================
+//                                           DeckListModel Signal Responses
+// =====================================================================================================================
+
 void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first, int last)
 {
     if (!trackedIndex.isValid()) {
@@ -177,27 +213,4 @@ void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSort
 
     clearAllDisplayWidgets();
     updateCardDisplays();
-}
-
-void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
-{
-    QWidget::mousePressEvent(event);
-    if (selectionModel) {
-        selectionModel->clearSelection();
-    }
-}
-
-void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
-{
-    emit cardClicked(event, card);
-}
-
-void CardGroupDisplayWidget::onHover(const ExactCard &card)
-{
-    emit cardHovered(card);
-}
-
-void CardGroupDisplayWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
 }
