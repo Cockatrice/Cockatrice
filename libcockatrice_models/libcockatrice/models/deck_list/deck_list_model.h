@@ -331,6 +331,10 @@ public:
      */
     [[nodiscard]] QList<QString> getCardNames() const;
     /**
+     * @brief Gets a deduplicated list of all CardRefs that appear in the model
+     */
+    [[nodiscard]] QList<CardRef> getCardRefs() const;
+    /**
      * @brief Gets a list of all zone names that appear in the model
      */
     [[nodiscard]] QList<QString> getZones() const;

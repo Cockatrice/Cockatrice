@@ -605,6 +605,17 @@ QList<QString> DeckListModel::getCardNames() const
     return names;
 }
 
+QList<CardRef> DeckListModel::getCardRefs() const
+{
+    auto nodes = deckList->getCardNodes();
+
+    QList<CardRef> cardRefs;
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(cardRefs),
+                   [](auto node) { return node->toCardRef(); });
+
+    return cardRefs;
+}
+
 QList<QString> DeckListModel::getZones() const
 {
     auto zoneNodes = deckList->getZoneNodes();

@@ -386,15 +386,15 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
 
     // Collect unique (name, providerId) pairs
     QSet<QPair<QString, QString>> bannerCardSet;
-    QList<const DecklistCardNode *> cardsInDeck = deckModel->getDeckList()->getCardNodes();
+    QList<CardRef> cardsInDeck = deckModel->getCardRefs();
 
-    for (auto currentCard : cardsInDeck) {
-        if (!CardDatabaseManager::query()->getCard(currentCard->toCardRef())) {
+    for (auto cardRef : cardsInDeck) {
+        if (!CardDatabaseManager::query()->getCard(cardRef)) {
             continue;
         }
 
         // Insert one entry per distinct card, ignore copies
-        bannerCardSet.insert({currentCard->getName(), currentCard->getCardProviderId()});
+        bannerCardSet.insert({cardRef.name, cardRef.providerId});
     }
 
     // Convert to sorted list
