@@ -122,7 +122,7 @@ public:
     DeckLoader *getDeckLoader() const;
 
     /** @brief Returns the currently active deck list. */
-    DeckList *getDeckList() const;
+    const DeckList &getDeckList() const;
 
     /** @brief Sets the modified state of the tab.
      *  @param _windowModified Whether the tab is modified.

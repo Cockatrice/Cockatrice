@@ -124,7 +124,7 @@ void AbstractTabDeckEditor::onDeckModified()
  */
 void AbstractTabDeckEditor::onDeckHistorySaveRequested(const QString &modificationReason)
 {
-    historyManager->save(deckDockWidget->getDeckList()->createMemento(modificationReason));
+    historyManager->save(deckDockWidget->getDeckList().createMemento(modificationReason));
 }
 
 /**
@@ -231,7 +231,7 @@ void AbstractTabDeckEditor::openDeck(const LoadedDeck &deck)
 void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 {
     deckDockWidget->setDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList().getCardRefList()));
     setModified(false);
 
     aDeckDockVisible->setChecked(true);
@@ -245,7 +245,7 @@ DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
 }
 
 /** @brief Returns the currently loaded deck list. */
-DeckList *AbstractTabDeckEditor::getDeckList() const
+const DeckList &AbstractTabDeckEditor::getDeckList() const
 {
     return deckDockWidget->getDeckList();
 }
@@ -446,7 +446,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(getDeckList()->getName().trimmed());
+    dialog.selectFile(getDeckList().getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -532,25 +532,25 @@ void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 /** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    DeckLoader::saveToClipboard(*getDeckList(), true, true);
+    DeckLoader::saveToClipboard(getDeckList(), true, true);
 }
 
 /** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    DeckLoader::saveToClipboard(*getDeckList(), true, false);
+    DeckLoader::saveToClipboard(getDeckList(), true, false);
 }
 
 /** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    DeckLoader::saveToClipboard(*getDeckList(), false, true);
+    DeckLoader::saveToClipboard(getDeckList(), false, true);
 }
 
 /** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    DeckLoader::saveToClipboard(*getDeckList(), false, false);
+    DeckLoader::saveToClipboard(getDeckList(), false, false);
 }
 
 /** @brief Prints the deck using a QPrintPreviewDialog. */
@@ -558,7 +558,7 @@ void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
     connect(dlg, &QPrintPreviewDialog::paintRequested, this,
-            [this](QPrinter *printer) { DeckLoader::printDeckList(printer, *getDeckList()); });
+            [this](QPrinter *printer) { DeckLoader::printDeckList(printer, getDeckList()); });
     dlg->exec();
 }
 
@@ -591,26 +591,21 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
  */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    if (DeckList *deckList = getDeckList()) {
-        QString decklistUrlString = DeckLoader::exportDeckToDecklist(*deckList, website);
-        // Check to make sure the string isn't empty.
-        if (decklistUrlString.isEmpty()) {
-            // Show an error if the deck is empty, and return.
-            QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
-            return;
-        }
-
-        // Encode the string recieved from the model to make sure all characters are encoded.
-        // first we put it into a qurl object
-        QUrl decklistUrl = QUrl(decklistUrlString);
-        // we get the correctly encoded url.
-        decklistUrlString = decklistUrl.toEncoded();
-        // We open the url in the user's default browser
-        QDesktopServices::openUrl(decklistUrlString);
-    } else {
-        // if there's no deck loader object, return an error
-        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be exported."));
+    QString decklistUrlString = DeckLoader::exportDeckToDecklist(getDeckList(), website);
+    // Check to make sure the string isn't empty.
+    if (decklistUrlString.isEmpty()) {
+        // Show an error if the deck is empty, and return.
+        QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
+        return;
     }
+
+    // Encode the string recieved from the model to make sure all characters are encoded.
+    // first we put it into a qurl object
+    QUrl decklistUrl = QUrl(decklistUrlString);
+    // we get the correctly encoded url.
+    decklistUrlString = decklistUrl.toEncoded();
+    // We open the url in the user's default browser
+    QDesktopServices::openUrl(decklistUrlString);
 }
 
 /** @brief Exports deck to www.decklist.org. */
@@ -629,14 +624,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(*getDeckList());
+    interface->analyzeDeck(getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(*getDeckList());
+    interface->analyzeDeck(getDeckList());
 }
 
 /** @brief Applies a new filter tree to the database display. */

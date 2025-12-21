@@ -61,7 +61,7 @@ public slots:
     void syncDisplayWidgetsToModel();
     void sortDeckModelToDeckView();
     DeckLoader *getDeckLoader();
-    DeckList *getDeckList();
+    const DeckList &getDeckList() const;
     void actIncrement();
     bool swapCard(const QModelIndex &idx);
     void actDecrementCard(const ExactCard &card, QString zoneName);
