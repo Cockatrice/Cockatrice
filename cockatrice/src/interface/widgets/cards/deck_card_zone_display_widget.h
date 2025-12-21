@@ -50,7 +50,6 @@ public slots:
     void refreshDisplayType(const DisplayType &displayType);
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
-    QList<QString> getGroupCriteriaValueList();
     void onCategoryAddition(const QModelIndex &parent, int first, int last);
     void onCategoryRemoval(const QModelIndex &parent, int first, int last);
 
