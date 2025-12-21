@@ -62,6 +62,10 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     retranslateUi();
 }
 
+// =====================================================================================================================
+//                                                  Constructor helpers
+// =====================================================================================================================
+
 void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 {
     searchBar = new QLineEdit(this);
@@ -198,96 +202,9 @@ void VisualDeckEditorWidget::retranslateUi()
                                     "preferred printing to the deck on pressing enter"));
 }
 
-void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
-{
-    if (selectionModel == model) {
-        return;
-    }
-
-    if (selectionModel) {
-        // TODO: Possibly disconnect old ones?
-    }
-
-    selectionModel = model;
-
-    if (selectionModel) {
-        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-                &VisualDeckEditorWidget::onSelectionChanged);
-    }
-}
-
-void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    for (auto &range : selected) {
-        for (int row = range.top(); row <= range.bottom(); ++row) {
-            QModelIndex idx = range.model()->index(row, 0, range.parent());
-            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
-            if (it != indexToWidgetMap.end()) {
-                // it.value()->setHighlighted(true);
-            }
-        }
-    }
-
-    for (auto &range : deselected) {
-        for (int row = range.top(); row <= range.bottom(); ++row) {
-            QModelIndex idx = range.model()->index(row, 0, range.parent());
-            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
-            if (it != indexToWidgetMap.end()) {
-                // it.value()->setHighlighted(false);
-            }
-        }
-    }
-}
-
-void VisualDeckEditorWidget::clearAllDisplayWidgets()
-{
-    for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
-        zoneContainerLayout->removeWidget(displayWidget);
-        indexToWidgetMap.remove(idx);
-        delete displayWidget;
-    }
-}
-
-void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
-{
-    zoneContainerLayout->removeWidget(displayWidget);
-    for (auto idx : indexToWidgetMap.keys()) {
-        if (!idx.isValid()) {
-            indexToWidgetMap.remove(idx);
-        }
-    }
-    delete displayWidget;
-}
-
-void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
-{
-    if (parent == deckListModel->getRoot()) {
-        for (int i = first; i <= last; i++) {
-            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
-
-            if (indexToWidgetMap.contains(index)) {
-                continue;
-            }
-
-            constructZoneWidgetForIndex(index);
-        }
-    }
-}
-
-void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
-{
-    Q_UNUSED(parent);
-    Q_UNUSED(first);
-    Q_UNUSED(last);
-    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-        if (!idx.isValid()) {
-            zoneContainerLayout->removeWidget(indexToWidgetMap.value(idx));
-            indexToWidgetMap.value(idx)->deleteLater();
-            indexToWidgetMap.remove(idx);
-        }
-    }
-}
+// =====================================================================================================================
+//                                              Display Widget Management
+// =====================================================================================================================
 
 void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex persistent)
 {
@@ -338,6 +255,60 @@ void VisualDeckEditorWidget::updateZoneWidgets()
 {
 }
 
+void VisualDeckEditorWidget::clearAllDisplayWidgets()
+{
+    for (auto idx : indexToWidgetMap.keys()) {
+        auto displayWidget = indexToWidgetMap.value(idx);
+        zoneContainerLayout->removeWidget(displayWidget);
+        indexToWidgetMap.remove(idx);
+        delete displayWidget;
+    }
+}
+
+void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
+{
+    zoneContainerLayout->removeWidget(displayWidget);
+    for (auto idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    delete displayWidget;
+}
+
+// =====================================================================================================================
+//                                                 DeckModel Signals Management
+// =====================================================================================================================
+
+void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
+{
+    if (parent == deckListModel->getRoot()) {
+        for (int i = first; i <= last; i++) {
+            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
+
+            if (indexToWidgetMap.contains(index)) {
+                continue;
+            }
+
+            constructZoneWidgetForIndex(index);
+        }
+    }
+}
+
+void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            zoneContainerLayout->removeWidget(indexToWidgetMap.value(idx));
+            indexToWidgetMap.value(idx)->deleteLater();
+            indexToWidgetMap.remove(idx);
+        }
+    }
+}
+
 void VisualDeckEditorWidget::decklistModelReset()
 {
     clearAllDisplayWidgets();
@@ -354,6 +325,17 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
     updateZoneWidgets();
 }
 
+// =====================================================================================================================
+//                                                 User Interaction
+// =====================================================================================================================
+
+void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
+                                         CardInfoPictureWithTextOverlayWidget *instance,
+                                         QString zoneName)
+{
+    emit cardClicked(event, instance, zoneName);
+}
+
 void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
 {
     // If user has any card selected, ignore hover
@@ -368,9 +350,43 @@ void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
     // highlightHoveredCard(hoveredCard);
 }
 
-void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
-                                         CardInfoPictureWithTextOverlayWidget *instance,
-                                         QString zoneName)
+void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
 {
-    emit cardClicked(event, instance, zoneName);
+    if (selectionModel == model) {
+        return;
+    }
+
+    if (selectionModel) {
+        // TODO: Possibly disconnect old ones?
+    }
+
+    selectionModel = model;
+
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &VisualDeckEditorWidget::onSelectionChanged);
+    }
+}
+
+void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    for (auto &range : selected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(true);
+            }
+        }
+    }
+
+    for (auto &range : deselected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(false);
+            }
+        }
+    }
 }
