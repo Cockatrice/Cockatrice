@@ -532,25 +532,25 @@ void AbstractTabDeckEditor::actEditDeckInClipboardRaw()
 /** @brief Saves deck to clipboard with set info and annotation. */
 void AbstractTabDeckEditor::actSaveDeckToClipboard()
 {
-    DeckLoader::saveToClipboard(getDeckList(), true, true);
+    DeckLoader::saveToClipboard(*getDeckList(), true, true);
 }
 
 /** @brief Saves deck to clipboard with annotation, without set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardNoSetInfo()
 {
-    DeckLoader::saveToClipboard(getDeckList(), true, false);
+    DeckLoader::saveToClipboard(*getDeckList(), true, false);
 }
 
 /** @brief Saves deck to clipboard without annotations, with set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRaw()
 {
-    DeckLoader::saveToClipboard(getDeckList(), false, true);
+    DeckLoader::saveToClipboard(*getDeckList(), false, true);
 }
 
 /** @brief Saves deck to clipboard without annotations or set info. */
 void AbstractTabDeckEditor::actSaveDeckToClipboardRawNoSetInfo()
 {
-    DeckLoader::saveToClipboard(getDeckList(), false, false);
+    DeckLoader::saveToClipboard(*getDeckList(), false, false);
 }
 
 /** @brief Prints the deck using a QPrintPreviewDialog. */
@@ -558,7 +558,7 @@ void AbstractTabDeckEditor::actPrintDeck()
 {
     auto *dlg = new QPrintPreviewDialog(this);
     connect(dlg, &QPrintPreviewDialog::paintRequested, this,
-            [this](QPrinter *printer) { DeckLoader::printDeckList(printer, getDeckList()); });
+            [this](QPrinter *printer) { DeckLoader::printDeckList(printer, *getDeckList()); });
     dlg->exec();
 }
 
@@ -592,7 +592,7 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
     if (DeckList *deckList = getDeckList()) {
-        QString decklistUrlString = DeckLoader::exportDeckToDecklist(deckList, website);
+        QString decklistUrlString = DeckLoader::exportDeckToDecklist(*deckList, website);
         // Check to make sure the string isn't empty.
         if (decklistUrlString.isEmpty()) {
             // Show an error if the deck is empty, and return.
@@ -629,14 +629,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
     auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(*getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
     auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
-    interface->analyzeDeck(getDeckList());
+    interface->analyzeDeck(*getDeckList());
 }
 
 /** @brief Applies a new filter tree to the database display. */
