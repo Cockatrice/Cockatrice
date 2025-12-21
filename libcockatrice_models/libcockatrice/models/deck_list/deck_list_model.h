@@ -240,6 +240,7 @@ signals:
 
 public:
     explicit DeckListModel(QObject *parent = nullptr);
+    explicit DeckListModel(QObject *parent, const QSharedPointer<DeckList> &deckList);
     ~DeckListModel() override;
 
     /**
@@ -323,11 +324,12 @@ public:
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
-    [[nodiscard]] DeckList *getDeckList() const
+
+    [[nodiscard]] QSharedPointer<DeckList> getDeckList() const
     {
         return deckList;
     }
-    void setDeckList(DeckList *_deck);
+    void setDeckList(const QSharedPointer<DeckList> &_deck);
 
     /**
      * @brief Apply a function to every card in the deck tree.
@@ -370,8 +372,8 @@ public:
     void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
 
 private:
-    DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
-    InnerDecklistNode *root; /**< Root node of the model tree. */
+    QSharedPointer<DeckList> deckList; /**< Pointer to the decklist providing the underlying data. */
+    InnerDecklistNode *root;           /**< Root node of the model tree. */
     DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
     int lastKnownColumn;          /**< Last column used for sorting. */
     Qt::SortOrder lastKnownOrder; /**< Last known sort order. */

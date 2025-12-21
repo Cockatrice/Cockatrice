@@ -5,12 +5,13 @@
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
-    // This class will leak the decklist object. We cannot safely delete it in the dtor because the deckList field is a
-    // non-owning pointer and another deckList might have been assigned to it.
-    // `DeckListModel::cleanList` also leaks for the same reason.
-    // TODO: fix the leak
-    deckList = new DeckList;
+    deckList = QSharedPointer<DeckList>(new DeckList());
     root = new InnerDecklistNode;
+}
+
+DeckListModel::DeckListModel(QObject *parent, const QSharedPointer<DeckList> &deckList) : DeckListModel(parent)
+{
+    setDeckList(deckList);
 }
 
 DeckListModel::~DeckListModel()
@@ -580,13 +581,13 @@ void DeckListModel::setActiveFormat(const QString &_format)
 
 void DeckListModel::cleanList()
 {
-    setDeckList(new DeckList);
+    setDeckList(QSharedPointer<DeckList>(new DeckList()));
 }
 
 /**
  * @param _deck The deck.
  */
-void DeckListModel::setDeckList(DeckList *_deck)
+void DeckListModel::setDeckList(const QSharedPointer<DeckList> &_deck)
 {
     if (deckList != _deck) {
         deckList = _deck;
