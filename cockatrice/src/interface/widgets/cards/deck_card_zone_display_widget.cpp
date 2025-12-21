@@ -22,6 +22,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
       displayType(_displayType), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity),
       cardSizeWidget(_cardSizeWidget)
 {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
@@ -171,16 +172,6 @@ void DeckCardZoneDisplayWidget::onCategoryRemoval(const QModelIndex &parent, int
     }
 }
 
-void DeckCardZoneDisplayWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    for (QObject *child : layout->children()) {
-        QWidget *widget = qobject_cast<QWidget *>(child);
-        if (widget) {
-            widget->setMaximumWidth(width());
-        }
-    }
-}
 void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
 {
     emit cardClicked(event, card, zoneName);

@@ -175,6 +175,7 @@ void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     zoneContainer = new QWidget(scrollArea);
+    zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
     zoneContainer->setLayout(zoneContainerLayout);
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
