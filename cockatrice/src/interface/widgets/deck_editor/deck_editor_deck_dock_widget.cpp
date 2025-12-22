@@ -80,10 +80,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
     connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapSelection);
-    connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
-    connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrementSelection);
+    connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onCtrlAltMinus, this, &DeckEditorDeckDockWidget::actDecrementSelection);
-    connect(&deckViewKeySignals, &KeySignals::onShiftRight, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onShiftRight, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onShiftLeft, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onDelete, this, &DeckEditorDeckDockWidget::actRemoveCard);
 
@@ -181,7 +181,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
-    connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
@@ -582,7 +582,7 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
     return selectedRows;
 }
 
-void DeckEditorDeckDockWidget::actIncrement()
+void DeckEditorDeckDockWidget::actIncrementSelection()
 {
     auto selectedRows = getSelectedCardNodes();
 
