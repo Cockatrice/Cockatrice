@@ -213,7 +213,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
@@ -450,7 +450,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.make_package
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
@@ -458,7 +458,7 @@ jobs:
 
       - name: Upload pdb database
         if: matrix.os == 'Windows'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Windows${{matrix.target}}-debug-pdbs
           path: |
