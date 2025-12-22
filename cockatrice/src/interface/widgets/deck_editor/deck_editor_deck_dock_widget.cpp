@@ -76,14 +76,14 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(deckView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDeckDockWidget::updateCard);
-    connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapCard);
+    connect(deckView, &QTreeView::doubleClicked, this, &DeckEditorDeckDockWidget::actSwapSelection);
     deckView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(deckView, &QTreeView::customContextMenuRequested, this, &DeckEditorDeckDockWidget::decklistCustomMenu);
-    connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapCard);
-    connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrement);
-    connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onShiftS, this, &DeckEditorDeckDockWidget::actSwapSelection);
+    connect(&deckViewKeySignals, &KeySignals::onEnter, this, &DeckEditorDeckDockWidget::actIncrementSelection);
+    connect(&deckViewKeySignals, &KeySignals::onCtrlAltEqual, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onCtrlAltMinus, this, &DeckEditorDeckDockWidget::actDecrementSelection);
-    connect(&deckViewKeySignals, &KeySignals::onShiftRight, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(&deckViewKeySignals, &KeySignals::onShiftRight, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onShiftLeft, this, &DeckEditorDeckDockWidget::actDecrementSelection);
     connect(&deckViewKeySignals, &KeySignals::onDelete, this, &DeckEditorDeckDockWidget::actRemoveCard);
 
@@ -181,7 +181,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
-    connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrement);
+    connect(aIncrement, &QAction::triggered, this, &DeckEditorDeckDockWidget::actIncrementSelection);
     auto *tbIncrement = new QToolButton(this);
     tbIncrement->setDefaultAction(aIncrement);
 
@@ -199,7 +199,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     aSwapCard = new QAction(QString(), this);
     aSwapCard->setIcon(QPixmap("theme:icons/swap"));
-    connect(aSwapCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actSwapCard);
+    connect(aSwapCard, &QAction::triggered, this, &DeckEditorDeckDockWidget::actSwapSelection);
     auto *tbSwapCard = new QToolButton(this);
     tbSwapCard->setDefaultAction(aSwapCard);
 
@@ -582,7 +582,32 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
     return selectedRows;
 }
 
-void DeckEditorDeckDockWidget::actIncrement()
+void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &_zoneName)
+{
+    if (!card) {
+        return;
+    }
+
+    QString zoneName = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : _zoneName;
+
+    emit requestDeckHistorySave(tr("Added (%1): %2 (%3) %4")
+                                    .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
+                                         card.getPrinting().getProperty("num")));
+
+    QModelIndex newCardIndex = deckModel->addCard(card, zoneName);
+
+    if (!newCardIndex.isValid()) {
+        return;
+    }
+
+    expandAll();
+    deckView->clearSelection();
+    deckView->setCurrentIndex(newCardIndex);
+
+    emit deckModified();
+}
+
+void DeckEditorDeckDockWidget::actIncrementSelection()
 {
     auto selectedRows = getSelectedCardNodes();
 
@@ -591,7 +616,20 @@ void DeckEditorDeckDockWidget::actIncrement()
     }
 }
 
-void DeckEditorDeckDockWidget::actSwapCard()
+void DeckEditorDeckDockWidget::actSwapCard(const ExactCard &card, const QString &zoneName)
+{
+    QString providerId = card.getPrinting().getUuid();
+    QString collectorNumber = card.getPrinting().getProperty("num");
+
+    QModelIndex foundCard = deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    if (!foundCard.isValid()) {
+        foundCard = deckModel->findCard(card.getName(), zoneName);
+    }
+
+    swapCard(foundCard);
+}
+
+void DeckEditorDeckDockWidget::actSwapSelection()
 {
     auto selectedRows = getSelectedCardNodes();
 

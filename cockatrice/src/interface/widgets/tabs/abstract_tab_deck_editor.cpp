@@ -140,23 +140,9 @@ void AbstractTabDeckEditor::onDeckHistoryClearRequested()
  * @param card Card to add.
  * @param zoneName Zone to add the card to.
  */
-void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, QString zoneName)
+void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &zoneName)
 {
-    if (!card)
-        return;
-
-    if (card.getInfo().getIsToken())
-        zoneName = DECK_ZONE_TOKENS;
-
-    onDeckHistorySaveRequested(QString(tr("Added (%1): %2 (%3) %4"))
-                                   .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
-                                        card.getPrinting().getProperty("num")));
-
-    QModelIndex newCardIndex = deckDockWidget->deckModel->addCard(card, zoneName);
-    deckDockWidget->expandAll();
-    deckDockWidget->deckView->clearSelection();
-    deckDockWidget->deckView->setCurrentIndex(newCardIndex);
-    setModified(true);
+    deckDockWidget->actAddCard(card, zoneName);
 
     databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
 }
@@ -191,24 +177,6 @@ void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
 void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
 {
     emit decrementCard(card, DECK_ZONE_SIDE);
-}
-
-/**
- * @brief Swaps a card in a deck zone.
- * @param card Card to swap.
- * @param zoneName Zone to swap in.
- */
-void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zoneName)
-{
-    QString providerId = card.getPrinting().getUuid();
-    QString collectorNumber = card.getPrinting().getProperty("num");
-
-    QModelIndex foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
-    if (!foundCard.isValid()) {
-        foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
-    }
-
-    deckDockWidget->swapCard(foundCard);
 }
 
 /**
