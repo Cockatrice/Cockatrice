@@ -151,9 +151,10 @@ void CardAmountWidget::addPrinting(const QString &zone)
     bool replacingProviderless = false;
 
     if (existing.isValid()) {
-        QString providerId = deckModel->data(existing.sibling(existing.row(), 4), Qt::DisplayRole).toString();
+        QString providerId =
+            existing.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
         if (providerId.isEmpty()) {
-            int amount = deckModel->data(existing, Qt::DisplayRole).toInt();
+            int amount = existing.data(Qt::DisplayRole).toInt();
             extraCopies = amount - 1; // One less because we *always* add one
             replacingProviderless = true;
         }
@@ -177,9 +178,10 @@ void CardAmountWidget::addPrinting(const QString &zone)
     recursiveExpand(newCardIndex);
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
-    QString foundProviderId = deckModel->data(existing.sibling(existing.row(), 4), Qt::DisplayRole).toString();
+    QString foundProviderId =
+        existing.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
     if (existing.isValid() && existing != newCardIndex && foundProviderId == "") {
-        auto amount = deckModel->data(existing, Qt::DisplayRole);
+        auto amount = existing.data(Qt::DisplayRole);
         for (int i = 0; i < amount.toInt() - 1; i++) {
             deckModel->addCard(rootCard, zone);
         }
@@ -252,8 +254,8 @@ void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
         return;
     }
 
-    const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
-    const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+    const QModelIndex numberIndex = idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT);
+    const int count = numberIndex.data(Qt::EditRole).toInt();
     const int new_count = count + offset;
 
     deckView->setCurrentIndex(numberIndex);

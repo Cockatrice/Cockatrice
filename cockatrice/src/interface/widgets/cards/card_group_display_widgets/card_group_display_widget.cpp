@@ -91,8 +91,9 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     if (indexToWidgetMap.contains(index)) {
         return indexToWidgetMap[index];
     }
-    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
+    auto cardName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+    auto cardProviderId =
+        index.sibling(index.row(), DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::EditRole).toString();
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
@@ -114,7 +115,7 @@ void CardGroupDisplayWidget::updateCardDisplays()
 
     // This doesn't really matter since overwrite the whole lessThan function to just compare dynamically anyway.
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
     QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
