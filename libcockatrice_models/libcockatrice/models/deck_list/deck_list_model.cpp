@@ -561,6 +561,11 @@ void DeckListModel::setDeckList(DeckList *_deck)
     rebuildTree();
 }
 
+void DeckListModel::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+{
+    deckList->forEachCard(func);
+}
+
 static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
 {
     QList<ExactCard> cards;
@@ -598,6 +603,17 @@ QList<QString> DeckListModel::getCardNames() const
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(names), [](auto node) { return node->getName(); });
 
     return names;
+}
+
+QList<CardRef> DeckListModel::getCardRefs() const
+{
+    auto nodes = deckList->getCardNodes();
+
+    QList<CardRef> cardRefs;
+    std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(cardRefs),
+                   [](auto node) { return node->toCardRef(); });
+
+    return cardRefs;
 }
 
 QList<QString> DeckListModel::getZones() const
