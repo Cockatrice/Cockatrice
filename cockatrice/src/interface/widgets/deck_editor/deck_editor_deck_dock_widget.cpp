@@ -582,6 +582,31 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
     return selectedRows;
 }
 
+void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &_zoneName)
+{
+    if (!card) {
+        return;
+    }
+
+    QString zoneName = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : _zoneName;
+
+    emit requestDeckHistorySave(tr("Added (%1): %2 (%3) %4")
+                                    .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
+                                         card.getPrinting().getProperty("num")));
+
+    QModelIndex newCardIndex = deckModel->addCard(card, zoneName);
+
+    if (!newCardIndex.isValid()) {
+        return;
+    }
+
+    expandAll();
+    deckView->clearSelection();
+    deckView->setCurrentIndex(newCardIndex);
+
+    emit deckModified();
+}
+
 void DeckEditorDeckDockWidget::actIncrementSelection()
 {
     auto selectedRows = getSelectedCardNodes();

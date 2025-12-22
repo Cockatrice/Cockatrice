@@ -319,7 +319,7 @@ protected:
     bool isBlankNewDeck() const;
 
     /** @brief Helper function to add a card to a specific deck zone. */
-    void addCardHelper(const ExactCard &card, QString zoneName);
+    void addCardHelper(const ExactCard &card, const QString &zoneName);
 
     /** @brief Opens a deck from a file. */
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);

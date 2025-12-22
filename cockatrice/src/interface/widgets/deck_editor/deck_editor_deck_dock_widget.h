@@ -62,6 +62,7 @@ public slots:
     void sortDeckModelToDeckView();
     DeckLoader *getDeckLoader();
     const DeckList &getDeckList() const;
+    void actAddCard(const ExactCard &card, const QString &zoneName);
     void actIncrementSelection();
     void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
