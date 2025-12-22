@@ -642,7 +642,7 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
                                     // Third argument (true) says create the card no matter what, even if not in DB
                                     : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
-    recursiveExpand(proxy->mapToSource(newCardIndex));
+    recursiveExpand(proxy->mapFromSource(newCardIndex));
 
     return true;
 }
@@ -663,8 +663,18 @@ void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString z
     }
 
     deckView->clearSelection();
-    deckView->setCurrentIndex(proxy->mapToSource(idx));
-    offsetCountAtIndex(idx, -1);
+    setCurrentProxyIndex(idx);
+    offsetCountAtIndex(proxy->mapFromSource(idx), -1);
+}
+
+void DeckEditorDeckDockWidget::setCurrentProxyIndex(const QModelIndex &index)
+{
+    deckView->setCurrentIndex(proxy->mapFromSource(index));
+}
+
+void DeckEditorDeckDockWidget::scrollToProxyIndex(const QModelIndex &index)
+{
+    deckView->setCurrentIndex(proxy->mapFromSource(index));
 }
 
 void DeckEditorDeckDockWidget::actDecrementSelection()
