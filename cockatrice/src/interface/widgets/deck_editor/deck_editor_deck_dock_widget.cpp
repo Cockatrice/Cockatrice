@@ -527,9 +527,9 @@ DeckLoader *DeckEditorDeckDockWidget::getDeckLoader()
     return deckLoader;
 }
 
-DeckList *DeckEditorDeckDockWidget::getDeckList()
+const DeckList &DeckEditorDeckDockWidget::getDeckList() const
 {
-    return deckModel->getDeckList();
+    return *deckModel->getDeckList();
 }
 
 /**

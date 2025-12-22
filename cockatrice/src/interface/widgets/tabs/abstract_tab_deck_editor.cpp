@@ -124,7 +124,7 @@ void AbstractTabDeckEditor::onDeckModified()
  */
 void AbstractTabDeckEditor::onDeckHistorySaveRequested(const QString &modificationReason)
 {
-    historyManager->save(deckDockWidget->getDeckList()->createMemento(modificationReason));
+    historyManager->save(deckDockWidget->getDeckList().createMemento(modificationReason));
 }
 
 /**
@@ -231,7 +231,7 @@ void AbstractTabDeckEditor::openDeck(const LoadedDeck &deck)
 void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 {
     deckDockWidget->setDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList()->getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(getDeckList().getCardRefList()));
     setModified(false);
 
     aDeckDockVisible->setChecked(true);
@@ -245,7 +245,7 @@ DeckLoader *AbstractTabDeckEditor::getDeckLoader() const
 }
 
 /** @brief Returns the currently loaded deck list. */
-DeckList *AbstractTabDeckEditor::getDeckList() const
+const DeckList &AbstractTabDeckEditor::getDeckList() const
 {
     return deckDockWidget->getDeckList();
 }
@@ -446,7 +446,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(getDeckList()->getName().trimmed());
+    dialog.selectFile(getDeckList().getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -591,26 +591,21 @@ void AbstractTabDeckEditor::actLoadDeckFromWebsite()
  */
 void AbstractTabDeckEditor::exportToDecklistWebsite(DeckLoader::DecklistWebsite website)
 {
-    if (DeckList *deckList = getDeckList()) {
-        QString decklistUrlString = DeckLoader::exportDeckToDecklist(deckList, website);
-        // Check to make sure the string isn't empty.
-        if (decklistUrlString.isEmpty()) {
-            // Show an error if the deck is empty, and return.
-            QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
-            return;
-        }
-
-        // Encode the string recieved from the model to make sure all characters are encoded.
-        // first we put it into a qurl object
-        QUrl decklistUrl = QUrl(decklistUrlString);
-        // we get the correctly encoded url.
-        decklistUrlString = decklistUrl.toEncoded();
-        // We open the url in the user's default browser
-        QDesktopServices::openUrl(decklistUrlString);
-    } else {
-        // if there's no deck loader object, return an error
-        QMessageBox::critical(this, tr("Error"), tr("No deck was selected to be exported."));
+    QString decklistUrlString = DeckLoader::exportDeckToDecklist(getDeckList(), website);
+    // Check to make sure the string isn't empty.
+    if (decklistUrlString.isEmpty()) {
+        // Show an error if the deck is empty, and return.
+        QMessageBox::critical(this, tr("Error"), tr("There are no cards in your deck to be exported"));
+        return;
     }
+
+    // Encode the string recieved from the model to make sure all characters are encoded.
+    // first we put it into a qurl object
+    QUrl decklistUrl = QUrl(decklistUrlString);
+    // we get the correctly encoded url.
+    decklistUrlString = decklistUrl.toEncoded();
+    // We open the url in the user's default browser
+    QDesktopServices::openUrl(decklistUrlString);
 }
 
 /** @brief Exports deck to www.decklist.org. */

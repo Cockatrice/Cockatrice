@@ -30,14 +30,14 @@ private:
     QNetworkAccessManager *manager;
 
     CardDatabase &cardDatabase;
-    void copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard);
+    void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
     void queryFinished(QNetworkReply *reply);
-    void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
+    void getAnalyzeRequestData(const DeckList &deck, QByteArray &data);
 
 public:
     explicit TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
-    void analyzeDeck(DeckList *deck);
+    void analyzeDeck(const DeckList &deck);
 };
 
 #endif
