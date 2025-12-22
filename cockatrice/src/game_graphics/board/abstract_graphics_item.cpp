@@ -17,12 +17,7 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     font.setWeight(QFont::Bold);
 
     QFontMetrics fm(font);
-    double w = 1.3 *
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-               fm.horizontalAdvance(numStr);
-#else
-               fm.width(numStr);
-#endif
+    double w = 1.3 * fm.horizontalAdvance(numStr);
     double h = fm.height() * 1.3;
     if (w < h)
         w = h;

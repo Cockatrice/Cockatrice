@@ -21,9 +21,7 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     // We need a timeout to ensure requests don't hang indefinitely in case of
     // cache corruption, see related Qt bug: https://bugreports.qt.io/browse/QTBUG-111397
     // Use Qt's default timeout (30s, as of 2023-02-22)
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     networkManager->setTransferTimeout();
-#endif
     cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *

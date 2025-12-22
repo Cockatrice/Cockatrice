@@ -499,11 +499,7 @@ QString MainWindow::extractInvalidUsernameMessage(QString &in)
                 if (words.startsWith("\n")) {
                     out += tr("no unacceptable language as specified by these server rules:",
                               "note that the following lines will not be translated");
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
                     for (QString &line : words.split("\n", Qt::SkipEmptyParts)) {
-#else
-                    for (QString &line : words.split("\n", QString::SkipEmptyParts)) {
-#endif
                         out += "<li>" + line + "</li>";
                     }
                 } else {

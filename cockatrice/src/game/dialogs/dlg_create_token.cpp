@@ -117,11 +117,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
         chooseTokenFromDeckRadioButton->setDisabled(true); // No tokens in deck = no need for option
     } else {
         chooseTokenFromDeckRadioButton->setChecked(true);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>(predefinedTokens.begin(), predefinedTokens.end()));
-#else
-        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
-#endif
     }
 
     auto *tokenChooseLayout = new QVBoxLayout;
@@ -223,11 +219,7 @@ void DlgCreateToken::actChooseTokenFromAll(bool checked)
 void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 {
     if (checked) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>(predefinedTokens.begin(), predefinedTokens.end()));
-#else
-        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
-#endif
     }
 }
 
