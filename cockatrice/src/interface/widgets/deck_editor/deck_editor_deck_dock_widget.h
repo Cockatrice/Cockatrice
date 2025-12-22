@@ -63,12 +63,11 @@ public slots:
     DeckLoader *getDeckLoader();
     const DeckList &getDeckList() const;
     void actIncrement();
-    bool swapCard(const QModelIndex &idx);
     void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
-    void actSwapCard();
+    void actSwapCard(const ExactCard &card, const QString &zoneName);
+    void actSwapSelection();
     void actRemoveCard();
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void initializeFormats();
     void expandAll();
 
@@ -108,9 +107,11 @@ private:
 
     void recursiveExpand(const QModelIndex &index);
     [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
+    void offsetCountAtIndex(const QModelIndex &idx, int offset);
 
 private slots:
     void decklistCustomMenu(QPoint point);
+    bool swapCard(const QModelIndex &currentIndex);
     void updateCard(QModelIndex, const QModelIndex &current);
     void updateName(const QString &name);
     void updateComments();

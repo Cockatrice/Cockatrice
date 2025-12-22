@@ -194,24 +194,6 @@ void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
 }
 
 /**
- * @brief Swaps a card in a deck zone.
- * @param card Card to swap.
- * @param zoneName Zone to swap in.
- */
-void AbstractTabDeckEditor::actSwapCard(const ExactCard &card, const QString &zoneName)
-{
-    QString providerId = card.getPrinting().getUuid();
-    QString collectorNumber = card.getPrinting().getProperty("num");
-
-    QModelIndex foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
-    if (!foundCard.isValid()) {
-        foundCard = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
-    }
-
-    deckDockWidget->swapCard(foundCard);
-}
-
-/**
  * @brief Opens a deck in this tab.
  * @param deck The deck
  */

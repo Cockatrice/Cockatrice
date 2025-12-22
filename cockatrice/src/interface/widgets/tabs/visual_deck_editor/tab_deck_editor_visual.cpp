@@ -191,7 +191,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 
     // Double click = swap
     if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton) {
-        actSwapCard(card, zoneName);
+        deckDockWidget->actSwapCard(card, zoneName);
         idx = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
         sel->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
         return;
