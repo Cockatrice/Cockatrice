@@ -123,6 +123,7 @@ private slots:
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
     void recursiveExpand(const QModelIndex &parent);
+    void expandAll();
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H

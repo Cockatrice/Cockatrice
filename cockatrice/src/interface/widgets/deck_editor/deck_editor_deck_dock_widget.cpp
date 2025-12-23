@@ -156,6 +156,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
         // Delay the update to avoid race conditions
         QTimer::singleShot(100, this, &DeckEditorDeckDockWidget::updateBannerCardComboBox);
     });
+    connect(deckModel, &DeckListModel::cardAddedAt, this, &DeckEditorDeckDockWidget::recursiveExpand);
+    connect(deckModel, &DeckListModel::deckReplaced, this, &DeckEditorDeckDockWidget::expandAll);
+
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::setBannerCard);
     bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
@@ -557,6 +560,14 @@ void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &sourceIndex)
         index = index.parent();
         deckView->expand(index);
     }
+}
+
+/**
+ * @brief Fully expands all levels of the deck view
+ */
+void DeckEditorDeckDockWidget::expandAll()
+{
+    deckView->expandRecursively(deckView->rootIndex());
 }
 
 /**
