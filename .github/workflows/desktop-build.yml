@@ -260,7 +260,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS13_Intel"
             artifact_name: macOS13_Intel-package
-            qt_version: 6.6.3
+            qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -275,7 +275,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS14"
             artifact_name: macOS14-package
-            qt_version: 6.6.3
+            qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -290,7 +290,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS15"
             artifact_name: macOS15-package
-            qt_version: 6.6.3
+            qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -302,7 +302,7 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.6.3
+            qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -327,7 +327,7 @@ jobs:
             make_package: 1
             package_suffix: "-Win10"
             artifact_name: Windows10-installer
-            qt_version: 6.6.3
+            qt_version: 6.6.*
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
@@ -381,19 +381,9 @@ jobs:
           modules: ${{matrix.qt_modules}}
           dir: ${{github.workspace}}
 
-      # the binaries from aqt are fat (universal), so we thin them to the target architecture to reduce the size of the packages and caches
       - name: Thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-        run: |
-          export ARCH=$(uname -m)
-          export NPROC=$(sysctl -n hw.ncpu)
-          echo "::group::Thinning Qt libraries to $ARCH using $NPROC cores"
-          find ${{ github.workspace }}/Qt -type f -print0 | \
-            xargs -0 -n1 -P "$NPROC" sh -c \
-              'file -b --mime-type "$0" | grep -q "application/x-mach-binary" && \
-                echo "Processing $0" && \
-                lipo "$0" -thin "$ARCH" -output "$0" || true'
-          echo "::endgroup::"
+        run: .ci/thin_macos_qtlib.sh
 
       - name: Cache thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
@@ -437,8 +427,6 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action, which sets a few environment variables
-          QTDIR: ${{ matrix.os == 'macOS' && format('{0}/Qt/{1}/macos', github.workspace, matrix.qt_version) || '' }}
         run: .ci/compile.sh --server --test --vcpkg
 
       - name: Sign app bundle

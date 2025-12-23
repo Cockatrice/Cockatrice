@@ -156,6 +156,18 @@ function ccachestatsverbose() {
 
 # Compile
 if [[ $RUNNER_OS == macOS ]]; then
+  # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
+  # which sets a few environment variables
+  if QTDIR=$(find "$GITHUB_WORKSPACE/Qt" -depth -maxdepth 2 -name macos -type d -print -quit); then
+    echo "found QTDIR at $QTDIR"
+  else
+    echo "could not find QTDIR!"
+    exit 2
+  fi
+  # the qtdir is located at Qt/[qtversion]/macos
+  # we use find to get the first subfolder with the name "macos"
+  # this works independent of the qt version as there should be only one version installed on the runner at a time
+  export QTDIR
 
   if [[ $TARGET_MACOS_VERSION ]]; then
     # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
