@@ -175,7 +175,6 @@ void CardAmountWidget::addPrinting(const QString &zone)
 
     // Add the card and expand the list UI
     auto newCardIndex = deckModel->addCard(rootCard, zone);
-    recursiveExpand(newCardIndex);
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
     QString foundProviderId =
@@ -227,19 +226,6 @@ void CardAmountWidget::removePrintingMainboard()
 void CardAmountWidget::removePrintingSideboard()
 {
     decrementCardHelper(DECK_ZONE_SIDE);
-}
-
-/**
- * @brief Recursively expands the card in the deck view starting from the given index.
- *
- * @param index The model index of the card to expand.
- */
-void CardAmountWidget::recursiveExpand(const QModelIndex &index)
-{
-    if (index.parent().isValid()) {
-        recursiveExpand(index.parent());
-    }
-    deckView->expand(index);
 }
 
 /**

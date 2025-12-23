@@ -175,8 +175,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
         deckModel->setActiveGroupCriteria(static_cast<DeckListModelGroupCriteria::Type>(
             activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
         deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
-        deckView->expandAll();
-        deckView->expandAll();
     });
 
     aIncrement = new QAction(QString(), this);
@@ -506,7 +504,6 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     bannerCardComboBox->blockSignals(false);
     updateHash();
     sortDeckModelToDeckView();
-    expandAll();
 
     deckTagsDisplayWidget->setTags(deckModel->getDeckList()->getTags());
 }
@@ -516,8 +513,6 @@ void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
     deckModel->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
     deckModel->setActiveFormat(deckModel->getDeckList()->getGameFormat());
     formatComboBox->setCurrentIndex(formatComboBox->findData(deckModel->getDeckList()->getGameFormat()));
-    deckView->expandAll();
-    deckView->expandAll();
 
     emit deckChanged();
 }
@@ -557,12 +552,6 @@ void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)
     deckView->expand(index);
 }
 
-void DeckEditorDeckDockWidget::expandAll()
-{
-    deckView->expandAll();
-    deckView->expandAll();
-}
-
 /**
  * Gets the index of all the currently selected card nodes in the decklist table.
  * The list is in reverse order of the visual selection, so that rows can be deleted while iterating over them.
@@ -600,7 +589,6 @@ void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &
         return;
     }
 
-    expandAll();
     deckView->clearSelection();
     deckView->setCurrentIndex(newCardIndex);
 
@@ -677,11 +665,12 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
-    ExactCard card = CardDatabaseManager::query()->getCard({cardName, cardProviderID});
-    QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
-                                    // Third argument (true) says create the card no matter what, even if not in DB
-                                    : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
-    recursiveExpand(proxy->mapFromSource(newCardIndex));
+    if (ExactCard card = CardDatabaseManager::query()->getCard({cardName, cardProviderID})) {
+        deckModel->addCard(card, otherZoneName);
+    } else {
+        // Third argument (true) says create the card no matter what, even if not in DB
+        deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
+    }
 
     return true;
 }

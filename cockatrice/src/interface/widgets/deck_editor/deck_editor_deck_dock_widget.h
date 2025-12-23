@@ -70,7 +70,6 @@ public slots:
     void actSwapSelection();
     void actRemoveCard();
     void initializeFormats();
-    void expandAll();
 
 signals:
     void nameChanged();
