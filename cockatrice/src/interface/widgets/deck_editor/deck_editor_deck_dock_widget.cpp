@@ -545,11 +545,18 @@ void DeckEditorDeckDockWidget::cleanDeck()
     deckTagsDisplayWidget->setTags(deckModel->getDeckList()->getTags());
 }
 
-void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &index)
+/**
+ * @brief Expands all parents of the given index.
+ * @param sourceIndex The index to expand (model source index)
+ */
+void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &sourceIndex)
 {
-    if (index.parent().isValid())
-        recursiveExpand(index.parent());
-    deckView->expand(index);
+    auto index = proxy->mapFromSource(sourceIndex);
+
+    while (index.parent().isValid()) {
+        index = index.parent();
+        deckView->expand(index);
+    }
 }
 
 /**
