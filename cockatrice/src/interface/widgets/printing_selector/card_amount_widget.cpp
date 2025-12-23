@@ -175,7 +175,6 @@ void CardAmountWidget::addPrinting(const QString &zone)
 
     // Add the card and expand the list UI
     auto newCardIndex = deckModel->addCard(rootCard, zone);
-    recursiveExpand(newCardIndex);
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
     QString foundProviderId =
@@ -230,46 +229,6 @@ void CardAmountWidget::removePrintingSideboard()
 }
 
 /**
- * @brief Recursively expands the card in the deck view starting from the given index.
- *
- * @param index The model index of the card to expand.
- */
-void CardAmountWidget::recursiveExpand(const QModelIndex &index)
-{
-    if (index.parent().isValid()) {
-        recursiveExpand(index.parent());
-    }
-    deckView->expand(index);
-}
-
-/**
- * @brief Offsets the card count at the specified index by the given amount.
- *
- * @param idx The model index of the card.
- * @param offset The amount to add or subtract from the card count.
- */
-void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
-{
-    if (!idx.isValid() || offset == 0) {
-        return;
-    }
-
-    const QModelIndex numberIndex = idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT);
-    const int count = numberIndex.data(Qt::EditRole).toInt();
-    const int new_count = count + offset;
-
-    deckView->setCurrentIndex(numberIndex);
-
-    if (new_count <= 0) {
-        deckModel->removeRow(idx.row(), idx.parent());
-    } else {
-        deckModel->setData(numberIndex, new_count, Qt::EditRole);
-    }
-
-    deckEditor->setModified(true);
-}
-
-/**
  * @brief Helper function to decrement the card count for a given zone.
  *
  * @param zone The zone from which to remove the card (DECK_ZONE_MAIN or DECK_ZONE_SIDE).
@@ -288,7 +247,7 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
     QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
                                           rootCard.getPrinting().getProperty("num"));
 
-    offsetCountAtIndex(idx, -1);
+    deckModel->decrementAmountAtIndex(idx);
     deckEditor->setModified(true);
 }
 

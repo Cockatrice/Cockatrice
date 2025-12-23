@@ -57,9 +57,7 @@ private:
 
     bool hovered;
 
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(const QString &zoneName);
-    void recursiveExpand(const QModelIndex &index);
 
 private slots:
     void addPrintingMainboard();
