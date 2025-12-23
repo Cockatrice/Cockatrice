@@ -106,7 +106,7 @@ private:
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
 private slots:
     void decklistCustomMenu(QPoint point);
@@ -122,7 +122,7 @@ private slots:
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
-    void recursiveExpand(const QModelIndex &sourceIndex);
+    void recursiveExpand(const QModelIndex &parent);
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H

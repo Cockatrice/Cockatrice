@@ -436,7 +436,51 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     }
     sort(lastKnownColumn, lastKnownOrder);
     emitRecursiveUpdates(parentIndex);
-    return nodeToIndex(cardNode);
+    auto index = nodeToIndex(cardNode);
+
+    emit cardAddedAt(index);
+
+    return index;
+}
+
+bool DeckListModel::incrementAmountAtIndex(const QModelIndex &idx)
+{
+    return offsetAmountAtIndex(idx, 1);
+}
+
+bool DeckListModel::decrementAmountAtIndex(const QModelIndex &idx)
+{
+    return offsetAmountAtIndex(idx, -1);
+}
+
+bool DeckListModel::offsetAmountAtIndex(const QModelIndex &idx, int offset)
+{
+    if (!idx.isValid()) {
+        return false;
+    }
+
+    auto *node = static_cast<AbstractDecklistNode *>(idx.internalPointer());
+    auto *card = dynamic_cast<DecklistModelCardNode *>(node);
+
+    if (!card) {
+        return false;
+    }
+
+    const QModelIndex numberIndex = idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT);
+    const int count = numberIndex.data(Qt::EditRole).toInt();
+    const int newCount = count + offset;
+
+    if (newCount <= 0) {
+        removeRow(idx.row(), idx.parent());
+    } else {
+        setData(numberIndex, newCount, Qt::EditRole);
+    }
+
+    if (offset > 0) {
+        emit cardAddedAt(idx);
+    }
+
+    return true;
 }
 
 int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const
@@ -559,6 +603,7 @@ void DeckListModel::setDeckList(DeckList *_deck)
         deckList = _deck;
     }
     rebuildTree();
+    emit deckReplaced();
 }
 
 void DeckListModel::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)

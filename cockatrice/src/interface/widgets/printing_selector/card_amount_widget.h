@@ -57,7 +57,6 @@ private:
 
     bool hovered;
 
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(const QString &zoneName);
 
 private slots:
