@@ -236,11 +236,7 @@ void ChatView::appendMessage(QString message,
     cursor.setCharFormat(defaultFormat);
 
     bool mentionEnabled = SettingsCache::instance().getChatMention();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     highlightedWords = SettingsCache::instance().getHighlightWords().split(' ', Qt::SkipEmptyParts);
-#else
-    highlightedWords = SettingsCache::instance().getHighlightWords().split(' ', QString::SkipEmptyParts);
-#endif
 
     // parse the message
     while (message.size()) {

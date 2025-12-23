@@ -63,11 +63,7 @@ void Server_CardZone::shuffle(int start, int end)
 
     for (int i = end; i > start; i--) {
         int j = rng->rand(start, i);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
         cards.swapItemsAt(j, i);
-#else
-        cards.swap(j, i);
-#endif
     }
     playersWithWritePermission.clear();
 }

@@ -328,11 +328,7 @@ QMap<QString, int> CardDatabaseQuerier::getAllSubCardTypesWithCount() const
         QStringList parts = type.split(" — ");
 
         if (parts.size() > 1) { // Ensure there are subtypes
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
             QStringList subtypes = parts[1].split(" ", Qt::SkipEmptyParts);
-#else
-            QStringList subtypes = parts[1].split(" ", QString::SkipEmptyParts);
-#endif
 
             for (const QString &subtype : subtypes) {
                 typeCounts[subtype]++;

@@ -57,11 +57,7 @@ void ServerLogger::logMessage(const QString &message, void *caller)
     // filter out all log entries based on values in configuration file
     bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
     QString logFilters = settingsCache->value("server/logfilters").toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList listlogFilters = logFilters.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList listlogFilters = logFilters.split(",", QString::SkipEmptyParts);
-#endif
     bool shouldWeSkipLine = false;
 
     if (!shouldWeWriteLog)

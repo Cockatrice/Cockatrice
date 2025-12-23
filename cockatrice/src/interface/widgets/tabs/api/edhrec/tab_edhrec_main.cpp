@@ -37,10 +37,7 @@ static bool canBeCommander(const CardInfoPtr &cardInfo)
 TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor)
 {
     networkManager = new QNetworkAccessManager(this);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     networkManager->setTransferTimeout(); // Use Qt's default timeout
-#endif
-
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
     connect(networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(processApiJson(QNetworkReply *)));
 

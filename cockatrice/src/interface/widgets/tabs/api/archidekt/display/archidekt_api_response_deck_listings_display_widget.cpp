@@ -16,10 +16,7 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
 
     imageNetworkManager = new QNetworkAccessManager(this);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     imageNetworkManager->setTransferTimeout(); // Use Qt's default timeout
-#endif
-
     imageNetworkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
     // Add widgets for deck listings

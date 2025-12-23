@@ -73,11 +73,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
       shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
       firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
-#else
-      gameMutex(QMutex::Recursive)
-#endif
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
