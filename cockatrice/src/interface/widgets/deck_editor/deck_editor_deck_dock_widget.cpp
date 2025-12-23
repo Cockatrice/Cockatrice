@@ -681,7 +681,7 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
     QModelIndex newCardIndex = card ? deckModel->addCard(card, otherZoneName)
                                     // Third argument (true) says create the card no matter what, even if not in DB
                                     : deckModel->addPreferredPrintingCard(cardName, otherZoneName, true);
-    recursiveExpand(proxy->mapToSource(newCardIndex));
+    recursiveExpand(proxy->mapFromSource(newCardIndex));
 
     return true;
 }
