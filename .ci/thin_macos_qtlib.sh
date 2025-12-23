@@ -9,14 +9,15 @@ arch=$(uname -m)
 nproc=$(sysctl -n hw.ncpu)
 
 function thin() {
-  local libfile=$0
-  if file -b --mime-type "$libfile" | grep -q "application/x-mach-binary"; then
+  local libfile=$1
+  if [[ $(file -b --mime-type "$libfile") == application/x-mach-binary ]]; then
     echo "Processing $libfile"
     lipo "$libfile" -thin "$arch" -output "$libfile"
   fi
   return 0
 }
 export -f thin  # export to allow use in xargs
+export arch
 
 echo "::group::Thinning Qt libraries to $arch using $nproc cores"
 find "$GITHUB_WORKSPACE/Qt" -type f -print0 | xargs -0 -n1 -P"$nproc" -I{} bash -c "thin '{}'"
