@@ -319,17 +319,17 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     QModelIndex current = deckView->selectionModel()->currentIndex();
     if (!current.isValid())
         return {};
-    const QString cardName = current.sibling(current.row(), 1).data().toString();
-    const QString cardProviderID = current.sibling(current.row(), 4).data().toString();
+    const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    const QString cardProviderID = current.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = current.parent().parent();
 
     if (!gparent.isValid()) {
         return {};
     }
 
-    const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
+    const QString zoneName = gparent.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
 
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+    if (!current.model()->hasChildren(current.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT))) {
         if (ExactCard selectedCard = CardDatabaseManager::query()->getCard({cardName, cardProviderID})) {
             return selectedCard;
         }
@@ -665,14 +665,15 @@ bool DeckEditorDeckDockWidget::swapCard(const QModelIndex &currentIndex)
 {
     if (!currentIndex.isValid())
         return false;
-    const QString cardName = currentIndex.sibling(currentIndex.row(), 1).data().toString();
-    const QString cardProviderID = currentIndex.sibling(currentIndex.row(), 4).data().toString();
+    const QString cardName = currentIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    const QString cardProviderID =
+        currentIndex.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = currentIndex.parent().parent();
 
     if (!gparent.isValid())
         return false;
 
-    const QString zoneName = gparent.sibling(gparent.row(), 1).data(Qt::EditRole).toString();
+    const QString zoneName = gparent.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     offsetCountAtIndex(currentIndex, -1);
     const QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
@@ -738,7 +739,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
             continue;
         }
         QModelIndex sourceIndex = proxy->mapToSource(index);
-        QString cardName = sourceIndex.sibling(sourceIndex.row(), 1).data().toString();
+        QString cardName = sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
 
         emit requestDeckHistorySave(QString(tr("Removed \"%1\" (all copies)")).arg(cardName));
 
@@ -761,11 +762,11 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
 
     QModelIndex sourceIndex = proxy->mapToSource(idx);
 
-    const QModelIndex numberIndex = sourceIndex.sibling(sourceIndex.row(), 0);
-    const QModelIndex nameIndex = sourceIndex.sibling(sourceIndex.row(), 1);
+    const QModelIndex numberIndex = sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT);
+    const QModelIndex nameIndex = sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME);
 
-    const QString cardName = deckModel->data(nameIndex, Qt::EditRole).toString();
-    const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
+    const QString cardName = nameIndex.data(Qt::EditRole).toString();
+    const int count = numberIndex.data(Qt::EditRole).toInt();
     const int new_count = count + offset;
 
     const auto reason =
@@ -773,7 +774,7 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, int of
             .arg(offset > 0 ? tr("Added") : tr("Removed"))
             .arg(qAbs(offset))
             .arg(cardName)
-            .arg(deckModel->data(sourceIndex.sibling(sourceIndex.row(), 4), Qt::DisplayRole).toString());
+            .arg(sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString());
 
     emit requestDeckHistorySave(reason);
 

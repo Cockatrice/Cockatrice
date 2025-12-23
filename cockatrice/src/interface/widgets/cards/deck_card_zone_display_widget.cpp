@@ -82,10 +82,11 @@ void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *
 
 void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
 {
-    auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     if (indexToWidgetMap.contains(index)) {
         return;
     }
+
+    auto categoryName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     if (displayType == DisplayType::Overlap) {
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, selectionModel, index, zoneName, categoryName, activeGroupCriteria,
@@ -120,7 +121,7 @@ void DeckCardZoneDisplayWidget::displayCards()
     QSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
     QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
