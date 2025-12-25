@@ -342,6 +342,8 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    env:
+      CACHE: ${{github.workspace}}/.cache/
 
     steps:
       - name: Checkout
@@ -356,16 +358,16 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      # Using jianmingyong/ccache-action to setup ccache without using brew
-      # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
-      - name: Setup ccache
+      - name: Restore compiler cache (ccache)
         if: matrix.use_ccache == 1
-        uses: jianmingyong/ccache-action@v1
+        id: ccache_restore
+        uses: actions/cache/restore@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          install-type: "binary"
-          ccache-key-prefix: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
-          max-size: 500M
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{env.CACHE}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
+          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
@@ -402,6 +404,13 @@ jobs:
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{env.CACHE}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
