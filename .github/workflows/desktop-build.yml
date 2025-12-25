@@ -343,7 +343,7 @@ jobs:
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
-      CACHE: ${{github.workspace}}/.cache/
+      CCACHE_DIR: ${{github.workspace}}/.cache/
 
     steps:
       - name: Checkout
@@ -369,9 +369,9 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CACHE}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
 
       - name: Install Qt ${{matrix.qt_version}}
         uses: jurplel/install-qt-action@v4
@@ -410,11 +410,13 @@ jobs:
         run: .ci/compile.sh --server --test --vcpkg
 
       - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
         uses: actions/cache/save@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CACHE}}
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
