@@ -263,7 +263,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false # qt caches take too much space for macOS (1.1Gi)
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -279,7 +278,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -295,7 +293,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -308,7 +305,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -321,7 +317,6 @@ jobs:
             artifact_name: Windows7-installer
             qt_version: 5.15.*
             qt_arch: win64_msvc2019_64
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
@@ -335,7 +330,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
@@ -367,13 +361,45 @@ jobs:
           max-size: 500M
           gh-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Qt ${{matrix.qt_version}}
+      - name: Restore thin Qt ${{matrix.qt_version}} libraries
+        if: matrix.os == 'macOS'
+        id: restore_qt
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
+
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
+      - name: Install fat Qt ${{matrix.qt_version}} (macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false
+          version: ${{matrix.qt_version}}
+          arch: ${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
+          dir: ${{github.workspace}}
+
+      - name: Thin Qt ${{matrix.qt_version}} libraries
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        run: .ci/thin_macos_qtlib.sh
+
+      - name: Cache thin Qt ${{matrix.qt_version}} libraries
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
+
+      - name: Install Qt ${{matrix.qt_version}} (Windows)
+        if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{matrix.qt_version}}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
-          cache: ${{matrix.cache_qt}}
+          cache: true
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
