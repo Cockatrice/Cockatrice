@@ -20,11 +20,11 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                      AbstractTabDeckEditor *_deckEditor,
-                                      DeckListModel *_deckModel,
-                                      QTreeView *_deckView,
-                                      QSlider *_cardSizeSlider,
-                                      const ExactCard &_rootCard);
+                                      AbstractTabDeckEditor *deckEditor,
+                                      DeckListModel *deckModel,
+                                      QTreeView *deckView,
+                                      QSlider *cardSizeSlider,
+                                      const ExactCard &rootCard);
 
 public slots:
     void clampSetNameToPicture();
@@ -35,11 +35,6 @@ signals:
 private:
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
-    AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
-    QSlider *cardSizeSlider;
-    ExactCard rootCard;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };
 

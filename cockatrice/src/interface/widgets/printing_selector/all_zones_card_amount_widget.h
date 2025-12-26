@@ -36,11 +36,7 @@ public slots:
 
 private:
     QVBoxLayout *layout;
-    AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
     QSlider *cardSizeSlider;
-    ExactCard rootCard;
     QLabel *zoneLabelMainboard;
     CardAmountWidget *buttonBoxMainboard;
     QLabel *zoneLabelSideboard;

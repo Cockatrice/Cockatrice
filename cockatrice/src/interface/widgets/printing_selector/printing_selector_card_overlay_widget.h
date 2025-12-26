@@ -48,9 +48,6 @@ private:
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
     QLabel *pinBadge = nullptr;
     AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
-    QSlider *cardSizeSlider;
     ExactCard rootCard;
 };
 
