@@ -42,8 +42,8 @@ PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(Printin
  */
 void PrintingSelectorCardSelectionWidget::connectSignals()
 {
-    connect(previousCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectPreviousCard);
-    connect(nextCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectNextCard);
+    connect(previousCardButton, &QPushButton::clicked, parent, &PrintingSelector::prevCardRequested);
+    connect(nextCardButton, &QPushButton::clicked, parent, &PrintingSelector::nextCardRequested);
 }
 
 void PrintingSelectorCardSelectionWidget::selectSetForCards()

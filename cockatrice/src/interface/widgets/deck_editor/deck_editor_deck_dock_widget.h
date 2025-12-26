@@ -56,6 +56,8 @@ public:
 
 public slots:
     void cleanDeck();
+    void selectPrevCard();
+    void selectNextCard();
     void updateBannerCardComboBox();
     void setDeck(const LoadedDeck &_deck);
     void syncDisplayWidgetsToModel();
@@ -122,6 +124,7 @@ private slots:
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
+    void changeSelectedCard(int changeBy);
     void recursiveExpand(const QModelIndex &parent);
     void expandAll();
 };
