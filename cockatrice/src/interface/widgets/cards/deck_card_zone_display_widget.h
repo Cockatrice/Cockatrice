@@ -40,7 +40,6 @@ public:
     QPersistentModelIndex trackedIndex;
     QString zoneName;
     void addCardsToOverlapWidget();
-    void resizeEvent(QResizeEvent *event) override;
 
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
@@ -51,7 +50,6 @@ public slots:
     void refreshDisplayType(const DisplayType &displayType);
     void onActiveGroupCriteriaChanged(QString activeGroupCriteria);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
-    QList<QString> getGroupCriteriaValueList();
     void onCategoryAddition(const QModelIndex &parent, int first, int last);
     void onCategoryRemoval(const QModelIndex &parent, int first, int last);
 
