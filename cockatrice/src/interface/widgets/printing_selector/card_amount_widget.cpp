@@ -147,13 +147,15 @@ void CardAmountWidget::addPrinting(const QString &zone)
     int addedCount = 1;
     // Check if we will need to add extra copies due to replacing copies without providerIds
     QModelIndex existing = deckModel->findCard(rootCard.getName(), zone);
+
+    QString foundProviderId;
     int extraCopies = 0;
     bool replacingProviderless = false;
 
     if (existing.isValid()) {
-        QString providerId =
+        foundProviderId =
             existing.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
-        if (providerId.isEmpty()) {
+        if (foundProviderId.isEmpty()) {
             int amount = existing.data(Qt::DisplayRole).toInt();
             extraCopies = amount - 1; // One less because we *always* add one
             replacingProviderless = true;
@@ -177,11 +179,8 @@ void CardAmountWidget::addPrinting(const QString &zone)
     auto newCardIndex = deckModel->addCard(rootCard, zone);
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
-    QString foundProviderId =
-        existing.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
     if (existing.isValid() && existing != newCardIndex && foundProviderId == "") {
-        auto amount = existing.data(Qt::DisplayRole);
-        for (int i = 0; i < amount.toInt() - 1; i++) {
+        for (int i = 0; i < extraCopies; i++) {
             deckModel->addCard(rootCard, zone);
         }
         deckModel->removeRow(existing.row(), existing.parent());
@@ -259,22 +258,14 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
  */
 int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
-    if (rootCard.getPrinting().getUuid().isEmpty()) {
-        return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
-    }
+    QString uuid = rootCard.getPrinting().getUuid();
 
-    if (!deckModel) {
-        return -1;
+    if (uuid.isEmpty()) {
+        return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
     }
 
     QList<ExactCard> cards = deckModel->getCardsForZone(deckZone);
 
-    int count = 0;
-    for (auto currentCard : cards) {
-        if (currentCard.getPrinting().getUuid() == rootCard.getPrinting().getProperty("uuid")) {
-            count++;
-        }
-    }
-
-    return count;
+    return std::count_if(cards.cbegin(), cards.cend(),
+                         [&uuid](const ExactCard &card) { return card.getPrinting().getUuid() == uuid; });
 }
