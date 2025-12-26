@@ -27,7 +27,7 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *pa
     layout->addWidget(text, 0, Qt::AlignCenter);
     setLayout(layout);
 
-    setFrameStyle(QFrame::Panel | QFrame::Raised);
+    setFrameStyle(static_cast<int>(QFrame::Panel) | QFrame::Raised);
 
     int pixmapHeight = QGuiApplication::primaryScreen()->geometry().height() / 3;
     int pixmapWidth = static_cast<int>(pixmapHeight / aspectRatio);
