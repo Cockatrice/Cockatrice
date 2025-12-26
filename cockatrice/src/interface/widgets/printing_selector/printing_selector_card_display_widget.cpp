@@ -22,17 +22,15 @@
  * @param _deckView The QTreeView instance displaying the deck.
  * @param _cardSizeSlider The slider controlling the size of the displayed card.
  * @param _rootCard The root card object, representing the card to be displayed.
- * @param _currentZone The current zone in which the card is located.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *_deckEditor,
                                                                      DeckListModel *_deckModel,
                                                                      QTreeView *_deckView,
                                                                      QSlider *_cardSizeSlider,
-                                                                     const ExactCard &_rootCard,
-                                                                     QString &_currentZone)
+                                                                     const ExactCard &_rootCard)
     : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(_rootCard), currentZone(_currentZone)
+      cardSizeSlider(_cardSizeSlider), rootCard(_rootCard)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);

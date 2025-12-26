@@ -24,8 +24,7 @@ public:
                                       DeckListModel *_deckModel,
                                       QTreeView *_deckView,
                                       QSlider *_cardSizeSlider,
-                                      const ExactCard &_rootCard,
-                                      QString &_currentZone);
+                                      const ExactCard &_rootCard);
 
 public slots:
     void clampSetNameToPicture();
@@ -41,7 +40,6 @@ private:
     QTreeView *deckView;
     QSlider *cardSizeSlider;
     ExactCard rootCard;
-    QString currentZone;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };
 

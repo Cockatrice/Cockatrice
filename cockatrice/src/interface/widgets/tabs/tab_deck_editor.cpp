@@ -158,8 +158,7 @@ void TabDeckEditor::refreshShortcuts()
  */
 void TabDeckEditor::showPrintingSelector()
 {
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr(),
-                                                          DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
     aPrintingSelectorDockVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);
