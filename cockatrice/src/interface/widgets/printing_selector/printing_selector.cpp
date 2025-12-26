@@ -139,58 +139,6 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
 }
 
 /**
- * @brief Selects the previous card in the list.
- */
-void PrintingSelector::selectPreviousCard()
-{
-    selectCard(-1);
-}
-
-/**
- * @brief Selects the next card in the list.
- */
-void PrintingSelector::selectNextCard()
-{
-    selectCard(1);
-}
-
-/**
- * @brief Selects a card based on the change direction.
- *
- * @param changeBy The direction to change, -1 for previous, 1 for next.
- */
-void PrintingSelector::selectCard(const int changeBy)
-{
-    if (changeBy == 0) {
-        return;
-    }
-
-    // Get the current index of the selected item
-    auto deckViewCurrentIndex = deckView->currentIndex();
-
-    auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
-    if (!nextIndex.isValid()) {
-        nextIndex = deckViewCurrentIndex;
-
-        // Increment to the next valid index, skipping header rows
-        AbstractDecklistNode *node;
-        do {
-            if (changeBy > 0) {
-                nextIndex = deckView->indexBelow(nextIndex);
-            } else {
-                nextIndex = deckView->indexAbove(nextIndex);
-            }
-            node = static_cast<AbstractDecklistNode *>(nextIndex.internalPointer());
-        } while (node && node->isDeckHeader());
-    }
-
-    if (nextIndex.isValid()) {
-        deckView->setCurrentIndex(nextIndex);
-        deckView->setFocus(Qt::FocusReason::MouseFocusReason);
-    }
-}
-
-/**
  * @brief Loads and displays all sets for the current selected card.
  */
 void PrintingSelector::getAllSetsForCurrentCard()

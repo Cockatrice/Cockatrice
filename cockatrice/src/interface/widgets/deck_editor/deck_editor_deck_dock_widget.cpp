@@ -548,6 +548,52 @@ void DeckEditorDeckDockWidget::cleanDeck()
     deckTagsDisplayWidget->setTags(deckModel->getDeckList()->getTags());
 }
 
+void DeckEditorDeckDockWidget::selectPrevCard()
+{
+    changeSelectedCard(-1);
+}
+
+void DeckEditorDeckDockWidget::selectNextCard()
+{
+    changeSelectedCard(1);
+}
+
+/**
+ * @brief Selects a card based on the change direction.
+ *
+ * @param changeBy The direction to change, -1 for previous, 1 for next.
+ */
+void DeckEditorDeckDockWidget::changeSelectedCard(int changeBy)
+{
+    if (changeBy == 0) {
+        return;
+    }
+
+    // Get the current index of the selected item
+    auto deckViewCurrentIndex = deckView->currentIndex();
+
+    auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
+    if (!nextIndex.isValid()) {
+        nextIndex = deckViewCurrentIndex;
+
+        // Increment to the next valid index, skipping header rows
+        AbstractDecklistNode *node;
+        do {
+            if (changeBy > 0) {
+                nextIndex = deckView->indexBelow(nextIndex);
+            } else {
+                nextIndex = deckView->indexAbove(nextIndex);
+            }
+            node = static_cast<AbstractDecklistNode *>(nextIndex.internalPointer());
+        } while (node && node->isDeckHeader());
+    }
+
+    if (nextIndex.isValid()) {
+        deckView->setCurrentIndex(nextIndex);
+        deckView->setFocus(Qt::FocusReason::MouseFocusReason);
+    }
+}
+
 /**
  * @brief Expands all parents of the given index.
  * @param sourceIndex The index to expand (model source index)
