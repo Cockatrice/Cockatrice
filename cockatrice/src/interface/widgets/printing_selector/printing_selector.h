@@ -33,7 +33,7 @@ class PrintingSelector : public QWidget
 public:
     PrintingSelector(QWidget *parent, AbstractTabDeckEditor *deckEditor);
 
-    void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
+    void setCard(const CardInfoPtr &newCard);
     void getAllSetsForCurrentCard();
     [[nodiscard]] DeckListModel *getDeckModel() const
     {
@@ -78,7 +78,6 @@ private:
     DeckListModel *deckModel;
     QTreeView *deckView;
     CardInfoPtr selectedCard;
-    QString currentZone;
     QTimer *widgetLoadingBufferTimer;
     int currentIndex = 0;
 };

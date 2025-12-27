@@ -266,8 +266,7 @@ bool TabDeckEditorVisual::actSaveDeckAs()
 /** @brief Shows the printing selector dock and updates it with the current card. */
 void TabDeckEditorVisual::showPrintingSelector()
 {
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr(),
-                                                          DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
     aPrintingSelectorDockVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);

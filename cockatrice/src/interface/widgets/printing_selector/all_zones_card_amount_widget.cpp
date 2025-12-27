@@ -23,8 +23,7 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
                                                    QTreeView *deckView,
                                                    QSlider *cardSizeSlider,
                                                    const ExactCard &rootCard)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard)
+    : QWidget(parent), cardSizeSlider(cardSizeSlider)
 {
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignHCenter);

@@ -13,7 +13,7 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
                                                                                  const QString &_setName,
                                                                                  const QString &_collectorsNumber,
                                                                                  QSlider *_cardSizeSlider)
-    : QWidget(parent)
+    : QWidget(parent), cardSizeSlider(_cardSizeSlider)
 {
     // Set up the layout for the widget
     layout = new QVBoxLayout(this);
@@ -35,7 +35,6 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
     collectorsNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // Store the card size slider and connect its signal to the font size adjustment slot
-    cardSizeSlider = _cardSizeSlider;
     connect(cardSizeSlider, &QSlider::valueChanged, this, &SetNameAndCollectorsNumberDisplayWidget::adjustFontSize);
 
     // Add labels to the layout

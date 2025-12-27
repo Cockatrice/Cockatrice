@@ -115,9 +115,8 @@ void PrintingSelector::updateDisplay()
  * @brief Sets the current card for the selector and updates the display.
  *
  * @param newCard The new card to set.
- * @param _currentZone The current zone the card is in.
  */
-void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_currentZone)
+void PrintingSelector::setCard(const CardInfoPtr &newCard)
 {
     if (newCard.isNull()) {
         return;
@@ -129,7 +128,6 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
     }
 
     selectedCard = newCard;
-    currentZone = _currentZone;
     if (isVisible()) {
         updateDisplay();
     }
@@ -166,8 +164,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
     connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
             auto card = ExactCard(selectedCard, printingsToUse[currentIndex]);
-            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(
-                this, deckEditor, deckModel, deckView, cardSizeWidget->getSlider(), card, currentZone);
+            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
+                                                                            cardSizeWidget->getSlider(), card);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
             connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,

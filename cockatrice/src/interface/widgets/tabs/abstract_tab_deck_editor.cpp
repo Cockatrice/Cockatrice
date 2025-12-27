@@ -101,7 +101,7 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
     cardInfoDockWidget->updateCard(card);
-    printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr(), DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr());
 }
 
 /** @brief Placeholder: called when the deck changes. */

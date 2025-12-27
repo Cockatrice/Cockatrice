@@ -143,6 +143,22 @@ void DlgSelectSetForCards::retranslateUi()
     setAllToPreferredButton->setText(tr("Set all to preferred"));
 }
 
+static bool swapPrinting(DeckListModel *model, const QString &modifiedSet, const QString &cardName)
+{
+    QModelIndex idx = model->findCard(cardName, DECK_ZONE_MAIN);
+    if (!idx.isValid()) {
+        return false;
+    }
+    int amount = model->data(idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
+    model->removeRow(idx.row(), idx.parent());
+    CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(cardName);
+    PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(cardName, modifiedSet, "");
+    for (int i = 0; i < amount; i++) {
+        model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
+    }
+    return true;
+}
+
 void DlgSelectSetForCards::actOK()
 {
     QMap<QString, QStringList> modifiedSetsAndCardsMap = getModifiedCards();
@@ -155,20 +171,10 @@ void DlgSelectSetForCards::actOK()
 
     for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
         for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
-            QModelIndex find_card = model->findCard(card, DECK_ZONE_MAIN);
-            if (!find_card.isValid()) {
-                continue;
-            }
-            int amount =
-                model->data(find_card.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
-            model->removeRow(find_card.row(), find_card.parent());
-            CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(card);
-            PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(card, modifiedSet, "");
-            for (int i = 0; i < amount; i++) {
-                model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
-            }
+            swapPrinting(model, modifiedSet, card);
         }
     }
+
     if (!modifiedSetsAndCardsMap.isEmpty()) {
         emit deckModified();
     }
