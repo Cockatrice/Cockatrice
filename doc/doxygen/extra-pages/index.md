@@ -1,10 +1,8 @@
-@mainpage Cockatrice Documentation
+@mainpage Documentation
 
-# Welcome
+Welcome to the Cockatrice code documentation.
 
-This is the **main landing page** of the Cockatrice documentation.
+- @subpage user_reference
+- @subpage developer_reference
 
-- Go to the @subpage user_reference page
-- Review the @subpage developer_reference
-
-Or check out the [Cockatrice Webpage](https://cockatrice.github.io/).
+Please also check the <a href="https://cockatrice.github.io/" target="_blank" rel="noopener noreferrer">Cockatrice Webpage</a> or our <a href="https://github.com/Cockatrice/Cockatrice" target="_blank" rel="noopener noreferrer">Code Repository</a> for general information.
