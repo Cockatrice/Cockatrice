@@ -1068,6 +1068,8 @@ RECURSIVE              = YES
 
 EXCLUDE                = build/ \
                          cmake/ \
+                         doc/doxygen/theme/docs/ \
+                         doc/doxygen/theme/include/ \
                          vcpkg/ \
                          webclient/
 
@@ -1430,7 +1432,8 @@ HTML_STYLESHEET        =
 # documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = doc/doxygen/css/doxygen_style.css
+HTML_EXTRA_STYLESHEET  = doc/doxygen/css/doxygen_style.css \
+                         doc/doxygen/theme/doxygen-awesome.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1453,7 +1456,7 @@ HTML_EXTRA_FILES       = doc/doxygen/js/graph_toggle.js
 # The default value is: AUTO_LIGHT.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE        = AUTO_DARK
+HTML_COLORSTYLE        = LIGHT    # required with doxygen-awesome-css theme, Auto Dark Mode will still work
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -1764,7 +1767,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO    # YES is bugged in the theme, see jothepro/doxygen-awesome-css/issues/201
 
 # The GENERATE_TREEVIEW tag is used to specify whether a tree-like index
 # structure should be generated to display hierarchical information. If the tag
@@ -1802,7 +1805,7 @@ PAGE_OUTLINE_PANEL     = YES
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-FULL_SIDEBAR           = NO
+FULL_SIDEBAR           = NO    # required for doxygen-awesome-css theme
 
 # The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values that
 # Doxygen will group on one line in the generated HTML documentation.
