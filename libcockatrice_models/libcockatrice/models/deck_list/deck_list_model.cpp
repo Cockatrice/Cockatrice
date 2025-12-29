@@ -443,17 +443,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     return index;
 }
 
-bool DeckListModel::incrementAmountAtIndex(const QModelIndex &idx)
-{
-    return offsetAmountAtIndex(idx, 1);
-}
-
-bool DeckListModel::decrementAmountAtIndex(const QModelIndex &idx)
-{
-    return offsetAmountAtIndex(idx, -1);
-}
-
-bool DeckListModel::offsetAmountAtIndex(const QModelIndex &idx, int offset)
+bool DeckListModel::offsetCountAtIndex(const QModelIndex &idx, int offset)
 {
     if (!idx.isValid()) {
         return false;

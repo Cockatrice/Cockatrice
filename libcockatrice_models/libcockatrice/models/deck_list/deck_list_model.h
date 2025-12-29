@@ -307,19 +307,13 @@ public:
     QModelIndex addCard(const ExactCard &card, const QString &zoneName);
 
     /**
-     * @brief Increments the `amount` field of the card node at the index by 1.
-     * @param idx The index of a card node. No-ops if the index is invalid or not a card node
+     * @brief Changes the `amount` field in the card node at the index by the amount.
+     * Removes the node if it causes the amount to fall to 0 or below.
+     * @param idx The index of a card node. No-ops if the index is invalid or not a card node.
+     * @param offset The amount to change the amount field by.
      * @return Whether the operation was successful
      */
-    bool incrementAmountAtIndex(const QModelIndex &idx);
-
-    /**
-     * @brief Decrements the `amount` field of the card node at the index by 1.
-     * Removes the node if it causes the amount to fall to 0.
-     * @param idx The index of a card node. No-ops if the index is invalid or not a card node
-     * @return Whether the operation was successful
-     */
-    bool decrementAmountAtIndex(const QModelIndex &idx);
+    bool offsetCountAtIndex(const QModelIndex &idx, int offset);
 
     /**
      * @brief Determines the sorted insertion row for a card.
@@ -394,8 +388,6 @@ private:
                                                       const QString &zoneName,
                                                       const QString &providerId = "",
                                                       const QString &cardNumber = "") const;
-
-    bool offsetAmountAtIndex(const QModelIndex &idx, int offset);
 
     void emitRecursiveUpdates(const QModelIndex &index);
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);

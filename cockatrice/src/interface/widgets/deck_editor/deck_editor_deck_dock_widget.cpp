@@ -831,11 +831,8 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool i
 
     emit requestDeckHistorySave(reason);
 
-    if (isIncrement) {
-        deckModel->incrementAmountAtIndex(sourceIndex);
-    } else {
-        deckModel->decrementAmountAtIndex(sourceIndex);
-    }
+    int offset = isIncrement ? 1 : -1;
+    deckModel->offsetCountAtIndex(sourceIndex, offset);
 
     emit deckModified();
 }

@@ -257,7 +257,7 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
     QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
                                           rootCard.getPrinting().getProperty("num"));
 
-    deckModel->decrementAmountAtIndex(idx);
+    deckModel->offsetCountAtIndex(idx, -1);
     deckEditor->setModified(true);
 }
 
