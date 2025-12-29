@@ -61,6 +61,10 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
 
     // Connect slider for dynamic font size adjustment
     connect(cardSizeSlider, &QSlider::valueChanged, this, &CardAmountWidget::adjustFontSize);
+
+    if (deckEditor) {
+        connect(this, &CardAmountWidget::deckModified, deckEditor, &AbstractTabDeckEditor::onDeckHistorySaveRequested);
+    }
 }
 
 /**
@@ -133,6 +137,31 @@ void CardAmountWidget::updateCardCount()
     layout->activate();
 }
 
+static QModelIndex addAndReplacePrintings(DeckListModel *model,
+                                          const QModelIndex &existing,
+                                          const ExactCard &rootCard,
+                                          const QString &zone,
+                                          int extraCopies,
+                                          bool replaceProviderless)
+{
+    auto newCardIndex = model->addCard(rootCard, zone);
+    if (!newCardIndex.isValid()) {
+        return {};
+    }
+
+    // Check if a card without a providerId already exists in the deckModel and replace it, if so.
+    if (existing.isValid() && existing != newCardIndex && replaceProviderless) {
+        for (int i = 0; i < extraCopies; i++) {
+            model->addCard(rootCard, zone);
+        }
+        model->removeRow(existing.row(), existing.parent());
+    }
+
+    // Set Index and Focus as if the user had just clicked the new card and modify the deckEditor saveState
+    return model->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
+                           rootCard.getPrinting().getProperty("num"));
+}
+
 /**
  * @brief Adds a printing of the card to the specified zone (Mainboard or Sideboard).
  *
@@ -140,27 +169,41 @@ void CardAmountWidget::updateCardCount()
  */
 void CardAmountWidget::addPrinting(const QString &zone)
 {
-    // Add the card and expand the list UI
-    auto newCardIndex = deckModel->addCard(rootCard, zone);
-    recursiveExpand(newCardIndex);
+    // Check if we will need to add extra copies due to replacing copies without providerIds
+    QModelIndex existing = deckModel->findCard(rootCard.getName(), zone);
 
-    // Check if a card without a providerId already exists in the deckModel and replace it, if so.
-    QModelIndex find_card = deckModel->findCard(rootCard.getName(), zone);
-    QString foundProviderId = deckModel->data(find_card.sibling(find_card.row(), 4), Qt::DisplayRole).toString();
-    if (find_card.isValid() && find_card != newCardIndex && foundProviderId == "") {
-        auto amount = deckModel->data(find_card, Qt::DisplayRole);
-        for (int i = 0; i < amount.toInt() - 1; i++) {
-            deckModel->addCard(rootCard, zone);
+    int extraCopies = 0;
+    bool replacingProviderless = false;
+
+    if (existing.isValid()) {
+        QString foundProviderId =
+            existing.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
+        if (foundProviderId.isEmpty()) {
+            int amount = existing.data(Qt::DisplayRole).toInt();
+            extraCopies = amount - 1; // One less because we *always* add one
+            replacingProviderless = true;
         }
-        deckModel->removeRow(find_card.row(), find_card.parent());
     }
 
-    // Set Index and Focus as if the user had just clicked the new card and modify the deckEditor saveState
-    newCardIndex = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
-                                       rootCard.getPrinting().getProperty("num"));
-    deckView->setCurrentIndex(newCardIndex);
-    deckView->setFocus(Qt::FocusReason::MouseFocusReason);
-    deckEditor->setModified(true);
+    QString reason = QString("Added %1 copies of '%2 (%3) %4' to %5 [ProviderID: %6]%7")
+                         .arg(1 + extraCopies)
+                         .arg(rootCard.getName())
+                         .arg(rootCard.getPrinting().getSet()->getShortName())
+                         .arg(rootCard.getPrinting().getProperty("num"))
+                         .arg(zone == DECK_ZONE_MAIN ? "mainboard" : "sideboard")
+                         .arg(rootCard.getPrinting().getUuid())
+                         .arg(replacingProviderless ? " (replaced providerless printings)" : "");
+
+    emit deckModified(reason);
+
+    // Add the card and expand the list UI
+    auto newCardIndex = addAndReplacePrintings(deckModel, existing, rootCard, zone, extraCopies, replacingProviderless);
+
+    if (newCardIndex.isValid()) {
+        deckView->setCurrentIndex(newCardIndex);
+        deckView->setFocus(Qt::FocusReason::MouseFocusReason);
+        deckEditor->setModified(true);
+    }
 }
 
 /**
@@ -196,52 +239,25 @@ void CardAmountWidget::removePrintingSideboard()
 }
 
 /**
- * @brief Recursively expands the card in the deck view starting from the given index.
- *
- * @param index The model index of the card to expand.
- */
-void CardAmountWidget::recursiveExpand(const QModelIndex &index)
-{
-    if (index.parent().isValid()) {
-        recursiveExpand(index.parent());
-    }
-    deckView->expand(index);
-}
-
-/**
- * @brief Offsets the card count at the specified index by the given amount.
- *
- * @param idx The model index of the card.
- * @param offset The amount to add or subtract from the card count.
- */
-void CardAmountWidget::offsetCountAtIndex(const QModelIndex &idx, int offset)
-{
-    if (!idx.isValid() || offset == 0) {
-        return;
-    }
-
-    const QModelIndex numberIndex = idx.sibling(idx.row(), 0);
-    const int count = deckModel->data(numberIndex, Qt::EditRole).toInt();
-    const int new_count = count + offset;
-    deckView->setCurrentIndex(numberIndex);
-    if (new_count <= 0) {
-        deckModel->removeRow(idx.row(), idx.parent());
-    } else {
-        deckModel->setData(numberIndex, new_count, Qt::EditRole);
-    }
-    deckEditor->setModified(true);
-}
-
-/**
  * @brief Helper function to decrement the card count for a given zone.
  *
  * @param zone The zone from which to remove the card (DECK_ZONE_MAIN or DECK_ZONE_SIDE).
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
+    QString reason = QString("Removed 1 copy of '%1 (%2) %3' from %4 [ProviderID: %5]")
+                         .arg(rootCard.getName())
+                         .arg(rootCard.getPrinting().getSet()->getShortName())
+                         .arg(rootCard.getPrinting().getProperty("num"))
+                         .arg(zone == DECK_ZONE_MAIN ? "mainboard" : "sideboard")
+                         .arg(rootCard.getPrinting().getUuid());
+
+    emit deckModified(reason);
+
     QModelIndex idx = deckModel->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),
                                           rootCard.getPrinting().getProperty("num"));
-    offsetCountAtIndex(idx, -1);
+
+    deckModel->offsetCountAtIndex(idx, -1);
     deckEditor->setModified(true);
 }
 
@@ -253,29 +269,14 @@ void CardAmountWidget::decrementCardHelper(const QString &zone)
  */
 int CardAmountWidget::countCardsInZone(const QString &deckZone)
 {
-    if (rootCard.getPrinting().getUuid().isEmpty()) {
+    QString uuid = rootCard.getPrinting().getUuid();
+
+    if (uuid.isEmpty()) {
         return 0; // Cards without uuids/providerIds CANNOT match another card, they are undefined for us.
     }
 
-    if (!deckModel) {
-        return -1;
-    }
+    QList<ExactCard> cards = deckModel->getCardsForZone(deckZone);
 
-    DeckList *decklist = deckModel->getDeckList();
-    if (!decklist) {
-        return -1;
-    }
-
-    QList<DecklistCardNode *> cardsInDeck = decklist->getCardNodes({deckZone});
-
-    int count = 0;
-    for (auto currentCard : cardsInDeck) {
-        for (int k = 0; k < currentCard->getNumber(); ++k) {
-            if (currentCard->getCardProviderId() == rootCard.getPrinting().getProperty("uuid")) {
-                count++;
-            }
-        }
-    }
-
-    return count;
+    return std::count_if(cards.cbegin(), cards.cend(),
+                         [&uuid](const ExactCard &card) { return card.getPrinting().getUuid() == uuid; });
 }

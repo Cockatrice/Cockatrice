@@ -10,10 +10,8 @@
 #include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.h"
 
 #include <QLoggingCategory>
-#include <QMap>
 #include <QString>
 #include <functional>
-#include <utility>
 
 inline Q_LOGGING_CATEGORY(DeckFilterStringLog, "deck_filter_string");
 
@@ -40,7 +38,7 @@ public:
         return filter(deck, info);
     }
 
-    bool valid() const
+    [[nodiscard]] bool valid() const
     {
         return _error.isEmpty();
     }

@@ -23,12 +23,12 @@ public:
 
     void clear();
 
-    bool canUndo() const
+    [[nodiscard]] bool canUndo() const
     {
         return !undoStack.isEmpty();
     }
 
-    bool canRedo() const
+    [[nodiscard]] bool canRedo() const
     {
         return !redoStack.isEmpty();
     }
@@ -37,11 +37,11 @@ public:
 
     void redo(DeckList *deck);
 
-    QStack<DeckListMemento> getRedoStack() const
+    [[nodiscard]] QStack<DeckListMemento> getRedoStack() const
     {
         return redoStack;
     }
-    QStack<DeckListMemento> getUndoStack() const
+    [[nodiscard]] QStack<DeckListMemento> getUndoStack() const
     {
         return undoStack;
     }

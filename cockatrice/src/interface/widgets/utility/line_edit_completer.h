@@ -9,9 +9,7 @@
 
 #include "custom_line_edit.h"
 
-#include <QFocusEvent>
 #include <QKeyEvent>
-#include <QStringList>
 
 class LineEditCompleter : public LineEditUnfocusable
 {

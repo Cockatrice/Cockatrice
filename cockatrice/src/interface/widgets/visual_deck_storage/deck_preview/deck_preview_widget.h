@@ -51,7 +51,7 @@ public:
 
 signals:
     void deckLoadRequested(const QString &filePath);
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
 
 public slots:
     void setFilePath(const QString &filePath);
@@ -72,6 +72,8 @@ private:
     void addSetBannerCardMenu(QMenu *menu);
 
 private slots:
+    void setTags(const QStringList &tags);
+
     void actRenameDeck();
     void actRenameFile();
     void actDeleteFile();

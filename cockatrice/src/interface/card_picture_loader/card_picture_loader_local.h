@@ -1,8 +1,6 @@
 #ifndef PICTURE_LOADER_LOCAL_H
 #define PICTURE_LOADER_LOCAL_H
 
-#include <QLoggingCategory>
-#include <QObject>
 #include <QTimer>
 #include <libcockatrice/card/printing/exact_card.h>
 
@@ -42,7 +40,7 @@ public:
      *
      * Uses a set of name variants and folder paths to attempt to locate the correct image.
      */
-    QImage tryLoad(const ExactCard &toLoad) const;
+    [[nodiscard]] QImage tryLoad(const ExactCard &toLoad) const;
 
 private:
     QString picsPath;       ///< Path to standard card image folder
@@ -72,10 +70,10 @@ private:
      * Uses several filename patterns to match card images, in order from
      * most-specific to least-specific.
      */
-    QImage tryLoadCardImageFromDisk(const QString &setName,
-                                    const QString &correctedCardName,
-                                    const QString &collectorNumber,
-                                    const QString &providerId) const;
+    [[nodiscard]] QImage tryLoadCardImageFromDisk(const QString &setName,
+                                                  const QString &correctedCardName,
+                                                  const QString &collectorNumber,
+                                                  const QString &providerId) const;
 
 private slots:
     /**

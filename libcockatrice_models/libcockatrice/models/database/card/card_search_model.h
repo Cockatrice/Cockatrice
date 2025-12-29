@@ -17,8 +17,8 @@ class CardSearchModel : public QAbstractListModel
 public:
     explicit CardSearchModel(CardDatabaseDisplayModel *sourceModel, QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     void updateSearchResults(const QString &query); // Update results based on input
 

@@ -3,7 +3,6 @@
 #include "../card_info_picture_with_text_overlay_widget.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/models/deck_list/deck_list_sort_filter_proxy_model.h>
@@ -33,7 +32,10 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
     CardGroupDisplayWidget::updateCardDisplays();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
-    connect(selectionModel, &QItemSelectionModel::selectionChanged, this, &CardGroupDisplayWidget::onSelectionChanged);
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &CardGroupDisplayWidget::onSelectionChanged);
+    }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 }
 
@@ -89,8 +91,9 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     if (indexToWidgetMap.contains(index)) {
         return indexToWidgetMap[index];
     }
-    auto cardName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
-    auto cardProviderId = deckListModel->data(index.sibling(index.row(), 4), Qt::EditRole).toString();
+    auto cardName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+    auto cardProviderId =
+        index.sibling(index.row(), DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::EditRole).toString();
 
     auto widget = new CardInfoPictureWithTextOverlayWidget(getLayoutParent(), true);
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
@@ -112,7 +115,7 @@ void CardGroupDisplayWidget::updateCardDisplays()
 
     // This doesn't really matter since overwrite the whole lessThan function to just compare dynamically anyway.
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
     QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
@@ -180,7 +183,9 @@ void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSort
 void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    selectionModel->clearSelection();
+    if (selectionModel) {
+        selectionModel->clearSelection();
+    }
 }
 
 void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)

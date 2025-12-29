@@ -12,8 +12,6 @@
 
 #include <QAction>
 #include <QMenu>
-#include <QMessageBox>
-#include <QSignalMapper>
 #include <QtGui>
 #include <QtWidgets>
 #include <libcockatrice/network/client/abstract/abstract_client.h>

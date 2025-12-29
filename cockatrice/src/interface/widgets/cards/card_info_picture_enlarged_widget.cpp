@@ -5,7 +5,6 @@
 
 #include <QPainterPath>
 #include <QStylePainter>
-#include <utility>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.
@@ -34,10 +33,13 @@ CardInfoPictureEnlargedWidget::CardInfoPictureEnlargedWidget(QWidget *parent) : 
  */
 void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
 {
+    // Handle DPI scaling
+    qreal dpr = devicePixelRatio();   // Get the actual scaling factor
+    QSize availableSize = size * dpr; // Convert to physical pixel size
     if (card) {
-        CardPictureLoader::getPixmap(enlargedPixmap, card, size);
+        CardPictureLoader::getPixmap(enlargedPixmap, card, availableSize);
     } else {
-        CardPictureLoader::getCardBackPixmap(enlargedPixmap, size);
+        CardPictureLoader::getCardBackPixmap(enlargedPixmap, availableSize);
     }
     pixmapDirty = false;
 }
@@ -78,25 +80,35 @@ void CardInfoPictureEnlargedWidget::paintEvent(QPaintEvent *event)
         loadPixmap(size());
     }
 
-    // Scale the size of the pixmap to fit the widget while maintaining the aspect ratio
-    QSize scaledSize = enlargedPixmap.size().scaled(size().width(), size().height(), Qt::KeepAspectRatio);
+    qreal dpr = enlargedPixmap.devicePixelRatio();
 
-    // Calculate the position to center the scaled pixmap
-    QPoint topLeft{(width() - scaledSize.width()) / 2, (height() - scaledSize.height()) / 2};
+    QSize logicalPixmapSize(enlargedPixmap.width() / dpr, enlargedPixmap.height() / dpr);
 
-    // Define the radius for rounded corners
-    // Adjust the radius as needed for rounded corners
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * scaledSize.width() : 0.;
+    // Scale the pixmap to fit the widget (logical → logical)
+    QSize scaledLogicalSize = logicalPixmapSize.scaled(size(), Qt::KeepAspectRatio);
+
+    // Convert scaled logical size → physical size for scaled()
+    QSize scaledPhysicalSize = scaledLogicalSize * dpr;
+
+    // Pixmap scaled in PHYSICAL pixels
+    QPixmap finalPixmap = enlargedPixmap.scaled(scaledPhysicalSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    finalPixmap.setDevicePixelRatio(dpr);
+
+    // Center inside widget
+    QPoint topLeft{(width() - scaledLogicalSize.width()) / 2, (height() - scaledLogicalSize.height()) / 2};
+
+    // Rounded corner radius based on logical width
+    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * scaledLogicalSize.width() : 0.0;
 
     QStylePainter painter(this);
     // Fill the background with transparent color to ensure rounded corners are rendered properly
     painter.fillRect(rect(), Qt::transparent); // Use the transparent background
 
     QPainterPath shape;
-    shape.addRoundedRect(QRect(topLeft, scaledSize), radius, radius);
+    shape.addRoundedRect(QRect(topLeft, scaledLogicalSize), radius, radius);
     painter.setClipPath(shape); // Set the clipping path
 
     // Draw the pixmap scaled to the calculated size
-    painter.drawItemPixmap(QRect(topLeft, scaledSize), Qt::AlignCenter,
-                           enlargedPixmap.scaled(scaledSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    painter.drawPixmap(QRect(topLeft, scaledLogicalSize), finalPixmap);
 }

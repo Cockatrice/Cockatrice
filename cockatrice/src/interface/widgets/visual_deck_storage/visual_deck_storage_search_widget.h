@@ -7,11 +7,10 @@
 #ifndef VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 #define VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 
-#include "visual_deck_storage_widget.h"
+#include "deck_preview/deck_preview_widget.h"
 
 #include <QHBoxLayout>
 #include <QLineEdit>
-#include <QTimer>
 #include <QWidget>
 
 class VisualDeckStorageWidget;

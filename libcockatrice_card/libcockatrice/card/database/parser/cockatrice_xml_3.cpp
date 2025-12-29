@@ -14,6 +14,11 @@
 #define COCKATRICE_XML3_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v3/cards.xsd"
 
+CockatriceXml3Parser::CockatriceXml3Parser(ICardSetPriorityController *_cardSetPriorityController)
+    : ICardDatabaseParser(_cardSetPriorityController)
+{
+}
+
 bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
     qCInfo(CockatriceXml3Log) << "Trying to parse: " << fileName;
@@ -438,12 +443,15 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     return xml;
 }
 
-bool CockatriceXml3Parser::saveToFile(SetNameMap _sets,
+bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
+                                      SetNameMap _sets,
                                       CardNameMap cards,
                                       const QString &fileName,
                                       const QString &sourceUrl,
                                       const QString &sourceVersion)
 {
+    Q_UNUSED(_formats);
+
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;

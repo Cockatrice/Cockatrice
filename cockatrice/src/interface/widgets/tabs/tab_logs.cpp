@@ -1,20 +1,18 @@
 #include "tab_logs.h"
 
-#include "../interface/widgets/dialogs/dlg_manage_sets.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 
 #include <QCheckBox>
-#include <QDialogButtonBox>
+#include <QDockWidget>
+#include <QGridLayout>
 #include <QGroupBox>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QTabWidget>
-#include <QtGui>
-#include <QtWidgets>
+#include <QTableWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>

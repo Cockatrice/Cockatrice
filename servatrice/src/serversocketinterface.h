@@ -177,7 +177,7 @@ public:
     QString getConnectionType() const
     {
         return "tcp";
-    };
+    }
 
 private:
     QTcpSocket *socket;
@@ -190,11 +190,11 @@ protected:
     void writeToSocket(QByteArray &data)
     {
         socket->write(data);
-    };
+    }
     void flushSocket()
     {
         socket->flush();
-    };
+    }
     void initSessionDeprecated();
     bool initTcpSession();
 protected slots:
@@ -224,7 +224,7 @@ public:
     QString getConnectionType() const
     {
         return "websocket";
-    };
+    }
 
 private:
     QWebSocket *socket;
@@ -234,11 +234,11 @@ protected:
     void writeToSocket(QByteArray &data)
     {
         socket->sendBinaryMessage(data);
-    };
+    }
     void flushSocket()
     {
         socket->flush();
-    };
+    }
     bool initWebsocketSession();
 protected slots:
     void binaryMessageReceived(const QByteArray &message);

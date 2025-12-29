@@ -59,7 +59,7 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 
 void DlgEditPassword::actOk()
 {
-    // TODO this stuff should be using qvalidators
+    //! \todo this stuff should be using qvalidators
     if (newPasswordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Error"), tr("Your password is too short."));
         return;

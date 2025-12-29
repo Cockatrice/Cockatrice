@@ -23,15 +23,15 @@ public:
     [[nodiscard]] bool isColorActive() const
     {
         return isActive;
-    };
+    }
     [[nodiscard]] QString getSymbol() const
     {
         return symbol;
-    };
+    }
     [[nodiscard]] QChar getSymbolChar() const
     {
         return symbol[0];
-    };
+    }
 
     void loadManaIcon();
 

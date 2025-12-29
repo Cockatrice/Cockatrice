@@ -8,13 +8,9 @@
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
 #include "../../interface/widgets/tabs/tab_game.h"
-#include "../game_scene.h"
 #include "deck_view.h"
 
 #include <QMessageBox>
-#include <QMouseEvent>
-#include <QToolButton>
-#include <google/protobuf/descriptor.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
@@ -263,7 +259,7 @@ void DeckViewContainer::loadLocalDeck()
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
     DeckLoader deck(this);
 
     bool success = deck.loadFromFile(filePath, fmt, true);
@@ -273,12 +269,12 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
         return;
     }
 
-    loadDeckFromDeckLoader(&deck);
+    loadDeckFromDeckList(deck.getDeck().deckList);
 }
 
-void DeckViewContainer::loadDeckFromDeckLoader(DeckLoader *deck)
+void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
 {
-    QString deckString = deck->getDeckList()->writeToString_Native();
+    QString deckString = deck.writeToString_Native();
 
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));
@@ -312,8 +308,8 @@ void DeckViewContainer::loadFromClipboard()
         return;
     }
 
-    DeckLoader *deck = dlg.getDeckList();
-    loadDeckFromDeckLoader(deck);
+    DeckList deck = dlg.getDeckList();
+    loadDeckFromDeckList(deck);
 }
 
 void DeckViewContainer::loadFromWebsite()
@@ -324,16 +320,15 @@ void DeckViewContainer::loadFromWebsite()
         return;
     }
 
-    DeckLoader *deck = dlg.getDeck();
-    loadDeckFromDeckLoader(deck);
+    DeckList deck = dlg.getDeck();
+    loadDeckFromDeckList(deck);
 }
 
 void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
-    DeckLoader newDeck(this, new DeckList(QString::fromStdString(resp.deck())));
-    CardPictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::query()->getCards(newDeck.getDeckList()->getCardRefList()));
+    DeckList newDeck = DeckList(QString::fromStdString(resp.deck()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }
@@ -414,8 +409,8 @@ void DeckViewContainer::setSideboardLocked(bool locked)
         deckView->resetSideboardPlan();
 }
 
-void DeckViewContainer::setDeck(DeckLoader &deck)
+void DeckViewContainer::setDeck(const DeckList &deck)
 {
-    deckView->setDeck(*deck.getDeckList());
+    deckView->setDeck(deck);
     switchToDeckLoadedView();
 }

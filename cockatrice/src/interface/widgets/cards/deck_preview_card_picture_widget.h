@@ -13,6 +13,7 @@
 #include <QColor>
 #include <QSize>
 #include <QTextOption>
+#include <QTimer>
 
 class DeckPreviewCardPictureWidget final : public CardInfoPictureWithTextOverlayWidget
 {

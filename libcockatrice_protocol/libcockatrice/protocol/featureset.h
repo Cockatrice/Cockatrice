@@ -3,7 +3,6 @@
 
 #include <QMap>
 #include <QObject>
-#include <QSet>
 #include <QString>
 
 class FeatureSet : public QObject

@@ -11,8 +11,8 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
     bool rightIsCard = src->data(right, Qt::UserRole + 1).toBool();
 
     if (!leftIsCard || !rightIsCard) {
-        QString lName = src->data(left.siblingAtColumn(1), Qt::EditRole).toString();
-        QString rName = src->data(right.siblingAtColumn(1), Qt::EditRole).toString();
+        QString lName = src->data(left.siblingAtColumn(DeckListModelColumns::CARD_NAME), Qt::EditRole).toString();
+        QString rName = src->data(right.siblingAtColumn(DeckListModelColumns::CARD_NAME), Qt::EditRole).toString();
         return lName.localeAwareCompare(rName) < 0;
     }
 

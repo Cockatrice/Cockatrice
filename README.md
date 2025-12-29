@@ -46,7 +46,8 @@ Latest <kbd>beta</kbd> version:
 
 - [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
-- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official webpage of the Cockatrice project
+- [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official Cockatrice webpage
+- [Cockatrice @Flathub](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration for our Linux `flatpak` package
 
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
@@ -54,11 +55,12 @@ Latest <kbd>beta</kbd> version:
 Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
 - [Official Website](https://cockatrice.github.io)
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
+- [Official Code Documentation](https://cockatrice.github.io/docs)
 - [Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
->[!IMPORTANT]
->For support regarding specific servers, please contact that server's admin/mods and use their dedicated communication channels rather than contacting the team building the software.
+> [!IMPORTANT]
+> For support regarding specific servers, please contact that server's admin/mods and use their dedicated communication channels rather than contacting the team building the software.
 
 
 # Contribute
@@ -75,10 +77,15 @@ This tag is used for issues that we are looking for somebody to pick up. Often t
 For both tags, we're willing to provide help to contributors in showing them where and how they can make changes, as well as code reviews for submitted changes.<br>
 We'll happily advice on how best to implement a feature, or we can show you where the codebase is doing something similar before you get too far along - put a note on an issue you want to discuss more on!
 
+You can also have a look at our `Todo List` in our [Code Documentation](https://cockatrice.github.io/docs) or search the repo for [`\todo` comments](https://github.com/search?q=repo%3ACockatrice%2FCockatrice%20%5Ctodo&type=code).
+
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
+#### Repository Activity
+![Cockatrice Repo Analytics](https://repobeats.axiom.co/api/embed/c7cec938789a5bbaeb4182a028b4dbb96db8f181.svg "Cockatrice Repo Analytics by Repobeats")
+
 <details>
-<summary><b>Kudos to our amazing contributors ❤️</b></summary>
+<summary><b>Kudos to all our amazing contributors ❤️</b></summary>
 <br>
    <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
       <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
@@ -124,8 +131,8 @@ You can then
     make package
     ```
 
->[!NOTE]
->Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)
+> [!NOTE]
+> Detailed compiling instructions can be found in the Cockatrice wiki at [Compiling Cockatrice](https://github.com/Cockatrice/Cockatrice/wiki/Compiling-Cockatrice)
 
 <br>
 

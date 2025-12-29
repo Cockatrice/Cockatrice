@@ -9,9 +9,12 @@
 
 #include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
-#include "../dialogs/dlg_create_token.h"
+#include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/logic/hand_zone_logic.h"
+#include "../zones/logic/pile_zone_logic.h"
+#include "../zones/logic/stack_zone_logic.h"
+#include "../zones/logic/table_zone_logic.h"
 #include "menu/player_menu.h"
-#include "player_actions.h"
 #include "player_area.h"
 #include "player_event_handler.h"
 #include "player_graphics_item.h"
@@ -20,9 +23,7 @@
 #include <QInputDialog>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QPoint>
 #include <QTimer>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
@@ -44,7 +45,6 @@ class ArrowTarget;
 class CardDatabase;
 class CardZone;
 class CommandContainer;
-class DeckLoader;
 class GameCommand;
 class GameEvent;
 class PlayerInfo;
@@ -66,7 +66,7 @@ class Player : public QObject
     Q_OBJECT
 
 signals:
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();
@@ -113,7 +113,7 @@ public:
     [[nodiscard]] PlayerActions *getPlayerActions() const
     {
         return playerActions;
-    };
+    }
 
     [[nodiscard]] PlayerEventHandler *getPlayerEventHandler() const
     {
@@ -123,16 +123,16 @@ public:
     [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
         return playerInfo;
-    };
+    }
 
     [[nodiscard]] PlayerMenu *getPlayerMenu() const
     {
         return playerMenu;
     }
 
-    void setDeck(DeckLoader &_deck);
+    void setDeck(const DeckList &_deck);
 
-    [[nodiscard]] DeckLoader *getDeck() const
+    [[nodiscard]] const DeckList &getDeck() const
     {
         return deck;
     }
@@ -241,7 +241,7 @@ private:
     bool active;
     bool conceded;
 
-    DeckLoader *deck;
+    DeckList deck;
 
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;

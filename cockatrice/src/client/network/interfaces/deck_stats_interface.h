@@ -7,7 +7,6 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include <QObject>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/deck_list/deck_list.h>
 
@@ -29,15 +28,15 @@ private:
      * closest non-token card instead. So we construct a new deck which has no
      * tokens.
      */
-    void copyDeckWithoutTokens(DeckList &source, DeckList &destination);
+    void copyDeckWithoutTokens(const DeckList &source, DeckList &destination);
 
 private slots:
     void queryFinished(QNetworkReply *reply);
-    void getAnalyzeRequestData(DeckList *deck, QByteArray *data);
+    void getAnalyzeRequestData(const DeckList &deck, QByteArray &data);
 
 public:
     explicit DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
-    void analyzeDeck(DeckList *deck);
+    void analyzeDeck(const DeckList &deck);
 };
 
 #endif

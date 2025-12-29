@@ -10,7 +10,6 @@
 #include "../abstract/abstract_client.h"
 
 #include <QLoggingCategory>
-#include <QTcpSocket>
 #include <QWebSocket>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>

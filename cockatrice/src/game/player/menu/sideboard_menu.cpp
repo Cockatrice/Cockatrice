@@ -1,6 +1,7 @@
 #include "sideboard_menu.h"
 
 #include "../player.h"
+#include "../player_actions.h"
 
 SideboardMenu::SideboardMenu(Player *player, QMenu *playerMenu) : QMenu(playerMenu)
 {

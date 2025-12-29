@@ -5,6 +5,8 @@
 #include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
+#include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
 #include <server.h>
 #include <server_database_interface.h>
 

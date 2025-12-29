@@ -7,10 +7,8 @@
 #include "../../pixel_map_generator.h"
 
 #include <QClipboard>
-#include <QFile>
 #include <QHeaderView>
 #include <QMenu>
-#include <QTextBrowser>
 #include <QToolButton>
 #include <QTreeView>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -136,13 +134,13 @@ void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
 
 void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
-    const QString cardName = current.sibling(current.row(), 0).data().toString();
-
     if (!current.isValid()) {
         return;
     }
 
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+    const QString cardName = current.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
+
+    if (!current.model()->hasChildren(current.siblingAtColumn(CardDatabaseModel::NameColumn))) {
         emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
     }
 }
@@ -174,7 +172,7 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
         return {};
     }
 
-    const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
+    const QString cardName = currentIndex.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
 
     return CardDatabaseManager::query()->getPreferredCard(cardName);
 }

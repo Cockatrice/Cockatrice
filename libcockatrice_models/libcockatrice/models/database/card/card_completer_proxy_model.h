@@ -16,7 +16,7 @@ public:
     explicit CardCompleterProxyModel(QObject *parent = nullptr);
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
 #endif // CARD_COMPLETER_PROXY_MODEL_H

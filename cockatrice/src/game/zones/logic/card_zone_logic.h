@@ -52,7 +52,7 @@ public:
     void rawInsertCard(CardItem *card, int index)
     {
         cards.insert(index, card);
-    };
+    }
 
     [[nodiscard]] const CardList &getCards() const
     {

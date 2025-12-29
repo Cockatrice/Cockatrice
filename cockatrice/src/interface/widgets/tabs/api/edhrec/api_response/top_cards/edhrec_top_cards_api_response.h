@@ -9,7 +9,6 @@
 
 #include "../cards/edhrec_api_response_card_container.h"
 
-#include <QDebug>
 #include <QString>
 
 class EdhrecTopCardsApiResponse

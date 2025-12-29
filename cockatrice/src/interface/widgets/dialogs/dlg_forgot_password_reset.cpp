@@ -2,8 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 
-#include <QCheckBox>
-#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -123,7 +121,7 @@ void DlgForgotPasswordReset::actOk()
         return;
     }
 
-    // TODO this stuff should be using qvalidators
+    //! \todo this stuff should be using qvalidators
     if (newpasswordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Error"), tr("Your password is too short."));
         return;

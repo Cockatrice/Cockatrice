@@ -1,6 +1,7 @@
 #include "printing_selector_card_selection_widget.h"
 
 #include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../tabs/abstract_tab_deck_editor.h"
 
 /**
  * @brief Constructs a PrintingSelectorCardSelectionWidget for navigating through cards in the deck.
@@ -41,13 +42,17 @@ PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(Printin
  */
 void PrintingSelectorCardSelectionWidget::connectSignals()
 {
-    connect(previousCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectPreviousCard);
-    connect(nextCardButton, &QPushButton::clicked, parent, &PrintingSelector::selectNextCard);
+    connect(previousCardButton, &QPushButton::clicked, parent, &PrintingSelector::prevCardRequested);
+    connect(nextCardButton, &QPushButton::clicked, parent, &PrintingSelector::nextCardRequested);
 }
 
 void PrintingSelectorCardSelectionWidget::selectSetForCards()
 {
     auto *setSelectionDialog = new DlgSelectSetForCards(nullptr, parent->getDeckModel());
+    connect(setSelectionDialog, &DlgSelectSetForCards::deckAboutToBeModified, parent->getDeckEditor(),
+            &AbstractTabDeckEditor::onDeckHistorySaveRequested);
+    connect(setSelectionDialog, &DlgSelectSetForCards::deckModified, parent->getDeckEditor(),
+            &AbstractTabDeckEditor::onDeckModified);
     if (!setSelectionDialog->exec()) {
         return;
     }

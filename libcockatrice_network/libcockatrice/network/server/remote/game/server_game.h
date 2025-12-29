@@ -90,11 +90,7 @@ private slots:
     void doStartGameIfReady(bool forceStartGame = false);
 
 public:
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     mutable QRecursiveMutex gameMutex;
-#else
-    mutable QMutex gameMutex;
-#endif
     Server_Game(const ServerInfo_User &_creatorInfo,
                 int _gameId,
                 const QString &_description,

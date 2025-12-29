@@ -122,7 +122,7 @@ if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
 if [[ $MAKE_NO_CLIENT ]]; then
-  flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0" "-DWITH_DBCONVERTER=0")
+  flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
@@ -246,7 +246,7 @@ fi
 
 if [[ $RUNNER_OS == macOS ]]; then
   echo "::group::Inspect Mach-O binaries"
-  for app in cockatrice oracle servatrice dbconverter; do
+  for app in cockatrice oracle servatrice; do
     binary="$GITHUB_WORKSPACE/build/$app/$app.app/Contents/MacOS/$app"
     echo "Inspecting $app..."
     vtool -show-build "$binary"

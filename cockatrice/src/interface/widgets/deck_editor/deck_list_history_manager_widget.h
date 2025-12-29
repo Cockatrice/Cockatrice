@@ -10,7 +10,6 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QListWidget>
-#include <QToolButton>
 #include <QWidget>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>

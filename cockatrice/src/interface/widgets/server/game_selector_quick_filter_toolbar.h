@@ -4,10 +4,7 @@
 #include "../tabs/tab_supervisor.h"
 #include "games_model.h"
 
-#include <QCheckBox>
-#include <QComboBox>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QLineEdit>
 #include <QWidget>
 

@@ -12,7 +12,6 @@
 #include "home_styled_button.h"
 
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
@@ -41,10 +40,12 @@ private:
     TabSupervisor *tabSupervisor;
     QPixmap background;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
-    DeckLoader *backgroundSourceDeck;
+    DeckList backgroundSourceDeck;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
+
+    void loadBackgroundSourceDeck();
 };
 
 #endif // HOME_WIDGET_H

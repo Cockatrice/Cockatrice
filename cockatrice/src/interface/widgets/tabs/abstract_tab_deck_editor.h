@@ -77,7 +77,6 @@ class QAction;
  *
  * - actAddCard(const ExactCard &card) — Adds a card to the deck.
  * - actDecrementCard(const ExactCard &card) — Removes a single instance of a card from the deck.
- * - actSwapCard(const ExactCard &card, const QString &zone) — Swaps a card between zones.
  * - actRemoveCard() — Removes the currently selected card from the deck.
  * - actSaveDeckAs() — Performs a "Save As" action for the deck.
  * - updateCard(const ExactCard &card) — Updates the currently displayed card info in the dock.
@@ -114,15 +113,15 @@ public:
     virtual void retranslateUi() override = 0;
 
     /** @brief Opens a deck in this tab.
-     *  @param deck Pointer to a DeckLoader object.
+     *  @param deck The deck to open
      */
-    void openDeck(DeckLoader *deck);
+    void openDeck(const LoadedDeck &deck);
 
     /** @brief Returns the currently active deck loader. */
     DeckLoader *getDeckLoader() const;
 
     /** @brief Returns the currently active deck list. */
-    DeckList *getDeckList() const;
+    const DeckList &getDeckList() const;
 
     /** @brief Sets the modified state of the tab.
      *  @param _windowModified Whether the tab is modified.
@@ -198,7 +197,7 @@ public slots:
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
-    void openDeckEditor(DeckLoader *deckLoader);
+    void openDeckEditor(const LoadedDeck &deck);
 
     /** @brief Emitted before the tab is closed. */
     void deckEditorClosing(AbstractTabDeckEditor *tab);
@@ -286,7 +285,7 @@ private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
      */
-    virtual void setDeck(DeckLoader *_deck);
+    virtual void setDeck(const LoadedDeck &_deck);
 
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
@@ -320,10 +319,7 @@ protected:
     bool isBlankNewDeck() const;
 
     /** @brief Helper function to add a card to a specific deck zone. */
-    void addCardHelper(const ExactCard &card, QString zoneName);
-
-    /** @brief Swaps a card in the deck view. */
-    void actSwapCard(const ExactCard &card, const QString &zoneName);
+    void addCardHelper(const ExactCard &card, const QString &zoneName);
 
     /** @brief Opens a deck from a file. */
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);

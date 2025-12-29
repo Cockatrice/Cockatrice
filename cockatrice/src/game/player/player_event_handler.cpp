@@ -6,6 +6,7 @@
 #include "../board/card_list.h"
 #include "../zones/view_zone.h"
 #include "player.h"
+#include "player_actions.h"
 
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
@@ -77,14 +78,7 @@ void PlayerEventHandler::eventShuffle(const Event_Shuffle &event)
 void PlayerEventHandler::eventRollDie(const Event_RollDie &event)
 {
     if (!event.values().empty()) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QList<uint> rolls(event.values().begin(), event.values().end());
-#else
-        QList<uint> rolls;
-        for (const auto &value : event.values()) {
-            rolls.append(value);
-        }
-#endif
         std::sort(rolls.begin(), rolls.end());
         emit logRollDie(player, static_cast<int>(event.sides()), rolls);
     } else if (event.value()) {

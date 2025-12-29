@@ -6,6 +6,7 @@
 #include "background_sources.h"
 #include "home_styled_button.h"
 
+#include <QGroupBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
@@ -19,10 +20,6 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     layout = new QGridLayout(this);
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
-    backgroundSourceDeck = new DeckLoader(this);
-
-    backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                       DeckLoader::CockatriceFormat, false);
 
     gradientColors = extractDominantColors(background);
 
@@ -71,11 +68,18 @@ void HomeWidget::initializeBackgroundFromSource()
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
         case BackgroundSources::DeckFileArt:
-            backgroundSourceDeck->loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod",
-                                               DeckLoader::CockatriceFormat, false);
+            loadBackgroundSourceDeck();
             cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
             break;
     }
+}
+
+void HomeWidget::loadBackgroundSourceDeck()
+{
+    DeckLoader deckLoader = DeckLoader(this);
+    deckLoader.loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice,
+                            false);
+    backgroundSourceDeck = deckLoader.getDeck().deckList;
 }
 
 void HomeWidget::updateRandomCard()
@@ -94,7 +98,7 @@ void HomeWidget::updateRandomCard()
                      newCard.getCardPtr()->getProperty("layout") != "normal");
             break;
         case BackgroundSources::DeckFileArt:
-            QList<CardRef> cardRefs = backgroundSourceDeck->getDeckList()->getCardRefList();
+            QList<CardRef> cardRefs = backgroundSourceDeck.getCardRefList();
             ExactCard oldCard = backgroundSourceCard->getCard();
 
             if (!cardRefs.empty()) {
@@ -182,7 +186,7 @@ QGroupBox *HomeWidget::createButtons()
 
     auto visualDeckEditorButton = new HomeStyledButton(tr("Create New Deck"), gradientColors);
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
-            [this] { tabSupervisor->openDeckInNewTab(nullptr); });
+            [this] { tabSupervisor->openDeckInNewTab(LoadedDeck()); });
     boxLayout->addWidget(visualDeckEditorButton);
     auto visualDeckStorageButton = new HomeStyledButton(tr("Browse Decks"), gradientColors);
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
@@ -195,6 +199,9 @@ QGroupBox *HomeWidget::createButtons()
     auto edhrecButton = new HomeStyledButton(tr("Browse EDHRec"), gradientColors);
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
+    auto archidektButton = new HomeStyledButton(tr("Browse Archidekt"), gradientColors);
+    connect(archidektButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addArchidektTab);
+    boxLayout->addWidget(archidektButton);
     auto replaybutton = new HomeStyledButton(tr("View Replays"), gradientColors);
     connect(replaybutton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replaybutton);

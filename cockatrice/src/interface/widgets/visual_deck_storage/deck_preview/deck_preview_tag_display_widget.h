@@ -30,12 +30,12 @@ public:
      * @param tagName The name of the tag to display.
      */
     explicit DeckPreviewTagDisplayWidget(QWidget *parent = nullptr, const QString &tagName = "");
-    QSize sizeHint() const override;
-    QString getTagName() const
+    [[nodiscard]] QSize sizeHint() const override;
+    [[nodiscard]] QString getTagName() const
     {
         return tagName;
     }
-    TagState getState() const
+    [[nodiscard]] TagState getState() const
     {
         return state;
     }
@@ -44,7 +44,7 @@ public:
     {
         state = newState;
         update();
-    };
+    }
 
 signals:
     /**

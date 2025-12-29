@@ -9,7 +9,6 @@
 
 #include <QObject>
 #include <QString>
-#include <utility>
 
 class CardFilter : public QObject
 {
@@ -34,6 +33,7 @@ public:
         AttrLoyalty,
         AttrManaCost,
         AttrName,
+        AttrNameExact,
         AttrPow,
         AttrRarity,
         AttrSet,
@@ -56,20 +56,20 @@ public:
     {
     }
 
-    Type type() const
+    [[nodiscard]] Type type() const
     {
         return t;
     }
-    const QString &term() const
+    [[nodiscard]] const QString &term() const
     {
         return trm;
     }
-    Attr attr() const
+    [[nodiscard]] Attr attr() const
     {
         return a;
     }
 
-    QJsonObject toJson() const;
+    [[nodiscard]] QJsonObject toJson() const;
     static CardFilter *fromJson(const QJsonObject &json);
     static const QString typeName(Type t);
     static const QString attrName(Attr a);

@@ -7,6 +7,8 @@
 #ifndef CARDINFOTEXT_H
 #define CARDINFOTEXT_H
 
+#include "libcockatrice/card/printing/exact_card.h"
+
 #include <QFrame>
 #include <libcockatrice/card/card_info.h>
 class QLabel;
@@ -32,7 +34,7 @@ public:
 signals:
     void linkActivated(const QString &link);
 public slots:
-    void setCard(CardInfoPtr card);
+    void setCard(const ExactCard &card);
 };
 
 #endif

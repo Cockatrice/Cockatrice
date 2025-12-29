@@ -11,9 +11,7 @@
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
-#include <QPainter>
 #include <QWidget>
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class PrintingSelectorCardDisplayWidget : public QWidget
@@ -22,12 +20,11 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                      AbstractTabDeckEditor *_deckEditor,
-                                      DeckListModel *_deckModel,
-                                      QTreeView *_deckView,
-                                      QSlider *_cardSizeSlider,
-                                      const ExactCard &_rootCard,
-                                      QString &_currentZone);
+                                      AbstractTabDeckEditor *deckEditor,
+                                      DeckListModel *deckModel,
+                                      QTreeView *deckView,
+                                      QSlider *cardSizeSlider,
+                                      const ExactCard &rootCard);
 
 public slots:
     void clampSetNameToPicture();
@@ -38,12 +35,6 @@ signals:
 private:
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
-    AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
-    QSlider *cardSizeSlider;
-    ExactCard rootCard;
-    QString currentZone;
     PrintingSelectorCardOverlayWidget *overlayWidget;
 };
 

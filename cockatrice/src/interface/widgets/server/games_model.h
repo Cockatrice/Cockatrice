@@ -3,11 +3,9 @@
 
 #include "game_type_map.h"
 
-#include <QAbstractTableModel>
 #include <QList>
 #include <QSet>
 #include <QSortFilterProxyModel>
-#include <QStringList>
 #include <QTime>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
@@ -42,19 +40,20 @@ public:
      */
     GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTypeMap> &_gameTypes, QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override
     {
         return parent.isValid() ? 0 : gameList.size();
     }
 
-    int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override
+    [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override
     {
         return NUM_COLS;
     }
 
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
 
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    [[nodiscard]] QVariant
+    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     /**
      * @brief Formats the game creation time into a human-readable string.
@@ -148,71 +147,71 @@ public:
     explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
     // Getters for filter parameters
-    bool getHideBuddiesOnlyGames() const
+    [[nodiscard]] bool getHideBuddiesOnlyGames() const
     {
         return hideBuddiesOnlyGames;
     }
-    bool getHideIgnoredUserGames() const
+    [[nodiscard]] bool getHideIgnoredUserGames() const
     {
         return hideIgnoredUserGames;
     }
-    bool getHideFullGames() const
+    [[nodiscard]] bool getHideFullGames() const
     {
         return hideFullGames;
     }
-    bool getHideGamesThatStarted() const
+    [[nodiscard]] bool getHideGamesThatStarted() const
     {
         return hideGamesThatStarted;
     }
-    bool getHidePasswordProtectedGames() const
+    [[nodiscard]] bool getHidePasswordProtectedGames() const
     {
         return hidePasswordProtectedGames;
     }
-    bool getHideNotBuddyCreatedGames() const
+    [[nodiscard]] bool getHideNotBuddyCreatedGames() const
     {
         return hideNotBuddyCreatedGames;
     }
-    bool getHideOpenDecklistGames() const
+    [[nodiscard]] bool getHideOpenDecklistGames() const
     {
         return hideOpenDecklistGames;
     }
-    QString getGameNameFilter() const
+    [[nodiscard]] QString getGameNameFilter() const
     {
         return gameNameFilter;
     }
-    QStringList getCreatorNameFilters() const
+    [[nodiscard]] QStringList getCreatorNameFilters() const
     {
         return creatorNameFilters;
     }
-    QSet<int> getGameTypeFilter() const
+    [[nodiscard]] QSet<int> getGameTypeFilter() const
     {
         return gameTypeFilter;
     }
-    int getMaxPlayersFilterMin() const
+    [[nodiscard]] int getMaxPlayersFilterMin() const
     {
         return maxPlayersFilterMin;
     }
-    int getMaxPlayersFilterMax() const
+    [[nodiscard]] int getMaxPlayersFilterMax() const
     {
         return maxPlayersFilterMax;
     }
-    const QTime &getMaxGameAge() const
+    [[nodiscard]] const QTime &getMaxGameAge() const
     {
         return maxGameAge;
     }
-    bool getShowOnlyIfSpectatorsCanWatch() const
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanWatch() const
     {
         return showOnlyIfSpectatorsCanWatch;
     }
-    bool getShowSpectatorPasswordProtected() const
+    [[nodiscard]] bool getShowSpectatorPasswordProtected() const
     {
         return showSpectatorPasswordProtected;
     }
-    bool getShowOnlyIfSpectatorsCanChat() const
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanChat() const
     {
         return showOnlyIfSpectatorsCanChat;
     }
-    bool getShowOnlyIfSpectatorsCanSeeHands() const
+    [[nodiscard]] bool getShowOnlyIfSpectatorsCanSeeHands() const
     {
         return showOnlyIfSpectatorsCanSeeHands;
     }
@@ -328,7 +327,7 @@ public:
     /**
      * @brief Returns the number of games filtered out by the current filter.
      */
-    int getNumFilteredGames() const;
+    [[nodiscard]] int getNumFilteredGames() const;
 
     /**
      * @brief Resets all filter parameters to default values.
@@ -338,7 +337,7 @@ public:
     /**
      * @brief Returns true if all filter parameters are set to their defaults.
      */
-    bool areFilterParametersSetToDefaults() const;
+    [[nodiscard]] bool areFilterParametersSetToDefaults() const;
 
     /**
      * @brief Loads filter parameters from persistent settings.
@@ -358,8 +357,8 @@ public:
     void refresh();
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
-    bool filterAcceptsRow(int sourceRow) const;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow) const;
 };
 
 #endif

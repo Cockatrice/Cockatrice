@@ -13,6 +13,7 @@
 
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
+struct LoadedDeck;
 class ServerInfo_User;
 class AbstractClient;
 class QTreeView;
@@ -23,7 +24,6 @@ class QTreeWidgetItem;
 class QGroupBox;
 class CommandContainer;
 class Response;
-class DeckLoader;
 
 class TabDeckStorage : public Tab
 {
@@ -87,7 +87,7 @@ public:
         return tr("Deck Storage");
     }
 signals:
-    void openDeckEditor(DeckLoader *deckLoader);
+    void openDeckEditor(const LoadedDeck &deck);
 };
 
 #endif

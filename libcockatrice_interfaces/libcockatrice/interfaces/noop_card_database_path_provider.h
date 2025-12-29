@@ -5,19 +5,19 @@
 class NoopCardDatabasePathProvider : public ICardDatabasePathProvider
 {
 public:
-    QString getCardDatabasePath() const override
+    [[nodiscard]] QString getCardDatabasePath() const override
     {
         return "";
     }
-    QString getCustomCardDatabasePath() const override
+    [[nodiscard]] QString getCustomCardDatabasePath() const override
     {
         return "";
     }
-    QString getTokenDatabasePath() const override
+    [[nodiscard]] QString getTokenDatabasePath() const override
     {
         return "";
     }
-    QString getSpoilerCardDatabasePath() const override
+    [[nodiscard]] QString getSpoilerCardDatabasePath() const override
     {
         return "";
     }

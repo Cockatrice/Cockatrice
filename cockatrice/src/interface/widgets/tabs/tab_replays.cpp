@@ -17,7 +17,6 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QUrl>
-#include <QVBoxLayout>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>

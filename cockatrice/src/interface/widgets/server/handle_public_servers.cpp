@@ -3,8 +3,6 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QJsonDocument>
-#include <QMessageBox>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QUrl>
 

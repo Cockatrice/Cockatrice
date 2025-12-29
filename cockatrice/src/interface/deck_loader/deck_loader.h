@@ -7,14 +7,16 @@
 #ifndef DECK_LOADER_H
 #define DECK_LOADER_H
 
+#include "loaded_deck.h"
+
 #include <QLoggingCategory>
 #include <QPrinter>
 #include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
 
-inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader")
+inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");
 
-    class DeckLoader : public QObject
+class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
@@ -22,12 +24,6 @@ signals:
     void loadFinished(bool success);
 
 public:
-    enum FileFormat
-    {
-        PlainTextFormat,
-        CockatriceFormat
-    };
-
     /**
      * Supported file extensions for decklist files
      */
@@ -45,56 +41,29 @@ public:
     };
 
 private:
-    DeckList *deckList;
-    QString lastFileName;
-    FileFormat lastFileFormat;
-    int lastRemoteDeckId;
+    LoadedDeck loadedDeck;
 
 public:
     DeckLoader(QObject *parent);
-    DeckLoader(QObject *parent, DeckList *_deckList);
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const QString &getLastFileName() const
+    [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastFileName;
-    }
-    void setLastFileName(const QString &_lastFileName)
-    {
-        lastFileName = _lastFileName;
-    }
-    FileFormat getLastFileFormat() const
-    {
-        return lastFileFormat;
-    }
-    int getLastRemoteDeckId() const
-    {
-        return lastRemoteDeckId;
+        return loadedDeck.lastLoadInfo.isEmpty();
     }
 
-    bool hasNotBeenLoaded() const
-    {
-        return getLastFileName().isEmpty() && getLastRemoteDeckId() == -1;
-    }
-
-    static void clearSetNamesAndNumbers(const DeckList *deckList);
-    static FileFormat getFormatFromName(const QString &fileName);
-
-    bool loadFromFile(const QString &fileName, FileFormat fmt, bool userRequest = false);
-    bool loadFromFileAsync(const QString &fileName, FileFormat fmt, bool userRequest);
+    bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
+    bool loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
     bool loadFromRemote(const QString &nativeString, int remoteDeckId);
-    bool saveToFile(const QString &fileName, FileFormat fmt);
-    bool updateLastLoadedTimestamp(const QString &fileName, FileFormat fmt);
+    bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
+    bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
-    static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
+    static QString exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website);
 
-    static void setProviderIdToPreferredPrinting(const DeckList *deckList);
-    static void resolveSetNameAndNumberToProviderID(const DeckList *deckList);
-
-    static void saveToClipboard(const DeckList *deckList, bool addComments = true, bool addSetNameAndNumber = true);
+    static void saveToClipboard(const DeckList &deckList, bool addComments = true, bool addSetNameAndNumber = true);
     static bool saveToStream_Plain(QTextStream &out,
-                                   const DeckList *deckList,
+                                   const DeckList &deckList,
                                    bool addComments = true,
                                    bool addSetNameAndNumber = true);
 
@@ -103,18 +72,26 @@ public:
      * @param printer The printer to render the decklist to.
      * @param deckList
      */
-    static void printDeckList(QPrinter *printer, const DeckList *deckList);
+    static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
-    bool convertToCockatriceFormat(QString fileName);
+    bool convertToCockatriceFormat(const QString &fileName);
 
-    DeckList *getDeckList()
+    LoadedDeck &getDeck()
     {
-        return deckList;
+        return loadedDeck;
+    }
+    const LoadedDeck &getDeck() const
+    {
+        return loadedDeck;
+    }
+    void setDeck(const LoadedDeck &deck)
+    {
+        loadedDeck = deck;
     }
 
 private:
-    static void printDeckListNode(QTextCursor *cursor, InnerDecklistNode *node);
-    static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);
+    static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
+    static void saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList);
 
     static void saveToStream_DeckZone(QTextStream &out,
                                       const InnerDecklistNode *zoneNode,
@@ -125,9 +102,6 @@ private:
                                            QList<DecklistCardNode *> cards,
                                            bool addComments = true,
                                            bool addSetNameAndNumber = true);
-
-    [[nodiscard]] static QString getCardZoneFromName(const QString &cardName, QString currentZoneName);
-    [[nodiscard]] static QString getCompleteCardName(const QString &cardName);
 };
 
 #endif

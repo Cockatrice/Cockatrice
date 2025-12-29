@@ -9,12 +9,6 @@
 
 #include "../../../../../../deck_loader/deck_loader.h"
 
-#include <QDebug>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QString>
-#include <QVector>
-
 class EdhrecDeckApiResponse
 {
 public:
@@ -27,7 +21,7 @@ public:
     // Debug method for logging
     void debugPrint() const;
 
-    DeckLoader *deckLoader;
+    DeckList deck;
 };
 
 #endif // EDHREC_DECK_API_RESPONSE_H

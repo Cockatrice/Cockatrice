@@ -9,9 +9,9 @@
 
 #include "../tab.h"
 
+struct LoadedDeck;
 class AbstractClient;
 class CommandContainer;
-class DeckLoader;
 class DeckPreviewWidget;
 class QFileSystemModel;
 class QGroupBox;
@@ -39,7 +39,7 @@ public slots:
     void actOpenLocalDeck(const QString &filePath);
 
 signals:
-    void openDeckEditor(DeckLoader *deckLoader);
+    void openDeckEditor(const LoadedDeck &deck);
 
 private:
     VisualDeckStorageWidget *visualDeckStorageWidget;

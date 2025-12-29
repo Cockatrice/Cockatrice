@@ -14,13 +14,11 @@
 #include "../game/player/player.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/widgets/replay/replay_manager.h"
-#include "../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "tab.h"
 
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
-#include <libcockatrice/protocol/pb/event_leave.pb.h>
 
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
@@ -47,7 +45,6 @@ class ReplayTimelineWidget;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
-class DeckLoader;
 class QVBoxLayout;
 class QHBoxLayout;
 class GameReplay;
@@ -121,7 +118,7 @@ signals:
     void containerProcessingStarted(const GameEventContext &context);
     void containerProcessingDone();
     void openMessageDialog(const QString &userName, bool focus);
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
     void notIdle();
 
     void phaseChanged(int phase);

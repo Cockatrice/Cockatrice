@@ -7,16 +7,13 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-#include "../general/layout_containers/flow_widget.h"
 #include "mana_base_widget.h"
 #include "mana_curve_widget.h"
 #include "mana_devotion_widget.h"
 
 #include <QHBoxLayout>
 #include <QScrollArea>
-#include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class DeckAnalyticsWidget : public QWidget
@@ -27,10 +24,11 @@ public:
     explicit DeckAnalyticsWidget(QWidget *parent, DeckListModel *deckListModel);
     void setDeckList(const DeckList &_deckListModel);
     std::map<int, int> analyzeManaCurve();
-    void refreshDisplays(DeckListModel *_deckListModel);
+    void refreshDisplays();
 
 private:
     DeckListModel *deckListModel;
+    DeckListStatisticsAnalyzer *deckListStatisticsAnalyzer;
     QVBoxLayout *mainLayout;
 
     QWidget *container;

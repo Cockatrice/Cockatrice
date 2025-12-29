@@ -7,6 +7,7 @@
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
+#include "../dialogs/dlg_create_token.h"
 #include "event_processing_options.h"
 #include "player.h"
 

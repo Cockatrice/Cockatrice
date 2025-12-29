@@ -45,13 +45,13 @@ private slots:
 
 public:
     explicit BanDialog(const ServerInfo_User &info, QWidget *parent = nullptr);
-    QString getBanName() const;
-    QString getBanIP() const;
-    QString getBanId() const;
-    int getMinutes() const;
-    QString getReason() const;
-    QString getVisibleReason() const;
-    int getDeleteMessages() const;
+    [[nodiscard]] QString getBanName() const;
+    [[nodiscard]] QString getBanIP() const;
+    [[nodiscard]] QString getBanId() const;
+    [[nodiscard]] int getMinutes() const;
+    [[nodiscard]] QString getReason() const;
+    [[nodiscard]] QString getVisibleReason() const;
+    [[nodiscard]] int getDeleteMessages() const;
 };
 
 class WarningDialog : public QDialog
@@ -68,10 +68,10 @@ private slots:
 
 public:
     WarningDialog(const QString userName, const QString clientID, QWidget *parent = nullptr);
-    QString getName() const;
-    QString getWarnID() const;
-    QString getReason() const;
-    int getDeleteMessages() const;
+    [[nodiscard]] QString getName() const;
+    [[nodiscard]] QString getWarnID() const;
+    [[nodiscard]] QString getReason() const;
+    [[nodiscard]] int getDeleteMessages() const;
     void addWarningOption(const QString warning);
 };
 
@@ -85,11 +85,11 @@ private:
 
 public:
     explicit AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent = nullptr);
-    QString getName() const
+    [[nodiscard]] QString getName() const
     {
         return userName;
     }
-    QString getNotes() const;
+    [[nodiscard]] QString getNotes() const;
 };
 
 class UserListItemDelegate : public QStyledItemDelegate
@@ -159,7 +159,7 @@ public:
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
     void setUserOnline(const QString &userName, bool online);
-    const QMap<QString, UserListTWI *> &getUsers() const
+    [[nodiscard]] const QMap<QString, UserListTWI *> &getUsers() const
     {
         return users;
     }

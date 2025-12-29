@@ -8,9 +8,8 @@
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
 
-#include <QFrame>
+#include <QBoxLayout>
 #include <QScrollBar>
-#include <qboxlayout.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.
@@ -116,9 +115,8 @@ void PrintingSelector::updateDisplay()
  * @brief Sets the current card for the selector and updates the display.
  *
  * @param newCard The new card to set.
- * @param _currentZone The current zone the card is in.
  */
-void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_currentZone)
+void PrintingSelector::setCard(const CardInfoPtr &newCard)
 {
     if (newCard.isNull()) {
         return;
@@ -130,65 +128,12 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard, const QString &_curre
     }
 
     selectedCard = newCard;
-    currentZone = _currentZone;
     if (isVisible()) {
         updateDisplay();
     }
     flowWidget->setMinimumSizeToMaxSizeHint();
     flowWidget->scrollArea->verticalScrollBar()->setValue(0);
     flowWidget->repaint();
-}
-
-/**
- * @brief Selects the previous card in the list.
- */
-void PrintingSelector::selectPreviousCard()
-{
-    selectCard(-1);
-}
-
-/**
- * @brief Selects the next card in the list.
- */
-void PrintingSelector::selectNextCard()
-{
-    selectCard(1);
-}
-
-/**
- * @brief Selects a card based on the change direction.
- *
- * @param changeBy The direction to change, -1 for previous, 1 for next.
- */
-void PrintingSelector::selectCard(const int changeBy)
-{
-    if (changeBy == 0) {
-        return;
-    }
-
-    // Get the current index of the selected item
-    auto deckViewCurrentIndex = deckView->currentIndex();
-
-    auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
-    if (!nextIndex.isValid()) {
-        nextIndex = deckViewCurrentIndex;
-
-        // Increment to the next valid index, skipping header rows
-        AbstractDecklistNode *node;
-        do {
-            if (changeBy > 0) {
-                nextIndex = deckView->indexBelow(nextIndex);
-            } else {
-                nextIndex = deckView->indexAbove(nextIndex);
-            }
-            node = static_cast<AbstractDecklistNode *>(nextIndex.internalPointer());
-        } while (node && node->isDeckHeader());
-    }
-
-    if (nextIndex.isValid()) {
-        deckView->setCurrentIndex(nextIndex);
-        deckView->setFocus(Qt::FocusReason::MouseFocusReason);
-    }
 }
 
 /**
@@ -219,8 +164,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
     connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
             auto card = ExactCard(selectedCard, printingsToUse[currentIndex]);
-            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(
-                this, deckEditor, deckModel, deckView, cardSizeWidget->getSlider(), card, currentZone);
+            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
+                                                                            cardSizeWidget->getSlider(), card);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
             connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,

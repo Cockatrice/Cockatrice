@@ -26,7 +26,7 @@ class CockatriceXml3Parser : public ICardDatabaseParser
 {
     Q_OBJECT
 public:
-    CockatriceXml3Parser() = default;
+    CockatriceXml3Parser(ICardSetPriorityController *cardSetPriorityController);
     ~CockatriceXml3Parser() override = default;
 
     /**
@@ -46,7 +46,8 @@ public:
     /**
      * @brief Save sets and cards back to an XML3 file.
      */
-    bool saveToFile(SetNameMap _sets,
+    bool saveToFile(FormatRulesNameMap _formats,
+                    SetNameMap _sets,
                     CardNameMap cards,
                     const QString &fileName,
                     const QString &sourceUrl = "unknown",

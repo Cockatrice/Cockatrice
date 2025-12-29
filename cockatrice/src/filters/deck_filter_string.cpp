@@ -1,5 +1,6 @@
 #include "deck_filter_string.h"
 
+#include <QFileInfo>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/utility/peglib.h>
@@ -12,7 +13,7 @@ QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / GenericQuery
+QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / FormatQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 
@@ -21,8 +22,9 @@ CardSearch <- '[[' CardFilterString ']]'
 CardFilterString <- (!']]'.)*
 
 DeckNameQuery <- ([Dd] 'eck')? [Nn] 'ame'? [:] String
-FileNameQuery <- [Ff] ('ile' 'name'?)? [:] String
+FileNameQuery <- [Ff] ([Nn] / 'ile' ([Nn] 'ame')?) [:] String
 PathQuery <- [Pp] 'ath'? [:] String
+FormatQuery <- [Ff] 'ormat'? [:] String
 
 GenericQuery <- String
 
@@ -117,12 +119,13 @@ static void setupParserRules()
 
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) -> bool {
             int count = 0;
-            deck->deckLoader->getDeckList()->forEachCard([&](InnerDecklistNode *, const DecklistCardNode *node) {
+            auto cardNodes = deck->deckLoader->getDeck().deckList.getCardNodes();
+            for (auto node : cardNodes) {
                 auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }
-            });
+            }
             return numberMatcher(count);
         };
     };
@@ -136,7 +139,7 @@ static void setupParserRules()
     search["DeckNameQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
         auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
-            return deck->deckLoader->getDeckList()->getName().contains(name, Qt::CaseInsensitive);
+            return deck->deckLoader->getDeck().deckList.getName().contains(name, Qt::CaseInsensitive);
         };
     };
 
@@ -152,6 +155,14 @@ static void setupParserRules()
         auto name = std::any_cast<QString>(sv[0]);
         return [=](const DeckPreviewWidget *, const ExtraDeckSearchInfo &info) {
             return info.relativeFilePath.contains(name, Qt::CaseInsensitive);
+        };
+    };
+
+    search["FormatQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto format = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            auto gameFormat = deck->deckLoader->getDeck().deckList.getGameFormat();
+            return QString::compare(format, gameFormat, Qt::CaseInsensitive) == 0;
         };
     };
 

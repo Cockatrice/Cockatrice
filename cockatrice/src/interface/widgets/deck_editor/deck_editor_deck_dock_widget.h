@@ -15,7 +15,6 @@
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 
-#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
 #include <QTextEdit>
@@ -57,19 +56,22 @@ public:
 
 public slots:
     void cleanDeck();
+    void selectPrevCard();
+    void selectNextCard();
     void updateBannerCardComboBox();
-    void setDeck(DeckLoader *_deck);
+    void setDeck(const LoadedDeck &_deck);
     void syncDisplayWidgetsToModel();
     void sortDeckModelToDeckView();
     DeckLoader *getDeckLoader();
-    DeckList *getDeckList();
-    void actIncrement();
-    bool swapCard(const QModelIndex &idx);
+    const DeckList &getDeckList() const;
+    void actAddCard(const ExactCard &card, const QString &zoneName);
+    void actIncrementSelection();
     void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
-    void actSwapCard();
+    void actSwapCard(const ExactCard &card, const QString &zoneName);
+    void actSwapSelection();
     void actRemoveCard();
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
+    void initializeFormats();
 
 signals:
     void nameChanged();
@@ -100,24 +102,30 @@ private:
     LineEditUnfocusable *hashLabel;
     QLabel *activeGroupCriteriaLabel;
     QComboBox *activeGroupCriteriaComboBox;
+    QLabel *formatLabel;
+    QComboBox *formatComboBox;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
-    void recursiveExpand(const QModelIndex &index);
-    QModelIndexList getSelectedCardNodes() const;
+    [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
+    void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
 private slots:
     void decklistCustomMenu(QPoint point);
+    bool swapCard(const QModelIndex &currentIndex);
     void updateCard(QModelIndex, const QModelIndex &current);
     void updateName(const QString &name);
     void updateComments();
     void setBannerCard(int);
+    void setTags(const QStringList &tags);
     void syncDeckListBannerCardWithComboBox();
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
+    void changeSelectedCard(int changeBy);
+    void recursiveExpand(const QModelIndex &parent);
     void expandAll();
 };
 

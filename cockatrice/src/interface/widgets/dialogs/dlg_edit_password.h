@@ -7,7 +7,6 @@
 #ifndef DLG_EDITPASSWORD_H
 #define DLG_EDITPASSWORD_H
 
-#include <QComboBox>
 #include <QDialog>
 #include <QLineEdit>
 
@@ -20,11 +19,11 @@ class DlgEditPassword : public QDialog
     Q_OBJECT
 public:
     explicit DlgEditPassword(QWidget *parent = nullptr);
-    QString getOldPassword() const
+    [[nodiscard]] QString getOldPassword() const
     {
         return oldPasswordEdit->text();
     }
-    QString getNewPassword() const
+    [[nodiscard]] QString getNewPassword() const
     {
         return newPasswordEdit->text();
     }

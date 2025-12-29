@@ -1,5 +1,6 @@
 #include "edhrec_api_response_card_details_display_widget.h"
 
+#include "../../../../../general/display/background_plate_widget.h"
 #include "../../tab_edhrec_main.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -18,15 +19,21 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     nameLabel = new QLabel(this);
     nameLabel->setText(toDisplay.name);
     nameLabel->setAlignment(Qt::AlignHCenter);
+    nameLabel->setStyleSheet("font-size: 20px; font-weight: bold");
 
     inclusionDisplayWidget = new EdhrecApiResponseCardInclusionDisplayWidget(this, toDisplay);
 
     synergyDisplayWidget = new EdhrecApiResponseCardSynergyDisplayWidget(this, toDisplay);
 
-    layout->addWidget(nameLabel);
-    layout->addWidget(cardPictureWidget);
-    layout->addWidget(inclusionDisplayWidget);
-    layout->addWidget(synergyDisplayWidget);
+    backgroundPlateWidget = new BackgroundPlateWidget(this);
+    auto plateLayout = new QVBoxLayout(backgroundPlateWidget);
+
+    plateLayout->addWidget(nameLabel);
+    plateLayout->addWidget(cardPictureWidget);
+    plateLayout->addWidget(inclusionDisplayWidget);
+    plateLayout->addWidget(synergyDisplayWidget);
+
+    layout->addWidget(backgroundPlateWidget);
 
     QWidget *currentParent = parentWidget();
     TabEdhRecMain *parentTab = nullptr;
@@ -47,6 +54,28 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
                 &TabEdhRecMain::actNavigatePage);
     }
+}
+
+void EdhrecApiResponseCardDetailsDisplayWidget::mousePressEvent(QMouseEvent *event)
+{
+    QWidget::mousePressEvent(event);
+    actRequestPageNavigation();
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEnterEvent *event)
+#else
+void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEvent *event)
+#endif
+{
+    QWidget::enterEvent(event);
+    backgroundPlateWidget->setFocused(true);
+}
+
+void EdhrecApiResponseCardDetailsDisplayWidget::leaveEvent(QEvent *event)
+{
+    QWidget::leaveEvent(event);
+    backgroundPlateWidget->setFocused(false);
 }
 
 void EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation()

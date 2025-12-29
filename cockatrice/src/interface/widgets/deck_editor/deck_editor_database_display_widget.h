@@ -32,7 +32,7 @@ public:
     QTreeView *getDatabaseView()
     {
         return databaseView;
-    };
+    }
 
 public slots:
     ExactCard currentCard() const;

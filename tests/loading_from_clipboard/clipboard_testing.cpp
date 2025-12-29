@@ -1,24 +1,34 @@
 #include "clipboard_testing.h"
 
 #include <QTextStream>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+
+DeckList getDeckList(const QString &clipboard)
+{
+    DeckList deckList;
+    QString cp(clipboard);
+    QTextStream stream(&cp); // text stream requires local copy
+    deckList.loadFromStream_Plain(stream, false);
+    return deckList;
+}
 
 void testEmpty(const QString &clipboard)
 {
-    QString cp(clipboard);
-    DeckList deckList;
-    QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream, false);
+    DeckList deckList = getDeckList(clipboard);
 
     ASSERT_TRUE(deckList.getCardList().isEmpty());
 }
 
+void testHash(const QString &clipboard, const std::string &hash)
+{
+    DeckList deckList = getDeckList(clipboard);
+
+    ASSERT_EQ(deckList.getDeckHash().toStdString(), hash);
+}
+
 void testDeck(const QString &clipboard, const Result &result)
 {
-    QString cp(clipboard);
-    DeckList deckList;
-    QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream, false);
+    DeckList deckList = getDeckList(clipboard);
 
     ASSERT_EQ(result.name, deckList.getName().toStdString());
     ASSERT_EQ(result.comments, deckList.getComments().toStdString());

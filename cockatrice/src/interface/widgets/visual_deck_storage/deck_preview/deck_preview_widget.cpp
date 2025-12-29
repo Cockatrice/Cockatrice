@@ -6,6 +6,7 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include <QClipboard>
+#include <QDir>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QMenu>
@@ -31,7 +32,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
      many deck loads have finished already and if we've loaded all decks and THEN load all the tags at once. */
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
-    deckLoader->loadFromFileAsync(filePath, DeckLoader::getFormatFromName(filePath), false);
+    deckLoader->loadFromFileAsync(filePath, DeckFileFormat::getFormatFromName(filePath), false);
 
     bannerCardDisplayWidget =
         new DeckPreviewCardPictureWidget(this, false, visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
@@ -73,23 +74,24 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     if (!deckLoadSuccess) {
         return;
     }
-    auto bannerCard = deckLoader->getDeckList()->getBannerCard().name.isEmpty()
+    auto bannerCard = deckLoader->getDeck().deckList.getBannerCard().name.isEmpty()
                           ? ExactCard()
-                          : CardDatabaseManager::query()->getCard(deckLoader->getDeckList()->getBannerCard());
+                          : CardDatabaseManager::query()->getCard(deckLoader->getDeck().deckList.getBannerCard());
 
     bannerCardDisplayWidget->setCard(bannerCard);
     bannerCardDisplayWidget->setFontSize(24);
-    setFilePath(deckLoader->getLastFileName());
+    setFilePath(deckLoader->getDeck().lastLoadInfo.fileName);
 
     colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeckList());
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeck().deckList.getTags());
+    connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, this, &DeckPreviewWidget::setTags);
 
     bannerCardLabel = new QLabel(this);
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardComboBox = new QComboBox(this);
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     bannerCardComboBox->setObjectName("bannerCardComboBox");
-    bannerCardComboBox->setCurrentText(deckLoader->getDeckList()->getBannerCard().name);
+    bannerCardComboBox->setCurrentText(deckLoader->getDeck().deckList.getBannerCard().name);
     bannerCardComboBox->installEventFilter(new NoScrollFilter());
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
@@ -151,7 +153,7 @@ void DeckPreviewWidget::updateTagsVisibility(bool visible)
 
 QString DeckPreviewWidget::getColorIdentity()
 {
-    QStringList cardList = deckLoader->getDeckList()->getCardList();
+    QStringList cardList = deckLoader->getDeck().deckList.getCardList();
     if (cardList.isEmpty()) {
         return {};
     }
@@ -185,8 +187,8 @@ QString DeckPreviewWidget::getColorIdentity()
  */
 QString DeckPreviewWidget::getDisplayName() const
 {
-    return deckLoader->getDeckList()->getName().isEmpty() ? QFileInfo(deckLoader->getLastFileName()).fileName()
-                                                          : deckLoader->getDeckList()->getName();
+    QString deckName = deckLoader->getDeck().deckList.getName();
+    return !deckName.isEmpty() ? deckName : QFileInfo(deckLoader->getDeck().lastLoadInfo.fileName).fileName();
 }
 
 void DeckPreviewWidget::setFilePath(const QString &_filePath)
@@ -233,7 +235,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
     // Prepare the new items with deduplication
     QSet<QPair<QString, QString>> bannerCardSet;
 
-    QList<DecklistCardNode *> cardsInDeck = deckLoader->getDeckList()->getCardNodes();
+    QList<const DecklistCardNode *> cardsInDeck = deckLoader->getDeck().deckList.getCardNodes();
 
     for (auto currentCard : cardsInDeck) {
         for (int k = 0; k < currentCard->getNumber(); ++k) {
@@ -267,7 +269,7 @@ void DeckPreviewWidget::updateBannerCardComboBox()
         bannerCardComboBox->setCurrentIndex(restoredIndex);
     } else {
         // Add a placeholder "-" and set it as the current selection
-        int bannerIndex = bannerCardComboBox->findText(deckLoader->getDeckList()->getBannerCard().name);
+        int bannerIndex = bannerCardComboBox->findText(deckLoader->getDeck().deckList.getBannerCard().name);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
         } else {
@@ -285,8 +287,8 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
 {
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
-    deckLoader->getDeckList()->setBannerCard(cardRef);
-    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+    deckLoader->getDeck().deckList.setBannerCard(cardRef);
+    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
@@ -306,13 +308,19 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
     emit deckLoadRequested(filePath);
 }
 
+void DeckPreviewWidget::setTags(const QStringList &tags)
+{
+    deckLoader->getDeck().deckList.setTags(tags);
+    deckLoader->saveToFile(filePath, DeckFileFormat::Cockatrice);
+}
+
 QMenu *DeckPreviewWidget::createRightClickMenu()
 {
     auto *menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(menu->addAction(tr("Open in deck editor")), &QAction::triggered, this,
-            [this] { emit openDeckEditor(deckLoader); });
+            [this] { emit openDeckEditor(deckLoader->getDeck()); });
 
     connect(menu->addAction(tr("Edit Tags")), &QAction::triggered, deckTagsDisplayWidget,
             &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
@@ -326,13 +334,13 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
     auto saveToClipboardMenu = menu->addMenu(tr("Save Deck to Clipboard"));
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this,
-            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), true, true); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeck().deckList, true, true); });
     connect(saveToClipboardMenu->addAction(tr("Annotated (No set info)")), &QAction::triggered, this,
-            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), true, false); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeck().deckList, true, false); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated")), &QAction::triggered, this,
-            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), false, true); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeck().deckList, false, true); });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set info)")), &QAction::triggered, this,
-            [this] { DeckLoader::saveToClipboard(deckLoader->getDeckList(), false, false); });
+            [this] { DeckLoader::saveToClipboard(deckLoader->getDeck().deckList, false, false); });
 
     menu->addSeparator();
 
@@ -368,7 +376,7 @@ void DeckPreviewWidget::addSetBannerCardMenu(QMenu *menu)
 void DeckPreviewWidget::actRenameDeck()
 {
     // read input
-    const QString oldName = deckLoader->getDeckList()->getName();
+    const QString oldName = deckLoader->getDeck().deckList.getName();
 
     bool ok;
     QString newName = QInputDialog::getText(this, "Rename deck", tr("New name:"), QLineEdit::Normal, oldName, &ok);
@@ -377,8 +385,8 @@ void DeckPreviewWidget::actRenameDeck()
     }
 
     // write change
-    deckLoader->getDeckList()->setName(newName);
-    deckLoader->saveToFile(filePath, DeckLoader::getFormatFromName(filePath));
+    deckLoader->getDeck().deckList.setName(newName);
+    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
 
     // update VDS
     refreshBannerCardText();
@@ -408,7 +416,7 @@ void DeckPreviewWidget::actRenameFile()
         return;
     }
 
-    deckLoader->setLastFileName(newFilePath);
+    deckLoader->getDeck().lastLoadInfo.fileName = newFilePath;
 
     // update VDS
     setFilePath(newFilePath);

@@ -23,9 +23,9 @@ public:
     ~FlowLayout() override;
     void insertWidgetAtIndex(QWidget *toInsert, int index);
 
-    QSize calculateMinimumSizeHorizontal() const;
-    QSize calculateSizeHintVertical() const;
-    QSize calculateMinimumSizeVertical() const;
+    [[nodiscard]] QSize calculateMinimumSizeHorizontal() const;
+    [[nodiscard]] QSize calculateSizeHintVertical() const;
+    [[nodiscard]] QSize calculateMinimumSizeVertical() const;
     void addItem(QLayoutItem *item) override;
     [[nodiscard]] int count() const override;
     [[nodiscard]] QLayoutItem *itemAt(int index) const override;
@@ -48,7 +48,7 @@ public:
     void layoutSingleColumn(const QVector<QLayoutItem *> &colItems, int x, int y);
     [[nodiscard]] QSize sizeHint() const override;
     [[nodiscard]] QSize minimumSize() const override;
-    QSize calculateSizeHintHorizontal() const;
+    [[nodiscard]] QSize calculateSizeHintHorizontal() const;
 
 protected:
     QList<QLayoutItem *> items; // List to store layout items

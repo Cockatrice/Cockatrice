@@ -1,12 +1,11 @@
 # Find a compatible Qt version
-# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, WITH_DBCONVERTER, FORCE_USE_QT5
+# Inputs: WITH_SERVER, WITH_CLIENT, WITH_ORACLE, FORCE_USE_QT5
 # Optional Input: QT6_DIR -- Hint as to where Qt6 lives on the system
 # Optional Input: QT5_DIR -- Hint as to where Qt5 lives on the system
 # Output: COCKATRICE_QT_VERSION_NAME -- Example values: Qt5, Qt6
 # Output: SERVATRICE_QT_MODULES
 # Output: COCKATRICE_QT_MODULES
 # Output: ORACLE_QT_MODULES
-# Output: DBCONVERTER_QT_MODULES
 # Output: TEST_QT_MODULES
 
 set(REQUIRED_QT_COMPONENTS Core)
@@ -29,15 +28,12 @@ endif()
 if(WITH_ORACLE)
   set(_ORACLE_NEEDED Concurrent Network Svg Widgets)
 endif()
-if(WITH_DBCONVERTER)
-  set(_DBCONVERTER_NEEDED Network Widgets)
-endif()
 if(TEST)
   set(_TEST_NEEDED Widgets)
 endif()
 
 set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_COCKATRICE_NEEDED} ${_ORACLE_NEEDED}
-                           ${_DBCONVERTER_NEEDED} ${_TEST_NEEDED}
+                           ${_TEST_NEEDED}
 )
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
@@ -63,7 +59,7 @@ if(Qt6_FOUND)
   endif()
 else()
   find_package(
-    Qt5 5.8.0
+    Qt5 5.15.2
     COMPONENTS ${REQUIRED_QT_COMPONENTS}
     QUIET HINTS ${Qt5_DIR}
   )
@@ -112,7 +108,6 @@ message(DEBUG "QT_LIBRARY_DIR = ${QT_LIBRARY_DIR}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" SERVATRICE_QT_MODULES "${_SERVATRICE_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" COCKATRICE_QT_MODULES "${_COCKATRICE_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" ORACLE_QT_MODULES "${_ORACLE_NEEDED}")
-string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" DB_CONVERTER_QT_MODULES "${_DBCONVERTER_NEEDED}")
 string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" TEST_QT_MODULES "${_TEST_NEEDED}")
 
 # Core-only export (useful for headless libs)

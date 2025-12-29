@@ -7,7 +7,6 @@
 #ifndef SHORTCUT_TREEVIEW_H
 #define SHORTCUT_TREEVIEW_H
 
-#include <QModelIndex>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
@@ -22,7 +21,7 @@ public:
     explicit ShortcutFilterProxyModel(QObject *parent = nullptr);
 
 protected:
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 
 class ShortcutTreeView : public QTreeView

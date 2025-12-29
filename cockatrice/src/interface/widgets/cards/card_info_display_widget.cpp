@@ -1,7 +1,6 @@
 #include "card_info_display_widget.h"
 
 #include "../../../game/board/card_item.h"
-#include "../../../main.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 
@@ -9,7 +8,6 @@
 #include <QScreen>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <utility>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)
     : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH)
@@ -51,7 +49,7 @@ void CardInfoDisplayWidget::setCard(const ExactCard &card)
     if (exactCard)
         connect(exactCard.getCardPtr().data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
 
-    text->setCard(exactCard.getCardPtr());
+    text->setCard(exactCard);
     pic->setCard(exactCard);
 }
 

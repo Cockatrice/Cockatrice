@@ -8,12 +8,9 @@
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../cards/card_info_picture_widget.h"
 #include "all_zones_card_amount_widget.h"
-#include "card_amount_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
-#include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class PrintingSelectorCardOverlayWidget : public QWidget
@@ -51,9 +48,6 @@ private:
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
     QLabel *pinBadge = nullptr;
     AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
-    QSlider *cardSizeSlider;
     ExactCard rootCard;
 };
 

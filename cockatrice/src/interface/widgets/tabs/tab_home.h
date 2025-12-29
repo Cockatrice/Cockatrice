@@ -10,9 +10,7 @@
 #include "../interface/widgets/general/home_widget.h"
 #include "tab.h"
 
-#include <QHBoxLayout>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <qgroupbox.h>
 
 class AbstractClient;
 
@@ -26,7 +24,7 @@ private:
 public:
     TabHome(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     void retranslateUi() override;
-    QString getTabText() const override
+    [[nodiscard]] QString getTabText() const override
     {
         return tr("Home");
     }

@@ -13,7 +13,7 @@ public:
     }
     virtual unsigned int rand(int min, int max) = 0;
     QVector<int> makeNumbersVector(int n, int min, int max);
-    double testRandom(const QVector<int> &numbers) const;
+    [[nodiscard]] double testRandom(const QVector<int> &numbers) const;
 };
 
 extern RNG_Abstract *rng;

@@ -83,7 +83,7 @@ public:
     virtual bool usernameIsValid(const QString & /*userName */, QString & /* error */)
     {
         return true;
-    };
+    }
 public slots:
     virtual void endSession(qint64 /* sessionId */)
     {
@@ -154,16 +154,16 @@ public:
                                    int & /* banSecondsRemaining */)
     {
         return false;
-    };
+    }
     virtual int checkNumberOfUserAccounts(const QString & /* email */)
     {
         return 0;
-    };
+    }
     virtual bool
     changeUserPassword(const QString & /* user */, const QString & /* password */, bool /* passwordNeedsHash */)
     {
         return false;
-    };
+    }
     virtual bool changeUserPassword(const QString & /* user */,
                                     const QString & /* oldPassword */,
                                     bool /* oldPasswordNeedsHash */,
@@ -171,7 +171,7 @@ public:
                                     bool /* newPasswordNeedsHash */)
     {
         return false;
-    };
+    }
 };
 
 #endif

@@ -9,8 +9,6 @@
 
 #include "settings_manager.h"
 
-#include <QObject>
-
 class DownloadSettings : public SettingsManager
 {
     Q_OBJECT

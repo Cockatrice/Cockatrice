@@ -6,6 +6,8 @@
 
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
+
+#include "../../../interface/deck_loader/card_node_function.h"
 #include "../../../interface/deck_loader/deck_loader.h"
 
 #include <QJsonArray>
@@ -16,21 +18,21 @@ class IJsonDeckParser
 public:
     virtual ~IJsonDeckParser() = default;
 
-    virtual DeckLoader *parse(const QJsonObject &obj) = 0;
+    virtual DeckList parse(const QJsonObject &obj) = 0;
 };
 
 class ArchidektJsonParser : public IJsonDeckParser
 {
 public:
-    DeckLoader *parse(const QJsonObject &obj) override
+    DeckList parse(const QJsonObject &obj) override
     {
-        DeckLoader *loader = new DeckLoader(nullptr);
+        DeckList deckList;
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->getDeckList()->setName(deckName);
-        loader->getDeckList()->setComments(deckDescription);
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -47,25 +49,25 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
+        deckList.loadFromStream_Plain(outStream, false);
+        deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
-        return loader;
+        return deckList;
     }
 };
 
 class MoxfieldJsonParser : public IJsonDeckParser
 {
 public:
-    DeckLoader *parse(const QJsonObject &obj) override
+    DeckList parse(const QJsonObject &obj) override
     {
-        DeckLoader *loader = new DeckLoader(nullptr);
+        DeckList deckList;
 
         QString deckName = obj.value("name").toString();
         QString deckDescription = obj.value("description").toString();
 
-        loader->getDeckList()->setName(deckName);
-        loader->getDeckList()->setComments(deckDescription);
+        deckList.setName(deckName);
+        deckList.setComments(deckDescription);
 
         QString outputText;
         QTextStream outStream(&outputText);
@@ -94,8 +96,8 @@ public:
             outStream << quantity << ' ' << cardName << " (" << setName << ") " << collectorNumber << '\n';
         }
 
-        loader->getDeckList()->loadFromStream_Plain(outStream, false);
-        DeckLoader::resolveSetNameAndNumberToProviderID(loader->getDeckList());
+        deckList.loadFromStream_Plain(outStream, false);
+        deckList.forEachCard(CardNodeFunction::ResolveProviderId());
 
         QJsonObject commandersObj = obj.value("commanders").toObject();
         if (!commandersObj.isEmpty()) {
@@ -106,12 +108,12 @@ public:
                 QString collectorNumber = cardData.value("cn").toString();
                 QString providerId = cardData.value("scryfall_id").toString();
 
-                loader->getDeckList()->setBannerCard({commanderName, providerId});
-                loader->getDeckList()->addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+                deckList.setBannerCard({commanderName, providerId});
+                deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
             }
         }
 
-        return loader;
+        return deckList;
     }
 };
 

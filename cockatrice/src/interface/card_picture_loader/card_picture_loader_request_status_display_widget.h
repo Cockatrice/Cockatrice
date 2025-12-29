@@ -1,11 +1,11 @@
 #ifndef PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 #define PICTURE_LOADER_REQUEST_STATUS_DISPLAY_WIDGET_H
 
-#include "card_picture_loader_worker_work.h"
-
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QUrl>
 #include <QWidget>
+#include <libcockatrice/card/printing/exact_card.h>
 
 /**
  * @class CardPictureLoaderRequestStatusDisplayWidget

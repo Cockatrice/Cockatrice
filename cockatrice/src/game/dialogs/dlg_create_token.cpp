@@ -16,7 +16,6 @@
 #include <QLineEdit>
 #include <QRadioButton>
 #include <QTreeView>
-#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/models/database/card_database_model.h>
@@ -118,11 +117,7 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
         chooseTokenFromDeckRadioButton->setDisabled(true); // No tokens in deck = no need for option
     } else {
         chooseTokenFromDeckRadioButton->setChecked(true);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>(predefinedTokens.begin(), predefinedTokens.end()));
-#else
-        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
-#endif
     }
 
     auto *tokenChooseLayout = new QVBoxLayout;
@@ -224,11 +219,7 @@ void DlgCreateToken::actChooseTokenFromAll(bool checked)
 void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 {
     if (checked) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>(predefinedTokens.begin(), predefinedTokens.end()));
-#else
-        cardDatabaseDisplayModel->setCardNameSet(QSet<QString>::fromList(predefinedTokens));
-#endif
     }
 }
 

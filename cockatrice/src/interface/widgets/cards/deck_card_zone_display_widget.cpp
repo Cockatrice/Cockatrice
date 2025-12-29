@@ -4,7 +4,6 @@
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
 
 #include <QResizeEvent>
-#include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
@@ -39,8 +38,10 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
     displayCards();
 
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &DeckCardZoneDisplayWidget::onCategoryAddition);
-    connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-            &DeckCardZoneDisplayWidget::onSelectionChanged);
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &DeckCardZoneDisplayWidget::onSelectionChanged);
+    }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
 }
 
@@ -81,10 +82,11 @@ void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *
 
 void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
 {
-    auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     if (indexToWidgetMap.contains(index)) {
         return;
     }
+
+    auto categoryName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     if (displayType == DisplayType::Overlap) {
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, selectionModel, index, zoneName, categoryName, activeGroupCriteria,
@@ -119,7 +121,7 @@ void DeckCardZoneDisplayWidget::displayCards()
     QSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
     QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);

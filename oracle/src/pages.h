@@ -131,6 +131,7 @@ protected:
     QString getDefaultSavePath() override;
     QString getWindowTitle() override;
     QString getFileType() override;
+    QString getFilePromptName() override;
 };
 
 class LoadTokensPage : public SimpleDownloadFilePage
@@ -148,6 +149,7 @@ protected:
     QString getDefaultSavePath() override;
     QString getWindowTitle() override;
     QString getFileType() override;
+    QString getFilePromptName() override;
     void initializePage() override;
 };
 

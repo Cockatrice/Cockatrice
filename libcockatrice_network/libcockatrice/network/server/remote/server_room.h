@@ -3,12 +3,10 @@
 
 #include "serverinfo_user_container.h"
 
-#include <QList>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
 #include <QReadWriteLock>
-#include <QStringList>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 

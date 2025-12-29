@@ -10,7 +10,6 @@
 #include "card_info_picture_enlarged_widget.h"
 
 #include <QPropertyAnimation>
-#include <QTimer>
 #include <QWidget>
 #include <libcockatrice/card/printing/exact_card.h>
 
@@ -64,7 +63,8 @@ protected:
     {
         return resizedPixmap;
     }
-    void showEnlargedPixmap() const;
+    void showEnlargedPixmap();
+    void destroyEnlargedPixmapWidget();
 
 private:
     ExactCard exactCard;

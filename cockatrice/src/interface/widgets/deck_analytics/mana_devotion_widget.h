@@ -8,6 +8,7 @@
 #define MANA_DEVOTION_WIDGET_H
 
 #include "../general/display/banner_widget.h"
+#include "deck_list_statistics_analyzer.h"
 
 #include <QHBoxLayout>
 #include <QWidget>
@@ -20,21 +21,15 @@ class ManaDevotionWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ManaDevotionWidget(QWidget *parent, DeckListModel *deckListModel);
+    explicit ManaDevotionWidget(QWidget *parent, DeckListStatisticsAnalyzer *deckStatAnalyzer);
     void updateDisplay();
 
-    std::unordered_map<char, int> countManaSymbols(const QString &manaString);
-    void mergeManaCounts(std::unordered_map<char, int> &manaCounts1, const std::unordered_map<char, int> &manaCounts2);
-
 public slots:
-    void setDeckModel(DeckListModel *deckModel);
-    std::unordered_map<char, int> analyzeManaDevotion();
     void retranslateUi();
 
 private:
-    DeckListModel *deckListModel;
+    DeckListStatisticsAnalyzer *deckStatAnalyzer;
     BannerWidget *bannerWidget;
-    std::unordered_map<char, int> manaDevotionMap;
     QVBoxLayout *layout;
     QHBoxLayout *barLayout;
 };

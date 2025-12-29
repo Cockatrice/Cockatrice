@@ -12,7 +12,6 @@
 #include "../../key_signals.h"
 
 #include <QDockWidget>
-#include <QTreeView>
 
 class FilterTreeModel;
 class AbstractTabDeckEditor;

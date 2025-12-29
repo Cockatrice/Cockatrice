@@ -20,7 +20,6 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <qpropertyanimation.h>
 #include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
@@ -207,6 +206,7 @@ void VisualDatabaseDisplayWidget::initialize()
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
     mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
+    formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
 
@@ -224,6 +224,7 @@ void VisualDatabaseDisplayWidget::initialize()
     filterContainerLayout->addWidget(quickFilterSubTypeWidget);
     filterContainerLayout->addWidget(quickFilterSetWidget);
     filterContainerLayout->addWidget(mainTypeFilterWidget);
+    filterContainerLayout->addWidget(formatLegalityWidget);
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);

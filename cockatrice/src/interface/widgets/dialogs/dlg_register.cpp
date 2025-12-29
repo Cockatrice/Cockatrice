@@ -3,13 +3,11 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QCheckBox>
-#include <QDebug>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
@@ -358,7 +356,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
 void DlgRegister::actOk()
 {
-    // TODO this stuff should be using qvalidators
+    //! \todo this stuff should be using qvalidators
     if (passwordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your password is too short."));
         return;

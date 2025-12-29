@@ -8,7 +8,6 @@
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
-#include <QAction>
 #include <QBasicTimer>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>

@@ -25,11 +25,11 @@ public:
     SetsMimeData(int _oldRow) : oldRow(_oldRow)
     {
     }
-    int getOldRow() const
+    [[nodiscard]] int getOldRow() const
     {
         return oldRow;
     }
-    QStringList formats() const
+    [[nodiscard]] QStringList formats() const
     {
         return QStringList() << "application/x-cockatricecardset";
     }
@@ -64,22 +64,23 @@ public:
 
     explicit SetsModel(CardDatabase *_db, QObject *parent = nullptr);
     ~SetsModel() override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] int columnCount(const QModelIndex &parent = QModelIndex()) const override
     {
         Q_UNUSED(parent);
         return NUM_COLS;
     }
-    QVariant data(const QModelIndex &index, int role) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-    Qt::DropActions supportedDropActions() const override;
+    [[nodiscard]] QVariant
+    headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
+    [[nodiscard]] Qt::DropActions supportedDropActions() const override;
 
-    QMimeData *mimeData(const QModelIndexList &indexes) const override;
+    [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
     bool
     dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
-    QStringList mimeTypes() const override;
+    [[nodiscard]] QStringList mimeTypes() const override;
     void swapRows(int oldRow, int newRow);
     void toggleRow(int row, bool enable);
     void toggleRow(int row);
@@ -97,8 +98,8 @@ public:
     explicit SetsDisplayModel(QObject *parent = nullptr);
 
 protected:
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    [[nodiscard]] bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+    [[nodiscard]] bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     void fetchMore(const QModelIndex &index) override;
 };
 

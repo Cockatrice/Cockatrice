@@ -5,7 +5,6 @@
 #include "../cards/edhrec_api_response_card_container.h"
 #include "edhrec_commander_api_response_average_deck_statistics.h"
 
-#include <QDebug>
 #include <QJsonObject>
 #include <QString>
 

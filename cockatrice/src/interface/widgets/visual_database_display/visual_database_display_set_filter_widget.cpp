@@ -27,7 +27,7 @@ VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentS
     filterToMostRecentSetsAmount->setMaximum(100);
     filterToMostRecentSetsAmount->setValue(
         SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
-    connect(filterToMostRecentSetsAmount, QOverload<int>::of(&QSpinBox::valueChanged), &SettingsCache::instance(),
+    connect(filterToMostRecentSetsAmount, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount);
 
     layout->addWidget(filterToMostRecentSetsCheckBox);

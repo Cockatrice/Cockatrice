@@ -17,20 +17,19 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListModel *_deckLi
     container->setLayout(containerLayout);
     scrollArea->setWidget(container);
 
-    manaCurveWidget = new ManaCurveWidget(this, deckListModel);
+    deckListStatisticsAnalyzer = new DeckListStatisticsAnalyzer(this, deckListModel);
+
+    manaCurveWidget = new ManaCurveWidget(this, deckListStatisticsAnalyzer);
     containerLayout->addWidget(manaCurveWidget);
 
-    manaDevotionWidget = new ManaDevotionWidget(this, deckListModel);
+    manaDevotionWidget = new ManaDevotionWidget(this, deckListStatisticsAnalyzer);
     containerLayout->addWidget(manaDevotionWidget);
 
-    manaBaseWidget = new ManaBaseWidget(this, deckListModel);
+    manaBaseWidget = new ManaBaseWidget(this, deckListStatisticsAnalyzer);
     containerLayout->addWidget(manaBaseWidget);
 }
 
-void DeckAnalyticsWidget::refreshDisplays(DeckListModel *_deckModel)
+void DeckAnalyticsWidget::refreshDisplays()
 {
-    deckListModel = _deckModel;
-    manaCurveWidget->setDeckModel(_deckModel);
-    manaDevotionWidget->setDeckModel(_deckModel);
-    manaBaseWidget->setDeckModel(_deckModel);
+    deckListStatisticsAnalyzer->update();
 }

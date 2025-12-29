@@ -2,13 +2,13 @@
 
 #include <QDesktopServices>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <version_string.h>
 
 TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)
@@ -67,32 +67,33 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
-void TappedOutInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
+void TappedOutInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray &data)
 {
     DeckList mainboard, sideboard;
-    copyDeckSplitMainAndSide(*deck, mainboard, sideboard);
+    copyDeckSplitMainAndSide(deck, mainboard, sideboard);
 
     QUrl params;
     QUrlQuery urlQuery;
-    urlQuery.addQueryItem("name", deck->getName());
+    urlQuery.addQueryItem("name", deck.getName());
     urlQuery.addQueryItem("mainboard", mainboard.writeToString_Plain(false, true));
     urlQuery.addQueryItem("sideboard", sideboard.writeToString_Plain(false, true));
     params.setQuery(urlQuery);
-    data->append(params.query(QUrl::EncodeReserved).toUtf8());
+    data.append(params.query(QUrl::EncodeReserved).toUtf8());
 }
 
-void TappedOutInterface::analyzeDeck(DeckList *deck)
+void TappedOutInterface::analyzeDeck(const DeckList &deck)
 {
     QByteArray data;
-    getAnalyzeRequestData(deck, &data);
+    getAnalyzeRequestData(deck, data);
 
     QNetworkRequest request(QUrl("https://tappedout.net/mtg-decks/paste/"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     manager->post(request, data);
 }
 
-void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
+void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());

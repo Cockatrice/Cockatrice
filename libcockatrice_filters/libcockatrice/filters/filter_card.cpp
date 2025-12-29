@@ -60,6 +60,8 @@ const QString CardFilter::attrName(Attr a)
     switch (a) {
         case AttrName:
             return tr("Name");
+        case AttrNameExact:
+            return tr("Name (Exact)");
         case AttrType:
             return tr("Type");
         case AttrColor:

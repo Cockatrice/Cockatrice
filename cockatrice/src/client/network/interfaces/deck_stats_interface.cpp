@@ -2,13 +2,13 @@
 
 #include <QDesktopServices>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/deck_list_card_node.h>
+#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <version_string.h>
 
 DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent)
     : QObject(parent), cardDatabase(_cardDatabase)
@@ -43,31 +43,32 @@ void DeckStatsInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
-void DeckStatsInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
+void DeckStatsInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray &data)
 {
     DeckList deckWithoutTokens;
-    copyDeckWithoutTokens(*deck, deckWithoutTokens);
+    copyDeckWithoutTokens(deck, deckWithoutTokens);
 
     QUrl params;
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("deck", deckWithoutTokens.writeToString_Plain());
-    urlQuery.addQueryItem("decktitle", deck->getName());
+    urlQuery.addQueryItem("decktitle", deck.getName());
     params.setQuery(urlQuery);
-    data->append(params.query(QUrl::EncodeReserved).toUtf8());
+    data.append(params.query(QUrl::EncodeReserved).toUtf8());
 }
 
-void DeckStatsInterface::analyzeDeck(DeckList *deck)
+void DeckStatsInterface::analyzeDeck(const DeckList &deck)
 {
     QByteArray data;
-    getAnalyzeRequestData(deck, &data);
+    getAnalyzeRequestData(deck, data);
 
     QNetworkRequest request(QUrl("https://deckstats.net/index.php"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
     manager->post(request, data);
 }
 
-void DeckStatsInterface::copyDeckWithoutTokens(DeckList &source, DeckList &destination)
+void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList &destination)
 {
     auto copyIfNotAToken = [this, &destination](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());

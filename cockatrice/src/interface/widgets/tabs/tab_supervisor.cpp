@@ -5,6 +5,7 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "api/archidekt/tab_archidekt.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
@@ -31,7 +32,6 @@
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
-#include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
@@ -133,13 +133,16 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
 
     // create tabs menu actions
     aTabDeckEditor = new QAction(this);
-    connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(nullptr); });
+    connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(LoadedDeck()); });
 
     aTabVisualDeckEditor = new QAction(this);
-    connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(nullptr); });
+    connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(LoadedDeck()); });
 
     aTabEdhRec = new QAction(this);
     connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
+
+    aTabArchidekt = new QAction(this);
+    connect(aTabArchidekt, &QAction::triggered, this, [this] { addArchidektTab(); });
 
     aTabHome = new QAction(this);
     aTabHome->setCheckable(true);
@@ -205,6 +208,7 @@ void TabSupervisor::retranslateUi()
     aTabDeckEditor->setText(tr("Deck Editor"));
     aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
     aTabEdhRec->setText(tr("EDHRec"));
+    aTabArchidekt->setText(tr("Archidekt"));
     aTabHome->setText(tr("Home"));
     aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
     aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
@@ -387,6 +391,7 @@ void TabSupervisor::resetTabsMenu()
     tabsMenu->addAction(aTabDeckEditor);
     tabsMenu->addAction(aTabVisualDeckEditor);
     tabsMenu->addAction(aTabEdhRec);
+    tabsMenu->addAction(aTabArchidekt);
     tabsMenu->addSeparator();
     tabsMenu->addAction(aTabHome);
     tabsMenu->addAction(aTabVisualDeckStorage);
@@ -841,9 +846,9 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 /**
  * Creates a new deck editor tab and loads the deck into it.
  * Creates either a classic or visual deck editor tab depending on settings
- * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
+ * @param deckToOpen The deck to open in the tab.
  */
-void TabSupervisor::openDeckInNewTab(DeckLoader *deckToOpen)
+void TabSupervisor::openDeckInNewTab(const LoadedDeck &deckToOpen)
 {
     int type = SettingsCache::instance().getDefaultDeckEditorType();
     switch (type) {
@@ -863,13 +868,12 @@ void TabSupervisor::openDeckInNewTab(DeckLoader *deckToOpen)
 
 /**
  * Creates a new deck editor tab
- * @param deckToOpen The deck to open in the tab. Creates a copy of the DeckLoader instance.
+ * @param deckToOpen The deck to open in the tab.
  */
-TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckLoader *deckToOpen)
+TabDeckEditor *TabSupervisor::addDeckEditorTab(const LoadedDeck &deckToOpen)
 {
     auto *tab = new TabDeckEditor(this);
-    if (deckToOpen)
-        tab->openDeck(deckToOpen);
+    tab->openDeck(deckToOpen);
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
@@ -878,11 +882,10 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(DeckLoader *deckToOpen)
     return tab;
 }
 
-TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(DeckLoader *deckToOpen)
+TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const LoadedDeck &deckToOpen)
 {
     auto *tab = new TabDeckEditorVisual(this);
-    if (deckToOpen)
-        tab->openDeck(deckToOpen);
+    tab->openDeck(deckToOpen);
     connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
     myAddTab(tab);
@@ -894,6 +897,15 @@ TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(DeckLoader *deckToOpe
 TabEdhRecMain *TabSupervisor::addEdhrecMainTab()
 {
     auto *tab = new TabEdhRecMain(this);
+
+    myAddTab(tab);
+    setCurrentWidget(tab);
+    return tab;
+}
+
+TabArchidekt *TabSupervisor::addArchidektTab()
+{
+    auto *tab = new TabArchidekt(this);
 
     myAddTab(tab);
     setCurrentWidget(tab);

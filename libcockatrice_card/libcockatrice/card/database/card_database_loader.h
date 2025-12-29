@@ -4,9 +4,9 @@
 #include <QBasicMutex>
 #include <QList>
 #include <QLoggingCategory>
-#include <QObject>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
+#include <libcockatrice/interfaces/interface_card_set_priority_controller.h>
 
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingLog, "card_database.loading");
 inline Q_LOGGING_CATEGORY(CardDatabaseLoadingSuccessOrFailureLog, "card_database.loading.success_or_failure");
@@ -53,7 +53,8 @@ public:
     explicit CardDatabaseLoader(QObject *parent,
                                 CardDatabase *db,
                                 ICardDatabasePathProvider *pathProvider,
-                                ICardPreferenceProvider *preferenceProvider);
+                                ICardPreferenceProvider *preferenceProvider,
+                                ICardSetPriorityController *_priorityController);
 
     /** @brief Destructor cleans up allocated parsers. */
     ~CardDatabaseLoader() override;
@@ -110,7 +111,7 @@ private:
      * @brief Collects custom card database paths recursively.
      * @return Sorted list of file paths to custom databases.
      */
-    QStringList collectCustomDatabasePaths() const;
+    [[nodiscard]] QStringList collectCustomDatabasePaths() const;
 
 private:
     CardDatabase *database;                        /**< Non-owning pointer to the target CardDatabase. */

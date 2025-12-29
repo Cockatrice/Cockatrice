@@ -35,7 +35,6 @@
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
-#include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/context_ping_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_delete_arrow.pb.h>
 #include <libcockatrice/protocol/pb/event_game_closed.pb.h>
@@ -50,7 +49,6 @@
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
-#include <libcockatrice/protocol/pb/serverinfo_playerping.pb.h>
 
 Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          int _gameId,
@@ -75,11 +73,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
       shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
       firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
-#else
-      gameMutex(QMutex::Recursive)
-#endif
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -503,7 +497,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         allPlayersEver.insert(playerName);
 
         // if the original creator of the game joins, give them host status back
-        // FIXME: transferring host to spectators has side effects
+        //! \todo transferring host to spectators has side effects
         if (newParticipant->getUserInfo()->name() == creatorInfo->name()) {
             hostId = newParticipant->getPlayerId();
             sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));

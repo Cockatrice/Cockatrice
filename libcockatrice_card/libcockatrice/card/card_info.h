@@ -1,6 +1,7 @@
 #ifndef CARD_INFO_H
 #define CARD_INFO_H
 
+#include "format/format_legality_rules.h"
 #include "printing/printing_info.h"
 
 #include <QDate>
@@ -10,7 +11,6 @@
 #include <QMap>
 #include <QMetaType>
 #include <QSharedPointer>
-#include <QStringList>
 #include <QVariant>
 #include <utility>
 
@@ -23,10 +23,12 @@ class ICardDatabaseParser;
 
 typedef QSharedPointer<CardInfo> CardInfoPtr;
 typedef QSharedPointer<CardSet> CardSetPtr;
+typedef QSharedPointer<FormatRules> FormatRulesPtr;
 typedef QMap<QString, QList<PrintingInfo>> SetToPrintingsMap;
 
 typedef QHash<QString, CardInfoPtr> CardNameMap;
 typedef QHash<QString, CardSetPtr> SetNameMap;
+typedef QHash<QString, FormatRulesPtr> FormatRulesNameMap;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 
@@ -159,7 +161,7 @@ public:
      *
      * @return Shared pointer to the cloned CardInfo.
      */
-    CardInfoPtr clone() const
+    [[nodiscard]] CardInfoPtr clone() const
     {
         auto newCardInfo = CardInfoPtr(new CardInfo(*this));
         newCardInfo->setSmartPointer(newCardInfo); // Set the smart pointer for the new instance
@@ -179,19 +181,19 @@ public:
     }
 
     /** @name Basic Properties Accessors */ //@{
-    inline const QString &getName() const
+    [[nodiscard]] inline const QString &getName() const
     {
         return name;
     }
-    const QString &getSimpleName() const
+    [[nodiscard]] const QString &getSimpleName() const
     {
         return simpleName;
     }
     const QSet<QString> &getAltNames()
     {
         return altNames;
-    };
-    const QString &getText() const
+    }
+    [[nodiscard]] const QString &getText() const
     {
         return text;
     }
@@ -200,15 +202,15 @@ public:
         text = _text;
         emit cardInfoChanged(smartThis);
     }
-    bool getIsToken() const
+    [[nodiscard]] bool getIsToken() const
     {
         return isToken;
     }
-    QStringList getProperties() const
+    [[nodiscard]] QStringList getProperties() const
     {
         return properties.keys();
     }
-    QString getProperty(const QString &propertyName) const
+    [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
         return properties.value(propertyName).toString();
     }
@@ -217,34 +219,34 @@ public:
         properties.insert(_name, _value);
         emit cardInfoChanged(smartThis);
     }
-    bool hasProperty(const QString &propertyName) const
+    [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
         return properties.contains(propertyName);
     }
-    const SetToPrintingsMap &getSets() const
+    [[nodiscard]] const SetToPrintingsMap &getSets() const
     {
         return setsToPrintings;
     }
-    const QString &getSetsNames() const
+    [[nodiscard]] const QString &getSetsNames() const
     {
         return setsNames;
     }
     //@}
 
     /** @name Related Cards Accessors */ //@{
-    const QList<CardRelation *> &getRelatedCards() const
+    [[nodiscard]] const QList<CardRelation *> &getRelatedCards() const
     {
         return relatedCards;
     }
-    const QList<CardRelation *> &getReverseRelatedCards() const
+    [[nodiscard]] const QList<CardRelation *> &getReverseRelatedCards() const
     {
         return reverseRelatedCards;
     }
-    const QList<CardRelation *> &getReverseRelatedCards2Me() const
+    [[nodiscard]] const QList<CardRelation *> &getReverseRelatedCards2Me() const
     {
         return reverseRelatedCardsToMe;
     }
-    QList<CardRelation *> getAllRelatedCards() const
+    [[nodiscard]] QList<CardRelation *> getAllRelatedCards() const
     {
         QList<CardRelation *> result;
         result.append(getRelatedCards());
@@ -259,24 +261,24 @@ public:
     //@}
 
     /** @name UI Positioning */ //@{
-    const UiAttributes &getUiAttributes() const
+    [[nodiscard]] const UiAttributes &getUiAttributes() const
     {
         return uiAttributes;
     }
     //@}
 
-    const QChar getColorChar() const;
+    [[nodiscard]] const QChar getColorChar() const;
 
     /** @name Legacy/Convenience Property Accessors */ //@{
-    const QString getCardType() const;
+    [[nodiscard]] const QString getCardType() const;
     void setCardType(const QString &value);
-    const QString getCmc() const;
-    const QString getColors() const;
+    [[nodiscard]] const QString getCmc() const;
+    [[nodiscard]] const QString getColors() const;
     void setColors(const QString &value);
-    const QString getLoyalty() const;
-    const QString getMainCardType() const;
-    const QString getManaCost() const;
-    const QString getPowTough() const;
+    [[nodiscard]] const QString getLoyalty() const;
+    [[nodiscard]] const QString getMainCardType() const;
+    [[nodiscard]] const QString getManaCost() const;
+    [[nodiscard]] const QString getPowTough() const;
     void setPowTough(const QString &value);
     //@}
 
@@ -287,7 +289,7 @@ public:
      *
      * @return Corrected card name as a QString.
      */
-    QString getCorrectedName() const;
+    [[nodiscard]] QString getCorrectedName() const;
 
     /**
      * @brief Adds a printing to a specific set.
