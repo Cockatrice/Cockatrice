@@ -284,16 +284,15 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
 void DeckEditorDeckDockWidget::initializeFormats()
 {
-    QMap<QString, int> allFormats = CardDatabaseManager::query()->getAllFormatsWithCount();
+    QStringList allFormats = CardDatabaseManager::query()->getAllFormatsWithCount().keys();
 
     formatComboBox->clear(); // Remove "Loading Database..."
     formatComboBox->setEnabled(true);
 
     // Populate with formats
     formatComboBox->addItem("", "");
-    for (auto it = allFormats.constBegin(); it != allFormats.constEnd(); ++it) {
-        QString displayText = QString("%1").arg(it.key());
-        formatComboBox->addItem(displayText, it.key()); // store the raw key in itemData
+    for (auto formatName : allFormats) {
+        formatComboBox->addItem(formatName, formatName); // store the raw key in itemData
     }
 
     if (!deckModel->getDeckList()->getGameFormat().isEmpty()) {
