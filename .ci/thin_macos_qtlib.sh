@@ -10,7 +10,7 @@ nproc=$(sysctl -n hw.ncpu)
 
 function thin() {
   local libfile=$1
-  if [[ $(file -b --mime-type "$libfile") == application/x-mach-binary ]]; then
+  if [[ $(file -b --mime-type "$libfile") == application/x-mach-binary* ]]; then
     echo "Processing $libfile"
     lipo "$libfile" -thin "$arch" -output "$libfile"
   fi
