@@ -571,7 +571,17 @@ void DeckEditorDeckDockWidget::changeSelectedCard(int changeBy)
     // Get the current index of the selected item
     auto deckViewCurrentIndex = deckView->currentIndex();
 
+    // For some reason, if the deckModel is modified but the view is not manually reselected,
+    // currentIndex will return an index for the underlying deckModel instead of the proxy,
+    // which won't behave as expected when indexBelow/indexAbove crosses a header node.
+    if (deckViewCurrentIndex.model() == deckModel) {
+        deckViewCurrentIndex = proxy->mapFromSource(deckViewCurrentIndex);
+    }
+
     auto nextIndex = deckViewCurrentIndex.siblingAtRow(deckViewCurrentIndex.row() + changeBy);
+
+    qInfo() << "TRACK current:" << deckViewCurrentIndex << "next:" << nextIndex;
+
     if (!nextIndex.isValid()) {
         nextIndex = deckViewCurrentIndex;
 
@@ -583,6 +593,9 @@ void DeckEditorDeckDockWidget::changeSelectedCard(int changeBy)
             } else {
                 nextIndex = deckView->indexAbove(nextIndex);
             }
+
+            qInfo() << "TRACK nextIndex:" << nextIndex;
+
             node = static_cast<AbstractDecklistNode *>(nextIndex.internalPointer());
         } while (node && node->isDeckHeader());
     }
