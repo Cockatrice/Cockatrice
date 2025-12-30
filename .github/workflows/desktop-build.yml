@@ -142,7 +142,6 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
