@@ -157,7 +157,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
         QTimer::singleShot(100, this, &DeckEditorDeckDockWidget::updateBannerCardComboBox);
     });
     connect(deckModel, &DeckListModel::cardAddedAt, this, &DeckEditorDeckDockWidget::recursiveExpand);
-    connect(deckModel, &DeckListModel::deckReplaced, this, &DeckEditorDeckDockWidget::expandAll);
+    connect(deckModel, &DeckListModel::modelReset, this, &DeckEditorDeckDockWidget::expandAll);
 
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::setBannerCard);
