@@ -943,8 +943,7 @@ void MainWindow::startupConfigCheck()
 
         if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
             if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
-                qCInfo(WindowMainStartupShortcutsLog)
-                    << "Update has changed to custom version, disabling auto update";
+                qCInfo(WindowMainStartupShortcutsLog) << "Update has changed to custom version, disabling auto update";
                 SettingsCache::instance().setCheckUpdatesOnStartup(Qt::Unchecked);
             } else {
                 int channel = 0;
@@ -952,8 +951,7 @@ void MainWindow::startupConfigCheck()
                     channel = 1;
                 }
                 if (SettingsCache::instance().getUpdateReleaseChannelIndex() != channel) {
-                    qCInfo(WindowMainStartupShortcutsLog)
-                        << "Update has changed beta state, updating release channel.";
+                    qCInfo(WindowMainStartupShortcutsLog) << "Update has changed beta state, updating release channel.";
                     SettingsCache::instance().setUpdateReleaseChannelIndex(channel);
                 }
             }
