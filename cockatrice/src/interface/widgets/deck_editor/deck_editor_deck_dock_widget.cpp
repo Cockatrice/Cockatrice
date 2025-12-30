@@ -575,6 +575,7 @@ void DeckEditorDeckDockWidget::changeSelectedCard(int changeBy)
     // currentIndex will return an index for the underlying deckModel instead of the proxy.
     // That index will return an invalid index when indexBelow/indexAbove crosses a header node,
     // causing the selection to fail to move down.
+    /// \todo Figure out why it's happening so we can do a proper fix instead of a hacky workaround
     if (deckViewCurrentIndex.model() == proxy->sourceModel()) {
         deckViewCurrentIndex = proxy->mapFromSource(deckViewCurrentIndex);
     }
