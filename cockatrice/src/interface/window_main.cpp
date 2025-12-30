@@ -938,13 +938,13 @@ void MainWindow::startupConfigCheck()
             const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
 
-        qCInfo(WindowMainStartupShortcutsLog) << "[MainWindow] Migrating shortcuts after update detected.";
+        qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
         SettingsCache::instance().shortcuts().migrateShortcuts();
 
         if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
             if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
                 qCInfo(WindowMainStartupShortcutsLog)
-                    << "[MainWindow] Update has changed to custom version, disabling auto update";
+                    << "Update has changed to custom version, disabling auto update";
                 SettingsCache::instance().setCheckUpdatesOnStartup(Qt::Unchecked);
             } else {
                 int channel = 0;
@@ -953,7 +953,7 @@ void MainWindow::startupConfigCheck()
                 }
                 if (SettingsCache::instance().getUpdateReleaseChannelIndex() != channel) {
                     qCInfo(WindowMainStartupShortcutsLog)
-                        << "[MainWindow] Update has changed beta state, updating release channel.";
+                        << "Update has changed beta state, updating release channel.";
                     SettingsCache::instance().setUpdateReleaseChannelIndex(channel);
                 }
             }
