@@ -120,9 +120,19 @@ public:
     /**
      * @brief Modifies the cards in the deck, in a wrapped operation that is saved to the history.
      *
-     * The operation is a function that accepts a DeckListModel that it operates upon, and returns a bool to indicate
-     * success/fail.
-     * If the operation is a failure, the history will not be updated.
+     * The operation is a function that accepts a DeckListModel that it operates upon, and returns a bool.
+     *
+     * This method will pass the underlying DeckListModel into the operation function. The function can call methods on
+     * the model to modify the deck.
+     * The function should return a bool to indicate success/failure.
+     *
+     * If the operation returns true, the state of the deck before the operation is ran is saved to the history, and the
+     * isModified state is updated.
+     * If the operation returns false, the history and isModified state is not updated.
+     *
+     * Note that even if the operation fails, any modifications to the model will already have been made.
+     * It's recommended for the operation to always return true if any modification has already been made to the model,
+     * as not doing that may cause the state to become desynced.
      *
      * @param reason The reason to display in the history
      * @param operation The modification operation.
@@ -134,7 +144,9 @@ public:
      * @brief Modifies the cards in the deck, in a wrapped operation that is saved to the history.
      *
      * The operation is a function that accepts a DeckListModel that it operates upon, and returns a QModelIndex.
-     * If the index is invalid, then the operation is assumed to be a failure, and the history will not be updated.
+     * If the index is invalid, then the operation is considered to be a failure.
+     *
+     * See the other @link DeckStateManager::modifyDeck for more info about the behavior of this method.
      *
      * @param reason The reason to display in the history
      * @param operation The modification operation.
