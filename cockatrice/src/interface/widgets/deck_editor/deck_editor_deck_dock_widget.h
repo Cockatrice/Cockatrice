@@ -101,7 +101,6 @@ private slots:
     void writeComments();
     void writeBannerCard(int);
     void setSelectedIndex(const QModelIndex &newCardIndex);
-    void syncDeckListBannerCardWithComboBox();
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);

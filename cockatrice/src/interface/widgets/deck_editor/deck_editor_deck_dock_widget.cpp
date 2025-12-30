@@ -409,7 +409,6 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     // Handle results
     if (restoreIndex != -1) {
         bannerCardComboBox->setCurrentIndex(restoreIndex);
-        syncDeckListBannerCardWithComboBox();
     } else {
         // Add a placeholder "-" and set it as the current selection
         bannerCardComboBox->insertItem(0, "-");
@@ -428,13 +427,6 @@ void DeckEditorDeckDockWidget::writeBannerCard(int index)
     auto [name, id] = bannerCardComboBox->itemData(index).value<QPair<QString, QString>>();
     CardRef bannerCard = {name, id};
     deckStateManager->setBannerCard(bannerCard);
-}
-
-void DeckEditorDeckDockWidget::syncDeckListBannerCardWithComboBox()
-{
-    auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
-    CardRef bannerCard = {name, id};
-    deckStateManager->getModel()->getDeckList()->setBannerCard(bannerCard);
 }
 
 void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
