@@ -178,22 +178,6 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
-{
-    int rows = rowCount(parent);
-    if (rows == 0)
-        return;
-
-    QModelIndex topLeft = index(0, 0, parent);
-    QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
-    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
-
-    for (int r = 0; r < rows; ++r) {
-        QModelIndex child = index(r, 0, parent);
-        emitBackgroundUpdates(child);
-    }
-}
-
 QVariant DeckListModel::headerData(const int section, const Qt::Orientation orientation, const int role) const
 {
     if ((role != Qt::DisplayRole) || (orientation != Qt::Horizontal)) {
@@ -252,6 +236,22 @@ Qt::ItemFlags DeckListModel::flags(const QModelIndex &index) const
     return result;
 }
 
+void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
+{
+    int rows = rowCount(parent);
+    if (rows == 0)
+        return;
+
+    QModelIndex topLeft = index(0, 0, parent);
+    QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
+    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
+
+    for (int r = 0; r < rows; ++r) {
+        QModelIndex child = index(r, 0, parent);
+        emitBackgroundUpdates(child);
+    }
+}
+
 void DeckListModel::emitRecursiveUpdates(const QModelIndex &index)
 {
     if (!index.isValid()) {
@@ -294,7 +294,6 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     deckList->refreshDeckHash();
     emit deckHashChanged();
 
-    emit dataChanged(index, index);
     return true;
 }
 

@@ -270,12 +270,6 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent) override;
 
     /**
-     * Recursively emits the dataChanged signal for all child nodes.
-     * @param parent The parent node
-     */
-    void emitBackgroundUpdates(const QModelIndex &parent);
-
-    /**
      * @brief Finds a card by name, zone, and optional identifiers.
      * @param cardName The card's name.
      * @param zoneName The zone to search in (main/side/etc.).
@@ -389,7 +383,19 @@ private:
                                                       const QString &providerId = "",
                                                       const QString &cardNumber = "") const;
 
+    /**
+     * @brief Recursively emits the dataChanged signal with role as Qt::BackgroundRole for all indices that are children
+     * of the given node. This is used to update the background color when changing formats.
+     * @param parent The parent node
+     */
+    void emitBackgroundUpdates(const QModelIndex &parent);
+
+    /**
+     * @brief Recursively emits the dataChanged signal for the given node and all parent nodes.
+     * @param index The parent node
+     */
     void emitRecursiveUpdates(const QModelIndex &index);
+
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
 
     template <typename T> T getNode(const QModelIndex &index) const
