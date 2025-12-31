@@ -371,8 +371,7 @@ jobs:
 
       - name: Install aqtinstall
         if: matrix.os == 'macOS'
-        run: |
-          pipx install aqtinstall
+        run: pipx install aqtinstall
 
       # Checking if there's a newer, uncached version of Qt available to install via aqtinstall
       - name: Resolve latest Qt patch version
