@@ -257,9 +257,24 @@ void ZoneViewWidget::stopWindowDrag()
     ungrabMouse();
 }
 
-QPointF ZoneViewWidget::draggedWindowPos(const QPoint &screenPos,
-                                         const QPointF &scenePos,
-                                         const QPointF &buttonDownScenePos) const
+QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
+{
+    QWidget *current = eventWidget;
+    while (current) {
+        if (auto *view = qobject_cast<QGraphicsView *>(current))
+            return view;
+        current = current->parentWidget();
+    }
+
+    if (scene() && !scene()->views().isEmpty())
+        return scene()->views().constFirst();
+
+    return nullptr;
+}
+
+QPointF ZoneViewWidget::calcDraggedWindowPos(const QPoint &screenPos,
+                                             const QPointF &scenePos,
+                                             const QPointF &buttonDownScenePos) const
 {
     if (dragView && dragView->viewport()) {
         const QPoint vpStart = dragView->viewport()->mapFromGlobal(dragStartScreenPos);
@@ -285,6 +300,7 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
             if (me->button() == Qt::LeftButton && section == Qt::TitleBarArea) {
                 // avoid drag on close button
                 const QRectF frameRectF = windowFrameRect();
+                // square at right end of the title bar is the close button
                 const QRectF closeRect(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight,
                                        kTitleBarHeight);
                 if (closeRect.contains(me->pos())) {
@@ -297,17 +313,7 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
                 dragStartItemPos = pos();
                 dragStartScreenPos = me->screenPos();
 
-                dragView = nullptr;
-                if (me->widget()) {
-                    QWidget *current = me->widget();
-                    while (current && !dragView) {
-                        dragView = qobject_cast<QGraphicsView *>(current);
-                        current = current->parentWidget();
-                    }
-                }
-                if (!dragView && scene() && !scene()->views().isEmpty()) {
-                    dragView = scene()->views().constFirst();
-                }
+                dragView = findDragView(me->widget());
 
                 // need to grab mouse to receive events and not miss initial movement
                 grabMouse();
@@ -326,7 +332,7 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
                     return true;
                 }
 
-                setPos(draggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
+                setPos(calcDraggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
                 me->accept();
                 return true;
             }
@@ -352,7 +358,7 @@ void ZoneViewWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     // move if the scene routes moves while dragging
     if (draggingWindow && (event->buttons() & Qt::LeftButton)) {
-        setPos(draggedWindowPos(event->screenPos(), event->scenePos(), event->buttonDownScenePos(Qt::LeftButton)));
+        setPos(calcDraggedWindowPos(event->screenPos(), event->scenePos(), event->buttonDownScenePos(Qt::LeftButton)));
         event->accept();
         return;
     }

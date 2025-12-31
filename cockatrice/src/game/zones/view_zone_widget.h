@@ -3,7 +3,6 @@
  * @ingroup GameGraphicsZones
  * @brief TODO: Document this.
  */
-
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
@@ -30,6 +29,7 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QStyleOption;
 class QGraphicsView;
+class QWidget;
 
 class ScrollableGraphicsProxyWidget : public QGraphicsProxyWidget
 {
@@ -74,7 +74,24 @@ private:
     QPointer<QGraphicsView> dragView;
 
     void stopWindowDrag();
-    QPointF draggedWindowPos(const QPoint &screenPos, const QPointF &scenePos, const QPointF &buttonDownScenePos) const;
+    /**
+     * @brief Resolves the QGraphicsView to use for drag coordinate mapping
+     *
+     * @param eventWidget QWidget that originated the mouse event
+     * @return The resolved QGraphicsView
+     */
+    QGraphicsView *findDragView(QWidget *eventWidget) const;
+    /**
+     * @brief Calculates the desired widget position while dragging
+     *
+     * @param screenPos Global screen coordinates of the current mouse position
+     * @param scenePos Scene coordinates of the current mouse position
+     * @param buttonDownScenePos Scene coordinates of the initial mouse press position
+     *
+     * @return The new widget position in scene coordinates
+     */
+    QPointF
+    calcDraggedWindowPos(const QPoint &screenPos, const QPointF &scenePos, const QPointF &buttonDownScenePos) const;
 
     void resizeScrollbar(qreal newZoneHeight);
 signals:
