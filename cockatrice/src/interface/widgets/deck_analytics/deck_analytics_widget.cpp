@@ -3,6 +3,8 @@
 #include "abstract_analytics_panel_widget.h"
 #include "add_analytics_panel_dialog.h"
 #include "analytics_panel_widget_factory.h"
+#include "analyzer_modules/mana_base/mana_base_config.h"
+#include "analyzer_modules/mana_devotion/mana_devotion_config.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
 
@@ -159,7 +161,13 @@ void DeckAnalyticsWidget::addDefaultPanels()
         QString type;
         QJsonObject cfg;
     };
-    QVector<DefaultPanel> defaults = {{"manaCurve", {}}, {"manaBase", {}}, {"manaDevotion", {}}};
+
+    // Prepare configs
+    QJsonObject manaCurveCfg; // empty config
+    QJsonObject manaBaseCfg = ManaBaseConfig("combinedBar", {}).toJson();
+    QJsonObject manaDevotionCfg = ManaDevotionConfig("combinedBar", {}).toJson();
+    QVector<DefaultPanel> defaults = {
+        {"manaCurve", manaCurveCfg}, {"manaBase", manaBaseCfg}, {"manaDevotion", manaDevotionCfg}};
 
     for (auto &d : defaults) {
         AbstractAnalyticsPanelWidget *w = AnalyticsPanelWidgetFactory::instance().create(d.type, this, statsAnalyzer);

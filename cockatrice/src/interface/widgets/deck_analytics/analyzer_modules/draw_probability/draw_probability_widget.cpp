@@ -68,12 +68,12 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     layout->addWidget(resultTable);
 
     // Connections
-    connect(criteriaCombo, &QComboBox::currentIndexChanged, this, [this] {
+    connect(criteriaCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
         config.criteria = criteriaCombo->currentData().toString();
         updateDisplay();
     });
 
-    connect(exactnessCombo, &QComboBox::currentIndexChanged, this, [this] {
+    connect(exactnessCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this] {
         config.atLeast = exactnessCombo->currentData().toBool();
         updateDisplay();
     });
