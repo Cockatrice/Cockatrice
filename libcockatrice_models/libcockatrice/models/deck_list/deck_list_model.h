@@ -268,6 +268,7 @@ public:
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
+    void sort(int column, Qt::SortOrder order) override;
 
     /**
      * @brief Finds a card by name, zone, and optional identifiers.
@@ -316,8 +317,6 @@ public:
      * @return Row index where the card should be inserted to maintain sort order.
      */
     int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;
-
-    void sort(int column, Qt::SortOrder order) override;
 
     /**
      * @brief Removes all cards and resets the model.
