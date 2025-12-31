@@ -12,7 +12,7 @@ DeckListStatisticsAnalyzer::DeckListStatisticsAnalyzer(QObject *parent,
                                                        DeckListStatisticsAnalyzerConfig _config)
     : QObject(parent), model(_model), config(_config)
 {
-    connect(model, &DeckListModel::dataChanged, this, &DeckListStatisticsAnalyzer::analyze);
+    connect(model, &DeckListModel::cardsChanged, this, &DeckListStatisticsAnalyzer::analyze);
 }
 
 void DeckListStatisticsAnalyzer::analyze()
