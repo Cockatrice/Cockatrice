@@ -151,9 +151,7 @@ static QModelIndex addAndReplacePrintings(DeckListModel *model,
 
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
     if (existing.isValid() && existing != newCardIndex && replaceProviderless) {
-        for (int i = 0; i < extraCopies; i++) {
-            model->addCard(rootCard, zone);
-        }
+        model->offsetCountAtIndex(newCardIndex, extraCopies);
         model->removeRow(existing.row(), existing.parent());
     }
 
