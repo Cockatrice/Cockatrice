@@ -256,7 +256,8 @@ public:
         return nodeToIndex(root);
     }
 
-    // Qt model overrides
+    /// @name Qt model overrides
+    ///@{
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
@@ -267,6 +268,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
     void sort(int column, Qt::SortOrder order) override;
+    ///@}
 
     /**
      * @brief Finds a card by name, zone, and optional identifiers.
