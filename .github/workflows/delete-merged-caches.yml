@@ -13,6 +13,8 @@ jobs:
       actions: write
     steps:
       - name: Cleanup
+        env:
+          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
         run: |
           echo "Fetching list of cache keys"
           cacheKeysForPR=$(gh cache list --ref $BRANCH --limit 100 --json id --jq '.[].id')
@@ -22,5 +24,3 @@ jobs:
               gh cache delete $cacheKey || true
           done
           echo "Done"
-        env:
-          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
