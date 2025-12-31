@@ -14,6 +14,8 @@
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
+class DeckStateManager;
+
 class DeckListHistoryManagerWidget : public QWidget
 {
     Q_OBJECT
@@ -25,22 +27,19 @@ public slots:
     void retranslateUi();
 
 public:
-    explicit DeckListHistoryManagerWidget(DeckListModel *deckListModel,
+    explicit DeckListHistoryManagerWidget(DeckStateManager *deckStateManager,
                                           DeckListStyleProxy *styleProxy,
-                                          DeckListHistoryManager *manager,
                                           QWidget *parent = nullptr);
-    void setDeckListModel(DeckListModel *_deckListModel);
 
 private slots:
     void refreshList();
-    void onListClicked(QListWidgetItem *item);
+    void onListClicked(const QListWidgetItem *item);
     void doUndo();
     void doRedo();
 
 private:
-    DeckListModel *deckListModel;
+    DeckStateManager *deckStateManager;
     DeckListStyleProxy *styleProxy;
-    DeckListHistoryManager *historyManager;
 
     QHBoxLayout *layout;
     QAction *aUndo;

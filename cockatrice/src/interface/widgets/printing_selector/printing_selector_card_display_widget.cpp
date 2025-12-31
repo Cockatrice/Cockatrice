@@ -18,15 +18,13 @@
  *
  * @param parent The parent widget for this display.
  * @param deckEditor The TabDeckEditor instance for deck management.
- * @param deckModel The DeckListModel instance providing deck data.
- * @param deckView The QTreeView instance displaying the deck.
+ * @param deckStateManager The DeckStateManager instance providing deck data.
  * @param cardSizeSlider The slider controlling the size of the displayed card.
  * @param rootCard The root card object, representing the card to be displayed.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *deckEditor,
-                                                                     DeckListModel *deckModel,
-                                                                     QTreeView *deckView,
+                                                                     DeckStateManager *deckStateManager,
                                                                      QSlider *cardSizeSlider,
                                                                      const ExactCard &rootCard)
     : QWidget(parent)
@@ -36,8 +34,7 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Create the overlay widget for the card display
-    overlayWidget =
-        new PrintingSelectorCardOverlayWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard);
+    overlayWidget = new PrintingSelectorCardOverlayWidget(this, deckEditor, deckStateManager, cardSizeSlider, rootCard);
     connect(overlayWidget, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
             [this]() { emit cardPreferenceChanged(); });
 

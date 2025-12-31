@@ -27,9 +27,7 @@ signals:
 
 public:
     explicit CardAmountWidget(QWidget *parent,
-                              AbstractTabDeckEditor *deckEditor,
-                              DeckListModel *deckModel,
-                              QTreeView *deckView,
+                              DeckStateManager *deckStateManager,
                               QSlider *cardSizeSlider,
                               const ExactCard &rootCard,
                               const QString &zoneName);
@@ -44,9 +42,7 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
-    AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
+    DeckStateManager *deckStateManager;
     QSlider *cardSizeSlider;
     ExactCard rootCard;
     QString zoneName;

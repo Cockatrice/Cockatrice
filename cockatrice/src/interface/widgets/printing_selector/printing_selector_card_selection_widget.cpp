@@ -11,7 +11,9 @@
  *
  * @param parent The parent PrintingSelector widget responsible for managing card selection.
  */
-PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(PrintingSelector *parent) : parent(parent)
+PrintingSelectorCardSelectionWidget::PrintingSelectorCardSelectionWidget(PrintingSelector *parent,
+                                                                         DeckStateManager *deckStateManager)
+    : parent(parent), deckStateManager(deckStateManager)
 {
     cardSelectionBarLayout = new QHBoxLayout(this);
     cardSelectionBarLayout->setContentsMargins(9, 0, 9, 0);
@@ -48,12 +50,6 @@ void PrintingSelectorCardSelectionWidget::connectSignals()
 
 void PrintingSelectorCardSelectionWidget::selectSetForCards()
 {
-    auto *setSelectionDialog = new DlgSelectSetForCards(nullptr, parent->getDeckModel());
-    connect(setSelectionDialog, &DlgSelectSetForCards::deckAboutToBeModified, parent->getDeckEditor(),
-            &AbstractTabDeckEditor::onDeckHistorySaveRequested);
-    connect(setSelectionDialog, &DlgSelectSetForCards::deckModified, parent->getDeckEditor(),
-            &AbstractTabDeckEditor::onDeckModified);
-    if (!setSelectionDialog->exec()) {
-        return;
-    }
+    auto *setSelectionDialog = new DlgSelectSetForCards(nullptr, deckStateManager);
+    setSelectionDialog->exec();
 }

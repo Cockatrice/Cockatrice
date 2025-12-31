@@ -21,6 +21,7 @@
 
 #define BATCH_SIZE 10
 
+class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
@@ -35,15 +36,6 @@ public:
 
     void setCard(const CardInfoPtr &newCard);
     void getAllSetsForCurrentCard();
-    [[nodiscard]] DeckListModel *getDeckModel() const
-    {
-        return deckModel;
-    }
-
-    [[nodiscard]] AbstractTabDeckEditor *getDeckEditor() const
-    {
-        return deckEditor;
-    }
 
 public slots:
     void retranslateUi();
@@ -75,8 +67,7 @@ private:
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
     AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
+    DeckStateManager *deckStateManager;
     CardInfoPtr selectedCard;
     QTimer *widgetLoadingBufferTimer;
     int currentIndex = 0;
