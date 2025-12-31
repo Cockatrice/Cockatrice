@@ -156,6 +156,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
+    src/interface/widgets/deck_editor/deck_state_manager.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
@@ -230,6 +231,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_formats.h
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
@@ -286,6 +288,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
 )
 
 add_subdirectory(sounds)

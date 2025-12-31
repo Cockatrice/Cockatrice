@@ -18,6 +18,7 @@
 #include <QVBoxLayout>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
+class DeckStateManager;
 class SetEntryWidget; // Forward declaration
 
 class DlgSelectSetForCards : public QDialog
@@ -25,7 +26,7 @@ class DlgSelectSetForCards : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgSelectSetForCards(QWidget *parent, DeckListModel *_model);
+    explicit DlgSelectSetForCards(QWidget *parent, DeckStateManager *deckStateManager);
     void retranslateUi();
     void sortSetsByCount();
     QMap<QString, QStringList> getCardsForSets();
@@ -37,7 +38,6 @@ public:
 signals:
     void widgetOrderChanged();
     void orderChanged();
-    void deckAboutToBeModified(const QString &reason);
     void deckModified();
 
 public slots:
@@ -61,7 +61,7 @@ private:
     QLabel *modifiedCardsLabel;
     QWidget *listContainer;
     QListWidget *listWidget;
-    DeckListModel *model;
+    DeckStateManager *deckStateManager;
     QMap<QString, SetEntryWidget *> setEntries;
     QPushButton *clearButton;
     QPushButton *setAllToPreferredButton;

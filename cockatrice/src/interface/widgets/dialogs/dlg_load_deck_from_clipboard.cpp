@@ -66,26 +66,26 @@ void AbstractDlgDeckTextEdit::setText(const QString &text)
 }
 
 /**
- * Tries to load the current contents of the contentsEdit into the DeckLoader
+ * Tries to load the current contents of the contentsEdit into the deckList
  *
- * @param deckLoader The DeckLoader to load the deck into
+ * @param deckList The deckList to load the deck into
  * @return Whether the loading was successful
  */
-bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckLoader *deckLoader) const
+bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckList &deckList) const
 {
     QString buffer = contentsEdit->toPlainText();
 
     if (buffer.contains("<cockatrice_deck version=\"1\">")) {
-        return deckLoader->getDeckList()->loadFromString_Native(buffer);
+        return deckList.loadFromString_Native(buffer);
     }
 
     QTextStream stream(&buffer);
 
-    if (deckLoader->getDeckList()->loadFromStream_Plain(stream, true)) {
+    if (deckList.loadFromStream_Plain(stream, true)) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
-            deckLoader->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
+            deckList.forEachCard(CardNodeFunction::ResolveProviderId());
         } else {
-            deckLoader->getDeckList()->forEachCard(CardNodeFunction::ClearPrintingData());
+            deckList.forEachCard(CardNodeFunction::ClearPrintingData());
         }
         return true;
     }
@@ -108,7 +108,7 @@ void AbstractDlgDeckTextEdit::keyPressEvent(QKeyEvent *event)
  *
  * @param parent The parent widget
  */
-DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : AbstractDlgDeckTextEdit(parent), deckList(nullptr)
+DlgLoadDeckFromClipboard::DlgLoadDeckFromClipboard(QWidget *parent) : AbstractDlgDeckTextEdit(parent)
 {
     setWindowTitle(tr("Load deck from clipboard"));
 
@@ -122,8 +122,6 @@ void DlgLoadDeckFromClipboard::actRefresh()
 
 void DlgLoadDeckFromClipboard::actOK()
 {
-    deckList = new DeckLoader(this);
-
     if (loadIntoDeck(deckList)) {
         accept();
     } else {
@@ -134,17 +132,14 @@ void DlgLoadDeckFromClipboard::actOK()
 /**
  * Creates the dialog window for the "Edit deck in clipboard" action
  *
- * @param _deckLoader The existing deck in the deck editor. Copies the instance
+ * @param _deckList The existing deck in the deck editor.
  * @param _annotated Whether to add annotations to the text that is loaded from the deck
  * @param parent The parent widget
  */
-DlgEditDeckInClipboard::DlgEditDeckInClipboard(DeckLoader *_deckLoader, bool _annotated, QWidget *parent)
-    : AbstractDlgDeckTextEdit(parent), annotated(_annotated)
+DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckList &_deckList, bool _annotated, QWidget *parent)
+    : AbstractDlgDeckTextEdit(parent), deckList(_deckList), annotated(_annotated)
 {
     setWindowTitle(tr("Edit deck in clipboard"));
-
-    deckLoader = new DeckLoader(this, _deckLoader->getDeckList());
-    deckLoader->setParent(this);
 
     DlgEditDeckInClipboard::actRefresh();
 }
@@ -155,7 +150,7 @@ DlgEditDeckInClipboard::DlgEditDeckInClipboard(DeckLoader *_deckLoader, bool _an
  * @param addComments Whether to add annotations
  * @return A QString
  */
-static QString deckListToString(const DeckList *deckList, bool addComments)
+static QString deckListToString(const DeckList &deckList, bool addComments)
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -165,12 +160,12 @@ static QString deckListToString(const DeckList *deckList, bool addComments)
 
 void DlgEditDeckInClipboard::actRefresh()
 {
-    setText(deckListToString(deckLoader->getDeckList(), annotated));
+    setText(deckListToString(deckList, annotated));
 }
 
 void DlgEditDeckInClipboard::actOK()
 {
-    if (loadIntoDeck(deckLoader)) {
+    if (loadIntoDeck(deckList)) {
         accept();
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck list."));

@@ -16,7 +16,7 @@
 
 #define ARCHIDEKT_DEFAULT_IMAGE "https://storage.googleapis.com/topdekt-user/images/archidekt_deck_card_shadow.jpg"
 
-QString timeAgo(const QString &timestamp)
+static QString timeAgo(const QString &timestamp)
 {
     QDateTime dt = QDateTime::fromString(timestamp, Qt::ISODate);
 

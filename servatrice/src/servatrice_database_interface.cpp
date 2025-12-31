@@ -163,11 +163,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
     QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
     QString disallowedWordsStr = settingsCache->value("users/disallowedwords", "").toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList disallowedWords = disallowedWordsStr.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList disallowedWords = disallowedWordsStr.split(",", QString::SkipEmptyParts);
-#endif
     disallowedWords.removeDuplicates();
     QVariant displayDisallowedWords = settingsCache->value("users/displaydisallowedwords");
     QString disallowedRegExpStr;

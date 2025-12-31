@@ -21,7 +21,7 @@ CardDatabase::CardDatabase(QObject *parent,
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
 
     // create loader and wire it up
-    loader = new CardDatabaseLoader(this, this, pathProvider, prefs);
+    loader = new CardDatabaseLoader(this, this, pathProvider, prefs, setPriorityController);
     // re-emit loader signals (so other code doesn't need to know about internals)
     connect(loader, &CardDatabaseLoader::loadingFinished, this, &CardDatabase::cardDatabaseLoadingFinished);
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);

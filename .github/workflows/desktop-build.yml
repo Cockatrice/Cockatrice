@@ -142,7 +142,6 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
@@ -166,7 +165,7 @@ jobs:
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
@@ -205,7 +204,7 @@ jobs:
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ${{env.CACHE}}
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -213,7 +212,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
@@ -336,6 +335,11 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    env:
+      CCACHE_DIR: ${{github.workspace}}/.cache/
+      # Cache size over the entire repo is 10Gi:
+      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_SIZE: 500M
 
     steps:
       - name: Checkout
@@ -350,16 +354,20 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      # Using jianmingyong/ccache-action to setup ccache without using brew
-      # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
       - name: Setup ccache
+        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
+        run: brew install ccache
+
+      - name: Restore compiler cache (ccache)
         if: matrix.use_ccache == 1
-        uses: jianmingyong/ccache-action@v1
+        id: ccache_restore
+        uses: actions/cache/restore@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          install-type: "binary"
-          ccache-key-prefix: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
-          max-size: 500M
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
 
       - name: Restore thin Qt ${{matrix.qt_version}} libraries
         if: matrix.os == 'macOS'
@@ -429,6 +437,15 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
+        uses: actions/cache/save@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
         env:
@@ -476,7 +493,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.make_package
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
@@ -484,7 +501,7 @@ jobs:
 
       - name: Upload pdb database
         if: matrix.os == 'Windows'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Windows${{matrix.target}}-debug-pdbs
           path: |

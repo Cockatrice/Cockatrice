@@ -441,8 +441,8 @@ private:
         size_t id;
     };
 
-    // TODO: Use unordered_map when heterogeneous lookup is supported in C++20
-    // std::unordered_map<std::string, Info> dic_;
+    //! \todo Use unordered_map when heterogeneous lookup is supported in C++20
+    //! \todo std::unordered_map<std::string, Info> dic_;
     std::map<std::string, Info, std::less<>> dic_;
 
     bool ignore_case_;
@@ -3068,7 +3068,7 @@ inline size_t Recovery::parse_core(const char *s, size_t n,
         c.cut_stack.back() = true;
 
         if (c.cut_stack.size() == 1) {
-            // TODO: Remove unneeded entries in packrat memoise table
+            //! \todo Remove unneeded entries in packrat memoise table
         }
     }
 

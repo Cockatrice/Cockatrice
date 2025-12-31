@@ -11,6 +11,7 @@
 #define DECKLIST_H
 
 #include "deck_list_memento.h"
+#include "deck_list_node_tree.h"
 #include "tree/inner_deck_list_node.h"
 
 #include <QMap>
@@ -107,14 +108,14 @@ public:
  * - Provide hashing for deck identity (deck hash).
  *
  * ### Ownership:
- * - Owns the root `InnerDecklistNode` tree.
+ * - Owns the `DecklistNodeTree`.
  * - Owns `SideboardPlan` instances stored in `sideboardPlans`.
  *
  * ### Example workflow:
  * ```
  * DeckList deck;
  * deck.setName("Mono Red Aggro");
- * deck.addCard("Lightning Bolt", "main", -1);
+ * deck.addCard("Lightning Bolt", "main");
  * deck.addTag("Aggro");
  * deck.saveToFile_Native(device);
  * ```
@@ -140,16 +141,13 @@ public:
 private:
     Metadata metadata;                             ///< Deck metadata that is stored in the deck file
     QMap<QString, SideboardPlan *> sideboardPlans; ///< Named sideboard plans.
-    InnerDecklistNode *root;                       ///< Root of the deck tree (zones + cards).
+    DecklistNodeTree tree;                         ///< The deck tree (zones + cards).
 
     /**
      * @brief Cached deck hash, recalculated lazily.
      * An empty string indicates the cache is invalid.
      */
     mutable QString cachedDeckHash;
-
-    // Helpers for traversing the tree
-    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
 
 public:
     /// @name Metadata setters
@@ -190,16 +188,28 @@ public:
 
     /// @brief Construct an empty deck.
     explicit DeckList();
-    /// @brief Copy constructor (deep copies the node tree)
-    DeckList(const DeckList &other);
     /// @brief Construct from a serialized native-format string.
     explicit DeckList(const QString &nativeString);
+    /// @brief Construct from components
+    DeckList(const Metadata &metadata,
+             const DecklistNodeTree &tree,
+             const QMap<QString, SideboardPlan *> &sideboardPlans = {});
     virtual ~DeckList();
+
+    /**
+     * @brief Gets a pointer to the underlying node tree.
+     * Note: DO NOT call this method unless the object needs to have access to the underlying model.
+     * For now, only the DeckListModel should be calling this.
+     */
+    DecklistNodeTree *getTree()
+    {
+        return &tree;
+    }
 
     /// @name Metadata getters
     /// The individual metadata getters still exist for backwards compatibility.
-    /// TODO: Figure out when we can remove them.
     ///@{
+    //! \todo Figure out when we can remove them.
     const Metadata &getMetadata() const
     {
         return metadata;
@@ -270,25 +280,21 @@ public:
     void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
     {
-        return root->isEmpty() && metadata.isEmpty() && sideboardPlans.isEmpty();
+        return tree.isEmpty() && metadata.isEmpty() && sideboardPlans.isEmpty();
     }
     QStringList getCardList() const;
     QList<CardRef> getCardRefList() const;
-    QList<const DecklistCardNode *> getCardNodes(const QStringList &restrictToZones = QStringList()) const;
+    QList<const DecklistCardNode *> getCardNodes(const QSet<QString> &restrictToZones = {}) const;
     QList<const InnerDecklistNode *> getZoneNodes() const;
     int getSideboardSize() const;
-    InnerDecklistNode *getRoot() const
-    {
-        return root;
-    }
+
     DecklistCardNode *addCard(const QString &cardName,
                               const QString &zoneName,
-                              int position,
+                              int position = -1,
                               const QString &cardSetName = QString(),
                               const QString &cardSetCollectorNumber = QString(),
                               const QString &cardProviderId = QString(),
                               const bool formatLegal = true);
-    bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
     ///@}
 
     /// @name Deck identity

@@ -283,11 +283,7 @@ bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
     auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
     const auto filter = filterRegularExpression();
-#else
-    const auto filter = filterRegExp();
-#endif
 
     return (sourceModel()->data(typeIndex).toString().contains(filter) ||
             sourceModel()->data(nameIndex).toString().contains(filter) ||

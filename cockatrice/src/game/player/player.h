@@ -9,6 +9,7 @@
 
 #include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
+#include "../interface/deck_loader/loaded_deck.h"
 #include "../zones/logic/hand_zone_logic.h"
 #include "../zones/logic/pile_zone_logic.h"
 #include "../zones/logic/stack_zone_logic.h"
@@ -44,7 +45,6 @@ class ArrowTarget;
 class CardDatabase;
 class CardZone;
 class CommandContainer;
-class DeckLoader;
 class GameCommand;
 class GameEvent;
 class PlayerInfo;
@@ -66,7 +66,7 @@ class Player : public QObject
     Q_OBJECT
 
 signals:
-    void openDeckEditor(DeckLoader *deck);
+    void openDeckEditor(const LoadedDeck &deck);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();
@@ -130,9 +130,9 @@ public:
         return playerMenu;
     }
 
-    void setDeck(DeckLoader &_deck);
+    void setDeck(const DeckList &_deck);
 
-    [[nodiscard]] DeckLoader *getDeck() const
+    [[nodiscard]] const DeckList &getDeck() const
     {
         return deck;
     }
@@ -241,7 +241,7 @@ private:
     bool active;
     bool conceded;
 
-    DeckLoader *deck;
+    DeckList deck;
 
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;

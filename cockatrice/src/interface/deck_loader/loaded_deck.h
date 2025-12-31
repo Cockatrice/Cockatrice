@@ -30,8 +30,8 @@ struct LoadedDeck
         bool isEmpty() const;
     };
 
-    DeckList deckList;     ///< The decklist itself
-    LoadInfo lastLoadInfo; ///< info about where the deck was loaded from
+    DeckList deckList;          ///< The decklist itself
+    LoadInfo lastLoadInfo = {}; ///< info about where the deck was loaded from
 
     bool isEmpty() const;
 };

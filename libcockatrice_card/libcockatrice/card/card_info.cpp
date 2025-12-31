@@ -75,7 +75,17 @@ QString CardInfo::getCorrectedName() const
     return result.remove(rmrx).replace(spacerx, space);
 }
 
-void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
+bool CardInfo::isLegalInFormat(const QString &format) const
+{
+    if (format.isEmpty()) {
+        return true;
+    }
+
+    QString formatLegality = getProperty("format-" + format);
+    return formatLegality == "legal" || formatLegality == "restricted";
+}
+
+void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 {
     if (!_set->contains(smartThis)) {
         _set->append(smartThis);
@@ -156,7 +166,7 @@ QString CardInfo::simplifyName(const QString &name)
     return simpleName;
 }
 
-const QChar CardInfo::getColorChar() const
+QChar CardInfo::getColorChar() const
 {
     QString colors = getColors();
     switch (colors.size()) {
@@ -178,7 +188,7 @@ void CardInfo::resetReverseRelatedCards2Me()
 }
 
 // Back-compatibility methods. Remove ASAP
-const QString CardInfo::getCardType() const
+QString CardInfo::getCardType() const
 {
     return getProperty(Mtg::CardType);
 }
@@ -186,11 +196,11 @@ void CardInfo::setCardType(const QString &value)
 {
     setProperty(Mtg::CardType, value);
 }
-const QString CardInfo::getCmc() const
+QString CardInfo::getCmc() const
 {
     return getProperty(Mtg::ConvertedManaCost);
 }
-const QString CardInfo::getColors() const
+QString CardInfo::getColors() const
 {
     return getProperty(Mtg::Colors);
 }
@@ -198,19 +208,19 @@ void CardInfo::setColors(const QString &value)
 {
     setProperty(Mtg::Colors, value);
 }
-const QString CardInfo::getLoyalty() const
+QString CardInfo::getLoyalty() const
 {
     return getProperty(Mtg::Loyalty);
 }
-const QString CardInfo::getMainCardType() const
+QString CardInfo::getMainCardType() const
 {
     return getProperty(Mtg::MainCardType);
 }
-const QString CardInfo::getManaCost() const
+QString CardInfo::getManaCost() const
 {
     return getProperty(Mtg::ManaCost);
 }
-const QString CardInfo::getPowTough() const
+QString CardInfo::getPowTough() const
 {
     return getProperty(Mtg::PowTough);
 }

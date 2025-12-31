@@ -19,6 +19,7 @@
 
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 
+class DeckStateManager;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
@@ -77,7 +78,6 @@ class QAction;
  *
  * - actAddCard(const ExactCard &card) — Adds a card to the deck.
  * - actDecrementCard(const ExactCard &card) — Removes a single instance of a card from the deck.
- * - actSwapCard(const ExactCard &card, const QString &zone) — Swaps a card between zones.
  * - actRemoveCard() — Removes the currently selected card from the deck.
  * - actSaveDeckAs() — Performs a "Save As" action for the deck.
  * - updateCard(const ExactCard &card) — Updates the currently displayed card info in the dock.
@@ -114,34 +114,17 @@ public:
     virtual void retranslateUi() override = 0;
 
     /** @brief Opens a deck in this tab.
-     *  @param deck Pointer to a DeckLoader object.
+     *  @param deck The deck to open
      */
-    void openDeck(DeckLoader *deck);
-
-    /** @brief Returns the currently active deck loader. */
-    DeckLoader *getDeckLoader() const;
-
-    /** @brief Returns the currently active deck list. */
-    DeckList *getDeckList() const;
-
-    /** @brief Sets the modified state of the tab.
-     *  @param _windowModified Whether the tab is modified.
-     */
-    void setModified(bool _windowModified);
+    void openDeck(const LoadedDeck &deck);
 
     DeckEditorDeckDockWidget *getDeckDockWidget() const
     {
         return deckDockWidget;
     }
 
-    DeckListHistoryManager *getHistoryManager() const
-    {
-        return historyManager;
-    }
-
-    DeckListHistoryManager *historyManager;
-
     // UI Elements
+    DeckStateManager *deckStateManager;
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;       ///< Database dock
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;                 ///< Card info dock
@@ -155,14 +138,6 @@ public slots:
 
     /** @brief Called when the deck is modified. */
     virtual void onDeckModified();
-
-    /** @brief Called when a widget is about to modify the state of the DeckList.
-     *  @param modificationReason The reason for the state modification
-     */
-    virtual void onDeckHistorySaveRequested(const QString &modificationReason);
-
-    /** @brief Called when a widget would like to clear the history. */
-    virtual void onDeckHistoryClearRequested();
 
     /** @brief Updates the card info panel.
      *  @param card The card to display.
@@ -198,13 +173,10 @@ public slots:
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
-    void openDeckEditor(DeckLoader *deckLoader);
+    void openDeckEditor(const LoadedDeck &deck);
 
     /** @brief Emitted before the tab is closed. */
     void deckEditorClosing(AbstractTabDeckEditor *tab);
-
-    /** @brief Emitted when a card should be decremented. */
-    void decrementCard(const ExactCard &card, QString zoneName);
 
 protected slots:
     /** @brief Starts a new deck in this tab. */
@@ -286,7 +258,7 @@ private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
      */
-    virtual void setDeck(DeckLoader *_deck);
+    virtual void setDeck(const LoadedDeck &_deck);
 
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
@@ -316,14 +288,8 @@ protected:
      */
     QMessageBox *createSaveConfirmationWindow();
 
-    /** @brief Returns true if the tab is a blank newly created deck. */
-    bool isBlankNewDeck() const;
-
     /** @brief Helper function to add a card to a specific deck zone. */
-    void addCardHelper(const ExactCard &card, QString zoneName);
-
-    /** @brief Swaps a card in the deck view. */
-    void actSwapCard(const ExactCard &card, const QString &zoneName);
+    void addCardHelper(const ExactCard &card, const QString &zoneName);
 
     /** @brief Opens a deck from a file. */
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
@@ -334,8 +300,6 @@ protected:
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating;
     QAction *aFilterDockVisible, *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
-
-    bool modified = false; ///< Whether the deck/tab has unsaved changes
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H

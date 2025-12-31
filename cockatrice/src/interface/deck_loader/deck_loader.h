@@ -41,28 +41,16 @@ public:
     };
 
 private:
-    DeckList *deckList;
-    LoadedDeck::LoadInfo lastLoadInfo;
+    LoadedDeck loadedDeck;
 
 public:
     DeckLoader(QObject *parent);
-    DeckLoader(QObject *parent, DeckList *_deckList);
     DeckLoader(const DeckLoader &) = delete;
     DeckLoader &operator=(const DeckLoader &) = delete;
 
-    const LoadedDeck::LoadInfo &getLastLoadInfo() const
-    {
-        return lastLoadInfo;
-    }
-
-    void setLastLoadInfo(const LoadedDeck::LoadInfo &info)
-    {
-        lastLoadInfo = info;
-    }
-
     [[nodiscard]] bool hasNotBeenLoaded() const
     {
-        return lastLoadInfo.isEmpty();
+        return loadedDeck.lastLoadInfo.isEmpty();
     }
 
     bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
@@ -71,11 +59,11 @@ public:
     bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
-    static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
+    static QString exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website);
 
-    static void saveToClipboard(const DeckList *deckList, bool addComments = true, bool addSetNameAndNumber = true);
+    static void saveToClipboard(const DeckList &deckList, bool addComments = true, bool addSetNameAndNumber = true);
     static bool saveToStream_Plain(QTextStream &out,
-                                   const DeckList *deckList,
+                                   const DeckList &deckList,
                                    bool addComments = true,
                                    bool addSetNameAndNumber = true);
 
@@ -84,18 +72,26 @@ public:
      * @param printer The printer to render the decklist to.
      * @param deckList
      */
-    static void printDeckList(QPrinter *printer, const DeckList *deckList);
+    static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
-    bool convertToCockatriceFormat(QString fileName);
+    bool convertToCockatriceFormat(const QString &fileName);
 
-    DeckList *getDeckList()
+    LoadedDeck &getDeck()
     {
-        return deckList;
+        return loadedDeck;
+    }
+    const LoadedDeck &getDeck() const
+    {
+        return loadedDeck;
+    }
+    void setDeck(const LoadedDeck &deck)
+    {
+        loadedDeck = deck;
     }
 
 private:
     static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
-    static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);
+    static void saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList);
 
     static void saveToStream_DeckZone(QTextStream &out,
                                       const InnerDecklistNode *zoneNode,
@@ -106,9 +102,6 @@ private:
                                            QList<DecklistCardNode *> cards,
                                            bool addComments = true,
                                            bool addSetNameAndNumber = true);
-
-    [[nodiscard]] static QString getCardZoneFromName(const QString &cardName, QString currentZoneName);
-    [[nodiscard]] static QString getCompleteCardName(const QString &cardName);
 };
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_INTERFACE_CARD_SET_PRIORITY_CONTROLLER_H
 #define COCKATRICE_INTERFACE_CARD_SET_PRIORITY_CONTROLLER_H
 
+#include <QString>
+
 class ICardSetPriorityController
 {
 public:

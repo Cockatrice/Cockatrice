@@ -14,6 +14,11 @@
 #define COCKATRICE_XML3_SCHEMALOCATION                                                                                 \
     "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v3/cards.xsd"
 
+CockatriceXml3Parser::CockatriceXml3Parser(ICardSetPriorityController *_cardSetPriorityController)
+    : ICardDatabaseParser(_cardSetPriorityController)
+{
+}
+
 bool CockatriceXml3Parser::getCanParseFile(const QString &fileName, QIODevice &device)
 {
     qCInfo(CockatriceXml3Log) << "Trying to parse: " << fileName;

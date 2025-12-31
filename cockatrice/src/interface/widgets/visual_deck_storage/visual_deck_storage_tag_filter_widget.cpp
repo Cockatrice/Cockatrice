@@ -57,7 +57,7 @@ void VisualDeckStorageTagFilterWidget::filterDecksBySelectedTags(const QList<Dec
     }
 
     for (DeckPreviewWidget *deckPreview : deckPreviews) {
-        QStringList deckTags = deckPreview->deckLoader->getDeckList()->getTags();
+        QStringList deckTags = deckPreview->deckLoader->getDeck().deckList.getTags();
 
         bool hasAllSelected = std::all_of(selectedTags.begin(), selectedTags.end(),
                                           [&deckTags](const QString &tag) { return deckTags.contains(tag); });
@@ -153,7 +153,7 @@ QSet<QString> VisualDeckStorageTagFilterWidget::gatherAllTags() const
 
     for (DeckPreviewWidget *widget : deckWidgets) {
         if (widget->checkVisibility()) {
-            for (const QString &tag : widget->deckLoader->getDeckList()->getTags()) {
+            for (const QString &tag : widget->deckLoader->getDeck().deckList.getTags()) {
                 allTags.insert(tag);
             }
         }

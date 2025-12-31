@@ -264,9 +264,10 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
 
 void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex persistent)
 {
+    QString zoneName =
+        persistent.sibling(persistent.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     DeckCardZoneDisplayWidget *zoneDisplayWidget = new DeckCardZoneDisplayWidget(
-        zoneContainer, deckListModel, selectionModel, persistent,
-        deckListModel->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
+        zoneContainer, deckListModel, selectionModel, persistent, zoneName,
         displayOptionsWidget->getActiveGroupCriteria(), displayOptionsWidget->getActiveSortCriteria(),
         displayOptionsWidget->getDisplayType(), 20, 10, cardSizeWidget);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
@@ -290,7 +291,7 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
     QSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     for (int i = 0; i < proxy.rowCount(); ++i) {
         QModelIndex proxyIndex = proxy.index(i, 0);

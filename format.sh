@@ -14,7 +14,6 @@ cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with 
 
 # defaults
 include=("cockatrice/src" \
-"dbconverter/src" \
 "libcockatrice_card" \
 "libcockatrice_deck_list" \
 "libcockatrice_network" \

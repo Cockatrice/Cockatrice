@@ -2,6 +2,7 @@
 
 #include "../../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../deck_editor/deck_state_manager.h"
 
 #include <QHBoxLayout>
 
@@ -60,18 +61,14 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
-    DeckListModel *deckListModel = deckEditor->deckDockWidget->deckModel;
+    DeckListModel *deckListModel = deckEditor->deckStateManager->getModel();
 
     if (!deckListModel)
         return;
-    DeckList *decklist = deckListModel->getDeckList();
-    if (!decklist)
-        return;
 
-    QList<const DecklistCardNode *> cardsInDeck = decklist->getCardNodes();
-
-    for (auto currentCard : cardsInDeck) {
-        createNameFilter(currentCard->getName());
+    QList<QString> cardNames = deckListModel->getCardNames();
+    for (auto cardName : cardNames) {
+        createNameFilter(cardName);
     }
 
     updateFilterModel();
@@ -83,7 +80,7 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard()
     if (!dlg.exec())
         return;
 
-    QStringList cardsInClipboard = dlg.getDeckList()->getDeckList()->getCardList();
+    QStringList cardsInClipboard = dlg.getDeckList().getCardList();
     for (QString cardName : cardsInClipboard) {
         createNameFilter(cardName);
     }

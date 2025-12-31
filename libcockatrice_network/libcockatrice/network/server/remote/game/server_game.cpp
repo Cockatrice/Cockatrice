@@ -73,11 +73,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
       shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
       firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
       gameMutex()
-#else
-      gameMutex(QMutex::Recursive)
-#endif
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -501,7 +497,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         allPlayersEver.insert(playerName);
 
         // if the original creator of the game joins, give them host status back
-        // FIXME: transferring host to spectators has side effects
+        //! \todo transferring host to spectators has side effects
         if (newParticipant->getUserInfo()->name() == creatorInfo->name()) {
             hostId = newParticipant->getPlayerId();
             sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));

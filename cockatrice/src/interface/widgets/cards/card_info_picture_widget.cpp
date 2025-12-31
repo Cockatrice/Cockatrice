@@ -39,10 +39,6 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
         setMouseTracking(true);
     }
 
-    enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(this->window());
-    enlargedPixmapWidget->hide();
-    connect(this, &QObject::destroyed, enlargedPixmapWidget, &CardInfoPictureEnlargedWidget::deleteLater);
-
     hoverTimer = new QTimer(this);
     hoverTimer->setSingleShot(true);
     connect(hoverTimer, &QTimer::timeout, this, &CardInfoPictureWidget::showEnlargedPixmap);
@@ -277,7 +273,7 @@ void CardInfoPictureWidget::leaveEvent(QEvent *event)
 
     if (hoverToZoomEnabled) {
         hoverTimer->stop();
-        enlargedPixmapWidget->hide();
+        destroyEnlargedPixmapWidget();
     }
 
     if (raiseOnEnter) {
@@ -294,7 +290,7 @@ void CardInfoPictureWidget::moveEvent(QMoveEvent *event)
     QWidget::moveEvent(event);
 
     hoverTimer->stop();
-    enlargedPixmapWidget->hide();
+    destroyEnlargedPixmapWidget();
 
     if (animation->state() == QAbstractAnimation::Running) {
         return;
@@ -310,7 +306,7 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QWidget::mouseMoveEvent(event);
 
-    if (hoverToZoomEnabled && enlargedPixmapWidget->isVisible()) {
+    if (hoverToZoomEnabled && enlargedPixmapWidget && enlargedPixmapWidget->isVisible()) {
         const QPoint cursorPos = QCursor::pos();
         const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
         const QSize widgetSize = enlargedPixmapWidget->size();
@@ -344,7 +340,7 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
 
 void CardInfoPictureWidget::hideEvent(QHideEvent *event)
 {
-    enlargedPixmapWidget->hide();
+    destroyEnlargedPixmapWidget();
     QWidget::hideEvent(event);
 }
 
@@ -444,10 +440,17 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
  * If card information is available, the enlarged pixmap is loaded, positioned near the cursor,
  * and displayed.
  */
-void CardInfoPictureWidget::showEnlargedPixmap() const
+void CardInfoPictureWidget::showEnlargedPixmap()
 {
     if (!exactCard) {
         return;
+    }
+
+    // Lazy creation of the enlarged widget
+    if (!enlargedPixmapWidget) {
+        enlargedPixmapWidget = new CardInfoPictureEnlargedWidget(const_cast<CardInfoPictureWidget *>(this)->window());
+        enlargedPixmapWidget->hide();
+        connect(this, &QObject::destroyed, enlargedPixmapWidget, &CardInfoPictureEnlargedWidget::deleteLater);
     }
 
     const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * aspectRatio * 2));
@@ -460,7 +463,6 @@ void CardInfoPictureWidget::showEnlargedPixmap() const
     int newX = cursorPos.x() + enlargedPixmapOffset;
     int newY = cursorPos.y() + enlargedPixmapOffset;
 
-    // Adjust if out of bounds
     if (newX + widgetSize.width() > screenGeometry.right()) {
         newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
     }
@@ -471,4 +473,12 @@ void CardInfoPictureWidget::showEnlargedPixmap() const
     enlargedPixmapWidget->move(newX, newY);
 
     enlargedPixmapWidget->show();
+}
+
+void CardInfoPictureWidget::destroyEnlargedPixmapWidget()
+{
+    if (enlargedPixmapWidget) {
+        enlargedPixmapWidget->deleteLater();
+        enlargedPixmapWidget = nullptr;
+    }
 }

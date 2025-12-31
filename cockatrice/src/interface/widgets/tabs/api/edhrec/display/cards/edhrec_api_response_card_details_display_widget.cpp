@@ -19,17 +19,17 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     nameLabel = new QLabel(this);
     nameLabel->setText(toDisplay.name);
     nameLabel->setAlignment(Qt::AlignHCenter);
+    nameLabel->setStyleSheet("font-size: 20px; font-weight: bold");
 
     inclusionDisplayWidget = new EdhrecApiResponseCardInclusionDisplayWidget(this, toDisplay);
 
     synergyDisplayWidget = new EdhrecApiResponseCardSynergyDisplayWidget(this, toDisplay);
 
-    layout->addWidget(nameLabel);
-    layout->addWidget(cardPictureWidget);
-
     backgroundPlateWidget = new BackgroundPlateWidget(this);
     auto plateLayout = new QVBoxLayout(backgroundPlateWidget);
 
+    plateLayout->addWidget(nameLabel);
+    plateLayout->addWidget(cardPictureWidget);
     plateLayout->addWidget(inclusionDisplayWidget);
     plateLayout->addWidget(synergyDisplayWidget);
 

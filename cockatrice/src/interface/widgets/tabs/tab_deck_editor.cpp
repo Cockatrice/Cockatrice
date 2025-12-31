@@ -1,6 +1,7 @@
 #include "tab_deck_editor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../deck_editor/deck_state_manager.h"
 #include "../filters/filter_builder.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
@@ -114,8 +115,8 @@ void TabDeckEditor::createMenus()
  */
 QString TabDeckEditor::getTabText() const
 {
-    QString result = tr("Deck: %1").arg(deckDockWidget->getSimpleDeckName());
-    if (modified)
+    QString result = tr("Deck: %1").arg(deckStateManager->getSimpleDeckName());
+    if (deckStateManager->isModified())
         result.prepend("* ");
     return result;
 }
@@ -158,8 +159,7 @@ void TabDeckEditor::refreshShortcuts()
  */
 void TabDeckEditor::showPrintingSelector()
 {
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr(),
-                                                          DECK_ZONE_MAIN);
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
     aPrintingSelectorDockVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);

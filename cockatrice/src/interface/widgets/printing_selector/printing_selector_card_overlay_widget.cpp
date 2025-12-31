@@ -22,19 +22,16 @@
  *
  * @param parent The parent widget for this overlay.
  * @param _deckEditor The TabDeckEditor instance for deck management.
- * @param _deckModel The DeckListModel instance providing deck data.
- * @param _deckView The QTreeView instance displaying the deck.
- * @param _cardSizeSlider The slider controlling the size of the card.
+ * @param deckStateManager The DeckStateManager instance providing deck data.
+ * @param cardSizeSlider The slider controlling the size of the card.
  * @param _rootCard The root card object that contains information about the card.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *_deckEditor,
-                                                                     DeckListModel *_deckModel,
-                                                                     QTreeView *_deckView,
-                                                                     QSlider *_cardSizeSlider,
+                                                                     DeckStateManager *deckStateManager,
+                                                                     QSlider *cardSizeSlider,
                                                                      const ExactCard &_rootCard)
-    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(_rootCard)
+    : QWidget(parent), deckEditor(_deckEditor), rootCard(_rootCard)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);
@@ -59,8 +56,7 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     updatePinBadgeVisibility();
 
     // Add AllZonesCardAmountWidget
-    allZonesCardAmountWidget =
-        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, _rootCard);
+    allZonesCardAmountWidget = new AllZonesCardAmountWidget(this, deckStateManager, cardSizeSlider, _rootCard);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
     // Set initial visibility based on amounts

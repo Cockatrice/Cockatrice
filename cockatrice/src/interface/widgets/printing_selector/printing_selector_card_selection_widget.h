@@ -18,7 +18,7 @@ class PrintingSelectorCardSelectionWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit PrintingSelectorCardSelectionWidget(PrintingSelector *parent);
+    explicit PrintingSelectorCardSelectionWidget(PrintingSelector *parent, DeckStateManager *deckStateManager);
 
     void connectSignals();
 
@@ -27,6 +27,7 @@ public slots:
 
 private:
     PrintingSelector *parent;
+    DeckStateManager *deckStateManager;
     QHBoxLayout *cardSelectionBarLayout;
     QPushButton *previousCardButton;
     QPushButton *selectSetForCardsButton;

@@ -32,7 +32,7 @@
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), deck(nullptr), zoneId(0), dialogSemaphore(false)
+      conceded(false), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
 
@@ -263,10 +263,9 @@ void Player::deleteCard(CardItem *card)
     }
 }
 
-// TODO: Does a player need a DeckLoader?
-void Player::setDeck(DeckLoader &_deck)
+void Player::setDeck(const DeckList &_deck)
 {
-    deck = new DeckLoader(this, _deck.getDeckList());
+    deck = _deck;
 
     emit deckChanged();
 }

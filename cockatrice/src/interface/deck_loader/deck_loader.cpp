@@ -25,11 +25,7 @@ const QStringList DeckLoader::ACCEPTED_FILE_EXTENSIONS = {"*.cod", "*.dec", "*.d
 const QStringList DeckLoader::FILE_NAME_FILTERS = {
     tr("Common deck formats (%1)").arg(ACCEPTED_FILE_EXTENSIONS.join(" ")), tr("All files (*.*)")};
 
-DeckLoader::DeckLoader(QObject *parent) : QObject(parent), deckList(new DeckList())
-{
-}
-
-DeckLoader::DeckLoader(QObject *parent, DeckList *_deckList) : QObject(parent), deckList(_deckList)
+DeckLoader::DeckLoader(QObject *parent) : QObject(parent)
 {
 }
 
@@ -41,17 +37,18 @@ bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fm
     }
 
     bool result = false;
+    DeckList deckList = DeckList();
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->loadFromFile_Plain(&file);
+            result = deckList.loadFromFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice: {
-            result = deckList->loadFromFile_Native(&file);
+            result = deckList.loadFromFile_Native(&file);
             qCInfo(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
                 qCInfo(DeckLoaderLog) << "Retrying as plain format";
                 file.seek(0);
-                result = deckList->loadFromFile_Plain(&file);
+                result = deckList.loadFromFile_Plain(&file);
                 fmt = DeckFileFormat::PlainText;
             }
             break;
@@ -62,7 +59,8 @@ bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fm
     }
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.deckList = deckList;
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -86,7 +84,7 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
         watcher->deleteLater();
 
         if (result) {
-            lastLoadInfo = {
+            loadedDeck.lastLoadInfo = {
                 .fileName = fileName,
                 .fileFormat = fmt,
             };
@@ -107,13 +105,13 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
 
         switch (fmt) {
             case DeckFileFormat::PlainText:
-                return deckList->loadFromFile_Plain(&file);
+                return loadedDeck.deckList.loadFromFile_Plain(&file);
             case DeckFileFormat::Cockatrice: {
                 bool result = false;
-                result = deckList->loadFromFile_Native(&file);
+                result = loadedDeck.deckList.loadFromFile_Native(&file);
                 if (!result) {
                     file.seek(0);
-                    return deckList->loadFromFile_Plain(&file);
+                    return loadedDeck.deckList.loadFromFile_Plain(&file);
                 }
                 return result;
             }
@@ -129,9 +127,9 @@ bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
 
 bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
-    bool result = deckList->loadFromString_Native(nativeString);
+    bool result = loadedDeck.deckList.loadFromString_Native(nativeString);
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .remoteDeckId = remoteDeckId,
         };
 
@@ -150,16 +148,16 @@ bool DeckLoader::saveToFile(const QString &fileName, DeckFileFormat::Format fmt)
     bool result = false;
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->saveToFile_Plain(&file);
+            result = loadedDeck.deckList.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            result = deckList->saveToFile_Native(&file);
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             qCInfo(DeckLoaderLog) << "Saving to " << fileName << "-" << result;
             break;
     }
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -194,18 +192,18 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, DeckFileForm
     // Perform file modifications
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList->saveToFile_Plain(&file);
+            result = loadedDeck.deckList.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            deckList->setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-            result = deckList->saveToFile_Native(&file);
+            loadedDeck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             break;
     }
 
     file.close(); // Close the file to ensure changes are flushed
 
     if (result) {
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = fileName,
             .fileFormat = fmt,
         };
@@ -289,14 +287,14 @@ static QString toDecklistExportString(const QList<const DecklistCardNode *> &car
  * @param deckList The decklist to export
  * @param website The website we're sending the deck to
  */
-QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website)
+QString DeckLoader::exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website)
 {
     // Add the base url
     QString deckString = "https://" + getDomainForWebsite(website) + "/?";
 
     // export all cards in zone
-    QString mainBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_MAIN}));
-    QString sideBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_SIDE}));
+    QString mainBoardCards = toDecklistExportString(deckList.getCardNodes({DECK_ZONE_MAIN}));
+    QString sideBoardCards = toDecklistExportString(deckList.getCardNodes({DECK_ZONE_SIDE}));
 
     // Remove the extra return at the end of the last cards
     mainBoardCards.chop(3);
@@ -312,7 +310,7 @@ QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsi
     return deckString;
 }
 
-void DeckLoader::saveToClipboard(const DeckList *deckList, bool addComments, bool addSetNameAndNumber)
+void DeckLoader::saveToClipboard(const DeckList &deckList, bool addComments, bool addSetNameAndNumber)
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -322,7 +320,7 @@ void DeckLoader::saveToClipboard(const DeckList *deckList, bool addComments, boo
 }
 
 bool DeckLoader::saveToStream_Plain(QTextStream &out,
-                                    const DeckList *deckList,
+                                    const DeckList &deckList,
                                     bool addComments,
                                     bool addSetNameAndNumber)
 {
@@ -331,7 +329,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     }
 
     // loop zones
-    for (auto zoneNode : deckList->getZoneNodes()) {
+    for (auto zoneNode : deckList.getZoneNodes()) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
@@ -341,14 +339,14 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     return true;
 }
 
-void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList)
+void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList)
 {
-    if (!deckList->getName().isEmpty()) {
-        out << "// " << deckList->getName() << "\n\n";
+    if (!deckList.getName().isEmpty()) {
+        out << "// " << deckList.getName() << "\n\n";
     }
 
-    if (!deckList->getComments().isEmpty()) {
-        QStringList commentRows = deckList->getComments().split(QRegularExpression("\n|\r\n|\r"));
+    if (!deckList.getComments().isEmpty()) {
+        QStringList commentRows = deckList.getComments().split(QRegularExpression("\n|\r\n|\r"));
         for (const QString &row : commentRows) {
             out << "// " << row << "\n";
         }
@@ -436,7 +434,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
     }
 }
 
-bool DeckLoader::convertToCockatriceFormat(QString fileName)
+bool DeckLoader::convertToCockatriceFormat(const QString &fileName)
 {
     // Change the file extension to .cod
     QFileInfo fileInfo(fileName);
@@ -455,7 +453,7 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
     switch (DeckFileFormat::getFormatFromName(fileName)) {
         case DeckFileFormat::PlainText:
             // Save in Cockatrice's native format
-            result = deckList->saveToFile_Native(&file);
+            result = loadedDeck.deckList.saveToFile_Native(&file);
             break;
         case DeckFileFormat::Cockatrice:
             qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
@@ -476,36 +474,13 @@ bool DeckLoader::convertToCockatriceFormat(QString fileName)
         } else {
             qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
         }
-        lastLoadInfo = {
+        loadedDeck.lastLoadInfo = {
             .fileName = newFileName,
             .fileFormat = DeckFileFormat::Cockatrice,
         };
     }
 
     return result;
-}
-
-QString DeckLoader::getCardZoneFromName(const QString &cardName, QString currentZoneName)
-{
-    CardInfoPtr card = CardDatabaseManager::query()->getCardInfo(cardName);
-
-    if (card && card->getIsToken()) {
-        return DECK_ZONE_TOKENS;
-    }
-
-    return currentZoneName;
-}
-
-QString DeckLoader::getCompleteCardName(const QString &cardName)
-{
-    if (CardDatabaseManager::getInstance()) {
-        ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
-        if (temp) {
-            return temp.getName();
-        }
-    }
-
-    return cardName;
 }
 
 void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
@@ -568,7 +543,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
     cursor->movePosition(QTextCursor::End);
 }
 
-void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
+void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 {
     QTextDocument doc;
 
@@ -584,14 +559,14 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
     headerCharFormat.setFontWeight(QFont::Bold);
 
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getName());
+    cursor.insertText(deckList.getName());
 
     headerCharFormat.setFontPointSize(12);
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getComments());
+    cursor.insertText(deckList.getComments());
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-    for (auto zoneNode : deckList->getZoneNodes()) {
+    for (auto zoneNode : deckList.getZoneNodes()) {
         cursor.insertHtml("<br><img src=theme:hr.jpg>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 

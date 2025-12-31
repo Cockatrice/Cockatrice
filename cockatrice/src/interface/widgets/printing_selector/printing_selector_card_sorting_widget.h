@@ -23,7 +23,7 @@ public:
     QList<PrintingInfo> prependPinnedPrintings(const QList<PrintingInfo> &printings, const QString &cardName);
     QList<PrintingInfo> prependPrintingsInDeck(const QList<PrintingInfo> &printings,
                                                const CardInfoPtr &selectedCard,
-                                               DeckListModel *deckModel);
+                                               const DeckListModel *deckModel);
 
 public slots:
     void updateSortOrder();

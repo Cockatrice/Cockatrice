@@ -28,22 +28,14 @@ class DeckEditorDeckDockWidget : public QDockWidget
     Q_OBJECT
 public:
     explicit DeckEditorDeckDockWidget(AbstractTabDeckEditor *parent);
-    DeckLoader *deckLoader;
+
     DeckListStyleProxy *proxy;
-    DeckListModel *deckModel;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
     void createDeckDock();
     ExactCard getCurrentCard();
     void retranslateUi();
-    QString getDeckName()
-    {
-        return nameEdit->text();
-    }
-    QString getSimpleDeckName()
-    {
-        return nameEdit->text().simplified();
-    }
+
     QComboBox *getGroupByComboBox()
     {
         return activeGroupCriteriaComboBox;
@@ -55,35 +47,27 @@ public:
     }
 
 public slots:
-    void cleanDeck();
+    void selectPrevCard();
+    void selectNextCard();
     void updateBannerCardComboBox();
-    void setDeck(DeckLoader *_deck);
     void syncDisplayWidgetsToModel();
     void sortDeckModelToDeckView();
-    DeckLoader *getDeckLoader();
-    DeckList *getDeckList();
-    void actIncrement();
-    bool swapCard(const QModelIndex &idx);
+    void actAddCard(const ExactCard &card, const QString &zoneName);
+    void actIncrementSelection();
     void actDecrementCard(const ExactCard &card, QString zoneName);
     void actDecrementSelection();
-    void actSwapCard();
+    void actSwapCard(const ExactCard &card, const QString &zoneName);
+    void actSwapSelection();
     void actRemoveCard();
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void initializeFormats();
-    void expandAll();
 
 signals:
-    void nameChanged();
-    void commentsChanged();
-    void hashChanged();
-    void deckChanged();
-    void deckModified();
-    void requestDeckHistorySave(const QString &modificationReason);
-    void requestDeckHistoryClear();
-    void cardChanged(const ExactCard &_card);
+    void selectedCardChanged(const ExactCard &card);
 
 private:
     AbstractTabDeckEditor *deckEditor;
+    DeckStateManager *deckStateManager;
+
     DeckListHistoryManagerWidget *historyManagerWidget;
     KeySignals deckViewKeySignals;
     QLabel *nameLabel;
@@ -106,22 +90,25 @@ private:
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
-    void recursiveExpand(const QModelIndex &index);
+    DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
+    void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
 private slots:
     void decklistCustomMenu(QPoint point);
     void updateCard(QModelIndex, const QModelIndex &current);
-    void updateName(const QString &name);
-    void updateComments();
-    void setBannerCard(int);
-    void setTags(const QStringList &tags);
-    void syncDeckListBannerCardWithComboBox();
+    void writeName();
+    void writeComments();
+    void writeBannerCard(int);
+    void setSelectedIndex(const QModelIndex &newCardIndex);
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
     void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
+    void changeSelectedCard(int changeBy);
+    void recursiveExpand(const QModelIndex &parent);
+    void expandAll();
 };
 
 #endif // DECK_EDITOR_DECK_DOCK_WIDGET_H
