@@ -41,26 +41,26 @@ void DeckListStatisticsAnalyzer::analyze()
         // per-type curve
         for (auto &t : types) {
             manaCurveByType[t][cmc]++;
-            manaCurveCardsByType[t][cmc].append(info->getName());
+            manaCurveCardsByType[t][cmc].append(info.getName());
         }
 
         // Per-subtype curve
         for (auto &st : subtypes) {
             manaCurveBySubtype[st][cmc]++;
-            manaCurveCardsBySubtype[st][cmc].append(info->getName());
+            manaCurveCardsBySubtype[st][cmc].append(info.getName());
         }
 
         // per-color curve
         for (auto &c : colors) {
             manaCurveByColor[c][cmc]++;
-            manaCurveCardsByColor[c][cmc].append(info->getName());
+            manaCurveCardsByColor[c][cmc].append(info.getName());
         }
 
         // Power/toughness
         manaCurveByPower[QString::number(power)][cmc]++;
-        manaCurveCardsByPower[QString::number(power)][cmc].append(info->getName());
+        manaCurveCardsByPower[QString::number(power)][cmc].append(info.getName());
         manaCurveByToughness[QString::number(toughness)][cmc]++;
-        manaCurveCardsByToughness[QString::number(toughness)][cmc].append(info->getName());
+        manaCurveCardsByToughness[QString::number(toughness)][cmc].append(info.getName());
 
         // ========== Category Counts ===========
         for (auto &t : types) {
@@ -76,7 +76,7 @@ void DeckListStatisticsAnalyzer::analyze()
 
         // ---------------- Mana Base ----------------
         if (config.computeManaBase) {
-            auto prod = determineManaProduction(info->getText());
+            auto prod = determineManaProduction(info.getText());
             for (auto it = prod.begin(); it != prod.end(); ++it) {
                 if (it.value() > 0) {
                     productionPipCount[it.key()] += it.value();
@@ -88,7 +88,7 @@ void DeckListStatisticsAnalyzer::analyze()
 
         // ---------------- Devotion ----------------
         if (config.computeDevotion) {
-            auto devo = countManaSymbols(info->getManaCost());
+            auto devo = countManaSymbols(info.getManaCost());
             for (auto &d : devo) {
                 if (d.second > 0) {
                     devotionPipCount[QString(d.first)] += d.second;
