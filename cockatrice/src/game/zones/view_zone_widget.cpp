@@ -17,6 +17,7 @@
 #include <QLabel>
 #include <QPainter>
 #include <QScrollBar>
+#include <QStyle>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 
@@ -257,6 +258,47 @@ void ZoneViewWidget::stopWindowDrag()
     ungrabMouse();
 }
 
+void ZoneViewWidget::startWindowDrag(QGraphicsSceneMouseEvent *event)
+{
+    draggingWindow = true;
+    dragStartItemPos = pos();
+    dragStartScreenPos = event->screenPos();
+    dragView = findDragView(event->widget());
+
+    // need to grab mouse to receive events and not miss initial movement
+    grabMouse();
+}
+
+QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
+{
+    const QRectF frameRectF = windowFrameRect();
+    const QRect titleBarRect(frameRectF.toRect().x(), frameRectF.toRect().y(), frameRectF.toRect().width(),
+                             static_cast<int>(kTitleBarHeight));
+
+    // query the style for the close button position (handles macOS top-left placement)
+    if (styleWidget) {
+        QStyleOptionTitleBar opt;
+        opt.initFrom(styleWidget);
+        opt.rect = titleBarRect;
+        opt.text = windowTitle();
+        opt.icon = styleWidget->windowIcon();
+        opt.titleBarFlags = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint;
+        opt.subControls = QStyle::SC_TitleBarCloseButton;
+        opt.activeSubControls = QStyle::SC_TitleBarCloseButton;
+        opt.titleBarState = styleWidget->isActiveWindow() ? Qt::WindowActive : Qt::WindowNoState;
+        if (styleWidget->isActiveWindow())
+            opt.state |= QStyle::State_Active;
+        const QRect r = styleWidget->style()->subControlRect(QStyle::CC_TitleBar, &opt, QStyle::SC_TitleBarCloseButton,
+                                                             styleWidget);
+        if (r.isValid() && !r.isEmpty()) {
+            return QRectF(r);
+        }
+    }
+
+    // fallback: square at right end of titlebar (Windows/Linux style)
+    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+}
+
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
 {
     QWidget *current = eventWidget;
@@ -289,64 +331,51 @@ QPointF ZoneViewWidget::calcDraggedWindowPos(const QPoint &screenPos,
 
 bool ZoneViewWidget::windowFrameEvent(QEvent *event)
 {
-    // Intercept and move the widget in a stable coordinate space
+    if (event->type() == QEvent::UngrabMouse) {
+        stopWindowDrag();
+        return QGraphicsWidget::windowFrameEvent(event);
+    }
+
+    auto *me = dynamic_cast<QGraphicsSceneMouseEvent *>(event);
+    if (!me)
+        return QGraphicsWidget::windowFrameEvent(event);
+
     switch (event->type()) {
-        case QEvent::UngrabMouse:
-            stopWindowDrag();
-            break;
-        case QEvent::GraphicsSceneMousePress: {
-            auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
-            const Qt::WindowFrameSection section = windowFrameSectionAt(me->pos());
-            if (me->button() == Qt::LeftButton && section == Qt::TitleBarArea) {
+        case QEvent::GraphicsSceneMousePress:
+            if (me->button() == Qt::LeftButton && windowFrameSectionAt(me->pos()) == Qt::TitleBarArea) {
                 // avoid drag on close button
-                const QRectF frameRectF = windowFrameRect();
-                // square at right end of the title bar is the close button
-                const QRectF closeRect(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight,
-                                       kTitleBarHeight);
-                if (closeRect.contains(me->pos())) {
+                if (closeButtonRect(me->widget()).contains(me->pos())) {
                     me->accept();
                     close();
                     return true;
                 }
-
-                draggingWindow = true;
-                dragStartItemPos = pos();
-                dragStartScreenPos = me->screenPos();
-
-                dragView = findDragView(me->widget());
-
-                // need to grab mouse to receive events and not miss initial movement
-                grabMouse();
-
+                startWindowDrag(me);
                 me->accept();
                 return true;
             }
             break;
-        }
-        case QEvent::GraphicsSceneMouseMove: {
-            auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
+
+        case QEvent::GraphicsSceneMouseMove:
             if (draggingWindow) {
                 if (!(me->buttons() & Qt::LeftButton)) {
                     stopWindowDrag();
-                    me->accept();
-                    return true;
+                } else {
+                    setPos(
+                        calcDraggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
                 }
-
-                setPos(calcDraggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
                 me->accept();
                 return true;
             }
             break;
-        }
-        case QEvent::GraphicsSceneMouseRelease: {
-            auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
+
+        case QEvent::GraphicsSceneMouseRelease:
             if (draggingWindow && me->button() == Qt::LeftButton) {
                 stopWindowDrag();
                 me->accept();
                 return true;
             }
             break;
-        }
+
         default:
             break;
     }

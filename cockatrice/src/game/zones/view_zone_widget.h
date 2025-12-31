@@ -74,6 +74,8 @@ private:
     QPointer<QGraphicsView> dragView;
 
     void stopWindowDrag();
+    void startWindowDrag(QGraphicsSceneMouseEvent *event);
+    QRectF closeButtonRect(QWidget *styleWidget) const;
     /**
      * @brief Resolves the QGraphicsView to use for drag coordinate mapping
      *
