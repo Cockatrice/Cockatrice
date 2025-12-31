@@ -1,6 +1,6 @@
 #include "add_analytics_panel_dialog.h"
 
-#include "deck_analytics_widget_factory.h"
+#include "analytics_panel_widget_factory.h"
 
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
@@ -14,7 +14,7 @@ AddAnalyticsPanelDialog::AddAnalyticsPanelDialog(QWidget *parent) : QDialog(pare
     typeCombo = new QComboBox(this);
 
     // Populate using descriptors
-    const auto widgets = DeckAnalyticsWidgetFactory::instance().availableWidgets();
+    const auto widgets = AnalyticsPanelWidgetFactory::instance().availableWidgets();
 
     for (const auto &desc : widgets) {
         // Show translated title to user

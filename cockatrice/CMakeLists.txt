@@ -144,11 +144,11 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/card_size_widget.cpp
     src/interface/widgets/cards/deck_card_zone_display_widget.cpp
     src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/interface/widgets/deck_analytics/abstract_analytics_panel_widget.cpp
     src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_factory.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_registrar.cpp
     src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
-    src/interface/widgets/deck_analytics/deck_analytics_widget_base.cpp
-    src/interface/widgets/deck_analytics/deck_analytics_widget_factory.cpp
-    src/interface/widgets/deck_analytics/deck_analytics_widget_registrar.cpp
     src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
     src/interface/widgets/deck_analytics/resizable_panel.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp

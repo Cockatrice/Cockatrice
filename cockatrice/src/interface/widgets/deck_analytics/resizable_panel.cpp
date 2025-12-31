@@ -7,7 +7,7 @@
 #include <QPixmap>
 #include <QtGlobal>
 
-ResizablePanel::ResizablePanel(const QString &_typeId, AnalyticsWidgetBase *analyticsPanel, QWidget *parent)
+ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWidget *analyticsPanel, QWidget *parent)
     : QWidget(parent), panel(analyticsPanel), typeId(_typeId)
 {
     setAcceptDrops(true);

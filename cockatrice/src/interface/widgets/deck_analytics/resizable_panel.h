@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_RESIZABLE_PANEL_H
 #define COCKATRICE_RESIZABLE_PANEL_H
 
-#include "deck_analytics_widget_base.h"
+#include "abstract_analytics_panel_widget.h"
 
 #include <QApplication>
 #include <QDrag>
@@ -19,7 +19,9 @@ class ResizablePanel : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ResizablePanel(const QString &typeId, AnalyticsWidgetBase *analyticsPanel, QWidget *parent = nullptr);
+    explicit ResizablePanel(const QString &typeId,
+                            AbstractAnalyticsPanelWidget *analyticsPanel,
+                            QWidget *parent = nullptr);
 
     void setSelected(bool selected);
     void setHeightFromSaved(int h);
@@ -33,7 +35,7 @@ public:
         return typeId;
     }
 
-    AnalyticsWidgetBase *panel;
+    AbstractAnalyticsPanelWidget *panel;
 
 signals:
     void dragStarted(ResizablePanel *panel);

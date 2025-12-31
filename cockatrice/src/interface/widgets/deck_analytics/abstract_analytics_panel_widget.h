@@ -10,7 +10,7 @@
 
 class DeckListStatisticsAnalyzer;
 
-class AnalyticsWidgetBase : public QWidget
+class AbstractAnalyticsPanelWidget : public QWidget
 {
     Q_OBJECT
 public slots:
@@ -19,7 +19,7 @@ public slots:
     virtual QDialog *createConfigDialog(QWidget *parent) = 0;
 
 public:
-    explicit AnalyticsWidgetBase(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
+    explicit AbstractAnalyticsPanelWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
 
     void setDisplayTitle(const QString &title)
     {

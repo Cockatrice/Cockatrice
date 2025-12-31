@@ -8,7 +8,7 @@
 #define MANA_BASE_WIDGET_H
 
 #include "../../../general/display/banner_widget.h"
-#include "../../deck_analytics_widget_base.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "mana_base_config.h"
 
@@ -18,7 +18,7 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <utility>
 
-class ManaBaseWidget : public AnalyticsWidgetBase
+class ManaBaseWidget : public AbstractAnalyticsPanelWidget
 {
     Q_OBJECT
 

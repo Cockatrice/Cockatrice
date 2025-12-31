@@ -3,7 +3,7 @@
 #include "../../../general/display/charts/bars/bar_chart_background_widget.h"
 #include "../../../general/display/charts/bars/bar_chart_widget.h"
 #include "../../../general/display/charts/bars/segmented_bar_widget.h"
-#include "../../deck_analytics_widget_registrar.h"
+#include "../../analytics_panel_widget_registrar.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "libcockatrice/utility/color.h"
 #include "libcockatrice/utility/qt_utils.h"
@@ -18,14 +18,14 @@
 namespace
 {
 
-DeckAnalyticsWidgetRegistrar registerManaCurve{
+AnalyticsPanelWidgetRegistrar registerManaCurve{
     "manaCurve", ManaCurveWidget::tr("Mana Curve"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaCurveWidget(parent, analyzer); }};
 
 } // anonymous namespace
 
 ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer, ManaCurveConfig cfg)
-    : AnalyticsWidgetBase(parent, analyzer), config(cfg)
+    : AbstractAnalyticsPanelWidget(parent, analyzer), config(cfg)
 {
     setLayout(layout);
 
@@ -46,14 +46,14 @@ ManaCurveWidget::ManaCurveWidget(QWidget *parent, DeckListStatisticsAnalyzer *an
 
 QDialog *ManaCurveWidget::createConfigDialog(QWidget *parent)
 {
-    auto *dlg = new ManaCurveAddDialog(analyzer, parent);
+    auto *dlg = new ManaCurveConfigDialog(analyzer, parent);
     dlg->setFromConfig(config);
     return dlg;
 }
 
 QJsonObject ManaCurveWidget::extractConfigFromDialog(QDialog *dlg) const
 {
-    auto *mc = qobject_cast<ManaCurveAddDialog *>(dlg);
+    auto *mc = qobject_cast<ManaCurveConfigDialog *>(dlg);
     return mc ? mc->result().toJson() : QJsonObject{};
 }
 

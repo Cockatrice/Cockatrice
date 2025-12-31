@@ -12,11 +12,11 @@ class QListWidget;
 class QCheckBox;
 class QComboBox;
 
-class ManaCurveAddDialog : public QDialog
+class ManaCurveConfigDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ManaCurveAddDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent = nullptr);
+    explicit ManaCurveConfigDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent = nullptr);
     void retranslateUi();
     void setFromConfig(const ManaCurveConfig &cfg);
 

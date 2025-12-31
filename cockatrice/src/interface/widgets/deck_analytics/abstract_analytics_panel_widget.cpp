@@ -1,10 +1,10 @@
-#include "deck_analytics_widget_base.h"
+#include "abstract_analytics_panel_widget.h"
 
 #include "deck_list_statistics_analyzer.h"
 
 #include <QPushButton>
 
-AnalyticsWidgetBase::AnalyticsWidgetBase(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
+AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
     : QWidget(parent), analyzer(analyzer)
 {
     layout = new QVBoxLayout(this);
@@ -21,15 +21,15 @@ AnalyticsWidgetBase::AnalyticsWidgetBase(QWidget *parent, DeckListStatisticsAnal
     // config button
     configureButton = new QPushButton(tr("Configure"), this);
     configureButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(configureButton, &QPushButton::clicked, this, &AnalyticsWidgetBase::applyConfigFromDialog);
+    connect(configureButton, &QPushButton::clicked, this, &AbstractAnalyticsPanelWidget::applyConfigFromDialog);
     bannerAndSettingsLayout->addWidget(configureButton, 0);
 
     layout->addWidget(bannerAndSettingsContainer);
 
-    connect(analyzer, &DeckListStatisticsAnalyzer::statsUpdated, this, &AnalyticsWidgetBase::updateDisplay);
+    connect(analyzer, &DeckListStatisticsAnalyzer::statsUpdated, this, &AbstractAnalyticsPanelWidget::updateDisplay);
 }
 
-bool AnalyticsWidgetBase::applyConfigFromDialog()
+bool AbstractAnalyticsPanelWidget::applyConfigFromDialog()
 {
     QDialog *dlg = createConfigDialog(this);
     if (!dlg) {

@@ -7,7 +7,7 @@
 #ifndef MANA_CURVE_WIDGET_H
 #define MANA_CURVE_WIDGET_H
 
-#include "../../deck_analytics_widget_base.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "mana_curve_category_widget.h"
 #include "mana_curve_config.h"
 #include "mana_curve_total_widget.h"
@@ -17,7 +17,7 @@
 class SegmentedBarWidget;
 class DeckListStatisticsAnalyzer;
 
-class ManaCurveWidget : public AnalyticsWidgetBase
+class ManaCurveWidget : public AbstractAnalyticsPanelWidget
 {
     Q_OBJECT
 

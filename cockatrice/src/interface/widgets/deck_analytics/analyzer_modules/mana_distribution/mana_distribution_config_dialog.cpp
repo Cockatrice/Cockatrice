@@ -9,7 +9,7 @@
 
 static const QStringList kColors = {"W", "U", "B", "R", "G", "C"};
 
-ManaDistributionAddDialog::ManaDistributionAddDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent)
+ManaDistributionConfigDialog::ManaDistributionConfigDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent)
     : QDialog(parent), analyzer(analyzer)
 {
     auto *lay = new QVBoxLayout(this);
@@ -35,15 +35,15 @@ ManaDistributionAddDialog::ManaDistributionAddDialog(DeckListStatisticsAnalyzer 
 
     buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     lay->addWidget(buttons);
-    connect(buttons, &QDialogButtonBox::accepted, this, &ManaDistributionAddDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, this, &ManaDistributionAddDialog::reject);
+    connect(buttons, &QDialogButtonBox::accepted, this, &ManaDistributionConfigDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, this, &ManaDistributionConfigDialog::reject);
 
     displayType->addItems({"pie", "bar"}); // combo items
 
     retranslateUi();
 }
 
-void ManaDistributionAddDialog::retranslateUi()
+void ManaDistributionConfigDialog::retranslateUi()
 {
     labelDisplayType->setText(tr("Top display type:"));
     displayType->setItemText(0, tr("pie"));
@@ -56,7 +56,7 @@ void ManaDistributionAddDialog::retranslateUi()
     // QDialogButtonBox buttons are automatically translated
 }
 
-void ManaDistributionAddDialog::setFromConfig(const ManaDistributionConfig &cfgIn)
+void ManaDistributionConfigDialog::setFromConfig(const ManaDistributionConfig &cfgIn)
 {
     cfg = cfgIn;
 
@@ -68,7 +68,7 @@ void ManaDistributionAddDialog::setFromConfig(const ManaDistributionConfig &cfgI
     showColorRows->setChecked(cfg.showColorRows);
 }
 
-void ManaDistributionAddDialog::accept()
+void ManaDistributionConfigDialog::accept()
 {
     cfg.displayType = displayType->currentText();
 

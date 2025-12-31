@@ -13,11 +13,11 @@ class QListWidget;
 class QCheckBox;
 class DeckListStatisticsAnalyzer;
 
-class ManaDistributionAddDialog : public QDialog
+class ManaDistributionConfigDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ManaDistributionAddDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent = nullptr);
+    explicit ManaDistributionConfigDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent = nullptr);
     void retranslateUi();
 
     void setFromConfig(const ManaDistributionConfig &cfg);

@@ -1,12 +1,8 @@
 #include "deck_analytics_widget.h"
 
+#include "abstract_analytics_panel_widget.h"
 #include "add_analytics_panel_dialog.h"
-#include "analyzer_modules/mana_base/mana_base_widget.h"
-#include "analyzer_modules/mana_curve/mana_curve_widget.h"
-#include "analyzer_modules/mana_devotion/mana_devotion_widget.h"
-#include "analyzer_modules/mana_distribution/mana_distribution_widget.h"
-#include "deck_analytics_widget_base.h"
-#include "deck_analytics_widget_factory.h"
+#include "analytics_panel_widget_factory.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
 
@@ -86,8 +82,8 @@ void DeckAnalyticsWidget::onAddPanel()
         return;
     }
 
-    AnalyticsWidgetBase *analyticsWidget =
-        DeckAnalyticsWidgetFactory::instance().create(selection, this, statsAnalyzer);
+    AbstractAnalyticsPanelWidget *analyticsWidget =
+        AnalyticsPanelWidgetFactory::instance().create(selection, this, statsAnalyzer);
     if (!analyticsWidget) {
         return;
     }
@@ -100,7 +96,9 @@ void DeckAnalyticsWidget::onAddPanel()
     addPanelInstance(selection, analyticsWidget, analyticsWidget->saveConfig());
 }
 
-void DeckAnalyticsWidget::addPanelInstance(const QString &typeId, AnalyticsWidgetBase *panel, const QJsonObject &cfg)
+void DeckAnalyticsWidget::addPanelInstance(const QString &typeId,
+                                           AbstractAnalyticsPanelWidget *panel,
+                                           const QJsonObject &cfg)
 {
     panel->loadConfig(cfg);
     panel->updateDisplay();
@@ -164,7 +162,7 @@ void DeckAnalyticsWidget::addDefaultPanels()
     QVector<DefaultPanel> defaults = {{"manaCurve", {}}, {"manaBase", {}}, {"manaDevotion", {}}};
 
     for (auto &d : defaults) {
-        AnalyticsWidgetBase *w = DeckAnalyticsWidgetFactory::instance().create(d.type, this, statsAnalyzer);
+        AbstractAnalyticsPanelWidget *w = AnalyticsPanelWidgetFactory::instance().create(d.type, this, statsAnalyzer);
         if (!w) {
             continue;
         }
@@ -197,7 +195,7 @@ bool DeckAnalyticsWidget::loadLayoutInternal()
         QString type = o["type"].toString();
         QJsonObject cfg = o["config"].toObject();
 
-        AnalyticsWidgetBase *w = DeckAnalyticsWidgetFactory::instance().create(type, this, statsAnalyzer);
+        AbstractAnalyticsPanelWidget *w = AnalyticsPanelWidgetFactory::instance().create(type, this, statsAnalyzer);
         if (!w) {
             continue;
         }

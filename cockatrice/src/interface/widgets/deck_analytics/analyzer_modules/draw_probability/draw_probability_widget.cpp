@@ -18,7 +18,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 
 DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
-    : AnalyticsWidgetBase(parent, analyzer)
+    : AbstractAnalyticsPanelWidget(parent, analyzer)
 {
     controls = new QWidget(this);
     controlLayout = new QHBoxLayout(controls);

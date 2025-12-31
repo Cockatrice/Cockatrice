@@ -7,13 +7,13 @@
 #include <QWidget>
 #include <functional>
 
-class AnalyticsWidgetBase;
+class AbstractAnalyticsPanelWidget;
 class DeckListStatisticsAnalyzer;
 
-class DeckAnalyticsWidgetFactory
+class AnalyticsPanelWidgetFactory
 {
 public:
-    using Creator = std::function<AnalyticsWidgetBase *(QWidget *, DeckListStatisticsAnalyzer *)>;
+    using Creator = std::function<AbstractAnalyticsPanelWidget *(QWidget *, DeckListStatisticsAnalyzer *)>;
 
     struct Descriptor
     {
@@ -22,20 +22,21 @@ public:
         Creator creator;
     };
 
-    static DeckAnalyticsWidgetFactory &instance();
+    static AnalyticsPanelWidgetFactory &instance();
 
     // NEW: richer registration
     void registerWidget(const Descriptor &desc);
 
-    AnalyticsWidgetBase *create(const QString &type, QWidget *parent, DeckListStatisticsAnalyzer *analyzer) const;
+    AbstractAnalyticsPanelWidget *
+    create(const QString &type, QWidget *parent, DeckListStatisticsAnalyzer *analyzer) const;
 
     // NEW: expose widgets to UI
     QList<Descriptor> availableWidgets() const;
 
 private:
-    DeckAnalyticsWidgetFactory() = default; // Ensure private constructor
-    DeckAnalyticsWidgetFactory(const DeckAnalyticsWidgetFactory &) = delete;
-    DeckAnalyticsWidgetFactory &operator=(const DeckAnalyticsWidgetFactory &) = delete;
+    AnalyticsPanelWidgetFactory() = default; // Ensure private constructor
+    AnalyticsPanelWidgetFactory(const AnalyticsPanelWidgetFactory &) = delete;
+    AnalyticsPanelWidgetFactory &operator=(const AnalyticsPanelWidgetFactory &) = delete;
 
     QMap<QString, Descriptor> widgets;
 };

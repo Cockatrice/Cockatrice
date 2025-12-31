@@ -2,7 +2,7 @@
 #ifndef COCKATRICE_ADD_ANALYTICS_PANEL_DIALOG_H
 #define COCKATRICE_ADD_ANALYTICS_PANEL_DIALOG_H
 
-#include "deck_analytics_widget_factory.h"
+#include "analytics_panel_widget_factory.h"
 
 #include <QComboBox>
 #include <QDialog>

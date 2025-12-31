@@ -3,7 +3,7 @@
 
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
-#include "../../deck_analytics_widget_base.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "mana_distribution_config.h"
 #include "mana_distribution_single_display_widget.h"
@@ -13,7 +13,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-class ManaDistributionWidget : public AnalyticsWidgetBase
+class ManaDistributionWidget : public AbstractAnalyticsPanelWidget
 {
     Q_OBJECT
 public:

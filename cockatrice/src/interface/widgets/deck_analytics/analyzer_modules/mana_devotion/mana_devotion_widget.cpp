@@ -3,7 +3,7 @@
 #include "../../../general/display/charts/bars/bar_widget.h"
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
-#include "../../deck_analytics_widget_registrar.h"
+#include "../../analytics_panel_widget_registrar.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "mana_devotion_config_dialog.h"
 
@@ -13,14 +13,14 @@
 namespace
 {
 
-DeckAnalyticsWidgetRegistrar registerManaDevotion{
+AnalyticsPanelWidgetRegistrar registerManaDevotion{
     "manaDevotion", ManaDevotionWidget::tr("Mana Devotion"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaDevotionWidget(parent, analyzer); }};
 
 } // anonymous namespace
 
 ManaDevotionWidget::ManaDevotionWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer, ManaDevotionConfig cfg)
-    : AnalyticsWidgetBase(parent, analyzer), config(std::move(cfg))
+    : AbstractAnalyticsPanelWidget(parent, analyzer), config(std::move(cfg))
 {
     barContainer = new QWidget(this);
     barLayout = new QHBoxLayout(barContainer);

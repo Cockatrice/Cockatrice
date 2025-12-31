@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 #define COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 
-#include "../../deck_analytics_widget_base.h"
+#include "../../abstract_analytics_panel_widget.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "draw_probability_config.h"
 
@@ -10,7 +10,7 @@
 #include <QSpinBox>
 #include <QTableWidget>
 
-class DrawProbabilityWidget : public AnalyticsWidgetBase
+class DrawProbabilityWidget : public AbstractAnalyticsPanelWidget
 {
     Q_OBJECT
 public:

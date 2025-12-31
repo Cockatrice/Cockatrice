@@ -3,7 +3,7 @@
 #include "../../../general/display/charts/bars/bar_widget.h"
 #include "../../../general/display/charts/bars/color_bar.h"
 #include "../../../general/display/charts/pies/color_pie.h"
-#include "../../deck_analytics_widget_registrar.h"
+#include "../../analytics_panel_widget_registrar.h"
 #include "mana_base_config_dialog.h"
 
 #include <QDialog>
@@ -12,14 +12,14 @@
 namespace
 {
 
-DeckAnalyticsWidgetRegistrar registerManaBase{
+AnalyticsPanelWidgetRegistrar registerManaBase{
     "manaBase", ManaBaseWidget::tr("Mana Base"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaBaseWidget(parent, analyzer); }};
 
 } // anonymous namespace
 
 ManaBaseWidget::ManaBaseWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer, ManaBaseConfig cfg)
-    : AnalyticsWidgetBase(parent, analyzer), config(std::move(cfg))
+    : AbstractAnalyticsPanelWidget(parent, analyzer), config(std::move(cfg))
 {
     barContainer = new QWidget(this);
     barLayout = new QHBoxLayout(barContainer);

@@ -7,7 +7,7 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 
-ManaCurveAddDialog::ManaCurveAddDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent)
+ManaCurveConfigDialog::ManaCurveConfigDialog(DeckListStatisticsAnalyzer *analyzer, QWidget *parent)
     : QDialog(parent), analyzer(analyzer)
 {
     auto *lay = new QVBoxLayout(this);
@@ -35,8 +35,8 @@ ManaCurveAddDialog::ManaCurveAddDialog(DeckListStatisticsAnalyzer *analyzer, QWi
 
     buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     lay->addWidget(buttons);
-    connect(buttons, &QDialogButtonBox::accepted, this, &ManaCurveAddDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, this, &ManaCurveAddDialog::reject);
+    connect(buttons, &QDialogButtonBox::accepted, this, &ManaCurveConfigDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, this, &ManaCurveConfigDialog::reject);
 
     // populate dynamic data
     QStringList cats = analyzer->getManaCurveByType().keys();
@@ -50,7 +50,7 @@ ManaCurveAddDialog::ManaCurveAddDialog(DeckListStatisticsAnalyzer *analyzer, QWi
     retranslateUi();
 }
 
-void ManaCurveAddDialog::retranslateUi()
+void ManaCurveConfigDialog::retranslateUi()
 {
     labelGroupBy->setText(tr("Group By:"));
     groupBy->setItemText(0, tr("type"));
@@ -65,7 +65,7 @@ void ManaCurveAddDialog::retranslateUi()
     showCatRows->setText(tr("Show per-category rows"));
 }
 
-void ManaCurveAddDialog::setFromConfig(const ManaCurveConfig &cfg)
+void ManaCurveConfigDialog::setFromConfig(const ManaCurveConfig &cfg)
 {
     groupBy->setCurrentText(cfg.groupBy);
     // restore filters
@@ -76,7 +76,7 @@ void ManaCurveAddDialog::setFromConfig(const ManaCurveConfig &cfg)
     showCatRows->setChecked(cfg.showCategoryRows);
 }
 
-void ManaCurveAddDialog::accept()
+void ManaCurveConfigDialog::accept()
 {
     cfg.groupBy = groupBy->currentText();
 

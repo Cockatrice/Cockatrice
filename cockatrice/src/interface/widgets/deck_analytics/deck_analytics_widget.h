@@ -7,7 +7,7 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-#include "deck_analytics_widget_base.h"
+#include "abstract_analytics_panel_widget.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
 
@@ -46,7 +46,7 @@ protected:
     int indexOfSelectedWrapper() const;
 
 private:
-    void addPanelInstance(const QString &typeId, AnalyticsWidgetBase *panel, const QJsonObject &cfg = {});
+    void addPanelInstance(const QString &typeId, AbstractAnalyticsPanelWidget *panel, const QJsonObject &cfg = {});
 
     QVBoxLayout *layout;
     QWidget *controlContainer;

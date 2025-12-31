@@ -1,6 +1,6 @@
 #include "mana_distribution_widget.h"
 
-#include "../../deck_analytics_widget_registrar.h"
+#include "../../analytics_panel_widget_registrar.h"
 #include "mana_distribution_config_dialog.h"
 
 #include <QComboBox>
@@ -10,8 +10,7 @@
 
 namespace
 {
-
-DeckAnalyticsWidgetRegistrar registerManaDistribution{
+AnalyticsPanelWidgetRegistrar registerManaDistribution{
     "manaProdDevotion", ManaDistributionWidget::tr("Mana Production + Devotion"),
     [](QWidget *parent, DeckListStatisticsAnalyzer *analyzer) { return new ManaDistributionWidget(parent, analyzer); }};
 
@@ -20,7 +19,7 @@ DeckAnalyticsWidgetRegistrar registerManaDistribution{
 static const QStringList kColors = {"W", "U", "B", "R", "G", "C"};
 
 ManaDistributionWidget::ManaDistributionWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
-    : AnalyticsWidgetBase(parent, analyzer)
+    : AbstractAnalyticsPanelWidget(parent, analyzer)
 {
     container = new QWidget(this);
     containerLayout = new QVBoxLayout(container);
@@ -117,7 +116,7 @@ void ManaDistributionWidget::updateDisplay()
 
 QDialog *ManaDistributionWidget::createConfigDialog(QWidget *parent)
 {
-    auto *dlg = new ManaDistributionAddDialog(analyzer, parent);
+    auto *dlg = new ManaDistributionConfigDialog(analyzer, parent);
     dlg->setWindowTitle(tr("Mana Distribution Settings"));
     dlg->setFromConfig(config);
 
