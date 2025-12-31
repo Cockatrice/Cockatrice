@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Cleanup
         env:
+          GH_TOKEN: ${{ github.token }} # needed by the gh client
           BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
         run: |
           echo "Fetching list of cache keys"
