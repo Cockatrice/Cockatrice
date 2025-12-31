@@ -217,7 +217,12 @@ public slots:
      */
     void rebuildTree();
 
-public slots:
+    /**
+     * @brief Sets the criteria used to group cards in the model.
+     * @param newCriteria The new grouping criteria.
+     */
+    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
+
     void setActiveFormat(const QString &_format);
 
 signals:
@@ -251,14 +256,8 @@ public:
         return nodeToIndex(root);
     }
 
-    /**
-     * @brief Returns the value of the grouping category for a card based on the current criteria.
-     * @param info Pointer to card information.
-     * @return String representing the value of the current grouping criteria for the card.
-     */
-    [[nodiscard]] QString getGroupCriteriaForCard(CardInfoPtr info) const;
-
-    // Qt model overrides
+    /// @name Qt model overrides
+    ///@{
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
@@ -268,6 +267,8 @@ public:
     [[nodiscard]] Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     bool removeRows(int row, int count, const QModelIndex &parent) override;
+    void sort(int column, Qt::SortOrder order) override;
+    ///@}
 
     /**
      * @brief Finds a card by name, zone, and optional identifiers.
@@ -310,16 +311,6 @@ public:
     bool offsetCountAtIndex(const QModelIndex &idx, int offset);
 
     /**
-     * @brief Determines the sorted insertion row for a card.
-     * @param parent The parent node where the card will be inserted.
-     * @param cardInfo The card info to insert.
-     * @return Row index where the card should be inserted to maintain sort order.
-     */
-    int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;
-
-    void sort(int column, Qt::SortOrder order) override;
-
-    /**
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
@@ -359,16 +350,6 @@ public:
      */
     [[nodiscard]] QList<QString> getZones() const;
 
-    bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
-    bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);
-    void refreshCardFormatLegalities();
-
-    /**
-     * @brief Sets the criteria used to group cards in the model.
-     * @param newCriteria The new grouping criteria.
-     */
-    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
-
 private:
     DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
     InnerDecklistNode *root; /**< Root node of the model tree. */
@@ -382,6 +363,14 @@ private:
                                                       const QString &zoneName,
                                                       const QString &providerId = "",
                                                       const QString &cardNumber = "") const;
+
+    /**
+     * @brief Determines the sorted insertion row for a card.
+     * @param parent The parent node where the card will be inserted.
+     * @param cardInfo The card info to insert.
+     * @return Row index where the card should be inserted to maintain sort order.
+     */
+    int findSortedInsertRow(const InnerDecklistNode *parent, const CardInfoPtr &cardInfo) const;
 
     /**
      * @brief Recursively emits the dataChanged signal with role as Qt::BackgroundRole for all indices that are children
@@ -404,6 +393,8 @@ private:
             return dynamic_cast<T>(root);
         return dynamic_cast<T>(static_cast<AbstractDecklistNode *>(index.internalPointer()));
     }
+
+    void refreshCardFormatLegalities();
 };
 
 #endif
