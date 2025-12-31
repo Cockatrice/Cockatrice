@@ -251,13 +251,6 @@ public:
         return nodeToIndex(root);
     }
 
-    /**
-     * @brief Returns the value of the grouping category for a card based on the current criteria.
-     * @param info Pointer to card information.
-     * @return String representing the value of the current grouping criteria for the card.
-     */
-    [[nodiscard]] QString getGroupCriteriaForCard(CardInfoPtr info) const;
-
     // Qt model overrides
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] int columnCount(const QModelIndex & /*parent*/ = QModelIndex()) const override;

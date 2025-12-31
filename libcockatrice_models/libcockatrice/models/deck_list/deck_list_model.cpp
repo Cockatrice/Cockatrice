@@ -18,13 +18,19 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
-QString DeckListModel::getGroupCriteriaForCard(CardInfoPtr info) const
+/**
+ * @brief Extract the value from the card that is used for the group criteria.
+ * @param info Pointer to card information.
+ * @param criteria The group criteria
+ * @return String representing the value of the criteria.
+ */
+static QString extractGroupCriteriaValue(const CardInfoPtr &info, DeckListModelGroupCriteria::Type criteria)
 {
     if (!info) {
         return "unknown";
     }
 
-    switch (activeGroupCriteria) {
+    switch (criteria) {
         case DeckListModelGroupCriteria::MAIN_TYPE:
             return info->getMainCardType();
         case DeckListModelGroupCriteria::MANA_COST:
@@ -56,7 +62,7 @@ void DeckListModel::rebuildTree()
             }
 
             CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            QString groupCriteria = getGroupCriteriaForCard(info);
+            QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
 
             auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
 
@@ -353,7 +359,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
         return nullptr;
     }
 
-    QString groupCriteria = getGroupCriteriaForCard(info);
+    QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
     InnerDecklistNode *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria));
     if (!groupNode) {
         return nullptr;
@@ -406,7 +412,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     CardInfoPtr cardInfo = card.getCardPtr();
     PrintingInfo printingInfo = card.getPrinting();
 
-    QString groupCriteria = getGroupCriteriaForCard(cardInfo);
+    QString groupCriteria = extractGroupCriteriaValue(cardInfo, activeGroupCriteria);
     InnerDecklistNode *groupNode = createNodeIfNeeded(groupCriteria, zoneNode);
 
     const QModelIndex parentIndex = nodeToIndex(groupNode);
