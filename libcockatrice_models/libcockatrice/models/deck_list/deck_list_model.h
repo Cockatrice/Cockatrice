@@ -217,7 +217,12 @@ public slots:
      */
     void rebuildTree();
 
-public slots:
+    /**
+     * @brief Sets the criteria used to group cards in the model.
+     * @param newCriteria The new grouping criteria.
+     */
+    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
+
     void setActiveFormat(const QString &_format);
 
 signals:
@@ -350,12 +355,6 @@ public:
      * @brief Gets a list of all zone names that appear in the model
      */
     [[nodiscard]] QList<QString> getZones() const;
-
-    /**
-     * @brief Sets the criteria used to group cards in the model.
-     * @param newCriteria The new grouping criteria.
-     */
-    void setActiveGroupCriteria(DeckListModelGroupCriteria::Type newCriteria);
 
 private:
     DeckList *deckList;      /**< Pointer to the deck loader providing the underlying data. */
