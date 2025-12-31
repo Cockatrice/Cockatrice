@@ -132,7 +132,11 @@ bool ResizablePanel::eventFilter(QObject *obj, QEvent *event)
         if (event->type() == QEvent::MouseButtonPress) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
             if (mouseEvent->button() == Qt::LeftButton) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                 dragStartPos = mouseEvent->globalPosition().toPoint();
+#else
+                dragStartPos = mouseEvent->globalPos();
+#endif
                 isDraggingPanel = false;
                 dragButton->setCursor(Qt::ClosedHandCursor);
             }
@@ -140,7 +144,11 @@ bool ResizablePanel::eventFilter(QObject *obj, QEvent *event)
         } else if (event->type() == QEvent::MouseMove) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
             if (mouseEvent->buttons() & Qt::LeftButton) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
                 QPoint currentPos = mouseEvent->globalPosition().toPoint();
+#else
+                QPoint currentPos = mouseEvent->globalPos();
+#endif
                 int distance = (currentPos - dragStartPos).manhattanLength();
                 if (distance >= 5 && !isDraggingPanel) {
                     isDraggingPanel = true;
@@ -159,14 +167,22 @@ bool ResizablePanel::eventFilter(QObject *obj, QEvent *event)
     if (obj == resizeHandle) {
         if (event->type() == QEvent::MouseButtonPress) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
-            isResizing = true;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             resizeStartY = mouseEvent->globalPosition().y();
+#else
+            resizeStartY = mouseEvent->globalPos().y();
+#endif
+            isResizing = true;
             resizeStartHeight = currentHeight;
             resizeHandle->grabMouse();
             return true;
         } else if (event->type() == QEvent::MouseMove && isResizing) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             int deltaY = mouseEvent->globalPosition().y() - resizeStartY;
+#else
+            int deltaY = mouseEvent->globalPos().y() - resizeStartY;
+#endif
             int newHeight = resizeStartHeight + deltaY;
 
             int minAllowed = getMinimumAllowedHeight();
@@ -190,7 +206,11 @@ void ResizablePanel::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasFormat("application/x-resizablepanel")) {
         event->acceptProposedAction();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         showDropIndicator(event->position().y());
+#else
+        showDropIndicator(event->pos().y());
+#endif
     }
 }
 
@@ -198,9 +218,13 @@ void ResizablePanel::dragMoveEvent(QDragMoveEvent *event)
 {
     if (event->mimeData()->hasFormat("application/x-resizablepanel")) {
         event->acceptProposedAction();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         showDropIndicator(event->position().y());
-
         lastDragPos = mapToGlobal(event->position().toPoint());
+#else
+        showDropIndicator(event->pos().y());
+        lastDragPos = mapToGlobal(event->pos());
+#endif
 
         if (!autoScrollTimer->isActive()) {
             autoScrollTimer->start();
@@ -226,7 +250,11 @@ void ResizablePanel::dropEvent(QDropEvent *event)
         ResizablePanel *draggedPanel = reinterpret_cast<ResizablePanel *>(ptr);
 
         if (draggedPanel && draggedPanel != this) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
             bool insertBefore = (event->position().y() < height() / 2);
+#else
+            bool insertBefore = (event->pos().y() < height() / 2);
+#endif
             emit dropRequested(draggedPanel, this, insertBefore);
             event->acceptProposedAction();
         }
