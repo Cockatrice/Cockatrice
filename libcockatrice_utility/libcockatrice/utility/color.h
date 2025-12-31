@@ -21,16 +21,6 @@ inline color convertQColorToColor(const QColor &c)
     result.set_b(c.blue());
     return result;
 }
-#endif
-
-inline color makeColor(int r, int g, int b)
-{
-    color result;
-    result.set_r(r);
-    result.set_g(g);
-    result.set_b(b);
-    return result;
-}
 
 namespace GameSpecificColors
 {
@@ -68,5 +58,15 @@ inline QColor colorHelper(const QString &name)
 }
 } // namespace MTG
 } // namespace GameSpecificColors
+#endif
+
+inline color makeColor(int r, int g, int b)
+{
+    color result;
+    result.set_r(r);
+    result.set_g(g);
+    result.set_b(b);
+    return result;
+}
 
 #endif
