@@ -478,7 +478,7 @@ bool DeckListModel::offsetCountAtIndex(const QModelIndex &idx, int offset)
     return true;
 }
 
-int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const
+int DeckListModel::findSortedInsertRow(const InnerDecklistNode *parent, const CardInfoPtr &cardInfo) const
 {
     if (!cardInfo) {
         return parent->size(); // fallback: append at end

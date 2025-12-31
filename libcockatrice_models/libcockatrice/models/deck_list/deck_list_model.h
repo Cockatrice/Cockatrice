@@ -309,14 +309,6 @@ public:
     bool offsetCountAtIndex(const QModelIndex &idx, int offset);
 
     /**
-     * @brief Determines the sorted insertion row for a card.
-     * @param parent The parent node where the card will be inserted.
-     * @param cardInfo The card info to insert.
-     * @return Row index where the card should be inserted to maintain sort order.
-     */
-    int findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const;
-
-    /**
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
@@ -369,6 +361,14 @@ private:
                                                       const QString &zoneName,
                                                       const QString &providerId = "",
                                                       const QString &cardNumber = "") const;
+
+    /**
+     * @brief Determines the sorted insertion row for a card.
+     * @param parent The parent node where the card will be inserted.
+     * @param cardInfo The card info to insert.
+     * @return Row index where the card should be inserted to maintain sort order.
+     */
+    int findSortedInsertRow(const InnerDecklistNode *parent, const CardInfoPtr &cardInfo) const;
 
     /**
      * @brief Recursively emits the dataChanged signal with role as Qt::BackgroundRole for all indices that are children
