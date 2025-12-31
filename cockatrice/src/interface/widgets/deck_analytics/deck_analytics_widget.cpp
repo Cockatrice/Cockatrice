@@ -164,9 +164,9 @@ void DeckAnalyticsWidget::addDefaultPanels()
     };
 
     // Prepare configs
-    QJsonObject manaCurveCfg = ManaCurveConfig().toJson();
-    QJsonObject manaBaseCfg = ManaBaseConfig("combinedBar", {}).toJson();
-    QJsonObject manaDevotionCfg = ManaDevotionConfig("combinedBar", {}).toJson();
+    QJsonObject manaCurveCfg = ManaCurveConfig{}.toJson();
+    QJsonObject manaBaseCfg = ManaBaseConfig{"combinedBar", {}}.toJson();
+    QJsonObject manaDevotionCfg = ManaDevotionConfig{"combinedBar", {}}.toJson();
     QVector<DefaultPanel> defaults = {
         {"manaCurve", manaCurveCfg}, {"manaBase", manaBaseCfg}, {"manaDevotion", manaDevotionCfg}};
 
