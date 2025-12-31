@@ -16,13 +16,10 @@ jobs:
         run: |
           echo "Fetching list of cache keys"
           cacheKeysForPR=$(gh cache list --ref $BRANCH --limit 100 --json id --jq '.[].id')
-
-          ## Setting this to not fail the workflow while deleting cache keys.
-          set +e
           echo "Deleting caches..."
           for cacheKey in $cacheKeysForPR
           do
-              gh cache delete $cacheKey
+              gh cache delete $cacheKey || true
           done
           echo "Done"
         env:
