@@ -39,6 +39,7 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
     selectionOverlay->setStyleSheet("background-color: rgba(61,174,233,50);"); // semi-transparent blue
     selectionOverlay->hide();                                                  // hidden by default
     selectionOverlay->raise();                                                 // make sure it is above children
+    selectionOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     // Bottom bar with drag button and resize handle
     auto *bottomBar = new QWidget(frame);
