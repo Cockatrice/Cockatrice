@@ -4,6 +4,7 @@
 #include "add_analytics_panel_dialog.h"
 #include "analytics_panel_widget_factory.h"
 #include "analyzer_modules/mana_base/mana_base_config.h"
+#include "analyzer_modules/mana_curve/mana_curve_config.h"
 #include "analyzer_modules/mana_devotion/mana_devotion_config.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
@@ -163,7 +164,7 @@ void DeckAnalyticsWidget::addDefaultPanels()
     };
 
     // Prepare configs
-    QJsonObject manaCurveCfg; // empty config
+    QJsonObject manaCurveCfg = ManaCurveConfig().toJson();
     QJsonObject manaBaseCfg = ManaBaseConfig("combinedBar", {}).toJson();
     QJsonObject manaDevotionCfg = ManaDevotionConfig("combinedBar", {}).toJson();
     QVector<DefaultPanel> defaults = {
