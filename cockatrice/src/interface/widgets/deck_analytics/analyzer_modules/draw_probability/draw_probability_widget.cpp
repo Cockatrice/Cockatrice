@@ -13,6 +13,7 @@
 #include <QSpinBox>
 #include <QTableWidgetItem>
 #include <QWidget>
+#include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 
