@@ -10,6 +10,7 @@
 #include "view_zone.h"
 
 #include <QCheckBox>
+#include <QGraphicsView>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneMouseEvent>
@@ -18,6 +19,11 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+
+namespace {
+constexpr qreal kTitleBarHeight = 24.0;
+constexpr qreal kMinVisibleWidth = 100.0;
+}
 
 /**
  * @param _player the player the cards were revealed to.
@@ -241,33 +247,148 @@ void ZoneViewWidget::retranslateUi()
     pileViewCheckBox.setText(tr("pile view"));
 }
 
-void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
+void ZoneViewWidget::stopWindowDrag()
 {
-    if (!scene())
+    if (!draggingWindow)
         return;
 
-    int titleBarHeight = 24;
+    draggingWindow = false;
+    ungrabMouse();
+}
 
-    QPointF scenePos = pos();
-
-    if (scenePos.x() < 0) {
-        scenePos.setX(0);
-    } else {
-        qreal maxw = scene()->sceneRect().width() - 100;
-        if (scenePos.x() > maxw)
-            scenePos.setX(maxw);
+QPointF ZoneViewWidget::draggedWindowPos(const QPoint &screenPos,
+                                        const QPointF &scenePos,
+                                        const QPointF &buttonDownScenePos) const
+{
+    if (dragView && dragView->viewport()) {
+        const QPoint vpStart = dragView->viewport()->mapFromGlobal(dragStartScreenPos);
+        const QPoint vpNow = dragView->viewport()->mapFromGlobal(screenPos);
+        const QPointF sceneStart = dragView->mapToScene(vpStart);
+        const QPointF sceneNow = dragView->mapToScene(vpNow);
+        return dragStartItemPos + (sceneNow - sceneStart);
     }
 
-    if (scenePos.y() < titleBarHeight) {
-        scenePos.setY(titleBarHeight);
-    } else {
-        qreal maxh = scene()->sceneRect().height() - titleBarHeight;
-        if (scenePos.y() > maxh)
-            scenePos.setY(maxh);
+    return dragStartItemPos + (scenePos - buttonDownScenePos);
+}
+
+bool ZoneViewWidget::windowFrameEvent(QEvent *event)
+{
+    // Intercept and move the widget in a stable coordinate space
+    switch (event->type()) {
+    case QEvent::UngrabMouse:
+        stopWindowDrag();
+        break;
+    case QEvent::GraphicsSceneMousePress: {
+        auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
+        const Qt::WindowFrameSection section = windowFrameSectionAt(me->pos());
+        if (me->button() == Qt::LeftButton && section == Qt::TitleBarArea) {
+            // avoid drag on close button
+            const QRectF frameRectF = windowFrameRect();
+            const QRectF closeRect(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight,
+                                   kTitleBarHeight);
+            if (closeRect.contains(me->pos())) {
+                me->accept();
+                close();
+                return true;
+            }
+
+            draggingWindow = true;
+            dragStartItemPos = pos();
+            dragStartScreenPos = me->screenPos();
+
+            dragView = nullptr;
+            if (me->widget()) {
+                QWidget *current = me->widget();
+                while (current && !dragView) {
+                    dragView = qobject_cast<QGraphicsView *>(current);
+                    current = current->parentWidget();
+                }
+            }
+            if (!dragView && scene() && !scene()->views().isEmpty()) {
+                dragView = scene()->views().constFirst();
+            }
+
+            // need to grab mouse to receive events and not miss initial movement
+            grabMouse();
+
+            me->accept();
+            return true;
+        }
+        break;
+    }
+    case QEvent::GraphicsSceneMouseMove: {
+        auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
+        if (draggingWindow) {
+            if (!(me->buttons() & Qt::LeftButton)) {
+                stopWindowDrag();
+                me->accept();
+                return true;
+            }
+
+            setPos(draggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
+            me->accept();
+            return true;
+        }
+        break;
+    }
+    case QEvent::GraphicsSceneMouseRelease: {
+        auto *me = static_cast<QGraphicsSceneMouseEvent *>(event);
+        if (draggingWindow && me->button() == Qt::LeftButton) {
+            stopWindowDrag();
+            me->accept();
+            return true;
+        }
+        break;
+    }
+    default:
+        break;
     }
 
-    if (scenePos != pos())
-        setPos(scenePos);
+    return QGraphicsWidget::windowFrameEvent(event);
+}
+
+void ZoneViewWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    // move if the scene routes moves while dragging
+    if (draggingWindow && (event->buttons() & Qt::LeftButton)) {
+        setPos(draggedWindowPos(event->screenPos(), event->scenePos(), event->buttonDownScenePos(Qt::LeftButton)));
+        event->accept();
+        return;
+    }
+
+    QGraphicsWidget::mouseMoveEvent(event);
+}
+
+void ZoneViewWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (draggingWindow && event->button() == Qt::LeftButton) {
+        stopWindowDrag();
+        event->accept();
+        return;
+    }
+
+    QGraphicsWidget::mouseReleaseEvent(event);
+}
+
+QVariant ZoneViewWidget::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionChange && scene()) {
+        // Keep grab area in main view
+        const QRectF sceneRect = scene()->sceneRect();
+        const QPointF requestedPos = value.toPointF();
+        QPointF desiredPos = requestedPos;
+
+        const qreal minX = sceneRect.left();
+        const qreal maxX = qMax(minX, sceneRect.right() - kMinVisibleWidth);
+        const qreal minY = sceneRect.top() + kTitleBarHeight;
+        const qreal maxY = qMax(minY, sceneRect.bottom() - kTitleBarHeight);
+
+        desiredPos.setX(qBound(minX, desiredPos.x(), maxX));
+        desiredPos.setY(qBound(minY, desiredPos.y(), maxY));
+        return desiredPos;
+    }
+
+    return QGraphicsWidget::itemChange(change, value);
 }
 
 void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
@@ -350,6 +471,7 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
+    stopWindowDrag();
     disconnect(zone, &ZoneViewZone::closed, this, 0);
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
