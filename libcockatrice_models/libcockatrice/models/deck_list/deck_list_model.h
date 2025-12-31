@@ -358,10 +358,6 @@ public:
      */
     [[nodiscard]] QList<QString> getZones() const;
 
-    bool isCardLegalForCurrentFormat(CardInfoPtr cardInfo);
-    bool isCardQuantityLegalForCurrentFormat(CardInfoPtr cardInfo, int quantity);
-    void refreshCardFormatLegalities();
-
     /**
      * @brief Sets the criteria used to group cards in the model.
      * @param newCriteria The new grouping criteria.
@@ -403,6 +399,8 @@ private:
             return dynamic_cast<T>(root);
         return dynamic_cast<T>(static_cast<AbstractDecklistNode *>(index.internalPointer()));
     }
+
+    void refreshCardFormatLegalities();
 };
 
 #endif

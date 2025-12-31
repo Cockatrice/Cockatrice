@@ -292,6 +292,15 @@ public:
     [[nodiscard]] QString getCorrectedName() const;
 
     /**
+     * @brief Checks if the card is legal in the given format.
+     * A card is considered legal in a format if its properties map contains an entry for "format-<name>", with value
+     * "legal" or "restricted".
+     * @param format The format's name. If empty, will always return true.
+     * @return Whether the card is legal in the given format.
+     */
+    [[nodiscard]] bool isLegalInFormat(const QString &format) const;
+
+    /**
      * @brief Adds a printing to a specific set.
      *
      * Updates the mapping and refreshes the cached list of set names.

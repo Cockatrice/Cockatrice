@@ -75,6 +75,16 @@ QString CardInfo::getCorrectedName() const
     return result.remove(rmrx).replace(spacerx, space);
 }
 
+bool CardInfo::isLegalInFormat(const QString &format) const
+{
+    if (format.isEmpty()) {
+        return true;
+    }
+
+    QString formatLegality = getProperty("format-" + format);
+    return formatLegality == "legal" || formatLegality == "restricted";
+}
+
 void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo _info)
 {
     if (!_set->contains(smartThis)) {
