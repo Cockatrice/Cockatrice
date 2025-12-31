@@ -74,9 +74,7 @@ private:
     QPointer<QGraphicsView> dragView;
 
     void stopWindowDrag();
-    QPointF draggedWindowPos(const QPoint &screenPos,
-                             const QPointF &scenePos,
-                             const QPointF &buttonDownScenePos) const;
+    QPointF draggedWindowPos(const QPoint &screenPos, const QPointF &scenePos, const QPointF &buttonDownScenePos) const;
 
     void resizeScrollbar(qreal newZoneHeight);
 signals:
