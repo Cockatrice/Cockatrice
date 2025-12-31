@@ -44,10 +44,10 @@ Latest <kbd>beta</kbd> version:
 
 # Related Repositories
 
-- [Magic-Token](https://github.com/Cockatrice/Magic-Token): MtG token data to use in Cockatrice
-- [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Script to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) to use in Cockatrice
+- [Magic-Token](https://github.com/Cockatrice/Magic-Token): File with MtG token data for use in Cockatrice
+- [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Code to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) for use in Cockatrice
 - [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official Cockatrice webpage
-- [Cockatrice @Flathub](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration for our Linux `flatpak` package
+- [io.github.Cockatrice.cockatrice](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration of our Linux `flatpak` package hosted at [Flathub](https://flathub.org/en/apps/io.github.Cockatrice.cockatrice)
 
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
@@ -55,7 +55,6 @@ Latest <kbd>beta</kbd> version:
 Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
 - [Official Website](https://cockatrice.github.io)
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
-- [Official Code Documentation](https://cockatrice.github.io/docs)
 - [Official Discord](https://discord.gg/3Z9yzmA)
 - [reddit r/Cockatrice](https://reddit.com/r/cockatrice)
 
@@ -64,6 +63,23 @@ Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other p
 
 
 # Contribute
+<p>
+   <a href="#code">Code</a> <b>|</b>
+   <a href="#documentation-">Documentation</a> <b>|</b>
+   <a href="#translation-">Translation</a>
+</p>
+
+#### Repository Activity
+![Cockatrice Repo Analytics](https://repobeats.axiom.co/api/embed/c7cec938789a5bbaeb4182a028b4dbb96db8f181.svg "Cockatrice Repo Analytics by Repobeats")
+
+<details>
+<summary><b>Kudos to all our amazing contributors ❤️</b></summary>
+<br>
+   <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
+      <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
+   </a><br>
+   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a></i></sub>
+</details>
 
 ### Code
 
@@ -79,21 +95,17 @@ We'll happily advice on how best to implement a feature, or we can show you wher
 
 You can also have a look at our `Todo List` in our [Code Documentation](https://cockatrice.github.io/docs) or search the repo for [`\todo` comments](https://github.com/search?q=repo%3ACockatrice%2FCockatrice%20%5Ctodo&type=code).
 
+### Documentation [![CI Docs](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml/badge.svg?event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/documentation-build.yml?query=event%3Apush)
+
+There are various places where useful information for different needs are maintained:
+- [Official Code Documentation](https://cockatrice.github.io/docs/) 
+- [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki) `Community supported`
+- [Official Webpage](https://cockatrice.github.io/)
+- [Official README](https://github.com/Cockatrice/Cockatrice/blob/master/README.md) `This file`
+
 Cockatrice tries to use the [Google Developer Documentation Style Guide](https://developers.google.com/style/) to ensure consistent documentation. We encourage you to improve the documentation by suggesting edits based on this guide.
 
-#### Repository Activity
-![Cockatrice Repo Analytics](https://repobeats.axiom.co/api/embed/c7cec938789a5bbaeb4182a028b4dbb96db8f181.svg "Cockatrice Repo Analytics by Repobeats")
-
-<details>
-<summary><b>Kudos to all our amazing contributors ❤️</b></summary>
-<br>
-   <a href="https://github.com/Cockatrice/Cockatrice/graphs/contributors">
-      <img src="https://contrib.rocks/image?repo=Cockatrice/Cockatrice" />
-   </a><br>
-   <sub><i>Made with <a href="https://contrib.rocks">contrib.rocks</a></i></sub>
-</details>
-
-### Translations [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://explore.transifex.com/cockatrice/cockatrice/)
+### Translation [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://explore.transifex.com/cockatrice/cockatrice/)
 
 Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://explore.transifex.com/cockatrice/cockatrice/).<br>
 
