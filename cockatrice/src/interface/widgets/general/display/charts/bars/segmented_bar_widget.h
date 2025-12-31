@@ -23,7 +23,7 @@ public:
     float total = 1.0;
 
     explicit SegmentedBarWidget(QString label, QVector<Segment> segments, int total, QWidget *parent = nullptr);
-    QSize sizeHint();
+    QSize sizeHint() const override;
 
 protected:
     void paintEvent(QPaintEvent *event) override;

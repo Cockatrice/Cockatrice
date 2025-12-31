@@ -16,7 +16,7 @@ template <typename T> T *findParentOfType(const QObject *obj)
     return nullptr;
 }
 
-static void clearLayoutRec(QLayout *l)
+static inline void clearLayoutRec(QLayout *l)
 {
     if (!l)
         return;

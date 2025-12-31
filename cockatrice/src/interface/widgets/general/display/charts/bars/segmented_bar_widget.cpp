@@ -14,7 +14,7 @@ SegmentedBarWidget::SegmentedBarWidget(QString label, QVector<Segment> segments,
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 }
 
-QSize SegmentedBarWidget::sizeHint()
+QSize SegmentedBarWidget::sizeHint() const
 {
     return QSize(50, 150);
 }
