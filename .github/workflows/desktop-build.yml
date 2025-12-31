@@ -380,22 +380,7 @@ jobs:
         id: resolve_qt_version
         shell: bash
         # Ouputs the version of Qt to install via aqtinstall
-        run: |
-          # If version is already specific (no wildcard), use it as-is
-          if [[ "${{matrix.qt_version}}" != *"*" ]]; then
-            echo "version=${{matrix.qt_version}}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Resolve latest patch
-          QT_RESOLVED=$(aqt list-qt mac desktop --spec "${{matrix.qt_version}}" --latest-version)
-          echo "QT_RESOLVED=$QT_RESOLVED"
-          if [ -z "$QT_RESOLVED" ]; then
-            echo "Error: Could not resolve Qt version for ${{matrix.qt_version}}"
-            exit 1
-          fi
-
-          echo "version=$QT_RESOLVED" >> "$GITHUB_OUTPUT"
+        run: .ci/resolve_latest_aqt_qt_version.sh "${{matrix.qt_version}}"
 
       - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
         if: matrix.os == 'macOS'
