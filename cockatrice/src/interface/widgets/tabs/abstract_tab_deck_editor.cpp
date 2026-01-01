@@ -55,7 +55,7 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 
     deckStateManager = new DeckStateManager(this);
 
-    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this);
+    cardDatabaseDockWidget = new DeckEditorCardDatabaseDockWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this);
@@ -68,21 +68,9 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     connect(deckStateManager, &DeckStateManager::isModifiedChanged, this, &AbstractTabDeckEditor::onDeckModified);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::selectedCardChanged, this, &AbstractTabDeckEditor::updateCard);
 
-    // Connect database display signals to this tab
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
-            &AbstractTabDeckEditor::updateCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
-            &AbstractTabDeckEditor::actAddCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
-            &AbstractTabDeckEditor::actAddCardToSideboard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, this,
-            &AbstractTabDeckEditor::actDecrementCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
-            &AbstractTabDeckEditor::actDecrementCardFromSideboard);
-
     // Connect filter signals
-    connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
-            &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
+    connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, cardDatabaseDockWidget,
+            &DeckEditorCardDatabaseDockWidget::clearAllDatabaseFilters);
 
     // Connect shortcut changes
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
@@ -122,7 +110,7 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &
 {
     deckStateManager->addCard(card, zoneName);
 
-    databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
+    cardDatabaseDockWidget->highlightAllSearchEdit();
 }
 
 /**
@@ -544,21 +532,21 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 /** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
+    auto *interface = new DeckStatsInterface(*cardDatabaseDockWidget->getDatabase(), this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
+    auto *interface = new TappedOutInterface(*cardDatabaseDockWidget->getDatabase(), this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Applies a new filter tree to the database display. */
 void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
-    databaseDisplayDockWidget->setFilterTree(filterTree);
+    cardDatabaseDockWidget->setFilterTree(filterTree);
 }
 
 /**
@@ -583,6 +571,9 @@ bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
         if (o == cardInfoDockWidget) {
             aCardInfoDockVisible->setChecked(false);
             aCardInfoDockFloating->setEnabled(false);
+        } else if (o == cardDatabaseDockWidget) {
+            aCardDatabaseDockVisible->setChecked(false);
+            aCardDatabaseDockFloating->setEnabled(false);
         } else if (o == deckDockWidget) {
             aDeckDockVisible->setChecked(false);
             aDeckDockFloating->setEnabled(false);

@@ -170,6 +170,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
     src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp

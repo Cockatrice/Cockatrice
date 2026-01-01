@@ -8,6 +8,7 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
+#include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
@@ -27,7 +28,7 @@ class CardInfoFrameWidget;
 class DeckLoader;
 class DeckEditorMenu;
 class DeckEditorCardInfoDockWidget;
-class DeckEditorDatabaseDisplayWidget;
+class DeckEditorCardDatabaseDockWidget;
 class DeckEditorDeckDockWidget;
 class DeckEditorFilterDockWidget;
 class DeckEditorPrintingSelectorDockWidget;
@@ -126,7 +127,7 @@ public:
     // UI Elements
     DeckStateManager *deckStateManager;
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
-    DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;       ///< Database dock
+    DeckEditorCardDatabaseDockWidget *cardDatabaseDockWidget;         ///< Database dock
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;                 ///< Card info dock
     DeckEditorDeckDockWidget *deckDockWidget;                         ///< Deck dock
     DeckEditorFilterDockWidget *filterDockWidget;                     ///< Filter dock
@@ -295,11 +296,15 @@ protected:
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
     // UI Menu Elements
-    QMenu *viewMenu, *cardInfoDockMenu, *deckDockMenu, *filterDockMenu, *printingSelectorDockMenu;
+    QMenu *viewMenu, *cardInfoDockMenu, *cardDatabaseDockMenu, *deckDockMenu, *filterDockMenu,
+        *printingSelectorDockMenu;
 
     QAction *aResetLayout;
-    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating;
-    QAction *aFilterDockVisible, *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
+    QAction *aCardInfoDockVisible, *aCardInfoDockFloating;
+    QAction *aCardDatabaseDockVisible, *aCardDatabaseDockFloating;
+    QAction *aDeckDockVisible, *aDeckDockFloating;
+    QAction *aFilterDockVisible, *aFilterDockFloating;
+    QAction *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H
