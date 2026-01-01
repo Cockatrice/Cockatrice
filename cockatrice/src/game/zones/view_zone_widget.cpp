@@ -272,10 +272,11 @@ void ZoneViewWidget::startWindowDrag(QGraphicsSceneMouseEvent *event)
 QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 {
     const QRectF frameRectF = windowFrameRect();
-    const QRect titleBarRect(frameRectF.toRect().x(), frameRectF.toRect().y(), frameRectF.toRect().width(),
-                             static_cast<int>(kTitleBarHeight));
 
     // query the style for the close button position (handles macOS top-left placement)
+    // Title bar rect MUST be local (0,0-based) for QStyle
+    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(kTitleBarHeight));
+
     if (styleWidget) {
         QStyleOptionTitleBar opt;
         opt.initFrom(styleWidget);
@@ -283,19 +284,26 @@ QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
         opt.text = windowTitle();
         opt.icon = styleWidget->windowIcon();
         opt.titleBarFlags = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint;
+
         opt.subControls = QStyle::SC_TitleBarCloseButton;
         opt.activeSubControls = QStyle::SC_TitleBarCloseButton;
         opt.titleBarState = styleWidget->isActiveWindow() ? Qt::WindowActive : Qt::WindowNoState;
-        if (styleWidget->isActiveWindow())
+
+        if (styleWidget->isActiveWindow()) {
             opt.state |= QStyle::State_Active;
-        const QRect r = styleWidget->style()->subControlRect(QStyle::CC_TitleBar, &opt, QStyle::SC_TitleBarCloseButton,
-                                                             styleWidget);
+        }
+
+        QRect r = styleWidget->style()->subControlRect(QStyle::CC_TitleBar, &opt, QStyle::SC_TitleBarCloseButton,
+                                                       styleWidget);
+
         if (r.isValid() && !r.isEmpty()) {
+            // Translate from local-titlebar coords → frame coords
+            r.translate(frameRectF.topLeft().toPoint());
             return QRectF(r);
         }
     }
 
-    // fallback: square at right end of titlebar (Windows/Linux style)
+    // Fallback: frame-relative top-right
     return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
 }
 
@@ -349,6 +357,7 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
                     close();
                     return true;
                 }
+
                 startWindowDrag(me);
                 me->accept();
                 return true;
