@@ -282,13 +282,13 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 {
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
-    auto l = DeckLoader(this);
-    if (l.loadFromFile(fileName, fmt, true)) {
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(fileName, fmt, true);
+    if (deckOpt) {
         if (deckOpenLocation == NEW_TAB) {
-            emit openDeckEditor(l.getDeck());
+            emit openDeckEditor(deckOpt.value());
         } else {
             deckMenu->setSaveStatus(false);
-            openDeck(l.getDeck());
+            openDeck(deckOpt.value());
         }
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
@@ -324,9 +324,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
     if (loadedDeck.lastLoadInfo.fileName.isEmpty())
         return actSaveDeckAs();
 
-    auto deckLoader = DeckLoader(this);
-    deckLoader.setDeck(loadedDeck);
-    if (deckLoader.saveToFile(loadedDeck.lastLoadInfo.fileName, loadedDeck.lastLoadInfo.fileFormat)) {
+    if (DeckLoader::saveToFile(loadedDeck)) {
         deckStateManager->setModified(false);
         return true;
     }
@@ -343,14 +341,14 @@ bool AbstractTabDeckEditor::actSaveDeck()
  */
 bool AbstractTabDeckEditor::actSaveDeckAs()
 {
-    LoadedDeck loadedDeck = deckStateManager->toLoadedDeck();
+    DeckList deckList = deckStateManager->getDeckList();
 
     QFileDialog dialog(this, tr("Save deck"));
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(loadedDeck.deckList.getName().trimmed());
+    dialog.selectFile(deckList.getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -358,16 +356,15 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
-    DeckLoader deckLoader = DeckLoader(this);
-    deckLoader.setDeck(loadedDeck);
-    if (!deckLoader.saveToFile(fileName, fmt)) {
+    std::optional<LoadedDeck::LoadInfo> infoOpt = DeckLoader::saveToFile(deckList, fileName, fmt);
+    if (!infoOpt) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
         return false;
     }
 
-    deckStateManager->setLastLoadInfo({.fileName = fileName, .fileFormat = fmt});
+    deckStateManager->setLastLoadInfo(infoOpt.value());
 
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);

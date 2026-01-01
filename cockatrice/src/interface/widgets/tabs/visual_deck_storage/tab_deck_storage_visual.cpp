@@ -24,11 +24,12 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
 
 void TabDeckStorageVisual::actOpenLocalDeck(const QString &filePath)
 {
-    auto deckLoader = DeckLoader(this);
-    if (!deckLoader.loadFromFile(filePath, DeckFileFormat::getFormatFromName(filePath), true)) {
+    std::optional<LoadedDeck> deckOpt =
+        DeckLoader::loadFromFile(filePath, DeckFileFormat::getFormatFromName(filePath), true);
+    if (!deckOpt) {
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(filePath));
         return;
     }
 
-    emit openDeckEditor(deckLoader.getDeck());
+    emit openDeckEditor(deckOpt.value());
 }

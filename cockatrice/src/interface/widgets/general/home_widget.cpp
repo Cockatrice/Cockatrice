@@ -76,10 +76,9 @@ void HomeWidget::initializeBackgroundFromSource()
 
 void HomeWidget::loadBackgroundSourceDeck()
 {
-    DeckLoader deckLoader = DeckLoader(this);
-    deckLoader.loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice,
-                            false);
-    backgroundSourceDeck = deckLoader.getDeck().deckList;
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
+        SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
+    backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
 }
 
 void HomeWidget::updateRandomCard()
