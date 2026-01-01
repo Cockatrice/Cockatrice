@@ -176,7 +176,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     activeGroupCriteriaComboBox->addItem(tr("Main Type"), DeckListModelGroupCriteria::MAIN_TYPE);
     activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
     activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
-    connect(activeGroupCriteriaComboBox, &QComboBox::currentIndexChanged, this,
+    connect(activeGroupCriteriaComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     aIncrement = new QAction(QString(), this);
