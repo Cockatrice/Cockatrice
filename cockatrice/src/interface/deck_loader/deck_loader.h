@@ -20,7 +20,6 @@ class DeckLoader : public QObject
 {
     Q_OBJECT
 signals:
-    void deckLoaded();
     void loadFinished(bool success);
 
 public:
@@ -53,11 +52,16 @@ public:
         return loadedDeck.lastLoadInfo.isEmpty();
     }
 
-    bool loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
-    bool loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
-    bool loadFromRemote(const QString &nativeString, int remoteDeckId);
-    bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
-    bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
+    void loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
+
+    static std::optional<LoadedDeck>
+    loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest = false);
+    static std::optional<LoadedDeck> loadFromRemote(const QString &nativeString, int remoteDeckId);
+
+    static std::optional<LoadedDeck::LoadInfo>
+    saveToFile(const DeckList &deck, const QString &fileName, DeckFileFormat::Format fmt);
+    static bool saveToFile(const LoadedDeck &deck);
+    static bool saveToNewFile(LoadedDeck &deck, const QString &fileName, DeckFileFormat::Format fmt);
 
     static QString exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website);
 
@@ -74,7 +78,7 @@ public:
      */
     static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
-    bool convertToCockatriceFormat(const QString &fileName);
+    static bool convertToCockatriceFormat(LoadedDeck &deck);
 
     LoadedDeck &getDeck()
     {
@@ -90,6 +94,7 @@ public:
     }
 
 private:
+    static bool updateLastLoadedTimestamp(LoadedDeck &deck);
     static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
     static void saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList);
 

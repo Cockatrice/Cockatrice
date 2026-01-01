@@ -29,24 +29,26 @@ DeckLoader::DeckLoader(QObject *parent) : QObject(parent)
 {
 }
 
-bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest)
+std::optional<LoadedDeck>
+DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return false;
+        qCWarning(DeckLoaderLog) << "File does not exist:" << fileName;
+        return std::nullopt;
     }
 
     bool result = false;
-    DeckList deckList = DeckList();
+    DeckList deckList;
     switch (fmt) {
         case DeckFileFormat::PlainText:
             result = deckList.loadFromFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice: {
             result = deckList.loadFromFile_Native(&file);
-            qCInfo(DeckLoaderLog) << "Loaded from" << fileName << "-" << result;
             if (!result) {
-                qCInfo(DeckLoaderLog) << "Retrying as plain format";
+                qCInfo(DeckLoaderLog) << "Failed to load " << fileName
+                                      << "as cockatrice format; retrying as plain format";
                 file.seek(0);
                 result = deckList.loadFromFile_Plain(&file);
                 fmt = DeckFileFormat::PlainText;
@@ -58,120 +60,108 @@ bool DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fm
             break;
     }
 
-    if (result) {
-        loadedDeck.deckList = deckList;
-        loadedDeck.lastLoadInfo = {
-            .fileName = fileName,
-            .fileFormat = fmt,
-        };
-        if (userRequest) {
-            updateLastLoadedTimestamp(fileName, fmt);
-        }
-
-        emit deckLoaded();
+    if (!result) {
+        qCWarning(DeckLoaderLog) << "Failed to load " << fileName << "as" << fmt;
+        return std::nullopt;
     }
 
-    qCInfo(DeckLoaderLog) << "Deck was loaded -" << result;
-    return result;
-}
+    LoadedDeck::LoadInfo lastLoadInfo = {
+        .fileName = fileName,
+        .fileFormat = fmt,
+    };
+    LoadedDeck loadedDeck = {deckList, lastLoadInfo};
 
-bool DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest)
-{
-    auto *watcher = new QFutureWatcher<bool>(this);
-
-    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, fileName, fmt, userRequest]() {
-        const bool result = watcher->result();
-        watcher->deleteLater();
-
-        if (result) {
-            loadedDeck.lastLoadInfo = {
-                .fileName = fileName,
-                .fileFormat = fmt,
-            };
-            if (userRequest) {
-                updateLastLoadedTimestamp(fileName, fmt);
-            }
-            emit deckLoaded();
-        }
-
-        emit loadFinished(result);
-    });
-
-    QFuture<bool> future = QtConcurrent::run([=, this]() {
-        QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            return false;
-        }
-
-        switch (fmt) {
-            case DeckFileFormat::PlainText:
-                return loadedDeck.deckList.loadFromFile_Plain(&file);
-            case DeckFileFormat::Cockatrice: {
-                bool result = false;
-                result = loadedDeck.deckList.loadFromFile_Native(&file);
-                if (!result) {
-                    file.seek(0);
-                    return loadedDeck.deckList.loadFromFile_Plain(&file);
-                }
-                return result;
-            }
-            default:
-                return false;
-                break;
-        }
-    });
-
-    watcher->setFuture(future);
-    return true; // Return immediately to indicate the async task was started
-}
-
-bool DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
-{
-    bool result = loadedDeck.deckList.loadFromString_Native(nativeString);
-    if (result) {
-        loadedDeck.lastLoadInfo = {
-            .remoteDeckId = remoteDeckId,
-        };
-
-        emit deckLoaded();
+    if (userRequest) {
+        updateLastLoadedTimestamp(loadedDeck);
     }
-    return result;
+
+    qCDebug(DeckLoaderLog) << "Loaded deck" << fileName << "with userRequest:" << userRequest;
+
+    return loadedDeck;
 }
 
-bool DeckLoader::saveToFile(const QString &fileName, DeckFileFormat::Format fmt)
+void DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest)
+{
+    QFuture<void> future = QtConcurrent::run([=, this] {
+        std::optional<LoadedDeck> deckOpt = loadFromFile(fileName, fmt, userRequest);
+        if (deckOpt) {
+            loadedDeck = deckOpt.value();
+        }
+        emit loadFinished(deckOpt.has_value());
+    });
+}
+
+std::optional<LoadedDeck> DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
+{
+    DeckList deckList;
+    bool success = deckList.loadFromString_Native(nativeString);
+
+    if (!success) {
+        qCWarning(DeckLoaderLog) << "Failed to load remote deck with id" << remoteDeckId << ":" << nativeString;
+        return std::nullopt;
+    }
+
+    LoadedDeck::LoadInfo lastLoadInfo = {.remoteDeckId = remoteDeckId};
+    LoadedDeck loadedDeck = {deckList, lastLoadInfo};
+
+    qCDebug(DeckLoaderLog) << "Loaded remote deck with id" << remoteDeckId;
+
+    return loadedDeck;
+}
+
+std::optional<LoadedDeck::LoadInfo>
+DeckLoader::saveToFile(const DeckList &deck, const QString &fileName, DeckFileFormat::Format fmt)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        return false;
+        qCWarning(DeckLoaderLog) << "Could not create or open file:" << fileName;
+        return std::nullopt;
     }
 
-    bool result = false;
+    bool success = false;
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = loadedDeck.deckList.saveToFile_Plain(&file);
+            success = deck.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            result = loadedDeck.deckList.saveToFile_Native(&file);
-            qCInfo(DeckLoaderLog) << "Saving to " << fileName << "-" << result;
+            success = deck.saveToFile_Native(&file);
             break;
-    }
-
-    if (result) {
-        loadedDeck.lastLoadInfo = {
-            .fileName = fileName,
-            .fileFormat = fmt,
-        };
-        qCInfo(DeckLoaderLog) << "Deck was saved -" << result;
     }
 
     file.flush();
     file.close();
 
-    return result;
+    qCInfo(DeckLoaderLog) << "Saved deck to " << fileName << "with format" << fmt << "-" << success;
+
+    if (!success) {
+        return std::nullopt;
+    }
+
+    LoadedDeck::LoadInfo lastLoadInfo = {fileName, fmt};
+    return lastLoadInfo;
 }
 
-bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt)
+bool DeckLoader::saveToFile(const LoadedDeck &deck)
 {
+    auto opt = saveToFile(deck.deckList, deck.lastLoadInfo.fileName, deck.lastLoadInfo.fileFormat);
+    return opt.has_value();
+}
+
+bool DeckLoader::saveToNewFile(LoadedDeck &deck, const QString &fileName, DeckFileFormat::Format fmt)
+{
+    std::optional<LoadedDeck::LoadInfo> infoOpt = saveToFile(deck.deckList, fileName, fmt);
+
+    if (infoOpt) {
+        deck.lastLoadInfo = infoOpt.value();
+    }
+
+    return infoOpt.has_value();
+}
+
+bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
+{
+    QString fileName = deck.lastLoadInfo.fileName;
+
     QFileInfo fileInfo(fileName);
     if (!fileInfo.exists()) {
         qCWarning(DeckLoaderLog) << "File does not exist:" << fileName;
@@ -190,24 +180,19 @@ bool DeckLoader::updateLastLoadedTimestamp(const QString &fileName, DeckFileForm
     bool result = false;
 
     // Perform file modifications
-    switch (fmt) {
+    switch (deck.lastLoadInfo.fileFormat) {
         case DeckFileFormat::PlainText:
-            result = loadedDeck.deckList.saveToFile_Plain(&file);
+            result = deck.deckList.saveToFile_Plain(&file);
             break;
         case DeckFileFormat::Cockatrice:
-            loadedDeck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-            result = loadedDeck.deckList.saveToFile_Native(&file);
+            deck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+            result = deck.deckList.saveToFile_Native(&file);
             break;
     }
 
     file.close(); // Close the file to ensure changes are flushed
 
     if (result) {
-        loadedDeck.lastLoadInfo = {
-            .fileName = fileName,
-            .fileFormat = fmt,
-        };
-
         // Re-open the file and set the original timestamp
         if (!file.open(QIODevice::ReadWrite)) {
             qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
@@ -434,8 +419,13 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
     }
 }
 
-bool DeckLoader::convertToCockatriceFormat(const QString &fileName)
+bool DeckLoader::convertToCockatriceFormat(LoadedDeck &deck)
 {
+    QString fileName = deck.lastLoadInfo.fileName;
+    if (fileName.isEmpty()) {
+        return false;
+    }
+
     // Change the file extension to .cod
     QFileInfo fileInfo(fileName);
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
@@ -453,7 +443,7 @@ bool DeckLoader::convertToCockatriceFormat(const QString &fileName)
     switch (DeckFileFormat::getFormatFromName(fileName)) {
         case DeckFileFormat::PlainText:
             // Save in Cockatrice's native format
-            result = loadedDeck.deckList.saveToFile_Native(&file);
+            result = deck.deckList.saveToFile_Native(&file);
             break;
         case DeckFileFormat::Cockatrice:
             qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
@@ -474,7 +464,7 @@ bool DeckLoader::convertToCockatriceFormat(const QString &fileName)
         } else {
             qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
         }
-        loadedDeck.lastLoadInfo = {
+        deck.lastLoadInfo = {
             .fileName = newFileName,
             .fileFormat = DeckFileFormat::Cockatrice,
         };
