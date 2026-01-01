@@ -477,16 +477,14 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     updateBannerCardComboBox();
     bannerCardComboBox->blockSignals(false);
     updateHash();
-    sortDeckModelToDeckView();
 
-    deckTagsDisplayWidget->setTags(deckStateManager->getMetadata().tags);
-}
-
-void DeckEditorDeckDockWidget::sortDeckModelToDeckView()
-{
-    getModel()->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
-    getModel()->setActiveFormat(deckStateManager->getMetadata().gameFormat);
+    formatComboBox->blockSignals(true);
     formatComboBox->setCurrentIndex(formatComboBox->findData(deckStateManager->getMetadata().gameFormat));
+    formatComboBox->blockSignals(false);
+
+    deckTagsDisplayWidget->blockSignals(true);
+    deckTagsDisplayWidget->setTags(deckStateManager->getMetadata().tags);
+    deckTagsDisplayWidget->blockSignals(false);
 }
 
 /**
