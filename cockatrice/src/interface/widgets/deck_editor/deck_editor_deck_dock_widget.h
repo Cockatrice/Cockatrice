@@ -99,6 +99,7 @@ private slots:
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex);
     void updateHash();
     void refreshShortcuts();

@@ -64,6 +64,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(deckStateManager, &DeckStateManager::focusIndexChanged, this, &DeckEditorDeckDockWidget::setSelectedIndex);
     connect(deckStateManager, &DeckStateManager::deckReplaced, this,
             &DeckEditorDeckDockWidget::syncDisplayWidgetsToModel);
+    connect(deckStateManager, &DeckStateManager::deckReplaced, this,
+            &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     deckView = new QTreeView();
     deckView->setObjectName("deckView");
@@ -174,11 +176,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     activeGroupCriteriaComboBox->addItem(tr("Main Type"), DeckListModelGroupCriteria::MAIN_TYPE);
     activeGroupCriteriaComboBox->addItem(tr("Mana Cost"), DeckListModelGroupCriteria::MANA_COST);
     activeGroupCriteriaComboBox->addItem(tr("Colors"), DeckListModelGroupCriteria::COLOR);
-    connect(activeGroupCriteriaComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
-        getModel()->setActiveGroupCriteria(static_cast<DeckListModelGroupCriteria::Type>(
-            activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
-        getModel()->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
-    });
+    connect(activeGroupCriteriaComboBox, &QComboBox::currentIndexChanged, this,
+            &DeckEditorDeckDockWidget::applyActiveGroupCriteria);
 
     aIncrement = new QAction(QString(), this);
     aIncrement->setIcon(QPixmap("theme:icons/increment"));
@@ -426,6 +425,13 @@ void DeckEditorDeckDockWidget::writeBannerCard(int index)
     auto [name, id] = bannerCardComboBox->itemData(index).value<QPair<QString, QString>>();
     CardRef bannerCard = {name, id};
     deckStateManager->setBannerCard(bannerCard);
+}
+
+void DeckEditorDeckDockWidget::applyActiveGroupCriteria()
+{
+    getModel()->setActiveGroupCriteria(
+        static_cast<DeckListModelGroupCriteria::Type>(activeGroupCriteriaComboBox->currentData(Qt::UserRole).toInt()));
+    getModel()->sort(deckView->header()->sortIndicatorSection(), deckView->header()->sortIndicatorOrder());
 }
 
 void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
