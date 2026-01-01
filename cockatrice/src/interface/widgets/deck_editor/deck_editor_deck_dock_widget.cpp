@@ -297,7 +297,6 @@ void DeckEditorDeckDockWidget::initializeFormats()
 
     QString format = deckStateManager->getMetadata().gameFormat;
     if (!format.isEmpty()) {
-        getModel()->setActiveFormat(format);
         formatComboBox->setCurrentIndex(formatComboBox->findData(format));
     } else {
         // Ensure no selection is visible initially
