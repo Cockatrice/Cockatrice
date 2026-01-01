@@ -288,6 +288,7 @@ SettingsCache::SettingsCache()
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
+    showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     roundCardCorners = settings->value("cards/roundcardcorners", true).toBool();
     overrideAllCardArtWithPersonalPreference =
@@ -713,6 +714,13 @@ void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
 {
     showShortcuts = static_cast<bool>(_showShortcuts);
     settings->setValue("menu/showshortcuts", showShortcuts);
+}
+
+void SettingsCache::setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar)
+{
+    showGameSelectorFilterToolbar = static_cast<bool>(_showGameSelectorFilterToolbar);
+    settings->setValue("menu/showgameselectorfiltertoolbar", showGameSelectorFilterToolbar);
+    emit showGameSelectorFilterToolbarChanged(showGameSelectorFilterToolbar);
 }
 
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)

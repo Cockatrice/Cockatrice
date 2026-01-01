@@ -462,8 +462,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
 
+    showGameSelectorFilterToolbarCheckBox.setChecked(settings.getShowGameSelectorFilterToolbar());
+    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setShowGameSelectorFilterToolbar);
+
     auto *menuGrid = new QGridLayout;
     menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
+    menuGrid->addWidget(&showGameSelectorFilterToolbarCheckBox, 1, 0);
 
     menuGroupBox = new QGroupBox;
     menuGroupBox->setLayout(menuGrid);
@@ -727,6 +732,7 @@ void AppearanceSettingsPage::retranslateUi()
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
+    showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
     cardsGroupBox->setTitle(tr("Card rendering"));
     displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
