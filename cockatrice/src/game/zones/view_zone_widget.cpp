@@ -272,31 +272,38 @@ void ZoneViewWidget::startWindowDrag(QGraphicsSceneMouseEvent *event)
 QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
 {
     const QRectF frameRectF = windowFrameRect();
-    const QRect titleBarRect(frameRectF.toRect().x(), frameRectF.toRect().y(), frameRectF.toRect().width(),
-                             static_cast<int>(kTitleBarHeight));
+    const QRectF contentRect = rect();
 
-    // query the style for the close button position (handles macOS top-left placement)
+    // Compute actual frame margins from frameRect vs contentRect
+    const qreal actualTopMargin = contentRect.top() - frameRectF.top();
+    const qreal actualLeftMargin = contentRect.left() - frameRectF.left();
+
+    // The visual titlebar spans the full frame width, not just content width
+    const qreal frameWidth = frameRectF.width();
+
+    // Query the platform style for close button position (handles macOS top-left placement)
     if (styleWidget) {
         QStyleOptionTitleBar opt;
         opt.initFrom(styleWidget);
-        opt.rect = titleBarRect;
-        opt.text = windowTitle();
-        opt.icon = styleWidget->windowIcon();
+        // Use frame width since the titlebar visually spans the entire frame
+        opt.rect = QRect(0, 0, qRound(frameWidth), static_cast<int>(actualTopMargin));
         opt.titleBarFlags = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint;
         opt.subControls = QStyle::SC_TitleBarCloseButton;
         opt.activeSubControls = QStyle::SC_TitleBarCloseButton;
-        opt.titleBarState = styleWidget->isActiveWindow() ? Qt::WindowActive : Qt::WindowNoState;
-        if (styleWidget->isActiveWindow())
-            opt.state |= QStyle::State_Active;
+
         const QRect r = styleWidget->style()->subControlRect(QStyle::CC_TitleBar, &opt, QStyle::SC_TitleBarCloseButton,
                                                              styleWidget);
+
         if (r.isValid() && !r.isEmpty()) {
-            return QRectF(r);
+            // Style returns coords relative to titlebar at (0,0), but our frame's
+            // titlebar starts at x=-leftMargin and y=-topMargin relative to content origin.
+            return QRectF(r).translated(-actualLeftMargin, -actualTopMargin);
         }
     }
 
-    // fallback: square at right end of titlebar (Windows/Linux style)
-    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+    // Fallback: square at right end of titlebar (Windows/Linux style)
+    const qreal fallbackX = frameWidth - actualLeftMargin - actualTopMargin;
+    return QRectF(fallbackX, -actualTopMargin, actualTopMargin, actualTopMargin);
 }
 
 QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
@@ -342,16 +349,21 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
 
     switch (event->type()) {
         case QEvent::GraphicsSceneMousePress:
-            if (me->button() == Qt::LeftButton && windowFrameSectionAt(me->pos()) == Qt::TitleBarArea) {
-                // avoid drag on close button
-                if (closeButtonRect(me->widget()).contains(me->pos())) {
+            if (me->button() == Qt::LeftButton) {
+                const QRectF closeRect = closeButtonRect(me->widget());
+
+                // Close button takes priority over drag handling
+                if (closeRect.contains(me->pos())) {
                     me->accept();
                     close();
                     return true;
                 }
-                startWindowDrag(me);
-                me->accept();
-                return true;
+
+                if (windowFrameSectionAt(me->pos()) == Qt::TitleBarArea) {
+                    startWindowDrag(me);
+                    me->accept();
+                    return true;
+                }
             }
             break;
 
