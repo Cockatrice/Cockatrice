@@ -78,9 +78,9 @@ public:
     };
 
 private:
-    Metadata metadata;                             ///< Deck metadata that is stored in the deck file
-    QMap<QString, SideboardPlan *> sideboardPlans; ///< Named sideboard plans.
-    DecklistNodeTree tree;                         ///< The deck tree (zones + cards).
+    Metadata metadata;                           ///< Deck metadata that is stored in the deck file
+    QMap<QString, SideboardPlan> sideboardPlans; ///< Named sideboard plans.
+    DecklistNodeTree tree;                       ///< The deck tree (zones + cards).
 
     /**
      * @brief Cached deck hash, recalculated lazily.
@@ -132,8 +132,7 @@ public:
     /// @brief Construct from components
     DeckList(const Metadata &metadata,
              const DecklistNodeTree &tree,
-             const QMap<QString, SideboardPlan *> &sideboardPlans = {});
-    virtual ~DeckList();
+             const QMap<QString, SideboardPlan> &sideboardPlans = {});
 
     /**
      * @brief Gets a pointer to the underlying node tree.
@@ -186,9 +185,9 @@ public:
 
     /// @name Sideboard plans
     ///@{
-    QList<MoveCard_ToZone> getCurrentSideboardPlan();
+    QList<MoveCard_ToZone> getCurrentSideboardPlan() const;
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
-    const QMap<QString, SideboardPlan *> &getSideboardPlans() const
+    const QMap<QString, SideboardPlan> &getSideboardPlans() const
     {
         return sideboardPlans;
     }

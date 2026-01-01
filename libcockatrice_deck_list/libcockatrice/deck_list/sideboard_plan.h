@@ -36,8 +36,7 @@ public:
      * @param _name The plan name.
      * @param _moveList Initial list of card move instructions.
      */
-    explicit SideboardPlan(const QString &_name = QString(),
-                           const QList<MoveCard_ToZone> &_moveList = QList<MoveCard_ToZone>());
+    explicit SideboardPlan(const QString &_name = "", const QList<MoveCard_ToZone> &_moveList = {});
 
     /**
      * @brief Read a SideboardPlan from an XML stream.
@@ -50,7 +49,7 @@ public:
      * @brief Write this SideboardPlan to XML.
      * @param xml Stream to append the serialized element to.
      */
-    void write(QXmlStreamWriter *xml);
+    void write(QXmlStreamWriter *xml) const;
 
     /// @return The plan name.
     [[nodiscard]] QString getName() const
