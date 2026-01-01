@@ -1023,7 +1023,7 @@ public slots:
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
-    void setShowGameSelectorFilterToolbar(Qt::CheckState _showGameSelectorFilterToolbar);
+    void setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
     void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);
