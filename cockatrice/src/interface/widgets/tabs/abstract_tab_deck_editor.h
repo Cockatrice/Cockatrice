@@ -246,9 +246,6 @@ protected slots:
     /** @brief Handles dock close events. */
     void closeEvent(QCloseEvent *event) override;
 
-    /** @brief Event filter for dock state changes. */
-    bool eventFilter(QObject *o, QEvent *e) override;
-
     /** @brief Slot triggered when a dock visibility changes. Pure virtual. */
     virtual void dockVisibleTriggered() = 0;
 

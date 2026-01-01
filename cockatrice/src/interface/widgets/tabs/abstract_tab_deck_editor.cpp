@@ -559,46 +559,6 @@ void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-/**
- * @brief Event filter for dock visibility and geometry changes.
- * @param o Object sending the event.
- * @param e Event.
- * @return False always.
- */
-bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
-{
-    if (e->type() == QEvent::Close) {
-        if (o == cardInfoDockWidget) {
-            aCardInfoDockVisible->setChecked(false);
-            aCardInfoDockFloating->setEnabled(false);
-        } else if (o == cardDatabaseDockWidget) {
-            aCardDatabaseDockVisible->setChecked(false);
-            aCardDatabaseDockFloating->setEnabled(false);
-        } else if (o == deckDockWidget) {
-            aDeckDockVisible->setChecked(false);
-            aDeckDockFloating->setEnabled(false);
-        } else if (o == filterDockWidget) {
-            aFilterDockVisible->setChecked(false);
-            aFilterDockFloating->setEnabled(false);
-        } else if (o == printingSelectorDockWidget) {
-            aPrintingSelectorDockVisible->setChecked(false);
-            aPrintingSelectorDockFloating->setEnabled(false);
-        }
-    }
-
-    if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        layouts.setDeckEditorLayoutState(saveState());
-        layouts.setDeckEditorGeometry(saveGeometry());
-        layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
-        layouts.setDeckEditorFilterSize(filterDockWidget->size());
-        layouts.setDeckEditorDeckSize(deckDockWidget->size());
-        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
-    }
-
-    return false;
-}
-
 /** @brief Shows a confirmation dialog before closing. */
 bool AbstractTabDeckEditor::confirmClose()
 {
