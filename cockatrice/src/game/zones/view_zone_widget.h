@@ -54,7 +54,6 @@ private:
     ZoneViewZone *zone;
     QGraphicsWidget *zoneContainer;
 
-    QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
 
