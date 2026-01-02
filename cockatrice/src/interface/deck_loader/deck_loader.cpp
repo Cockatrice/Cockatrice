@@ -158,6 +158,10 @@ bool DeckLoader::saveToNewFile(LoadedDeck &deck, const QString &fileName, DeckFi
     return infoOpt.has_value();
 }
 
+/**
+ * @brief Updates the lastLoadedTimestamp field in the file corresponding to the deck, without changing the
+ * FileModificationTime of the file.
+ */
 bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
 {
     QString fileName = deck.lastLoadInfo.fileName;
