@@ -27,6 +27,11 @@ searches are case insensitive.
 <dt><u>F</u>ormat:</dt>
 <dd>[f:standard](#f:standard) <small>(Any deck with format set to standard)</small></dd>
 
+<dt><u>C</u>omments:</dt>
+<dd>[c:good](#c:good) <small>(Any deck with comments containing the word good)</small></dd>
+<dd>[c:good c:deck](#c:good c:deck) <small>(Any deck with comments containing the words good and deck)</small></dd>
+<dd>[c:"good deck"](#c:%22good deck%22) <small>(Any deck with comments containing the exact phrase "good deck")</small></dd>
+
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>
 <dd><a href="#[[t:legendary]]">[[t:legendary]]</a> <small>(Any deck that contains at least one legendary)</small></dd>
