@@ -90,7 +90,7 @@ private:
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     DeckListModel *getModel() const;
-    [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
+    [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
 private slots:
