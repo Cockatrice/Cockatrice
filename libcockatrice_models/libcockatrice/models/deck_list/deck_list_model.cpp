@@ -637,6 +637,16 @@ QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
     return cardNodesToExactCards(nodes);
 }
 
+QList<const DecklistCardNode *> DeckListModel::getCardNodes() const
+{
+    return deckList->getCardNodes();
+}
+
+QList<const DecklistCardNode *> DeckListModel::getCardNodesForZone(const QString &zoneName) const
+{
+    return deckList->getCardNodes({zoneName});
+}
+
 QList<QString> DeckListModel::getCardNames() const
 {
     auto nodes = deckList->getCardNodes();

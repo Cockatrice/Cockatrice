@@ -340,6 +340,12 @@ public:
     [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
 
     /**
+     * @brief Gets a list of all card nodes in the deck.
+     */
+    [[nodiscard]] QList<const DecklistCardNode *> getCardNodes() const;
+    [[nodiscard]] QList<const DecklistCardNode *> getCardNodesForZone(const QString &zoneName) const;
+
+    /**
      * @brief Gets a deduplicated list of all card names that appear in the model
      */
     [[nodiscard]] QList<QString> getCardNames() const;
