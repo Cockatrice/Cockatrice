@@ -27,11 +27,13 @@ public:
 
 public slots:
     void clampSetNameToPicture();
+    void updateCardAmounts(const QMap<QString, QPair<int, int>> &uuidToAmounts);
 
 signals:
     void cardPreferenceChanged();
 
 private:
+    ExactCard rootCard;
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
     PrintingSelectorCardOverlayWidget *overlayWidget;

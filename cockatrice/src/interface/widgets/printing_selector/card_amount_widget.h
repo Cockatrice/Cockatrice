@@ -31,9 +31,10 @@ public:
                               QSlider *cardSizeSlider,
                               const ExactCard &rootCard,
                               const QString &zoneName);
-    int countCardsInZone(const QString &deckZone);
+    int getAmount();
 
 public slots:
+    void setAmount(int _amount);
     void updateCardCount();
     void addPrinting(const QString &zone);
 
@@ -52,6 +53,7 @@ private:
     QLabel *cardCountInZone;
 
     bool hovered;
+    int amount = 0;
 
     void decrementCardHelper(const QString &zoneName);
 
