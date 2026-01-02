@@ -578,18 +578,19 @@ void DeckEditorDeckDockWidget::expandAll()
 }
 
 /**
- * Gets the index of all the currently selected card nodes in the decklist table.
+ * Gets the source index of all the currently selected card nodes in the decklist table.
  * The list is in reverse order of the visual selection, so that rows can be deleted while iterating over them.
  *
- * @return A model index list containing all selected card nodes
+ * @return A list containing the source indices of all selected card nodes
  */
-QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodes() const
+QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodeSourceIndices() const
 {
     auto selectedRows = deckView->selectionModel()->selectedRows();
 
-    const auto notLeafNode = [this](const QModelIndex &index) {
-        return getModel()->hasChildren(proxy->mapToSource(index));
-    };
+    const auto mapToSource = [this](const QModelIndex &index) { return proxy->mapToSource(index); };
+    std::transform(selectedRows.begin(), selectedRows.end(), selectedRows.begin(), mapToSource);
+
+    const auto notLeafNode = [this](const QModelIndex &sourceIndex) { return getModel()->hasChildren(sourceIndex); };
     selectedRows.erase(std::remove_if(selectedRows.begin(), selectedRows.end(), notLeafNode), selectedRows.end());
 
     std::reverse(selectedRows.begin(), selectedRows.end());
@@ -608,10 +609,10 @@ void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &
 
 void DeckEditorDeckDockWidget::actIncrementSelection()
 {
-    auto selectedRows = getSelectedCardNodes();
+    auto selectedRows = getSelectedCardNodeSourceIndices();
 
-    for (const auto &index : selectedRows) {
-        offsetCountAtIndex(index, true);
+    for (const auto &sourceIndex : selectedRows) {
+        offsetCountAtIndex(sourceIndex, true);
     }
 }
 
@@ -630,7 +631,7 @@ void DeckEditorDeckDockWidget::actSwapCard(const ExactCard &card, const QString 
 
 void DeckEditorDeckDockWidget::actSwapSelection()
 {
-    auto selectedRows = getSelectedCardNodes();
+    auto selectedRows = getSelectedCardNodeSourceIndices();
 
     // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
     // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
@@ -638,8 +639,8 @@ void DeckEditorDeckDockWidget::actSwapSelection()
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
-    for (const auto &currentIndex : selectedRows) {
-        deckStateManager->swapCardAtIndex(currentIndex);
+    for (const auto &sourceIndex : selectedRows) {
+        deckStateManager->swapCardAtIndex(sourceIndex);
     }
 
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -659,7 +660,7 @@ void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString z
 
 void DeckEditorDeckDockWidget::actDecrementSelection()
 {
-    auto selectedRows = getSelectedCardNodes();
+    auto selectedRows = getSelectedCardNodeSourceIndices();
 
     // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
     // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
@@ -667,8 +668,8 @@ void DeckEditorDeckDockWidget::actDecrementSelection()
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
-    for (const auto &index : selectedRows) {
-        offsetCountAtIndex(index, false);
+    for (const auto &sourceIndex : selectedRows) {
+        offsetCountAtIndex(sourceIndex, false);
     }
 
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -676,7 +677,7 @@ void DeckEditorDeckDockWidget::actDecrementSelection()
 
 void DeckEditorDeckDockWidget::actRemoveCard()
 {
-    auto selectedRows = getSelectedCardNodes();
+    auto selectedRows = getSelectedCardNodeSourceIndices();
 
     // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
     // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
@@ -684,8 +685,8 @@ void DeckEditorDeckDockWidget::actRemoveCard()
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
-    for (const auto &row : selectedRows) {
-        deckStateManager->removeCardAtIndex(row);
+    for (const auto &sourceIndex : selectedRows) {
+        deckStateManager->removeCardAtIndex(sourceIndex);
     }
 
     deckView->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -693,7 +694,7 @@ void DeckEditorDeckDockWidget::actRemoveCard()
 
 /**
  * @brief Increments or decrements the amount of the card node at the index by 1.
- * @param idx The proxy index
+ * @param idx The source index
  * @param isIncrement If true, increments the count. If false, decrements the count
  */
 void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool isIncrement)
@@ -702,12 +703,10 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool i
         return;
     }
 
-    QModelIndex sourceIndex = proxy->mapToSource(idx);
-
     if (isIncrement) {
-        deckStateManager->incrementCountAtIndex(sourceIndex);
+        deckStateManager->incrementCountAtIndex(idx);
     } else {
-        deckStateManager->decrementCountAtIndex(sourceIndex);
+        deckStateManager->decrementCountAtIndex(idx);
     }
 }
 
