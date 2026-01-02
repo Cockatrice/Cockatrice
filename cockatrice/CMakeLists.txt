@@ -415,15 +415,15 @@ endif()
 if(Qt5_FOUND)
   target_link_libraries(
     cockatrice
-    libcockatrice_card
-    libcockatrice_deck_list
-    libcockatrice_filters
-    libcockatrice_utility
-    libcockatrice_network
-    libcockatrice_models
-    libcockatrice_rng
-    libcockatrice_settings
-    ${COCKATRICE_QT_MODULES}
+    PUBLIC libcockatrice_card
+           libcockatrice_deck_list
+           libcockatrice_filters
+           libcockatrice_utility
+           libcockatrice_network
+           libcockatrice_models
+           libcockatrice_rng
+           libcockatrice_settings
+           ${COCKATRICE_QT_MODULES}
   )
 else()
   target_link_libraries(
@@ -438,6 +438,11 @@ else()
            libcockatrice_settings
            ${COCKATRICE_QT_MODULES}
   )
+endif()
+
+if(WITH_GUI_TEST)
+  target_link_libraries(cockatrice PRIVATE QtTesting)
+  target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
 endif()
 
 if(UNIX)

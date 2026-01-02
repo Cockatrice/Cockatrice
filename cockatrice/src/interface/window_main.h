@@ -25,6 +25,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "pqTestUtility.h"
+
 #include <QList>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -161,6 +163,7 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
+    // pqTestUtility *TestUtility;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
