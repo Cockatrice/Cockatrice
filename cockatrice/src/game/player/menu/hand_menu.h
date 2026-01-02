@@ -46,6 +46,8 @@ private:
 
     QAction *aViewHand = nullptr;
     QAction *aMulligan = nullptr;
+    QAction *aMulliganSame = nullptr;
+    QAction *aMulliganMinusOne = nullptr;
 
     QMenu *mSortHand = nullptr;
     QAction *aSortHandByName = nullptr;
