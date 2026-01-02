@@ -44,7 +44,7 @@ bool SideboardPlan::readElement(QXmlStreamReader *xml)
     return false;
 }
 
-void SideboardPlan::write(QXmlStreamWriter *xml)
+void SideboardPlan::write(QXmlStreamWriter *xml) const
 {
     xml->writeStartElement("sideboard_plan");
     xml->writeTextElement("name", name);
