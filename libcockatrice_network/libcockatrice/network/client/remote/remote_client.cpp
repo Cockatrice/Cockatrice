@@ -278,6 +278,34 @@ void RemoteClient::passwordSaltResponse(const Response &response)
     }
 }
 
+Command_ClientDiagnostics RemoteClient::generateClientDiagnostics()
+{
+    Command_ClientDiagnostics diag;
+
+    diag.set_clientver(VERSION_STRING);
+
+#if defined(Q_OS_WIN)
+    diag.set_os("windows");
+#elif defined(Q_OS_MAC)
+    diag.set_os("macos");
+#elif defined(Q_OS_LINUX)
+    diag.set_os("linux");
+#else
+    diag.set_os("unknown");
+#endif
+
+    diag.set_arch(QSysInfo::currentCpuArchitecture().toStdString());
+
+    return diag;
+}
+
+void RemoteClient::addDiagnosticsFeature(Command_ClientDiagnostics *diag, const QString &name, const QString &value)
+{
+    FeatureFlag *flag = diag->add_feature_flags();
+    flag->set_name(name.toStdString());
+    flag->set_value(value.toStdString());
+}
+
 void RemoteClient::loginResponse(const Response &response)
 {
     const Response_Login &resp = response.GetExtension(Response_Login::ext);
@@ -302,6 +330,15 @@ void RemoteClient::loginResponse(const Response &response)
             ignoreList.append(resp.ignore_list(i));
         emit ignoreListReceived(ignoreList);
 
+        // send diagnostics if enabled
+        SendDiagnosticsMode mode = SendDiagnosticsMode(networkSettingsProvider->getSendDiagnostics());
+
+        if (mode == SendDiagnosticsUnprompted) {
+            emit notifyUserAboutDiagnostics();
+        } else if (mode == SendDiagnosticsBasic || mode == SendDiagnosticsFull) {
+            sendDiagnostics();
+        }
+
         if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
             networkSettingsProvider->getNotifyAboutUpdates()) {
             networkSettingsProvider->setKnownMissingFeatures(possibleMissingFeatures);
@@ -318,6 +355,13 @@ void RemoteClient::loginResponse(const Response &response)
                         static_cast<quint32>(resp.denied_end_time()), missingFeatures);
         setStatus(StatusDisconnecting);
     }
+}
+
+void RemoteClient::sendDiagnostics()
+{
+    Command_ClientDiagnostics diag = generateClientDiagnostics();
+    PendingCommand *pend = prepareSessionCommand(diag);
+    sendCommand(pend);
 }
 
 void RemoteClient::registerResponse(const Response &response)

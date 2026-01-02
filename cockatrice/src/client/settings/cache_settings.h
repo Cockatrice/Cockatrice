@@ -218,6 +218,7 @@ private:
     int cardUpdateCheckInterval;
     QDate lastCardUpdateCheck;
     bool notifyAboutUpdates;
+    int sendDiagnostics;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
     QList<int> seenTips;
@@ -497,6 +498,10 @@ public:
     [[nodiscard]] bool getNotifyAboutUpdates() const override
     {
         return notifyAboutUpdates;
+    }
+    [[nodiscard]] int getSendDiagnostics() const override
+    {
+        return sendDiagnostics;
     }
     [[nodiscard]] bool getNotifyAboutNewVersion() const
     {
@@ -1105,6 +1110,7 @@ public slots:
     void setCardUpdateCheckInterval(int value);
     void setLastCardUpdateCheck(QDate value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
+    void setSendDiagnostics(int _sendDiagnostics);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);

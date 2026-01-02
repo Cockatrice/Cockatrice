@@ -81,6 +81,7 @@ private slots:
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void notifyUserAboutUpdate();
+    void notifyUserAboutDiagnostics();
     void actDisconnect();
     void actSinglePlayer();
     void actWatchReplay();
