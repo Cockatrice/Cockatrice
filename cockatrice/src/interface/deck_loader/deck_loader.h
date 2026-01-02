@@ -91,7 +91,7 @@ public:
     saveToFile(const DeckList &deck, const QString &fileName, DeckFileFormat::Format fmt);
 
     /**
-     * @brief Saves a LoadedDeck a local file.
+     * @brief Saves a LoadedDeck to a local file.
      * Uses the lastLoadInfo in the LoadedDeck to determine where to save to.
      * @param deck The LoadedDeck to save. Should have valid lastLoadInfo.
      * @return Whether the save succeeded.
@@ -123,8 +123,8 @@ public:
     static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
     /**
-     * Converts the given deck's file to the cockatrice file format, using the lastLoadInfo to determine the current
-     * file format and where to write to.
+     * Converts the given deck's file to the cockatrice file format.
+     * Uses the lastLoadInfo in the LoadedDeck to determine the current name of the file and where to save to.
      * @param deck The deck to convert. Should have valid lastLoadInfo. Will update the lastLoadInfo.
      * @return Whether the conversion succeeded.
      */
