@@ -28,7 +28,10 @@ void DeckListStatisticsAnalyzer::analyze()
         }
 
         const int amount = node->getNumber();
-        QStringList copiesOfName = QStringList(amount).fill(info->getName());
+        QStringList copiesOfName;
+        for (int i = 0; i < amount; i++) {
+            copiesOfName.append(node->getName());
+        }
 
         // Convert once
         const int cmc = info->getCmc().toInt();
