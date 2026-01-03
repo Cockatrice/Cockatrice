@@ -29,7 +29,7 @@ public:
     [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
-        return tr("EDHRec: ") + cardName;
+        return tr("EDHRec") + ": ") + cardName;
     }
 
     CardSizeWidget *getCardSizeSlider() const
