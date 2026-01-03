@@ -18,6 +18,7 @@ function thin() {
 }
 export -f thin  # export to allow use in xargs
 export arch
+set -eo pipefail
 
 echo "::group::Thinning Qt libraries to $arch using $nproc cores"
 find "$GITHUB_WORKSPACE/Qt" -type f -print0 | xargs -0 -n1 -P"$nproc" -I{} bash -c "thin '{}'"
