@@ -28,9 +28,10 @@ void DeckListStatisticsAnalyzer::analyze()
         }
 
         const int amount = node->getNumber();
-        const int cmc = info->getCmc().toInt();
+        QStringList copiesOfName = QStringList(amount).fill(info->getName());
 
         // Convert once
+        const int cmc = info->getCmc().toInt();
         QStringList types = info->getMainCardType().split(' ');
         QStringList subtypes = info->getCardType().split('-').last().split(" ");
         QString colors = info->getColors();
@@ -46,26 +47,26 @@ void DeckListStatisticsAnalyzer::analyze()
         // per-type curve
         for (auto &t : types) {
             manaCurveByType[t][cmc] += amount;
-            manaCurveCardsByType[t][cmc] << QStringList(amount, info->getName());
+            manaCurveCardsByType[t][cmc] << copiesOfName;
         }
 
         // Per-subtype curve
         for (auto &st : subtypes) {
             manaCurveBySubtype[st][cmc] += amount;
-            manaCurveCardsBySubtype[st][cmc] << QStringList(amount, info->getName());
+            manaCurveCardsBySubtype[st][cmc] << copiesOfName;
         }
 
         // per-color curve
         for (auto &c : colors) {
             manaCurveByColor[c][cmc] += amount;
-            manaCurveCardsByColor[c][cmc] << QStringList(amount, info->getName());
+            manaCurveCardsByColor[c][cmc] << copiesOfName;
         }
 
         // Power/toughness
         manaCurveByPower[QString::number(power)][cmc] += amount;
-        manaCurveCardsByPower[QString::number(power)][cmc] << QStringList(amount, info->getName());
+        manaCurveCardsByPower[QString::number(power)][cmc] << copiesOfName;
         manaCurveByToughness[QString::number(toughness)][cmc] += amount;
-        manaCurveCardsByToughness[QString::number(toughness)][cmc] << QStringList(amount, info->getName());
+        manaCurveCardsByToughness[QString::number(toughness)][cmc] << copiesOfName;
 
         // ========== Category Counts ===========
         for (auto &t : types) {
