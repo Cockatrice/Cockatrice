@@ -81,13 +81,30 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     }
 }
 
+static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
+{
+    QList<ExactCard> cards;
+    for (auto node : nodes) {
+        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        if (card) {
+            for (int k = 0; k < node->getNumber(); ++k) {
+                cards.append(card);
+            }
+        } else {
+            qDebug() << "Card not found in database!";
+        }
+    }
+
+    return cards;
+}
+
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
     QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
 
-    QList<ExactCard> mainDeckCards = deckListModel->getCardsForZone(DECK_ZONE_MAIN);
+    QList<ExactCard> mainDeckCards = cardNodesToExactCards(deckListModel->getCardNodesForZone(DECK_ZONE_MAIN));
 
     if (mainDeckCards.isEmpty())
         return randomCards;

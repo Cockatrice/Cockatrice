@@ -608,35 +608,6 @@ void DeckListModel::forEachCard(const std::function<void(InnerDecklistNode *, De
     deckList->forEachCard(func);
 }
 
-static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
-{
-    QList<ExactCard> cards;
-    for (auto node : nodes) {
-        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
-        if (card) {
-            for (int k = 0; k < node->getNumber(); ++k) {
-                cards.append(card);
-            }
-        } else {
-            qDebug() << "Card not found in database!";
-        }
-    }
-
-    return cards;
-}
-
-QList<ExactCard> DeckListModel::getCards() const
-{
-    auto nodes = deckList->getCardNodes();
-    return cardNodesToExactCards(nodes);
-}
-
-QList<ExactCard> DeckListModel::getCardsForZone(const QString &zoneName) const
-{
-    auto nodes = deckList->getCardNodes({zoneName});
-    return cardNodesToExactCards(nodes);
-}
-
 QList<const DecklistCardNode *> DeckListModel::getCardNodes() const
 {
     return deckList->getCardNodes();

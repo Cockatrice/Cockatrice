@@ -19,82 +19,87 @@ void DeckListStatisticsAnalyzer::analyze()
 {
     clearData();
 
-    QList<ExactCard> cards = model->getCards();
+    QList<const DecklistCardNode *> nodes = model->getCardNodes();
 
-    for (auto card : cards) {
-        auto info = card.getInfo();
-        const int cmc = info.getCmc().toInt();
+    for (auto node : nodes) {
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
+        if (!info) {
+            continue;
+        }
+
+        const int amount = node->getNumber();
+        const int cmc = info->getCmc().toInt();
 
         // Convert once
-        QStringList types = info.getMainCardType().split(' ');
-        QStringList subtypes = info.getCardType().split('-').last().split(" ");
-        QString colors = info.getColors();
-        int power = info.getPowTough().split("/").first().toInt();
-        int toughness = info.getPowTough().split("/").last().toInt();
+        QStringList types = info->getMainCardType().split(' ');
+        QStringList subtypes = info->getCardType().split('-').last().split(" ");
+        QString colors = info->getColors();
+        int power = info->getPowTough().split("/").first().toInt();
+        int toughness = info->getPowTough().split("/").last().toInt();
 
         // For each copy of card
         // ---------------- Mana Curve ----------------
         if (config.computeManaCurve) {
-            manaCurveMap[cmc]++;
+            manaCurveMap[cmc] += amount;
         }
 
         // per-type curve
         for (auto &t : types) {
-            manaCurveByType[t][cmc]++;
-            manaCurveCardsByType[t][cmc].append(info.getName());
+            manaCurveByType[t][cmc] += amount;
+            manaCurveCardsByType[t][cmc] << QStringList(amount, info->getName());
         }
 
         // Per-subtype curve
         for (auto &st : subtypes) {
-            manaCurveBySubtype[st][cmc]++;
-            manaCurveCardsBySubtype[st][cmc].append(info.getName());
+            manaCurveBySubtype[st][cmc] += amount;
+            manaCurveCardsBySubtype[st][cmc] << QStringList(amount, info->getName());
         }
 
         // per-color curve
         for (auto &c : colors) {
-            manaCurveByColor[c][cmc]++;
-            manaCurveCardsByColor[c][cmc].append(info.getName());
+            manaCurveByColor[c][cmc] += amount;
+            manaCurveCardsByColor[c][cmc] << QStringList(amount, info->getName());
         }
 
         // Power/toughness
-        manaCurveByPower[QString::number(power)][cmc]++;
-        manaCurveCardsByPower[QString::number(power)][cmc].append(info.getName());
-        manaCurveByToughness[QString::number(toughness)][cmc]++;
-        manaCurveCardsByToughness[QString::number(toughness)][cmc].append(info.getName());
+        manaCurveByPower[QString::number(power)][cmc] += amount;
+        manaCurveCardsByPower[QString::number(power)][cmc] << QStringList(amount, info->getName());
+        manaCurveByToughness[QString::number(toughness)][cmc] += amount;
+        manaCurveCardsByToughness[QString::number(toughness)][cmc] << QStringList(amount, info->getName());
 
         // ========== Category Counts ===========
         for (auto &t : types) {
-            typeCount[t]++;
+            typeCount[t] += amount;
         }
         for (auto &st : subtypes) {
-            subtypeCount[st]++;
+            subtypeCount[st] += amount;
         }
         for (auto &c : colors) {
-            colorCount[c]++;
+            colorCount[c] += amount;
         }
-        manaValueCount[cmc]++;
+        manaValueCount[cmc] += amount;
 
         // ---------------- Mana Base ----------------
         if (config.computeManaBase) {
-            auto prod = determineManaProduction(info.getText());
+            auto prod = determineManaProduction(info->getText());
             for (auto it = prod.begin(); it != prod.end(); ++it) {
                 if (it.value() > 0) {
-                    productionPipCount[it.key()] += it.value();
-                    productionCardCount[it.key()]++;
+                    productionPipCount[it.key()] += it.value() * amount;
+                    productionCardCount[it.key()] += amount;
                 }
-                manaBaseMap[it.key()] += it.value();
+                manaBaseMap[it.key()] += it.value() * amount;
             }
         }
 
         // ---------------- Devotion ----------------
         if (config.computeDevotion) {
-            auto devo = countManaSymbols(info.getManaCost());
+            auto devo = countManaSymbols(info->getManaCost());
             for (auto &d : devo) {
                 if (d.second > 0) {
-                    devotionPipCount[QString(d.first)] += d.second;
-                    devotionCardCount[QString(d.first)]++;
+                    devotionPipCount[QString(d.first)] += d.second * amount;
+                    devotionCardCount[QString(d.first)] += amount;
                 }
-                manaDevotionMap[d.first] += d.second;
+                manaDevotionMap[d.first] += d.second * amount;
             }
         }
     }
