@@ -44,6 +44,7 @@ public slots:
 
 private slots:
     void printingsInDeckChanged();
+    void updateCardAmounts();
 
 signals:
     /**
@@ -54,6 +55,12 @@ signals:
      * Requests the next card in the list
      */
     void nextCardRequested();
+
+    /**
+     * The amounts of the printings in the deck has changed
+     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard) in the deck
+     */
+    void cardAmountsChanged(const QMap<QString, QPair<int, int>> &uuidToAmounts);
 
 private:
     QVBoxLayout *layout;

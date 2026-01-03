@@ -78,6 +78,7 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     // Connect deck model data change signal to update display
     connect(deckStateManager, &DeckStateManager::uniqueCardsChanged, this, &PrintingSelector::printingsInDeckChanged);
+    connect(deckStateManager, &DeckStateManager::cardModified, this, &PrintingSelector::updateCardAmounts);
 
     retranslateUi();
 }
@@ -91,6 +92,36 @@ void PrintingSelector::printingsInDeckChanged()
 {
     // Delay the update to avoid race conditions
     QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+}
+
+/**
+ * @return A map of uuid to amounts (main, side).
+ */
+static QMap<QString, QPair<int, int>> tallyUuidCounts(const DeckListModel *model, const QString &cardName)
+{
+    QMap<QString, QPair<int, int>> map;
+
+    auto mainNodes = model->getCardNodesForZone(DECK_ZONE_MAIN);
+    for (auto &node : mainNodes) {
+        if (node->getName() == cardName) {
+            map[node->getCardProviderId()].first += node->getNumber();
+        }
+    }
+
+    auto sideNodes = model->getCardNodesForZone(DECK_ZONE_SIDE);
+    for (auto &node : sideNodes) {
+        if (node->getName() == cardName) {
+            map[node->getCardProviderId()].second += node->getNumber();
+        }
+    }
+
+    return map;
+}
+
+void PrintingSelector::updateCardAmounts()
+{
+    auto map = tallyUuidCounts(deckStateManager->getModel(), selectedCard->getName());
+    emit cardAmountsChanged(map);
 }
 
 /**
@@ -156,6 +187,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
     }
     printingsToUse = sortToolBar->prependPinnedPrintings(printingsToUse, selectedCard->getName());
 
+    auto uuidToAmounts = tallyUuidCounts(deckStateManager->getModel(), selectedCard->getName());
+
     // Defer widget creation
     currentIndex = 0;
 
@@ -166,8 +199,11 @@ void PrintingSelector::getAllSetsForCurrentCard()
                                                                             cardSizeWidget->getSlider(), card);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();
+            cardDisplayWidget->updateCardAmounts(uuidToAmounts);
             connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
                     &PrintingSelector::updateDisplay);
+            connect(this, &PrintingSelector::cardAmountsChanged, cardDisplayWidget,
+                    &PrintingSelectorCardDisplayWidget::updateCardAmounts);
         }
 
         // Stop timer when done

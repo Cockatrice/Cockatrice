@@ -27,7 +27,7 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
                                                                      DeckStateManager *deckStateManager,
                                                                      QSlider *cardSizeSlider,
                                                                      const ExactCard &rootCard)
-    : QWidget(parent)
+    : QWidget(parent), rootCard(rootCard)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -63,4 +63,10 @@ void PrintingSelectorCardDisplayWidget::clampSetNameToPicture()
         setNameAndCollectorsNumberDisplayWidget->setMaximumWidth(overlayWidget->width());
     }
     update();
+}
+
+void PrintingSelectorCardDisplayWidget::updateCardAmounts(const QMap<QString, QPair<int, int>> &uuidToAmounts)
+{
+    auto [main, side] = uuidToAmounts.value(rootCard.getPrinting().getUuid());
+    overlayWidget->updateCardAmounts(main, side);
 }
