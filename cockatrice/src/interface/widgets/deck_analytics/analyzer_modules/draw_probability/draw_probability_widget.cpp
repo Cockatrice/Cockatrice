@@ -168,7 +168,7 @@ void DrawProbabilityWidget::updateFilterOptions()
     QMap<QString, int> categoryCounts;
     int totalDeckCards = 0;
 
-    const auto nodes = analyzer->getModel()->getDeckList()->getCardNodes();
+    const auto nodes = analyzer->getModel()->getCardNodes();
     for (auto *node : nodes) {
         CardInfoPtr info = CardDatabaseManager::query()->getCard({node->getName()}).getCardPtr();
         if (!info) {
