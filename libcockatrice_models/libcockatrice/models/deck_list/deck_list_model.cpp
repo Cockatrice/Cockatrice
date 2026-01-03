@@ -599,6 +599,7 @@ void DeckListModel::setDeckList(const QSharedPointer<DeckList> &_deck)
         deckList = _deck;
     }
     rebuildTree();
+    refreshCardFormatLegalities();
     emit deckReplaced();
 }
 

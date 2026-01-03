@@ -85,6 +85,9 @@ public slots:
     void actDrawCards();
     void actUndoDraw();
     void actMulligan();
+    void actMulliganSameSize();
+    void actMulliganMinusOne();
+    void doMulligan(int number);
 
     void actPlay();
     void actPlayFacedown();

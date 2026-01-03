@@ -51,7 +51,6 @@ public slots:
     void selectNextCard();
     void updateBannerCardComboBox();
     void syncDisplayWidgetsToModel();
-    void sortDeckModelToDeckView();
     void actAddCard(const ExactCard &card, const QString &zoneName);
     void actIncrementSelection();
     void actDecrementCard(const ExactCard &card, QString zoneName);
@@ -91,7 +90,7 @@ private:
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
     DeckListModel *getModel() const;
-    [[nodiscard]] QModelIndexList getSelectedCardNodes() const;
+    [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
 private slots:
@@ -100,6 +99,7 @@ private slots:
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex);
     void updateHash();
     void refreshShortcuts();
