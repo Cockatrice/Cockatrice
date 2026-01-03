@@ -236,10 +236,7 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
     for (auto node : nodes) {
         CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
         if (info) {
-            QString property = info->getProperty(activeGroupCriteria);
-            for (int i = 0; i < node->getNumber(); i++) {
-                groupCriteriaValues.append(property);
-            }
+            groupCriteriaValues.append(info->getProperty(activeGroupCriteria));
         }
     }
 
