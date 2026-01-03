@@ -68,7 +68,10 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
 
     model = new DeckListModel(this);
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
-    model->getDeckList()->loadFromStream_Plain(deckStream, false);
+
+    auto decklist = QSharedPointer<DeckList>(new DeckList);
+    decklist->loadFromStream_Plain(deckStream, false);
+    model->setDeckList(decklist);
 
     model->forEachCard(CardNodeFunction::ResolveProviderId());
 

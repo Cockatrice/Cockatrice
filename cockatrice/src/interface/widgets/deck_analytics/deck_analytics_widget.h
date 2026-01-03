@@ -1,44 +1,71 @@
 /**
  * @file deck_analytics_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
- * @brief TODO: Document this.
+ * @brief Main analytics widget container with resizable panels for deck statistics.
  */
 
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
-#include "mana_base_widget.h"
-#include "mana_curve_widget.h"
-#include "mana_devotion_widget.h"
+#include "abstract_analytics_panel_widget.h"
+#include "deck_list_statistics_analyzer.h"
+#include "resizable_panel.h"
 
-#include <QHBoxLayout>
+#include <QJsonObject>
 #include <QScrollArea>
+#include <QVBoxLayout>
+#include <QVector>
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
+
+class LayoutInspector;
 
 class DeckAnalyticsWidget : public QWidget
 {
     Q_OBJECT
 
+public slots:
+    void updateDisplays();
+
 public:
-    explicit DeckAnalyticsWidget(QWidget *parent, DeckListModel *deckListModel);
-    void setDeckList(const DeckList &_deckListModel);
-    std::map<int, int> analyzeManaCurve();
-    void refreshDisplays();
+    explicit DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
+    void retranslateUi();
+
+private slots:
+    void onAddPanel();
+    void onRemoveSelected();
+    void onPanelDropped(ResizablePanel *dragged, ResizablePanel *target, bool insertBefore);
+    void saveLayout();
+    void loadLayout();
+    void addDefaultPanels();
+    bool loadLayoutInternal();
+    void clearPanels();
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void selectWrapper(ResizablePanel *panel);
+    int indexOfSelectedWrapper() const;
 
 private:
-    DeckListModel *deckListModel;
-    DeckListStatisticsAnalyzer *deckListStatisticsAnalyzer;
-    QVBoxLayout *mainLayout;
+    void addPanelInstance(const QString &typeId, AbstractAnalyticsPanelWidget *panel, const QJsonObject &cfg = {});
 
-    QWidget *container;
-    QVBoxLayout *containerLayout;
+    QVBoxLayout *layout;
+    QWidget *controlContainer;
+    QHBoxLayout *controlLayout;
+
+    QPushButton *addButton;
+    QPushButton *removeButton;
+    QPushButton *saveButton;
+    QPushButton *loadButton;
 
     QScrollArea *scrollArea;
+    QWidget *panelContainer;
+    QVBoxLayout *panelLayout;
 
-    ManaCurveWidget *manaCurveWidget;
-    ManaDevotionWidget *manaDevotionWidget;
-    ManaBaseWidget *manaBaseWidget;
+    QVector<ResizablePanel *> panelWrappers;
+    ResizablePanel *selectedWrapper = nullptr;
+
+    DeckListStatisticsAnalyzer *statsAnalyzer;
+    LayoutInspector *insp = nullptr;
 };
 
 #endif // DECK_ANALYTICS_WIDGET_H

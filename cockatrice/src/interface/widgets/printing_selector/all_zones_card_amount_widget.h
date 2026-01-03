@@ -18,9 +18,7 @@ class AllZonesCardAmountWidget : public QWidget
     Q_OBJECT
 public:
     explicit AllZonesCardAmountWidget(QWidget *parent,
-                                      AbstractTabDeckEditor *deckEditor,
-                                      DeckListModel *deckModel,
-                                      QTreeView *deckView,
+                                      DeckStateManager *deckStateManager,
                                       QSlider *cardSizeSlider,
                                       const ExactCard &rootCard);
     int getMainboardAmount();

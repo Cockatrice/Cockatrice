@@ -2,6 +2,7 @@
 
 #include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../deck_editor/deck_state_manager.h"
 #include "../interface/widgets/cards/card_info_picture_widget.h"
 #include "../interface/widgets/general/layout_containers/flow_widget.h"
 
@@ -21,7 +22,8 @@
 #include <qdrag.h>
 #include <qevent.h>
 
-DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckListModel *_model) : QDialog(parent), model(_model)
+DlgSelectSetForCards::DlgSelectSetForCards(QWidget *parent, DeckStateManager *deckStateManger)
+    : QDialog(parent), deckStateManager(deckStateManger)
 {
     setMinimumSize(500, 500);
     setAcceptDrops(true);
@@ -165,36 +167,39 @@ void DlgSelectSetForCards::actOK()
 
     if (modifiedSetsAndCardsMap.isEmpty()) {
         accept(); // Nothing to do
-    } else {
-        emit deckAboutToBeModified(tr("Bulk modified printings."));
+        return;
     }
 
-    for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
-        for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
-            swapPrinting(model, modifiedSet, card);
+    auto bulkModify = [&modifiedSetsAndCardsMap](DeckListModel *model) {
+        for (QString modifiedSet : modifiedSetsAndCardsMap.keys()) {
+            for (QString card : modifiedSetsAndCardsMap.value(modifiedSet)) {
+                swapPrinting(model, modifiedSet, card);
+            }
         }
-    }
+        return true;
+    };
 
-    if (!modifiedSetsAndCardsMap.isEmpty()) {
-        emit deckModified();
-    }
+    deckStateManager->modifyDeck(tr("Bulk modified printings."), bulkModify);
+
     accept();
 }
 
 void DlgSelectSetForCards::actClear()
 {
-    emit deckAboutToBeModified(tr("Cleared all printing information."));
-    model->forEachCard(CardNodeFunction::ClearPrintingData());
-    emit deckModified();
+    deckStateManager->modifyDeck(tr("Cleared all printing information."), [](auto model) {
+        model->forEachCard(CardNodeFunction::ClearPrintingData());
+        return true;
+    });
     accept();
 }
 
 void DlgSelectSetForCards::actSetAllToPreferred()
 {
-    emit deckAboutToBeModified(tr("Set all printings to preferred."));
-    model->forEachCard(CardNodeFunction::ClearPrintingData());
-    model->forEachCard(CardNodeFunction::SetProviderIdToPreferred());
-    emit deckModified();
+    deckStateManager->modifyDeck(tr("Set all printings to preferred."), [](auto model) {
+        model->forEachCard(CardNodeFunction::ClearPrintingData());
+        model->forEachCard(CardNodeFunction::SetProviderIdToPreferred());
+        return true;
+    });
     accept();
 }
 
@@ -227,10 +232,8 @@ void DlgSelectSetForCards::sortSetsByCount()
 QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
 {
     QMap<QString, int> setCounts;
-    if (!model)
-        return setCounts;
 
-    QList<QString> cardNames = model->getCardNames();
+    QList<QString> cardNames = deckStateManager->getModel()->getCardNames();
 
     for (auto cardName : cardNames) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
@@ -269,7 +272,7 @@ void DlgSelectSetForCards::updateCardLists()
         }
     }
 
-    QList<QString> cardNames = model->getCardNames();
+    QList<QString> cardNames = deckStateManager->getModel()->getCardNames();
 
     for (auto cardName : cardNames) {
         bool found = false;
@@ -351,10 +354,8 @@ void DlgSelectSetForCards::dropEvent(QDropEvent *event)
 QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
 {
     QMap<QString, QStringList> setCards;
-    if (!model)
-        return setCards;
 
-    QList<QString> cardNames = model->getCardNames();
+    QList<QString> cardNames = deckStateManager->getModel()->getCardNames();
 
     for (auto cardName : cardNames) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);

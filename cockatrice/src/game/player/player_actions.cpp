@@ -310,28 +310,48 @@ void PlayerActions::actMulligan()
 {
     int startSize = SettingsCache::instance().getStartingHandSize();
     int handSize = player->getHandZone()->getCards().size();
-    int deckSize = player->getDeckZone()->getCards().size() + handSize; // hand is shuffled back into the deck
+    int deckSize = player->getDeckZone()->getCards().size() + handSize;
+
     bool ok;
     int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Draw hand"),
                                       tr("Number of cards: (max. %1)").arg(deckSize) + '\n' +
                                           tr("0 and lower are in comparison to current hand size"),
                                       startSize, -handSize, deckSize, 1, &ok);
+
     if (!ok) {
         return;
     }
-    Command_Mulligan cmd;
+
     if (number < 1) {
-        if (handSize == 0) {
-            return;
-        }
-        cmd.set_number(handSize + number);
-    } else {
-        cmd.set_number(number);
+        number = handSize + number;
     }
+
+    doMulligan(number);
+    SettingsCache::instance().setStartingHandSize(number);
+}
+
+void PlayerActions::actMulliganSameSize()
+{
+    int handSize = player->getHandZone()->getCards().size();
+    doMulligan(handSize);
+}
+
+void PlayerActions::actMulliganMinusOne()
+{
+    int handSize = player->getHandZone()->getCards().size();
+    int targetSize = qMax(1, handSize - 1);
+    doMulligan(targetSize);
+}
+
+void PlayerActions::doMulligan(int number)
+{
+    if (number < 1) {
+        return;
+    }
+
+    Command_Mulligan cmd;
+    cmd.set_number(number);
     sendGameCommand(cmd);
-    if (startSize != number) {
-        SettingsCache::instance().setStartingHandSize(number);
-    }
 }
 
 void PlayerActions::actDrawCards()

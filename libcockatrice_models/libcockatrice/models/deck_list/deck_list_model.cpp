@@ -5,12 +5,13 @@
 DeckListModel::DeckListModel(QObject *parent)
     : QAbstractItemModel(parent), lastKnownColumn(1), lastKnownOrder(Qt::AscendingOrder)
 {
-    // This class will leak the decklist object. We cannot safely delete it in the dtor because the deckList field is a
-    // non-owning pointer and another deckList might have been assigned to it.
-    // `DeckListModel::cleanList` also leaks for the same reason.
-    // TODO: fix the leak
-    deckList = new DeckList;
+    deckList = QSharedPointer<DeckList>(new DeckList());
     root = new InnerDecklistNode;
+}
+
+DeckListModel::DeckListModel(QObject *parent, const QSharedPointer<DeckList> &deckList) : DeckListModel(parent)
+{
+    setDeckList(deckList);
 }
 
 DeckListModel::~DeckListModel()
@@ -18,13 +19,19 @@ DeckListModel::~DeckListModel()
     delete root;
 }
 
-QString DeckListModel::getGroupCriteriaForCard(CardInfoPtr info) const
+/**
+ * @brief Extract the value from the card that is used for the group criteria.
+ * @param info Pointer to card information.
+ * @param criteria The group criteria
+ * @return String representing the value of the criteria.
+ */
+static QString extractGroupCriteriaValue(const CardInfoPtr &info, DeckListModelGroupCriteria::Type criteria)
 {
     if (!info) {
         return "unknown";
     }
 
-    switch (activeGroupCriteria) {
+    switch (criteria) {
         case DeckListModelGroupCriteria::MAIN_TYPE:
             return info->getMainCardType();
         case DeckListModelGroupCriteria::MANA_COST:
@@ -56,7 +63,7 @@ void DeckListModel::rebuildTree()
             }
 
             CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
-            QString groupCriteria = getGroupCriteriaForCard(info);
+            QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
 
             auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
 
@@ -353,7 +360,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
         return nullptr;
     }
 
-    QString groupCriteria = getGroupCriteriaForCard(info);
+    QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
     InnerDecklistNode *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria));
     if (!groupNode) {
         return nullptr;
@@ -406,7 +413,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     CardInfoPtr cardInfo = card.getCardPtr();
     PrintingInfo printingInfo = card.getPrinting();
 
-    QString groupCriteria = getGroupCriteriaForCard(cardInfo);
+    QString groupCriteria = extractGroupCriteriaValue(cardInfo, activeGroupCriteria);
     InnerDecklistNode *groupNode = createNodeIfNeeded(groupCriteria, zoneNode);
 
     const QModelIndex parentIndex = nodeToIndex(groupNode);
@@ -420,7 +427,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
 
         auto *decklistCard =
             deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName, printingInfo.getProperty("num"),
-                              printingInfo.getProperty("uuid"), isCardLegalForCurrentFormat(cardInfo));
+                              printingInfo.getProperty("uuid"), cardInfo->isLegalInFormat(deckList->getGameFormat()));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, groupNode, insertRow);
@@ -472,7 +479,7 @@ bool DeckListModel::offsetCountAtIndex(const QModelIndex &idx, int offset)
     return true;
 }
 
-int DeckListModel::findSortedInsertRow(InnerDecklistNode *parent, CardInfoPtr cardInfo) const
+int DeckListModel::findSortedInsertRow(const InnerDecklistNode *parent, const CardInfoPtr &cardInfo) const
 {
     if (!cardInfo) {
         return parent->size(); // fallback: append at end
@@ -580,18 +587,19 @@ void DeckListModel::setActiveFormat(const QString &_format)
 
 void DeckListModel::cleanList()
 {
-    setDeckList(new DeckList);
+    setDeckList(QSharedPointer<DeckList>(new DeckList()));
 }
 
 /**
  * @param _deck The deck.
  */
-void DeckListModel::setDeckList(DeckList *_deck)
+void DeckListModel::setDeckList(const QSharedPointer<DeckList> &_deck)
 {
     if (deckList != _deck) {
         deckList = _deck;
     }
     rebuildTree();
+    refreshCardFormatLegalities();
     emit deckReplaced();
 }
 
@@ -661,18 +669,6 @@ QList<QString> DeckListModel::getZones() const
     return zones;
 }
 
-bool DeckListModel::isCardLegalForCurrentFormat(const CardInfoPtr cardInfo)
-{
-    if (!deckList->getGameFormat().isEmpty()) {
-        if (cardInfo->getProperties().contains("format-" + deckList->getGameFormat())) {
-            QString formatLegality = cardInfo->getProperty("format-" + deckList->getGameFormat());
-            return formatLegality == "legal" || formatLegality == "restricted";
-        }
-        return false;
-    }
-    return true;
-}
-
 static int maxAllowedForLegality(const FormatRules &format, const QString &legality)
 {
     for (const AllowedCount &c : format.allowedCounts) {
@@ -683,25 +679,29 @@ static int maxAllowedForLegality(const FormatRules &format, const QString &legal
     return -1; // unknown legality → treat as illegal
 }
 
-bool DeckListModel::isCardQuantityLegalForCurrentFormat(const CardInfoPtr cardInfo, int quantity)
+static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &cardInfo, int quantity)
 {
-    auto formatRules = CardDatabaseManager::query()->getFormat(deckList->getGameFormat());
+    if (format.isEmpty()) {
+        return true;
+    }
+
+    auto formatRules = CardDatabaseManager::query()->getFormat(format);
 
     if (!formatRules) {
         return true;
     }
 
     // Exceptions always win
-    if (cardHasAnyException(*cardInfo, *formatRules)) {
+    if (cardHasAnyException(cardInfo, *formatRules)) {
         return true;
     }
 
-    const QString legalityProp = "format-" + deckList->getGameFormat();
-    if (!cardInfo->getProperties().contains(legalityProp)) {
+    const QString legalityProp = "format-" + format;
+    if (!cardInfo.getProperties().contains(legalityProp)) {
         return false;
     }
 
-    const QString legality = cardInfo->getProperty(legalityProp);
+    const QString legality = cardInfo.getProperty(legalityProp);
 
     int maxAllowed = maxAllowedForLegality(*formatRules, legality);
 
@@ -735,10 +735,11 @@ void DeckListModel::refreshCardFormatLegalities()
                 continue;
             }
 
-            bool legal = isCardLegalForCurrentFormat(exactCard.getCardPtr());
+            QString format = deckList->getGameFormat();
+            bool legal = exactCard.getInfo().isLegalInFormat(format);
 
             if (legal) {
-                legal = isCardQuantityLegalForCurrentFormat(exactCard.getCardPtr(), currentCard->getNumber());
+                legal = isCardQuantityLegalForFormat(format, exactCard.getInfo(), currentCard->getNumber());
             }
 
             currentCard->setFormatLegality(legal);

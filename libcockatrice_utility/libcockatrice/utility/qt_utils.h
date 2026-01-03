@@ -15,6 +15,20 @@ template <typename T> T *findParentOfType(const QObject *obj)
     }
     return nullptr;
 }
+
+static inline void clearLayoutRec(QLayout *l)
+{
+    if (!l)
+        return;
+    QLayoutItem *it;
+    while ((it = l->takeAt(0)) != nullptr) {
+        if (QWidget *w = it->widget())
+            w->deleteLater();
+        if (QLayout *sub = it->layout())
+            clearLayoutRec(sub);
+        delete it;
+    }
+}
 } // namespace QtUtils
 
 #endif // COCKATRICE_QT_UTILS_H

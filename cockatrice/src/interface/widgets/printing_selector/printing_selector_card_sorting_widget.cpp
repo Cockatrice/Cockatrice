@@ -183,7 +183,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPinnedPrintings(co
  */
 QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(const QList<PrintingInfo> &printings,
                                                                               const CardInfoPtr &selectedCard,
-                                                                              DeckListModel *deckModel)
+                                                                              const DeckListModel *deckModel)
 {
     if (!selectedCard) {
         return {};

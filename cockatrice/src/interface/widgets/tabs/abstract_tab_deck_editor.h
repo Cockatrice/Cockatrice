@@ -19,6 +19,7 @@
 
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 
+class DeckStateManager;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
@@ -117,30 +118,13 @@ public:
      */
     void openDeck(const LoadedDeck &deck);
 
-    /** @brief Returns the currently active deck loader. */
-    DeckLoader *getDeckLoader() const;
-
-    /** @brief Returns the currently active deck list. */
-    const DeckList &getDeckList() const;
-
-    /** @brief Sets the modified state of the tab.
-     *  @param _windowModified Whether the tab is modified.
-     */
-    void setModified(bool _windowModified);
-
     DeckEditorDeckDockWidget *getDeckDockWidget() const
     {
         return deckDockWidget;
     }
 
-    DeckListHistoryManager *getHistoryManager() const
-    {
-        return historyManager;
-    }
-
-    DeckListHistoryManager *historyManager;
-
     // UI Elements
+    DeckStateManager *deckStateManager;
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
     DeckEditorDatabaseDisplayWidget *databaseDisplayDockWidget;       ///< Database dock
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;                 ///< Card info dock
@@ -154,14 +138,6 @@ public slots:
 
     /** @brief Called when the deck is modified. */
     virtual void onDeckModified();
-
-    /** @brief Called when a widget is about to modify the state of the DeckList.
-     *  @param modificationReason The reason for the state modification
-     */
-    virtual void onDeckHistorySaveRequested(const QString &modificationReason);
-
-    /** @brief Called when a widget would like to clear the history. */
-    virtual void onDeckHistoryClearRequested();
 
     /** @brief Updates the card info panel.
      *  @param card The card to display.
@@ -201,9 +177,6 @@ signals:
 
     /** @brief Emitted before the tab is closed. */
     void deckEditorClosing(AbstractTabDeckEditor *tab);
-
-    /** @brief Emitted when a card should be decremented. */
-    void decrementCard(const ExactCard &card, QString zoneName);
 
 protected slots:
     /** @brief Starts a new deck in this tab. */
@@ -315,9 +288,6 @@ protected:
      */
     QMessageBox *createSaveConfirmationWindow();
 
-    /** @brief Returns true if the tab is a blank newly created deck. */
-    bool isBlankNewDeck() const;
-
     /** @brief Helper function to add a card to a specific deck zone. */
     void addCardHelper(const ExactCard &card, const QString &zoneName);
 
@@ -330,8 +300,6 @@ protected:
     QAction *aResetLayout;
     QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aDeckDockVisible, *aDeckDockFloating;
     QAction *aFilterDockVisible, *aFilterDockFloating, *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
-
-    bool modified = false; ///< Whether the deck/tab has unsaved changes
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H

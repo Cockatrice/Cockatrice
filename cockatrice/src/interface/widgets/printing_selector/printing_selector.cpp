@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../deck_editor/deck_state_manager.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
@@ -21,12 +22,9 @@
  *
  * @param parent The parent widget for the PrintingSelector.
  * @param deckEditor The TabDeckEditor instance used for managing the deck.
- * @param deckModel The DeckListModel instance that provides data for the deck's contents.
- * @param deckView The QTreeView instance used to display the deck and its contents.
  */
 PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
-    : QWidget(parent), deckEditor(_deckEditor), deckModel(deckEditor->deckDockWidget->deckModel),
-      deckView(deckEditor->deckDockWidget->deckView)
+    : QWidget(parent), deckEditor(_deckEditor), deckStateManager(_deckEditor->deckStateManager)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);
@@ -74,13 +72,12 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     layout->addWidget(flowWidget);
 
-    cardSelectionBar = new PrintingSelectorCardSelectionWidget(this);
+    cardSelectionBar = new PrintingSelectorCardSelectionWidget(this, deckStateManager);
     cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
     layout->addWidget(cardSelectionBar);
 
     // Connect deck model data change signal to update display
-    connect(deckModel, &DeckListModel::rowsInserted, this, &PrintingSelector::printingsInDeckChanged);
-    connect(deckModel, &DeckListModel::rowsRemoved, this, &PrintingSelector::printingsInDeckChanged);
+    connect(deckStateManager, &DeckStateManager::uniqueCardsChanged, this, &PrintingSelector::printingsInDeckChanged);
 
     retranslateUi();
 }
@@ -152,7 +149,8 @@ void PrintingSelector::getAllSetsForCurrentCard()
     QList<PrintingInfo> printingsToUse;
 
     if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
-        printingsToUse = sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckModel);
+        printingsToUse =
+            sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckStateManager->getModel());
     } else {
         printingsToUse = filteredPrintings;
     }
@@ -164,7 +162,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
     connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
         for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
             auto card = ExactCard(selectedCard, printingsToUse[currentIndex]);
-            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckModel, deckView,
+            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckStateManager,
                                                                             cardSizeWidget->getSlider(), card);
             flowWidget->addWidget(cardDisplayWidget);
             cardDisplayWidget->clampSetNameToPicture();

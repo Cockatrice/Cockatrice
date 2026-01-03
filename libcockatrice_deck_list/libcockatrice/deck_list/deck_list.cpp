@@ -21,61 +21,7 @@ uint qHash(const QRegularExpression &key, uint seed) noexcept
 }
 #endif
 
-SideboardPlan::SideboardPlan(const QString &_name, const QList<MoveCard_ToZone> &_moveList)
-    : name(_name), moveList(_moveList)
-{
-}
-
-void SideboardPlan::setMoveList(const QList<MoveCard_ToZone> &_moveList)
-{
-    moveList = _moveList;
-}
-
-bool SideboardPlan::readElement(QXmlStreamReader *xml)
-{
-    while (!xml->atEnd()) {
-        xml->readNext();
-        const QString childName = xml->name().toString();
-        if (xml->isStartElement()) {
-            if (childName == "name")
-                name = xml->readElementText();
-            else if (childName == "move_card_to_zone") {
-                MoveCard_ToZone m;
-                while (!xml->atEnd()) {
-                    xml->readNext();
-                    const QString childName2 = xml->name().toString();
-                    if (xml->isStartElement()) {
-                        if (childName2 == "card_name")
-                            m.set_card_name(xml->readElementText().toStdString());
-                        else if (childName2 == "start_zone")
-                            m.set_start_zone(xml->readElementText().toStdString());
-                        else if (childName2 == "target_zone")
-                            m.set_target_zone(xml->readElementText().toStdString());
-                    } else if (xml->isEndElement() && (childName2 == "move_card_to_zone")) {
-                        moveList.append(m);
-                        break;
-                    }
-                }
-            }
-        } else if (xml->isEndElement() && (childName == "sideboard_plan"))
-            return true;
-    }
-    return false;
-}
-
-void SideboardPlan::write(QXmlStreamWriter *xml)
-{
-    xml->writeStartElement("sideboard_plan");
-    xml->writeTextElement("name", name);
-    for (auto &i : moveList) {
-        xml->writeStartElement("move_card_to_zone");
-        xml->writeTextElement("card_name", QString::fromStdString(i.card_name()));
-        xml->writeTextElement("start_zone", QString::fromStdString(i.start_zone()));
-        xml->writeTextElement("target_zone", QString::fromStdString(i.target_zone()));
-        xml->writeEndElement();
-    }
-    xml->writeEndElement();
-}
+static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 
 bool DeckList::Metadata::isEmpty() const
 {
@@ -93,36 +39,23 @@ DeckList::DeckList(const QString &nativeString)
 
 DeckList::DeckList(const Metadata &metadata,
                    const DecklistNodeTree &tree,
-                   const QMap<QString, SideboardPlan *> &sideboardPlans)
+                   const QMap<QString, SideboardPlan> &sideboardPlans)
     : metadata(metadata), sideboardPlans(sideboardPlans), tree(tree)
 {
 }
 
-DeckList::~DeckList()
+QList<MoveCard_ToZone> DeckList::getCurrentSideboardPlan() const
 {
-    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
-    while (i.hasNext())
-        delete i.next().value();
-}
+    if (!sideboardPlans.contains(CURRENT_SIDEBOARD_PLAN_KEY)) {
+        return {};
+    }
 
-QList<MoveCard_ToZone> DeckList::getCurrentSideboardPlan()
-{
-    SideboardPlan *current = sideboardPlans.value(QString(), 0);
-    if (!current)
-        return QList<MoveCard_ToZone>();
-    else
-        return current->getMoveList();
+    return sideboardPlans.value(CURRENT_SIDEBOARD_PLAN_KEY).getMoveList();
 }
 
 void DeckList::setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan)
 {
-    SideboardPlan *current = sideboardPlans.value(QString(), 0);
-    if (!current) {
-        current = new SideboardPlan;
-        sideboardPlans.insert(QString(), current);
-    }
-
-    current->setMoveList(plan);
+    sideboardPlans[CURRENT_SIDEBOARD_PLAN_KEY].setMoveList(plan);
 }
 
 bool DeckList::readElement(QXmlStreamReader *xml)
@@ -151,11 +84,9 @@ bool DeckList::readElement(QXmlStreamReader *xml)
         } else if (childName == "zone") {
             tree.readZoneElement(xml);
         } else if (childName == "sideboard_plan") {
-            SideboardPlan *newSideboardPlan = new SideboardPlan;
-            if (newSideboardPlan->readElement(xml)) {
-                sideboardPlans.insert(newSideboardPlan->getName(), newSideboardPlan);
-            } else {
-                delete newSideboardPlan;
+            SideboardPlan newSideboardPlan;
+            if (newSideboardPlan.readElement(xml)) {
+                sideboardPlans.insert(newSideboardPlan.getName(), newSideboardPlan);
             }
         }
     } else if (xml->isEndElement() && (childName == "cockatrice_deck")) {
@@ -194,9 +125,8 @@ void DeckList::write(QXmlStreamWriter *xml) const
     tree.write(xml);
 
     // Write sideboard plans
-    QMapIterator<QString, SideboardPlan *> i(sideboardPlans);
-    while (i.hasNext()) {
-        i.next().value()->write(xml);
+    for (auto &sideboardPlan : sideboardPlans.values()) {
+        sideboardPlan.write(xml);
     }
 
     xml->writeEndElement(); // Close "cockatrice_deck"

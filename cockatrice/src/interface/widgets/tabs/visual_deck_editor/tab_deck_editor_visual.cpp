@@ -1,6 +1,7 @@
 #include "tab_deck_editor_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../deck_editor/deck_state_manager.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
@@ -61,7 +62,7 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckDockWidget->deckModel,
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(),
                                                     databaseDisplayDockWidget->databaseModel,
                                                     databaseDisplayDockWidget->databaseDisplayModel);
 
@@ -84,8 +85,8 @@ void TabDeckEditorVisual::onDeckChanged()
 {
     AbstractTabDeckEditor::onDeckModified();
     tabContainer->visualDeckView->constructZoneWidgetsFromDeckListModel();
-    tabContainer->deckAnalytics->refreshDisplays();
-    tabContainer->sampleHandWidget->setDeckModel(deckDockWidget->deckModel);
+    tabContainer->deckAnalytics->updateDisplays();
+    tabContainer->sampleHandWidget->setDeckModel(deckStateManager->getModel());
 }
 
 /** @brief Creates menus for deck editing and view options, including dock actions. */
@@ -149,8 +150,8 @@ void TabDeckEditorVisual::createMenus()
 /** @brief Returns the tab text, prepending a mark if the deck has unsaved changes. */
 QString TabDeckEditorVisual::getTabText() const
 {
-    QString result = tr("Visual Deck: %1").arg(deckDockWidget->getSimpleDeckName());
-    if (modified)
+    QString result = tr("Visual Deck: %1").arg(deckStateManager->getSimpleDeckName());
+    if (deckStateManager->isModified())
         result.prepend("* ");
     return result;
 }
@@ -166,9 +167,9 @@ void TabDeckEditorVisual::changeModelIndexAndCardInfo(const ExactCard &activeCar
 void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
 {
     QString cardName = activeCard.getName();
-    QModelIndex index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_MAIN);
+    QModelIndex index = deckStateManager->getModel()->findCard(cardName, DECK_ZONE_MAIN);
     if (!index.isValid()) {
-        index = deckDockWidget->deckModel->findCard(cardName, DECK_ZONE_SIDE);
+        index = deckStateManager->getModel()->findCard(cardName, DECK_ZONE_SIDE);
     }
     if (!deckDockWidget->getSelectionModel()->hasSelection()) {
         deckDockWidget->getSelectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
@@ -182,7 +183,7 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
     auto card = instance->getCard();
 
     // Get the model index for the card
-    QModelIndex idx = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
+    QModelIndex idx = deckStateManager->getModel()->findCard(card.getName(), zoneName);
     if (!idx.isValid()) {
         return;
     }
@@ -191,8 +192,8 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 
     // Double click = swap
     if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton) {
-        deckDockWidget->actSwapCard(card, zoneName);
-        idx = deckDockWidget->deckModel->findCard(card.getName(), zoneName);
+        deckStateManager->swapCardAtIndex(idx);
+        idx = deckStateManager->getModel()->findCard(card.getName(), zoneName);
         sel->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
         return;
     }

@@ -1,10 +1,11 @@
 #include "deck_list_history_manager_widget.h"
 
-DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckListModel,
+#include "deck_state_manager.h"
+
+DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_deckStateManager,
                                                            DeckListStyleProxy *_styleProxy,
-                                                           DeckListHistoryManager *manager,
                                                            QWidget *parent)
-    : QWidget(parent), deckListModel(_deckListModel), styleProxy(_styleProxy), historyManager(manager)
+    : QWidget(parent), deckStateManager(_deckStateManager), styleProxy(_styleProxy)
 {
     layout = new QHBoxLayout(this);
 
@@ -43,8 +44,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckListModel *_deckL
 
     connect(historyList, &QListWidget::itemClicked, this, &DeckListHistoryManagerWidget::onListClicked);
 
-    connect(historyManager, &DeckListHistoryManager::undoRedoStateChanged, this,
-            &DeckListHistoryManagerWidget::refreshList);
+    connect(deckStateManager, &DeckStateManager::historyChanged, this, &DeckListHistoryManagerWidget::refreshList);
 
     refreshList();
     retranslateUi();
@@ -58,14 +58,11 @@ void DeckListHistoryManagerWidget::retranslateUi()
     historyLabel->setText(tr("Click on an entry to revert to that point in the history."));
 }
 
-void DeckListHistoryManagerWidget::setDeckListModel(DeckListModel *_deckListModel)
-{
-    deckListModel = _deckListModel;
-}
-
 void DeckListHistoryManagerWidget::refreshList()
 {
     historyList->clear();
+
+    DeckListHistoryManager *historyManager = deckStateManager->getHistoryManager();
 
     // Fill redo section first (oldest redo at top, newest redo closest to divider)
     const auto redoStack = historyManager->getRedoStack();
@@ -98,36 +95,7 @@ void DeckListHistoryManagerWidget::refreshList()
     redoButton->setEnabled(historyManager->canRedo());
 }
 
-void DeckListHistoryManagerWidget::doUndo()
-{
-    if (!historyManager->canUndo()) {
-        return;
-    }
-
-    historyManager->undo(deckListModel->getDeckList());
-    deckListModel->rebuildTree();
-    emit deckListModel->layoutChanged();
-    emit requestDisplayWidgetSync();
-
-    refreshList();
-}
-
-void DeckListHistoryManagerWidget::doRedo()
-{
-    if (!historyManager->canRedo()) {
-        return;
-    }
-
-    historyManager->redo(deckListModel->getDeckList());
-    deckListModel->rebuildTree();
-
-    emit deckListModel->layoutChanged();
-    emit requestDisplayWidgetSync();
-
-    refreshList();
-}
-
-void DeckListHistoryManagerWidget::onListClicked(QListWidgetItem *item)
+void DeckListHistoryManagerWidget::onListClicked(const QListWidgetItem *item)
 {
     // Ignore non-selectable items (like divider)
     if (!(item->flags() & Qt::ItemIsSelectable)) {
@@ -138,23 +106,24 @@ void DeckListHistoryManagerWidget::onListClicked(QListWidgetItem *item)
     int index = item->data(Qt::UserRole + 1).toInt();
 
     if (mode == "redo") {
-        const auto redoStack = historyManager->getRedoStack();
+        const auto redoStack = deckStateManager->getHistoryManager()->getRedoStack();
         int steps = redoStack.size() - index;
-        for (int i = 0; i < steps; ++i) {
-            historyManager->redo(deckListModel->getDeckList());
-        }
+        deckStateManager->redo(steps);
     } else if (mode == "undo") {
-        const auto undoStack = historyManager->getUndoStack();
-        int steps = undoStack.size() - 1 - index;
-        for (int i = 0; i < steps + 1; ++i) {
-            historyManager->undo(deckListModel->getDeckList());
-        }
+        const auto undoStack = deckStateManager->getHistoryManager()->getUndoStack();
+        int steps = undoStack.size() - index;
+        deckStateManager->undo(steps);
     }
 
-    deckListModel->rebuildTree();
-
-    emit deckListModel->layoutChanged();
-    emit requestDisplayWidgetSync();
-
     refreshList();
+}
+
+void DeckListHistoryManagerWidget::doUndo()
+{
+    deckStateManager->undo();
+}
+
+void DeckListHistoryManagerWidget::doRedo()
+{
+    deckStateManager->redo();
 }
