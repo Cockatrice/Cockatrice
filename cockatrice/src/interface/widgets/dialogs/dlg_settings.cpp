@@ -441,7 +441,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
-    homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
+    homeTabBackgroundShuffleFrequencySpinBox.setSuffix(QString(" ") + tr("seconds"));
     homeTabBackgroundShuffleFrequencySpinBox.setValue(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency());
     connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged),
             &SettingsCache::instance(), &SettingsCache::setHomeTabBackgroundShuffleFrequency);
