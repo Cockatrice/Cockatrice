@@ -154,7 +154,13 @@ You will not be able to manage printing preferences on a per-deck basis, or see 
 You will have to use the Set Manager, available through Card Database -&gt; Manage Sets.
 
 Are you sure you would like to enable this feature?</source>
-        <translation>L&apos;activation de cette fonction désactivera l&apos;utilisation du sélecteur d&apos;impression.Vous ne pourrez plus gérer les préférences d&apos;impression pour chaque deck ni voir les impressions sélectionnées par d&apos;autres joueurs.Vous devrez utiliser le Gestionnaire d&apos;extensions, accessible via Base de données de cartes -&gt; Gérer les extensions.Êtes-vous sûr de vouloir activer cette fonction ?</translation>
+        <translation>L&apos;activation de cette fonction désactivera l&apos;utilisation du sélecteur d&apos;impression.
+
+Vous ne pourrez plus gérer les préférences d&apos;impression pour chaque deck ni voir les impressions sélectionnées par d&apos;autres joueurs.
+
+Vous devrez utiliser le Gestionnaire d&apos;extensions, accessible via Base de données de cartes -&gt; Gérer les extensions.
+
+Êtes-vous sûr de vouloir activer cette fonction ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="668"/>
@@ -165,7 +171,13 @@ You can now choose printings on a per-deck basis in the Deck Editor and configur
 You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector (other sort orders like alphabetical or release date are available).
 
 Are you sure you would like to disable this feature?</source>
-        <translation>Désactiver cette fonction activera le sélecteur d&apos;impression.Vous pouvez désormais choisir les impressions pour chaque deck dans l&apos;éditeur de deck et configurer l&apos;impression ajoutée par défaut en l&apos;épinglant dans le sélecteur d&apos;impression.Vous pouvez également utiliser le gestionnaire de d&apos;extension pour personnaliser l&apos;ordre de tri des impressions dans le sélecteur d&apos;impression (d&apos;autres ordres de tri, comme l&apos;ordre alphabétique ou la date de parution, sont disponibles).Êtes-vous sûr de vouloir désactiver cette fonction ?</translation>
+        <translation>Désactiver cette fonction activera le sélecteur d&apos;impression.
+
+Vous pouvez désormais choisir les impressions pour chaque deck dans l&apos;éditeur de deck et configurer l&apos;impression ajoutée par défaut en l&apos;épinglant dans le sélecteur d&apos;impression.
+
+Vous pouvez également utiliser le gestionnaire de d&apos;extension pour personnaliser l&apos;ordre de tri des impressions dans le sélecteur d&apos;impression (d&apos;autres ordres de tri, comme l&apos;ordre alphabétique ou la date de parution, sont disponibles).
+
+Êtes-vous sûr de vouloir désactiver cette fonction ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="677"/>
@@ -2784,7 +2796,13 @@ https://archidekt.com/decks/9999999
 https://deckstats.net/decks/99999/9999999-your-deck-name/en
 https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz
 https://tappedout.net/mtg-decks/your-deck-name/</source>
-        <translation>L&apos;URL fournie n&apos;est pas reconnue comme une URL de deck valide.Les URL de deck valides ressemblent à ceci :https://archidekt.com/decks/9999999https://deckstats.net/decks/99999/9999999-your-deck-name/enhttps://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzzhttps://tappedout.net/mtg-decks/your-deck-name/</translation>
+        <translation>L&apos;URL fournie n&apos;est pas reconnue comme une URL de deck valide.
+Les URL de deck valides ressemblent à ceci:
+
+https://archidekt.com/decks/9999999
+https://deckstats.net/decks/99999/9999999-your-deck-name/en
+https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz
+https://tappedout.net/mtg-decks/your-deck-name/</translation>
     </message>
 </context>
 <context>
