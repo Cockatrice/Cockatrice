@@ -76,7 +76,7 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
 
 void HomeStyledButton::paintEvent(QPaintEvent *event)
 {
-    Q_UNUSED(event); // Event is just used for update clipping, we redraw the whole widget.
+    Q_UNUSED(event);
     QStyleOptionButton opt;
     initStyleOption(&opt);
     opt.text.clear(); // prevent style from drawing text
@@ -84,7 +84,6 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     style()->drawControl(QStyle::CE_PushButton, &opt, &painter, this);
 
-    // Draw white text with a black outline
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
 
@@ -92,14 +91,20 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     font.setBold(true);
     painter.setFont(font);
 
-    QFontMetrics fm(font);
-    QSize textSize = fm.size(Qt::TextSingleLine, this->text());
-    QPointF center((width() - textSize.width()) / 2.0, (height() + textSize.height() / 2.0) / 2.0);
+    QFontMetricsF fm(font);
+    QPainterPath textPath;
+    textPath.setFillRule(Qt::WindingFill);
+    textPath.addText(0, fm.ascent(), font, this->text());
 
-    QPainterPath path;
-    path.addText(center, font, this->text());
+    // Calculate translation to center the text path
+    QRectF pathBounds = textPath.boundingRect();
+    qreal tx = (width() - pathBounds.width()) / 2.0 - pathBounds.left();
+    qreal ty = (height() - pathBounds.height()) / 2.0 - pathBounds.top();
 
+    textPath.translate(tx, ty);
+
+    // Draw outline then fill
     painter.setPen(QPen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter.setBrush(Qt::white);
-    painter.drawPath(path);
+    painter.drawPath(textPath);
 }
