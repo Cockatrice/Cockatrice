@@ -170,7 +170,7 @@ void DrawProbabilityWidget::updateFilterOptions()
 
     const auto nodes = analyzer->getModel()->getCardNodes();
     for (auto *node : nodes) {
-        CardInfoPtr info = CardDatabaseManager::query()->getCard({node->getName()}).getCardPtr();
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
         if (!info) {
             continue;
         }

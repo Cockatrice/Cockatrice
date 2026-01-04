@@ -2,6 +2,7 @@
 
 #include "card_group_display_widgets/flat_card_group_display_widget.h"
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
+#include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QResizeEvent>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
@@ -230,10 +231,13 @@ QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
 {
     QList<QString> groupCriteriaValues;
 
-    QList<ExactCard> cardsInZone = deckListModel->getCardsForZone(zoneName);
+    QList<const DecklistCardNode *> nodes = deckListModel->getCardNodesForZone(zoneName);
 
-    for (const ExactCard &cardInZone : cardsInZone) {
-        groupCriteriaValues.append(cardInZone.getInfo().getProperty(activeGroupCriteria));
+    for (auto node : nodes) {
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
+        if (info) {
+            groupCriteriaValues.append(info->getProperty(activeGroupCriteria));
+        }
     }
 
     groupCriteriaValues.removeDuplicates();
