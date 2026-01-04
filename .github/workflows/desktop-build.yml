@@ -262,7 +262,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false # qt caches take too much space for macOS (1.1Gi)
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -278,7 +277,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -294,7 +292,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -307,7 +304,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -320,7 +316,6 @@ jobs:
             artifact_name: Windows7-installer
             qt_version: 5.15.*
             qt_arch: win64_msvc2019_64
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
@@ -334,7 +329,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
@@ -375,13 +369,57 @@ jobs:
           key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
           restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
 
-      - name: Install Qt ${{matrix.qt_version}}
+      - name: Install aqtinstall
+        if: matrix.os == 'macOS'
+        run: pipx install aqtinstall
+
+      # Checking if there's a newer, uncached version of Qt available to install via aqtinstall
+      - name: Resolve latest Qt patch version
+        if: matrix.os == 'macOS'
+        id: resolve_qt_version
+        shell: bash
+        # Ouputs the version of Qt to install via aqtinstall
+        run: .ci/resolve_latest_aqt_qt_version.sh "${{matrix.qt_version}}"
+
+      - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS'
+        id: restore_qt
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
+      - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false
+          version: ${{ steps.resolve_qt_version.outputs.version }}
+          arch: ${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
+          dir: ${{github.workspace}}
+
+      - name: Thin Qt libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        run: .ci/thin_macos_qtlib.sh
+
+      - name: Cache thin Qt libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+
+      - name: Install Qt ${{matrix.qt_version}} (Windows)
+        if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{matrix.qt_version}}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
-          cache: ${{matrix.cache_qt}}
+          cache: true
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
