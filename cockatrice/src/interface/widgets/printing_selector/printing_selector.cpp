@@ -90,8 +90,10 @@ void PrintingSelector::retranslateUi()
 
 void PrintingSelector::printingsInDeckChanged()
 {
-    // Delay the update to avoid race conditions
-    QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+        // Delay the update to avoid race conditions
+        QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+    }
 }
 
 /**
