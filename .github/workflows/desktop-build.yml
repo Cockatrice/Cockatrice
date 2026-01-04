@@ -327,7 +327,7 @@ jobs:
             package_suffix: "-Win10"
             artifact_name: Windows10-installer
             qt_version: 6.8.*
-            qt_arch: win64_msvc2019_64
+            qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
