@@ -74,25 +74,27 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, &SearchLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
-    connect(&searchKeySignals, &KeySignals::onEnter, deckEditor->databaseDisplayDockWidget,
+
+    DeckEditorDatabaseDisplayWidget *databaseDisplayWidget = deckEditor->cardDatabaseDockWidget->databaseDisplayWidget;
+    connect(&searchKeySignals, &KeySignals::onEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlEnter, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlC, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlC, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
-    databaseView = deckEditor->databaseDisplayDockWidget->getDatabaseView();
+    databaseView = databaseDisplayWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);

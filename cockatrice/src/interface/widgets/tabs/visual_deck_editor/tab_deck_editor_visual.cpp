@@ -50,7 +50,7 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     refreshShortcuts();
 
     loadLayout();
-    databaseDisplayDockWidget->setHidden(true);
+    cardDatabaseDockWidget->setHidden(true);
 }
 
 /** @brief Creates the central frame containing the tab container. */
@@ -62,9 +62,9 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(),
-                                                    databaseDisplayDockWidget->databaseModel,
-                                                    databaseDisplayDockWidget->databaseDisplayModel);
+    tabContainer = new TabDeckEditorVisualTabWidget(
+        centralWidget, this, deckStateManager->getModel(), cardDatabaseDockWidget->databaseDisplayWidget->databaseModel,
+        cardDatabaseDockWidget->databaseDisplayWidget->databaseDisplayModel);
 
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
