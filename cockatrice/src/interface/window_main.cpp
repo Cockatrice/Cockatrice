@@ -42,6 +42,7 @@
 #include "pqEventSource.h"
 #include "pqEventTypes.h"
 #include "pqTestUtility.h"
+#include "qttesting_autogen/include/ui_pqPlayBackEventsDialog.h"
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
 
@@ -374,6 +375,23 @@ void MainWindow::actOpenSettingsFolder()
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
+void MainWindow::actRecord()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Test File Name", QString(), "XML Files (*.xml)");
+    if (!filename.isEmpty()) {
+        QApplication::activeWindow();
+        this->TestUtility->recordTests(filename);
+    }
+}
+
+void MainWindow::actPlayRecording()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Test File Name", QString(), "XML Files (*.xml)");
+    if (!filename.isEmpty()) {
+        this->TestUtility->playTests(filename);
+    }
+}
+
 void MainWindow::serverTimeout()
 {
     QMessageBox::critical(this, tr("Error"), tr("Server timeout"));
@@ -697,6 +715,8 @@ void MainWindow::retranslateUi()
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
+    aRecord->setText(tr("Begin recording"));
+    aPlayRecording->setText(tr("Play recording"));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -757,6 +777,10 @@ void MainWindow::createActions()
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
+    aRecord = new QAction(this);
+    connect(aRecord, &QAction::triggered, this, &MainWindow::actRecord);
+    aPlayRecording = new QAction(this);
+    connect(aPlayRecording, &QAction::triggered, this, &MainWindow::actPlayRecording);
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -835,6 +859,9 @@ void MainWindow::createMenus()
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
     helpMenu->addAction(aOpenSettingsFolder);
+    helpMenu->addSeparator();
+    helpMenu->addAction(aRecord);
+    helpMenu->addAction(aPlayRecording);
 }
 
 class XMLEventObserver : public pqEventObserver

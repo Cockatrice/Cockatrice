@@ -95,6 +95,9 @@ private slots:
     void actUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
+    void actRecord();
+    void actPlayRecording();
+
     void forgotPasswordSuccess();
     void forgotPasswordError();
     void promptForgotPasswordReset();
@@ -148,7 +151,7 @@ private:
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
     QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
-        *aOpenSettingsFolder;
+        *aOpenSettingsFolder, *aRecord, *aPlayRecording;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
