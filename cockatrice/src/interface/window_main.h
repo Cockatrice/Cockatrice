@@ -163,7 +163,7 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
-    // pqTestUtility *TestUtility;
+    pqTestUtility *TestUtility;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

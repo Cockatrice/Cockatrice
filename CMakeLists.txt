@@ -357,6 +357,7 @@ if(WITH_ORACLE)
 endif()
 
 if(WITH_GUI_TEST)
+  set(QtTesting_QT_VERSION "6")
   add_subdirectory(external/qttesting)
 endif()
 
