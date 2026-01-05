@@ -232,7 +232,7 @@ QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies poi
 Server_AbstractPlayer *Server_Game::getPlayer(int id) const
 {
     auto *participant = participants.value(id);
-    if (!participant->isSpectator()) {
+    if (participant && !participant->isSpectator()) {
         return static_cast<Server_AbstractPlayer *>(participant);
     } else {
         return nullptr;
