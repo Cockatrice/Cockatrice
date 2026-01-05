@@ -11,8 +11,7 @@ DeckStateManager::DeckStateManager(QObject *parent)
         setModified(true);
         emit historyChanged();
     });
-    connect(deckListModel, &DeckListModel::rowsInserted, this, &DeckStateManager::uniqueCardsChanged);
-    connect(deckListModel, &DeckListModel::rowsRemoved, this, &DeckStateManager::uniqueCardsChanged);
+    connect(deckListModel, &DeckListModel::cardNodesChanged, this, &DeckStateManager::uniqueCardsChanged);
 }
 
 const DeckList &DeckStateManager::getDeckList() const

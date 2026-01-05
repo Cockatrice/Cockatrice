@@ -154,7 +154,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel->setText(tr("Banner Card"));
     bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
-    connect(getModel(), &DeckListModel::dataChanged, this, [this]() {
+    connect(getModel(), &DeckListModel::cardNodesChanged, this, [this]() {
         // Delay the update to avoid race conditions
         QTimer::singleShot(100, this, &DeckEditorDeckDockWidget::updateBannerCardComboBox);
     });
