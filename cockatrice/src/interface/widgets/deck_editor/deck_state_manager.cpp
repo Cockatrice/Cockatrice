@@ -174,11 +174,13 @@ QModelIndex DeckStateManager::addCard(const ExactCard &card, const QString &zone
         return {};
     }
 
+    QString zone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
+
     QString reason = tr("Added (%1): %2 (%3) %4")
-                         .arg(zoneName, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
+                         .arg(zone, card.getName(), card.getPrinting().getSet()->getCorrectedShortName(),
                               card.getPrinting().getProperty("num"));
 
-    QModelIndex idx = modifyDeck(reason, [&card, &zoneName](auto model) { return model->addCard(card, zoneName); });
+    QModelIndex idx = modifyDeck(reason, [&card, &zone](auto model) { return model->addCard(card, zone); });
 
     if (idx.isValid()) {
         emit focusIndexChanged(idx);

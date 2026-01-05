@@ -597,13 +597,12 @@ QModelIndexList DeckEditorDeckDockWidget::getSelectedCardNodeSourceIndices() con
     return selectedRows;
 }
 
-void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &_zoneName)
+void DeckEditorDeckDockWidget::actAddCard(const ExactCard &card, const QString &zoneName)
 {
     if (!card) {
         return;
     }
 
-    QString zoneName = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : _zoneName;
     deckStateManager->addCard(card, zoneName);
 }
 
