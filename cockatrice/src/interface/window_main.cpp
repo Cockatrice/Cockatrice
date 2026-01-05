@@ -380,7 +380,7 @@ void MainWindow::actRecord()
     QString filename = QFileDialog::getSaveFileName(this, "Test File Name", QString(), "XML Files (*.xml)");
     if (!filename.isEmpty()) {
         QApplication::activeWindow();
-        this->TestUtility->recordTests(filename);
+        testUtility->recordTests(filename);
     }
 }
 
@@ -388,7 +388,7 @@ void MainWindow::actPlayRecording()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Test File Name", QString(), "XML Files (*.xml)");
     if (!filename.isEmpty()) {
-        this->TestUtility->playTests(filename);
+        testUtility->playTests(filename);
     }
 }
 
@@ -940,9 +940,9 @@ MainWindow::MainWindow(QWidget *parent)
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
 
-    this->TestUtility = new pqTestUtility(this);
-    this->TestUtility->addEventObserver("xml", new XMLEventObserver(this));
-    this->TestUtility->addEventSource("xml", new XMLEventSource(this));
+    testUtility = new pqTestUtility(this);
+    testUtility->addEventObserver("xml", new XMLEventObserver(this));
+    testUtility->addEventSource("xml", new XMLEventSource(this));
 }
 
 void MainWindow::startupConfigCheck()

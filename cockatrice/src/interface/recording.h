@@ -13,8 +13,8 @@ class QXmlStreamWriter;
 
 class XMLEventObserver : public pqEventObserver
 {
-    QXmlStreamWriter *XMLStream;
-    QString XMLString;
+    QXmlStreamWriter *xmlStream;
+    QString xmlString;
 
 public:
     explicit XMLEventObserver(QObject *p);
@@ -30,7 +30,7 @@ protected:
 
 class XMLEventSource : public pqEventSource
 {
-    QXmlStreamReader *XMLStream;
+    QXmlStreamReader *xmlStream;
 
 public:
     explicit XMLEventSource(QObject *p);
