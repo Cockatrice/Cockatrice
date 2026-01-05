@@ -189,7 +189,7 @@ void Server_Game::pingClockTimeout()
         if (participant == nullptr)
             continue;
 
-        if (!participant->getSpectator()) {
+        if (!participant->isSpectator()) {
             ++playerCount;
         }
 
@@ -200,7 +200,7 @@ void Server_Game::pingClockTimeout()
         }
 
         if ((participant->getPingTime() != -1) &&
-            (!participant->getSpectator() || participant->getPlayerId() == hostId)) {
+            (!participant->isSpectator() || participant->getPlayerId() == hostId)) {
             allPlayersInactive = false;
         }
     }
@@ -222,7 +222,7 @@ QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies poi
     QMutexLocker locker(&gameMutex);
     for (int id : participants.keys()) {
         auto *participant = participants[id];
-        if (!participant->getSpectator()) {
+        if (!participant->isSpectator()) {
             players[id] = static_cast<Server_AbstractPlayer *>(participant);
         }
     }
@@ -232,7 +232,7 @@ QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies poi
 Server_AbstractPlayer *Server_Game::getPlayer(int id) const
 {
     auto *participant = participants.value(id);
-    if (!participant->getSpectator()) {
+    if (!participant->isSpectator()) {
         return static_cast<Server_AbstractPlayer *>(participant);
     } else {
         return nullptr;
@@ -250,7 +250,7 @@ int Server_Game::getSpectatorCount() const
 
     int result = 0;
     for (Server_AbstractParticipant *participant : participants.values()) {
-        if (participant->getSpectator())
+        if (participant->isSpectator())
             ++result;
     }
     return result;
@@ -295,8 +295,8 @@ void Server_Game::sendGameStateToPlayers()
     // send game state info to clients according to their role in the game
     for (auto *participant : participants.values()) {
         GameEventContainer *gec;
-        if (participant->getSpectator()) {
-            if (spectatorsSeeEverything || participant->getJudge()) {
+        if (participant->isSpectator()) {
+            if (spectatorsSeeEverything || participant->isJudge()) {
                 gec = prepareGameEvent(omniscientEvent, -1);
             } else {
                 gec = prepareGameEvent(spectatorNormalEvent, -1);
@@ -527,7 +527,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
                                               gameId, participant->getPlayerId());
     participants.remove(participant->getPlayerId());
 
-    bool spectator = participant->getSpectator();
+    bool spectator = participant->isSpectator();
     GameEventStorage ges;
     if (!spectator) {
         auto *player = static_cast<Server_AbstractPlayer *>(participant);
@@ -728,8 +728,8 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     getInfo(*event1.mutable_game_info());
     event1.set_host_id(hostId);
     event1.set_player_id(joiningParticipant->getPlayerId());
-    event1.set_spectator(joiningParticipant->getSpectator());
-    event1.set_judge(joiningParticipant->getJudge());
+    event1.set_spectator(joiningParticipant->isSpectator());
+    event1.set_judge(joiningParticipant->isJudge());
     event1.set_resuming(resuming);
     if (resuming) {
         const QStringList &allGameTypes = room->getGameTypes();
@@ -747,7 +747,7 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    bool omniscient = joiningParticipant->getSpectator() && (spectatorsSeeEverything || joiningParticipant->getJudge());
+    bool omniscient = joiningParticipant->isSpectator() && (spectatorsSeeEverything || joiningParticipant->isJudge());
     for (auto *participant : participants.values()) {
         participant->getInfo(event2.add_player_list(), joiningParticipant, omniscient, true);
     }
@@ -765,7 +765,7 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
     for (auto *participant : participants.values()) {
         const bool playerPrivate =
             (participant->getPlayerId() == privatePlayerId) ||
-            (participant->getSpectator() && (spectatorsSeeEverything || participant->getJudge()));
+            (participant->isSpectator() && (spectatorsSeeEverything || participant->isJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
             participant->sendGameEvent(*cont);
