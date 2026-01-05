@@ -42,7 +42,6 @@
 #include "pqEventSource.h"
 #include "pqEventTypes.h"
 #include "pqTestUtility.h"
-#include "qttesting_autogen/include/ui_pqPlayBackEventsDialog.h"
 #include "version_string.h"
 #include "widgets/utility/get_text_with_max.h"
 
@@ -715,7 +714,7 @@ void MainWindow::retranslateUi()
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
-    aRecord->setText(tr("Begin recording"));
+    aRecord->setText(tr("Start recording"));
     aPlayRecording->setText(tr("Play recording"));
 
     aShow->setText(tr("Show/Hide"));
