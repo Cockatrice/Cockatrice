@@ -763,9 +763,8 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 
     cont->set_game_id(gameId);
     for (auto *participant : participants.values()) {
-        const bool playerPrivate =
-            (participant->getPlayerId() == privatePlayerId) ||
-            (participant->isSpectator() && (spectatorsSeeEverything || participant->isJudge()));
+        const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) ||
+                                   (participant->isSpectator() && (spectatorsSeeEverything || participant->isJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
             participant->sendGameEvent(*cont);
