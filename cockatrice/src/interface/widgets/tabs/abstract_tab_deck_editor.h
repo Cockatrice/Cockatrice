@@ -275,6 +275,22 @@ protected:
         NEW_TAB    ///< Open deck in a new tab
     };
 
+    /**
+     * @brief The actions associated with managing a QDockWidget
+     */
+    struct DockActions
+    {
+        QMenu *menu;        ///< The menu containing the actions
+        QAction *aVisible;  ///< The menu action that toggles visibility
+        QAction *aFloating; ///< The menu action that toggles floating
+    };
+
+    /**
+     * @brief registers a QDockWidget as a managed dock widget. Creates the associated actions and menu, adds them to
+     * the viewMenu, and connects those actions to the tab's slots.
+     */
+    void registerDockWidget(QDockWidget *widget);
+
     /** @brief Confirms deck open action based on settings and modified state.
      *  @param openInSameTabIfBlank Whether to reuse same tab if blank.
      *  @return Selected DeckOpenLocation.
@@ -293,15 +309,11 @@ protected:
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
 
     // UI Menu Elements
-    QMenu *viewMenu, *cardInfoDockMenu, *cardDatabaseDockMenu, *deckDockMenu, *filterDockMenu,
-        *printingSelectorDockMenu;
+    QMenu *viewMenu;
 
     QAction *aResetLayout;
-    QAction *aCardInfoDockVisible, *aCardInfoDockFloating;
-    QAction *aCardDatabaseDockVisible, *aCardDatabaseDockFloating;
-    QAction *aDeckDockVisible, *aDeckDockFloating;
-    QAction *aFilterDockVisible, *aFilterDockFloating;
-    QAction *aPrintingSelectorDockVisible, *aPrintingSelectorDockFloating;
+
+    QMap<QDockWidget *, DockActions> dockToActions;
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H
