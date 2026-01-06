@@ -92,7 +92,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     bannerCardComboBox->setObjectName("bannerCardComboBox");
     bannerCardComboBox->setCurrentText(deckLoader->getDeck().deckList.getBannerCard().name);
-    bannerCardComboBox->installEventFilter(new NoScrollFilter());
+    bannerCardComboBox->installEventFilter(new NoScrollFilter(bannerCardComboBox));
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
 

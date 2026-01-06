@@ -47,7 +47,7 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
     originalPos = this->pos();
 
     // Create the animation
-    animation = new QPropertyAnimation(this, "pos");
+    animation = new QPropertyAnimation(this, "pos", this);
     animation->setDuration(200); // 200ms animation duration
     animation->setEasingCurve(QEasingCurve::OutQuad);
 
