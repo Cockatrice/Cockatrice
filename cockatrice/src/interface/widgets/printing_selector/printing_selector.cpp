@@ -122,6 +122,10 @@ static QMap<QString, QPair<int, int>> tallyUuidCounts(const DeckListModel *model
 
 void PrintingSelector::updateCardAmounts()
 {
+    if (selectedCard.isNull()) {
+        return;
+    }
+
     auto map = tallyUuidCounts(deckStateManager->getModel(), selectedCard->getName());
     emit cardAmountsChanged(map);
 }
