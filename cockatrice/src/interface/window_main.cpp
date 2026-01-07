@@ -941,6 +941,7 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
 
     testUtility = new pqTestUtility(this);
+    testUtility->setRecordWithDialog(true);
     testUtility->addEventObserver("xml", new XMLEventObserver(this));
     testUtility->addEventSource("xml", new XMLEventSource(this));
 }
