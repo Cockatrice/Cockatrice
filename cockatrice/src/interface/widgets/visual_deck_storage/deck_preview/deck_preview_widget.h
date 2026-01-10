@@ -38,6 +38,7 @@ public:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     QVBoxLayout *layout;
     QString filePath;
+    QDateTime lastModifiedTime;
     DeckLoader *deckLoader;
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget = nullptr;
     ColorIdentityWidget *colorIdentityWidget = nullptr;
@@ -57,18 +58,25 @@ public slots:
     void setFilePath(const QString &filePath);
     void refreshBannerCardText();
     void refreshBannerCardToolTip();
-    void updateBannerCardComboBox();
+    void updateBannerCardComboBox(const QString &currentText);
     void setBannerCard(int);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
+    void resyncWidgets();
+    void reloadIfModified();
     void updateVisibility();
     void updateColorIdentityVisibility(bool visible);
     void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
     void resizeEvent(QResizeEvent *event) override;
 
+protected:
+    void enterEvent(QEnterEvent *event) override;
+
 private:
+    void updateLastModifiedTime();
+    void writeDeckToFile();
     QMenu *createRightClickMenu();
     void addSetBannerCardMenu(QMenu *menu);
 
