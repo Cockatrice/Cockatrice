@@ -459,12 +459,15 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
     }
 }
 
-void DeckEditorDeckDockWidget::setSelectedIndex(const QModelIndex &newCardIndex)
+void DeckEditorDeckDockWidget::setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus)
 {
     deckView->clearSelection();
     deckView->setCurrentIndex(newCardIndex);
     recursiveExpand(newCardIndex);
-    deckView->setFocus(Qt::FocusReason::MouseFocusReason);
+
+    if (!preserveWidgetFocus) {
+        deckView->setFocus(Qt::FocusReason::MouseFocusReason);
+    }
 }
 
 void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()

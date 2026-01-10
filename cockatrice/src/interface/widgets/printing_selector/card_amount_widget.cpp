@@ -198,7 +198,7 @@ void CardAmountWidget::addPrinting(const QString &zone)
     });
 
     if (newCardIndex.isValid()) {
-        emit deckStateManager->focusIndexChanged(newCardIndex);
+        emit deckStateManager->focusIndexChanged(newCardIndex, false);
     }
 }
 

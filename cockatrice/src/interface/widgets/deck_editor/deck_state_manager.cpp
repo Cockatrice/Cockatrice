@@ -182,7 +182,7 @@ QModelIndex DeckStateManager::addCard(const ExactCard &card, const QString &zone
     QModelIndex idx = modifyDeck(reason, [&card, &zone](auto model) { return model->addCard(card, zone); });
 
     if (idx.isValid()) {
-        emit focusIndexChanged(idx);
+        emit focusIndexChanged(idx, true);
     }
 
     return idx;
@@ -208,7 +208,7 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
     }
 
     if (idx.isValid()) {
-        emit focusIndexChanged(idx);
+        emit focusIndexChanged(idx, true);
     }
 
     return idx;
