@@ -1,3 +1,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg.git
+[submodule "external/qttesting"]
+	path = external/qttesting
+	url = https://github.com/Kitware/QtTesting.git
