@@ -21,6 +21,7 @@ public:
     static QStringList parseColorIdentity(const QString &manaString);
 
 public slots:
+    void setColorIdentity(const QString &_colorIdentity);
     void resizeEvent(QResizeEvent *event) override;
     void toggleUnusedVisibility();
 
