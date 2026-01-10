@@ -39,6 +39,7 @@ signals:
                              const QString &_realname);
     void sigActivateToServer(const QString &_token);
     void sigDisconnectFromServer();
+    void notifyUserAboutDiagnostics();
     void notifyUserAboutUpdate();
     void sigRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
     void sigForgotPasswordSuccess();
@@ -80,6 +81,8 @@ private slots:
     void doLogin();
     void doHashedLogin();
     Command_Login generateCommandLogin();
+    Command_ClientDiagnostics generateClientDiagnostics();
+    void addDiagnosticsFeature(Command_ClientDiagnostics *diag, const QString &name, const QString &value);
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
     void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
@@ -119,6 +122,9 @@ private:
 
 protected slots:
     void sendCommandContainer(const CommandContainer &cont) override;
+
+public slots:
+    void sendDiagnostics();
 
 public:
     explicit RemoteClient(QObject *parent = nullptr, INetworkSettingsProvider *networkSettingsProvider = nullptr);

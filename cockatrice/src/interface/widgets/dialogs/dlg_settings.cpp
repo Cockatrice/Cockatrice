@@ -13,6 +13,7 @@
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 #include "../main.h"
+#include "dlg_prompt_send_diagnostics.h"
 
 #include <../../client/settings/card_counter_settings.h>
 #include <QAbstractButton>
@@ -101,6 +102,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     advertiseTranslationPageLabel.setOpenExternalLinks(true);
 
+    // Add items with the enum as userData
+    populateSendDiagnosticsCombo(SettingsCache::instance().getSendDiagnostics());
+
+    connect(&sendDiagnosticsSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        int mode = sendDiagnosticsSelector.itemData(index).toInt();
+
+        if (mode == SendDiagnosticsUnprompted) {
+            DlgPromptSendDiagnostics dlg(this);
+            if (dlg.exec() == QDialog::Accepted) {
+                mode = dlg.selectedChoice();
+            } else {
+                mode = SendDiagnosticsDisabled;
+            }
+        }
+
+        SettingsCache::instance().setSendDiagnostics(mode);
+
+        // Rebuild combo if we transitioned out of Unprompted
+        populateSendDiagnosticsCombo(mode);
+    });
+
     connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::languageBoxChanged);
     connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
@@ -125,15 +147,17 @@ GeneralSettingsPage::GeneralSettingsPage()
     personalGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
     personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
     personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
-    personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 5, 0);
-    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 1);
-    personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 6, 0);
-    personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 6, 1);
-    personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 7, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 8, 0, 1, 2);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 9, 0, 1, 2);
-    personalGrid->addWidget(&showTipsOnStartup, 10, 0, 1, 2);
+    personalGrid->addWidget(&sendDiagnosticsLabel, 3, 0);
+    personalGrid->addWidget(&sendDiagnosticsSelector, 3, 1);
+    personalGrid->addWidget(&startupUpdateCheckCheckBox, 5, 0, 1, 2);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 6, 0);
+    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 6, 1);
+    personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 7, 0);
+    personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 7, 1);
+    personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 8, 1);
+    personalGrid->addWidget(&updateNotificationCheckBox, 9, 0, 1, 2);
+    personalGrid->addWidget(&newVersionOracleCheckBox, 10, 0, 1, 2);
+    personalGrid->addWidget(&showTipsOnStartup, 11, 0, 1, 2);
 
     personalGroupBox = new QGroupBox;
     personalGroupBox->setLayout(personalGrid);
@@ -268,6 +292,32 @@ QString GeneralSettingsPage::languageName(const QString &lang)
     return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
+void GeneralSettingsPage::populateSendDiagnosticsCombo(int mode)
+{
+    QSignalBlocker blocker(sendDiagnosticsSelector);
+
+    sendDiagnosticsSelector.clear();
+
+    if (mode == SendDiagnosticsUnprompted) {
+        sendDiagnosticsSelector.addItem(QString(), SendDiagnosticsUnprompted);
+    }
+
+    sendDiagnosticsSelector.addItem(tr("Disabled"), SendDiagnosticsDisabled);
+    sendDiagnosticsSelector.addItem(tr("Minimal"), SendDiagnosticsBasic);
+    sendDiagnosticsSelector.addItem(tr("Full"), SendDiagnosticsFull);
+
+    // Restore selection
+    for (int i = 0; i < sendDiagnosticsSelector.count(); ++i) {
+        if (sendDiagnosticsSelector.itemData(i).toInt() == mode) {
+            sendDiagnosticsSelector.setCurrentIndex(i);
+            return;
+        }
+    }
+
+    // Fallback: if unprompted was removed, default to Disabled
+    sendDiagnosticsSelector.setCurrentIndex(0);
+}
+
 void GeneralSettingsPage::deckPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
@@ -376,6 +426,7 @@ void GeneralSettingsPage::retranslateUi()
     customCardDatabasePathLabel.setText(tr("Custom database directory:"));
     tokenDatabasePathLabel.setText(tr("Token database:"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
+    sendDiagnosticsLabel.setText(tr("Send usage statistics:"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
     startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));

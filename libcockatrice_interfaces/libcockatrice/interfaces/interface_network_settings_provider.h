@@ -2,6 +2,13 @@
 #define COCKATRICE_INETWORKSETTINGSPROVIDER_H
 #include <QString>
 
+enum SendDiagnosticsMode {
+    SendDiagnosticsUnprompted = 0, // never asked
+    SendDiagnosticsDisabled = 1,
+    SendDiagnosticsBasic = 2,
+    SendDiagnosticsFull = 3,
+};
+
 class INetworkSettingsProvider
 {
 public:
@@ -12,6 +19,7 @@ public:
     [[nodiscard]] virtual int getTimeOut() const = 0;
     [[nodiscard]] virtual int getKeepAlive() const = 0;
     [[nodiscard]] virtual bool getNotifyAboutUpdates() const = 0;
+    [[nodiscard]] virtual int getSendDiagnostics() const = 0;
 
     virtual void setKnownMissingFeatures(const QString &_knownMissingFeatures) = 0;
     virtual QString getKnownMissingFeatures() = 0;

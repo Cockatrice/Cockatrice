@@ -42,6 +42,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_prompt_send_diagnostics.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
