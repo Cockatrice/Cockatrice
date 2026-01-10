@@ -9,8 +9,8 @@
 #include <QResizeEvent>
 #include <QSize>
 
-ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_manaCost)
-    : QWidget(parent), manaCost(_manaCost)
+ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
+    : QWidget(parent), colorIdentity(_colorIdentity)
 {
     layout = new QHBoxLayout(this);
     layout->setSpacing(5); // Small spacing between icons
@@ -28,7 +28,7 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
 {
     // Define the full WUBRG set (White, Blue, Black, Red, Green)
     QString fullColorIdentity = "WUBRG";
-    QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
+    QStringList symbols = parseColorIdentity(colorIdentity); // Parse mana cost string
 
     // clear old layout
     for (auto widgets : layout->findChildren<ManaSymbolWidget *>()) {
@@ -49,9 +49,9 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     }
 }
 
-void ColorIdentityWidget::setColorIdentity(const QString &manaString)
+void ColorIdentityWidget::setColorIdentity(const QString &_colorIdentity)
 {
-    manaCost = manaString;
+    colorIdentity = _colorIdentity;
     populateManaSymbolWidgets();
 }
 
