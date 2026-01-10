@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 #include <QResizeEvent>
 #include <QSize>
+#include <libcockatrice/utility/qt_utils.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)
     : QWidget(parent), colorIdentity(_colorIdentity)
@@ -46,13 +47,7 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
 
 void ColorIdentityWidget::toggleUnusedVisibility()
 {
-    if (layout != nullptr) {
-        QLayoutItem *item;
-        while ((item = layout->takeAt(0)) != nullptr) {
-            item->widget()->deleteLater(); // Delete the widget
-            delete item;                   // Delete the layout item
-        }
-    }
+    QtUtils::clearLayoutRec(layout);
     populateManaSymbolWidgets();
 }
 
