@@ -31,6 +31,9 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     QString fullColorIdentity = "WUBRG";
     QStringList symbols = parseColorIdentity(colorIdentity); // Parse mana cost string
 
+    // clear old layout
+    QtUtils::clearLayoutRec(layout);
+
     // populate mana symbols
     if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
         for (const QString symbol : fullColorIdentity) {
@@ -47,7 +50,6 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
 
 void ColorIdentityWidget::toggleUnusedVisibility()
 {
-    QtUtils::clearLayoutRec(layout);
     populateManaSymbolWidgets();
 }
 
