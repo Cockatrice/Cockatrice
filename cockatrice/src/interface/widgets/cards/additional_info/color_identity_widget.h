@@ -15,18 +15,17 @@ class ColorIdentityWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ColorIdentityWidget(QWidget *parent, CardInfoPtr card);
-    explicit ColorIdentityWidget(QWidget *parent, QString manaCost);
+    explicit ColorIdentityWidget(QWidget *parent, const QString &manaCost = "");
     void populateManaSymbolWidgets();
 
-    QStringList parseColorIdentity(const QString &manaString);
+    static QStringList parseColorIdentity(const QString &manaString);
 
 public slots:
+    void setColorIdentity(const QString &manaString);
     void resizeEvent(QResizeEvent *event) override;
     void toggleUnusedVisibility();
 
 private:
-    CardInfoPtr card;
     QString manaCost;
     QHBoxLayout *layout;
 };

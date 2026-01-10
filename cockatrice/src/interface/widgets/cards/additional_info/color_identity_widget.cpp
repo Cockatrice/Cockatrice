@@ -9,29 +9,8 @@
 #include <QResizeEvent>
 #include <QSize>
 
-ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, CardInfoPtr _card) : QWidget(parent), card(_card)
-{
-    layout = new QHBoxLayout(this);
-    layout->setSpacing(5); // Small spacing between icons
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setAlignment(Qt::AlignCenter); // Ensure icons are centered
-    setLayout(layout);
-
-    // Define the full WUBRG set (White, Blue, Black, Red, Green)
-    QString fullColorIdentity = "WUBRG";
-
-    if (card) {
-        manaCost = card->getColors();                       // Get mana cost string
-        QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
-
-        populateManaSymbolWidgets();
-    }
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
-            &ColorIdentityWidget::toggleUnusedVisibility);
-}
-
-ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, QString _manaCost)
-    : QWidget(parent), card(nullptr), manaCost(_manaCost)
+ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_manaCost)
+    : QWidget(parent), manaCost(_manaCost)
 {
     layout = new QHBoxLayout(this);
     layout->setSpacing(5); // Small spacing between icons
@@ -51,6 +30,12 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     QString fullColorIdentity = "WUBRG";
     QStringList symbols = parseColorIdentity(manaCost); // Parse mana cost string
 
+    // clear old layout
+    for (auto widgets : layout->findChildren<ManaSymbolWidget *>()) {
+        widgets->deleteLater();
+    }
+
+    // populate mana symbols
     if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
         for (const QString symbol : fullColorIdentity) {
             auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
@@ -62,6 +47,12 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
             layout->addWidget(manaSymbol);
         }
     }
+}
+
+void ColorIdentityWidget::setColorIdentity(const QString &manaString)
+{
+    manaCost = manaString;
+    populateManaSymbolWidgets();
 }
 
 void ColorIdentityWidget::toggleUnusedVisibility()
