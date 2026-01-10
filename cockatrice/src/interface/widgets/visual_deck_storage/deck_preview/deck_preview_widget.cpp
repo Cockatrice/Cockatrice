@@ -288,7 +288,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
     deckLoader->getDeck().deckList.setBannerCard(cardRef);
-    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
+    DeckLoader::saveToFile(deckLoader->getDeck());
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
@@ -311,7 +311,7 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
 void DeckPreviewWidget::setTags(const QStringList &tags)
 {
     deckLoader->getDeck().deckList.setTags(tags);
-    deckLoader->saveToFile(filePath, DeckFileFormat::Cockatrice);
+    DeckLoader::saveToFile(deckLoader->getDeck());
 }
 
 QMenu *DeckPreviewWidget::createRightClickMenu()
@@ -386,7 +386,7 @@ void DeckPreviewWidget::actRenameDeck()
 
     // write change
     deckLoader->getDeck().deckList.setName(newName);
-    deckLoader->saveToFile(filePath, DeckFileFormat::getFormatFromName(filePath));
+    DeckLoader::saveToFile(deckLoader->getDeck());
 
     // update VDS
     refreshBannerCardText();
