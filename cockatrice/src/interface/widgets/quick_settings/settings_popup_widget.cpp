@@ -10,6 +10,7 @@ SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::
 {
     // Main layout for the popup itself
     layout = new QVBoxLayout(this);
+    layout->setContentsMargins(5, 5, 5, 5);
 
     // Container for the content (with or without scroll area)
     containerWidget = new QWidget();

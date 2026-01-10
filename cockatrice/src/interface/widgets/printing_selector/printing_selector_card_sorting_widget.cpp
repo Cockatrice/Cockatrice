@@ -21,6 +21,7 @@ PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSel
 {
     setMinimumWidth(300);
     sortToolBar = new QHBoxLayout(this);
+    sortToolBar->setContentsMargins(11, 0, 11, 0);
 
     sortOptionsSelector = new QComboBox(this);
     sortOptionsSelector->setFocusPolicy(Qt::StrongFocus);
