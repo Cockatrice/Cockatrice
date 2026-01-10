@@ -63,6 +63,13 @@ public:
     void loadFromFileAsync(const QString &fileName, DeckFileFormat::Format fmt, bool userRequest);
 
     /**
+     * @brief Loads the file that the lastLoadInfo currently points to into this instance.
+     * No-ops if the lastLoadInfo is missing the required info or the load fails.
+     * @return Whether the loaded succeeded.
+     */
+    bool reload();
+
+    /**
      * @brief Loads a deck from a local file.
      * @param fileName The file to load
      * @param fmt The format of the file to load
