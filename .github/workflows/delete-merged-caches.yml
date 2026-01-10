@@ -1,0 +1,28 @@
+# from https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manage-caches
+
+name: Cleanup github runner caches on closed pull requests
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Cleanup
+        env:
+          GH_TOKEN: ${{ github.token }} # needed by the gh client
+          GH_REPO: ${{ github.repository }} # needed by the gh client
+          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
+        run: |
+          echo "Fetching list of cache keys"
+          cacheKeysForPR=$(gh cache list --ref $BRANCH --limit 100 --json id --jq '.[].id')
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeysForPR
+          do
+              gh cache delete $cacheKey || true
+          done
+          echo "Done"
