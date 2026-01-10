@@ -29,6 +29,8 @@ public:
         }
     }
 
+    void setClosable(bool closable);
+
     QString displayTitleText() const
     {
         return displayTitle;
@@ -54,8 +56,12 @@ protected:
     QWidget *bannerAndSettingsContainer;
     QHBoxLayout *bannerAndSettingsLayout;
     QString displayTitle;
+    QPushButton *closeButton;
     BannerWidget *bannerWidget;
     QPushButton *configureButton;
+
+signals:
+    void closed();
 };
 
 #endif // COCKATRICE_DECK_ANALYTICS_WIDGET_BASE_H
