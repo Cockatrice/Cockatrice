@@ -54,58 +54,18 @@ void TabDeckEditor::createMenus()
 
     viewMenu = new QMenu(this);
 
-    cardInfoDockMenu = viewMenu->addMenu(QString());
-    cardDatabaseDockMenu = viewMenu->addMenu(QString());
-    deckDockMenu = viewMenu->addMenu(QString());
-    filterDockMenu = viewMenu->addMenu(QString());
-    printingSelectorDockMenu = viewMenu->addMenu(QString());
-
-    // Card Info dock
-    aCardInfoDockVisible = cardInfoDockMenu->addAction(QString());
-    aCardInfoDockVisible->setCheckable(true);
-    connect(aCardInfoDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
-    aCardInfoDockFloating = cardInfoDockMenu->addAction(QString());
-    aCardInfoDockFloating->setCheckable(true);
-    connect(aCardInfoDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
-
-    // Card Database dock
-    aCardDatabaseDockVisible = cardDatabaseDockMenu->addAction(QString());
-    aCardDatabaseDockVisible->setCheckable(true);
-    connect(aCardDatabaseDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
-    aCardDatabaseDockFloating = cardDatabaseDockMenu->addAction(QString());
-    aCardDatabaseDockFloating->setCheckable(true);
-    connect(aCardDatabaseDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
-
-    // Deck dock
-    aDeckDockVisible = deckDockMenu->addAction(QString());
-    aDeckDockVisible->setCheckable(true);
-    connect(aDeckDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
-    aDeckDockFloating = deckDockMenu->addAction(QString());
-    aDeckDockFloating->setCheckable(true);
-    connect(aDeckDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
-
-    // Filter dock
-    aFilterDockVisible = filterDockMenu->addAction(QString());
-    aFilterDockVisible->setCheckable(true);
-    connect(aFilterDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
-    aFilterDockFloating = filterDockMenu->addAction(QString());
-    aFilterDockFloating->setCheckable(true);
-    connect(aFilterDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
-
-    // Printing selector dock
-    aPrintingSelectorDockVisible = printingSelectorDockMenu->addAction(QString());
-    aPrintingSelectorDockVisible->setCheckable(true);
-    connect(aPrintingSelectorDockVisible, &QAction::triggered, this, &TabDeckEditor::dockVisibleTriggered);
-    aPrintingSelectorDockFloating = printingSelectorDockMenu->addAction(QString());
-    aPrintingSelectorDockFloating->setCheckable(true);
-    connect(aPrintingSelectorDockFloating, &QAction::triggered, this, &TabDeckEditor::dockFloatingTriggered);
+    registerDockWidget(cardInfoDockWidget);
+    registerDockWidget(cardDatabaseDockWidget);
+    registerDockWidget(deckDockWidget);
+    registerDockWidget(filterDockWidget);
+    registerDockWidget(printingSelectorDockWidget);
 
     if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-        printingSelectorDockMenu->setEnabled(false);
+        dockToActions[printingSelectorDockWidget].menu->setEnabled(false);
     }
 
     connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
-            [this](bool enabled) { printingSelectorDockMenu->setEnabled(!enabled); });
+            [this](bool enabled) { dockToActions[printingSelectorDockWidget].menu->setEnabled(!enabled); });
 
     viewMenu->addSeparator();
 
@@ -141,22 +101,18 @@ void TabDeckEditor::retranslateUi()
     printingSelectorDockWidget->retranslateUi();
 
     viewMenu->setTitle(tr("&View"));
-    cardInfoDockMenu->setTitle(tr("Card Info"));
-    cardDatabaseDockMenu->setTitle(tr("Card Database"));
-    deckDockMenu->setTitle(tr("Deck"));
-    filterDockMenu->setTitle(tr("Filters"));
-    printingSelectorDockMenu->setTitle(tr("Printing"));
 
-    aCardInfoDockVisible->setText(tr("Visible"));
-    aCardInfoDockFloating->setText(tr("Floating"));
-    aCardDatabaseDockVisible->setText(tr("Visible"));
-    aCardDatabaseDockFloating->setText(tr("Floating"));
-    aDeckDockVisible->setText(tr("Visible"));
-    aDeckDockFloating->setText(tr("Floating"));
-    aFilterDockVisible->setText(tr("Visible"));
-    aFilterDockFloating->setText(tr("Floating"));
-    aPrintingSelectorDockVisible->setText(tr("Visible"));
-    aPrintingSelectorDockFloating->setText(tr("Floating"));
+    dockToActions[cardInfoDockWidget].menu->setTitle(tr("Card Info"));
+    dockToActions[cardDatabaseDockWidget].menu->setTitle(tr("Card Database"));
+    dockToActions[deckDockWidget].menu->setTitle(tr("Deck"));
+    dockToActions[filterDockWidget].menu->setTitle(tr("Filters"));
+    dockToActions[printingSelectorDockWidget].menu->setTitle(tr("Printing"));
+
+    for (auto &actions : dockToActions.values()) {
+        actions.aVisible->setText(tr("Visible"));
+        actions.aFloating->setText(tr("Floating"));
+    }
+
     aResetLayout->setText(tr("Reset layout"));
 }
 
@@ -174,7 +130,7 @@ void TabDeckEditor::showPrintingSelector()
 {
     printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
-    aPrintingSelectorDockVisible->setChecked(true);
+    dockToActions[printingSelectorDockWidget].aVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);
 }
 
@@ -196,27 +152,22 @@ void TabDeckEditor::loadLayout()
     if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         if (!printingSelectorDockWidget->isHidden()) {
             printingSelectorDockWidget->setHidden(true);
-            aPrintingSelectorDockVisible->setChecked(false);
+            dockToActions[printingSelectorDockWidget].aVisible->setChecked(true);
         }
     }
 
-    aCardInfoDockVisible->setChecked(!cardInfoDockWidget->isHidden());
-    aCardDatabaseDockVisible->setChecked(!cardDatabaseDockWidget->isHidden());
-    aFilterDockVisible->setChecked(!filterDockWidget->isHidden());
-    aDeckDockVisible->setChecked(!deckDockWidget->isHidden());
-    aPrintingSelectorDockVisible->setChecked(!printingSelectorDockWidget->isHidden());
+    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
+        QDockWidget *dockWidget = it.key();
+        const DockActions &actions = it.value();
 
-    aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
-    aCardDatabaseDockFloating->setChecked(aCardDatabaseDockVisible->isChecked());
-    aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
-    aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
-    aPrintingSelectorDockFloating->setEnabled(aPrintingSelectorDockVisible->isChecked());
+        actions.aVisible->setChecked(!dockWidget->isHidden());
+        actions.aFloating->setEnabled(actions.aVisible->isChecked());
+        actions.aFloating->setChecked(dockWidget->isFloating());
+    }
 
-    aCardInfoDockFloating->setChecked(cardInfoDockWidget->isFloating());
-    aCardDatabaseDockFloating->setChecked(cardDatabaseDockWidget->isFloating());
-    aFilterDockFloating->setChecked(filterDockWidget->isFloating());
-    aDeckDockFloating->setChecked(deckDockWidget->isFloating());
-    aPrintingSelectorDockFloating->setChecked(printingSelectorDockWidget->isFloating());
+    // special case for cardDatabaseDock
+    auto &actions = dockToActions[cardDatabaseDockWidget];
+    actions.aFloating->setChecked(actions.aVisible->isChecked());
 
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
     cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
@@ -240,36 +191,28 @@ void TabDeckEditor::restartLayout()
 {
 
     // Update menu checkboxes
-    aCardInfoDockVisible->setChecked(true);
-    aCardDatabaseDockVisible->setChecked(true);
-    aDeckDockVisible->setChecked(true);
-    aFilterDockVisible->setChecked(true);
-    aPrintingSelectorDockVisible->setChecked(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
+        QDockWidget *dockWidget = it.key();
+        const DockActions &actions = it.value();
 
-    aCardInfoDockFloating->setChecked(false);
-    aCardDatabaseDockFloating->setChecked(false);
-    aDeckDockFloating->setChecked(false);
-    aFilterDockFloating->setChecked(false);
-    aPrintingSelectorDockFloating->setChecked(false);
+        actions.aVisible->setEnabled(true);
+        actions.aFloating->setEnabled(false);
+
+        // Show/hide and reset floating
+        dockWidget->setVisible(true);
+        dockWidget->setFloating(false);
+    }
+
+    // Printing selector special case
+    dockToActions[printingSelectorDockWidget].aVisible->setChecked(
+        !SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     addDockWidget(Qt::LeftDockWidgetArea, cardDatabaseDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, deckDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, filterDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, printingSelectorDockWidget);
-
-    // Show/hide and reset floating
-    cardDatabaseDockWidget->setFloating(false);
-    deckDockWidget->setFloating(false);
-    cardInfoDockWidget->setFloating(false);
-    filterDockWidget->setFloating(false);
-    printingSelectorDockWidget->setFloating(false);
-
-    cardDatabaseDockWidget->setVisible(true);
-    deckDockWidget->setVisible(true);
-    cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(true);
-    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);
@@ -285,41 +228,26 @@ void TabDeckEditor::freeDocksSize()
     const QSize minSize(100, 100);
     const QSize maxSize(5000, 5000);
 
-    deckDockWidget->setMinimumSize(minSize);
-    deckDockWidget->setMaximumSize(maxSize);
-
-    cardDatabaseDockWidget->setMinimumSize(minSize);
-    cardDatabaseDockWidget->setMaximumSize(maxSize);
-
-    cardInfoDockWidget->setMinimumSize(minSize);
-    cardInfoDockWidget->setMaximumSize(maxSize);
-
-    filterDockWidget->setMinimumSize(minSize);
-    filterDockWidget->setMaximumSize(maxSize);
-
-    printingSelectorDockWidget->setMinimumSize(minSize);
-    printingSelectorDockWidget->setMaximumSize(maxSize);
+    for (auto dockWidget : dockToActions.keys()) {
+        dockWidget->setMinimumSize(minSize);
+        dockWidget->setMaximumSize(maxSize);
+    }
 }
 
 /** @brief Handles dock visibility toggling from menu actions. */
 void TabDeckEditor::dockVisibleTriggered()
 {
     QObject *o = sender();
-    if (o == aCardInfoDockVisible) {
-        cardInfoDockWidget->setHidden(!aCardInfoDockVisible->isChecked());
-        aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
-    } else if (o == aCardDatabaseDockVisible) {
-        cardDatabaseDockWidget->setHidden(!aCardDatabaseDockVisible->isChecked());
-        aCardDatabaseDockFloating->setEnabled(aCardDatabaseDockVisible->isChecked());
-    } else if (o == aDeckDockVisible) {
-        deckDockWidget->setHidden(!aDeckDockVisible->isChecked());
-        aDeckDockFloating->setEnabled(aDeckDockVisible->isChecked());
-    } else if (o == aFilterDockVisible) {
-        filterDockWidget->setHidden(!aFilterDockVisible->isChecked());
-        aFilterDockFloating->setEnabled(aFilterDockVisible->isChecked());
-    } else if (o == aPrintingSelectorDockVisible) {
-        printingSelectorDockWidget->setHidden(!aPrintingSelectorDockVisible->isChecked());
-        aPrintingSelectorDockFloating->setEnabled(aPrintingSelectorDockVisible->isChecked());
+
+    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
+        QDockWidget *dockWidget = it.key();
+        const DockActions &actions = it.value();
+
+        if (o == actions.aVisible) {
+            dockWidget->setHidden(!actions.aVisible->isChecked());
+            actions.aFloating->setEnabled(actions.aVisible->isChecked());
+            return;
+        }
     }
 }
 
@@ -327,32 +255,28 @@ void TabDeckEditor::dockVisibleTriggered()
 void TabDeckEditor::dockFloatingTriggered()
 {
     QObject *o = sender();
-    if (o == aCardInfoDockFloating)
-        cardInfoDockWidget->setFloating(aCardInfoDockFloating->isChecked());
-    else if (o == aCardDatabaseDockFloating)
-        cardDatabaseDockWidget->setFloating(aCardDatabaseDockFloating->isChecked());
-    else if (o == aDeckDockFloating)
-        deckDockWidget->setFloating(aDeckDockFloating->isChecked());
-    else if (o == aFilterDockFloating)
-        filterDockWidget->setFloating(aFilterDockFloating->isChecked());
-    else if (o == aPrintingSelectorDockFloating)
-        printingSelectorDockWidget->setFloating(aPrintingSelectorDockFloating->isChecked());
+
+    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
+        QDockWidget *dockWidget = it.key();
+        const DockActions &actions = it.value();
+
+        if (o == actions.aFloating) {
+            dockWidget->setFloating(actions.aFloating->isChecked());
+            return;
+        }
+    }
 }
 
 /** @brief Syncs menu state with dock floating changes. */
 void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 {
     QObject *o = sender();
-    if (o == cardInfoDockWidget)
-        aCardInfoDockFloating->setChecked(topLevel);
-    else if (o == aCardDatabaseDockFloating)
-        aCardDatabaseDockFloating->setChecked(topLevel);
-    else if (o == deckDockWidget)
-        aDeckDockFloating->setChecked(topLevel);
-    else if (o == filterDockWidget)
-        aFilterDockFloating->setChecked(topLevel);
-    else if (o == printingSelectorDockWidget)
-        aPrintingSelectorDockFloating->setChecked(topLevel);
+
+    auto dockWidget = qobject_cast<QDockWidget *>(o);
+    if (dockToActions.contains(dockWidget)) {
+        DockActions actions = dockToActions.value(dockWidget);
+        actions.aFloating->setChecked(topLevel);
+    }
 }
 
 /**
@@ -364,21 +288,11 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
 bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
     if (e->type() == QEvent::Close) {
-        if (o == cardInfoDockWidget) {
-            aCardInfoDockVisible->setChecked(false);
-            aCardInfoDockFloating->setEnabled(false);
-        } else if (o == cardDatabaseDockWidget) {
-            aCardDatabaseDockVisible->setChecked(false);
-            aCardDatabaseDockFloating->setEnabled(false);
-        } else if (o == deckDockWidget) {
-            aDeckDockVisible->setChecked(false);
-            aDeckDockFloating->setEnabled(false);
-        } else if (o == filterDockWidget) {
-            aFilterDockVisible->setChecked(false);
-            aFilterDockFloating->setEnabled(false);
-        } else if (o == printingSelectorDockWidget) {
-            aPrintingSelectorDockVisible->setChecked(false);
-            aPrintingSelectorDockFloating->setEnabled(false);
+        auto dockWidget = qobject_cast<QDockWidget *>(o);
+        if (dockToActions.contains(dockWidget)) {
+            DockActions actions = dockToActions.value(dockWidget);
+            actions.aVisible->setChecked(false);
+            actions.aFloating->setEnabled(false);
         }
     }
 
