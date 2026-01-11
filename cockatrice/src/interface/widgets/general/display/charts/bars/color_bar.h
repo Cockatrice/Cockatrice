@@ -100,7 +100,7 @@ protected:
 
 private:
     /// Map of color keys to counts used for rendering.
-    QMap<QString, int> colors;
+    QList<QPair<QString, int>> colors;
 
     /// True if the mouse is currently inside the widget.
     bool isHovered = false;

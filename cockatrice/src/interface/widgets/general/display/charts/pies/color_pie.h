@@ -31,7 +31,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    QMap<QString, int> colors;
+    QList<QPair<QString, int>> colors;
     bool isHovered = false;
     const double minRatioThreshold = 0.01; // skip tiny slices
 

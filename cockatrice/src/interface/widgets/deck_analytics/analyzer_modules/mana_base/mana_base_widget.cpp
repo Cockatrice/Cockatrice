@@ -8,6 +8,7 @@
 
 #include <QDialog>
 #include <QListWidget>
+#include <libcockatrice/utility/color.h>
 
 namespace
 {
@@ -71,14 +72,16 @@ void ManaBaseWidget::updateDisplay()
 
     // Choose display mode
     if (config.displayType == "bar") {
-        QHash<QString, QColor> colors = {{"W", QColor(248, 231, 185)}, {"U", QColor(14, 104, 171)},
-                                         {"B", QColor(21, 11, 0)},     {"R", QColor(211, 32, 42)},
-                                         {"G", QColor(0, 115, 62)},    {"C", QColor(150, 150, 150)}};
+        const QList<QPair<QString, int>> sortedColors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(mapSorted);
+        static const QHash<QString, QColor> colorMap = {
+            {"W", QColor(248, 231, 185)}, {"U", QColor(14, 104, 171)}, {"B", QColor(21, 11, 0)},
+            {"R", QColor(211, 32, 42)},   {"G", QColor(0, 115, 62)},   {"C", QColor(150, 150, 150)},
+        };
 
-        for (auto color : manaMap.keys()) {
-            QString label = QString("%1 %2 (%3)").arg(color).arg(manaMap[color]).arg(cardCount.value(color));
+        for (const auto &[color, count] : sortedColors) {
+            QString label = QString("%1 %2 (%3)").arg(color).arg(count).arg(cardCount.value(color));
 
-            BarWidget *bar = new BarWidget(label, manaMap[color], highest, colors.value(color, Qt::gray), this);
+            BarWidget *bar = new BarWidget(label, count, highest, colorMap.value(color, Qt::gray), this);
 
             barLayout->addWidget(bar);
         }
