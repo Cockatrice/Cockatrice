@@ -89,7 +89,7 @@
     <message>
         <location filename="src/pages.cpp" line="277"/>
         <source>Please choose a file.</source>
-        <translation>Bitte wählen Sie eine Datei.</translation>
+        <translation>Bitte wähle eine Datei aus.</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="282"/>
@@ -421,7 +421,7 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="129"/>
         <source>Please choose a file.</source>
-        <translation>Bitte wählen Sie eine Datei.</translation>
+        <translation>Bitte wähle eine Datei aus.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="134"/>
