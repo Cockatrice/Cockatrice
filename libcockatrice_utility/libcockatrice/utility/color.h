@@ -56,6 +56,9 @@ inline QColor colorHelper(const QString &name)
 
     return QColor(r, g, b);
 }
+
+#include <QSet>
+
 inline QList<QPair<QString, int>> sortManaMapWUBRGCFirst(const QMap<QString, int> &input)
 {
     static const QStringList priorityOrder = {"W", "U", "B", "R", "G", "C"};
