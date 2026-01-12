@@ -53,27 +53,27 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));
+    quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/floppy_disk"));
     quickFilterSaveLoadWidget->setButtonText("Save/Load");
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/rename"));
+    quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/pen_to_square"));
     quickFilterNameWidget->setButtonText("Name");
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
-    quickFilterMainTypeWidget->setButtonIcon(QPixmap("theme:icons/player"));
+    quickFilterMainTypeWidget->setButtonIcon(QPixmap("theme:icons/circle_half_stroke"));
     quickFilterMainTypeWidget->setButtonText("Main Type");
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/player"));
+    quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/dragon"));
     quickFilterSubTypeWidget->setButtonText("Sub Type");
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scales"));
+    quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scroll"));
     quickFilterSetWidget->setButtonText("Sets");
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
-    quickFilterFormatLegalityWidget->setButtonIcon(QPixmap("theme:icons/player"));
+    quickFilterFormatLegalityWidget->setButtonIcon(QPixmap("theme:icons/scale_balanced"));
     quickFilterFormatLegalityWidget->setButtonText("Formats");
 
     retranslateUi();
@@ -110,12 +110,13 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterContainerLayout->addWidget(sortColumnCombo);
     filterContainerLayout->addWidget(sortOrderCombo);
     filterContainerLayout->addWidget(filterByLabel);
-    filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
     filterContainerLayout->addWidget(quickFilterNameWidget);
     filterContainerLayout->addWidget(quickFilterMainTypeWidget);
     filterContainerLayout->addWidget(quickFilterSubTypeWidget);
     filterContainerLayout->addWidget(quickFilterSetWidget);
     filterContainerLayout->addWidget(quickFilterFormatLegalityWidget);
+    filterContainerLayout->addStretch();
+    filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
 }
 
 void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
