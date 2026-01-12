@@ -12,13 +12,12 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
                                                                                      FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
-    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
     // Get all main card types with their count
+    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
+    setMinimumWidth(300);
+    setMaximumHeight(200);
 
-    setMaximumHeight(75);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-    layout = new QHBoxLayout(this);
+    layout = new QVBoxLayout(this);
     setLayout(layout);
     layout->setContentsMargins(0, 1, 0, 1);
     layout->setSpacing(1);

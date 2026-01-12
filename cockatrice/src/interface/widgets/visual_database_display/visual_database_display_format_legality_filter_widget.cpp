@@ -14,11 +14,10 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
     : QWidget(parent), filterModel(_filterModel)
 {
     allFormatsWithCount = CardDatabaseManager::query()->getAllFormatsWithCount();
+    setMinimumWidth(300);
+    setMaximumHeight(300);
 
-    setMaximumHeight(75);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-    layout = new QHBoxLayout(this);
+    layout = new QVBoxLayout(this);
     setLayout(layout);
     layout->setContentsMargins(0, 1, 0, 1);
     layout->setSpacing(1);

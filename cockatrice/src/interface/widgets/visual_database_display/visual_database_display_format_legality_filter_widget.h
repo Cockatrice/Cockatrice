@@ -30,7 +30,7 @@ private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allFormatsWithCount;
     QSpinBox *spinBox;
-    QHBoxLayout *layout;
+    QVBoxLayout *layout;
     FlowWidget *flowWidget;
     QPushButton *toggleButton; // Mode switch button
 

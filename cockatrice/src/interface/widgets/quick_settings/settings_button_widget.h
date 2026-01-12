@@ -22,6 +22,7 @@ public:
     void addSettingsWidget(QWidget *toAdd) const;
     void removeSettingsWidget(QWidget *toRemove) const;
     void setButtonIcon(QPixmap iconMap);
+    void setButtonText(const QString &buttonText);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
