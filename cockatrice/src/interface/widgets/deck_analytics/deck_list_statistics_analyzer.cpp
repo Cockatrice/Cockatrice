@@ -9,38 +9,102 @@
 
 DeckListStatisticsAnalyzer::DeckListStatisticsAnalyzer(QObject *parent,
                                                        DeckListModel *_model,
-                                                       DeckListStatisticsAnalyzerConfig cfg)
-    : QObject(parent), model(_model), config(cfg)
+                                                       DeckListStatisticsAnalyzerConfig _config)
+    : QObject(parent), model(_model), config(_config)
 {
-    connect(model, &DeckListModel::dataChanged, this, &DeckListStatisticsAnalyzer::update);
+    connect(model, &DeckListModel::cardsChanged, this, &DeckListStatisticsAnalyzer::analyze);
 }
 
-void DeckListStatisticsAnalyzer::update()
+void DeckListStatisticsAnalyzer::analyze()
 {
-    manaBaseMap.clear();
-    manaCurveMap.clear();
-    manaDevotionMap.clear();
+    clearData();
 
-    QList<ExactCard> cards = model->getCards();
+    QList<const DecklistCardNode *> nodes = model->getCardNodes();
 
-    for (const ExactCard &card : cards) {
-        // ---- Mana curve ----
+    for (auto node : nodes) {
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
+        if (!info) {
+            continue;
+        }
+
+        const int amount = node->getNumber();
+        QStringList copiesOfName;
+        for (int i = 0; i < amount; i++) {
+            copiesOfName.append(node->getName());
+        }
+
+        // Convert once
+        const int cmc = info->getCmc().toInt();
+        QStringList types = info->getMainCardType().split(' ');
+        QStringList subtypes = info->getCardType().split('-').last().split(" ");
+        QString colors = info->getColors();
+        int power = info->getPowTough().split("/").first().toInt();
+        int toughness = info->getPowTough().split("/").last().toInt();
+
+        // For each copy of card
+        // ---------------- Mana Curve ----------------
         if (config.computeManaCurve) {
-            manaCurveMap[card.getInfo().getCmc().toInt()]++;
+            manaCurveMap[cmc] += amount;
         }
 
-        // ---- Mana base ----
+        // per-type curve
+        for (auto &t : types) {
+            manaCurveByType[t][cmc] += amount;
+            manaCurveCardsByType[t][cmc] << copiesOfName;
+        }
+
+        // Per-subtype curve
+        for (auto &st : subtypes) {
+            manaCurveBySubtype[st][cmc] += amount;
+            manaCurveCardsBySubtype[st][cmc] << copiesOfName;
+        }
+
+        // per-color curve
+        for (auto &c : colors) {
+            manaCurveByColor[c][cmc] += amount;
+            manaCurveCardsByColor[c][cmc] << copiesOfName;
+        }
+
+        // Power/toughness
+        manaCurveByPower[QString::number(power)][cmc] += amount;
+        manaCurveCardsByPower[QString::number(power)][cmc] << copiesOfName;
+        manaCurveByToughness[QString::number(toughness)][cmc] += amount;
+        manaCurveCardsByToughness[QString::number(toughness)][cmc] << copiesOfName;
+
+        // ========== Category Counts ===========
+        for (auto &t : types) {
+            typeCount[t] += amount;
+        }
+        for (auto &st : subtypes) {
+            subtypeCount[st] += amount;
+        }
+        for (auto &c : colors) {
+            colorCount[c] += amount;
+        }
+        manaValueCount[cmc] += amount;
+
+        // ---------------- Mana Base ----------------
         if (config.computeManaBase) {
-            auto mana = determineManaProduction(card.getInfo().getText());
-            for (auto it = mana.begin(); it != mana.end(); ++it)
-                manaBaseMap[it.key()] += it.value();
+            auto prod = determineManaProduction(info->getText());
+            for (auto it = prod.begin(); it != prod.end(); ++it) {
+                if (it.value() > 0) {
+                    productionPipCount[it.key()] += it.value() * amount;
+                    productionCardCount[it.key()] += amount;
+                }
+                manaBaseMap[it.key()] += it.value() * amount;
+            }
         }
 
-        // ---- Devotion ----
+        // ---------------- Devotion ----------------
         if (config.computeDevotion) {
-            auto devo = countManaSymbols(card.getInfo().getManaCost());
-            for (auto &d : devo)
-                manaDevotionMap[d.first] += d.second;
+            auto devo = countManaSymbols(info->getManaCost());
+            for (auto &d : devo) {
+                if (d.second > 0) {
+                    devotionPipCount[QString(d.first)] += d.second * amount;
+                    devotionCardCount[QString(d.first)] += amount;
+                }
+                manaDevotionMap[d.first] += d.second * amount;
+            }
         }
     }
 
@@ -111,4 +175,58 @@ std::unordered_map<char, int> DeckListStatisticsAnalyzer::countManaSymbols(const
     }
 
     return manaCounts;
+}
+
+// Hypergeometric probability: P(X=k)
+double DeckListStatisticsAnalyzer::hypergeometric(int N, int K, int n, int k)
+{
+    if (k < 0 || k > n || K > N) {
+        return 0.0;
+    }
+
+    auto choose = [](int n, int r) -> double {
+        if (r > n)
+            return 0.0;
+        if (r == 0 || r == n)
+            return 1.0;
+        double res = 1.0;
+        for (int i = 1; i <= r; ++i) {
+            res *= (n - r + i);
+            res /= i;
+        }
+        return res;
+    };
+
+    return choose(K, k) * choose(N - K, n - k) / choose(N, n);
+}
+
+void DeckListStatisticsAnalyzer::clearData()
+{
+    manaBaseMap.clear();
+    manaCurveMap.clear();
+    manaDevotionMap.clear();
+
+    devotionPipCount.clear();
+    devotionCardCount.clear();
+
+    productionPipCount.clear();
+    productionCardCount.clear();
+
+    manaCurveByType.clear();
+    manaCurveBySubtype.clear();
+    manaCurveByColor.clear();
+    manaCurveByPower.clear();
+    manaCurveByToughness.clear();
+
+    manaCurveCardsByType.clear();
+    manaCurveCardsBySubtype.clear();
+    manaCurveCardsByColor.clear();
+    manaCurveCardsByPower.clear();
+    manaCurveCardsByToughness.clear();
+
+    typeCount.clear();
+    subtypeCount.clear();
+    colorCount.clear();
+    rarityCount.clear();
+    manaValueCount.clear();
 }

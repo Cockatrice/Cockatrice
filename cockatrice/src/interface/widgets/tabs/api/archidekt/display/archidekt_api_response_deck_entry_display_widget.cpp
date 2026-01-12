@@ -3,7 +3,7 @@
 #include "../../../../../card_picture_loader/card_picture_loader.h"
 #include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../../../general/display/background_plate_widget.h"
-#include "../../../../general/display/color_bar.h"
+#include "../../../../general/display/charts/bars/color_bar.h"
 #include "archidekt_deck_preview_image_display_widget.h"
 
 #include <QHBoxLayout>

@@ -145,6 +145,7 @@ signals:
     void homeTabBackgroundShuffleFrequencyChanged();
     void picDownloadChanged();
     void showStatusBarChanged(bool state);
+    void showGameSelectorFilterToolbarChanged(bool state);
     void displayCardNamesChanged();
     void overrideAllCardArtWithPersonalPreferenceChanged(bool _overrideAllCardArtWithPersonalPreference);
     void bumpSetsWithCardsInDeckToTopChanged();
@@ -236,6 +237,7 @@ private:
     bool annotateTokens;
     QByteArray tabGameSplitterSizes;
     bool showShortcuts;
+    bool showGameSelectorFilterToolbar;
     bool displayCardNames;
     bool overrideAllCardArtWithPersonalPreference;
     bool bumpSetsWithCardsInDeckToTop;
@@ -552,6 +554,10 @@ public:
     [[nodiscard]] bool getShowShortcuts() const
     {
         return showShortcuts;
+    }
+    [[nodiscard]] bool getShowGameSelectorFilterToolbar() const
+    {
+        return showGameSelectorFilterToolbar;
     }
     [[nodiscard]] bool getDisplayCardNames() const
     {
@@ -1017,6 +1023,7 @@ public slots:
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
     void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
+    void setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
     void setOverrideAllCardArtWithPersonalPreference(QT_STATE_CHANGED_T _overrideAllCardArt);
     void setBumpSetsWithCardsInDeckToTop(QT_STATE_CHANGED_T _bumpSetsWithCardsInDeckToTop);

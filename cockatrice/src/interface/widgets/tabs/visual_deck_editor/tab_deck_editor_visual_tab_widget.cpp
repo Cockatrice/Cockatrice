@@ -45,10 +45,13 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay);
 
-    deckAnalytics = new DeckAnalyticsWidget(this, deckModel);
+    statsAnalyzer = new DeckListStatisticsAnalyzer(this, deckModel);
+    statsAnalyzer->analyze();
+
+    deckAnalytics = new DeckAnalyticsWidget(this, statsAnalyzer);
     deckAnalytics->setObjectName("deckAnalytics");
 
-    sampleHandWidget = new VisualDeckEditorSampleHandWidget(this, deckModel);
+    sampleHandWidget = new VisualDeckEditorSampleHandWidget(this, deckModel, statsAnalyzer);
 
     this->addNewTab(visualDeckView, tr("Visual Deck View"));
     this->addNewTab(visualDatabaseDisplay, tr("Visual Database Display"));

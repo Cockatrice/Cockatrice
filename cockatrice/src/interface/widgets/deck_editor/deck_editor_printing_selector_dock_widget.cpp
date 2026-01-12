@@ -33,6 +33,10 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
 
     installEventFilter(deckEditor);
     connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
+    connect(printingSelector, &PrintingSelector::prevCardRequested, deckEditor->getDeckDockWidget(),
+            &DeckEditorDeckDockWidget::selectPrevCard);
+    connect(printingSelector, &PrintingSelector::nextCardRequested, deckEditor->getDeckDockWidget(),
+            &DeckEditorDeckDockWidget::selectNextCard);
 }
 
 void DeckEditorPrintingSelectorDockWidget::retranslateUi()

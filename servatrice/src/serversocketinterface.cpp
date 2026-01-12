@@ -972,11 +972,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     Response_WarnList *re = new Response_WarnList;
 
     QString officialWarnings = settingsCache->value("server/officialwarnings").toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList warningsList = officialWarnings.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
-#endif
     for (const QString &warning : warningsList) {
         re->add_warning(warning.toStdString());
     }
@@ -1172,13 +1168,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     const auto parsedEmailParts = EmailParser::parseEmailAddress(nameFromStdString(cmd.email()));
     const auto emailUser = parsedEmailParts.first;
     const auto emailDomain = parsedEmailParts.second;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     const QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
     const QStringList emailWhiteListFilters = emailWhiteList.split(",", Qt::SkipEmptyParts);
-#else
-    const QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
-    const QStringList emailWhiteListFilters = emailWhiteList.split(",", QString::SkipEmptyParts);
-#endif
 
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
     if (requireEmailForRegistration && emailUser.isEmpty()) {
@@ -1930,13 +1921,8 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
-#else
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
-#endif
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -2109,10 +2095,8 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     }
     socket = (QWebSocket *)_socket;
     socket->setParent(this);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     // https://bugreports.qt.io/browse/QTBUG-70693
     socket->setMaxAllowedIncomingMessageSize(1500000); // 1.5MB
-#endif
 
     address = socket->peerAddress();
 

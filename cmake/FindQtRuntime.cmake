@@ -59,7 +59,7 @@ if(Qt6_FOUND)
   endif()
 else()
   find_package(
-    Qt5 5.8.0
+    Qt5 5.15.2
     COMPONENTS ${REQUIRED_QT_COMPONENTS}
     QUIET HINTS ${Qt5_DIR}
   )

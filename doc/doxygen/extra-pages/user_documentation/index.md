@@ -1,13 +1,17 @@
 @page user_reference User Reference
+ 
+# Deck Management
 
-@subpage search_syntax_help
+- @subpage creating_decks
+- @subpage importing_decks
+- @subpage editing_decks
+- @subpage exporting_decks
 
-@subpage deck_search_syntax_help
+# Release Channels
 
-@subpage creating_decks
+- @subpage beta_release
 
-@subpage importing_decks
+# Syntax Help
 
-@subpage editing_decks
-
-@subpage exporting_decks
+- @subpage search_syntax_help
+- @subpage deck_search_syntax_help

@@ -1,11 +1,13 @@
 @page deck_search_syntax_help Deck Search Syntax Help
 
 ## Deck Search Syntax Help
------
+
 The search bar recognizes a set of special commands.<br>
 In this list of examples below, each entry has an explanation and can be clicked to test the query. Note that all
 searches are case insensitive.
+
 <dl>
+
 <dt>Display Name (The deck name, or the filename if the deck name isn't set):</dt>
 <dd>[red deck wins](#red deck wins) <small>(Any deck with a display name containing the words red, deck, and wins)</small></dd>
 <dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck with a display name containing the exact phrase "red deck wins")</small></dd>
@@ -26,6 +28,11 @@ searches are case insensitive.
 
 <dt><u>F</u>ormat:</dt>
 <dd>[f:standard](#f:standard) <small>(Any deck with format set to standard)</small></dd>
+
+<dt><u>C</u>omments:</dt>
+<dd>[c:good](#c:good) <small>(Any deck with comments containing the word good)</small></dd>
+<dd>[c:good c:deck](#c:good c:deck) <small>(Any deck with comments containing the words good and deck)</small></dd>
+<dd>[c:"good deck"](#c:%22good deck%22) <small>(Any deck with comments containing the exact phrase "good deck")</small></dd>
 
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>

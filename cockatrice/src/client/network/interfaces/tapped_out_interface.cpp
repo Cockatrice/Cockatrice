@@ -67,24 +67,24 @@ void TappedOutInterface::queryFinished(QNetworkReply *reply)
     deleteLater();
 }
 
-void TappedOutInterface::getAnalyzeRequestData(DeckList *deck, QByteArray *data)
+void TappedOutInterface::getAnalyzeRequestData(const DeckList &deck, QByteArray &data)
 {
     DeckList mainboard, sideboard;
-    copyDeckSplitMainAndSide(*deck, mainboard, sideboard);
+    copyDeckSplitMainAndSide(deck, mainboard, sideboard);
 
     QUrl params;
     QUrlQuery urlQuery;
-    urlQuery.addQueryItem("name", deck->getName());
+    urlQuery.addQueryItem("name", deck.getName());
     urlQuery.addQueryItem("mainboard", mainboard.writeToString_Plain(false, true));
     urlQuery.addQueryItem("sideboard", sideboard.writeToString_Plain(false, true));
     params.setQuery(urlQuery);
-    data->append(params.query(QUrl::EncodeReserved).toUtf8());
+    data.append(params.query(QUrl::EncodeReserved).toUtf8());
 }
 
-void TappedOutInterface::analyzeDeck(DeckList *deck)
+void TappedOutInterface::analyzeDeck(const DeckList &deck)
 {
     QByteArray data;
-    getAnalyzeRequestData(deck, &data);
+    getAnalyzeRequestData(deck, data);
 
     QNetworkRequest request(QUrl("https://tappedout.net/mtg-decks/paste/"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -93,7 +93,7 @@ void TappedOutInterface::analyzeDeck(DeckList *deck)
     manager->post(request, data);
 }
 
-void TappedOutInterface::copyDeckSplitMainAndSide(DeckList &source, DeckList &mainboard, DeckList &sideboard)
+void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());

@@ -287,14 +287,14 @@ static QString toDecklistExportString(const QList<const DecklistCardNode *> &car
  * @param deckList The decklist to export
  * @param website The website we're sending the deck to
  */
-QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website)
+QString DeckLoader::exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website)
 {
     // Add the base url
     QString deckString = "https://" + getDomainForWebsite(website) + "/?";
 
     // export all cards in zone
-    QString mainBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_MAIN}));
-    QString sideBoardCards = toDecklistExportString(deckList->getCardNodes({DECK_ZONE_SIDE}));
+    QString mainBoardCards = toDecklistExportString(deckList.getCardNodes({DECK_ZONE_MAIN}));
+    QString sideBoardCards = toDecklistExportString(deckList.getCardNodes({DECK_ZONE_SIDE}));
 
     // Remove the extra return at the end of the last cards
     mainBoardCards.chop(3);
@@ -310,7 +310,7 @@ QString DeckLoader::exportDeckToDecklist(const DeckList *deckList, DecklistWebsi
     return deckString;
 }
 
-void DeckLoader::saveToClipboard(const DeckList *deckList, bool addComments, bool addSetNameAndNumber)
+void DeckLoader::saveToClipboard(const DeckList &deckList, bool addComments, bool addSetNameAndNumber)
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -320,7 +320,7 @@ void DeckLoader::saveToClipboard(const DeckList *deckList, bool addComments, boo
 }
 
 bool DeckLoader::saveToStream_Plain(QTextStream &out,
-                                    const DeckList *deckList,
+                                    const DeckList &deckList,
                                     bool addComments,
                                     bool addSetNameAndNumber)
 {
@@ -329,7 +329,7 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     }
 
     // loop zones
-    for (auto zoneNode : deckList->getZoneNodes()) {
+    for (auto zoneNode : deckList.getZoneNodes()) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
@@ -339,14 +339,14 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
     return true;
 }
 
-void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList)
+void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList)
 {
-    if (!deckList->getName().isEmpty()) {
-        out << "// " << deckList->getName() << "\n\n";
+    if (!deckList.getName().isEmpty()) {
+        out << "// " << deckList.getName() << "\n\n";
     }
 
-    if (!deckList->getComments().isEmpty()) {
-        QStringList commentRows = deckList->getComments().split(QRegularExpression("\n|\r\n|\r"));
+    if (!deckList.getComments().isEmpty()) {
+        QStringList commentRows = deckList.getComments().split(QRegularExpression("\n|\r\n|\r"));
         for (const QString &row : commentRows) {
             out << "// " << row << "\n";
         }
@@ -434,7 +434,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
     }
 }
 
-bool DeckLoader::convertToCockatriceFormat(QString fileName)
+bool DeckLoader::convertToCockatriceFormat(const QString &fileName)
 {
     // Change the file extension to .cod
     QFileInfo fileInfo(fileName);
@@ -543,7 +543,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
     cursor->movePosition(QTextCursor::End);
 }
 
-void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
+void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 {
     QTextDocument doc;
 
@@ -559,14 +559,14 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList *deckList)
     headerCharFormat.setFontWeight(QFont::Bold);
 
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getName());
+    cursor.insertText(deckList.getName());
 
     headerCharFormat.setFontPointSize(12);
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
-    cursor.insertText(deckList->getComments());
+    cursor.insertText(deckList.getComments());
     cursor.insertBlock(headerBlockFormat, headerCharFormat);
 
-    for (auto zoneNode : deckList->getZoneNodes()) {
+    for (auto zoneNode : deckList.getZoneNodes()) {
         cursor.insertHtml("<br><img src=theme:hr.jpg>");
         cursor.insertBlock(headerBlockFormat, headerCharFormat);
 

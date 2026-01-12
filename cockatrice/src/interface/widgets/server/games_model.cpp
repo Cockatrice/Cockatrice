@@ -421,10 +421,8 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, QTimeZone::UTC).date();
-#elif (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-    static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
 #else
-    static const QDate epochDate = QDateTime::fromTime_t(0, Qt::UTC).date();
+    static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
 #endif
     auto *model = qobject_cast<GamesModel *>(sourceModel());
     if (!model)

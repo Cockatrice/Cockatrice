@@ -60,6 +60,16 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
     connect(aMulligan, &QAction::triggered, actions, &PlayerActions::actMulligan);
     addAction(aMulligan);
 
+    // Mulligan same size
+    aMulliganSame = new QAction(this);
+    connect(aMulliganSame, &QAction::triggered, actions, &PlayerActions::actMulliganSameSize);
+    addAction(aMulliganSame);
+
+    // Mulligan -1
+    aMulliganMinusOne = new QAction(this);
+    connect(aMulliganMinusOne, &QAction::triggered, actions, &PlayerActions::actMulliganMinusOne);
+    addAction(aMulliganMinusOne);
+
     addSeparator();
 
     mMoveHandMenu = addTearOffMenu(QString());
@@ -104,7 +114,9 @@ void HandMenu::retranslateUi()
         aSortHandByType->setText(tr("Type"));
         aSortHandByManaValue->setText(tr("Mana Value"));
 
-        aMulligan->setText(tr("Take &mulligan"));
+        aMulligan->setText(tr("Take &mulligan (Choose hand size)"));
+        aMulliganSame->setText(tr("Take mulligan (Same hand size)"));
+        aMulliganMinusOne->setText(tr("Take mulligan (Hand size - 1)"));
 
         mMoveHandMenu->setTitle(tr("&Move hand to..."));
         aMoveHandToTopLibrary->setText(tr("&Top of library"));
@@ -128,6 +140,8 @@ void HandMenu::setShortcutsActive()
     aSortHandByType->setShortcuts(shortcuts.getShortcut("Player/aSortHandByType"));
     aSortHandByManaValue->setShortcuts(shortcuts.getShortcut("Player/aSortHandByManaValue"));
     aMulligan->setShortcuts(shortcuts.getShortcut("Player/aMulligan"));
+    aMulliganSame->setShortcuts(shortcuts.getShortcut("Player/aMulliganSame"));
+    aMulliganMinusOne->setShortcuts(shortcuts.getShortcut("Player/aMulliganMinusOne"));
     aRevealHandToAll->setShortcuts(shortcuts.getShortcut("Player/aRevealHandToAll"));
     aRevealRandomHandCardToAll->setShortcuts(shortcuts.getShortcut("Player/aRevealRandomHandCardToAll"));
 }

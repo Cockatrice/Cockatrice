@@ -2,6 +2,7 @@
 
 #include "card_group_display_widgets/flat_card_group_display_widget.h"
 #include "card_group_display_widgets/overlapped_card_group_display_widget.h"
+#include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QResizeEvent>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
@@ -89,10 +90,11 @@ void DeckCardZoneDisplayWidget::onSelectionChanged(const QItemSelection &selecte
 
 void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
 {
-    auto categoryName = deckListModel->data(index.sibling(index.row(), 1), Qt::EditRole).toString();
     if (indexToWidgetMap.contains(index)) {
         return;
     }
+
+    auto categoryName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     if (displayType == DisplayType::Overlap) {
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
             cardGroupContainer, deckListModel, selectionModel, index, zoneName, categoryName, activeGroupCriteria,
@@ -127,7 +129,7 @@ void DeckCardZoneDisplayWidget::displayCards()
     QSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     // 1. trackedIndex is a source index → map it to proxy space
     QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
@@ -227,4 +229,23 @@ void DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeS
 {
     activeSortCriteria = _activeSortCriteria;
     emit activeSortCriteriaChanged(activeSortCriteria);
+}
+
+QList<QString> DeckCardZoneDisplayWidget::getGroupCriteriaValueList()
+{
+    QList<QString> groupCriteriaValues;
+
+    QList<const DecklistCardNode *> nodes = deckListModel->getCardNodesForZone(zoneName);
+
+    for (auto node : nodes) {
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
+        if (info) {
+            groupCriteriaValues.append(info->getProperty(activeGroupCriteria));
+        }
+    }
+
+    groupCriteriaValues.removeDuplicates();
+    groupCriteriaValues.sort();
+
+    return groupCriteriaValues;
 }
