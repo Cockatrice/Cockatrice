@@ -22,6 +22,8 @@ inline color convertQColorToColor(const QColor &c)
     return result;
 }
 
+#include <QSet>
+
 namespace GameSpecificColors
 {
 namespace MTG
@@ -56,8 +58,6 @@ inline QColor colorHelper(const QString &name)
 
     return QColor(r, g, b);
 }
-
-#include <QSet>
 
 inline QList<QPair<QString, int>> sortManaMapWUBRGCFirst(const QMap<QString, int> &input)
 {
