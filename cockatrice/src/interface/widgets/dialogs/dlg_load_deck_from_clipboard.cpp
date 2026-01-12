@@ -150,7 +150,7 @@ DlgEditDeckInClipboard::DlgEditDeckInClipboard(const DeckList &_deckList, bool _
  * @param addComments Whether to add annotations
  * @return A QString
  */
-static QString deckListToString(const DeckList *deckList, bool addComments)
+static QString deckListToString(const DeckList &deckList, bool addComments)
 {
     QString buffer;
     QTextStream stream(&buffer);
@@ -160,7 +160,7 @@ static QString deckListToString(const DeckList *deckList, bool addComments)
 
 void DlgEditDeckInClipboard::actRefresh()
 {
-    setText(deckListToString(&deckList, annotated));
+    setText(deckListToString(deckList, annotated));
 }
 
 void DlgEditDeckInClipboard::actOK()

@@ -68,11 +68,12 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
 
     model = new DeckListModel(this);
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
-    model->getDeckList()->loadFromStream_Plain(deckStream, false);
 
-    model->getDeckList()->forEachCard(CardNodeFunction::ResolveProviderId());
+    auto decklist = QSharedPointer<DeckList>(new DeckList);
+    decklist->loadFromStream_Plain(deckStream, false);
+    model->setDeckList(decklist);
 
-    model->rebuildTree();
+    model->forEachCard(CardNodeFunction::ResolveProviderId());
 
     retranslateUi();
 }
@@ -85,7 +86,7 @@ void ArchidektApiResponseDeckDisplayWidget::retranslateUi()
 void ArchidektApiResponseDeckDisplayWidget::onGroupCriteriaChange(const QString &activeGroupCriteria)
 {
     model->setActiveGroupCriteria(DeckListModelGroupCriteria::fromString(activeGroupCriteria));
-    model->sort(1, Qt::AscendingOrder);
+    model->sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 }
 
 void ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor()
@@ -122,7 +123,7 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
     QSortFilterProxyModel proxy;
     proxy.setSourceModel(model);
     proxy.setSortRole(Qt::EditRole);
-    proxy.sort(1, Qt::AscendingOrder);
+    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
 
     for (int i = 0; i < proxy.rowCount(); ++i) {
         QModelIndex proxyIndex = proxy.index(i, 0);
@@ -135,10 +136,12 @@ void ArchidektApiResponseDeckDisplayWidget::constructZoneWidgetsFromDeckListMode
             continue;
         }
 
+        QString zoneName =
+            persistent.sibling(persistent.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+
         DeckCardZoneDisplayWidget *zoneDisplayWidget =
-            new DeckCardZoneDisplayWidget(zoneContainer, model, nullptr, persistent,
-                                          model->data(persistent.sibling(persistent.row(), 1), Qt::EditRole).toString(),
-                                          "maintype", {"name"}, DisplayType::Overlap, 20, 10, cardSizeSlider);
+            new DeckCardZoneDisplayWidget(zoneContainer, model, nullptr, persistent, zoneName, "maintype", {"name"},
+                                          DisplayType::Overlap, 20, 10, cardSizeSlider);
 
         connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, zoneDisplayWidget,
                 &DeckCardZoneDisplayWidget::onActiveSortCriteriaChanged);

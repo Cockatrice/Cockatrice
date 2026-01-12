@@ -120,6 +120,7 @@ private:
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
+    QCheckBox showGameSelectorFilterToolbarCheckBox;
     QCheckBox displayCardNamesCheckBox;
     QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;

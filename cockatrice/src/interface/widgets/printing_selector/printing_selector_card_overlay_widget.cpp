@@ -22,19 +22,16 @@
  *
  * @param parent The parent widget for this overlay.
  * @param _deckEditor The TabDeckEditor instance for deck management.
- * @param _deckModel The DeckListModel instance providing deck data.
- * @param _deckView The QTreeView instance displaying the deck.
- * @param _cardSizeSlider The slider controlling the size of the card.
+ * @param deckStateManager The DeckStateManager instance providing deck data.
+ * @param cardSizeSlider The slider controlling the size of the card.
  * @param _rootCard The root card object that contains information about the card.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                                      AbstractTabDeckEditor *_deckEditor,
-                                                                     DeckListModel *_deckModel,
-                                                                     QTreeView *_deckView,
-                                                                     QSlider *_cardSizeSlider,
+                                                                     DeckStateManager *deckStateManager,
+                                                                     QSlider *cardSizeSlider,
                                                                      const ExactCard &_rootCard)
-    : QWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), deckView(_deckView),
-      cardSizeSlider(_cardSizeSlider), rootCard(_rootCard)
+    : QWidget(parent), deckEditor(_deckEditor), rootCard(_rootCard)
 {
     // Set up the main layout
     auto *mainLayout = new QVBoxLayout(this);
@@ -59,16 +56,9 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     updatePinBadgeVisibility();
 
     // Add AllZonesCardAmountWidget
-    allZonesCardAmountWidget =
-        new AllZonesCardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, _rootCard);
+    allZonesCardAmountWidget = new AllZonesCardAmountWidget(this, deckStateManager, cardSizeSlider, _rootCard);
 
     allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
-    // Set initial visibility based on amounts
-    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
-        allZonesCardAmountWidget->setVisible(true);
-    } else {
-        allZonesCardAmountWidget->setVisible(false);
-    }
 
     // Attempt to cast the parent to PrintingSelectorCardDisplayWidget
     if (const auto *parentWidget = qobject_cast<PrintingSelectorCardDisplayWidget *>(parent)) {
@@ -117,8 +107,7 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
 /**
  * @brief Handles the mouse enter event when the cursor enters the overlay widget area.
  *
- * When the cursor enters the widget, the card information is updated, and the card amount widget
- * is displayed if the amounts are zero for both the mainboard and sideboard.
+ * When the cursor enters the widget, the card amount widget becomes visible regardless of whether the amounts are zero.
  *
  * @param event The event triggered when the mouse enters the widget.
  */
@@ -130,16 +119,27 @@ void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
 {
     QWidget::enterEvent(event);
     deckEditor->updateCard(rootCard);
-
-    // Check if either mainboard or sideboard amount is greater than 0
-    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
-        // Don't change visibility if amounts are greater than 0
-        return;
-    }
-
-    // Show the widget if amounts are 0
-    allZonesCardAmountWidget->setVisible(true);
+    updateVisibility();
 }
+
+void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount, int sideboardAmount)
+{
+    allZonesCardAmountWidget->setAmounts(mainboardAmount, sideboardAmount);
+    updateVisibility();
+}
+
+/**
+ * @brief Sets the visibility of the widgets depending on the amounts and whether the mouse is hovering over.
+ */
+void PrintingSelectorCardOverlayWidget::updateVisibility()
+{
+    if (allZonesCardAmountWidget->isNonZero() || underMouse()) {
+        allZonesCardAmountWidget->setVisible(true);
+    } else {
+        allZonesCardAmountWidget->setVisible(false);
+    }
+}
+
 /**
  * @brief Updates the pin badge visibility and position based on the card's pinned state.
  *
@@ -186,15 +186,7 @@ void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
 void PrintingSelectorCardOverlayWidget::leaveEvent(QEvent *event)
 {
     QWidget::leaveEvent(event);
-
-    // Check if either mainboard or sideboard amount is greater than 0
-    if (allZonesCardAmountWidget->getMainboardAmount() > 0 || allZonesCardAmountWidget->getSideboardAmount() > 0) {
-        // Don't hide the widget if amounts are greater than 0
-        return;
-    }
-
-    // Hide the widget if amounts are 0
-    allZonesCardAmountWidget->setVisible(false);
+    updateVisibility();
 }
 
 /**

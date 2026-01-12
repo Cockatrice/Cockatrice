@@ -2,6 +2,7 @@
 
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
+#include "version_string.h"
 
 #include <QAbstractListModel>
 #include <QApplication>
@@ -198,7 +199,13 @@ SettingsCache::SettingsCache()
 
     mbDownloadSpoilers = settings->value("personal/downloadspoilers", false).toBool();
 
-    checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
+    if (settings->contains("personal/startupUpdateCheck")) {
+        checkUpdatesOnStartup = settings->value("personal/startupUpdateCheck", true).toBool();
+    } else if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
+        checkUpdatesOnStartup = false; // do not run auto updater on custom version
+    } else {
+        checkUpdatesOnStartup = true; // default to run auto updater
+    }
     startupCardUpdateCheckPromptForUpdate =
         settings->value("personal/startupCardUpdateCheckPromptForUpdate", true).toBool();
     startupCardUpdateCheckAlwaysUpdate = settings->value("personal/startupCardUpdateCheckAlwaysUpdate", false).toBool();
@@ -206,7 +213,15 @@ SettingsCache::SettingsCache()
     lastCardUpdateCheck = settings->value("personal/lastCardUpdateCheck", QDateTime::currentDateTime().date()).toDate();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
-    updateReleaseChannel = settings->value("personal/updatereleasechannel", 0).toInt();
+
+    if (settings->contains("personal/updatereleasechannel")) {
+        updateReleaseChannel = settings->value("personal/updatereleasechannel").toInt();
+    } else if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
+        // default to beta if this is a beta release
+        updateReleaseChannel = 1;
+    } else {
+        updateReleaseChannel = 0; // stable
+    }
 
     lang = settings->value("personal/lang").toString();
     keepalive = settings->value("personal/keepalive", 3).toInt();
@@ -273,6 +288,7 @@ SettingsCache::SettingsCache()
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
+    showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
     roundCardCorners = settings->value("cards/roundcardcorners", true).toBool();
     overrideAllCardArtWithPersonalPreference =
@@ -698,6 +714,13 @@ void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
 {
     showShortcuts = static_cast<bool>(_showShortcuts);
     settings->setValue("menu/showshortcuts", showShortcuts);
+}
+
+void SettingsCache::setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar)
+{
+    showGameSelectorFilterToolbar = static_cast<bool>(_showGameSelectorFilterToolbar);
+    settings->setValue("menu/showgameselectorfiltertoolbar", showGameSelectorFilterToolbar);
+    emit showGameSelectorFilterToolbarChanged(showGameSelectorFilterToolbar);
 }
 
 void SettingsCache::setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames)

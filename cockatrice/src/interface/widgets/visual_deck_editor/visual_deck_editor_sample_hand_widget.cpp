@@ -3,12 +3,16 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../cards/card_info_picture_widget.h"
+#include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
+#include "../deck_analytics/deck_list_statistics_analyzer.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <random>
 
-VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent, DeckListModel *_deckListModel)
-    : QWidget(parent), deckListModel(_deckListModel)
+VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent,
+                                                                   DeckListModel *_deckListModel,
+                                                                   DeckListStatisticsAnalyzer *_statsAnalyzer)
+    : QWidget(parent), deckListModel(_deckListModel), statsAnalyzer(_statsAnalyzer)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -34,6 +38,9 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
+
+    drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
+    layout->addWidget(drawProbabilityWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
     layout->addWidget(cardSizeWidget);
@@ -74,13 +81,30 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     }
 }
 
+static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
+{
+    QList<ExactCard> cards;
+    for (auto node : nodes) {
+        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        if (card) {
+            for (int k = 0; k < node->getNumber(); ++k) {
+                cards.append(card);
+            }
+        } else {
+            qDebug() << "Card not found in database!";
+        }
+    }
+
+    return cards;
+}
+
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
     QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
 
-    QList<ExactCard> mainDeckCards = deckListModel->getCardsForZone(DECK_ZONE_MAIN);
+    QList<ExactCard> mainDeckCards = cardNodesToExactCards(deckListModel->getCardNodesForZone(DECK_ZONE_MAIN));
 
     if (mainDeckCards.isEmpty())
         return randomCards;

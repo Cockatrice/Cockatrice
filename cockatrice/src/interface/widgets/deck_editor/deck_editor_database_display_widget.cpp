@@ -21,10 +21,10 @@ static bool canBeCommander(const CardInfo &cardInfo)
            cardInfo.getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 
-DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(AbstractTabDeckEditor *parent)
-    : QWidget(parent), deckEditor(parent)
+DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor)
+    : QWidget(parent), deckEditor(deckEditor)
 {
-    setObjectName("centralWidget");
+    setObjectName("databaseDisplayWidget");
 
     centralFrame = new QVBoxLayout(this);
     centralFrame->setObjectName("centralFrame");
@@ -134,13 +134,13 @@ void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
 
 void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
-    const QString cardName = current.sibling(current.row(), 0).data().toString();
-
     if (!current.isValid()) {
         return;
     }
 
-    if (!current.model()->hasChildren(current.sibling(current.row(), 0))) {
+    const QString cardName = current.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
+
+    if (!current.model()->hasChildren(current.siblingAtColumn(CardDatabaseModel::NameColumn))) {
         emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
     }
 }
@@ -172,7 +172,7 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
         return {};
     }
 
-    const QString cardName = currentIndex.sibling(currentIndex.row(), 0).data().toString();
+    const QString cardName = currentIndex.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
 
     return CardDatabaseManager::query()->getPreferredCard(cardName);
 }

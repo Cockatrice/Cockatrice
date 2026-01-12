@@ -142,7 +142,6 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
@@ -213,7 +212,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.package != 'skip'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
@@ -263,7 +262,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false # qt caches take too much space for macOS (1.1Gi)
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -279,7 +277,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -295,7 +292,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -308,7 +304,6 @@ jobs:
             qt_version: 6.6.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: false
             cmake_generator: Ninja
             use_ccache: 1
 
@@ -321,7 +316,6 @@ jobs:
             artifact_name: Windows7-installer
             qt_version: 5.15.*
             qt_arch: win64_msvc2019_64
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
@@ -335,13 +329,17 @@ jobs:
             qt_version: 6.6.*
             qt_arch: win64_msvc2019_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cache_qt: true
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    env:
+      CCACHE_DIR: ${{github.workspace}}/.cache/
+      # Cache size over the entire repo is 10Gi:
+      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_SIZE: 500M
 
     steps:
       - name: Checkout
@@ -356,24 +354,72 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      # Using jianmingyong/ccache-action to setup ccache without using brew
-      # It tries to download a binary of ccache from GitHub Release and falls back to building from source if it fails
       - name: Setup ccache
-        if: matrix.use_ccache == 1
-        uses: jianmingyong/ccache-action@v1
-        with:
-          install-type: "binary"
-          ccache-key-prefix: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}
-          max-size: 500M
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
+        run: brew install ccache
 
-      - name: Install Qt ${{matrix.qt_version}}
+      - name: Restore compiler cache (ccache)
+        if: matrix.use_ccache == 1
+        id: ccache_restore
+        uses: actions/cache/restore@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+
+      - name: Install aqtinstall
+        if: matrix.os == 'macOS'
+        run: pipx install aqtinstall
+
+      # Checking if there's a newer, uncached version of Qt available to install via aqtinstall
+      - name: Resolve latest Qt patch version
+        if: matrix.os == 'macOS'
+        id: resolve_qt_version
+        shell: bash
+        # Ouputs the version of Qt to install via aqtinstall
+        run: .ci/resolve_latest_aqt_qt_version.sh "${{matrix.qt_version}}"
+
+      - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS'
+        id: restore_qt
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+
+      # Using jurplel/install-qt-action to install Qt without using brew
+      # qt build using vcpkg either just fails or takes too long to build
+      - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v4
+        with:
+          cache: false
+          version: ${{ steps.resolve_qt_version.outputs.version }}
+          arch: ${{matrix.qt_arch}}
+          modules: ${{matrix.qt_modules}}
+          dir: ${{github.workspace}}
+
+      - name: Thin Qt libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        run: .ci/thin_macos_qtlib.sh
+
+      - name: Cache thin Qt libraries (${{ matrix.soc }} macOS)
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/Qt
+          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+
+      - name: Install Qt ${{matrix.qt_version}} (Windows)
+        if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{matrix.qt_version}}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
-          cache: ${{matrix.cache_qt}}
+          cache: true
 
       - name: Setup vcpkg cache
         id: vcpkg-cache
@@ -402,6 +448,15 @@ jobs:
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
+        uses: actions/cache/save@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          path: ${{env.CCACHE_DIR}}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
@@ -450,7 +505,7 @@ jobs:
       - name: Upload artifact
         id: upload_artifact
         if: matrix.make_package
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
@@ -458,7 +513,7 @@ jobs:
 
       - name: Upload pdb database
         if: matrix.os == 'Windows'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Windows${{matrix.target}}-debug-pdbs
           path: |

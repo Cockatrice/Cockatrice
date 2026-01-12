@@ -57,17 +57,10 @@ void Logger::openLogfileSession()
         return;
     }
     fileStream.setDevice(&fileHandle);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << Qt::endl;
     fileStream << getClientVersion() << Qt::endl;
     fileStream << getSystemArchitecture() << Qt::endl;
     fileStream << getClientInstallInfo() << Qt::endl;
-#else
-    fileStream << "Log session started at " << QDateTime::currentDateTime().toString() << endl;
-    fileStream << getClientVersion() << endl;
-    fileStream << getSystemArchitecture() << endl;
-    fileStream << getClientInstallInfo() << endl;
-#endif
     logToFileEnabled = true;
 }
 
@@ -77,11 +70,7 @@ void Logger::closeLogfileSession()
         return;
 
     logToFileEnabled = false;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << Qt::endl;
-#else
-    fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << endl;
-#endif
     fileHandle.close();
 }
 
@@ -103,11 +92,7 @@ void Logger::internalLog(const QString &message)
     std::cerr << message.toStdString() << std::endl; // Print to stdout
 
     if (logToFileEnabled) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         fileStream << message << Qt::endl; // Print to fileStream
-#else
-        fileStream << message << endl; // Print to fileStream
-#endif
     }
 }
 

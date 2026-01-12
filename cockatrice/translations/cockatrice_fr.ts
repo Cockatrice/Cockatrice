@@ -133,7 +133,7 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="445"/>
         <source> seconds</source>
-        <translation type="unfinished"/>
+        <translation>secondes</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="645"/>
@@ -154,7 +154,13 @@ You will not be able to manage printing preferences on a per-deck basis, or see 
 You will have to use the Set Manager, available through Card Database -&gt; Manage Sets.
 
 Are you sure you would like to enable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;activation de cette fonction désactivera l&apos;utilisation du sélecteur d&apos;impression.
+
+Vous ne pourrez plus gérer les préférences d&apos;impression pour chaque deck ni voir les impressions sélectionnées par d&apos;autres joueurs.
+
+Vous devrez utiliser le Gestionnaire d&apos;extensions, accessible via Base de données de cartes -&gt; Gérer les extensions.
+
+Êtes-vous sûr de vouloir activer cette fonction ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="668"/>
@@ -165,12 +171,18 @@ You can now choose printings on a per-deck basis in the Deck Editor and configur
 You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector (other sort orders like alphabetical or release date are available).
 
 Are you sure you would like to disable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Désactiver cette fonction activera le sélecteur d&apos;impression.
+
+Vous pouvez désormais choisir les impressions pour chaque deck dans l&apos;éditeur de deck et configurer l&apos;impression ajoutée par défaut en l&apos;épinglant dans le sélecteur d&apos;impression.
+
+Vous pouvez également utiliser le gestionnaire de d&apos;extension pour personnaliser l&apos;ordre de tri des impressions dans le sélecteur d&apos;impression (d&apos;autres ordres de tri, comme l&apos;ordre alphabétique ou la date de parution, sont disponibles).
+
+Êtes-vous sûr de vouloir désactiver cette fonction ?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="677"/>
         <source>Confirm Change</source>
-        <translation type="unfinished"/>
+        <translation>Confirmer le changement</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="722"/>
@@ -190,17 +202,17 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="725"/>
         <source>Home tab background source:</source>
-        <translation type="unfinished"/>
+        <translation>Source d&apos;arrière-plan de l&apos;onglet Accueil:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="726"/>
         <source>Home tab background shuffle frequency:</source>
-        <translation type="unfinished"/>
+        <translation>Fréquence de mélange de l&apos;arrière-plan de l&apos;onglet Accueil:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="727"/>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Désactivé</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="729"/>
@@ -230,7 +242,7 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="736"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior)</source>
-        <translation type="unfinished"/>
+        <translation>Remplacer toutes les illustrations de cartes par les préférences personnelles (comportement avant modification du ProviderID)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="738"/>
@@ -319,17 +331,17 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/general/background_sources.h" line="35"/>
         <source>Theme</source>
-        <translation type="unfinished"/>
+        <translation>Thème</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/background_sources.h" line="36"/>
         <source>Art crop of random card</source>
-        <translation type="unfinished"/>
+        <translation>Recadrage d&apos;image d&apos;une carte aléatoire</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/background_sources.h" line="37"/>
         <source>Art crop of background.cod deck file</source>
-        <translation type="unfinished"/>
+        <translation>Recadrage d&apos;image du fichier background.cod</translation>
     </message>
 </context>
 <context>
@@ -667,124 +679,124 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="275"/>
         <source>Re&amp;veal to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="306"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="339"/>
         <source>View related cards</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes associées</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="387"/>
         <source>Token: </source>
-        <translation type="unfinished"/>
+        <translation>Jeton :</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="404"/>
         <source>All tokens</source>
-        <translation type="unfinished"/>
+        <translation>Tout les jetons</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="427"/>
         <source>&amp;Select All</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Sélectionner Tout</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="428"/>
         <source>S&amp;elect Row</source>
-        <translation type="unfinished"/>
+        <translation>Sél&amp;ectionne une ligne</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="429"/>
         <source>S&amp;elect Column</source>
-        <translation type="unfinished"/>
+        <translation>Sél&amp;ectionne une colonne</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="431"/>
         <source>&amp;Play</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Jouer</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="432"/>
         <source>&amp;Hide</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cacher</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="433"/>
         <source>Play &amp;Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Jouer &amp;Face Cachée</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="435"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
-        <translation type="unfinished"/>
+        <translation>&amp;Engager / Dégager</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="436"/>
         <source>Toggle &amp;normal untapping</source>
-        <translation type="unfinished"/>
+        <translation>Activer dégagement &amp;normal</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="438"/>
         <source>T&amp;urn Over</source>
         <extracomment>Turn face up/face down</extracomment>
-        <translation type="unfinished"/>
+        <translation>Reto&amp;urner</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="441"/>
         <source>&amp;Peek at card face</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Regarder furtivement la carte face cachée</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="442"/>
         <source>&amp;Clone</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cloner</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="443"/>
         <source>Attac&amp;h to card...</source>
-        <translation type="unfinished"/>
+        <translation>Attac&amp;her à une carte...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="444"/>
         <source>Unattac&amp;h</source>
-        <translation type="unfinished"/>
+        <translation>Détac&amp;her</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="445"/>
         <source>&amp;Draw arrow...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tracer une flèche...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="446"/>
         <source>&amp;Set annotation...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Annoter...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="448"/>
         <source>Ca&amp;rd counters</source>
-        <translation type="unfinished"/>
+        <translation>Ma&amp;rqueurs sur la carte</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="453"/>
         <source>&amp;Add counter (%1)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Ajouter un marqueur (%1)</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="456"/>
         <source>&amp;Remove counter (%1)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Retirer un marqueur (%1)</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="459"/>
         <source>&amp;Set counters (%1)...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Changer le nombre de marqueurs (%1)...</translation>
     </message>
 </context>
 <context>
@@ -801,133 +813,133 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="170"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>sa main</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="170"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>main de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="174"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>sa bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="175"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>bibliothèque de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="177"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>de sa bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="178"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation type="unfinished"/>
+        <translation>de la bibliothèque de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="180"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>sa bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="181"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>bibliothèque de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="183"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>sa bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="183"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>bibliothèque de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="185"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>sa bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="185"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>bibliothèque de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="188"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>son cimetière</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="188"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>le cimetière de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="190"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>sa zone d&apos;exil</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="190"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>la zone d&apos;exil de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="194"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>sa réserve</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="195"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>la réserve de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="197"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>sa réserve</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="198"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>la réserve de %1</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="203"/>
         <source>their custom zone &apos;%1&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>sa zone personnalisée &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="204"/>
         <source>%1&apos;s custom zone &apos;%2&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>La zone personnalisée &apos;%2&apos; de %1</translation>
     </message>
 </context>
 <context>
@@ -951,13 +963,13 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/player/menu/custom_zone_menu.cpp" line="18"/>
         <source>C&amp;ustom Zones</source>
-        <translation type="unfinished"/>
+        <translation>Zones pe&amp;rsonnalisés</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/custom_zone_menu.cpp" line="23"/>
         <location filename="src/game/player/menu/custom_zone_menu.cpp" line="37"/>
         <source>View custom zone &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Voir la zone personnalisée &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -993,12 +1005,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="211"/>
         <source>Show on EDHRec (Commander)</source>
-        <translation type="unfinished"/>
+        <translation>Afficher sur EDHRec (Commandant)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="215"/>
         <source>Show on EDHRec (Card)</source>
-        <translation type="unfinished"/>
+        <translation>Afficher sur EDHRec (carte)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp" line="223"/>
@@ -1204,7 +1216,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/menus/deck_editor_menu.cpp" line="173"/>
         <source>Load deck from online service...</source>
-        <translation type="unfinished"/>
+        <translation>Charger un deck depuis un service en ligne...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/menus/deck_editor_menu.cpp" line="174"/>
@@ -1671,7 +1683,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="130"/>
         <source>Load from website...</source>
-        <translation type="unfinished"/>
+        <translation>Charger depuis un site web...</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="131"/>
@@ -1983,7 +1995,7 @@ Voulez-vous convertir le deck au format .cod ?</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="105"/>
         <source>Open decklists in lobby</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir les listes de deck dans le lobby</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="114"/>
@@ -2455,7 +2467,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="43"/>
         <source>Hide games with forced open decklists</source>
-        <translation type="unfinished"/>
+        <translation>Masquer les parties avec les listes de decks ouvertes forcées</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="51"/>
@@ -2743,7 +2755,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="43"/>
         <source>Paste a link to a decklist site here to import it.
 (Archidekt, Deckstats, Moxfield, and TappedOut are supported.)</source>
-        <translation type="unfinished"/>
+        <translation>Collez ici un lien vers un site de liste de deck pour l&apos;importer.(Archidekt, Deckstats, Moxfield et TappedOut sont supportés.)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="62"/>
@@ -2752,28 +2764,28 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="113"/>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="124"/>
         <source>Load Deck from Website</source>
-        <translation type="unfinished"/>
+        <translation>Charger un deck depuis un site web</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="63"/>
         <source>No parser available for this deck provider.
  (Archidekt, Deckstats, Moxfield, and TappedOut are supported.)</source>
-        <translation type="unfinished"/>
+        <translation>Aucun analyseur disponible pour ce fournisseur de deck.(Archidekt, Deckstats, Moxfield et TappedOut sont supportés.)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="78"/>
         <source>Network error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Erreur réseau : %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="92"/>
         <source>Received empty deck data.</source>
-        <translation type="unfinished"/>
+        <translation>Données de deck vide reçues.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="114"/>
         <source>Failed to parse deck data: %1</source>
-        <translation type="unfinished"/>
+        <translation>Échec de l&apos;analyse des données du deck : %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="125"/>
@@ -2784,7 +2796,13 @@ https://archidekt.com/decks/9999999
 https://deckstats.net/decks/99999/9999999-your-deck-name/en
 https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz
 https://tappedout.net/mtg-decks/your-deck-name/</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;URL fournie n&apos;est pas reconnue comme une URL de deck valide.
+Les URL de deck valides ressemblent à ceci:
+
+https://archidekt.com/decks/9999999
+https://deckstats.net/decks/99999/9999999-your-deck-name/en
+https://moxfield.com/decks/XYZxx-XYZ99Yyy-xyzXzzz
+https://tappedout.net/mtg-decks/your-deck-name/</translation>
     </message>
 </context>
 <context>
@@ -3495,22 +3513,22 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/game/game_event_handler.cpp" line="413"/>
         <source>kicked by game host or moderator</source>
-        <translation type="unfinished"/>
+        <translation>Éjecté par l&apos;hôte de la partie ou un modérateur</translation>
     </message>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="416"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>joueur a quitté la partie</translation>
     </message>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="419"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>joueur déconnecté du serveur</translation>
     </message>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="423"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>raison inconnue</translation>
     </message>
 </context>
 <context>
@@ -3676,7 +3694,7 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/interface/widgets/server/games_model.cpp" line="157"/>
         <source>open decklists</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir les listes de deck</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/games_model.cpp" line="189"/>
@@ -3889,47 +3907,47 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="98"/>
         <source>&amp;Graveyard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="100"/>
         <source>&amp;View graveyard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir le cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="103"/>
         <source>&amp;Move graveyard to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Déplacer le cimetière vers...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="104"/>
         <source>&amp;Top of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="105"/>
         <source>&amp;Bottom of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="73"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="106"/>
         <source>&amp;Hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="107"/>
         <source>&amp;Exile</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exil</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="109"/>
         <source>Reveal random card to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler une carte au hasard à...</translation>
     </message>
 </context>
 <context>
@@ -3937,63 +3955,63 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="72"/>
         <source>&amp;Hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="75"/>
         <source>&amp;View hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir la main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="76"/>
         <source>&amp;Sort hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Trier la main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="77"/>
         <source>Take &amp;mulligan</source>
-        <translation type="unfinished"/>
+        <translation>Faire un &amp;mulligan</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="79"/>
         <source>&amp;Move hand to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Déplacer la main vers…</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="80"/>
         <source>&amp;Top of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="81"/>
         <source>&amp;Bottom of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="82"/>
         <source>&amp;Graveyard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="83"/>
         <source>&amp;Exile</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exil</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="85"/>
         <source>&amp;Reveal hand to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Révéler la main à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="86"/>
         <source>Reveal r&amp;andom card to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler une c&amp;arte au hasard à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="109"/>
         <location filename="src/game/player/menu/hand_menu.cpp" line="129"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tous les joueurs</translation>
     </message>
 </context>
 <context>
@@ -4001,47 +4019,47 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="183"/>
         <source>Create New Deck</source>
-        <translation type="unfinished"/>
+        <translation>Créer un Nouveau Deck</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="187"/>
         <source>Browse Decks</source>
-        <translation type="unfinished"/>
+        <translation>Parcourir les Decks</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="191"/>
         <source>Browse Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Parcourir la Base de Carte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="195"/>
         <source>Browse EDHRec</source>
-        <translation type="unfinished"/>
+        <translation>Parcourir EDHRec</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="198"/>
         <source>View Replays</source>
-        <translation type="unfinished"/>
+        <translation>Voir les replays</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="202"/>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="217"/>
         <source>Connecting...</source>
-        <translation type="unfinished"/>
+        <translation>Connection...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="221"/>
         <source>Connect</source>
-        <translation type="unfinished"/>
+        <translation>Se connecter</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="227"/>
         <source>Play</source>
-        <translation type="unfinished"/>
+        <translation>Jouer</translation>
     </message>
 </context>
 <context>
@@ -4049,193 +4067,193 @@ Vous allez peut-être devoir télécharger manuellement la nouvelle version.</tr
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="192"/>
         <source>&amp;Library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="195"/>
         <source>&amp;View library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="196"/>
         <source>View &amp;top cards of library...</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du &amp;dessus de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="197"/>
         <source>View bottom cards of library...</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du dessous de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="198"/>
         <source>Reveal &amp;library to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler la &amp;bibliothèque à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="199"/>
         <source>Lend library to...</source>
-        <translation type="unfinished"/>
+        <translation>Prêter la bibliothèque à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="200"/>
         <source>Reveal &amp;top cards to...</source>
-        <translation type="unfinished"/>
+        <translation>Révéler les cartes du &amp;dessus à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="201"/>
         <source>&amp;Top of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="202"/>
         <source>&amp;Bottom of library...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessous de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="203"/>
         <source>&amp;Always reveal top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Toujours révéler la carte du dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="204"/>
         <source>&amp;Always look at top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Toujours voir la carte du dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="205"/>
         <source>&amp;Open deck in deck editor</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Ouvrir le deck dans l&apos;éditeur</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="207"/>
         <source>&amp;Draw card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Piocher une carte</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="208"/>
         <source>D&amp;raw cards...</source>
-        <translation type="unfinished"/>
+        <translation>P&amp;iocher plusieurs cartes...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="209"/>
         <source>&amp;Undo last draw</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Annuler la dernière pioche</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="211"/>
         <source>Shuffle</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="213"/>
         <source>&amp;Play top card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Jouer la carte du dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="214"/>
         <source>Play top card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Jouer la carte du dessus &amp;face cachée</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="215"/>
         <source>Put top card on &amp;bottom</source>
-        <translation type="unfinished"/>
+        <translation>Placer la carte du dessus au-&amp;dessous</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="216"/>
         <source>Move top card to grave&amp;yard</source>
-        <translation type="unfinished"/>
+        <translation>Mettre la carte du dessus dans le cime&amp;tière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="217"/>
         <source>Move top card to e&amp;xile</source>
-        <translation type="unfinished"/>
+        <translation>E&amp;xiler la carte du dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="218"/>
         <source>Move top cards to &amp;graveyard...</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessus dans le &amp;cimetière...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="219"/>
         <source>Move top cards to &amp;exile...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exiler les cartes du dessus...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="220"/>
         <source>Put top cards on stack &amp;until...</source>
-        <translation type="unfinished"/>
+        <translation>Placer les cartes du dessus sur la pile &amp;jusqu&apos;à...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="221"/>
         <source>Shuffle top cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessus...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="223"/>
         <source>&amp;Draw bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Piocher la carte du dessous </translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="224"/>
         <source>D&amp;raw bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>P&amp;iocher les cartes du dessous...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="225"/>
         <source>&amp;Play bottom card</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Jouer la carte du dessous</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="226"/>
         <source>Play bottom card &amp;face down</source>
-        <translation type="unfinished"/>
+        <translation>Jouer la carte du dessous &amp;face cachée</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="227"/>
         <source>Move bottom card to grave&amp;yard</source>
-        <translation type="unfinished"/>
+        <translation>Mettre la carte du dessous dans le cime&amp;tière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="228"/>
         <source>Move bottom card to e&amp;xile</source>
-        <translation type="unfinished"/>
+        <translation>E&amp;xiler la carte du dessous</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="229"/>
         <source>Move bottom cards to &amp;graveyard...</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessus dans le &amp;cimetière...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="230"/>
         <source>Move bottom cards to &amp;exile...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exiler les cartes du dessous...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="231"/>
         <source>Put bottom card on &amp;top</source>
-        <translation type="unfinished"/>
+        <translation>Placer la carte du dessous au-&amp;dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="232"/>
         <source>Shuffle bottom cards...</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessous...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="240"/>
         <location filename="src/game/player/menu/library_menu.cpp" line="274"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Tous les joueurs</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="309"/>
         <source>Reveal top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Révéler les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="310"/>
         <source>Number of cards: (max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de cartes : (max. %1)</translation>
     </message>
 </context>
 <context>
@@ -5418,7 +5436,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="411"/>
         <source>You are flooding the game. Please wait a couple of seconds.</source>
-        <translation type="unfinished"/>
+        <translation>Vous floodez la partie. Veuillez patienter quelques secondes.</translation>
     </message>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="417"/>
@@ -5804,37 +5822,37 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="7"/>
         <source>Move to</source>
-        <translation type="unfinished"/>
+        <translation>Déplacer vers</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="57"/>
         <source>&amp;Top of library in random order</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque dans un ordre aléatoire</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="58"/>
         <source>X cards from the top of library...</source>
-        <translation type="unfinished"/>
+        <translation>X cartes du dessus de la bibliothèque...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="59"/>
         <source>&amp;Bottom of library in random order</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessous de la bibliothèque dans un ordre aléatoire</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="60"/>
         <source>&amp;Hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="61"/>
         <source>&amp;Graveyard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="62"/>
         <source>&amp;Exile</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exil</translation>
     </message>
 </context>
 <context>
@@ -6043,7 +6061,7 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="151"/>
         <source>View top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="152"/>
@@ -6058,119 +6076,119 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
         <location filename="src/game/player/player_actions.cpp" line="622"/>
         <location filename="src/game/player/player_actions.cpp" line="739"/>
         <source>Number of cards: (max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de cartes : (max. %1)</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="164"/>
         <source>View bottom cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Voir les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="224"/>
         <source>Shuffle top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="253"/>
         <source>Shuffle bottom cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Mélanger les cartes du dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="287"/>
         <source>Draw hand</source>
-        <translation type="unfinished"/>
+        <translation>Piocher une main</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="289"/>
         <source>0 and lower are in comparison to current hand size</source>
-        <translation type="unfinished"/>
+        <translation>0 et moins sont en comparaison avec la taille actuelle de la main</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="313"/>
         <source>Draw cards</source>
-        <translation type="unfinished"/>
+        <translation>Piocher des cartes</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="385"/>
         <source>Move top cards to grave</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessus dans le cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="417"/>
         <source>Move top cards to exile</source>
-        <translation type="unfinished"/>
+        <translation>Exiler les cartes du dessus</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="589"/>
         <source>Move bottom cards to grave</source>
-        <translation type="unfinished"/>
+        <translation>Mettre les cartes du dessous dans le cimetière</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="621"/>
         <source>Move bottom cards to exile</source>
-        <translation type="unfinished"/>
+        <translation>Exiler les cartes du dessous</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="738"/>
         <source>Draw bottom cards</source>
-        <translation type="unfinished"/>
+        <translation>Piocher les cartes du dessous</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="842"/>
         <location filename="src/game/player/player_actions.cpp" line="888"/>
         <source>C&amp;reate another %1 token</source>
-        <translation type="unfinished"/>
+        <translation>C&amp;réer un autre jeton %1</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1016"/>
         <source>Create tokens</source>
-        <translation type="unfinished"/>
+        <translation>Créer des jetons</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1016"/>
         <location filename="src/game/player/player_actions.cpp" line="1556"/>
         <source>Number:</source>
-        <translation type="unfinished"/>
+        <translation>Nombre :</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1182"/>
         <source>Place card X cards from top of library</source>
-        <translation type="unfinished"/>
+        <translation>Placer les X cartes depuis le dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1183"/>
         <source>Which position should this card be placed:</source>
-        <translation type="unfinished"/>
+        <translation>Dans quelle position cette carte doit-elle être placée :</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1183"/>
         <source>(max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>(max. %1)</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1342"/>
         <source>Change power/toughness</source>
-        <translation type="unfinished"/>
+        <translation>Changer la force/l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1342"/>
         <source>Change stats to:</source>
-        <translation type="unfinished"/>
+        <translation>Changer les stats pour :</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1462"/>
         <source>Set annotation</source>
-        <translation type="unfinished"/>
+        <translation>Annoter</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1463"/>
         <source>Please enter the new annotation:</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez entrer la nouvelle annotation :</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="1556"/>
         <source>Set counters</source>
-        <translation type="unfinished"/>
+        <translation>Définir les marqueurs</translation>
     </message>
 </context>
 <context>
@@ -6178,17 +6196,17 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/menu/player_menu.cpp" line="101"/>
         <source>Player &quot;%1&quot;</source>
-        <translation type="unfinished"/>
+        <translation>Joueur &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/player_menu.cpp" line="118"/>
         <source>&amp;Counters</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Marqueurs</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/player_menu.cpp" line="135"/>
         <source>S&amp;ay</source>
-        <translation type="unfinished"/>
+        <translation>D&amp;ire</translation>
     </message>
 </context>
 <context>
@@ -6282,57 +6300,57 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="6"/>
         <source>Power / toughness</source>
-        <translation type="unfinished"/>
+        <translation>Force / Endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="52"/>
         <source>&amp;Increase power</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Augmenter la force</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="53"/>
         <source>&amp;Decrease power</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Diminuer la force</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="54"/>
         <source>I&amp;ncrease toughness</source>
-        <translation type="unfinished"/>
+        <translation>A&amp;ugmenter l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="55"/>
         <source>D&amp;ecrease toughness</source>
-        <translation type="unfinished"/>
+        <translation>D&amp;iminuer l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="56"/>
         <source>In&amp;crease power and toughness</source>
-        <translation type="unfinished"/>
+        <translation>Au&amp;gmenter la force et l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="57"/>
         <source>Dec&amp;rease power and toughness</source>
-        <translation type="unfinished"/>
+        <translation>Dim&amp;inuer la force et l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="58"/>
         <source>Increase power and decrease toughness</source>
-        <translation type="unfinished"/>
+        <translation>Augmenter la force et diminuer l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="59"/>
         <source>Decrease power and increase toughness</source>
-        <translation type="unfinished"/>
+        <translation>Diminuer la force et augmenter l&apos;endurance</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="60"/>
         <source>Set &amp;power and toughness...</source>
-        <translation type="unfinished"/>
+        <translation>Changer la &amp;force et l&apos;endurance...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/pt_menu.cpp" line="61"/>
         <source>Reset p&amp;ower and toughness</source>
-        <translation type="unfinished"/>
+        <translation>Réinitialiser la f&amp;orce et l&apos;endurance</translation>
     </message>
 </context>
 <context>
@@ -6565,37 +6583,37 @@ Cockactrice va maintenant recharger la base de données de cartes.</translation>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="58"/>
         <source>&amp;Exile</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Exil</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="60"/>
         <source>&amp;View exile</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir la zone d&apos;exil</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="63"/>
         <source>&amp;Move exile to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Déplacer la zone d&apos;exil vers...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="64"/>
         <source>&amp;Top of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessus de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="65"/>
         <source>&amp;Bottom of library</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dessous de la bibliothèque</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="66"/>
         <source>&amp;Hand</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Main</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/rfg_menu.cpp" line="67"/>
         <source>&amp;Graveyard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Cimetière</translation>
     </message>
 </context>
 <context>
@@ -6803,12 +6821,12 @@ Please check your shortcut settings!</source>
     <message>
         <location filename="src/game/player/menu/sideboard_menu.cpp" line="19"/>
         <source>&amp;Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Réserve</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/sideboard_menu.cpp" line="20"/>
         <source>&amp;View sideboard</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Voir la réserve</translation>
     </message>
 </context>
 <context>
@@ -7382,7 +7400,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.h" line="33"/>
         <source>EDHRec: </source>
-        <translation type="unfinished"/>
+        <translation>EDHRec :</translation>
     </message>
 </context>
 <context>
@@ -7509,7 +7527,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/interface/widgets/tabs/tab_game.cpp" line="340"/>
         <source>Selected cards</source>
-        <translation type="unfinished"/>
+        <translation>Cartes sélectionnées</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_game.cpp" line="343"/>
@@ -7588,7 +7606,7 @@ Veuillez entrer un nom:</translation>
     <message>
         <location filename="src/interface/widgets/tabs/tab_home.h" line="31"/>
         <source>Home</source>
-        <translation type="unfinished"/>
+        <translation>Accueil</translation>
     </message>
 </context>
 <context>
@@ -7841,13 +7859,13 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="211"/>
         <source>Get replay share code</source>
-        <translation type="unfinished"/>
+        <translation>Obtenir le code de partage du replay</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="213"/>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="566"/>
         <source>Look up replay by share code</source>
-        <translation type="unfinished"/>
+        <translation>Regarder un replay depuis un code de partage</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="282"/>
@@ -7897,71 +7915,71 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="537"/>
         <source>Failed to get code</source>
-        <translation type="unfinished"/>
+        <translation>Echec d&apos;obtention du code</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="539"/>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="600"/>
         <source>Either this server does not support replay sharing, or does not permit replay sharing for you.</source>
-        <translation type="unfinished"/>
+        <translation>Soit ce serveur ne prend pas en charge le partage de replay, soit il ne vous autorise pas à partager des replays.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="545"/>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="593"/>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="605"/>
         <source>Failed</source>
-        <translation type="unfinished"/>
+        <translation>Échec</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="545"/>
         <source>Could not get replay code</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;obtenir le code de replay</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="553"/>
         <source>Replay Share Code</source>
-        <translation type="unfinished"/>
+        <translation>Code de Partage de Replay</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="555"/>
         <source>Others can use this code to add the replay to their list of remote replays:
 %1</source>
-        <translation type="unfinished"/>
+        <translation>D&apos;autres peuvent utiliser ce code pour ajouter la replay à leur liste de replay distantes :%1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="557"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copier vers le presse-papier</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="566"/>
         <source>Replay share code</source>
-        <translation type="unfinished"/>
+        <translation>Code de partage de replay</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="587"/>
         <source>Replay code found</source>
-        <translation type="unfinished"/>
+        <translation>Code de replay trouvé</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="588"/>
         <source>Replay was added, or you already had access to it.</source>
-        <translation type="unfinished"/>
+        <translation>Le replay a été ajoutée, ou vous y aviez déjà accès.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="593"/>
         <source>Replay code not found</source>
-        <translation type="unfinished"/>
+        <translation>Code de replay non trouvé</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="598"/>
         <source>Failed to submit code</source>
-        <translation type="unfinished"/>
+        <translation>Échec de l&apos;envoi du code</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="605"/>
         <source>Unexpected error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur inattendue</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_replays.cpp" line="489"/>
@@ -8078,7 +8096,7 @@ Plus vous entrez d&apos;informations, meilleurs seront les résultats.</translat
     <message>
         <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="208"/>
         <source>Home</source>
-        <translation type="unfinished"/>
+        <translation>Accueil</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="209"/>
@@ -8378,22 +8396,22 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="88"/>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="92"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="84"/>
         <source>This user does not exist.</source>
-        <translation type="unfinished"/>
+        <translation>Cet utilisateur n&apos;existe pas.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="89"/>
         <source>You are being ignored by %1 and can&apos;t see their games.</source>
-        <translation type="unfinished"/>
+        <translation>Vous avez été ignoré par %1 et ne pouvez pas voir ses parties.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="93"/>
         <source>Could not get %1&apos;s games.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;obtenir les parties de %1.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/user/user_context_menu.cpp" line="120"/>
@@ -8833,32 +8851,32 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="86"/>
         <source>Increment all card counters</source>
-        <translation type="unfinished"/>
+        <translation>Incrémenter tous les marqueurs de la carte</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="87"/>
         <source>&amp;Untap all permanents</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Dégager tous les permanents</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="88"/>
         <source>R&amp;oll die...</source>
-        <translation type="unfinished"/>
+        <translation>L&amp;ancer un dé...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="89"/>
         <source>&amp;Create token...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Créer un jeton...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="90"/>
         <source>C&amp;reate another token</source>
-        <translation type="unfinished"/>
+        <translation>C&amp;réer un autre jeton</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/utility_menu.cpp" line="91"/>
         <source>Cr&amp;eate predefined token</source>
-        <translation type="unfinished"/>
+        <translation>C&amp;réer un jeton prédéfini</translation>
     </message>
 </context>
 <context>
@@ -9019,7 +9037,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="200"/>
         <source>Loading database ...</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de la base de données...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="202"/>
@@ -10000,7 +10018,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="423"/>
         <source>Increment all card counters</source>
-        <translation type="unfinished"/>
+        <translation>Incrémenter tous les marqueurs de la carte</translation>
     </message>
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="426"/>
@@ -10256,7 +10274,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="565"/>
         <source>Sort Hand</source>
-        <translation type="unfinished"/>
+        <translation>Trier la main</translation>
     </message>
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="571"/>
@@ -10449,7 +10467,7 @@ Merci de ne pas recommencer ou d&apos;autres mesures peuvent être prises contre
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="717"/>
         <source>Home</source>
-        <translation type="unfinished"/>
+        <translation>Accueil</translation>
     </message>
     <message>
         <location filename="../libcockatrice_settings/libcockatrice/settings/shortcuts_settings.h" line="718"/>

@@ -82,6 +82,11 @@ private slots:
 class NoScrollFilter : public QObject
 {
     Q_OBJECT
+public:
+    explicit NoScrollFilter(QObject *parent = nullptr) : QObject(parent)
+    {
+    }
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override
     {

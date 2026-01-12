@@ -8,10 +8,8 @@ by selecting "Deck Editor" or "Visual Deck Editor" under the "Tabs" application 
 
 # Further References
 
-See @ref editing_decks for information on how to modify the attributes and contents of a deck in the Deck Editor
+- See @ref editing_decks for information on how to modify the attributes and contents of a deck in the Deck Editor
 widgets.
-
-See @ref exporting_decks for information on how to store and persist your deck either in-client or to external
+- See @ref exporting_decks for information on how to store and persist your deck either in-client or to external
 services.
-
-See @ref importing_decks for information on how to import existing decks either in-client or from external services
+- See @ref importing_decks for information on how to import existing decks either in-client or from external services

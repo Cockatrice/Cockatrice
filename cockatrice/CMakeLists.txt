@@ -144,28 +144,54 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/card_size_widget.cpp
     src/interface/widgets/cards/deck_card_zone_display_widget.cpp
     src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/interface/widgets/deck_analytics/abstract_analytics_panel_widget.cpp
+    src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_factory.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_registrar.cpp
     src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
     src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
-    src/interface/widgets/deck_analytics/mana_base_widget.cpp
-    src/interface/widgets/deck_analytics/mana_curve_widget.cpp
-    src/interface/widgets/deck_analytics/mana_devotion_widget.cpp
+    src/interface/widgets/deck_analytics/resizable_panel.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
     src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
+    src/interface/widgets/deck_editor/deck_state_manager.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
-    src/interface/widgets/general/display/bar_widget.cpp
-    src/interface/widgets/general/display/color_bar.cpp
     src/interface/widgets/general/display/dynamic_font_size_label.cpp
     src/interface/widgets/general/display/dynamic_font_size_push_button.cpp
     src/interface/widgets/general/display/labeled_input.cpp
-    src/interface/widgets/general/display/percent_bar_widget.cpp
     src/interface/widgets/general/display/shadow_background_label.cpp
+    src/interface/widgets/general/display/charts/bars/bar_widget.cpp
+    src/interface/widgets/general/display/charts/bars/color_bar.cpp
+    src/interface/widgets/general/display/charts/bars/percent_bar_widget.cpp
+    src/interface/widgets/general/display/charts/bars/bar_chart_widget.cpp
+    src/interface/widgets/general/display/charts/bars/bar_chart_background_widget.cpp
+    src/interface/widgets/general/display/charts/bars/segmented_bar_widget.cpp
+    src/interface/widgets/general/display/charts/pies/color_pie.cpp
     src/interface/widgets/general/home_styled_button.cpp
     src/interface/widgets/general/home_widget.cpp
     src/interface/widgets/general/layout_containers/flow_widget.cpp
@@ -287,6 +313,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
 )
 
 add_subdirectory(sounds)

@@ -21,6 +21,7 @@
 
 #define BATCH_SIZE 10
 
+class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
@@ -33,27 +34,33 @@ class PrintingSelector : public QWidget
 public:
     PrintingSelector(QWidget *parent, AbstractTabDeckEditor *deckEditor);
 
-    void setCard(const CardInfoPtr &newCard, const QString &_currentZone);
+    void setCard(const CardInfoPtr &newCard);
     void getAllSetsForCurrentCard();
-    [[nodiscard]] DeckListModel *getDeckModel() const
-    {
-        return deckModel;
-    }
-
-    [[nodiscard]] AbstractTabDeckEditor *getDeckEditor() const
-    {
-        return deckEditor;
-    }
 
 public slots:
     void retranslateUi();
     void updateDisplay();
-    void selectPreviousCard();
-    void selectNextCard();
     void toggleVisibilityNavigationButtons(bool _state);
 
 private slots:
     void printingsInDeckChanged();
+    void updateCardAmounts();
+
+signals:
+    /**
+     * Requests the previous card in the list
+     */
+    void prevCardRequested();
+    /**
+     * Requests the next card in the list
+     */
+    void nextCardRequested();
+
+    /**
+     * The amounts of the printings in the deck has changed
+     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard) in the deck
+     */
+    void cardAmountsChanged(const QMap<QString, QPair<int, int>> &uuidToAmounts);
 
 private:
     QVBoxLayout *layout;
@@ -67,13 +74,10 @@ private:
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;
     AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
+    DeckStateManager *deckStateManager;
     CardInfoPtr selectedCard;
-    QString currentZone;
     QTimer *widgetLoadingBufferTimer;
     int currentIndex = 0;
-    void selectCard(int changeBy);
 };
 
 #endif // PRINTING_SELECTOR_H

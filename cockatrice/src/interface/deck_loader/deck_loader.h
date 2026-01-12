@@ -59,11 +59,11 @@ public:
     bool saveToFile(const QString &fileName, DeckFileFormat::Format fmt);
     bool updateLastLoadedTimestamp(const QString &fileName, DeckFileFormat::Format fmt);
 
-    static QString exportDeckToDecklist(const DeckList *deckList, DecklistWebsite website);
+    static QString exportDeckToDecklist(const DeckList &deckList, DecklistWebsite website);
 
-    static void saveToClipboard(const DeckList *deckList, bool addComments = true, bool addSetNameAndNumber = true);
+    static void saveToClipboard(const DeckList &deckList, bool addComments = true, bool addSetNameAndNumber = true);
     static bool saveToStream_Plain(QTextStream &out,
-                                   const DeckList *deckList,
+                                   const DeckList &deckList,
                                    bool addComments = true,
                                    bool addSetNameAndNumber = true);
 
@@ -72,9 +72,9 @@ public:
      * @param printer The printer to render the decklist to.
      * @param deckList
      */
-    static void printDeckList(QPrinter *printer, const DeckList *deckList);
+    static void printDeckList(QPrinter *printer, const DeckList &deckList);
 
-    bool convertToCockatriceFormat(QString fileName);
+    bool convertToCockatriceFormat(const QString &fileName);
 
     LoadedDeck &getDeck()
     {
@@ -91,7 +91,7 @@ public:
 
 private:
     static void printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node);
-    static void saveToStream_DeckHeader(QTextStream &out, const DeckList *deckList);
+    static void saveToStream_DeckHeader(QTextStream &out, const DeckList &deckList);
 
     static void saveToStream_DeckZone(QTextStream &out,
                                       const InnerDecklistNode *zoneNode,

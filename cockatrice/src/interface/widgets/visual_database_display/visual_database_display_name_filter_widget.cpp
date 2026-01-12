@@ -2,6 +2,7 @@
 
 #include "../../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../deck_editor/deck_state_manager.h"
 
 #include <QHBoxLayout>
 
@@ -60,7 +61,7 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
-    DeckListModel *deckListModel = deckEditor->deckDockWidget->deckModel;
+    DeckListModel *deckListModel = deckEditor->deckStateManager->getModel();
 
     if (!deckListModel)
         return;

@@ -20,8 +20,7 @@ class PrintingSelectorCardOverlayWidget : public QWidget
 public:
     explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
                                                AbstractTabDeckEditor *_deckEditor,
-                                               DeckListModel *_deckModel,
-                                               QTreeView *_deckView,
+                                               DeckStateManager *_deckStateManager,
                                                QSlider *_cardSizeSlider,
                                                const ExactCard &_rootCard);
 
@@ -39,7 +38,11 @@ protected:
 signals:
     void cardPreferenceChanged();
 
+public slots:
+    void updateCardAmounts(int mainboardAmount, int sideboardAmount);
+
 private slots:
+    void updateVisibility();
     void updatePinBadgeVisibility();
 
 private:
@@ -48,9 +51,6 @@ private:
     AllZonesCardAmountWidget *allZonesCardAmountWidget;
     QLabel *pinBadge = nullptr;
     AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
-    QSlider *cardSizeSlider;
     ExactCard rootCard;
 };
 

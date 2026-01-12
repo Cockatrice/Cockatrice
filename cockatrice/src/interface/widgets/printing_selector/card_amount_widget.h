@@ -27,15 +27,14 @@ signals:
 
 public:
     explicit CardAmountWidget(QWidget *parent,
-                              AbstractTabDeckEditor *deckEditor,
-                              DeckListModel *deckModel,
-                              QTreeView *deckView,
+                              DeckStateManager *deckStateManager,
                               QSlider *cardSizeSlider,
                               const ExactCard &rootCard,
                               const QString &zoneName);
-    int countCardsInZone(const QString &deckZone);
+    int getAmount();
 
 public slots:
+    void setAmount(int _amount);
     void updateCardCount();
     void addPrinting(const QString &zone);
 
@@ -44,9 +43,7 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
-    AbstractTabDeckEditor *deckEditor;
-    DeckListModel *deckModel;
-    QTreeView *deckView;
+    DeckStateManager *deckStateManager;
     QSlider *cardSizeSlider;
     ExactCard rootCard;
     QString zoneName;
@@ -56,10 +53,9 @@ private:
     QLabel *cardCountInZone;
 
     bool hovered;
+    int amount = 0;
 
-    void offsetCountAtIndex(const QModelIndex &idx, int offset);
     void decrementCardHelper(const QString &zoneName);
-    void recursiveExpand(const QModelIndex &index);
 
 private slots:
     void addPrintingMainboard();

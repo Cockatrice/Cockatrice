@@ -3,7 +3,6 @@
  * @ingroup GameGraphicsZones
  * @brief TODO: Document this.
  */
-
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
@@ -14,6 +13,7 @@
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
+#include <QPointer>
 #include <libcockatrice/utility/macros.h>
 
 class QLabel;
@@ -28,6 +28,8 @@ class ServerInfo_Card;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 class QStyleOption;
+class QGraphicsView;
+class QWidget;
 
 class ScrollableGraphicsProxyWidget : public QGraphicsProxyWidget
 {
@@ -52,7 +54,6 @@ private:
     ZoneViewZone *zone;
     QGraphicsWidget *zoneContainer;
 
-    QPushButton *closeButton;
     QScrollBar *scrollBar;
     ScrollableGraphicsProxyWidget *scrollBarProxy;
 
@@ -66,6 +67,33 @@ private:
     int extraHeight;
     Player *player;
 
+    bool draggingWindow = false;
+    QPoint dragStartScreenPos;
+    QPointF dragStartItemPos;
+    QPointer<QGraphicsView> dragView;
+
+    void stopWindowDrag();
+    void startWindowDrag(QGraphicsSceneMouseEvent *event);
+    QRectF closeButtonRect(QWidget *styleWidget) const;
+    /**
+     * @brief Resolves the QGraphicsView to use for drag coordinate mapping
+     *
+     * @param eventWidget QWidget that originated the mouse event
+     * @return The resolved QGraphicsView
+     */
+    QGraphicsView *findDragView(QWidget *eventWidget) const;
+    /**
+     * @brief Calculates the desired widget position while dragging
+     *
+     * @param screenPos Global screen coordinates of the current mouse position
+     * @param scenePos Scene coordinates of the current mouse position
+     * @param buttonDownScenePos Scene coordinates of the initial mouse press position
+     *
+     * @return The new widget position in scene coordinates
+     */
+    QPointF
+    calcDraggedWindowPos(const QPoint &screenPos, const QPointF &scenePos, const QPointF &buttonDownScenePos) const;
+
     void resizeScrollbar(qreal newZoneHeight);
 signals:
     void closePressed(ZoneViewWidget *zv);
@@ -76,7 +104,6 @@ private slots:
     void resizeToZoneContents(bool forceInitialHeight = false);
     void handleScrollBarChange(int value);
     void zoneDeleted();
-    void moveEvent(QGraphicsSceneMoveEvent * /* event */) override;
     void resizeEvent(QGraphicsSceneResizeEvent * /* event */) override;
     void expandWindow();
 
@@ -101,6 +128,10 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void initStyleOption(QStyleOption *option) const override;
+    bool windowFrameEvent(QEvent *event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 };
 

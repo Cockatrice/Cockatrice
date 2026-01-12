@@ -42,11 +42,7 @@ RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSe
     connect(socket, &QTcpSocket::connected, this, &RemoteClient::slotConnected);
     connect(socket, &QTcpSocket::readyRead, this, &RemoteClient::readData);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     connect(socket, &QTcpSocket::errorOccurred, this, &RemoteClient::slotSocketError);
-#else
-    connect(socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error), this, &RemoteClient::slotSocketError);
-#endif
 
     websocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
     connect(websocket, &QWebSocket::binaryMessageReceived, this, &RemoteClient::websocketMessageReceived);

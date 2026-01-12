@@ -11,20 +11,15 @@
  * UI elements for managing card counts in both the mainboard and sideboard zones.
  *
  * @param parent The parent widget.
- * @param deckEditor Pointer to the TabDeckEditor.
- * @param deckModel Pointer to the DeckListModel.
- * @param deckView Pointer to the QTreeView for the deck display.
+ * @param deckStateManager Pointer to the DeckStateManager
  * @param cardSizeSlider Pointer to the QSlider used for dynamic font resizing.
  * @param rootCard The root card for the widget.
  */
 AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
-                                                   AbstractTabDeckEditor *deckEditor,
-                                                   DeckListModel *deckModel,
-                                                   QTreeView *deckView,
+                                                   DeckStateManager *deckStateManager,
                                                    QSlider *cardSizeSlider,
                                                    const ExactCard &rootCard)
-    : QWidget(parent), deckEditor(deckEditor), deckModel(deckModel), deckView(deckView), cardSizeSlider(cardSizeSlider),
-      rootCard(rootCard)
+    : QWidget(parent), cardSizeSlider(cardSizeSlider)
 {
     layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignHCenter);
@@ -33,11 +28,9 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     setContentsMargins(5, 5, 5, 5); // Padding around the text
 
     zoneLabelMainboard = new ShadowBackgroundLabel(this, tr("Mainboard"));
-    buttonBoxMainboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, DECK_ZONE_MAIN);
+    buttonBoxMainboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
-    buttonBoxSideboard =
-        new CardAmountWidget(this, deckEditor, deckModel, deckView, cardSizeSlider, rootCard, DECK_ZONE_SIDE);
+    buttonBoxSideboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_SIDE);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);
@@ -79,6 +72,12 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     repaint();
 }
 
+void AllZonesCardAmountWidget::setAmounts(int mainboardAmount, int sideboardAmount)
+{
+    buttonBoxMainboard->setAmount(mainboardAmount);
+    buttonBoxSideboard->setAmount(sideboardAmount);
+}
+
 /**
  * @brief Gets the card count in the mainboard zone.
  *
@@ -86,7 +85,7 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
  */
 int AllZonesCardAmountWidget::getMainboardAmount()
 {
-    return buttonBoxMainboard->countCardsInZone(DECK_ZONE_MAIN);
+    return buttonBoxMainboard->getAmount();
 }
 
 /**
@@ -96,7 +95,15 @@ int AllZonesCardAmountWidget::getMainboardAmount()
  */
 int AllZonesCardAmountWidget::getSideboardAmount()
 {
-    return buttonBoxSideboard->countCardsInZone(DECK_ZONE_SIDE);
+    return buttonBoxSideboard->getAmount();
+}
+
+/**
+ * @brief Checks if the amount is at least one in either the mainboard or sideboard.
+ */
+bool AllZonesCardAmountWidget::isNonZero()
+{
+    return getMainboardAmount() > 0 || getSideboardAmount() > 0;
 }
 
 /**
