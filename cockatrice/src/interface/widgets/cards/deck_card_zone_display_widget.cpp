@@ -23,6 +23,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
       displayType(_displayType), bannerOpacity(bannerOpacity), subBannerOpacity(subBannerOpacity),
       cardSizeWidget(_cardSizeWidget)
 {
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
@@ -44,6 +45,20 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
                 &DeckCardZoneDisplayWidget::onSelectionChanged);
     }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &DeckCardZoneDisplayWidget::onCategoryRemoval);
+}
+
+// =====================================================================================================================
+//                                                    User Interaction
+// =====================================================================================================================
+
+void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
+{
+    emit cardClicked(event, card, zoneName);
+}
+
+void DeckCardZoneDisplayWidget::onHover(const ExactCard &card)
+{
+    emit cardHovered(card);
 }
 
 void DeckCardZoneDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -69,17 +84,9 @@ void DeckCardZoneDisplayWidget::onSelectionChanged(const QItemSelection &selecte
     }
 }
 
-void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget)
-{
-    cardGroupLayout->removeWidget(displayWidget);
-    displayWidget->setParent(nullptr);
-    for (auto idx : indexToWidgetMap.keys()) {
-        if (!idx.isValid()) {
-            indexToWidgetMap.remove(idx);
-        }
-    }
-    delete displayWidget;
-}
+// =====================================================================================================================
+//                                             Display Widget Management
+// =====================================================================================================================
 
 void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex index)
 {
@@ -141,6 +148,45 @@ void DeckCardZoneDisplayWidget::displayCards()
     }
 }
 
+void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
+{
+    displayType = _displayType;
+    QLayoutItem *item;
+    while ((item = cardGroupLayout->takeAt(0)) != nullptr) {
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        } else if (item->layout()) {
+            item->layout()->deleteLater();
+        }
+        delete item;
+    }
+
+    indexToWidgetMap.clear();
+
+    // We gotta wait for all the deleteLater's to finish so we fire after the next event cycle
+
+    auto timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [this]() { displayCards(); });
+    timer->start();
+}
+
+void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget)
+{
+    cardGroupLayout->removeWidget(displayWidget);
+    displayWidget->setParent(nullptr);
+    for (auto idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    delete displayWidget;
+}
+
+// =====================================================================================================================
+//                                           DeckListModel Signal Responses
+// =====================================================================================================================
+
 void DeckCardZoneDisplayWidget::onCategoryAddition(const QModelIndex &parent, int first, int last)
 {
     if (!trackedIndex.isValid()) {
@@ -171,48 +217,6 @@ void DeckCardZoneDisplayWidget::onCategoryRemoval(const QModelIndex &parent, int
     if (!trackedIndex.isValid()) {
         emit requestCleanup(this);
     }
-}
-
-void DeckCardZoneDisplayWidget::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-    for (QObject *child : layout->children()) {
-        QWidget *widget = qobject_cast<QWidget *>(child);
-        if (widget) {
-            widget->setMaximumWidth(width());
-        }
-    }
-}
-void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
-{
-    emit cardClicked(event, card, zoneName);
-}
-void DeckCardZoneDisplayWidget::onHover(const ExactCard &card)
-{
-    emit cardHovered(card);
-}
-
-void DeckCardZoneDisplayWidget::refreshDisplayType(const DisplayType &_displayType)
-{
-    displayType = _displayType;
-    QLayoutItem *item;
-    while ((item = cardGroupLayout->takeAt(0)) != nullptr) {
-        if (item->widget()) {
-            item->widget()->deleteLater();
-        } else if (item->layout()) {
-            item->layout()->deleteLater();
-        }
-        delete item;
-    }
-
-    indexToWidgetMap.clear();
-
-    // We gotta wait for all the deleteLater's to finish so we fire after the next event cycle
-
-    auto timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, [this]() { displayCards(); });
-    timer->start();
 }
 
 void DeckCardZoneDisplayWidget::onActiveGroupCriteriaChanged(QString _activeGroupCriteria)
