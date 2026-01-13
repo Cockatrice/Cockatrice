@@ -60,6 +60,7 @@
         <file>resources/icons/mana/W.svg</file>
 
         <file>resources/backgrounds/home.png</file>
+        <file>resources/backgrounds/card_triplet.svg</file>
 
         <file>resources/config/general.svg</file>
         <file>resources/config/appearance.svg</file>

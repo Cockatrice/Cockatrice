@@ -180,6 +180,14 @@ void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
 
     zoneContainer = new QWidget(scrollArea);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    zoneContainer->setObjectName("zoneContainer");
+    zoneContainer->setStyleSheet(R"(
+    QWidget#zoneContainer {
+        background-image: url(theme:backgrounds/card_triplet.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+)");
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
     zoneContainer->setLayout(zoneContainerLayout);
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
