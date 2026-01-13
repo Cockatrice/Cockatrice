@@ -438,7 +438,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
         SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
-        updateHomeTabDisplayCardNameVisibility();
+        updateHomeTabSettingsVisibility();
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
@@ -451,7 +451,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setHomeTabDisplayCardName);
 
-    updateHomeTabDisplayCardNameVisibility();
+    updateHomeTabSettingsVisibility();
 
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
@@ -659,13 +659,13 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
-void AppearanceSettingsPage::updateHomeTabDisplayCardNameVisibility()
+void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 {
     bool visible =
         SettingsCache::instance().getHomeTabBackgroundSource() != BackgroundSources::toId(BackgroundSources::Theme);
-    qInfo() << BackgroundSources::toId(BackgroundSources::Theme);
-    qInfo() << SettingsCache::instance().getHomeTabBackgroundSource();
-    qInfo() << visible;
+
+    homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
+    homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
     homeTabDisplayCardNameLabel.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
 }
