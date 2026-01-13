@@ -44,6 +44,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
+    // Lambda is cleaner to read than overloading this
+    connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
 }
 
 void HomeWidget::initializeBackgroundFromSource()
@@ -297,6 +299,7 @@ QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 void HomeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
     background = background.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
@@ -308,13 +311,47 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(topLeft, background);
 
     // Draw translucent black overlay with rounded corners
-    QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset
+    QRectF overlayRect(5, 5, width() - 10, height() - 10);
     QPainterPath roundedRectPath;
-    roundedRectPath.addRoundedRect(overlayRect, 20, 20); // 20px corner radius
+    roundedRectPath.addRoundedRect(overlayRect, 20, 20);
 
-    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
-    painter.setRenderHint(QPainter::Antialiasing);
+    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
     painter.fillPath(roundedRectPath, semiTransparentBlack);
+
+    // Card name overlay (bottom-right)
+    QString cardName;
+    ExactCard card = backgroundSourceCard->getCard();
+    if (card) {
+        cardName = card.getCardPtr()->getName() + " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
+                   card.getPrinting().getProperty("num");
+    }
+
+    if (!cardName.isEmpty() && SettingsCache::instance().getHomeTabDisplayCardName()) {
+        QFont font = painter.font();
+        font.setPointSize(14);
+        font.setBold(true);
+        painter.setFont(font);
+
+        QFontMetrics fm(font);
+        constexpr int padding = 10;
+        constexpr int margin = 15;
+
+        QRect textRect = fm.boundingRect(cardName);
+
+        QRect bgRect(width() - textRect.width() - padding * 2 - margin,
+                     height() - textRect.height() - padding * 2 - margin, textRect.width() + padding * 2,
+                     textRect.height() + padding * 2);
+
+        // Background bubble
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(0, 0, 0, 160));
+        painter.drawRoundedRect(bgRect, 8, 8);
+
+        // Text
+        painter.setPen(Qt::white);
+        painter.drawText(bgRect.adjusted(padding, padding, -padding, -padding), Qt::AlignRight | Qt::AlignVCenter,
+                         cardName);
+    }
 
     QWidget::paintEvent(event);
 }

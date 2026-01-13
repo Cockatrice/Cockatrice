@@ -143,6 +143,7 @@ signals:
     void themeChanged();
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
+    void homeTabDisplayCardNameChanged();
     void picDownloadChanged();
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
@@ -222,6 +223,7 @@ private:
     bool showTipsOnStartup;
     QList<int> seenTips;
     int homeTabBackgroundShuffleFrequency;
+    bool homeTabDisplayCardName;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -412,6 +414,10 @@ public:
     [[nodiscard]] int getHomeTabBackgroundShuffleFrequency() const
     {
         return homeTabBackgroundShuffleFrequency;
+    }
+    [[nodiscard]] bool getHomeTabDisplayCardName() const
+    {
+        return homeTabDisplayCardName;
     }
     [[nodiscard]] bool getTabVisualDeckStorageOpen() const
     {
@@ -1001,6 +1007,7 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setHomeTabBackgroundSource(const QString &_backgroundSource);
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
+    void setHomeTabDisplayCardName(QT_STATE_CHANGED_T _displayCardName);
     void setTabVisualDeckStorageOpen(bool value);
     void setTabServerOpen(bool value);
     void setTabAccountOpen(bool value);
