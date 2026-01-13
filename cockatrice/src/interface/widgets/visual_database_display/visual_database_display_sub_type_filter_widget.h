@@ -10,6 +10,7 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
+#include <QLabel>
 #include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
@@ -33,10 +34,12 @@ public:
 private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allSubCardTypesWithCount;
-    QSpinBox *spinBox;
+
     QVBoxLayout *layout;
     QLineEdit *searchBox;
     FlowWidget *flowWidget;
+    QLabel *thresholdLabel;
+    QSpinBox *spinBox;
     QPushButton *toggleButton; // Mode switch button
 
     QMap<QString, bool> activeSubTypes;       // Track active filters

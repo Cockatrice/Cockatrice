@@ -51,14 +51,6 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
-    layout->addWidget(recentSetsSettingsWidget);
-
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search sets..."));
     layout->addWidget(searchBox);
@@ -67,6 +59,14 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
+
+    recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
+    layout->addWidget(recentSetsSettingsWidget);
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);

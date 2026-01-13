@@ -2,6 +2,7 @@
 
 #include "../../../filters/filter_tree_model.h"
 
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
@@ -20,15 +21,6 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    // Create and setup the spinbox
-    spinBox = new QSpinBox(this);
-    spinBox->setMinimum(1);
-    spinBox->setMaximum(getMaxSubTypeCount());
-    spinBox->setValue(150);
-    layout->addWidget(spinBox);
-    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
-            &VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility);
-
     // Create search box
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search subtypes..."));
@@ -39,6 +31,26 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     flowWidget->setMaximumHeight(300);
     layout->addWidget(flowWidget);
+
+    // Create a container for the threshold control
+    auto *thresholdLayout = new QHBoxLayout();
+    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+
+    thresholdLabel = new QLabel(this);
+    thresholdLayout->addWidget(thresholdLabel);
+
+    // Create the spinbox
+    spinBox = new QSpinBox(this);
+    spinBox->setMinimum(1);
+    spinBox->setMaximum(getMaxSubTypeCount());
+    spinBox->setValue(150);
+    thresholdLayout->addWidget(spinBox);
+    thresholdLayout->addStretch();
+
+    layout->addLayout(thresholdLayout);
+
+    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility);
 
     // Toggle button setup (Exact Match / Includes mode)
     toggleButton = new QPushButton(this);
@@ -57,6 +69,8 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
 
 void VisualDatabaseDisplaySubTypeFilterWidget::retranslateUi()
 {
+    thresholdLabel->setText(tr("Show sub types with at least:"));
+    spinBox->setSuffix(tr(" cards"));
     spinBox->setToolTip(tr("Do not display card sub-types with less than this amount of cards in the database"));
     toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
