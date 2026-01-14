@@ -77,16 +77,30 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
-void AbstractTabDeckEditor::registerDockWidget(QDockWidget *widget)
+void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
 {
-    QMenu *menu = viewMenu->addMenu(QString());
+    QMenu *menu = _viewMenu->addMenu(QString());
 
     QAction *aVisible = menu->addAction(QString());
     aVisible->setCheckable(true);
-    connect(aVisible, &QAction::triggered, this, &AbstractTabDeckEditor::dockVisibleTriggered);
+
     QAction *aFloating = menu->addAction(QString());
     aFloating->setCheckable(true);
-    connect(aFloating, &QAction::triggered, this, &AbstractTabDeckEditor::dockFloatingTriggered);
+    aFloating->setEnabled(false);
+
+    // user interaction
+    connect(aVisible, &QAction::triggered, widget, [widget](bool checked) { widget->setVisible(checked); });
+    connect(aFloating, &QAction::triggered, this, [widget](bool checked) { widget->setFloating(checked); });
+
+    // sync aFloating's enabled state with aVisible's checked state
+    connect(aVisible, &QAction::toggled, aFloating, [aFloating](bool checked) { aFloating->setEnabled(checked); });
+
+    // sync aFloating with dockWidget's floating state
+    connect(widget, &QDockWidget::topLevelChanged, aFloating,
+            [aFloating](bool topLevel) { aFloating->setChecked(topLevel); });
+
+    // sync aVisible with dockWidget's visible state
+    widget->installEventFilter(new DockWidgetVisibilityFilter(widget, aVisible));
 
     dockToActions.insert(widget, {menu, aVisible, aFloating});
 }
@@ -593,4 +607,23 @@ bool AbstractTabDeckEditor::closeRequest()
     if (!confirmClose())
         return false;
     return close();
+}
+
+DockWidgetVisibilityFilter::DockWidgetVisibilityFilter(QDockWidget *dockWidget, QAction *aVisible)
+    : QObject(dockWidget), dockWidget(dockWidget), aVisible(aVisible)
+{
+}
+
+bool DockWidgetVisibilityFilter::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == dockWidget && !e->spontaneous()) {
+        if (e->type() == QEvent::Show) {
+            aVisible->setChecked(true);
+        }
+
+        if (e->type() == QEvent::Hide) {
+            aVisible->setChecked(false);
+        }
+    }
+    return false;
 }
