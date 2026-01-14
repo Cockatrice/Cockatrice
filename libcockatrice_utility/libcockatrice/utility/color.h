@@ -22,6 +22,8 @@ inline color convertQColorToColor(const QColor &c)
     return result;
 }
 
+#include <QSet>
+
 namespace GameSpecificColors
 {
 namespace MTG
@@ -55,6 +57,32 @@ inline QColor colorHelper(const QString &name)
     int b = 100 + ((h >> 16) % 120);
 
     return QColor(r, g, b);
+}
+
+inline QList<QPair<QString, int>> sortManaMapWUBRGCFirst(const QMap<QString, int> &input)
+{
+    static const QStringList priorityOrder = {"W", "U", "B", "R", "G", "C"};
+
+    QList<QPair<QString, int>> result;
+    QSet<QString> consumed;
+
+    // 1. Add priority colors in fixed order
+    for (const QString &key : priorityOrder) {
+        auto it = input.find(key);
+        if (it != input.end()) {
+            result.append({it.key(), it.value()});
+            consumed.insert(it.key());
+        }
+    }
+
+    // 2. Add remaining keys (QMap iteration is already sorted)
+    for (auto it = input.begin(); it != input.end(); ++it) {
+        if (!consumed.contains(it.key())) {
+            result.append({it.key(), it.value()});
+        }
+    }
+
+    return result;
 }
 } // namespace MTG
 } // namespace GameSpecificColors
