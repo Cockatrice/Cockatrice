@@ -203,6 +203,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/printing_selector.cpp
     src/interface/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
+    src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_search_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp

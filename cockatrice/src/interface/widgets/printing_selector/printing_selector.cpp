@@ -8,6 +8,7 @@
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
 #include "printing_selector_card_sorting_widget.h"
+#include "printing_selector_placeholder_widget.h"
 
 #include <QBoxLayout>
 #include <QScrollBar>
@@ -33,6 +34,8 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     widgetLoadingBufferTimer = new QTimer(this);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+
+    placeholderWidget = new PrintingSelectorPlaceholderWidget(this);
 
     sortToolBar = new PrintingSelectorCardSortingWidget(this);
     sortToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -70,7 +73,12 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     layout->addWidget(sortAndOptionsContainer);
 
+    layout->addWidget(placeholderWidget);
     layout->addWidget(flowWidget);
+
+    // Initially show placeholder, hide flowWidget
+    placeholderWidget->setVisible(true);
+    flowWidget->setVisible(false);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this, deckStateManager);
     cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
@@ -139,7 +147,16 @@ void PrintingSelector::updateDisplay()
     widgetLoadingBufferTimer->deleteLater();
     widgetLoadingBufferTimer = new QTimer(this);
     flowWidget->clearLayout();
-    if (selectedCard != nullptr) {
+
+    if (selectedCard.isNull()) {
+        // Show placeholder, hide flowWidget
+        placeholderWidget->setVisible(true);
+        flowWidget->setVisible(false);
+        setWindowTitle(tr("Printing Selector"));
+    } else {
+        // Hide placeholder, show flowWidget
+        placeholderWidget->setVisible(false);
+        flowWidget->setVisible(true);
         setWindowTitle(selectedCard->getName());
     }
     getAllSetsForCurrentCard();
@@ -153,6 +170,8 @@ void PrintingSelector::updateDisplay()
 void PrintingSelector::setCard(const CardInfoPtr &newCard)
 {
     if (newCard.isNull()) {
+        selectedCard = newCard;
+        updateDisplay();
         return;
     }
 
