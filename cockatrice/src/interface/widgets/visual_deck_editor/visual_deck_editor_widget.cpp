@@ -59,6 +59,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
                 &VisualDeckEditorWidget::onSelectionChanged);
     }
 
+    updatePlaceholderVisibility();
     retranslateUi();
 }
 
@@ -181,15 +182,13 @@ void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
     zoneContainer = new QWidget(scrollArea);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     zoneContainer->setObjectName("zoneContainer");
-    zoneContainer->setStyleSheet(R"(
-    QWidget#zoneContainer {
-        background-image: url(theme:backgrounds/card_triplet.svg);
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-)");
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
     zoneContainer->setLayout(zoneContainerLayout);
+
+    // Create placeholder widget
+    placeholderWidget = new VisualDeckEditorPlaceholderWidget(zoneContainer);
+    zoneContainerLayout->addWidget(placeholderWidget);
+
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 }
@@ -208,6 +207,17 @@ void VisualDeckEditorWidget::retranslateUi()
     searchPushButton->setText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
+
+    if (placeholderWidget) {
+        placeholderWidget->retranslateUi();
+    }
+}
+
+void VisualDeckEditorWidget::updatePlaceholderVisibility()
+{
+    if (placeholderWidget) {
+        placeholderWidget->setVisible(indexToWidgetMap.isEmpty());
+    }
 }
 
 // =====================================================================================================================
@@ -258,6 +268,7 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 
         constructZoneWidgetForIndex(persistent);
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
