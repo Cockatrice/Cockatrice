@@ -165,10 +165,6 @@ void TabDeckEditor::loadLayout()
         actions.aFloating->setChecked(dockWidget->isFloating());
     }
 
-    // special case for cardDatabaseDock
-    auto &actions = dockToActions[cardDatabaseDockWidget];
-    actions.aFloating->setChecked(actions.aVisible->isChecked());
-
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
     cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
 

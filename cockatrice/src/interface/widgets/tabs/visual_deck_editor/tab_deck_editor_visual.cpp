@@ -291,7 +291,7 @@ void TabDeckEditorVisual::loadLayout()
         QDockWidget *dockWidget = it.key();
         const DockActions &actions = it.value();
 
-        actions.aVisible->setCheckable(dockWidget->isHidden());
+        actions.aVisible->setChecked(dockWidget->isHidden());
         actions.aFloating->setEnabled(actions.aVisible->isChecked());
         actions.aFloating->setChecked(dockWidget->isFloating());
     }
