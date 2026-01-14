@@ -10,6 +10,7 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "printing_selector_placeholder_widget.h"
 
 #include <QCheckBox>
 #include <QLabel>
@@ -70,6 +71,7 @@ private:
     QCheckBox *navigationCheckBox;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
+    PrintingSelectorPlaceholderWidget *placeholderWidget;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;

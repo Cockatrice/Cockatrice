@@ -59,6 +59,7 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
                 &VisualDeckEditorWidget::onSelectionChanged);
     }
 
+    updatePlaceholderVisibility();
     retranslateUi();
 }
 
@@ -180,8 +181,14 @@ void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
 
     zoneContainer = new QWidget(scrollArea);
     zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    zoneContainer->setObjectName("zoneContainer");
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
     zoneContainer->setLayout(zoneContainerLayout);
+
+    // Create placeholder widget
+    placeholderWidget = new VisualDeckEditorPlaceholderWidget(zoneContainer);
+    zoneContainerLayout->addWidget(placeholderWidget);
+
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
 }
@@ -200,6 +207,17 @@ void VisualDeckEditorWidget::retranslateUi()
     searchPushButton->setText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
+
+    if (placeholderWidget) {
+        placeholderWidget->retranslateUi();
+    }
+}
+
+void VisualDeckEditorWidget::updatePlaceholderVisibility()
+{
+    if (placeholderWidget) {
+        placeholderWidget->setVisible(indexToWidgetMap.isEmpty());
+    }
 }
 
 // =====================================================================================================================
@@ -250,6 +268,7 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 
         constructZoneWidgetForIndex(persistent);
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
@@ -264,6 +283,7 @@ void VisualDeckEditorWidget::clearAllDisplayWidgets()
         indexToWidgetMap.remove(idx);
         delete displayWidget;
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
@@ -275,6 +295,7 @@ void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *disp
         }
     }
     delete displayWidget;
+    updatePlaceholderVisibility();
 }
 
 // =====================================================================================================================
@@ -294,6 +315,7 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
             constructZoneWidgetForIndex(index);
         }
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
@@ -308,6 +330,7 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
             indexToWidgetMap.remove(idx);
         }
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::decklistModelReset()

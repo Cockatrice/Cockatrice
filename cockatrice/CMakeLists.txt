@@ -203,6 +203,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/printing_selector.cpp
     src/interface/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
+    src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_search_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
@@ -228,6 +229,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
@@ -236,6 +238,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_database_display/visual_database_display_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp
+    src/interface/widgets/visual_deck_editor/visual_deck_editor_placeholder_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
@@ -317,8 +320,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
-    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp
-    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.h
 )
 
 add_subdirectory(sounds)
