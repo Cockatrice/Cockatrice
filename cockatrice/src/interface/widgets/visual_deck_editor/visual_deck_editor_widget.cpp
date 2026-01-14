@@ -283,6 +283,7 @@ void VisualDeckEditorWidget::clearAllDisplayWidgets()
         indexToWidgetMap.remove(idx);
         delete displayWidget;
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
@@ -294,6 +295,7 @@ void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *disp
         }
     }
     delete displayWidget;
+    updatePlaceholderVisibility();
 }
 
 // =====================================================================================================================
@@ -313,6 +315,7 @@ void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first
             constructZoneWidgetForIndex(index);
         }
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
@@ -327,6 +330,7 @@ void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first,
             indexToWidgetMap.remove(idx);
         }
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::decklistModelReset()
