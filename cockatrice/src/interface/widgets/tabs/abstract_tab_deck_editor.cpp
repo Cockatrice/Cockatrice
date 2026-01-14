@@ -77,6 +77,20 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
+void AbstractTabDeckEditor::registerDockWidget(QDockWidget *widget)
+{
+    QMenu *menu = viewMenu->addMenu(QString());
+
+    QAction *aVisible = menu->addAction(QString());
+    aVisible->setCheckable(true);
+    connect(aVisible, &QAction::triggered, this, &AbstractTabDeckEditor::dockVisibleTriggered);
+    QAction *aFloating = menu->addAction(QString());
+    aFloating->setCheckable(true);
+    connect(aFloating, &QAction::triggered, this, &AbstractTabDeckEditor::dockFloatingTriggered);
+
+    dockToActions.insert(widget, {menu, aVisible, aFloating});
+}
+
 /**
  * @brief Updates the card info dock and printing selector.
  * @param card The card to display.
@@ -167,8 +181,8 @@ void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
     deckStateManager->replaceDeck(_deck);
     CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(_deck.deckList.getCardRefList()));
 
-    aDeckDockVisible->setChecked(true);
-    deckDockWidget->setVisible(aDeckDockVisible->isChecked());
+    dockToActions.value(deckDockWidget).aVisible->setChecked(true);
+    deckDockWidget->setVisible(dockToActions.value(deckDockWidget).aVisible->isChecked());
 }
 
 /** @brief Creates a new deck. Handles opening in new tab if needed. */
