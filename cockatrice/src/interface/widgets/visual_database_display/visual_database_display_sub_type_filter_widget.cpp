@@ -2,6 +2,7 @@
 
 #include "../../../filters/filter_tree_model.h"
 
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
@@ -20,15 +21,6 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    // Create and setup the spinbox
-    spinBox = new QSpinBox(this);
-    spinBox->setMinimum(1);
-    spinBox->setMaximum(getMaxSubTypeCount());
-    spinBox->setValue(150);
-    layout->addWidget(spinBox);
-    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
-            &VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility);
-
     // Create search box
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search subtypes..."));
@@ -40,23 +32,44 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
     flowWidget->setMaximumHeight(300);
     layout->addWidget(flowWidget);
 
+    // Create a container for the threshold control
+    auto *thresholdLayout = new QHBoxLayout();
+    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+
+    thresholdLabel = new QLabel(this);
+    thresholdLayout->addWidget(thresholdLabel);
+
+    // Create the spinbox
+    spinBox = new QSpinBox(this);
+    spinBox->setMinimum(1);
+    spinBox->setMaximum(getMaxSubTypeCount());
+    spinBox->setValue(150);
+    thresholdLayout->addWidget(spinBox);
+    thresholdLayout->addStretch();
+
+    layout->addLayout(thresholdLayout);
+
+    connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
+            &VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeButtonsVisibility);
+
     // Toggle button setup (Exact Match / Includes mode)
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
+    connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
         QTimer::singleShot(100, this, &VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel);
     });
 
-    createSubTypeButtons();  // Populate buttons initially
-    updateFilterMode(false); // Initialize the toggle button text
+    createSubTypeButtons(); // Populate buttons initially
+    updateFilterMode();     // Initialize the toggle button text
 
     retranslateUi();
 }
 
 void VisualDatabaseDisplaySubTypeFilterWidget::retranslateUi()
 {
+    thresholdLabel->setText(tr("Show sub types with at least:"));
+    spinBox->setSuffix(tr(" cards"));
     spinBox->setToolTip(tr("Do not display card sub-types with less than this amount of cards in the database"));
     toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
@@ -155,7 +168,7 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
             if (activeSubTypes[type]) {
                 QString typeString = type;
                 filterModel->addFilter(
-                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrSubType));
+                    new CardFilter(typeString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrSubType));
             }
         }
     }
@@ -166,9 +179,9 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
     emit filterModel->layoutChanged();
 }
 
-void VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateSubTypeFilter();
 }
@@ -188,7 +201,7 @@ void VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel()
     // Get active filters for sub types
     QSet<QString> activeTypes;
     for (const auto &filter : filterModel->getFiltersOfType(CardFilter::AttrSubType)) {
-        if (filter->type() == CardFilter::Type::TypeAnd) {
+        if (filter->type() == CardFilter::Type::TypeAnd || filter->type() == CardFilter::Type::TypeOr) {
             activeTypes.insert(filter->term());
         }
     }

@@ -53,14 +53,6 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
-    layout->addWidget(recentSetsSettingsWidget);
-
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
-            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-
     searchBox = new QLineEdit(this);
     searchBox->setPlaceholderText(tr("Search sets..."));
     layout->addWidget(searchBox);
@@ -70,15 +62,23 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
+    recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
+    layout->addWidget(recentSetsSettingsWidget);
+
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
+            &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
+
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
+    connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
     createSetButtons(); // Populate buttons initially
+    updateFilterMode();
     retranslateUi();
 }
 
@@ -266,9 +266,16 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
     }
 }
 
-void VisualDatabaseDisplaySetFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplaySetFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    // Disconnect the layoutChanged -> sync lambda temporarily
+    disconnect(filterModel, &FilterTreeModel::layoutChanged, this, nullptr);
+
+    exactMatchMode = !exactMatchMode;
     updateSetFilter();
     retranslateUi();
+
+    // Reconnect the layoutChanged -> sync lambda
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 }

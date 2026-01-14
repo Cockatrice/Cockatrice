@@ -15,18 +15,23 @@
         <file>resources/icons/arrow_top_green.svg</file>
         <file>resources/icons/arrow_up_green.svg</file>
         <file>resources/icons/arrow_undo.svg</file>
+        <file>resources/icons/circle_half_stroke.svg</file>
         <file>resources/icons/clearsearch.svg</file>
         <file>resources/icons/cogwheel.svg</file>
         <file>resources/icons/conceded.svg</file>
         <file>resources/icons/decrement.svg</file>
         <file>resources/icons/delete.svg</file>
+        <file>resources/icons/dragon.svg</file>
         <file>resources/icons/dropdown_collapsed.svg</file>
         <file>resources/icons/dropdown_expanded.svg</file>
+        <file>resources/icons/floppy_disk.svg</file>
         <file>resources/icons/forgot_password.svg</file>
+        <file>resources/icons/gear.svg</file>
         <file>resources/icons/increment.svg</file>
         <file>resources/icons/info.svg</file>
         <file>resources/icons/lock.svg</file>
         <file>resources/icons/not_ready_start.svg</file>
+        <file>resources/icons/pen_to_square.svg</file>
         <file>resources/icons/pencil.svg</file>
         <file>resources/icons/pin.svg</file>
         <file>resources/icons/player.svg</file>
@@ -34,7 +39,9 @@
         <file>resources/icons/reload.svg</file>
         <file>resources/icons/remove_row.svg</file>
         <file>resources/icons/rename.svg</file>
+        <file>resources/icons/scale_balanced.svg</file>
         <file>resources/icons/scales.svg</file>
+        <file>resources/icons/scroll.svg</file>
         <file>resources/icons/search.svg</file>
         <file>resources/icons/settings.svg</file>
         <file>resources/icons/share.svg</file>

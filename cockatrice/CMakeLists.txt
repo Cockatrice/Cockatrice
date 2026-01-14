@@ -317,6 +317,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
+    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp
+    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.h
 )
 
 add_subdirectory(sounds)
