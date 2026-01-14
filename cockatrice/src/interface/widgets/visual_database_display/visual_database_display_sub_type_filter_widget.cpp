@@ -168,7 +168,7 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
             if (activeSubTypes[type]) {
                 QString typeString = type;
                 filterModel->addFilter(
-                    new CardFilter(typeString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrSubType));
+                    new CardFilter(typeString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrSubType));
             }
         }
     }
@@ -201,7 +201,7 @@ void VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel()
     // Get active filters for sub types
     QSet<QString> activeTypes;
     for (const auto &filter : filterModel->getFiltersOfType(CardFilter::AttrSubType)) {
-        if (filter->type() == CardFilter::Type::TypeAnd) {
+        if (filter->type() == CardFilter::Type::TypeAnd || filter->type() == CardFilter::Type::TypeOr) {
             activeTypes.insert(filter->term());
         }
     }
