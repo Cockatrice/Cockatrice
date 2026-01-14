@@ -6,6 +6,7 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     : QWidget(_parent), visualDatabaseDisplay(_parent)
 {
     filterContainerLayout = new QHBoxLayout(this);
+    // filterContainerLayout->setContentsMargins(11, 0, 11, 0);
     setLayout(filterContainerLayout);
     filterContainerLayout->setAlignment(Qt::AlignLeft);
 
@@ -54,27 +55,21 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
     quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/floppy_disk"));
-    quickFilterSaveLoadWidget->setButtonText("Save/Load");
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
     quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/pen_to_square"));
-    quickFilterNameWidget->setButtonText("Name");
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
     quickFilterMainTypeWidget->setButtonIcon(QPixmap("theme:icons/circle_half_stroke"));
-    quickFilterMainTypeWidget->setButtonText("Main Type");
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
     quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/dragon"));
-    quickFilterSubTypeWidget->setButtonText("Sub Type");
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
     quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scroll"));
-    quickFilterSetWidget->setButtonText("Sets");
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
     quickFilterFormatLegalityWidget->setButtonIcon(QPixmap("theme:icons/scale_balanced"));
-    quickFilterFormatLegalityWidget->setButtonText("Formats");
 
     retranslateUi();
 }
@@ -126,6 +121,15 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
 
     quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
     quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
+    quickFilterMainTypeWidget->setToolTip(tr("Filter by card main-type"));
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
     quickFilterSetWidget->setToolTip(tr("Filter by set"));
+    quickFilterFormatLegalityWidget->setToolTip(tr("Filter by format legality"));
+
+    quickFilterSaveLoadWidget->setButtonText(tr("Save/Load"));
+    quickFilterNameWidget->setButtonText(tr("Name"));
+    quickFilterMainTypeWidget->setButtonText(tr("Main Type"));
+    quickFilterSubTypeWidget->setButtonText(tr("Sub Type"));
+    quickFilterSetWidget->setButtonText(tr("Sets"));
+    quickFilterFormatLegalityWidget->setButtonText(tr("Formats"));
 }
