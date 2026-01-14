@@ -60,7 +60,7 @@ private:
     QMap<QString, QPushButton *> setButtons;  // Store set filter buttons
     QMap<QString, bool> activeSets;           // Track active set filters
 
-    bool exactMatchMode = false; // Toggle between "Exact Match" and "Includes"
+    bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H

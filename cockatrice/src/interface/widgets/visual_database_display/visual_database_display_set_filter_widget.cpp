@@ -76,6 +76,7 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
     createSetButtons(); // Populate buttons initially
+    updateFilterMode();
     retranslateUi();
 }
 
@@ -265,7 +266,14 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
 
 void VisualDatabaseDisplaySetFilterWidget::updateFilterMode()
 {
+    // Disconnect the layoutChanged -> sync lambda temporarily
+    disconnect(filterModel, &FilterTreeModel::layoutChanged, this, nullptr);
+
     exactMatchMode = !exactMatchMode;
     updateSetFilter();
     retranslateUi();
+
+    // Reconnect the layoutChanged -> sync lambda
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 }
