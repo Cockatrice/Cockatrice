@@ -16,6 +16,8 @@ class ColorIdentityWidget : public QWidget
     Q_OBJECT
 public:
     explicit ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity = "");
+    explicit ColorIdentityWidget(QWidget *parent, const CardInfoPtr &card);
+
     void populateManaSymbolWidgets();
 
     static QStringList parseColorIdentity(const QString &manaString);

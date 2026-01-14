@@ -25,6 +25,11 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorI
             &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
+ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const CardInfoPtr &card)
+    : ColorIdentityWidget(parent, card->getColors())
+{
+}
+
 void ColorIdentityWidget::populateManaSymbolWidgets()
 {
     // Define the full WUBRG set (White, Blue, Black, Red, Green)
@@ -74,12 +79,12 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
-QStringList ColorIdentityWidget::parseColorIdentity(const QString &cmc)
+QStringList ColorIdentityWidget::parseColorIdentity(const QString &manaString)
 {
     QStringList symbols;
 
     // Handle split costs (e.g., "3U // 4UU")
-    QStringList splitCosts = cmc.split(" // ");
+    QStringList splitCosts = manaString.split(" // ");
     for (const QString &part : splitCosts) {
         QRegularExpression regex(R"(\{([^}]+)\}|(\d+)|([WUBRGCSPX]))");
         QRegularExpressionMatchIterator matches = regex.globalMatch(part);
