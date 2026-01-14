@@ -6,7 +6,7 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     : QWidget(_parent), visualDatabaseDisplay(_parent)
 {
     filterContainerLayout = new QHBoxLayout(this);
-    // filterContainerLayout->setContentsMargins(11, 0, 11, 0);
+    filterContainerLayout->setContentsMargins(11, 0, 11, 0);
     setLayout(filterContainerLayout);
     filterContainerLayout->setAlignment(Qt::AlignLeft);
 
