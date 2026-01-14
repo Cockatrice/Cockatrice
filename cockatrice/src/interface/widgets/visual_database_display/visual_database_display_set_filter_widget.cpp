@@ -70,9 +70,8 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
+    connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySetFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel); });
 
@@ -264,9 +263,9 @@ void VisualDatabaseDisplaySetFilterWidget::syncWithFilterModel()
     }
 }
 
-void VisualDatabaseDisplaySetFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplaySetFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     updateSetFilter();
     retranslateUi();
 }

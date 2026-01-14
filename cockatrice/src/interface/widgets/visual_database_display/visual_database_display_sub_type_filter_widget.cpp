@@ -54,15 +54,14 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
 
     // Toggle button setup (Exact Match / Includes mode)
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
+    connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
         QTimer::singleShot(100, this, &VisualDatabaseDisplaySubTypeFilterWidget::syncWithFilterModel);
     });
 
-    createSubTypeButtons();  // Populate buttons initially
-    updateFilterMode(false); // Initialize the toggle button text
+    createSubTypeButtons(); // Populate buttons initially
+    updateFilterMode();     // Initialize the toggle button text
 
     retranslateUi();
 }
@@ -180,9 +179,9 @@ void VisualDatabaseDisplaySubTypeFilterWidget::updateSubTypeFilter()
     emit filterModel->layoutChanged();
 }
 
-void VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplaySubTypeFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateSubTypeFilter();
 }

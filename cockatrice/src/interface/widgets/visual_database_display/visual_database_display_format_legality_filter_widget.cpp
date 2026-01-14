@@ -53,16 +53,15 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this,
+    connect(toggleButton, &QPushButton::clicked, this,
             &VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
         QTimer::singleShot(100, this, &VisualDatabaseDisplayFormatLegalityFilterWidget::syncWithFilterModel);
     });
 
-    createFormatButtons();   // Populate buttons initially
-    updateFilterMode(false); // Initialize toggle button text
+    createFormatButtons(); // Populate buttons initially
+    updateFilterMode();    // Initialize toggle button text
 
     retranslateUi();
 }
@@ -177,9 +176,9 @@ void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFormatFilter()
     emit filterModel->layoutChanged();
 }
 
-void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateFormatFilter();
 }

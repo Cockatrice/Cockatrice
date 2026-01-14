@@ -29,7 +29,7 @@ public:
 
     void handleMainTypeToggled(const QString &mainType, bool active);
     void updateMainTypeFilter();
-    void updateFilterMode(bool checked);
+    void updateFilterMode();
     void syncWithFilterModel();
 
 private:
@@ -45,7 +45,7 @@ private:
     QMap<QString, bool> activeMainTypes;      // Track active filters
     QMap<QString, QPushButton *> typeButtons; // Store toggle buttons
 
-    bool exactMatchMode = false; // Toggle between "Exact Match" and "Includes"
+    bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_MAIN_TYPE_FILTER_WIDGET_H
