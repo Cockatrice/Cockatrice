@@ -241,11 +241,11 @@ void TabDeckStorage::actOpenLocalDeck()
             continue;
         QString filePath = localDirModel->filePath(curLeft);
 
-        auto deckLoader = new DeckLoader(this);
-        if (!deckLoader->loadFromFile(filePath, DeckFileFormat::Cockatrice, true))
+        std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
+        if (!deckOpt)
             continue;
 
-        emit openDeckEditor(deckLoader->getDeck());
+        emit openDeckEditor(deckOpt.value());
     }
 }
 
@@ -307,13 +307,13 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
     QFile deckFile(filePath);
     QFileInfo deckFileInfo(deckFile);
 
-    DeckLoader deckLoader(this);
-    if (!deckLoader.loadFromFile(filePath, DeckFileFormat::Cockatrice)) {
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
+    if (!deckOpt) {
         QMessageBox::critical(this, tr("Error"), tr("Invalid deck file"));
         return;
     }
 
-    DeckList deck = deckLoader.getDeck().deckList;
+    DeckList deck = deckOpt.value().deckList;
 
     if (deck.getName().isEmpty()) {
         bool ok;
@@ -434,11 +434,11 @@ void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandCont
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     const Command_DeckDownload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckDownload::ext);
 
-    DeckLoader loader(this);
-    if (!loader.loadFromRemote(QString::fromStdString(resp.deck()), cmd.deck_id()))
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromRemote(QString::fromStdString(resp.deck()), cmd.deck_id());
+    if (!deckOpt)
         return;
 
-    emit openDeckEditor(loader.getDeck());
+    emit openDeckEditor(deckOpt.value());
 }
 
 void TabDeckStorage::actDownload()
@@ -496,10 +496,7 @@ void TabDeckStorage::downloadFinished(const Response &r,
 
     DeckList deckList = DeckList(QString::fromStdString(resp.deck()));
 
-    DeckLoader deckLoader(this);
-    deckLoader.setDeck({deckList, {}});
-
-    deckLoader.saveToFile(filePath, DeckFileFormat::Cockatrice);
+    DeckLoader::saveToFile(deckList, filePath, DeckFileFormat::Cockatrice);
 }
 
 void TabDeckStorage::actNewFolder()

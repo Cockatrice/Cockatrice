@@ -77,10 +77,10 @@ static QStringList findAllKnownTags()
     QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
 
     QStringList knownTags;
-    auto loader = DeckLoader(nullptr);
     for (const QString &file : allFiles) {
-        loader.loadFromFile(file, DeckFileFormat::getFormatFromName(file), false);
-        QStringList tags = loader.getDeck().deckList.getTags();
+        std::optional<LoadedDeck> deckOpt =
+            DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), false);
+        QStringList tags = deckOpt.has_value() ? deckOpt->deckList.getTags() : QStringList();
         knownTags.append(tags);
         knownTags.removeDuplicates();
     }
@@ -124,7 +124,7 @@ static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
 
 static void convertFileToCockatriceFormat(DeckPreviewWidget *deckPreviewWidget)
 {
-    deckPreviewWidget->deckLoader->convertToCockatriceFormat(deckPreviewWidget->filePath);
+    DeckLoader::convertToCockatriceFormat(deckPreviewWidget->deckLoader->getDeck());
     deckPreviewWidget->filePath = deckPreviewWidget->deckLoader->getDeck().lastLoadInfo.fileName;
     deckPreviewWidget->refreshBannerCardText();
 }
