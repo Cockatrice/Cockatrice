@@ -19,6 +19,7 @@ class LayoutsSettings : public SettingsManager
 public:
     void setDeckEditorLayoutState(const QByteArray &value);
     void setDeckEditorGeometry(const QByteArray &value);
+    void setDeckEditorCardDatabaseSize(const QSize &value);
     void setDeckEditorCardSize(const QSize &value);
     void setDeckEditorDeckSize(const QSize &value);
     void setDeckEditorPrintingSelectorSize(const QSize &value);
@@ -41,6 +42,7 @@ public:
 
     const QByteArray getDeckEditorLayoutState();
     const QByteArray getDeckEditorGeometry();
+    QSize getDeckEditorCardDatabaseSize();
     QSize getDeckEditorCardSize();
     QSize getDeckEditorDeckSize();
     QSize getDeckEditorPrintingSelectorSize();
