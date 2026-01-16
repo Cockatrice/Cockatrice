@@ -18,6 +18,7 @@
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -100,7 +101,9 @@ void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *wi
             [aFloating](bool topLevel) { aFloating->setChecked(topLevel); });
 
     // sync aVisible with dockWidget's visible state
-    widget->installEventFilter(new DockWidgetVisibilityFilter(widget, aVisible));
+    auto filter = new VisibilityChangeListener(widget);
+    connect(filter, &VisibilityChangeListener::visibilityChanged, aVisible,
+            [aVisible](bool visible) { aVisible->setChecked(visible); });
 
     dockToActions.insert(widget, {menu, aVisible, aFloating});
 }
@@ -607,23 +610,4 @@ bool AbstractTabDeckEditor::closeRequest()
     if (!confirmClose())
         return false;
     return close();
-}
-
-DockWidgetVisibilityFilter::DockWidgetVisibilityFilter(QDockWidget *dockWidget, QAction *aVisible)
-    : QObject(dockWidget), dockWidget(dockWidget), aVisible(aVisible)
-{
-}
-
-bool DockWidgetVisibilityFilter::eventFilter(QObject *o, QEvent *e)
-{
-    if (o == dockWidget && !e->spontaneous()) {
-        if (e->type() == QEvent::Show) {
-            aVisible->setChecked(true);
-        }
-
-        if (e->type() == QEvent::Hide) {
-            aVisible->setChecked(false);
-        }
-    }
-    return false;
 }
