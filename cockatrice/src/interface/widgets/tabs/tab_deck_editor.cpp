@@ -154,6 +154,9 @@ void TabDeckEditor::loadLayout()
         }
     }
 
+    cardDatabaseDockWidget->setMinimumSize(layouts.getDeckEditorCardDatabaseSize());
+    cardDatabaseDockWidget->setMaximumSize(layouts.getDeckEditorCardDatabaseSize());
+
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
     cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
 
@@ -221,6 +224,7 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
         layouts.setDeckEditorGeometry(saveGeometry());
+        layouts.setDeckEditorCardDatabaseSize(cardDatabaseDockWidget->size());
         layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
         layouts.setDeckEditorFilterSize(filterDockWidget->size());
         layouts.setDeckEditorDeckSize(deckDockWidget->size());
