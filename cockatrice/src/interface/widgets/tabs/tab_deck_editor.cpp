@@ -54,8 +54,8 @@ void TabDeckEditor::createMenus()
 
     viewMenu = new QMenu(this);
 
-    registerDockWidget(viewMenu, cardInfoDockWidget);
     registerDockWidget(viewMenu, cardDatabaseDockWidget);
+    registerDockWidget(viewMenu, cardInfoDockWidget);
     registerDockWidget(viewMenu, deckDockWidget);
     registerDockWidget(viewMenu, filterDockWidget);
     registerDockWidget(viewMenu, printingSelectorDockWidget);
@@ -94,16 +94,16 @@ QString TabDeckEditor::getTabText() const
 void TabDeckEditor::retranslateUi()
 {
     deckMenu->retranslateUi();
-    cardInfoDockWidget->retranslateUi();
     cardDatabaseDockWidget->retranslateUi();
+    cardInfoDockWidget->retranslateUi();
     deckDockWidget->retranslateUi();
     filterDockWidget->retranslateUi();
     printingSelectorDockWidget->retranslateUi();
 
     viewMenu->setTitle(tr("&View"));
 
-    dockToActions[cardInfoDockWidget].menu->setTitle(tr("Card Info"));
     dockToActions[cardDatabaseDockWidget].menu->setTitle(tr("Card Database"));
+    dockToActions[cardInfoDockWidget].menu->setTitle(tr("Card Info"));
     dockToActions[deckDockWidget].menu->setTitle(tr("Deck"));
     dockToActions[filterDockWidget].menu->setTitle(tr("Filters"));
     dockToActions[printingSelectorDockWidget].menu->setTitle(tr("Printing"));
