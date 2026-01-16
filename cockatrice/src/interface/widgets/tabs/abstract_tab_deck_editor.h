@@ -307,19 +307,4 @@ protected:
     QMap<QDockWidget *, DockActions> dockToActions;
 };
 
-/**
- * This filter syncs the dock widget's visibility with the viewMenu visibility action's check state.
- */
-class DockWidgetVisibilityFilter : public QObject
-{
-    Q_OBJECT
-
-    QDockWidget *dockWidget;
-    QAction *aVisible;
-
-public:
-    explicit DockWidgetVisibilityFilter(QDockWidget *dockWidget, QAction *aVisible);
-    bool eventFilter(QObject *o, QEvent *e) override;
-};
-
 #endif // TAB_GENERIC_DECK_EDITOR_H
