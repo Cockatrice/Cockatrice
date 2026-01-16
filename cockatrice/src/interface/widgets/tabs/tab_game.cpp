@@ -97,12 +97,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMessageDock();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
-    createReplayDock(nullptr);
+    replayDock = nullptr;
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
-    replayDock->setHidden(true);
 
     mainWidget = new QStackedWidget(this);
     mainWidget->addWidget(deckViewContainerWidget);
@@ -256,13 +255,15 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    delete replayManager->replay;
+    if (replayManager) {
+        delete replayManager->replay;
+    }
 }
 
 void TabGame::updatePlayerListDockTitle()
 {
-    QString tabText = " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" +
-                      QString::number(game->getGameMetaInfo()->gameId());
+    QString type = replayDock ? tr("Replay") : tr("Game");
+    QString tabText = " | " + type + " #" + QString::number(game->getGameMetaInfo()->gameId());
     QString userCountInfo =
         QString(" %1/%2").arg(game->getPlayerManager()->getPlayerCount()).arg(game->getGameMetaInfo()->maxPlayers());
     playerListDock->setWindowTitle(tr("Player List") + userCountInfo +
@@ -271,8 +272,8 @@ void TabGame::updatePlayerListDockTitle()
 
 void TabGame::retranslateUi()
 {
-    QString tabText = " | " + (replayManager->replay ? tr("Replay") : tr("Game")) + " #" +
-                      QString::number(game->getGameMetaInfo()->gameId());
+    QString type = replayDock ? tr("Replay") : tr("Game");
+    QString tabText = " | " + type + " #" + QString::number(game->getGameMetaInfo()->gameId());
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
@@ -318,7 +319,7 @@ void TabGame::retranslateUi()
         }
     }
     if (aLeaveGame) {
-        if (replayManager->replay) {
+        if (replayDock) {
             aLeaveGame->setText(tr("C&lose replay"));
         } else {
             aLeaveGame->setText(tr("&Leave game"));
@@ -517,7 +518,7 @@ bool TabGame::leaveGame()
                 return false;
         }
 
-        if (!replayManager->replay)
+        if (!replayDock)
             emit gameLeft();
     }
     return true;
@@ -904,7 +905,7 @@ QString TabGame::getTabText() const
     QString gameId(QString::number(game->getGameMetaInfo()->gameId()));
 
     QString tabText;
-    if (replayManager->replay)
+    if (replayDock)
         tabText.append(tr("Replay") + " ");
     if (!gameTypeInfo.isEmpty())
         tabText.append(gameTypeInfo + " ");
@@ -1085,7 +1086,7 @@ void TabGame::createViewMenuItems()
 void TabGame::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    if (replayManager->replay) {
+    if (replayDock) {
         restoreGeometry(layouts.getReplayPlayAreaGeometry());
         restoreState(layouts.getReplayPlayAreaLayoutState());
 
@@ -1121,7 +1122,7 @@ void TabGame::loadLayout()
     aMessageLayoutDockFloating->setChecked(messageLayoutDock->isFloating());
     aPlayerListDockFloating->setChecked(playerListDock->isFloating());
 
-    if (replayManager->replay) {
+    if (replayDock) {
         aReplayDockVisible->setChecked(replayDock->isVisible());
         aReplayDockFloating->setEnabled(aReplayDockVisible->isChecked());
         aReplayDockFloating->setChecked(replayDock->isFloating());
@@ -1380,7 +1381,7 @@ void TabGame::createMessageDock(bool bReplay)
 void TabGame::hideEvent(QHideEvent *event)
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    if (replayManager->replay) {
+    if (replayDock) {
         layouts.setReplayPlayAreaState(saveState());
         layouts.setReplayPlayAreaGeometry(saveGeometry());
         layouts.setReplayCardInfoSize(cardInfoDock->size());
