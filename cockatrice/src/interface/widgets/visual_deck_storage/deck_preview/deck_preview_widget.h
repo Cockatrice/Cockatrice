@@ -72,7 +72,11 @@ public slots:
     void resizeEvent(QResizeEvent *event) override;
 
 protected:
-    void enterEvent(QEnterEvent *event) override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent(QEnterEvent *event) override; // Qt6 signature
+#else
+    void enterEvent(QEvent *event) override; // Qt5 signature
+#endif
 
 private:
     void updateLastModifiedTime();
