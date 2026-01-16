@@ -15,10 +15,13 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     : QWidget(parent), deckListModel(_deckListModel), statsAnalyzer(_statsAnalyzer)
 {
     layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
     setLayout(layout);
 
-    resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);
+    resetAndHandSizeLayout->setContentsMargins(11, 0, 11, 0);
+
+    resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeContainerWidget->setLayout(resetAndHandSizeLayout);
 
     resetButton = new QPushButton(this);
@@ -39,11 +42,11 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
-    drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
-    layout->addWidget(drawProbabilityWidget);
-
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
     layout->addWidget(cardSizeWidget);
+
+    drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
+    layout->addWidget(drawProbabilityWidget);
 
     for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);

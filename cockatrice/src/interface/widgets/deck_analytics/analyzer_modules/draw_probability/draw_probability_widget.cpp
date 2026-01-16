@@ -22,6 +22,7 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
 {
     controls = new QWidget(this);
     controlLayout = new QHBoxLayout(controls);
+    controlLayout->setContentsMargins(11, 0, 11, 0);
 
     labelPrefix = new QLabel(this);
     controlLayout->addWidget(labelPrefix);
@@ -65,6 +66,7 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     resultTable = new QTableWidget(this);
     resultTable->setColumnCount(3);
     resultTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    resultTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     layout->addWidget(resultTable);
 
     // Connections
