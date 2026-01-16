@@ -169,9 +169,6 @@ public slots:
     /** @brief Shows the printing selector dock. Pure virtual. */
     virtual void showPrintingSelector() = 0;
 
-    /** @brief Slot for when a dock's top-level state changes. Pure virtual. */
-    virtual void dockTopLevelChanged(bool topLevel) = 0;
-
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
     void openDeckEditor(const LoadedDeck &deck);
@@ -246,12 +243,6 @@ protected slots:
     /** @brief Handles dock close events. */
     void closeEvent(QCloseEvent *event) override;
 
-    /** @brief Slot triggered when a dock visibility changes. Pure virtual. */
-    virtual void dockVisibleTriggered() = 0;
-
-    /** @brief Slot triggered when a dock floating state changes. Pure virtual. */
-    virtual void dockFloatingTriggered() = 0;
-
 private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
@@ -289,7 +280,7 @@ protected:
      * @brief registers a QDockWidget as a managed dock widget. Creates the associated actions and menu, adds them to
      * the viewMenu, and connects those actions to the tab's slots.
      */
-    void registerDockWidget(QDockWidget *widget);
+    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget);
 
     /** @brief Confirms deck open action based on settings and modified state.
      *  @param openInSameTabIfBlank Whether to reuse same tab if blank.
@@ -314,6 +305,21 @@ protected:
     QAction *aResetLayout;
 
     QMap<QDockWidget *, DockActions> dockToActions;
+};
+
+/**
+ * This filter syncs the dock widget's visibility with the viewMenu visibility action's check state.
+ */
+class DockWidgetVisibilityFilter : public QObject
+{
+    Q_OBJECT
+
+    QDockWidget *dockWidget;
+    QAction *aVisible;
+
+public:
+    explicit DockWidgetVisibilityFilter(QDockWidget *dockWidget, QAction *aVisible);
+    bool eventFilter(QObject *o, QEvent *e) override;
 };
 
 #endif // TAB_GENERIC_DECK_EDITOR_H

@@ -54,11 +54,11 @@ void TabDeckEditor::createMenus()
 
     viewMenu = new QMenu(this);
 
-    registerDockWidget(cardInfoDockWidget);
-    registerDockWidget(cardDatabaseDockWidget);
-    registerDockWidget(deckDockWidget);
-    registerDockWidget(filterDockWidget);
-    registerDockWidget(printingSelectorDockWidget);
+    registerDockWidget(viewMenu, cardInfoDockWidget);
+    registerDockWidget(viewMenu, cardDatabaseDockWidget);
+    registerDockWidget(viewMenu, deckDockWidget);
+    registerDockWidget(viewMenu, filterDockWidget);
+    registerDockWidget(viewMenu, printingSelectorDockWidget);
 
     if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         dockToActions[printingSelectorDockWidget].menu->setEnabled(false);
@@ -130,7 +130,6 @@ void TabDeckEditor::showPrintingSelector()
 {
     printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
-    dockToActions[printingSelectorDockWidget].aVisible->setChecked(true);
     printingSelectorDockWidget->setVisible(true);
 }
 
@@ -152,17 +151,7 @@ void TabDeckEditor::loadLayout()
     if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
         if (!printingSelectorDockWidget->isHidden()) {
             printingSelectorDockWidget->setHidden(true);
-            dockToActions[printingSelectorDockWidget].aVisible->setChecked(true);
         }
-    }
-
-    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
-        QDockWidget *dockWidget = it.key();
-        const DockActions &actions = it.value();
-
-        actions.aVisible->setChecked(!dockWidget->isHidden());
-        actions.aFloating->setEnabled(actions.aVisible->isChecked());
-        actions.aFloating->setChecked(dockWidget->isFloating());
     }
 
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
@@ -185,23 +174,13 @@ void TabDeckEditor::loadLayout()
  */
 void TabDeckEditor::restartLayout()
 {
-
-    // Update menu checkboxes
-    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
-        QDockWidget *dockWidget = it.key();
-        const DockActions &actions = it.value();
-
-        actions.aVisible->setEnabled(true);
-        actions.aFloating->setEnabled(false);
-
-        // Show/hide and reset floating
+    // Show/hide and reset floating
+    for (auto dockWidget : dockToActions.keys()) {
         dockWidget->setVisible(true);
         dockWidget->setFloating(false);
     }
 
     // Printing selector special case
-    dockToActions[printingSelectorDockWidget].aVisible->setChecked(
-        !SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
     printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
 
     addDockWidget(Qt::LeftDockWidgetArea, cardDatabaseDockWidget);
@@ -230,51 +209,6 @@ void TabDeckEditor::freeDocksSize()
     }
 }
 
-/** @brief Handles dock visibility toggling from menu actions. */
-void TabDeckEditor::dockVisibleTriggered()
-{
-    QObject *o = sender();
-
-    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
-        QDockWidget *dockWidget = it.key();
-        const DockActions &actions = it.value();
-
-        if (o == actions.aVisible) {
-            dockWidget->setHidden(!actions.aVisible->isChecked());
-            actions.aFloating->setEnabled(actions.aVisible->isChecked());
-            return;
-        }
-    }
-}
-
-/** @brief Handles dock floating toggling from menu actions. */
-void TabDeckEditor::dockFloatingTriggered()
-{
-    QObject *o = sender();
-
-    for (auto it = dockToActions.begin(); it != dockToActions.end(); ++it) {
-        QDockWidget *dockWidget = it.key();
-        const DockActions &actions = it.value();
-
-        if (o == actions.aFloating) {
-            dockWidget->setFloating(actions.aFloating->isChecked());
-            return;
-        }
-    }
-}
-
-/** @brief Syncs menu state with dock floating changes. */
-void TabDeckEditor::dockTopLevelChanged(bool topLevel)
-{
-    QObject *o = sender();
-
-    auto dockWidget = qobject_cast<QDockWidget *>(o);
-    if (dockToActions.contains(dockWidget)) {
-        DockActions actions = dockToActions.value(dockWidget);
-        actions.aFloating->setChecked(topLevel);
-    }
-}
-
 /**
  * @brief Handles close/hide events to update menu state and save layout.
  * @param o Object sending the event.
@@ -283,15 +217,6 @@ void TabDeckEditor::dockTopLevelChanged(bool topLevel)
  */
 bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
 {
-    if (e->type() == QEvent::Close) {
-        auto dockWidget = qobject_cast<QDockWidget *>(o);
-        if (dockToActions.contains(dockWidget)) {
-            DockActions actions = dockToActions.value(dockWidget);
-            actions.aVisible->setChecked(false);
-            actions.aFloating->setEnabled(false);
-        }
-    }
-
     if (o == this && e->type() == QEvent::Hide) {
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());

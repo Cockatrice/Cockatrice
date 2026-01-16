@@ -25,7 +25,6 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
     setWidget(dockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 
     // connect signals
     connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, deckEditor,
