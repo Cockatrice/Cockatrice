@@ -97,12 +97,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMessageDock();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
-    createReplayDock(nullptr);
+    replayDock = nullptr;
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
-    replayDock->setHidden(true);
 
     mainWidget = new QStackedWidget(this);
     mainWidget->addWidget(deckViewContainerWidget);
@@ -1380,7 +1379,7 @@ void TabGame::createMessageDock(bool bReplay)
 void TabGame::hideEvent(QHideEvent *event)
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    if (replayManager->replay) {
+    if (replayDock) {
         layouts.setReplayPlayAreaState(saveState());
         layouts.setReplayPlayAreaGeometry(saveGeometry());
         layouts.setReplayCardInfoSize(cardInfoDock->size());
