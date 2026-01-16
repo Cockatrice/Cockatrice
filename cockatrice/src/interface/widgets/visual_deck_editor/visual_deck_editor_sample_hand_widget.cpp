@@ -55,13 +55,6 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
 
     drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
 
-    for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
-        auto displayWidget = new CardInfoPictureWidget(this);
-        displayWidget->setCard(card);
-        displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
-        flowWidget->addWidget(displayWidget);
-    }
-
     auto *splitter = new QSplitter(this);
     splitter->setObjectName("splitter");
     splitter->setOrientation(Qt::Vertical);
