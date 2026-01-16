@@ -6,6 +6,7 @@
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
 #include "../deck_analytics/deck_list_statistics_analyzer.h"
 
+#include <QSplitter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <random>
 
@@ -17,6 +18,10 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     setLayout(layout);
+
+    auto upperLayout = new QVBoxLayout(this);
+    upperLayout->setContentsMargins(0, 0, 0, 0);
+    upperLayout->setSpacing(0);
 
     resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);
     resetAndHandSizeLayout->setContentsMargins(11, 0, 11, 0);
@@ -37,16 +42,18 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
             &VisualDeckEditorSampleHandWidget::updateDisplay);
     resetAndHandSizeLayout->addWidget(handSizeSpinBox);
 
-    layout->addWidget(resetAndHandSizeContainerWidget);
+    upperLayout->addWidget(resetAndHandSizeContainerWidget);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
-    layout->addWidget(flowWidget);
+    upperLayout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
-    layout->addWidget(cardSizeWidget);
+    upperLayout->addWidget(cardSizeWidget);
+
+    auto upperLayoutWidget = new QWidget(this);
+    upperLayoutWidget->setLayout(upperLayout);
 
     drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
-    layout->addWidget(drawProbabilityWidget);
 
     for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
         auto displayWidget = new CardInfoPictureWidget(this);
@@ -54,6 +61,15 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
         displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
         flowWidget->addWidget(displayWidget);
     }
+
+    auto *splitter = new QSplitter(this);
+    splitter->setObjectName("splitter");
+    splitter->setOrientation(Qt::Vertical);
+
+    splitter->addWidget(upperLayoutWidget);
+    splitter->addWidget(drawProbabilityWidget);
+
+    layout->addWidget(splitter);
 
     retranslateUi();
 }
