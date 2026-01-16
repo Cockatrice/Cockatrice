@@ -255,7 +255,7 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    if (replayDock) {
+    if (replayManager) {
         delete replayManager->replay;
     }
 }

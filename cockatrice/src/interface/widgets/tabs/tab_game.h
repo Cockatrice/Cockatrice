@@ -58,7 +58,7 @@ class TabGame : public Tab
 private:
     AbstractGame *game;
     const UserListProxy *userListProxy;
-    ReplayManager *replayManager;
+    ReplayManager *replayManager = nullptr;
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;
