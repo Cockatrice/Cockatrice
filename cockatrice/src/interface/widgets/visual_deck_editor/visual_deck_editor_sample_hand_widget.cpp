@@ -23,10 +23,9 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     upperLayout->setContentsMargins(0, 0, 0, 0);
     upperLayout->setSpacing(0);
 
+    resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);
     resetAndHandSizeLayout->setContentsMargins(11, 0, 11, 0);
-
-    resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeContainerWidget->setLayout(resetAndHandSizeLayout);
 
     resetButton = new QPushButton(this);
