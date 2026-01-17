@@ -20,6 +20,7 @@
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
 #include "../main.h"
+#include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -337,23 +338,18 @@ void TabGame::retranslateUi()
     }
 
     viewMenu->setTitle(tr("&View"));
-    cardInfoDockMenu->setTitle(tr("Card Info"));
-    messageLayoutDockMenu->setTitle(tr("Messages"));
-    playerListDockMenu->setTitle(tr("Player List"));
 
-    aCardInfoDockVisible->setText(tr("Visible"));
-    aCardInfoDockFloating->setText(tr("Floating"));
-
-    aMessageLayoutDockVisible->setText(tr("Visible"));
-    aMessageLayoutDockFloating->setText(tr("Floating"));
-
-    aPlayerListDockVisible->setText(tr("Visible"));
-    aPlayerListDockFloating->setText(tr("Floating"));
+    dockToActions[cardInfoDock].menu->setTitle(tr("Card Info"));
+    dockToActions[messageLayoutDock].menu->setTitle(tr("Messages"));
+    dockToActions[playerListDock].menu->setTitle(tr("Player List"));
 
     if (replayDock) {
-        replayDockMenu->setTitle(tr("Replay Timeline"));
-        aReplayDockVisible->setText(tr("Visible"));
-        aReplayDockFloating->setText(tr("Floating"));
+        dockToActions[replayDock].menu->setTitle(tr("Replay Timeline"));
+    }
+
+    for (auto &actions : dockToActions.values()) {
+        actions.aVisible->setText(tr("Visible"));
+        actions.aFloating->setText(tr("Floating"));
     }
 
     aResetLayout->setText(tr("Reset layout"));
@@ -1038,40 +1034,12 @@ void TabGame::createViewMenuItems()
 {
     viewMenu = new QMenu(this);
 
-    cardInfoDockMenu = viewMenu->addMenu(QString());
-    messageLayoutDockMenu = viewMenu->addMenu(QString());
-    playerListDockMenu = viewMenu->addMenu(QString());
-
-    aCardInfoDockVisible = cardInfoDockMenu->addAction(QString());
-    aCardInfoDockVisible->setCheckable(true);
-    connect(aCardInfoDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
-    aCardInfoDockFloating = cardInfoDockMenu->addAction(QString());
-    aCardInfoDockFloating->setCheckable(true);
-    connect(aCardInfoDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
-
-    aMessageLayoutDockVisible = messageLayoutDockMenu->addAction(QString());
-    aMessageLayoutDockVisible->setCheckable(true);
-    connect(aMessageLayoutDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
-    aMessageLayoutDockFloating = messageLayoutDockMenu->addAction(QString());
-    aMessageLayoutDockFloating->setCheckable(true);
-    connect(aMessageLayoutDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
-
-    aPlayerListDockVisible = playerListDockMenu->addAction(QString());
-    aPlayerListDockVisible->setCheckable(true);
-    connect(aPlayerListDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
-    aPlayerListDockFloating = playerListDockMenu->addAction(QString());
-    aPlayerListDockFloating->setCheckable(true);
-    connect(aPlayerListDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
+    registerDockWidget(viewMenu, cardInfoDock);
+    registerDockWidget(viewMenu, messageLayoutDock);
+    registerDockWidget(viewMenu, playerListDock);
 
     if (replayDock) {
-        replayDockMenu = viewMenu->addMenu(QString());
-
-        aReplayDockVisible = replayDockMenu->addAction(QString());
-        aReplayDockVisible->setCheckable(true);
-        connect(aReplayDockVisible, &QAction::triggered, this, &TabGame::dockVisibleTriggered);
-        aReplayDockFloating = replayDockMenu->addAction(QString());
-        aReplayDockFloating->setCheckable(true);
-        connect(aReplayDockFloating, &QAction::triggered, this, &TabGame::dockFloatingTriggered);
+        registerDockWidget(viewMenu, replayDock);
     }
 
     viewMenu->addSeparator();
@@ -1081,6 +1049,36 @@ void TabGame::createViewMenuItems()
     viewMenu->addAction(aResetLayout);
 
     addTabMenu(viewMenu);
+}
+
+void TabGame::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
+{
+    QMenu *menu = _viewMenu->addMenu(QString());
+
+    QAction *aVisible = menu->addAction(QString());
+    aVisible->setCheckable(true);
+
+    QAction *aFloating = menu->addAction(QString());
+    aFloating->setCheckable(true);
+    aFloating->setEnabled(false);
+
+    // user interaction
+    connect(aVisible, &QAction::triggered, widget, [widget](bool checked) { widget->setVisible(checked); });
+    connect(aFloating, &QAction::triggered, this, [widget](bool checked) { widget->setFloating(checked); });
+
+    // sync aFloating's enabled state with aVisible's checked state
+    connect(aVisible, &QAction::toggled, aFloating, [aFloating](bool checked) { aFloating->setEnabled(checked); });
+
+    // sync aFloating with dockWidget's floating state
+    connect(widget, &QDockWidget::topLevelChanged, aFloating,
+            [aFloating](bool topLevel) { aFloating->setChecked(topLevel); });
+
+    // sync aVisible with dockWidget's visible state
+    auto filter = new VisibilityChangeListener(widget);
+    connect(filter, &VisibilityChangeListener::visibilityChanged, aVisible,
+            [aVisible](bool visible) { aVisible->setChecked(visible); });
+
+    dockToActions.insert(widget, {menu, aVisible, aFloating});
 }
 
 void TabGame::loadLayout()
@@ -1108,24 +1106,6 @@ void TabGame::loadLayout()
         messageLayoutDock->setMaximumSize(layouts.getGameMessageLayoutSize());
         playerListDock->setMinimumSize(layouts.getGamePlayerListSize());
         playerListDock->setMaximumSize(layouts.getGamePlayerListSize());
-    }
-
-    aCardInfoDockVisible->setChecked(cardInfoDock->isVisible());
-    aMessageLayoutDockVisible->setChecked(messageLayoutDock->isVisible());
-    aPlayerListDockVisible->setChecked(playerListDock->isVisible());
-
-    aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
-    aMessageLayoutDockFloating->setEnabled(aMessageLayoutDockVisible->isChecked());
-    aPlayerListDockFloating->setEnabled(aPlayerListDockVisible->isChecked());
-
-    aCardInfoDockFloating->setChecked(cardInfoDock->isFloating());
-    aMessageLayoutDockFloating->setChecked(messageLayoutDock->isFloating());
-    aPlayerListDockFloating->setChecked(playerListDock->isFloating());
-
-    if (replayDock) {
-        aReplayDockVisible->setChecked(replayDock->isVisible());
-        aReplayDockFloating->setEnabled(aReplayDockVisible->isChecked());
-        aReplayDockFloating->setChecked(replayDock->isFloating());
     }
 
     QTimer::singleShot(100, this, &TabGame::freeDocksSize);
@@ -1158,14 +1138,6 @@ void TabGame::actResetLayout()
     playerListDock->setFloating(false);
     messageLayoutDock->setFloating(false);
 
-    aCardInfoDockVisible->setChecked(true);
-    aPlayerListDockVisible->setChecked(true);
-    aMessageLayoutDockVisible->setChecked(true);
-
-    aCardInfoDockFloating->setChecked(false);
-    aPlayerListDockFloating->setChecked(false);
-    aMessageLayoutDockFloating->setChecked(false);
-
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
@@ -1174,8 +1146,6 @@ void TabGame::actResetLayout()
         replayDock->setVisible(true);
         replayDock->setFloating(false);
         addDockWidget(Qt::BottomDockWidgetArea, replayDock);
-        aReplayDockVisible->setChecked(true);
-        aReplayDockFloating->setChecked(false);
 
         cardInfoDock->setMinimumSize(250, 360);
         cardInfoDock->setMaximumSize(250, 360);
@@ -1227,9 +1197,6 @@ void TabGame::createReplayDock(GameReplay *replay)
                             QDockWidget::DockWidgetMovable);
     replayDock->setWidget(replayManager);
     replayDock->setFloating(false);
-
-    replayDock->installEventFilter(this);
-    connect(replayDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)
@@ -1268,9 +1235,6 @@ void TabGame::createCardInfoDock(bool bReplay)
                               QDockWidget::DockWidgetMovable);
     cardInfoDock->setWidget(cardBoxLayoutWidget);
     cardInfoDock->setFloating(false);
-
-    cardInfoDock->installEventFilter(this);
-    connect(cardInfoDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createPlayerListDock(bool bReplay)
@@ -1290,9 +1254,6 @@ void TabGame::createPlayerListDock(bool bReplay)
                                 QDockWidget::DockWidgetMovable);
     playerListDock->setWidget(playerListWidget);
     playerListDock->setFloating(false);
-
-    playerListDock->installEventFilter(this);
-    connect(playerListDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::createMessageDock(bool bReplay)
@@ -1373,9 +1334,6 @@ void TabGame::createMessageDock(bool bReplay)
                                    QDockWidget::DockWidgetMovable);
     messageLayoutDock->setWidget(messageLogLayoutWidget);
     messageLayoutDock->setFloating(false);
-
-    messageLayoutDock->installEventFilter(this);
-    connect(messageLayoutDock, &QDockWidget::topLevelChanged, this, &TabGame::dockTopLevelChanged);
 }
 
 void TabGame::hideEvent(QHideEvent *event)
@@ -1397,104 +1355,4 @@ void TabGame::hideEvent(QHideEvent *event)
     }
 
     Tab::hideEvent(event);
-}
-
-// Method uses to sync docks state with menu items state
-bool TabGame::eventFilter(QObject *o, QEvent *e)
-{
-    if (e->type() == QEvent::Close) {
-        if (o == cardInfoDock) {
-            aCardInfoDockVisible->setChecked(false);
-            aCardInfoDockFloating->setEnabled(false);
-        } else if (o == messageLayoutDock) {
-            aMessageLayoutDockVisible->setChecked(false);
-            aMessageLayoutDockFloating->setEnabled(false);
-        } else if (o == playerListDock) {
-            aPlayerListDockVisible->setChecked(false);
-            aPlayerListDockFloating->setEnabled(false);
-        } else if (o == replayDock) {
-            aReplayDockVisible->setChecked(false);
-            aReplayDockFloating->setEnabled(false);
-        }
-    }
-
-    return false;
-}
-
-void TabGame::dockVisibleTriggered()
-{
-    QObject *o = sender();
-    if (o == aCardInfoDockVisible) {
-        cardInfoDock->setVisible(aCardInfoDockVisible->isChecked());
-        aCardInfoDockFloating->setEnabled(aCardInfoDockVisible->isChecked());
-        return;
-    }
-
-    if (o == aMessageLayoutDockVisible) {
-        messageLayoutDock->setVisible(aMessageLayoutDockVisible->isChecked());
-        aMessageLayoutDockFloating->setEnabled(aMessageLayoutDockVisible->isChecked());
-        return;
-    }
-
-    if (o == aPlayerListDockVisible) {
-        playerListDock->setVisible(aPlayerListDockVisible->isChecked());
-        aPlayerListDockFloating->setEnabled(aPlayerListDockVisible->isChecked());
-        return;
-    }
-
-    if (o == aReplayDockVisible) {
-        replayDock->setVisible(aReplayDockVisible->isChecked());
-        aReplayDockFloating->setEnabled(aReplayDockVisible->isChecked());
-        return;
-    }
-}
-
-void TabGame::dockFloatingTriggered()
-{
-    QObject *o = sender();
-    if (o == aCardInfoDockFloating) {
-        cardInfoDock->setFloating(aCardInfoDockFloating->isChecked());
-        return;
-    }
-
-    if (o == aMessageLayoutDockFloating) {
-        messageLayoutDock->setFloating(aMessageLayoutDockFloating->isChecked());
-        return;
-    }
-
-    if (o == aPlayerListDockFloating) {
-        playerListDock->setFloating(aPlayerListDockFloating->isChecked());
-        return;
-    }
-
-    if (o == aReplayDockFloating) {
-        replayDock->setFloating(aReplayDockFloating->isChecked());
-        return;
-    }
-}
-
-void TabGame::dockTopLevelChanged(bool topLevel)
-{
-    retranslateUi();
-
-    QObject *o = sender();
-    if (o == cardInfoDock) {
-        aCardInfoDockFloating->setChecked(topLevel);
-        return;
-    }
-
-    if (o == messageLayoutDock) {
-        aMessageLayoutDockFloating->setChecked(topLevel);
-        return;
-    }
-
-    if (o == playerListDock) {
-        aPlayerListDockFloating->setChecked(topLevel);
-        return;
-    }
-
-    if (o == replayDock) {
-        aReplayDockFloating->setChecked(topLevel);
-        return;
-    }
 }
