@@ -63,6 +63,7 @@ private slots:
 private:
     QStringList findQmFiles();
     QString languageName(const QString &lang);
+    void populateSendDiagnosticsCombo(int mode);
     QLineEdit *deckPathEdit;
     QLineEdit *filtersPathEdit;
     QLineEdit *replaysPathEdit;
@@ -84,6 +85,7 @@ private:
     QCheckBox updateNotificationCheckBox;
     QCheckBox newVersionOracleCheckBox;
     QComboBox updateReleaseChannelBox;
+    QComboBox sendDiagnosticsSelector;
     QLabel languageLabel;
     QLabel deckPathLabel;
     QLabel filtersPathLabel;
@@ -93,6 +95,7 @@ private:
     QLabel customCardDatabasePathLabel;
     QLabel tokenDatabasePathLabel;
     QLabel updateReleaseChannelLabel;
+    QLabel sendDiagnosticsLabel;
     QLabel advertiseTranslationPageLabel;
     QCheckBox showTipsOnStartup;
 };

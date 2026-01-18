@@ -28,6 +28,7 @@
 #include "../interface/widgets/dialogs/dlg_forgot_password_request.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
+#include "../interface/widgets/dialogs/dlg_prompt_send_diagnostics.h"
 #include "../interface/widgets/dialogs/dlg_register.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/dialogs/dlg_startup_card_check.h"
@@ -851,6 +852,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &RemoteClient::protocolVersionMismatch, this, &MainWindow::protocolVersionMismatch);
     connect(client, &RemoteClient::userInfoChanged, this, &MainWindow::userInfoReceived, Qt::BlockingQueuedConnection);
     connect(client, &RemoteClient::notifyUserAboutUpdate, this, &MainWindow::notifyUserAboutUpdate);
+    connect(client, &RemoteClient::notifyUserAboutDiagnostics, this, &MainWindow::notifyUserAboutDiagnostics);
     connect(client, &RemoteClient::registerAccepted, this, &MainWindow::registerAccepted);
     connect(client, &RemoteClient::registerAcceptedNeedsActivate, this, &MainWindow::registerAcceptedNeedsActivate);
     connect(client, &RemoteClient::registerError, this, &MainWindow::registerError);
@@ -1383,6 +1385,21 @@ void MainWindow::notifyUserAboutUpdate()
         tr("This server supports additional features that your client doesn't have.\nThis is most likely not a "
            "problem, but this message might mean there is a new version of Cockatrice available or this server is "
            "running a custom or pre-release version.\n\nTo update your client, go to Help -> Check for Updates."));
+}
+
+void MainWindow::notifyUserAboutDiagnostics()
+{
+    int mode = SendDiagnosticsDisabled;
+    DlgPromptSendDiagnostics dlg(this);
+    if (dlg.exec() == QDialog::Accepted) {
+        mode = dlg.selectedChoice();
+    }
+
+    SettingsCache::instance().setSendDiagnostics(mode);
+
+    if (mode == SendDiagnosticsBasic || mode == SendDiagnosticsFull) {
+        client->sendDiagnostics();
+    }
 }
 
 void MainWindow::actOpenCustomFolder()
