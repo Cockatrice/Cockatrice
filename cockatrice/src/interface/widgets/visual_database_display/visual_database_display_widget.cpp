@@ -142,7 +142,7 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
     sequence.addStep({colorFilterWidget, "Filter the database by colors with these controls"});
     sequence.addStep({displayModeButton, "You can change back to the old table display-style with this button."});
     sequence.addStep({filterContainer, "Use these controls for quick access to common filters."});
-    sequence.addStep(
+    /*sequence.addStep(
         {quickFilterSaveLoadWidget, "This button will let you save and load all currently applied filters to files."});
     sequence.addStep({quickFilterNameWidget,
                       "This button will let you apply name filters. Optionally, you can import every card in "
@@ -153,7 +153,7 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
     sequence.addStep(
         {quickFilterSetWidget,
          "This button will let you apply filters for card sets. You can also filter to the X most recent sets. "
-         "Filtering to a set will display all printings of a card within that set."});
+         "Filtering to a set will display all printings of a card within that set."});*/
 
     return sequence;
 }

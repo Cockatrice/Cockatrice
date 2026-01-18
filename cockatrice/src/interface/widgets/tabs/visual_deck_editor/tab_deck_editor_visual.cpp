@@ -51,7 +51,8 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     refreshShortcuts();
 
     loadLayout();
-    cardDatabaseDockWidget->setHidden(true);    tutorialController = new TutorialController(this);
+    cardDatabaseDockWidget->setHidden(true);
+    tutorialController = new TutorialController(this);
 
     auto sequence = TutorialSequence();
 
