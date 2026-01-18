@@ -137,7 +137,8 @@ bool TutorialOverlay::eventFilter(QObject *obj, QEvent *event)
     if (obj == targetWidget) {
         if (event->type() == QEvent::Show) {
             // Defer layout recalculation to give Qt time to finalize geometry
-            QMetaObject::invokeMethod(this, [this]() { recomputeLayout(); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                this, [this]() { recomputeLayout(); }, Qt::QueuedConnection);
         } else if (event->type() == QEvent::Hide || event->type() == QEvent::Move || event->type() == QEvent::Resize) {
             recomputeLayout();
         }
