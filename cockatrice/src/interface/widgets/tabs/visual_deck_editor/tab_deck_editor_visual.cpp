@@ -6,6 +6,7 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
+#include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../tab_deck_editor.h"
 #include "../tab_supervisor.h"
@@ -51,6 +52,31 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 
     loadLayout();
     cardDatabaseDockWidget->setHidden(true);
+    tutorialController = new TutorialController(this);
+
+    auto sequence = TutorialSequence();
+
+    sequence.addStep({tabContainer->visualDeckView, "View your deck here.",
+                      [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); }});
+    sequence.addStep({printingSelectorDockWidget, "Change the printings in your deck here."});
+
+    tutorialController->addSequence(sequence);
+
+    auto vddSequence = tabContainer->visualDatabaseDisplay->addTutorialSteps();
+    vddSequence.steps.prepend({tabContainer->visualDatabaseDisplay, "View the database here",
+                               [this]() { tabContainer->setCurrentWidget(tabContainer->visualDatabaseDisplay); }});
+
+    tutorialController->addSequence(vddSequence);
+}
+
+void TabDeckEditorVisual::showEvent(QShowEvent *ev)
+{
+    QWidget::showEvent(ev);
+    if (!tutorialStarted) {
+        tutorialStarted = true;
+        // Start on next event loop iteration so everything is fully painted
+        QTimer::singleShot(0, tutorialController, [this] { tutorialController->start(); });
+    }
 }
 
 /** @brief Creates the central frame containing the tab container. */

@@ -5,6 +5,7 @@
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
@@ -133,6 +134,28 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     }
 
     retranslateUi();
+}
+
+TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
+{
+    auto sequence = TutorialSequence();
+    sequence.addStep({colorFilterWidget, "Filter the database by colors with these controls"});
+    sequence.addStep({displayModeButton, "You can change back to the old table display-style with this button."});
+    sequence.addStep({filterContainer, "Use these controls for quick access to common filters."});
+    /*sequence.addStep(
+        {quickFilterSaveLoadWidget, "This button will let you save and load all currently applied filters to files."});
+    sequence.addStep({quickFilterNameWidget,
+                      "This button will let you apply name filters. Optionally, you can import every card in "
+                      "your deck as a name filter and then save this as a filter using the save/load button "
+                      "to make your own quick access collections!"});
+    sequence.addStep({mainTypeFilterWidget, "Use these buttons to quickly filter by card types."});
+    sequence.addStep({quickFilterSubTypeWidget, "This button will let you apply filters for card sub-types."});
+    sequence.addStep(
+        {quickFilterSetWidget,
+         "This button will let you apply filters for card sets. You can also filter to the X most recent sets. "
+         "Filtering to a set will display all printings of a card within that set."});*/
+
+    return sequence;
 }
 
 void VisualDatabaseDisplayWidget::initialize()
