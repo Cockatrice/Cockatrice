@@ -318,6 +318,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/recording.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
@@ -420,15 +421,15 @@ endif()
 if(Qt5_FOUND)
   target_link_libraries(
     cockatrice
-    libcockatrice_card
-    libcockatrice_deck_list
-    libcockatrice_filters
-    libcockatrice_utility
-    libcockatrice_network
-    libcockatrice_models
-    libcockatrice_rng
-    libcockatrice_settings
-    ${COCKATRICE_QT_MODULES}
+    PUBLIC libcockatrice_card
+           libcockatrice_deck_list
+           libcockatrice_filters
+           libcockatrice_utility
+           libcockatrice_network
+           libcockatrice_models
+           libcockatrice_rng
+           libcockatrice_settings
+           ${COCKATRICE_QT_MODULES}
   )
 else()
   target_link_libraries(
@@ -443,6 +444,11 @@ else()
            libcockatrice_settings
            ${COCKATRICE_QT_MODULES}
   )
+endif()
+
+if(WITH_GUI_TEST)
+  target_link_libraries(cockatrice PRIVATE QtTesting)
+  target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
 endif()
 
 if(UNIX)
