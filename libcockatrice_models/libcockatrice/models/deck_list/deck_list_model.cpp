@@ -709,8 +709,9 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
 
     auto formatRules = CardDatabaseManager::query()->getFormat(format);
 
+    // if format has no custom rules, then just do the default check
     if (!formatRules) {
-        return true;
+        return cardInfo.isLegalInFormat(format);
     }
 
     // Exceptions always win
@@ -758,11 +759,7 @@ void DeckListModel::refreshCardFormatLegalities()
             }
 
             QString format = deckList->getGameFormat();
-            bool legal = exactCard.getInfo().isLegalInFormat(format);
-
-            if (legal) {
-                legal = isCardQuantityLegalForFormat(format, exactCard.getInfo(), currentCard->getNumber());
-            }
+            bool legal = isCardQuantityLegalForFormat(format, exactCard.getInfo(), currentCard->getNumber());
 
             currentCard->setFormatLegality(legal);
         }
