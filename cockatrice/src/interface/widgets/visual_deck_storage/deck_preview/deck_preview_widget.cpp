@@ -42,6 +42,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
+    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowColorIdentityChanged, this,
+            &DeckPreviewWidget::updateColorIdentityVisibility);
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
             &DeckPreviewWidget::updateTagsVisibility);
     connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
@@ -96,6 +98,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
 
+    updateColorIdentityVisibility(SettingsCache::instance().getVisualDeckStorageShowColorIdentity());
     updateBannerCardComboBox();
     updateBannerCardComboBoxVisibility(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
     updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
@@ -121,6 +124,15 @@ bool DeckPreviewWidget::checkVisibility() const
         return false;
     }
     return true;
+}
+
+void DeckPreviewWidget::updateColorIdentityVisibility(bool visible)
+{
+    if (colorIdentityWidget == nullptr) {
+        return;
+    }
+
+    colorIdentityWidget->setVisible(visible);
 }
 
 void DeckPreviewWidget::updateBannerCardComboBoxVisibility(bool visible)

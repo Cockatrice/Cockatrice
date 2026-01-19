@@ -310,6 +310,7 @@ SettingsCache::SettingsCache()
     visualDeckStorageDefaultTagsList =
         settings->value("interface/visualdeckstoragedefaulttagslist", defaultTags).toStringList();
     visualDeckStorageSearchFolderNames = settings->value("interface/visualdeckstoragesearchfoldernames", true).toBool();
+    visualDeckStorageShowColorIdentity = settings->value("interface/visualdeckstorageshowcoloridentity", true).toBool();
     visualDeckStorageShowBannerCardComboBox =
         settings->value("interface/visualdeckstorageshowbannercardcombobox", true).toBool();
     visualDeckStorageShowTagsOnDeckPreviews =
@@ -827,6 +828,13 @@ void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T val
 {
     visualDeckStorageSearchFolderNames = value;
     settings->setValue("interface/visualdeckstoragesearchfoldernames", visualDeckStorageSearchFolderNames);
+}
+
+void SettingsCache::setVisualDeckStorageShowColorIdentity(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageShowColorIdentity = value;
+    settings->setValue("interface/visualdeckstorageshowcoloridentity", visualDeckStorageShowColorIdentity);
+    emit visualDeckStorageShowColorIdentityChanged(visualDeckStorageShowColorIdentity);
 }
 
 void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox)
