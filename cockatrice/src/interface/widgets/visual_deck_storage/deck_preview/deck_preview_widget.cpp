@@ -153,7 +153,7 @@ void DeckPreviewWidget::updateTagsVisibility(bool visible)
 
 QString DeckPreviewWidget::getColorIdentity()
 {
-    QStringList cardList = deckLoader->getDeck().deckList.getCardList();
+    QStringList cardList = deckLoader->getDeck().deckList.getCardList({DECK_ZONE_MAIN, DECK_ZONE_SIDE});
     if (cardList.isEmpty()) {
         return {};
     }

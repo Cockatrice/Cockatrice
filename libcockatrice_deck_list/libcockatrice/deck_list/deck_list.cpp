@@ -438,9 +438,9 @@ void DeckList::cleanList(bool preserveMetadata)
     refreshDeckHash();
 }
 
-QStringList DeckList::getCardList() const
+QStringList DeckList::getCardList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QStringList result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result), [](auto node) { return node->getName(); });
@@ -448,9 +448,9 @@ QStringList DeckList::getCardList() const
     return result;
 }
 
-QList<CardRef> DeckList::getCardRefList() const
+QList<CardRef> DeckList::getCardRefList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QList<CardRef> result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result),
