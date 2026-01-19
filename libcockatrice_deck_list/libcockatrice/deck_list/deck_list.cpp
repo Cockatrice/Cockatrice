@@ -464,9 +464,9 @@ QList<const DecklistCardNode *> DeckList::getCardNodes(const QSet<QString> &rest
     return tree.getCardNodes(restrictToZones);
 }
 
-QList<const InnerDecklistNode *> DeckList::getZoneNodes() const
+QList<const InnerDecklistNode *> DeckList::getZoneNodes(const QSet<QString> &restrictToZones) const
 {
-    return tree.getZoneNodes();
+    return tree.getZoneNodes(restrictToZones);
 }
 
 int DeckList::getSideboardSize() const
