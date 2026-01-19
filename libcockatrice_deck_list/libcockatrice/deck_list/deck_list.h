@@ -224,7 +224,7 @@ public:
     QStringList getCardList(const QSet<QString> &restrictToZones = {}) const;
     QList<CardRef> getCardRefList(const QSet<QString> &restrictToZones = {}) const;
     QList<const DecklistCardNode *> getCardNodes(const QSet<QString> &restrictToZones = {}) const;
-    QList<const InnerDecklistNode *> getZoneNodes() const;
+    QList<const InnerDecklistNode *> getZoneNodes(const QSet<QString> &restrictToZones = {}) const;
     int getSideboardSize() const;
 
     DecklistCardNode *addCard(const QString &cardName,
