@@ -63,6 +63,7 @@ public slots:
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
     void initializeUi(bool deckLoadSuccess);
     void updateVisibility();
+    void updateColorIdentityVisibility(bool visible);
     void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
     void resizeEvent(QResizeEvent *event) override;

@@ -26,6 +26,14 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     connect(showTagFilterCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setVisualDeckStorageShowTagFilter);
 
+    // show color identity on DeckPreviewWidget checkbox
+    showColorIdentityCheckBox = new QCheckBox(this);
+    showColorIdentityCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowColorIdentity());
+    connect(showColorIdentityCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &VisualDeckStorageQuickSettingsWidget::showColorIdentityChanged);
+    connect(showColorIdentityCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckStorageShowColorIdentity);
+
     // show tags on DeckPreviewWidget checkbox
     showTagsOnDeckPreviewsCheckBox = new QCheckBox(this);
     showTagsOnDeckPreviewsCheckBox->setChecked(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
@@ -103,6 +111,7 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
     // putting everything together
     this->addSettingsWidget(showFoldersCheckBox);
     this->addSettingsWidget(showTagFilterCheckBox);
+    this->addSettingsWidget(showColorIdentityCheckBox);
     this->addSettingsWidget(showTagsOnDeckPreviewsCheckBox);
     this->addSettingsWidget(showBannerCardComboBoxCheckBox);
     this->addSettingsWidget(drawUnusedColorIdentitiesCheckBox);
@@ -119,6 +128,7 @@ void VisualDeckStorageQuickSettingsWidget::retranslateUi()
 {
     showFoldersCheckBox->setText(tr("Show Folders"));
     showTagFilterCheckBox->setText(tr("Show Tag Filter"));
+    showColorIdentityCheckBox->setText(tr("Show Color Identity"));
     showTagsOnDeckPreviewsCheckBox->setText(tr("Show Tags On Deck Previews"));
     showBannerCardComboBoxCheckBox->setText(tr("Show Banner Card Selection Option"));
     drawUnusedColorIdentitiesCheckBox->setText(tr("Draw unused Color Identities"));
@@ -138,6 +148,11 @@ bool VisualDeckStorageQuickSettingsWidget::getShowFolders() const
 bool VisualDeckStorageQuickSettingsWidget::getDrawUnusedColorIdentities() const
 {
     return drawUnusedColorIdentitiesCheckBox->isChecked();
+}
+
+bool VisualDeckStorageQuickSettingsWidget::getShowColorIdentity() const
+{
+    return showColorIdentityCheckBox->isChecked();
 }
 
 bool VisualDeckStorageQuickSettingsWidget::getShowBannerCardComboBox() const
