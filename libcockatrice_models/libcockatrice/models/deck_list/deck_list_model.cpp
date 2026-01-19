@@ -435,9 +435,8 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Determine the correct index
         int insertRow = findSortedInsertRow(groupNode, cardInfo);
 
-        auto *decklistCard =
-            deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName, printingInfo.getProperty("num"),
-                              printingInfo.getProperty("uuid"), cardInfo->isLegalInFormat(deckList->getGameFormat()));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
+                                               printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, groupNode, insertRow);
@@ -453,6 +452,7 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         emit deckHashChanged();
     }
     sort(lastKnownColumn, lastKnownOrder);
+    refreshCardFormatLegalities();
     emitRecursiveUpdates(parentIndex);
     auto index = nodeToIndex(cardNode);
 
