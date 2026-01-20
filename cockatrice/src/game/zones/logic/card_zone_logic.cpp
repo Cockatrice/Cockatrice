@@ -43,8 +43,10 @@ void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, 
 
     for (auto *view : views) {
         if (qobject_cast<ZoneViewZoneLogic *>(view->getLogic())->prepareAddCard(x)) {
-            view->getLogic()->addCard(new CardItem(player, nullptr, card->getCardRef(), card->getId()), reorganize, x,
-                                      y);
+            auto copy = new CardItem(player, nullptr, card->getCardRef(), card->getId());
+            copy->setFaceDown(card->getFaceDown());
+
+            view->getLogic()->addCard(copy, reorganize, x, y);
         }
     }
 

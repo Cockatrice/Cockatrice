@@ -212,10 +212,12 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     }
 }
 
+/**
+ * @brief Resets the fields that should be reset after a zone transition
+ */
 void CardItem::resetState(bool keepAnnotations)
 {
     attacking = false;
-    facedown = false;
     counters.clear();
     pt.clear();
     if (!keepAnnotations) {
