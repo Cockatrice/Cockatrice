@@ -198,6 +198,30 @@ shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, c
     return true;
 }
 
+/**
+ * @brief Determines whether the moved card should be face-down
+ */
+static bool
+shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZone, const Server_CardZone *targetZone)
+{
+    // being face-down only makes sense for public zones
+    if (targetZone->getType() != ServerInfo_Zone::PublicZone) {
+        return false;
+    }
+
+    // face-down property in proto takes precedence
+    if (cardStruct.cardToMove->has_face_down()) {
+        return cardStruct.cardToMove->face_down();
+    }
+
+    // default to keep face-down the same if zone didn't change
+    if (startZone == targetZone) {
+        return cardStruct.card->getFaceDown();
+    }
+
+    return false;
+}
+
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        Server_CardZone *startzone,
                                                        const QList<const CardToMove *> &_cards,
@@ -257,10 +281,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 
     for (auto cardStruct : cardsToMove) {
         Server_Card *card = cardStruct.card;
-        const CardToMove *thisCardProperties = cardStruct.cardToMove;
         int originalPosition = cardStruct.position;
-        bool faceDown = targetzone->hasCoords() &&
-                        (thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown());
 
         bool sourceBeingLookedAt;
         int position = startzone->removeCard(card, sourceBeingLookedAt);
@@ -314,6 +335,8 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
         if (card) {
             ++xIndex;
             int newX = isReversed ? targetzone->getCards().size() - xCoord + xIndex : xCoord + xIndex;
+
+            bool faceDown = shouldBeFaceDown(cardStruct, startzone, targetzone);
 
             if (targetzone->hasCoords()) {
                 newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
