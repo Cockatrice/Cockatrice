@@ -1,6 +1,7 @@
 #include "tutorial_controller.h"
 
 #include <QComboBox>
+#include <QDebug>
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QPlainTextEdit>
