@@ -204,6 +204,10 @@ shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, c
 static bool
 shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZone, const Server_CardZone *targetZone)
 {
+    if (!targetZone) {
+        return false;
+    }
+
     // being face-down only makes sense for public zones
     if (targetZone->getType() != ServerInfo_Zone::PublicZone) {
         return false;
