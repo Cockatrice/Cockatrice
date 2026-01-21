@@ -156,7 +156,13 @@ You will not be able to manage printing preferences on a per-deck basis, or see 
 You will have to use the Set Manager, available through Card Database -&gt; Manage Sets.
 
 Are you sure you would like to enable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Diese Funktion aktivieren wird die Nutzung der Druckauswahl deaktivieren.
+
+Es wird ihnen nicht möglich sein ihre Druckeinstellungen auf einer Per-Deck Basis zu verwalten, oder die Drucke, die andere Personen für ihre Decks ausgewählt haben, zu sehen.
+
+Sie werden den Set-Manager verwenden müssen, der über Kartendatenbank -&gt; Sets verwalten verfügbar ist.
+
+Sind sie sicher, dass diese Funktion aktiviert werden soll?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="672"/>
@@ -167,12 +173,18 @@ You can now choose printings on a per-deck basis in the Deck Editor and configur
 You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector (other sort orders like alphabetical or release date are available).
 
 Are you sure you would like to disable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Diese Funktion deaktivieren wird die Nutzung der Druckauswahl aktivieren.
+
+Es wird ihnen nun möglich sein ihre Druckeinstellungen auf einer Per-Deck Basis im Deck-Editor zu verwalten und zu konfigurieren, welcher Druck standardmäßig in ein Deck hinzugefügt wird, indem sie es anheften in der Druckauswahl
+
+Sie können auch den Set-Manager verwenden, um selbstständig die Sortierungsreihenfolge für Drucke in der Druckauswahl festzulegen (andere Sortierungsoptionen wie alphabetisch oder Veröffentlichkeitsdatum sind verfügbar).
+
+Sind sie sicher, dass diese Funktion deaktiviert werden soll?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="681"/>
         <source>Confirm Change</source>
-        <translation type="unfinished"/>
+        <translation>Änderung bestätigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="726"/>
@@ -217,7 +229,7 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="735"/>
         <source>Show game filter toolbar above list in room tab</source>
-        <translation type="unfinished"/>
+        <translation>Spiel-Filter Symbolleiste über der Liste im Raum-Tab anzeigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="737"/>
@@ -237,7 +249,7 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="741"/>
         <source>Override all card art with personal set preference (Pre-ProviderID change behavior)</source>
-        <translation type="unfinished"/>
+        <translation>Überschreiben aller Kartenbilder mit persönlichen Set-Präferenzen (Vor-AnbieterID Wechselverhalten) </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="743"/>
@@ -326,7 +338,7 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="83"/>
         <source>Open Deck in Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Deck im Deck-Editor öffnen</translation>
     </message>
 </context>
 <context>
@@ -550,7 +562,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="64"/>
         <source>Name (Exact)</source>
-        <translation type="unfinished"/>
+        <translation>Name (Exakt)</translation>
     </message>
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="66"/>
@@ -674,12 +686,12 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="69"/>
         <source>Set:</source>
-        <translation type="unfinished"/>
+        <translation>Set:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="71"/>
         <source>Collector Number:</source>
-        <translation type="unfinished"/>
+        <translation>Sammlernummer:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="85"/>
@@ -995,22 +1007,22 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="65"/>
         <source>Add Panel</source>
-        <translation type="unfinished"/>
+        <translation>Feld hinzufügen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="66"/>
         <source>Remove Panel</source>
-        <translation type="unfinished"/>
+        <translation>Feld entfernen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="67"/>
         <source>Save Layout</source>
-        <translation type="unfinished"/>
+        <translation>Layout speichern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="68"/>
         <source>Load Layout</source>
-        <translation type="unfinished"/>
+        <translation>Layout laden</translation>
     </message>
 </context>
 <context>
@@ -1018,7 +1030,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp" line="50"/>
         <source>Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Kartendatenbank</translation>
     </message>
 </context>
 <context>
@@ -1082,7 +1094,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="132"/>
         <source>Loading Database...</source>
-        <translation type="unfinished"/>
+        <translation>Datenbank wird geladen...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="154"/>
@@ -1147,7 +1159,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="742"/>
         <source>Format:</source>
-        <translation type="unfinished"/>
+        <translation>Format:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="744"/>
@@ -1488,32 +1500,32 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="55"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Rückgängig machen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="56"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Wiederholen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="57"/>
         <source>Undo/Redo history</source>
-        <translation type="unfinished"/>
+        <translation>Rückgängig machen/Wiederholen Verlauf</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="58"/>
         <source>Click on an entry to revert to that point in the history.</source>
-        <translation type="unfinished"/>
+        <translation>Einen Eintrag anklicken um zu diesem Zeitpunkt im Verlauf zurückzukehren</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="70"/>
         <source>[redo] </source>
-        <translation type="unfinished"/>
+        <translation>[wiederholen] </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="87"/>
         <source>[undo] </source>
-        <translation type="unfinished"/>
+        <translation>[rückgängig machen] </translation>
     </message>
 </context>
 <context>
@@ -1746,57 +1758,57 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="113"/>
         <source>Rename deck to &quot;%1&quot; from &quot;%2&quot;</source>
-        <translation type="unfinished"/>
+        <translation>Deck umbenennen von &quot;%1&quot; zu &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="126"/>
         <source>Updated comments (was %1 chars, now %2 chars)</source>
-        <translation type="unfinished"/>
+        <translation>Kommentare aktualisiert (davor %1 Zeichen, jetzt %2 Zeichen)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="139"/>
         <source>Set banner card to %1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>Bannerkarte setzen als %1 (%2)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="152"/>
         <source>Tags changed</source>
-        <translation type="unfinished"/>
+        <translation>Tags geändert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="164"/>
         <source>Set format to %1</source>
-        <translation type="unfinished"/>
+        <translation>Format setzen zu %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="178"/>
         <source>Added (%1): %2 (%3) %4</source>
-        <translation type="unfinished"/>
+        <translation>(%1): %2 (%3) %4 hinzugefügt</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="253"/>
         <source>Moved to %1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>Nach %1 1 × &quot;%2&quot; (%3) bewegt</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="271"/>
         <source>Removed &quot;%1&quot; (all copies)</source>
-        <translation type="unfinished"/>
+        <translation>&quot;%1&quot; entfernt (alle Kopien)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="295"/>
         <source>%1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>%1 1 × &quot;%2&quot; (%3)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="296"/>
         <source>Added</source>
-        <translation type="unfinished"/>
+        <translation>Hinzugefügt</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="296"/>
         <source>Removed</source>
-        <translation type="unfinished"/>
+        <translation>Entfernt</translation>
     </message>
 </context>
 <context>
@@ -2150,7 +2162,7 @@ Möchten sie das Deck ins .cod Format konvertieren?</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="106"/>
         <source>Create game as judge</source>
-        <translation type="unfinished"/>
+        <translation>Spiel als Richter erstellen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="118"/>
@@ -2618,7 +2630,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="40"/>
         <source>Hide games not created by buddies</source>
         <oldsource>Hide games not created by buddy</oldsource>
-        <translation type="unfinished"/>
+        <translation>Nicht von Freunden erstellte Spiele verstecken</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="43"/>
@@ -3150,17 +3162,17 @@ Die E-Mail-Adresse wird zur Accountverifikation genutzt.</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="182"/>
         <source>Bulk modified printings.</source>
-        <translation type="unfinished"/>
+        <translation>Drucke in Masse modifizieren.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="189"/>
         <source>Cleared all printing information.</source>
-        <translation type="unfinished"/>
+        <translation>Alle Druckinformation gelöscht.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="198"/>
         <source>Set all printings to preferred.</source>
-        <translation type="unfinished"/>
+        <translation>Alle Drucke auf bevorzugt setzen.</translation>
     </message>
 </context>
 <context>
@@ -3556,63 +3568,63 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="54"/>
         <source>Draw Probability Settings</source>
-        <translation type="unfinished"/>
+        <translation>Zieh-Wahrscheinlichkeitseinstellungen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="56"/>
         <source>Criteria:</source>
-        <translation type="unfinished"/>
+        <translation>Kriterien:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="57"/>
         <source>Card Name</source>
-        <translation type="unfinished"/>
+        <translation>Kartenname</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="58"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="59"/>
         <source>Subtype</source>
-        <translation type="unfinished"/>
+        <translation>Untertyp</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="60"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Manawert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="62"/>
         <source>Exactness:</source>
-        <translation type="unfinished"/>
+        <translation>Genauheit:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="63"/>
         <source>At least</source>
-        <translation type="unfinished"/>
+        <translation>mindestens</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="64"/>
         <source>Exactly</source>
-        <translation type="unfinished"/>
+        <translation>genau</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="66"/>
         <source>Quantity (N):</source>
-        <translation type="unfinished"/>
+        <translation>Menge (N):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="67"/>
         <source>Cards drawn (M):</source>
-        <translation type="unfinished"/>
+        <translation>Karten die gezogen wurden (M):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="70"/>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="71"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>Karten</translation>
     </message>
 </context>
 <context>
@@ -3620,67 +3632,67 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="98"/>
         <source>Draw Probability</source>
-        <translation type="unfinished"/>
+        <translation>Zieh-Wahrscheinlichkeit</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="100"/>
         <source>Probability of drawing</source>
-        <translation type="unfinished"/>
+        <translation>Wahrscheinlichkeit des Ziehens</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="102"/>
         <source>Card Name</source>
-        <translation type="unfinished"/>
+        <translation>Kartenname</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="103"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="104"/>
         <source>Subtype</source>
-        <translation type="unfinished"/>
+        <translation>Untertyp</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="105"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Manawert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="107"/>
         <source>At least</source>
-        <translation type="unfinished"/>
+        <translation>mindestens</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="108"/>
         <source>Exactly</source>
-        <translation type="unfinished"/>
+        <translation>genau</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="110"/>
         <source>card(s) having drawn at least</source>
-        <translation type="unfinished"/>
+        <translation>Karte(n) gezogen haben mindestens</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="111"/>
         <source>cards</source>
-        <translation type="unfinished"/>
+        <translation>Karten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>Category</source>
-        <translation type="unfinished"/>
+        <translation>Kategorie</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>Qty</source>
-        <translation type="unfinished"/>
+        <translation>Menge</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>Odds (%)</source>
-        <translation type="unfinished"/>
+        <translation>Wahrscheinlichkeit (%)</translation>
     </message>
 </context>
 <context>
@@ -3757,7 +3769,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp" line="40"/>
         <source>Game Changers</source>
-        <translation type="unfinished"/>
+        <translation>Spielwechsler</translation>
     </message>
 </context>
 <context>
@@ -3765,7 +3777,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp" line="40"/>
         <source>Budget</source>
-        <translation type="unfinished"/>
+        <translation>Budget</translation>
     </message>
 </context>
 <context>
@@ -3916,12 +3928,12 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="317"/>
         <source>Join Game as Judge</source>
-        <translation type="unfinished"/>
+        <translation>Spiel als Richter beitreten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="322"/>
         <source>Spectate Game as Judge</source>
-        <translation type="unfinished"/>
+        <translation>Spiel als Richter zuschauen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="351"/>
@@ -3961,7 +3973,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="414"/>
         <source>Join as judge</source>
-        <translation type="unfinished"/>
+        <translation>Als Richter beitreten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="415"/>
@@ -3971,7 +3983,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="416"/>
         <source>Join as judge spectator</source>
-        <translation type="unfinished"/>
+        <translation>Als Richter-Zuschauer beitreten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="437"/>
@@ -3989,32 +4001,32 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="52"/>
         <source>All types</source>
-        <translation type="unfinished"/>
+        <translation>Alle Typen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="104"/>
         <source>Filter by game name...</source>
-        <translation type="unfinished"/>
+        <translation>Nach Spielnamen filtern...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="105"/>
         <source>Filter by game type/format</source>
-        <translation type="unfinished"/>
+        <translation>Nach Spieltyp/Format filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="106"/>
         <source>Hide games not created by buddies</source>
-        <translation type="unfinished"/>
+        <translation>Nicht von Freunden erstellte Spiele ausblenden</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="107"/>
         <source>Hide full games</source>
-        <translation type="unfinished"/>
+        <translation>Volle Spiele ausblenden</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp" line="108"/>
         <source>Hide started games</source>
-        <translation type="unfinished"/>
+        <translation>Gestartete Spiele ausblenden</translation>
     </message>
 </context>
 <context>
@@ -4297,7 +4309,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="72"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Alle Spieler</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/grave_menu.cpp" line="105"/>
@@ -4330,37 +4342,37 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="112"/>
         <source>Sort hand by...</source>
-        <translation type="unfinished"/>
+        <translation>Hand nach ... sortieren</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="113"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="114"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="115"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Manawert</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="117"/>
         <source>Take &amp;mulligan (Choose hand size)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Mulligan nehmen (Handgröße wählen)</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="118"/>
         <source>Take mulligan (Same hand size)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan nehmen (Gleiche Handgröße)</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="119"/>
         <source>Take mulligan (Hand size - 1)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan nehmen (Handgröße -1)</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="121"/>
@@ -4396,7 +4408,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
         <location filename="src/game/player/menu/hand_menu.cpp" line="128"/>
         <location filename="src/game/player/menu/hand_menu.cpp" line="131"/>
         <source>All players</source>
-        <translation type="unfinished"/>
+        <translation>Alle Spieler</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/hand_menu.cpp" line="130"/>
@@ -4429,7 +4441,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="202"/>
         <source>Browse Archidekt</source>
-        <translation type="unfinished"/>
+        <translation>Archidekt durchsuchen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/home_widget.cpp" line="205"/>
@@ -4638,17 +4650,17 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
         <location filename="src/game/player/menu/library_menu.cpp" line="240"/>
         <location filename="src/game/player/menu/library_menu.cpp" line="274"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Alle Spieler</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="309"/>
         <source>Reveal top cards of library</source>
-        <translation type="unfinished"/>
+        <translation>Oberste Karten der Bibliothek vorzeigen</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="310"/>
         <source>Number of cards: (max. %1)</source>
-        <translation type="unfinished"/>
+        <translation>Anzahl der Karten: (max. %1)</translation>
     </message>
 </context>
 <context>
@@ -5484,42 +5496,42 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="46"/>
         <source>Mana Base Configuration</source>
-        <translation type="unfinished"/>
+        <translation>Mana-Basis Konfiguration</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="48"/>
         <source>Display type:</source>
-        <translation type="unfinished"/>
+        <translation>Anzeigetyp:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
         <source>pie</source>
-        <translation type="unfinished"/>
+        <translation>Torte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
         <source>bar</source>
-        <translation type="unfinished"/>
+        <translation>Leiste</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="51"/>
         <source>combinedBar</source>
-        <translation type="unfinished"/>
+        <translation>kombinierteLeiste</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="53"/>
         <source>Filter Colors (optional):</source>
-        <translation type="unfinished"/>
+        <translation>Farben filtern (optional):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="55"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp" line="56"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -5535,47 +5547,47 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="55"/>
         <source>Group By:</source>
-        <translation type="unfinished"/>
+        <translation>Gruppieren nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="56"/>
         <source>type</source>
-        <translation type="unfinished"/>
+        <translation>Typ</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="57"/>
         <source>color</source>
-        <translation type="unfinished"/>
+        <translation>Farbe</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="58"/>
         <source>subtype</source>
-        <translation type="unfinished"/>
+        <translation>Untertyp</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="59"/>
         <source>power</source>
-        <translation type="unfinished"/>
+        <translation>Stärke</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="60"/>
         <source>toughness</source>
-        <translation type="unfinished"/>
+        <translation>Widerstandskraft</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="62"/>
         <source>Filters (optional):</source>
-        <translation type="unfinished"/>
+        <translation>Filter (optional):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="64"/>
         <source>Show main bar row</source>
-        <translation type="unfinished"/>
+        <translation>Anzeigen der Hauptleistenreihe</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp" line="65"/>
         <source>Show per-category rows</source>
-        <translation type="unfinished"/>
+        <translation>Anzeige der per-Kategoriereihen</translation>
     </message>
 </context>
 <context>
@@ -5591,27 +5603,27 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="46"/>
         <source>Display type:</source>
-        <translation type="unfinished"/>
+        <translation>Anzeigetyp:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="47"/>
         <source>pie</source>
-        <translation type="unfinished"/>
+        <translation>Torte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="48"/>
         <source>bar</source>
-        <translation type="unfinished"/>
+        <translation>Leiste</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="49"/>
         <source>combinedBar</source>
-        <translation type="unfinished"/>
+        <translation>kombinierteLeiste</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp" line="51"/>
         <source>Filter Colors (optional):</source>
-        <translation type="unfinished"/>
+        <translation>Farben filtern (optional):</translation>
     </message>
 </context>
 <context>
@@ -5627,27 +5639,27 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="48"/>
         <source>Top display type:</source>
-        <translation type="unfinished"/>
+        <translation>Oberster Anzeigetyp:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="49"/>
         <source>pie</source>
-        <translation type="unfinished"/>
+        <translation>Torte</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="50"/>
         <source>bar</source>
-        <translation type="unfinished"/>
+        <translation>Leiste</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="52"/>
         <source>Colors:</source>
-        <translation type="unfinished"/>
+        <translation>Farben:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp" line="54"/>
         <source>Show per-color rows</source>
-        <translation type="unfinished"/>
+        <translation>Anzeige der per-Farbenreihen</translation>
     </message>
 </context>
 <context>
@@ -5655,12 +5667,12 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp" line="42"/>
         <source>%1 pips (%2 cards)</source>
-        <translation type="unfinished"/>
+        <translation>%1 Pips (%2 Karten)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp" line="48"/>
         <source>%1 mana (%2 cards)</source>
-        <translation type="unfinished"/>
+        <translation>%1 Mana (%2 Karten)</translation>
     </message>
 </context>
 <context>
@@ -5668,12 +5680,12 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp" line="14"/>
         <source>Mana Production + Devotion</source>
-        <translation type="unfinished"/>
+        <translation>Manaerzeugung + Hingabe </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp" line="120"/>
         <source>Mana Distribution Settings</source>
-        <translation type="unfinished"/>
+        <translation>Manaverteilungseinstellungen</translation>
     </message>
 </context>
 <context>
@@ -7633,58 +7645,58 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="58"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="64"/>
         <source>Desc.</source>
-        <translation type="unfinished"/>
+        <translation>Beschreibung.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="64"/>
         <source>Asc.</source>
-        <translation type="unfinished"/>
+        <translation>Aufsteigend.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="108"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="348"/>
         <source>Any Bracket</source>
-        <translation type="unfinished"/>
+        <translation>Jede Klammer</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="129"/>
         <source>Deck name contains...</source>
-        <translation type="unfinished"/>
+        <translation>Deckname enthält...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="133"/>
         <source>Owner name contains...</source>
-        <translation type="unfinished"/>
+        <translation>Besitzername enthält...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="205"/>
         <source>Disabled</source>
-        <translation type="unfinished"/>
+        <translation>Deaktiviert</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="298"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Suche</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="299"/>
         <source>Formats</source>
-        <translation type="unfinished"/>
+        <translation>Formate</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="300"/>
         <source>Min. # of Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Min. # an Karten:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="301"/>
         <source>Page:</source>
-        <translation type="unfinished"/>
+        <translation>Seite: </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.h" line="79"/>
         <source>Archidekt: </source>
-        <translation type="unfinished"/>
+        <translation>Archidekt:</translation>
     </message>
 </context>
 <context>
@@ -7712,7 +7724,7 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="145"/>
         <source>Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Kartendatenbank</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_deck_editor.cpp" line="148"/>
@@ -8726,7 +8738,7 @@ Je mehr Informationen Sie angeben, desto spezifischer fallen die Ergebnisse aus.
     <message>
         <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="211"/>
         <source>Archidekt</source>
-        <translation type="unfinished"/>
+        <translation>Archidekt</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_supervisor.cpp" line="212"/>
@@ -8854,7 +8866,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="26"/>
         <source>Database Display</source>
-        <translation type="unfinished"/>
+        <translation>Datenbankanzeige</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/tab_visual_database_display.h" line="27"/>
@@ -9350,7 +9362,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="955"/>
         <source>Do not delete &amp;arrows inside of subphases</source>
-        <translation type="unfinished"/>
+        <translation>Keine &amp;Pfeile löschen in Unterphasen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="956"/>
@@ -9552,7 +9564,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="51"/>
         <source>Search filter...</source>
-        <translation type="unfinished"/>
+        <translation>Suchfilter....</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp" line="52"/>
@@ -9575,22 +9587,22 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="57"/>
         <source>Do not display formats with less than this amount of cards in the database</source>
-        <translation type="unfinished"/>
+        <translation>Keine Formate mit weniger als dieser Anzahl an Karten in der Datenbank anzeigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="58"/>
         <source>Filter mode (AND/OR/NOT conjunctions of filters)</source>
-        <translation type="unfinished"/>
+        <translation>Filtermodus (UND/ODER/NICHT Verbindungen von Filtern)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="166"/>
         <source>Mode: Exact Match</source>
-        <translation type="unfinished"/>
+        <translation>Modus: Exakte Übereinstimmung</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="166"/>
         <source>Mode: Includes</source>
-        <translation type="unfinished"/>
+        <translation>Modus: Enthält</translation>
     </message>
 </context>
 <context>
@@ -9621,7 +9633,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="55"/>
         <source>Filter by name... (Exact match)</source>
-        <translation type="unfinished"/>
+        <translation>Nach Namen filtern... (Exakte Übereinstimmung)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp" line="56"/>
@@ -9711,7 +9723,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="65"/>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="296"/>
         <source>Visual</source>
-        <translation type="unfinished"/>
+        <translation>Visuell</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="266"/>
@@ -9726,12 +9738,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="270"/>
         <source>Sort by:</source>
-        <translation type="unfinished"/>
+        <translation>Sortieren nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="271"/>
         <source>Filter by:</source>
-        <translation type="unfinished"/>
+        <translation>Filtern nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="273"/>
@@ -9756,7 +9768,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_widget.cpp" line="289"/>
         <source>Table</source>
-        <translation type="unfinished"/>
+        <translation>Tisch</translation>
     </message>
 </context>
 <context>
@@ -9764,43 +9776,43 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="86"/>
         <source>Group by:</source>
-        <translation type="unfinished"/>
+        <translation>Gruppieren nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="87"/>
         <source>Change how cards are divided into categories/groups.</source>
-        <translation type="unfinished"/>
+        <translation>Wie Karten innerhalb ihrer Kategorien/Gruppierungen sortiert werden ändern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="88"/>
         <source>Sort by:</source>
-        <translation type="unfinished"/>
+        <translation>Sortieren nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="89"/>
         <source>Click and drag to change the sort order within the groups</source>
-        <translation type="unfinished"/>
+        <translation>Klicken und ziehen, um die Sortierungsreihenfolge innerhalb von Gruppen zu ändern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="90"/>
         <source>Configure how cards are sorted within their groups</source>
-        <translation type="unfinished"/>
+        <translation>Wie Karten innerhalb ihrer Gruppierung sortiert werden einstellen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="91"/>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="118"/>
         <source>Toggle Layout: Overlap</source>
-        <translation type="unfinished"/>
+        <translation>Umschalten des Layouts: Überlappung</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="93"/>
         <source>Change how cards are displayed within zones (i.e. overlapped or fully visible.)</source>
-        <translation type="unfinished"/>
+        <translation>Wie Karten innerhalb von Zonen angezeigt werden ändern ( z.B. überlappend oder vollständig sichtbar)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp" line="115"/>
         <source>Toggle Layout: Flat</source>
-        <translation type="unfinished"/>
+        <translation>Umschalten des Layouts: Flach</translation>
     </message>
 </context>
 <context>
@@ -9821,7 +9833,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="168"/>
         <source>Type a card name here for suggestions from the database...</source>
-        <translation type="unfinished"/>
+        <translation>Hier einen Kartennahmen eingeben für Vorschläge aus der Datenbank...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp" line="169"/>
@@ -10945,7 +10957,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="546"/>
         <source>Reveal Selected Cards to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Ausgewählte Karten allen Spielern vorzeigen</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="549"/>
@@ -11100,12 +11112,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="663"/>
         <source>Mulligan (Same hand size)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan nehmen (Gleiche Handgröße)</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="666"/>
         <source>Mulligan (Hand size - 1)</source>
-        <translation type="unfinished"/>
+        <translation>Mulligan nehmen (Handgröße -1)</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="669"/>
@@ -11135,27 +11147,27 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="684"/>
         <source>Sort Hand by Name</source>
-        <translation type="unfinished"/>
+        <translation>Hand sortieren nach Name</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="687"/>
         <source>Sort Hand by Type</source>
-        <translation type="unfinished"/>
+        <translation>Hand sortieren nach Typ</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="690"/>
         <source>Sort Hand by Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Hand sortieren nach Manawert</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="693"/>
         <source>Reveal Hand to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Hand allen Spielern vorzeigen</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="697"/>
         <source>Reveal Random Card to All Players</source>
-        <translation type="unfinished"/>
+        <translation>Zufällige Karte allen Spielern vorzeigen</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="700"/>
