@@ -54,6 +54,10 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     cardDatabaseDockWidget->setHidden(true);
     tutorialController = new TutorialController(this);
 
+    auto deckDockSequence = deckDockWidget->generateTutorialSequence();
+
+    tutorialController->addSequence(deckDockSequence);
+
     auto sequence = TutorialSequence();
 
     sequence.addStep({tabContainer->tabBar(),
@@ -80,6 +84,23 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
          [this]() { tabContainer->setCurrentWidget(tabContainer->visualDatabaseDisplay); }});
 
     tutorialController->addSequence(vddSequence);
+
+    auto analyticsSequence = tabContainer->deckAnalytics->generateTutorialSequence();
+    analyticsSequence.steps.prepend({tabContainer->tabBar(), "Let's look at the analytics tab now."});
+
+    TutorialStep analyticsConclusionStep;
+    analyticsConclusionStep.targetWidget = tabContainer->tabBar();
+    analyticsConclusionStep.text =
+        tr("That was it for the analytics tab.\n\nLet's now look at an equally useful tab, which provides you with "
+           "detailed information about possible hands, invaluable information when testing out a new deck.");
+
+    analyticsSequence.addStep(analyticsConclusionStep);
+
+    tutorialController->addSequence(analyticsSequence);
+
+    auto sampleHandSequence = tabContainer->sampleHandWidget->generateTutorialSequence();
+
+    tutorialController->addSequence(sampleHandSequence);
 }
 
 void TabDeckEditorVisual::showEvent(QShowEvent *ev)
