@@ -37,6 +37,7 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                 &CardGroupDisplayWidget::onSelectionChanged);
     }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+    connect(deckListModel, &QAbstractItemModel::dataChanged, this, &CardGroupDisplayWidget::onDataChanged);
 }
 
 // Just here so it can get overwritten in subclasses.
@@ -81,8 +82,11 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
-                    displayWidget->setHighlighted(true);
+                // Highlight all copies of this card
+                for (auto widget : it.value()) {
+                    if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(widget)) {
+                        displayWidget->setHighlighted(true);
+                    }
                 }
             }
         }
@@ -96,8 +100,11 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
-                    displayWidget->setHighlighted(false);
+                // Un-highlight all copies of this card
+                for (auto widget : it.value()) {
+                    if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(widget)) {
+                        displayWidget->setHighlighted(false);
+                    }
                 }
             }
         }
@@ -110,9 +117,6 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
 QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex index)
 {
-    if (indexToWidgetMap.contains(index)) {
-        return indexToWidgetMap[index];
-    }
     auto cardName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     auto cardProviderId =
         index.sibling(index.row(), DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::EditRole).toString();
@@ -125,7 +129,12 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::onHover);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
 
-    indexToWidgetMap.insert(index, widget);
+    // Add to the list of widgets for this index
+    if (!indexToWidgetMap.contains(index)) {
+        indexToWidgetMap.insert(index, QList<QWidget *>());
+    }
+    indexToWidgetMap[index].append(widget);
+
     return widget;
 }
 
@@ -152,17 +161,25 @@ void CardGroupDisplayWidget::updateCardDisplays()
         // 4. persist the source index
         QPersistentModelIndex persistent(sourceIndex);
 
-        addToLayout(constructWidgetForIndex(persistent));
+        // Get the card amount
+        int cardAmount =
+            sourceIndex.sibling(sourceIndex.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+        // Create multiple widgets for the card count
+        for (int copy = 0; copy < cardAmount; ++copy) {
+            addToLayout(constructWidgetForIndex(persistent));
+        }
     }
 }
 
 void CardGroupDisplayWidget::clearAllDisplayWidgets()
 {
     for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
-        removeFromLayout(displayWidget);
+        for (auto displayWidget : indexToWidgetMap.value(idx)) {
+            removeFromLayout(displayWidget);
+            delete displayWidget;
+        }
         indexToWidgetMap.remove(idx);
-        delete displayWidget;
     }
 }
 
@@ -184,7 +201,13 @@ void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first
             // Persist the index
             QPersistentModelIndex persistent(child);
 
-            insertIntoLayout(constructWidgetForIndex(persistent), row);
+            // Get the card amount for the newly added card
+            int cardAmount = child.sibling(child.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+            // Insert multiple copies
+            for (int copy = 0; copy < cardAmount; ++copy) {
+                insertIntoLayout(constructWidgetForIndex(persistent), row);
+            }
         }
     }
 }
@@ -193,19 +216,42 @@ void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first,
 {
     Q_UNUSED(first);
     Q_UNUSED(last);
+
     if (parent == trackedIndex) {
+        QList<QPersistentModelIndex> keysToRemove;
+
         for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
             if (!idx.isValid()) {
-                removeFromLayout(indexToWidgetMap.value(idx));
-                indexToWidgetMap.value(idx)->deleteLater();
-                indexToWidgetMap.remove(idx);
+                keysToRemove.append(idx);
             }
+        }
+
+        for (const QPersistentModelIndex &idx : keysToRemove) {
+            for (auto widget : indexToWidgetMap.value(idx)) {
+                removeFromLayout(widget);
+                widget->deleteLater();
+            }
+            indexToWidgetMap.remove(idx);
         }
 
         if (!trackedIndex.isValid()) {
             emit cleanupRequested(this);
         }
     }
+}
+
+void CardGroupDisplayWidget::onDataChanged(const QModelIndex &topLeft,
+                                           const QModelIndex &bottomRight,
+                                           const QVector<int> &roles)
+{
+    Q_UNUSED(roles);
+    if (topLeft.parent() != trackedIndex && bottomRight.parent() != trackedIndex) {
+        return;
+    }
+
+    // When card amounts change, rebuild the display
+    clearAllDisplayWidgets();
+    updateCardDisplays();
 }
 
 void CardGroupDisplayWidget::onActiveSortCriteriaChanged(QStringList _activeSortCriteria)
