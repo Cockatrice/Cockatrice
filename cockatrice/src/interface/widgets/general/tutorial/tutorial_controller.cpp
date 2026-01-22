@@ -31,7 +31,7 @@ void TutorialController::addSequence(const TutorialSequence &seq)
 
 void TutorialController::start()
 {
-    if (sequences.isEmpty()) {
+    if (sequences.isEmpty() || tutorialCompleted) {
         return;
     }
 
@@ -110,17 +110,21 @@ bool TutorialController::validateCurrentStep()
 
 void TutorialController::nextStep()
 {
-    currentStep++;
-
     if (currentSequence < 0) {
         return;
     }
 
-    if (currentStep >= sequences[currentSequence].steps.size()) {
+    if (currentStep >= sequences[currentSequence].steps.size() - 1) {
+        // We're on the last step of this sequence, run its onExit before advancing
+        const auto &lastStep = sequences[currentSequence].steps[currentStep];
+        if (lastStep.onExit) {
+            lastStep.onExit();
+        }
         nextSequence();
         return;
     }
 
+    currentStep++;
     showStep();
 }
 
@@ -183,6 +187,7 @@ void TutorialController::exitTutorial()
     tutorialOverlay->hide();
     currentSequence = -1;
     currentStep = -1;
+    tutorialCompleted = true;
 }
 
 void TutorialController::updateProgress()

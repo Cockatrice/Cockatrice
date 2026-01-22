@@ -87,6 +87,8 @@ private:
     TutorialOverlay *tutorialOverlay;
     QVector<TutorialSequence> sequences;
 
+    bool tutorialCompleted = false;
+
     int currentSequence = -1;
     int currentStep = -1;
 

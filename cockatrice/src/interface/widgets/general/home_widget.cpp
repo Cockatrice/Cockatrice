@@ -60,6 +60,12 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     vdeStep.requiresInteraction = true;
     vdeStep.allowClickThrough = true;
     vdeStep.validationHint = "Open the deck editor to try it out!";
+    vdeStep.validationTiming = ValidationTiming::OnSignal;
+    vdeStep.autoAdvanceOnValid = true;
+    vdeStep.validator = []() { return true; };
+    vdeStep.signalSource = visualDeckEditorButton;
+    vdeStep.signalName = SIGNAL(clicked());
+
     sequence.addStep(vdeStep);
     sequence.addStep({visualDeckStorageButton, "Browse the decks in your local collection."});
     sequence.addStep({visualDatabaseDisplayButton, "View the card database here."});

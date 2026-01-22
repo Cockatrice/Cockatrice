@@ -99,6 +99,21 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
+    generateTutorialSequence();
+}
+
+TutorialSequence DeckViewContainer::generateTutorialSequence()
+{
+    TutorialSequence deckViewContainerSequence;
+    deckViewContainerSequence.name = tr("Loading and selecting decks");
+
+    deckViewContainerSequence.addStep(
+        {this, tr("There are multiple ways to select a deck:\n\n- From a local file"
+                  "\n- From the contents of your clipboard\nFrom an external online service")});
+
+    deckViewContainerSequence = visualDeckStorageWidget->generateTutorialSequence(deckViewContainerSequence);
+
+    return deckViewContainerSequence;
 }
 
 /**

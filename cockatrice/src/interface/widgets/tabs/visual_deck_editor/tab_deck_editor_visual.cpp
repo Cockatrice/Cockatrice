@@ -9,6 +9,7 @@
 #include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../tab_deck_editor.h"
+#include "../tab_home.h"
 #include "../tab_supervisor.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 
@@ -101,6 +102,24 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     auto sampleHandSequence = tabContainer->sampleHandWidget->generateTutorialSequence();
 
     tutorialController->addSequence(sampleHandSequence);
+
+    TutorialSequence endSequence;
+    endSequence.name = tr("Visual Deck Editor Conclusion");
+
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("This concludes the Visual Deck Editor tutorial.");
+    introStep.onEnter = [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); };
+    endSequence.addStep(introStep);
+
+    TutorialStep conclusionStep;
+    conclusionStep.targetWidget = tabSupervisor->tabBar();
+    conclusionStep.text =
+        tr("Let's go back to the Home Tab now to explore where you can manage your newly created deck.");
+    conclusionStep.onExit = [this]() { tabSupervisor->setCurrentWidget(tabSupervisor->getTabHome()); };
+    endSequence.addStep(conclusionStep);
+
+    tutorialController->addSequence(endSequence);
 }
 
 void TabDeckEditorVisual::showEvent(QShowEvent *ev)
