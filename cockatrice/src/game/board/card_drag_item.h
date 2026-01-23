@@ -16,7 +16,7 @@ class CardDragItem : public AbstractCardDragItem
     Q_OBJECT
 private:
     int id;
-    bool faceDown;
+    bool forceFaceDown;
     bool occupied;
     CardZone *currentZone;
 
@@ -24,15 +24,15 @@ public:
     CardDragItem(CardItem *_item,
                  int _id,
                  const QPointF &_hotSpot,
-                 bool _faceDown,
+                 bool _forceFaceDown,
                  AbstractCardDragItem *parentDrag = 0);
     int getId() const
     {
         return id;
     }
-    bool getFaceDown() const
+    bool isForceFaceDown() const
     {
-        return faceDown;
+        return forceFaceDown;
     }
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void updatePosition(const QPointF &cursorScenePos) override;
