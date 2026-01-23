@@ -31,13 +31,17 @@ FlatCardGroupDisplayWidget::FlatCardGroupDisplayWidget(QWidget *parent,
 
     layout->addWidget(flowWidget);
 
+    // Clear all existing widgets
     for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-        FlatCardGroupDisplayWidget::removeFromLayout(indexToWidgetMap.value(idx));
-        indexToWidgetMap.value(idx)->deleteLater();
+        for (auto widget : indexToWidgetMap.value(idx)) {
+            FlatCardGroupDisplayWidget::removeFromLayout(widget);
+            widget->deleteLater();
+        }
         indexToWidgetMap.remove(idx);
     }
 
     FlatCardGroupDisplayWidget::updateCardDisplays();
+
     disconnect(deckListModel, &QAbstractItemModel::rowsInserted, this, &CardGroupDisplayWidget::onCardAddition);
     disconnect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
 

@@ -37,6 +37,7 @@ CardGroupDisplayWidget::CardGroupDisplayWidget(QWidget *parent,
                 &CardGroupDisplayWidget::onSelectionChanged);
     }
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &CardGroupDisplayWidget::onCardRemoval);
+    connect(deckListModel, &QAbstractItemModel::dataChanged, this, &CardGroupDisplayWidget::onDataChanged);
 }
 
 // Just here so it can get overwritten in subclasses.
@@ -81,8 +82,11 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
-                    displayWidget->setHighlighted(true);
+                // Highlight all copies of this card
+                for (auto widget : it.value()) {
+                    if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(widget)) {
+                        displayWidget->setHighlighted(true);
+                    }
                 }
             }
         }
@@ -96,10 +100,41 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {
-                if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(it.value())) {
-                    displayWidget->setHighlighted(false);
+                // Un-highlight all copies of this card
+                for (auto widget : it.value()) {
+                    if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(widget)) {
+                        displayWidget->setHighlighted(false);
+                    }
                 }
             }
+        }
+    }
+}
+
+void CardGroupDisplayWidget::refreshSelectionForIndex(const QPersistentModelIndex &persistent)
+{
+    if (!selectionModel || !indexToWidgetMap.contains(persistent)) {
+        return;
+    }
+
+    // Convert persistent index to regular index for selection check
+    QModelIndex idx = QModelIndex(persistent);
+
+    // Check if this index is selected
+    // We need to check against the selection model's model (which might be a proxy)
+    bool isSelected = false;
+    if (auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model())) {
+        // Map source index to proxy
+        QModelIndex proxyIdx = proxyModel->mapFromSource(idx);
+        isSelected = selectionModel->isSelected(proxyIdx);
+    } else {
+        isSelected = selectionModel->isSelected(idx);
+    }
+
+    // Apply selection state to all widgets for this index
+    for (auto widget : indexToWidgetMap[persistent]) {
+        if (auto displayWidget = qobject_cast<CardInfoPictureWithTextOverlayWidget *>(widget)) {
+            displayWidget->setHighlighted(isSelected);
         }
     }
 }
@@ -110,9 +145,6 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
 
 QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex index)
 {
-    if (indexToWidgetMap.contains(index)) {
-        return indexToWidgetMap[index];
-    }
     auto cardName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     auto cardProviderId =
         index.sibling(index.row(), DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::EditRole).toString();
@@ -125,7 +157,8 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::onHover);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
 
-    indexToWidgetMap.insert(index, widget);
+    indexToWidgetMap[index].append(widget);
+
     return widget;
 }
 
@@ -152,17 +185,26 @@ void CardGroupDisplayWidget::updateCardDisplays()
         // 4. persist the source index
         QPersistentModelIndex persistent(sourceIndex);
 
-        addToLayout(constructWidgetForIndex(persistent));
+        // Get the card amount
+        int cardAmount =
+            sourceIndex.sibling(sourceIndex.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+        // Create multiple widgets for the card count
+        for (int copy = 0; copy < cardAmount; ++copy) {
+            addToLayout(constructWidgetForIndex(persistent));
+        }
     }
 }
 
 void CardGroupDisplayWidget::clearAllDisplayWidgets()
 {
-    for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
-        removeFromLayout(displayWidget);
-        indexToWidgetMap.remove(idx);
-        delete displayWidget;
+    auto it = indexToWidgetMap.begin();
+    while (it != indexToWidgetMap.end()) {
+        for (auto displayWidget : it.value()) {
+            removeFromLayout(displayWidget);
+            delete displayWidget;
+        }
+        it = indexToWidgetMap.erase(it);
     }
 }
 
@@ -184,7 +226,13 @@ void CardGroupDisplayWidget::onCardAddition(const QModelIndex &parent, int first
             // Persist the index
             QPersistentModelIndex persistent(child);
 
-            insertIntoLayout(constructWidgetForIndex(persistent), row);
+            // Get the card amount for the newly added card
+            int cardAmount = child.sibling(child.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+            // Insert multiple copies
+            for (int copy = 0; copy < cardAmount; ++copy) {
+                insertIntoLayout(constructWidgetForIndex(persistent), row);
+            }
         }
     }
 }
@@ -193,18 +241,100 @@ void CardGroupDisplayWidget::onCardRemoval(const QModelIndex &parent, int first,
 {
     Q_UNUSED(first);
     Q_UNUSED(last);
-    if (parent == trackedIndex) {
-        for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-            if (!idx.isValid()) {
-                removeFromLayout(indexToWidgetMap.value(idx));
-                indexToWidgetMap.value(idx)->deleteLater();
-                indexToWidgetMap.remove(idx);
+
+    if (parent != trackedIndex) {
+        return;
+    }
+
+    // Use iterator so we can remove while iterating
+    auto it = indexToWidgetMap.begin();
+    while (it != indexToWidgetMap.end()) {
+        const QPersistentModelIndex &idx = it.key();
+        bool shouldRemove = !idx.isValid() || it.value().isEmpty();
+
+        if (shouldRemove) {
+            // Clean up widgets
+            for (auto widget : it.value()) {
+                removeFromLayout(widget);
+                widget->deleteLater();
+            }
+
+            // Erase and advance iterator
+            it = indexToWidgetMap.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    if (!trackedIndex.isValid()) {
+        emit cleanupRequested(this);
+    }
+}
+
+void CardGroupDisplayWidget::onDataChanged(const QModelIndex &topLeft,
+                                           const QModelIndex &bottomRight,
+                                           const QVector<int> &roles)
+{
+    if (topLeft.parent() != trackedIndex && bottomRight.parent() != trackedIndex) {
+        return;
+    }
+
+    // Check if CARD_AMOUNT column changed
+    bool amountChanged = (topLeft.column() <= DeckListModelColumns::CARD_AMOUNT &&
+                          bottomRight.column() >= DeckListModelColumns::CARD_AMOUNT) ||
+                         roles.isEmpty() || roles.contains(Qt::EditRole);
+
+    if (!amountChanged) {
+        return;
+    }
+
+    // For each affected row, adjust widget count
+    for (int row = topLeft.row(); row <= bottomRight.row(); ++row) {
+        QModelIndex idx = deckListModel->index(row, 0, trackedIndex);
+
+        if (!idx.isValid()) {
+            continue;
+        }
+
+        QPersistentModelIndex persistent(idx);
+        int newAmount = idx.sibling(idx.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+        // Get current widget count
+        int currentWidgetCount = indexToWidgetMap.contains(persistent) ? indexToWidgetMap.value(persistent).count() : 0;
+
+        if (newAmount == currentWidgetCount) {
+            // Still refresh selection even if count didn't change
+            refreshSelectionForIndex(persistent);
+            continue;
+        }
+
+        if (newAmount < currentWidgetCount) {
+            // Remove excess widgets
+            int toRemove = currentWidgetCount - newAmount;
+
+            for (int i = 0; i < toRemove; ++i) {
+                if (!indexToWidgetMap[persistent].isEmpty()) {
+                    QWidget *widget = indexToWidgetMap[persistent].takeLast();
+                    removeFromLayout(widget);
+                    widget->deleteLater();
+                }
+            }
+
+            // If all widgets removed, clean up the map entry
+            if (indexToWidgetMap[persistent].isEmpty()) {
+                indexToWidgetMap.remove(persistent);
+            }
+        } else {
+            // Add new widgets
+            int toAdd = newAmount - currentWidgetCount;
+
+            for (int i = 0; i < toAdd; ++i) {
+                addToLayout(constructWidgetForIndex(persistent));
             }
         }
 
-        if (!trackedIndex.isValid()) {
-            emit cleanupRequested(this);
-        }
+        // Always refresh selection state after modifying widgets
+        refreshSelectionForIndex(persistent);
     }
 }
 

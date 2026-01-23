@@ -30,9 +30,12 @@ OverlappedCardGroupDisplayWidget::OverlappedCardGroupDisplayWidget(QWidget *pare
 
     layout->addWidget(overlapWidget);
 
+    // Clear all existing widgets
     for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-        OverlappedCardGroupDisplayWidget::removeFromLayout(indexToWidgetMap.value(idx));
-        indexToWidgetMap.value(idx)->deleteLater();
+        for (auto widget : indexToWidgetMap.value(idx)) {
+            OverlappedCardGroupDisplayWidget::removeFromLayout(widget);
+            widget->deleteLater();
+        }
         indexToWidgetMap.remove(idx);
     }
 
