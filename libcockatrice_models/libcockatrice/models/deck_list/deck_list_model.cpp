@@ -450,6 +450,10 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         cardNode->setCardProviderId(printingInfo.getProperty("uuid"));
         deckList->refreshDeckHash();
         emit deckHashChanged();
+        // Emit dataChanged for the amount column since we modified it
+        QModelIndex cardIndex = nodeToIndex(cardNode);
+        QModelIndex amountIndex = cardIndex.sibling(cardIndex.row(), DeckListModelColumns::CARD_AMOUNT);
+        emit dataChanged(amountIndex, amountIndex, {Qt::EditRole});
     }
     sort(lastKnownColumn, lastKnownOrder);
     refreshCardFormatLegalities();
