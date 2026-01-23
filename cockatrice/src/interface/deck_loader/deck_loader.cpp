@@ -91,6 +91,22 @@ void DeckLoader::loadFromFileAsync(const QString &fileName, DeckFileFormat::Form
     });
 }
 
+bool DeckLoader::reload()
+{
+    QString lastFileName = loadedDeck.lastLoadInfo.fileName;
+    if (lastFileName.isEmpty()) {
+        return false;
+    }
+    std::optional<LoadedDeck> deck = loadFromFile(lastFileName, loadedDeck.lastLoadInfo.fileFormat, false);
+
+    if (!deck) {
+        return false;
+    }
+
+    loadedDeck = *deck;
+    return true;
+}
+
 std::optional<LoadedDeck> DeckLoader::loadFromRemote(const QString &nativeString, int remoteDeckId)
 {
     DeckList deckList;

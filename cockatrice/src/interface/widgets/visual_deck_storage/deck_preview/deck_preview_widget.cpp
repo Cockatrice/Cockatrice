@@ -71,21 +71,48 @@ void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void DeckPreviewWidget::enterEvent(QEnterEvent *event)
+#else
+void DeckPreviewWidget::enterEvent(QEvent *event)
+#endif
+{
+    QWidget::enterEvent(event);
+    reloadIfModified();
+}
+
+/**
+ * @brief Sets the lastModifiedTime to the value given by the file.
+ */
+void DeckPreviewWidget::updateLastModifiedTime()
+{
+    QFileInfo fileInfo(filePath);
+    lastModifiedTime = fileInfo.lastModified();
+}
+
+/**
+ * @brief Writes the current contents of the deck to file. Updates the lastModifiedTime afterward.
+ */
+void DeckPreviewWidget::writeDeckToFile()
+{
+    DeckLoader::saveToFile(deckLoader->getDeck());
+    updateLastModifiedTime();
+}
+
 void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 {
     if (!deckLoadSuccess) {
         return;
     }
-    auto bannerCard = deckLoader->getDeck().deckList.getBannerCard().name.isEmpty()
-                          ? ExactCard()
-                          : CardDatabaseManager::query()->getCard(deckLoader->getDeck().deckList.getBannerCard());
 
-    bannerCardDisplayWidget->setCard(bannerCard);
+    QFileInfo fileInfo(filePath);
+    lastModifiedTime = fileInfo.lastModified();
+
     bannerCardDisplayWidget->setFontSize(24);
     setFilePath(deckLoader->getDeck().lastLoadInfo.fileName);
 
-    colorIdentityWidget = new ColorIdentityWidget(this, getColorIdentity());
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, deckLoader->getDeck().deckList.getTags());
+    colorIdentityWidget = new ColorIdentityWidget(this);
+    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this);
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, this, &DeckPreviewWidget::setTags);
 
     bannerCardLabel = new QLabel(this);
@@ -93,13 +120,11 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     bannerCardComboBox = new QComboBox(this);
     bannerCardComboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     bannerCardComboBox->setObjectName("bannerCardComboBox");
-    bannerCardComboBox->setCurrentText(deckLoader->getDeck().deckList.getBannerCard().name);
     bannerCardComboBox->installEventFilter(new NoScrollFilter(bannerCardComboBox));
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
 
     updateColorIdentityVisibility(SettingsCache::instance().getVisualDeckStorageShowColorIdentity());
-    updateBannerCardComboBox();
     updateBannerCardComboBoxVisibility(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
     updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
 
@@ -108,9 +133,44 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     layout->addWidget(bannerCardLabel);
     layout->addWidget(bannerCardComboBox);
 
-    refreshBannerCardText();
-
     retranslateUi();
+    resyncWidgets();
+}
+
+/**
+ * @brief Syncs the contents of the child widgets with the current deck.
+ */
+void DeckPreviewWidget::resyncWidgets()
+{
+    auto bannerCardRef = deckLoader->getDeck().deckList.getBannerCard();
+    auto bannerCard = bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query()->getCard(bannerCardRef);
+
+    bannerCardDisplayWidget->setCard(bannerCard);
+    refreshBannerCardText();
+    updateBannerCardComboBox(bannerCardRef.name);
+    colorIdentityWidget->setColorIdentity(getColorIdentity());
+    deckTagsDisplayWidget->setTags(deckLoader->getDeck().deckList.getTags());
+}
+
+/**
+ * @brief Reloads the deck if the file's last modified time has increased since we last checked.
+ */
+void DeckPreviewWidget::reloadIfModified()
+{
+    QFileInfo fileInfo(filePath);
+    QDateTime newLastModifiedTime = fileInfo.lastModified();
+
+    if (!newLastModifiedTime.isValid() || newLastModifiedTime <= lastModifiedTime) {
+        return;
+    }
+
+    bool success = deckLoader->reload();
+
+    if (success) {
+        fileInfo.refresh();
+        lastModifiedTime = fileInfo.lastModified();
+        resyncWidgets();
+    }
 }
 
 void DeckPreviewWidget::updateVisibility()
@@ -232,11 +292,8 @@ void DeckPreviewWidget::refreshBannerCardToolTip()
     }
 }
 
-void DeckPreviewWidget::updateBannerCardComboBox()
+void DeckPreviewWidget::updateBannerCardComboBox(const QString &currentText)
 {
-    // Store the current text of the combo box
-    QString currentText = bannerCardComboBox->currentText();
-
     // Block signals temporarily
     bool wasBlocked = bannerCardComboBox->blockSignals(true);
     bannerCardComboBox->setUpdatesEnabled(false);
@@ -300,7 +357,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     auto [name, id] = bannerCardComboBox->currentData().value<QPair<QString, QString>>();
     CardRef cardRef = {name, id};
     deckLoader->getDeck().deckList.setBannerCard(cardRef);
-    DeckLoader::saveToFile(deckLoader->getDeck());
+    writeDeckToFile();
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
@@ -323,7 +380,7 @@ void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewC
 void DeckPreviewWidget::setTags(const QStringList &tags)
 {
     deckLoader->getDeck().deckList.setTags(tags);
-    DeckLoader::saveToFile(deckLoader->getDeck());
+    writeDeckToFile();
 }
 
 QMenu *DeckPreviewWidget::createRightClickMenu()
@@ -398,7 +455,7 @@ void DeckPreviewWidget::actRenameDeck()
 
     // write change
     deckLoader->getDeck().deckList.setName(newName);
-    DeckLoader::saveToFile(deckLoader->getDeck());
+    writeDeckToFile();
 
     // update VDS
     refreshBannerCardText();
@@ -429,9 +486,10 @@ void DeckPreviewWidget::actRenameFile()
     }
 
     deckLoader->getDeck().lastLoadInfo.fileName = newFilePath;
+    setFilePath(newFilePath);
 
     // update VDS
-    setFilePath(newFilePath);
+    updateLastModifiedTime();
     refreshBannerCardText();
 }
 

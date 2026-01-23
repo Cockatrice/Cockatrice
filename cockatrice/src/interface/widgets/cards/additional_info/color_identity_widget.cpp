@@ -53,6 +53,16 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     }
 }
 
+void ColorIdentityWidget::setColorIdentity(const QString &_colorIdentity)
+{
+    if (colorIdentity == _colorIdentity) {
+        return;
+    }
+
+    colorIdentity = _colorIdentity;
+    populateManaSymbolWidgets();
+}
+
 void ColorIdentityWidget::toggleUnusedVisibility()
 {
     populateManaSymbolWidgets();
