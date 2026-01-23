@@ -33,6 +33,7 @@ public:
                            int bannerOpacity,
                            CardSizeWidget *cardSizeWidget);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void refreshSelectionForIndex(const QPersistentModelIndex &persistent);
     void clearAllDisplayWidgets();
 
     DeckListModel *deckListModel;
