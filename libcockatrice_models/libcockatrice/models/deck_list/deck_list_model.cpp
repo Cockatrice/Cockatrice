@@ -738,29 +738,26 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
     return quantity <= maxAllowed;
 }
 
+static bool isCardNodeLegalForFormat(const QString &format, const InnerDecklistNode *zone, const DecklistCardNode *card)
+{
+    Q_UNUSED(zone)
+
+    // unknown cards are not legal
+    ExactCard exactCard = CardDatabaseManager::query()->getCard(card->toCardRef());
+    if (!exactCard) {
+        return false;
+    }
+
+    // actual check
+    return isCardQuantityLegalForFormat(format, exactCard.getInfo(), card->getNumber());
+}
+
 void DeckListModel::refreshCardFormatLegalities()
 {
-    InnerDecklistNode *listRoot = deckList->getTree()->getRoot();
+    QString format = deckList->getGameFormat();
 
-    for (int i = 0; i < listRoot->size(); i++) {
-        auto *currentZone = static_cast<InnerDecklistNode *>(listRoot->at(i));
-        for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = static_cast<DecklistCardNode *>(currentZone->at(j));
-
-            // TODO: better sanity checking
-            if (currentCard == nullptr) {
-                continue;
-            }
-
-            ExactCard exactCard = CardDatabaseManager::query()->getCard(currentCard->toCardRef());
-            if (!exactCard) {
-                continue;
-            }
-
-            QString format = deckList->getGameFormat();
-            bool legal = isCardQuantityLegalForFormat(format, exactCard.getInfo(), currentCard->getNumber());
-
-            currentCard->setFormatLegality(legal);
-        }
-    }
+    deckList->forEachCard([&format](const InnerDecklistNode *zone, DecklistCardNode *card) {
+        bool legal = isCardNodeLegalForFormat(format, zone, card);
+        card->setFormatLegality(legal);
+    });
 }
