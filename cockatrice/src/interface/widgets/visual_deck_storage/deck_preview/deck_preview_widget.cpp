@@ -78,7 +78,11 @@ void DeckPreviewWidget::enterEvent(QEvent *event)
 #endif
 {
     QWidget::enterEvent(event);
-    reloadIfModified();
+
+    // don't do reloads until widgets have been created
+    if (bannerCardComboBox != nullptr) {
+        reloadIfModified();
+    }
 }
 
 /**
