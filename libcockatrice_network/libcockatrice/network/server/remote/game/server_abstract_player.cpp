@@ -218,8 +218,9 @@ shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZ
         return cardStruct.cardToMove->face_down();
     }
 
-    // default to keep face-down the same if zone didn't change
-    if (startZone == targetZone) {
+    // Default to keep face-down the same if zone didn't change.
+    // Compare using zone names because face-down is maintained when changing controllers.
+    if (startZone && startZone->getName() == targetZone->getName()) {
         return cardStruct.card->getFaceDown();
     }
 
