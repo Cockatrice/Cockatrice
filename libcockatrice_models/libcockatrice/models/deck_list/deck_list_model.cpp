@@ -740,7 +740,10 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
 
 static bool isCardNodeLegalForFormat(const QString &format, const InnerDecklistNode *zone, const DecklistCardNode *card)
 {
-    Q_UNUSED(zone)
+    // Don't check legality for tokens
+    if (zone->getName() == DECK_ZONE_TOKENS) {
+        return true;
+    }
 
     // unknown cards are not legal
     ExactCard exactCard = CardDatabaseManager::query()->getCard(card->toCardRef());
