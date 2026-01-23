@@ -201,17 +201,19 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
-    bool success = offsetCountAtIndex(idx, false);
+    bool success = offsetCountAtIndex(idx, -1);
 
     if (!success) {
         return {};
     }
 
-    if (idx.isValid()) {
-        emit focusIndexChanged(idx, true);
+    // old index is no longer safe since rows could have been removed
+    QModelIndex newIdx = deckListModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    if (newIdx.isValid()) {
+        emit focusIndexChanged(newIdx, true);
     }
 
-    return idx;
+    return newIdx;
 }
 
 static bool doSwapCard(DeckListModel *model,
