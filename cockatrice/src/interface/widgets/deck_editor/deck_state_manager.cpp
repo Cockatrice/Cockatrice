@@ -201,7 +201,7 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
-    bool success = offsetCountAtIndex(idx, false);
+    bool success = offsetCountAtIndex(idx, -1);
 
     if (!success) {
         return {};
