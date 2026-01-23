@@ -13,9 +13,10 @@
 CardDragItem::CardDragItem(CardItem *_item,
                            int _id,
                            const QPointF &_hotSpot,
-                           bool _faceDown,
+                           bool _forceFaceDown,
                            AbstractCardDragItem *parentDrag)
-    : AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), faceDown(_faceDown), occupied(false), currentZone(0)
+    : AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), forceFaceDown(_forceFaceDown), occupied(false),
+      currentZone(0)
 {
 }
 
