@@ -143,13 +143,12 @@ static void setupParserRules()
     search["FormatQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         if (sv.choice() == 0) {
             const auto format = std::any_cast<QString>(sv[0]);
-            return
-                [=](const CardData &x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == "legal"; };
+            return [=](const CardData &x) -> bool { return x->getLegalityProp(format) == "legal"; };
         }
 
         const auto format = std::any_cast<QString>(sv[1]);
         const auto legality = std::any_cast<QString>(sv[0]);
-        return [=](const CardData &x) -> bool { return x->getProperty(QString("format-%1").arg(format)) == legality; };
+        return [=](const CardData &x) -> bool { return x->getLegalityProp(format) == legality; };
     };
     search["Legality"] = [](const peg::SemanticValues &sv) -> QString {
         switch (tolower(std::string(sv.sv())[0])) {

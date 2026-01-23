@@ -719,12 +719,11 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
         return true;
     }
 
-    const QString legalityProp = "format-" + format;
-    if (!cardInfo.getProperties().contains(legalityProp)) {
+    // check legality prop
+    const QString legality = cardInfo.getLegalityProp(format);
+    if (legality.isEmpty()) {
         return false;
     }
-
-    const QString legality = cardInfo.getProperty(legalityProp);
 
     int maxAllowed = maxAllowedForLegality(*formatRules, legality);
 
