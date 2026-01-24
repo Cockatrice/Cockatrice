@@ -1,0 +1,10 @@
+/* hide navigation sync control and icons */
+#nav-sync,
+#nav-sync * {
+    display: none !important;
+}
+
+div.nav-sync-icon,
+div.nav-sync-icon * {
+    display: none !important;
+}
