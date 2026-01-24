@@ -25,6 +25,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "pqTestUtility.h"
+
 #include <QList>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -93,6 +95,9 @@ private slots:
     void actUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
+    void actRecord();
+    void actPlayRecording();
+
     void forgotPasswordSuccess();
     void forgotPasswordError();
     void promptForgotPasswordReset();
@@ -146,7 +151,7 @@ private:
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
     QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
-        *aOpenSettingsFolder;
+        *aOpenSettingsFolder, *aRecord, *aPlayRecording;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
@@ -161,6 +166,7 @@ private:
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
+    pqTestUtility *testUtility;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
