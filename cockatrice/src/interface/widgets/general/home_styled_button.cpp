@@ -42,7 +42,7 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
         QPushButton {
             font-size: 34px;
             font-weight: bold;
-            font-family: sans-serif;
+            font-family: sans-serif, "Segoe UI", "Helvetica Neue";
             padding: 30px;
             color: white;
             border: 2px solid %1;
