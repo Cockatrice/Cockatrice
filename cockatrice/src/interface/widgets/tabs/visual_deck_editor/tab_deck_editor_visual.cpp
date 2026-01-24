@@ -163,23 +163,32 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
     QItemSelectionModel *sel = deckDockWidget->getSelectionModel();
 
     // Double click = swap
-    if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton) {
+    if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton &&
+        !event->modifiers().testFlag(Qt::AltModifier)) {
         deckStateManager->swapCardAtIndex(idx);
         idx = deckStateManager->getModel()->findCard(card.getName(), zoneName);
         sel->setCurrentIndex(idx, QItemSelectionModel::ClearAndSelect);
         return;
     }
 
-    // Right-click = decrement
-    if (event->button() == Qt::RightButton) {
-        actDecrementCard(card);
+    // Alt + Right-click = decrement
+    if (event->button() == Qt::RightButton && event->modifiers().testFlag(Qt::AltModifier)) {
+        if (zoneName == DECK_ZONE_MAIN) {
+            actDecrementCard(card);
+        } else {
+            actDecrementCardFromSideboard(card);
+        }
         //  Keep selection intact.
         return;
     }
 
     // Alt + Left click = increment
     if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::AltModifier)) {
-        // actIncrementCard(card);
+        if (zoneName == DECK_ZONE_MAIN) {
+            actAddCard(card);
+        } else {
+            actAddCardToSideboard(card);
+        }
         //  Keep selection intact.
         return;
     }
