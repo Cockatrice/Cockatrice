@@ -41,6 +41,8 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
     return QString(R"(
         QPushButton {
             font-size: 34px;
+            font-weight: bold;
+            font-family: sans-serif;
             padding: 30px;
             color: white;
             border: 2px solid %1;
@@ -88,16 +90,12 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
 
-    QFont font = this->font();
-    font.setBold(true);
-    painter.setFont(font);
-
-    QFontMetrics fm(font);
-    QSize textSize = fm.size(Qt::TextSingleLine, this->text());
+    QFontMetrics fm(font());
+    QSize textSize = fm.size(Qt::TextSingleLine, text());
     QPointF center((width() - textSize.width()) / 2.0, (height() + textSize.height() / 2.0) / 2.0);
 
     QPainterPath path;
-    path.addText(center, font, this->text());
+    path.addText(center, font(), text());
 
     painter.setPen(QPen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter.setBrush(Qt::white);
