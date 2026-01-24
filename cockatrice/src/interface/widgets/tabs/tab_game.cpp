@@ -218,12 +218,13 @@ void TabGame::finishTutorialInitialization()
          tr("Let's go over them quickly, left-to-right.\n\nThe phase toolbar\nThe player area\nThe battlefield")});
     gamePlaySequence.addStep(
         {gamePlayAreaWidget,
-         tr("First up, is the phase toolbar. This toolbar shows the current phase of the turn. You "
-            "can advance it by pressing\n\n- Tab (simply advances the phase)\n- Ctrl+Space (advances "
-            "the phase and performes any associated actions)\n- Clicking directly on the phase you "
-            "want to change to.\n\nYou can also pass the turn here, although, you should note that "
-            "most players prefer you simply leave your turn on the end step and allow them to "
-            "'take' the turn from you by pressing 'Next turn' themselves.")});
+         tr("First up, is the phase toolbar. This toolbar shows the current phase of the turn. You can advance it by "
+            "pressing\n\n"
+            "- Tab (simply advances the phase)\n"
+            "- Ctrl+Space (advances the phase and performes any associated actions)\n"
+            "- Clicking directly on the phase you want to change to.\n\n"
+            "You can also pass the turn here, although, you should note that most players prefer you simply leave your "
+            "turn on the end step and allow them to 'take' the turn from you by pressing 'Next turn' themselves.")});
     gamePlaySequence.addStep({gamePlayAreaWidget, tr("Next up, is your player area.\n\nHere you can find:\n\n- Your "
                                                      "avatar\n- Your life-counter\n- Various counters you can use to "
                                                      "track temporary resources (i.e. mana)\n- Your "
