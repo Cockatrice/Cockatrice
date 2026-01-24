@@ -226,6 +226,7 @@ private:
     QTimer *searchDebounceTimer;           ///< Timer to debounce search requests
     int currentPage;                       ///< Current page number for infinite scroll
     bool isLoadingMore;                    ///< Flag to prevent multiple simultaneous page loads
+    bool isListMode;
     ArchidektApiResponseDeckListingsDisplayWidget *listingsWidget = nullptr;
 
     // ---------------------------------------------------------------------

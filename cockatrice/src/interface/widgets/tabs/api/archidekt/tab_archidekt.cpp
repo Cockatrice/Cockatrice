@@ -29,7 +29,8 @@
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <version_string.h>
 
-TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor), currentPage(1), isLoadingMore(false)
+TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
+    : Tab(_tabSupervisor), currentPage(1), isLoadingMore(false), isListMode(true)
 {
     // Initialize network
     networkManager = new QNetworkAccessManager(this);
@@ -185,13 +186,14 @@ bool TabArchidekt::eventFilter(QObject *obj, QEvent *event)
     if (obj == scrollArea->viewport() && event->type() == QEvent::Wheel) {
         auto *wheelEvent = static_cast<QWheelEvent *>(event);
 
-        if (wheelEvent->angleDelta().y() < 0 && !isLoadingMore) {
+        if (wheelEvent->angleDelta().y() < 0 && !isLoadingMore && isListMode) {
             loadNextPage();
             wheelEvent->accept();
             return false; // allow scrolling
         }
     }
 
+    // Always pass the event to the parent to handle normal scrolling
     return QWidget::eventFilter(obj, event);
 }
 
@@ -510,7 +512,11 @@ QString TabArchidekt::buildSearchUrl()
 
 void TabArchidekt::doSearch()
 {
+    // Reset to first page on new search
     currentPage = 1;
+    // We're searching, so we'll be in list mode
+    isListMode = true;
+    // Don't debounce - only called by explicit user actions now
     doSearchImmediate();
 }
 
@@ -616,6 +622,9 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 {
     ArchidektApiResponseDeck deckData;
     deckData.fromJson(reply);
+
+    // We're in single deck mode - disable infinite scroll
+    isListMode = false;
 
     // Clear existing results for single deck view
     QLayoutItem *item;
