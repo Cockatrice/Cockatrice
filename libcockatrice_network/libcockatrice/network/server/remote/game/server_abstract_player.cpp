@@ -575,51 +575,8 @@ Server_AbstractPlayer::cmdConcede(const Command_Concede & /*cmd*/, ResponseConta
     setConceded(true);
     game->removeArrowsRelatedToPlayer(ges, this);
     game->unattachCards(ges, this);
+    game->returnCardsFromPlayer(ges, this);
 
-    playerMutex.lock();
-
-    // Return cards to their rightful owners before conceding the game
-    static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
-    for (const auto &card : zones.value("table")->getCards()) {
-        if (card == nullptr) {
-            continue;
-        }
-
-        const auto &regexResult = ownerRegex.match(card->getAnnotation());
-        if (!regexResult.hasMatch()) {
-            continue;
-        }
-
-        CardToMove cardToMove;
-        cardToMove.set_card_id(card->getId());
-
-        for (const auto *player : game->getPlayers()) {
-            if (player == nullptr || player->getUserInfo() == nullptr) {
-                continue;
-            }
-
-            const auto &ownerToReturnTo = regexResult.captured(1);
-            const auto &correctOwner = QString::compare(QString::fromStdString(player->getUserInfo()->name()),
-                                                        ownerToReturnTo, Qt::CaseInsensitive) == 0;
-            if (!correctOwner) {
-                continue;
-            }
-
-            const auto &startZone = zones.value("table");
-            const auto &targetZone = player->getZones().value("table");
-
-            if (startZone == nullptr || targetZone == nullptr) {
-                continue;
-            }
-
-            moveCard(ges, startZone, QList<const CardToMove *>() << &cardToMove, targetZone, 0, 0, false);
-            break;
-        }
-    }
-
-    playerMutex.unlock();
-
-    // All borrowed cards have been returned, can now continue cleanup process
     clearZones();
 
     Event_PlayerPropertiesChanged event;

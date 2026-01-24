@@ -23,6 +23,7 @@
 #include "../server_database_interface.h"
 #include "../server_protocolhandler.h"
 #include "../server_room.h"
+#include "libcockatrice/protocol/pb/command_move_card.pb.h"
 #include "server_abstract_player.h"
 #include "server_arrow.h"
 #include "server_card.h"
@@ -31,6 +32,7 @@
 #include "server_spectator.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -822,5 +824,48 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_share_decklists_on_load(shareDecklistsOnLoad);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
+    }
+}
+
+void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player)
+{
+    QMutexLocker locker(&gameMutex);
+    // Return cards to their rightful owners before conceding the game
+    static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
+    const auto &playerTable = player->getZones().value("table");
+    for (const auto &card : playerTable->getCards()) {
+        if (card == nullptr) {
+            continue;
+        }
+
+        const auto &regexResult = ownerRegex.match(card->getAnnotation());
+        if (!regexResult.hasMatch()) {
+            continue;
+        }
+
+        CardToMove cardToMove;
+        cardToMove.set_card_id(card->getId());
+
+        for (const auto *otherPlayer : getPlayers()) {
+            if (otherPlayer == nullptr || otherPlayer->getUserInfo() == nullptr) {
+                continue;
+            }
+
+            const auto &ownerToReturnTo = regexResult.captured(1);
+            const auto &correctOwner = QString::compare(QString::fromStdString(otherPlayer->getUserInfo()->name()),
+                                                        ownerToReturnTo, Qt::CaseInsensitive) == 0;
+            if (!correctOwner) {
+                continue;
+            }
+
+            const auto &targetZone = otherPlayer->getZones().value("table");
+
+            if (playerTable == nullptr || targetZone == nullptr) {
+                continue;
+            }
+
+            player->moveCard(ges, playerTable, QList<const CardToMove *>() << &cardToMove, targetZone, 0, 0, false);
+            break;
+        }
     }
 }
