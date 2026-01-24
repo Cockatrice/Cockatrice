@@ -55,6 +55,22 @@ message Command_Login {
     optional string hashed_password = 6;
 }
 
+message FeatureFlag {
+    optional string name = 1;
+    optional string value = 2;
+}
+
+message Command_ClientDiagnostics {
+    extend SessionCommand {
+        optional Command_ClientDiagnostics ext = 1051;
+    }
+
+    optional string clientver = 1;
+    repeated FeatureFlag feature_flags = 2;
+    optional string os = 3;
+    optional string arch = 4;
+}
+
 message Command_Message {
     extend SessionCommand {
         optional Command_Message ext = 1002;

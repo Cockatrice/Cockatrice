@@ -212,6 +212,7 @@ SettingsCache::SettingsCache()
     cardUpdateCheckInterval = settings->value("personal/cardUpdateCheckInterval", 7).toInt();
     lastCardUpdateCheck = settings->value("personal/lastCardUpdateCheck", QDateTime::currentDateTime().date()).toDate();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
+    sendDiagnostics = settings->value("personal/senddiagnostics", 0).toInt();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
 
     if (settings->contains("personal/updatereleasechannel")) {
@@ -1510,6 +1511,12 @@ void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate)
 {
     notifyAboutUpdates = static_cast<bool>(_notifyaboutupdate);
     settings->setValue("personal/updatenotification", notifyAboutUpdates);
+}
+
+void SettingsCache::setSendDiagnostics(int _sendDiagnostics)
+{
+    sendDiagnostics = _sendDiagnostics;
+    settings->setValue("personal/senddiagnostics", sendDiagnostics);
 }
 
 void SettingsCache::setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion)
