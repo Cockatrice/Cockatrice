@@ -102,13 +102,6 @@ void TabDeckEditorVisual::createMenus()
     registerDockWidget(viewMenu, filterDockWidget);
     registerDockWidget(viewMenu, printingSelectorDockWidget);
 
-    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-        dockToActions[printingSelectorDockWidget].menu->setEnabled(false);
-    }
-
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
-            [this](bool enabled) { dockToActions[printingSelectorDockWidget].menu->setEnabled(!enabled); });
-
     viewMenu->addSeparator();
 
     aResetLayout = viewMenu->addAction(QString());
@@ -279,12 +272,6 @@ void TabDeckEditorVisual::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
-    if (SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-        if (!printingSelectorDockWidget->isHidden()) {
-            printingSelectorDockWidget->setHidden(true);
-        }
-    }
-
     cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
     cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
 
@@ -310,7 +297,7 @@ void TabDeckEditorVisual::restartLayout()
     deckDockWidget->setVisible(true);
     cardInfoDockWidget->setVisible(true);
     filterDockWidget->setVisible(false);
-    printingSelectorDockWidget->setVisible(!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+    printingSelectorDockWidget->setVisible(true);
 
     setCentralWidget(centralWidget);
     addDockWidget(Qt::RightDockWidgetArea, deckDockWidget);

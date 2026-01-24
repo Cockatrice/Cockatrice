@@ -713,14 +713,12 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool i
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
-        QMenu menu;
+    QMenu menu;
 
-        QAction *selectPrinting = menu.addAction(tr("Select Printing"));
-        connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
+    QAction *selectPrinting = menu.addAction(tr("Select Printing"));
+    connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
-        menu.exec(deckView->mapToGlobal(point));
-    }
+    menu.exec(deckView->mapToGlobal(point));
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()
