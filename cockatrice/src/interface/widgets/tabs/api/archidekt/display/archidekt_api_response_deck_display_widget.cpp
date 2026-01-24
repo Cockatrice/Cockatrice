@@ -20,11 +20,21 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    openInEditorButton = new QPushButton(this);
-    layout->addWidget(openInEditorButton);
+    navigationContainer = new QWidget(this);
+    navigationContainerLayout = new QHBoxLayout(navigationContainer);
+
+    homeButton = new QPushButton(navigationContainer);
+    navigationContainerLayout->addWidget(homeButton);
+
+    connect(homeButton, &QPushButton::clicked, this, &ArchidektApiResponseDeckDisplayWidget::requestSearch);
+
+    openInEditorButton = new QPushButton(navigationContainer);
+    navigationContainerLayout->addWidget(openInEditorButton);
 
     connect(openInEditorButton, &QPushButton::clicked, this,
             &ArchidektApiResponseDeckDisplayWidget::actOpenInDeckEditor);
+
+    layout->addWidget(navigationContainer);
 
     displayOptionsWidget = new VisualDeckDisplayOptionsWidget(this);
     layout->addWidget(displayOptionsWidget);
@@ -80,6 +90,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
 
 void ArchidektApiResponseDeckDisplayWidget::retranslateUi()
 {
+    homeButton->setText(tr("Back to results"));
     openInEditorButton->setText(tr("Open Deck in Deck Editor"));
 }
 
