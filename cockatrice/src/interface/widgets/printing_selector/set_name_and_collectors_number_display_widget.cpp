@@ -36,6 +36,7 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
 
     // Store the card size slider and connect its signal to the font size adjustment slot
     connect(cardSizeSlider, &QSlider::valueChanged, this, &SetNameAndCollectorsNumberDisplayWidget::adjustFontSize);
+    adjustFontSize(cardSizeSlider->value());
 
     // Add labels to the layout
     layout->addWidget(setName);
