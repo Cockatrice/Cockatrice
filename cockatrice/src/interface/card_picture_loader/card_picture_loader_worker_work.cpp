@@ -70,6 +70,7 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
     QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    bool redirectFailure = false;
     if (redirectTarget.isValid()) {
         QUrl url = reply->request().url();
         QUrl redirectUrl = redirectTarget.toUrl();
@@ -78,16 +79,13 @@ void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
         }
         if (url == redirectUrl) {
             qCWarning(CardPictureLoaderWorkerWorkLog) << "recusive redirect detected!";
-            qCWarning(CardPictureLoaderWorkerWorkLog) << "refusing to load" << redirectTarget;
-            reply->deleteLater();
-            picDownloadFailed();
-            return;
+            redirectFailure = true;
         } else {
             emit urlRedirected(url, redirectUrl);
         }
     }
 
-    if (reply->error()) {
+    if (redirectFailure || reply->error()) {
         handleFailedReply(reply);
     } else {
         handleSuccessfulReply(reply);
