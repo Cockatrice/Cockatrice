@@ -433,7 +433,7 @@ void DeckEditorDeckDockWidget::requestBracketEstimate()
     bracketInfoButton->setEnabled(false);
     bracketValueLabel->setText(tr("Calculating…"));
 
-    requestId = CommanderSpellbookApiAccessor::instance().estimateBracket(*deckModel->getDeckList(), this);
+    requestId = CommanderSpellbookApiAccessor::instance().estimateBracket(*deckStateManager->getModel()->getDeckList(), this);
 
     connect(&CommanderSpellbookApiAccessor::instance(), &CommanderSpellbookApiAccessor::estimateBracketFinished, this,
             &DeckEditorDeckDockWidget::onEstimateBracketFinished);
@@ -501,8 +501,6 @@ void DeckEditorDeckDockWidget::initializeFormats()
             deckStateManager->setFormat(""); // clear format if deselected
         }
 
-        emit deckModified();
-
         const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
         const bool commanderSpellbookIntegrationEnabled =
             SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled() !=
@@ -528,7 +526,7 @@ void DeckEditorDeckDockWidget::initializeFormats()
 
 void DeckEditorDeckDockWidget::maybeAutoEstimateBracket()
 {
-    const QString formatKey = deckModel->getDeckList()->getGameFormat();
+    const QString formatKey = deckStateManager->getModel()->getDeckList()->getGameFormat();
 
     const bool isCommander = (formatKey.compare("commander", Qt::CaseInsensitive) == 0);
 
