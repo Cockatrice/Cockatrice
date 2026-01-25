@@ -97,7 +97,7 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     QPainterPath path;
     path.addText(center, font(), text());
 
-    painter.setPen(QPen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter.setBrush(Qt::white);
-    painter.drawPath(path);
+    QPen pen(Qt::black, 4.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    painter.strokePath(path, pen);
+    painter.fillPath(path, Qt::white);
 }
