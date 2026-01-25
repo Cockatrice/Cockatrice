@@ -17,6 +17,8 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
 {
     // Set up the layout for the widget
     layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(1);
     setLayout(layout);
 
     // Set the widget's size policy and minimum size
