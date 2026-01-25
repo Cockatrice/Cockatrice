@@ -325,11 +325,22 @@ void CardGroupDisplayWidget::onDataChanged(const QModelIndex &topLeft,
                 indexToWidgetMap.remove(persistent);
             }
         } else {
-            // Add new widgets
             int toAdd = newAmount - currentWidgetCount;
+            int insertBase = 0;
 
+            // Count widgets belonging to rows before this one
+            for (int r = 0; r < row; ++r) {
+                QModelIndex prevIdx = deckListModel->index(r, 0, trackedIndex);
+                QPersistentModelIndex prevPersistent(prevIdx);
+
+                if (indexToWidgetMap.contains(prevPersistent)) {
+                    insertBase += indexToWidgetMap.value(prevPersistent).size();
+                }
+            }
+
+            // Insert after existing copies of this card
             for (int i = 0; i < toAdd; ++i) {
-                addToLayout(constructWidgetForIndex(persistent));
+                insertIntoLayout(constructWidgetForIndex(persistent), insertBase + currentWidgetCount + i);
             }
         }
 
