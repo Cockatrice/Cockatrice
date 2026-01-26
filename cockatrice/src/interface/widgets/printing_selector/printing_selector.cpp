@@ -223,7 +223,6 @@ void PrintingSelector::getAllSetsForCurrentCard()
             auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckStateManager,
                                                                             cardSizeWidget->getSlider(), card);
             flowWidget->addWidget(cardDisplayWidget);
-            cardDisplayWidget->clampSetNameToPicture();
             cardDisplayWidget->updateCardAmounts(uuidToAmounts);
             connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
                     &PrintingSelector::updateDisplay);

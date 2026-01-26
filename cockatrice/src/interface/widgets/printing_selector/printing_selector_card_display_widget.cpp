@@ -70,3 +70,9 @@ void PrintingSelectorCardDisplayWidget::updateCardAmounts(const QMap<QString, QP
     auto [main, side] = uuidToAmounts.value(rootCard.getPrinting().getUuid());
     overlayWidget->updateCardAmounts(main, side);
 }
+
+void PrintingSelectorCardDisplayWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    clampSetNameToPicture();
+}
