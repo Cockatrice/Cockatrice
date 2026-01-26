@@ -30,6 +30,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     : QWidget(parent), rootCard(rootCard)
 {
     layout = new QVBoxLayout(this);
+    layout->setContentsMargins(5, 5, 5, 5);
+    layout->setSpacing(3);
     setLayout(layout);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
