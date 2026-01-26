@@ -15,17 +15,17 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <utility>
 
-static constexpr qreal magicTheGatheringCardAspectRatio = 1.396;
-static constexpr qreal yuGiOhCardAspectRatio = 1.457;
-static constexpr qreal aspectRatio = magicTheGatheringCardAspectRatio;
+static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
+static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;
+static constexpr qreal ASPECT_RATIO = MTG_CARD_ASPECT_RATIO;
 
-static constexpr int baseWidth = 200;
-static constexpr int baseHeight = 200;
+static constexpr int BASE_WIDTH = 200;
+static constexpr int BASE_HEIGHT = 200;
 
-static constexpr int enlargedPixmapOffset = 10;
+static constexpr int ENLARGED_PIXMAP_OFFSET = 10;
 
-static constexpr int hoverActivateThresholdInMs = 500;
-static constexpr int animationOffset = 10; // Adjust this for how much the widget moves up
+static constexpr int HOVER_ACTIVATE_THRESHOLD_MS = 500;
+static constexpr int ANIMATION_OFFSET = 10; // Adjust this for how much the widget moves up
 
 /**
  * @class CardInfoPictureWidget
@@ -46,7 +46,7 @@ static constexpr int animationOffset = 10; // Adjust this for how much the widge
 CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverToZoomEnabled, const bool _raiseOnEnter)
     : QWidget(parent), pixmapDirty(true), hoverToZoomEnabled(_hoverToZoomEnabled), raiseOnEnter(_raiseOnEnter)
 {
-    setMinimumHeight(baseHeight);
+    setMinimumHeight(BASE_HEIGHT);
     if (hoverToZoomEnabled) {
         setMouseTracking(true);
     }
@@ -64,7 +64,7 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
     animation->setEasingCurve(QEasingCurve::OutQuad);
 
     animation->setStartValue(originalPos);
-    animation->setEndValue(originalPos - QPoint(0, animationOffset));
+    animation->setEndValue(originalPos - QPoint(0, ANIMATION_OFFSET));
 
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
@@ -131,8 +131,8 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
  */
 void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    const int newWidth = baseWidth * scale / 100;
-    const int newHeight = static_cast<int>(newWidth * aspectRatio);
+    const int newWidth = BASE_WIDTH * scale / 100;
+    const int newHeight = static_cast<int>(newWidth * ASPECT_RATIO);
 
     scaleFactor = scale;
 
@@ -238,8 +238,8 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
  */
 QSize CardInfoPictureWidget::sizeHint() const
 {
-    return {static_cast<int>(baseWidth * scaleFactor / 100.0),
-            static_cast<int>(baseWidth * scaleFactor / 100.0 * aspectRatio)};
+    return {static_cast<int>(BASE_WIDTH * scaleFactor / 100.0),
+            static_cast<int>(BASE_WIDTH * scaleFactor / 100.0 * ASPECT_RATIO)};
 }
 
 /**
@@ -256,7 +256,7 @@ void CardInfoPictureWidget::enterEvent(QEvent *event)
 
     // If hover-to-zoom is enabled, start the hover timer
     if (hoverToZoomEnabled) {
-        hoverTimer->start(hoverActivateThresholdInMs);
+        hoverTimer->start(HOVER_ACTIVATE_THRESHOLD_MS);
     }
 
     // Emit signal indicating a card is being hovered on
@@ -268,7 +268,7 @@ void CardInfoPictureWidget::enterEvent(QEvent *event)
         } else {
             originalPos = this->pos(); // Update the baseline position
             animation->setStartValue(originalPos);
-            animation->setEndValue(originalPos - QPoint(0, animationOffset));
+            animation->setEndValue(originalPos - QPoint(0, ANIMATION_OFFSET));
         }
         animation->setDirection(QAbstractAnimation::Forward);
         animation->start();
@@ -323,15 +323,15 @@ void CardInfoPictureWidget::mouseMoveEvent(QMouseEvent *event)
         const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
         const QSize widgetSize = enlargedPixmapWidget->size();
 
-        int newX = cursorPos.x() + enlargedPixmapOffset;
-        int newY = cursorPos.y() + enlargedPixmapOffset;
+        int newX = cursorPos.x() + ENLARGED_PIXMAP_OFFSET;
+        int newY = cursorPos.y() + ENLARGED_PIXMAP_OFFSET;
 
         // Adjust if out of bounds
         if (newX + widgetSize.width() > screenGeometry.right()) {
-            newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+            newX = cursorPos.x() - widgetSize.width() - ENLARGED_PIXMAP_OFFSET;
         }
         if (newY + widgetSize.height() > screenGeometry.bottom()) {
-            newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+            newY = cursorPos.y() - widgetSize.height() - ENLARGED_PIXMAP_OFFSET;
         }
 
         enlargedPixmapWidget->move(newX, newY);
@@ -465,21 +465,21 @@ void CardInfoPictureWidget::showEnlargedPixmap()
         connect(this, &QObject::destroyed, enlargedPixmapWidget, &CardInfoPictureEnlargedWidget::deleteLater);
     }
 
-    const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * aspectRatio * 2));
+    const QSize enlargedSize(static_cast<int>(size().width() * 2), static_cast<int>(size().width() * ASPECT_RATIO * 2));
     enlargedPixmapWidget->setCardPixmap(exactCard, enlargedSize);
 
     const QPoint cursorPos = QCursor::pos();
     const QRect screenGeometry = QGuiApplication::screenAt(cursorPos)->geometry();
     const QSize widgetSize = enlargedPixmapWidget->size();
 
-    int newX = cursorPos.x() + enlargedPixmapOffset;
-    int newY = cursorPos.y() + enlargedPixmapOffset;
+    int newX = cursorPos.x() + ENLARGED_PIXMAP_OFFSET;
+    int newY = cursorPos.y() + ENLARGED_PIXMAP_OFFSET;
 
     if (newX + widgetSize.width() > screenGeometry.right()) {
-        newX = cursorPos.x() - widgetSize.width() - enlargedPixmapOffset;
+        newX = cursorPos.x() - widgetSize.width() - ENLARGED_PIXMAP_OFFSET;
     }
     if (newY + widgetSize.height() > screenGeometry.bottom()) {
-        newY = cursorPos.y() - widgetSize.height() - enlargedPixmapOffset;
+        newY = cursorPos.y() - widgetSize.height() - ENLARGED_PIXMAP_OFFSET;
     }
 
     enlargedPixmapWidget->move(newX, newY);
