@@ -6,8 +6,7 @@
  * @class SetNameAndCollectorsNumberDisplayWidget
  * @brief A widget to display the set name and collectors number with adjustable font size.
  *
- * This widget displays the set name and collectors number on two separate labels. The font size is resized dynamically
- * when the card size is changed.
+ * This widget displays the set name and collectors number on two separate labels.
  */
 SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget(QWidget *parent,
                                                                                  const QString &_setName,
