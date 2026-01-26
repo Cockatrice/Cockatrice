@@ -78,7 +78,7 @@ private:
 
     QTimer *hoverTimer;
     QPropertyAnimation *animation;
-    QPoint originalPos;             // Store the original position
+    QPoint originalPos; // Store the original position
 
     QMenu *createRightClickMenu();
     QMenu *createViewRelatedCardsMenu();
