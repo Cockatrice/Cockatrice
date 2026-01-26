@@ -17,17 +17,13 @@ class SetNameAndCollectorsNumberDisplayWidget : public QWidget
 {
     Q_OBJECT
 public:
-    SetNameAndCollectorsNumberDisplayWidget(QWidget *parent,
-                                            const QString &setName,
-                                            const QString &collectorsNumber,
-                                            QSlider *cardSizeSlider);
+    SetNameAndCollectorsNumberDisplayWidget(QWidget *parent, const QString &setName, const QString &collectorsNumber);
     void resizeEvent(QResizeEvent *event) override;
 
 private:
     QVBoxLayout *layout;
     QLabel *setName;
     QLabel *collectorsNumber;
-    QSlider *cardSizeSlider;
 };
 
 #endif // SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H

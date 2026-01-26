@@ -42,8 +42,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
 
     // Create the widget to display the set name and collector's number
     QString combinedSetName = QString(set->getLongName() + " (" + set->getShortName() + ")");
-    setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
-        this, combinedSetName, rootCard.getPrinting().getProperty("num"), cardSizeSlider);
+    setNameAndCollectorsNumberDisplayWidget =
+        new SetNameAndCollectorsNumberDisplayWidget(this, combinedSetName, rootCard.getPrinting().getProperty("num"));
 
     // Add the widgets to the layout
     layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);
