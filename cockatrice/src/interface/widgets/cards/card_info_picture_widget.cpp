@@ -16,7 +16,7 @@
 #include <utility>
 
 static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
-static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;
+// static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;
 static constexpr qreal ASPECT_RATIO = MTG_CARD_ASPECT_RATIO;
 
 static constexpr int BASE_WIDTH = 200;
