@@ -23,9 +23,6 @@ public:
                                             QSlider *cardSizeSlider);
     void resizeEvent(QResizeEvent *event) override;
 
-public slots:
-    void adjustFontSize(int scalePercentage);
-
 private:
     QVBoxLayout *layout;
     QLabel *setName;
