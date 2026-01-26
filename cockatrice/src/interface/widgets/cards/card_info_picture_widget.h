@@ -68,23 +68,17 @@ protected:
 
 private:
     ExactCard exactCard;
-    qreal magicTheGatheringCardAspectRatio = 1.396;
-    qreal yuGiOhCardAspectRatio = 1.457;
-    qreal aspectRatio = magicTheGatheringCardAspectRatio;
-    int baseWidth = 200;
-    int baseHeight = 200;
     double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
     bool hoverToZoomEnabled;
     bool raiseOnEnter;
-    int hoverActivateThresholdInMs = 500;
+
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget = nullptr;
-    int enlargedPixmapOffset = 10;
+
     QTimer *hoverTimer;
     QPropertyAnimation *animation;
     QPoint originalPos;             // Store the original position
-    const int animationOffset = 10; // Adjust this for how much the widget moves up
 
     QMenu *createRightClickMenu();
     QMenu *createViewRelatedCardsMenu();

@@ -15,6 +15,18 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <utility>
 
+static constexpr qreal magicTheGatheringCardAspectRatio = 1.396;
+static constexpr qreal yuGiOhCardAspectRatio = 1.457;
+static constexpr qreal aspectRatio = magicTheGatheringCardAspectRatio;
+
+static constexpr int baseWidth = 200;
+static constexpr int baseHeight = 200;
+
+static constexpr int enlargedPixmapOffset = 10;
+
+static constexpr int hoverActivateThresholdInMs = 500;
+static constexpr int animationOffset = 10; // Adjust this for how much the widget moves up
+
 /**
  * @class CardInfoPictureWidget
  * @brief Widget that displays an enlarged image of a card, loading the image based on the card's info or showing a
