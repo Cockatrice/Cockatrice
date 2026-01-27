@@ -6,10 +6,15 @@
 #include <QColor>
 #include <QDebug>
 #include <QLibraryInfo>
+#include <QPalette>
 #include <QPixmapCache>
 #include <QStandardPaths>
+#include <QStyleFactory>
+#include <QStyleHints>
+#include <Qt>
 
 #define NONE_THEME_NAME "Default"
+#define FUSION_THEME_NAME "Fusion"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
 #define PLAYERZONE_BG_NAME "playerzone"
@@ -24,6 +29,9 @@ static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
+#endif
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ThemeManager::themeChangedSlot);
     themeChangedSlot();
 }
@@ -44,6 +52,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 
     // add default value
     availableThemes.insert(NONE_THEME_NAME, QString());
+    availableThemes.insert(FUSION_THEME_NAME, QString());
 
     // load themes from user profile dir
     dir.setPath(SettingsCache::instance().getThemesPath());
@@ -115,6 +124,20 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
     } else {
         qApp->setStyleSheet("");
+    }
+
+    if (themeName == FUSION_THEME_NAME) {
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+        QPalette palette;
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+            palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+        }
+
+        qApp->setPalette(palette);
+#endif
+    } else {
+        qApp->setStyle(QStyleFactory::create(QStyleFactory::keys().first()));
     }
 
     if (dirPath.isEmpty()) {
