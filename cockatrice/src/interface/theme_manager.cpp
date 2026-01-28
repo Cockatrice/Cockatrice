@@ -14,7 +14,9 @@
 #include <Qt>
 
 #define NONE_THEME_NAME "Default"
-#define FUSION_THEME_NAME "Fusion"
+#define FUSION_THEME_NAME "Fusion (System Default)"
+#define FUSION_THEME_NAME_LIGHT "Fusion (Light)"
+#define FUSION_THEME_NAME_DARK "Fusion (Dark)"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
 #define PLAYERZONE_BG_NAME "playerzone"
@@ -37,12 +39,9 @@ struct PaletteColorInfo
     QColor color;
 };
 
-QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
+static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
 {
     QList<PaletteColorInfo> colors;
-
-    // QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
-    // QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
 
     // Iterate through relevant color groups (Active, Disabled, Inactive)
     const QList<QPalette::ColorGroup> groups = {QPalette::Active, QPalette::Disabled, QPalette::Inactive};
@@ -66,7 +65,7 @@ QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->pa
 }
 
 // Pretty print version
-void printPaletteColors(const QPalette &palette = qApp->palette())
+static inline void printPaletteColors(const QPalette &palette = qApp->palette())
 {
     QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
     QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
@@ -87,33 +86,6 @@ void printPaletteColors(const QPalette &palette = qApp->palette())
                               << color.green() << ", " << color.blue() << ", " << color.alpha() << ")";
         }
     }
-}
-
-// Export to structured format (e.g., for config files)
-QMap<QString, QMap<QString, QString>> exportPaletteToMap(const QPalette &palette = qApp->palette())
-{
-    QMap<QString, QMap<QString, QString>> result;
-
-    QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
-    QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
-
-    const QList<QPalette::ColorGroup> groups = {QPalette::Active, QPalette::Disabled, QPalette::Inactive};
-
-    for (auto group : groups) {
-        QString groupName = groupEnum.valueToKey(group);
-
-        for (int r = 0; r < QPalette::NColorRoles; ++r) {
-            auto role = static_cast<QPalette::ColorRole>(r);
-            if (role == QPalette::NoRole)
-                continue;
-
-            QString roleName = roleEnum.valueToKey(role);
-            QColor color = palette.color(group, role);
-            result[groupName][roleName] = color.name(QColor::HexArgb);
-        }
-    }
-
-    return result;
 }
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
@@ -143,6 +115,8 @@ QStringMap &ThemeManager::getAvailableThemes()
     // add default value
     availableThemes.insert(NONE_THEME_NAME, QString());
     availableThemes.insert(FUSION_THEME_NAME, QString());
+    availableThemes.insert(FUSION_THEME_NAME_LIGHT, QString());
+    availableThemes.insert(FUSION_THEME_NAME_DARK, QString());
 
     // load themes from user profile dir
     dir.setPath(SettingsCache::instance().getThemesPath());
@@ -201,6 +175,145 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
     return brush;
 }
 
+static inline QPalette createDarkGreenFusionPalette()
+{
+    QPalette p;
+
+    // ---------- Core backgrounds ----------
+    p.setColor(QPalette::Window, QColor(30, 30, 30));        // #ff1e1e1e
+    p.setColor(QPalette::Base, QColor(45, 45, 45));          // #ff2d2d2d
+    p.setColor(QPalette::AlternateBase, QColor(53, 53, 53)); // #ff353535
+    p.setColor(QPalette::Button, QColor(60, 60, 60));        // #ff3c3c3c
+    p.setColor(QPalette::ToolTipBase, QColor(60, 60, 60));   // #ff3c3c3c
+
+    // ---------- Core text ----------
+    p.setColor(QPalette::WindowText, Qt::white);                       // #ffffffff
+    p.setColor(QPalette::Text, Qt::white);                             // #ffffffff
+    p.setColor(QPalette::ButtonText, Qt::white);                       // #ffffffff
+    p.setColor(QPalette::ToolTipText, QColor(212, 212, 212));          // #ffd4d4d4
+    p.setColor(QPalette::PlaceholderText, QColor(255, 255, 255, 128)); // #80ffffff
+
+    // ---------- Selection / focus ----------
+    const QColor highlight(20, 140, 60); // #ff148c3c
+    p.setColor(QPalette::Highlight, highlight);
+    p.setColor(QPalette::HighlightedText, Qt::white); // #ffffffff
+
+    // ---------- Links ----------
+    p.setColor(QPalette::Link, QColor(0, 246, 82));        // #ff00f652
+    p.setColor(QPalette::LinkVisited, QColor(0, 211, 70)); // #ff00d346
+
+    // ---------- Accent (Qt 6) ----------
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Accent, QColor(0, 211, 70)); // #ff00d346
+#endif
+
+    // ---------- Bright text ----------
+    p.setColor(QPalette::BrightText, QColor(0, 246, 82)); // #ff00f652
+
+    // ---------- 3D / frame shading ----------
+    p.setColor(QPalette::Light, QColor(120, 120, 120)); // #ff787878
+    p.setColor(QPalette::Midlight, QColor(90, 90, 90)); // #ff5a5a5a
+    p.setColor(QPalette::Mid, QColor(40, 40, 40));      // #ff282828
+    p.setColor(QPalette::Dark, QColor(30, 30, 30));     // #ff1e1e1e
+    p.setColor(QPalette::Shadow, Qt::black);            // #ff000000
+
+    // ---------- Disabled state ----------
+    const QColor disabledText(157, 157, 157); // #ff9d9d9d
+    p.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::Text, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::ButtonText, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::Base, QColor(30, 30, 30));
+    p.setColor(QPalette::Disabled, QPalette::Window, QColor(30, 30, 30));
+    p.setColor(QPalette::Disabled, QPalette::Link, QColor(48, 140, 198));       // #ff308cc6
+    p.setColor(QPalette::Disabled, QPalette::LinkVisited, QColor(255, 0, 255)); // #ffff00ff
+    p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(255, 255, 220));
+    p.setColor(QPalette::Disabled, QPalette::ToolTipText, Qt::black);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Disabled, QPalette::Accent, disabledText);
+#endif
+
+    // ---------- Inactive state ----------
+    p.setColor(QPalette::Inactive, QPalette::Highlight, QColor(30, 30, 30));
+    p.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::white);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Inactive, QPalette::Accent, QColor(30, 30, 30));
+#endif
+
+    return p;
+}
+
+static inline QPalette createLightGreenFusionPalette()
+{
+    QPalette p;
+
+    // ---------- Core backgrounds ----------
+    p.setColor(QPalette::Window, QColor(240, 240, 240));        // #fff0f0f0
+    p.setColor(QPalette::Base, Qt::white);                      // #ffffffff
+    p.setColor(QPalette::AlternateBase, QColor(233, 231, 227)); // #ffe9e7e3
+    p.setColor(QPalette::Button, QColor(240, 240, 240));        // #fff0f0f0
+    p.setColor(QPalette::ToolTipBase, QColor(255, 255, 220));   // #ffffffdc
+
+    // ---------- Core text ----------
+    p.setColor(QPalette::WindowText, Qt::black);                 // #ff000000
+    p.setColor(QPalette::Text, Qt::black);                       // #ff000000
+    p.setColor(QPalette::ButtonText, Qt::black);                 // #ff000000
+    p.setColor(QPalette::ToolTipText, Qt::black);                // #ff000000
+    p.setColor(QPalette::PlaceholderText, QColor(0, 0, 0, 128)); // #80000000
+
+    // ---------- Selection / focus ----------
+    const QColor highlight(20, 140, 60); // #ff148c3c
+    p.setColor(QPalette::Highlight, highlight);
+    p.setColor(QPalette::HighlightedText, Qt::white); // #ffffffff
+
+    // ---------- Links ----------
+    p.setColor(QPalette::Link, QColor(13, 95, 40));       // #ff0d5f28
+    p.setColor(QPalette::LinkVisited, QColor(8, 64, 27)); // #ff08401b
+
+    // ---------- Accent (Qt 6) ----------
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Accent, QColor(16, 117, 50)); // #ff107532
+#endif
+
+    // ---------- Bright text ----------
+    p.setColor(QPalette::BrightText, Qt::white); // #ffffffff
+
+    // ---------- 3D / frame shading ----------
+    p.setColor(QPalette::Light, Qt::white);                // #ffffffff
+    p.setColor(QPalette::Midlight, QColor(227, 227, 227)); // #ffe3e3e3
+    p.setColor(QPalette::Mid, QColor(160, 160, 160));      // #ffa0a0a0
+    p.setColor(QPalette::Dark, QColor(160, 160, 160));     // #ffa0a0a0
+    p.setColor(QPalette::Shadow, QColor(105, 105, 105));   // #ff696969
+
+    // ---------- Disabled state ----------
+    const QColor disabledText(120, 120, 120); // #ff787878
+    p.setColor(QPalette::Disabled, QPalette::WindowText, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::Text, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::ButtonText, disabledText);
+    p.setColor(QPalette::Disabled, QPalette::Base, QColor(240, 240, 240));
+    p.setColor(QPalette::Disabled, QPalette::Window, QColor(240, 240, 240));
+    p.setColor(QPalette::Disabled, QPalette::Midlight, QColor(247, 247, 247));
+    p.setColor(QPalette::Disabled, QPalette::AlternateBase, QColor(247, 247, 247));
+    p.setColor(QPalette::Disabled, QPalette::Shadow, Qt::black);
+    p.setColor(QPalette::Disabled, QPalette::Link, QColor(0, 0, 255));
+    p.setColor(QPalette::Disabled, QPalette::LinkVisited, QColor(255, 0, 255));
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Disabled, QPalette::Accent, disabledText);
+#endif
+
+    // ---------- Inactive state ----------
+    p.setColor(QPalette::Inactive, QPalette::Highlight, QColor(240, 240, 240));
+    p.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::black);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    p.setColor(QPalette::Inactive, QPalette::Accent, QColor(240, 240, 240));
+#endif
+
+    return p;
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
@@ -226,6 +339,12 @@ void ThemeManager::themeChangedSlot()
 
         qApp->setPalette(palette);
 #endif
+    } else if (themeName == FUSION_THEME_NAME_LIGHT) {
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        qApp->setPalette(createLightGreenFusionPalette());
+    } else if (themeName == FUSION_THEME_NAME_DARK) {
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        qApp->setPalette(createDarkGreenFusionPalette());
     } else {
         qApp->setStyle(QStyleFactory::create(QStyleFactory::keys().first()));
     }
@@ -255,8 +374,6 @@ void ThemeManager::themeChangedSlot()
     }
 
     QPixmapCache::clear();
-
-    printPaletteColors();
 
     emit themeChanged();
 }
