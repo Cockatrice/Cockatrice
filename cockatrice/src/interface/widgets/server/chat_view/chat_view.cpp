@@ -28,21 +28,9 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
       userListProxy(_tabSupervisor->getUserListManager()), evenNumber(true), showTimestamps(_showTimestamps),
       hoveredItemType(HoveredNothing)
 {
-    if (palette().windowText().color().lightness() > 200) {
-        document()->setDefaultStyleSheet(R"(
-           a { text-decoration: none; color: rgb(71,158,252); }
-           .blue { color: rgb(71,158,252); }
-        )");
-        serverMessageColor = QColor(0xFF, 0x73, 0x83);
-        otherUserColor = otherUserColor.lighter(150);
-        linkColor = QColor(71, 158, 252);
-    } else {
-        document()->setDefaultStyleSheet(R"(
-            a { text-decoration: none; color: blue; }
-            .blue { color: blue }
-        )");
-        linkColor = palette().link().color();
-    }
+    adjustColorsToPalette();
+
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ChatView::adjustColorsToPalette);
 
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -61,6 +49,53 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
     setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
+}
+
+void ChatView::adjustColorsToPalette()
+{
+    if (palette().windowText().color().lightness() > 200) {
+        document()->setDefaultStyleSheet(R"(
+           a { text-decoration: none; color: rgb(71,158,252); }
+           .blue { color: rgb(71,158,252); }
+        )");
+        serverMessageColor = QColor(0xFF, 0x73, 0x83);
+        otherUserColor = otherUserColor.lighter(150);
+        linkColor = QColor(71, 158, 252);
+    } else {
+        document()->setDefaultStyleSheet(R"(
+            a { text-decoration: none; color: blue; }
+            .blue { color: blue }
+        )");
+        linkColor = palette().link().color();
+    }
+
+    QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
+}
+
+void ChatView::refreshBlockColors()
+{
+    QTextDocument *doc = document();
+    QTextCursor cursor(doc);
+
+    bool even = true; // start fresh
+
+    for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+        QTextBlockFormat fmt = block.blockFormat();
+
+        if (even)
+            fmt.setBackground(palette().window());
+        else
+            fmt.setBackground(palette().base());
+
+        fmt.setForeground(palette().text());
+
+        cursor.setPosition(block.position());
+        cursor.setBlockFormat(fmt);
+
+        even = !even;
+    }
+
+    evenNumber = even; // keep future rows consistent
 }
 
 void ChatView::retranslateUi()
