@@ -39,6 +39,7 @@ struct PaletteColorInfo
     QColor color;
 };
 
+#ifndef NDEBUG
 static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
 {
     QList<PaletteColorInfo> colors;
@@ -87,6 +88,7 @@ static inline void printPaletteColors(const QPalette &palette = qApp->palette())
         }
     }
 }
+#endif
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
