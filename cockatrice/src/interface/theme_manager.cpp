@@ -39,7 +39,7 @@ struct PaletteColorInfo
     QColor color;
 };
 
-#ifndef NDEBUG
+[[maybe_unused]]
 static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
 {
     QList<PaletteColorInfo> colors;
@@ -66,6 +66,7 @@ static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &pale
 }
 
 // Pretty print version
+[[maybe_unused]]
 static inline void printPaletteColors(const QPalette &palette = qApp->palette())
 {
     QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
@@ -88,7 +89,6 @@ static inline void printPaletteColors(const QPalette &palette = qApp->palette())
         }
     }
 }
-#endif
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
