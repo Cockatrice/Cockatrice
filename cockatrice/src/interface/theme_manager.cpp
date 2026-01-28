@@ -203,7 +203,7 @@ static inline QPalette createDarkGreenFusionPalette()
     p.setColor(QPalette::LinkVisited, QColor(0, 211, 70)); // #ff00d346
 
     // ---------- Accent (Qt 6) ----------
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Accent, QColor(0, 211, 70)); // #ff00d346
 #endif
 
@@ -229,7 +229,7 @@ static inline QPalette createDarkGreenFusionPalette()
     p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(255, 255, 220));
     p.setColor(QPalette::Disabled, QPalette::ToolTipText, Qt::black);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Disabled, QPalette::Accent, disabledText);
 #endif
 
@@ -237,7 +237,7 @@ static inline QPalette createDarkGreenFusionPalette()
     p.setColor(QPalette::Inactive, QPalette::Highlight, QColor(30, 30, 30));
     p.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::white);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Inactive, QPalette::Accent, QColor(30, 30, 30));
 #endif
 
@@ -272,7 +272,7 @@ static inline QPalette createLightGreenFusionPalette()
     p.setColor(QPalette::LinkVisited, QColor(8, 64, 27)); // #ff08401b
 
     // ---------- Accent (Qt 6) ----------
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Accent, QColor(16, 117, 50)); // #ff107532
 #endif
 
@@ -299,7 +299,7 @@ static inline QPalette createLightGreenFusionPalette()
     p.setColor(QPalette::Disabled, QPalette::Link, QColor(0, 0, 255));
     p.setColor(QPalette::Disabled, QPalette::LinkVisited, QColor(255, 0, 255));
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Disabled, QPalette::Accent, disabledText);
 #endif
 
@@ -307,7 +307,7 @@ static inline QPalette createLightGreenFusionPalette()
     p.setColor(QPalette::Inactive, QPalette::Highlight, QColor(240, 240, 240));
     p.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::black);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     p.setColor(QPalette::Inactive, QPalette::Accent, QColor(240, 240, 240));
 #endif
 
