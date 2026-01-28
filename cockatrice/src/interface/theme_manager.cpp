@@ -39,8 +39,7 @@ struct PaletteColorInfo
     QColor color;
 };
 
-[[maybe_unused]]
-static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
+[[maybe_unused]] static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
 {
     QList<PaletteColorInfo> colors;
 
@@ -66,8 +65,7 @@ static inline QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &pale
 }
 
 // Pretty print version
-[[maybe_unused]]
-static inline void printPaletteColors(const QPalette &palette = qApp->palette())
+[[maybe_unused]] static inline void printPaletteColors(const QPalette &palette = qApp->palette())
 {
     QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
     QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
