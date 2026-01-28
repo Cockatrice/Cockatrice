@@ -17,6 +17,8 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
 {
     // Set up the layout for the widget
     layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(1);
     setLayout(layout);
 
     // Set the widget's size policy and minimum size
@@ -26,12 +28,12 @@ SetNameAndCollectorsNumberDisplayWidget::SetNameAndCollectorsNumberDisplayWidget
     // Create and configure the set name label
     setName = new QLabel(_setName);
     setName->setWordWrap(true);
-    setName->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    setName->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     setName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     // Create and configure the collectors number label
     collectorsNumber = new QLabel(_collectorsNumber);
-    collectorsNumber->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    collectorsNumber->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     collectorsNumber->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // Store the card size slider and connect its signal to the font size adjustment slot
