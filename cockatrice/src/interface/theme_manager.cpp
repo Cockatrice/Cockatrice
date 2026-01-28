@@ -26,6 +26,96 @@ static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
 static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 
+#include <QMap>
+#include <QMetaEnum>
+#include <QString>
+
+struct PaletteColorInfo
+{
+    QPalette::ColorGroup group;
+    QPalette::ColorRole role;
+    QColor color;
+};
+
+QList<PaletteColorInfo> queryAllPaletteColors(const QPalette &palette = qApp->palette())
+{
+    QList<PaletteColorInfo> colors;
+
+    // QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
+    // QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
+
+    // Iterate through relevant color groups (Active, Disabled, Inactive)
+    const QList<QPalette::ColorGroup> groups = {QPalette::Active, QPalette::Disabled, QPalette::Inactive};
+
+    for (auto group : groups) {
+        // Iterate through all color roles (excluding NoRole and NColorRoles)
+        for (int r = 0; r < QPalette::NColorRoles; ++r) {
+            auto role = static_cast<QPalette::ColorRole>(r);
+            if (role == QPalette::NoRole)
+                continue;
+
+            PaletteColorInfo info;
+            info.group = group;
+            info.role = role;
+            info.color = palette.color(group, role);
+            colors.append(info);
+        }
+    }
+
+    return colors;
+}
+
+// Pretty print version
+void printPaletteColors(const QPalette &palette = qApp->palette())
+{
+    QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
+    QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
+
+    const QList<QPalette::ColorGroup> groups = {QPalette::Active, QPalette::Disabled, QPalette::Inactive};
+
+    for (auto group : groups) {
+        qInfo() << "\n===========" << groupEnum.valueToKey(group) << "===========";
+
+        for (int r = 0; r < QPalette::NColorRoles; ++r) {
+            auto role = static_cast<QPalette::ColorRole>(r);
+            if (role == QPalette::NoRole)
+                continue;
+
+            QColor color = palette.color(group, role);
+            qInfo().nospace() << qPrintable(QString("%1").arg(roleEnum.valueToKey(role), -20)) << " : "
+                              << qPrintable(color.name(QColor::HexArgb)) << " (RGBA: " << color.red() << ", "
+                              << color.green() << ", " << color.blue() << ", " << color.alpha() << ")";
+        }
+    }
+}
+
+// Export to structured format (e.g., for config files)
+QMap<QString, QMap<QString, QString>> exportPaletteToMap(const QPalette &palette = qApp->palette())
+{
+    QMap<QString, QMap<QString, QString>> result;
+
+    QMetaEnum groupEnum = QMetaEnum::fromType<QPalette::ColorGroup>();
+    QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
+
+    const QList<QPalette::ColorGroup> groups = {QPalette::Active, QPalette::Disabled, QPalette::Inactive};
+
+    for (auto group : groups) {
+        QString groupName = groupEnum.valueToKey(group);
+
+        for (int r = 0; r < QPalette::NColorRoles; ++r) {
+            auto role = static_cast<QPalette::ColorRole>(r);
+            if (role == QPalette::NoRole)
+                continue;
+
+            QString roleName = roleEnum.valueToKey(role);
+            QColor color = palette.color(group, role);
+            result[groupName][roleName] = color.name(QColor::HexArgb);
+        }
+    }
+
+    return result;
+}
+
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     ensureThemeDirectoryExists();
@@ -165,6 +255,8 @@ void ThemeManager::themeChangedSlot()
     }
 
     QPixmapCache::clear();
+
+    printPaletteColors();
 
     emit themeChanged();
 }
