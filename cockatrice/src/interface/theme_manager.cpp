@@ -114,12 +114,13 @@ QStringMap &ThemeManager::getAvailableThemes()
 
     // add default value
     availableThemes.insert(NONE_THEME_NAME, QString());
-    availableThemes.insert(FUSION_THEME_NAME, QString());
-    availableThemes.insert(FUSION_THEME_NAME_LIGHT, QString());
-    availableThemes.insert(FUSION_THEME_NAME_DARK, QString());
 
     // load themes from user profile dir
     dir.setPath(SettingsCache::instance().getThemesPath());
+
+    availableThemes.insert(FUSION_THEME_NAME, dir.filePath("Fusion (System Default)"));
+    availableThemes.insert(FUSION_THEME_NAME_LIGHT, dir.filePath("Fusion (Light)"));
+    availableThemes.insert(FUSION_THEME_NAME_DARK, dir.filePath("Fusion (Dark)"));
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName)) {
