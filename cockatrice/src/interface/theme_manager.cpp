@@ -6,9 +6,12 @@
 #include <QColor>
 #include <QDebug>
 #include <QLibraryInfo>
+#include <QMap>
+#include <QMetaEnum>
 #include <QPalette>
 #include <QPixmapCache>
 #include <QStandardPaths>
+#include <QString>
 #include <QStyleFactory>
 #include <QStyleHints>
 #include <Qt>
@@ -27,10 +30,6 @@ static const QColor TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
 static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
 static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
-
-#include <QMap>
-#include <QMetaEnum>
-#include <QString>
 
 struct PaletteColorInfo
 {
