@@ -70,16 +70,22 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
     QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    bool redirectFailure = false;
     if (redirectTarget.isValid()) {
         QUrl url = reply->request().url();
         QUrl redirectUrl = redirectTarget.toUrl();
         if (redirectUrl.isRelative()) {
             redirectUrl = url.resolved(redirectUrl);
         }
-        emit urlRedirected(url, redirectUrl);
+        if (url == redirectUrl) {
+            qCWarning(CardPictureLoaderWorkerWorkLog) << "recursive redirect detected!";
+            redirectFailure = true;
+        } else {
+            emit urlRedirected(url, redirectUrl);
+        }
     }
 
-    if (reply->error()) {
+    if (redirectFailure || reply->error()) {
         handleFailedReply(reply);
     } else {
         handleSuccessfulReply(reply);

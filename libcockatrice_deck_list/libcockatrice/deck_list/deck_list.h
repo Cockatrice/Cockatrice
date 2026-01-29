@@ -201,16 +201,17 @@ public:
     bool loadFromString_Native(const QString &nativeString);
     QString writeToString_Native() const;
     bool loadFromFile_Native(QIODevice *device);
-    bool saveToFile_Native(QIODevice *device);
+    bool saveToFile_Native(QIODevice *device) const;
     ///@}
 
     /// @name Serialization (Plain text)
     ///@{
     bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata);
     bool loadFromFile_Plain(QIODevice *device);
-    bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards);
-    bool saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
-    QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false);
+    bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const;
+    bool
+    saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false) const;
+    QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false) const;
     ///@}
 
     /// @name Deck manipulation
@@ -220,10 +221,10 @@ public:
     {
         return tree.isEmpty() && metadata.isEmpty() && sideboardPlans.isEmpty();
     }
-    QStringList getCardList() const;
-    QList<CardRef> getCardRefList() const;
+    QStringList getCardList(const QSet<QString> &restrictToZones = {}) const;
+    QList<CardRef> getCardRefList(const QSet<QString> &restrictToZones = {}) const;
     QList<const DecklistCardNode *> getCardNodes(const QSet<QString> &restrictToZones = {}) const;
-    QList<const InnerDecklistNode *> getZoneNodes() const;
+    QList<const InnerDecklistNode *> getZoneNodes(const QSet<QString> &restrictToZones = {}) const;
     int getSideboardSize() const;
 
     DecklistCardNode *addCard(const QString &cardName,

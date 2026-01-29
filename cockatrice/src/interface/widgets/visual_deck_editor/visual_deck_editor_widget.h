@@ -11,6 +11,7 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "visual_deck_editor_placeholder_widget.h"
 
 #include <QCheckBox>
 #include <QListWidget>
@@ -39,12 +40,12 @@ public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
     void retranslateUi();
     void clearAllDisplayWidgets();
-    void resizeEvent(QResizeEvent *event) override;
 
     void setDeckList(const DeckList &_deckListModel);
 
     void setSelectionModel(QItemSelectionModel *model);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void updatePlaceholderVisibility();
     QItemSelectionModel *getSelectionModel() const
     {
         return selectionModel;
@@ -70,6 +71,13 @@ signals:
     void cardAdditionRequested(const ExactCard &card);
     void displayTypeChanged(DisplayType displayType);
 
+protected:
+    void initializeSearchBarAndCompleter();
+    void initializeDisplayOptionsWidget();
+    void initializeDisplayOptionsAndSearchWidget();
+    void initializeScrollAreaAndZoneContainer();
+    void connectDeckListModel();
+
 protected slots:
     void onHover(const ExactCard &hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
@@ -90,8 +98,8 @@ private:
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;
+    VisualDeckEditorPlaceholderWidget *placeholderWidget;
     // OverlapControlWidget *overlapControlWidget;
-    QWidget *container;
     QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
 };
 

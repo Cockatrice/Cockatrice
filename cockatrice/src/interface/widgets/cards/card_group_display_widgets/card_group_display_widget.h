@@ -33,12 +33,13 @@ public:
                            int bannerOpacity,
                            CardSizeWidget *cardSizeWidget);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void refreshSelectionForIndex(const QPersistentModelIndex &persistent);
     void clearAllDisplayWidgets();
 
     DeckListModel *deckListModel;
     QItemSelectionModel *selectionModel;
     QPersistentModelIndex trackedIndex;
-    QHash<QPersistentModelIndex, QWidget *> indexToWidgetMap;
+    QMap<QPersistentModelIndex, QList<QWidget *>> indexToWidgetMap;
     QString zoneName;
     QString cardGroupCategory;
     QString activeGroupCriteria;
@@ -53,6 +54,7 @@ public slots:
     virtual void updateCardDisplays();
     virtual void onCardAddition(const QModelIndex &parent, int first, int last);
     virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
     void resizeEvent(QResizeEvent *event) override;
 

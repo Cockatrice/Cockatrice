@@ -23,6 +23,7 @@
 #include "../server_database_interface.h"
 #include "../server_protocolhandler.h"
 #include "../server_room.h"
+#include "libcockatrice/protocol/pb/command_move_card.pb.h"
 #include "server_abstract_player.h"
 #include "server_arrow.h"
 #include "server_card.h"
@@ -31,6 +32,7 @@
 #include "server_spectator.h"
 
 #include <QDebug>
+#include <QRegularExpression>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -189,7 +191,7 @@ void Server_Game::pingClockTimeout()
         if (participant == nullptr)
             continue;
 
-        if (!participant->getSpectator()) {
+        if (!participant->isSpectator()) {
             ++playerCount;
         }
 
@@ -200,7 +202,7 @@ void Server_Game::pingClockTimeout()
         }
 
         if ((participant->getPingTime() != -1) &&
-            (!participant->getSpectator() || participant->getPlayerId() == hostId)) {
+            (!participant->isSpectator() || participant->getPlayerId() == hostId)) {
             allPlayersInactive = false;
         }
     }
@@ -222,7 +224,7 @@ QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies poi
     QMutexLocker locker(&gameMutex);
     for (int id : participants.keys()) {
         auto *participant = participants[id];
-        if (!participant->getSpectator()) {
+        if (!participant->isSpectator()) {
             players[id] = static_cast<Server_AbstractPlayer *>(participant);
         }
     }
@@ -232,7 +234,7 @@ QMap<int, Server_AbstractPlayer *> Server_Game::getPlayers() const // copies poi
 Server_AbstractPlayer *Server_Game::getPlayer(int id) const
 {
     auto *participant = participants.value(id);
-    if (!participant->getSpectator()) {
+    if (participant && !participant->isSpectator()) {
         return static_cast<Server_AbstractPlayer *>(participant);
     } else {
         return nullptr;
@@ -250,7 +252,7 @@ int Server_Game::getSpectatorCount() const
 
     int result = 0;
     for (Server_AbstractParticipant *participant : participants.values()) {
-        if (participant->getSpectator())
+        if (participant->isSpectator())
             ++result;
     }
     return result;
@@ -295,8 +297,8 @@ void Server_Game::sendGameStateToPlayers()
     // send game state info to clients according to their role in the game
     for (auto *participant : participants.values()) {
         GameEventContainer *gec;
-        if (participant->getSpectator()) {
-            if (spectatorsSeeEverything || participant->getJudge()) {
+        if (participant->isSpectator()) {
+            if (spectatorsSeeEverything || participant->isJudge()) {
                 gec = prepareGameEvent(omniscientEvent, -1);
             } else {
                 gec = prepareGameEvent(spectatorNormalEvent, -1);
@@ -527,7 +529,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
                                               gameId, participant->getPlayerId());
     participants.remove(participant->getPlayerId());
 
-    bool spectator = participant->getSpectator();
+    bool spectator = participant->isSpectator();
     GameEventStorage ges;
     if (!spectator) {
         auto *player = static_cast<Server_AbstractPlayer *>(participant);
@@ -728,8 +730,8 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     getInfo(*event1.mutable_game_info());
     event1.set_host_id(hostId);
     event1.set_player_id(joiningParticipant->getPlayerId());
-    event1.set_spectator(joiningParticipant->getSpectator());
-    event1.set_judge(joiningParticipant->getJudge());
+    event1.set_spectator(joiningParticipant->isSpectator());
+    event1.set_judge(joiningParticipant->isJudge());
     event1.set_resuming(resuming);
     if (resuming) {
         const QStringList &allGameTypes = room->getGameTypes();
@@ -747,7 +749,7 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    bool omniscient = joiningParticipant->getSpectator() && (spectatorsSeeEverything || joiningParticipant->getJudge());
+    bool omniscient = joiningParticipant->isSpectator() && (spectatorsSeeEverything || joiningParticipant->isJudge());
     for (auto *participant : participants.values()) {
         participant->getInfo(event2.add_player_list(), joiningParticipant, omniscient, true);
     }
@@ -763,9 +765,8 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 
     cont->set_game_id(gameId);
     for (auto *participant : participants.values()) {
-        const bool playerPrivate =
-            (participant->getPlayerId() == privatePlayerId) ||
-            (participant->getSpectator() && (spectatorsSeeEverything || participant->getJudge()));
+        const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) ||
+                                   (participant->isSpectator() && (spectatorsSeeEverything || participant->isJudge()));
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
             participant->sendGameEvent(*cont);
@@ -823,5 +824,48 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_share_decklists_on_load(shareDecklistsOnLoad);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
+    }
+}
+
+void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player)
+{
+    QMutexLocker locker(&gameMutex);
+    // Return cards to their rightful owners before conceding the game
+    static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
+    const auto &playerTable = player->getZones().value("table");
+    for (const auto &card : playerTable->getCards()) {
+        if (card == nullptr) {
+            continue;
+        }
+
+        const auto &regexResult = ownerRegex.match(card->getAnnotation());
+        if (!regexResult.hasMatch()) {
+            continue;
+        }
+
+        CardToMove cardToMove;
+        cardToMove.set_card_id(card->getId());
+
+        for (const auto *otherPlayer : getPlayers()) {
+            if (otherPlayer == nullptr || otherPlayer->getUserInfo() == nullptr) {
+                continue;
+            }
+
+            const auto &ownerToReturnTo = regexResult.captured(1);
+            const auto &correctOwner = QString::compare(QString::fromStdString(otherPlayer->getUserInfo()->name()),
+                                                        ownerToReturnTo, Qt::CaseInsensitive) == 0;
+            if (!correctOwner) {
+                continue;
+            }
+
+            const auto &targetZone = otherPlayer->getZones().value("table");
+
+            if (playerTable == nullptr || targetZone == nullptr) {
+                continue;
+            }
+
+            player->moveCard(ges, playerTable, QList<const CardToMove *>() << &cardToMove, targetZone, 0, 0, false);
+            break;
+        }
     }
 }

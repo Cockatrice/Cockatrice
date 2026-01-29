@@ -19,7 +19,8 @@ AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, Deck
     bannerAndSettingsLayout->addWidget(bannerWidget, 1);
 
     // config button
-    configureButton = new QPushButton(tr("Configure"), this);
+    configureButton = new QPushButton(this);
+    configureButton->setIcon(QPixmap("theme:icons/cogwheel"));
     configureButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(configureButton, &QPushButton::clicked, this, &AbstractAnalyticsPanelWidget::applyConfigFromDialog);
     bannerAndSettingsLayout->addWidget(configureButton, 0);

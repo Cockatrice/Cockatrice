@@ -25,6 +25,17 @@ void LayoutsSettings::setDeckEditorGeometry(const QByteArray &value)
     setValue(value, "layouts/deckEditor_geometry");
 }
 
+QSize LayoutsSettings::getDeckEditorCardDatabaseSize()
+{
+    QVariant previous = getValue("layouts/deckEditor_CardDatabaseSize");
+    return previous == QVariant() ? QSize(500, 500) : previous.toSize();
+}
+
+void LayoutsSettings::setDeckEditorCardDatabaseSize(const QSize &value)
+{
+    setValue(value, "layouts/deckEditor_CardDatabaseSize");
+}
+
 QSize LayoutsSettings::getDeckEditorCardSize()
 {
     QVariant previous = getValue("layouts/deckEditor_CardSize");

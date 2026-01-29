@@ -45,7 +45,12 @@ public:
      */
     QList<const DecklistCardNode *> getCardNodes(const QSet<QString> &restrictToZones = {}) const;
 
-    QList<const InnerDecklistNode *> getZoneNodes() const;
+    /**
+     * Gets all zone nodes in the tree
+     * @param restrictToZones If not empty, only get the zone nodes with these names.
+     * @return A QList containing all the zone nodes in the tree.
+     */
+    QList<const InnerDecklistNode *> getZoneNodes(const QSet<QString> &restrictToZones = {}) const;
 
     /**
      * @brief Computes the deck hash

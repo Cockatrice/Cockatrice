@@ -30,6 +30,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     : QWidget(parent), rootCard(rootCard)
 {
     layout = new QVBoxLayout(this);
+    layout->setContentsMargins(5, 5, 5, 5);
+    layout->setSpacing(3);
     setLayout(layout);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -42,8 +44,8 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
 
     // Create the widget to display the set name and collector's number
     QString combinedSetName = QString(set->getLongName() + " (" + set->getShortName() + ")");
-    setNameAndCollectorsNumberDisplayWidget = new SetNameAndCollectorsNumberDisplayWidget(
-        this, combinedSetName, rootCard.getPrinting().getProperty("num"), cardSizeSlider);
+    setNameAndCollectorsNumberDisplayWidget =
+        new SetNameAndCollectorsNumberDisplayWidget(this, combinedSetName, rootCard.getPrinting().getProperty("num"));
 
     // Add the widgets to the layout
     layout->addWidget(overlayWidget, 0, Qt::AlignHCenter);
@@ -69,4 +71,10 @@ void PrintingSelectorCardDisplayWidget::updateCardAmounts(const QMap<QString, QP
 {
     auto [main, side] = uuidToAmounts.value(rootCard.getPrinting().getUuid());
     overlayWidget->updateCardAmounts(main, side);
+}
+
+void PrintingSelectorCardDisplayWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    clampSetNameToPicture();
 }

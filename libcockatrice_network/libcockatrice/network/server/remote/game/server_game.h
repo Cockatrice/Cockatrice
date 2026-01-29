@@ -218,6 +218,7 @@ public:
                                 GameEventStorageItem::EventRecipients recipients = GameEventStorageItem::SendToPrivate |
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
+    void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
 };
 
 #endif

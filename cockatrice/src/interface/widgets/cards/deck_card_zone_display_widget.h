@@ -40,7 +40,6 @@ public:
     QPersistentModelIndex trackedIndex;
     QString zoneName;
     void addCardsToOverlapWidget();
-    void resizeEvent(QResizeEvent *event) override;
 
 public slots:
     void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);

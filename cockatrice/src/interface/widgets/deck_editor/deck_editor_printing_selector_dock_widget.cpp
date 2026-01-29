@@ -1,6 +1,8 @@
 #include "deck_editor_printing_selector_dock_widget.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "printing_disabled_info_widget.h"
 
 #include <QVBoxLayout>
 
@@ -14,6 +16,11 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
     setFloating(false);
 
     createPrintingSelectorDock();
+    printingDisabledInfoWidget = new PrintingDisabledInfoWidget(this);
+
+    setVisibleWidget(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
+    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+            &DeckEditorPrintingSelectorDockWidget::setVisibleWidget);
 
     retranslateUi();
 }
@@ -26,13 +33,11 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
     printingSelectorFrame->setObjectName("printingSelectorFrame");
     printingSelectorFrame->addWidget(printingSelector);
 
-    auto *printingSelectorDockContents = new QWidget();
+    printingSelectorDockContents = new QWidget();
     printingSelectorDockContents->setObjectName("printingSelectorDockContents");
     printingSelectorDockContents->setLayout(printingSelectorFrame);
-    setWidget(printingSelectorDockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
     connect(printingSelector, &PrintingSelector::prevCardRequested, deckEditor->getDeckDockWidget(),
             &DeckEditorDeckDockWidget::selectPrevCard);
     connect(printingSelector, &PrintingSelector::nextCardRequested, deckEditor->getDeckDockWidget(),
@@ -42,4 +47,14 @@ void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
 void DeckEditorPrintingSelectorDockWidget::retranslateUi()
 {
     setWindowTitle(tr("Printing Selector"));
+}
+
+void DeckEditorPrintingSelectorDockWidget::setVisibleWidget(bool overridePrintings)
+{
+    if (overridePrintings) {
+        setWidget(printingDisabledInfoWidget);
+    } else {
+        setWidget(printingSelectorDockContents);
+        printingSelector->updateDisplay();
+    }
 }

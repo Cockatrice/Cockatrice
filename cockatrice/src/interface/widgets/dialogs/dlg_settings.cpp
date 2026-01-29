@@ -13,6 +13,7 @@
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 #include "../main.h"
+#include "override_printing_warning.h"
 
 #include <../../client/settings/card_counter_settings.h>
 #include <QAbstractButton>
@@ -438,6 +439,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
         SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
+        updateHomeTabSettingsVisibility();
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
@@ -445,6 +447,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabBackgroundShuffleFrequencySpinBox.setValue(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency());
     connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged),
             &SettingsCache::instance(), &SettingsCache::setHomeTabBackgroundShuffleFrequency);
+
+    homeTabDisplayCardNameCheckBox.setChecked(settings.getHomeTabDisplayCardName());
+    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setHomeTabDisplayCardName);
+
+    updateHomeTabSettingsVisibility();
 
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
@@ -454,6 +462,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&homeTabBackgroundSourceBox, 2, 1);
     themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 3, 0);
     themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 3, 1);
+    themeGrid->addWidget(&homeTabDisplayCardNameLabel, 4, 0);
+    themeGrid->addWidget(&homeTabDisplayCardNameCheckBox, 4, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -650,6 +660,17 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
+void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
+{
+    bool visible =
+        SettingsCache::instance().getHomeTabBackgroundSource() != BackgroundSources::toId(BackgroundSources::Theme);
+
+    homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
+    homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
+    homeTabDisplayCardNameLabel.setVisible(visible);
+    homeTabDisplayCardNameCheckBox.setVisible(visible);
+}
+
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().setShowShortcuts(value);
@@ -660,32 +681,9 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
 {
     bool enable = static_cast<bool>(value);
 
-    QString message;
-    if (enable) {
-        message = tr("Enabling this feature will disable the use of the Printing Selector.\n\n"
-                     "You will not be able to manage printing preferences on a per-deck basis, "
-                     "or see printings other people have selected for their decks.\n\n"
-                     "You will have to use the Set Manager, available through Card Database -> Manage Sets.\n\n"
-                     "Are you sure you would like to enable this feature?");
-    } else {
-        message =
-            tr("Disabling this feature will enable the Printing Selector.\n\n"
-               "You can now choose printings on a per-deck basis in the Deck Editor and configure which printing "
-               "gets added to a deck by default by pinning it in the Printing Selector.\n\n"
-               "You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector"
-               " (other sort orders like alphabetical or release date are available).\n\n"
-               "Are you sure you would like to disable this feature?");
-    }
+    bool accepted = OverridePrintingWarning::execMessageBox(this, enable);
 
-    QMessageBox::StandardButton result =
-        QMessageBox::question(this, tr("Confirm Change"), message, QMessageBox::Yes | QMessageBox::No);
-
-    if (result == QMessageBox::Yes) {
-        SettingsCache::instance().setOverrideAllCardArtWithPersonalPreference(value);
-        // Caches are now invalid.
-        CardPictureLoader::clearPixmapCache();
-        CardPictureLoader::clearNetworkCache();
-    } else {
+    if (!accepted) {
         // If user cancels, revert the checkbox/state back
         QTimer::singleShot(0, this, [this, enable]() {
             overrideAllCardArtWithPersonalPreferenceCheckBox.blockSignals(true);
@@ -729,6 +727,7 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
+    homeTabDisplayCardNameLabel.setText(tr("Display card name of background in bottom right:"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));

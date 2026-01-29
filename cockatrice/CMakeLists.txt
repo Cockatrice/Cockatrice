@@ -47,6 +47,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
+    src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
@@ -170,6 +171,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
     src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
@@ -177,6 +179,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/deck_editor/deck_state_manager.cpp
+    src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
@@ -202,6 +205,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/printing_selector.cpp
     src/interface/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
+    src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_search_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
@@ -225,8 +229,11 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
     src/interface/widgets/utility/sequence_edit.cpp
+    src/interface/widgets/utility/visibility_change_listener.cpp
+    src/interface/widgets/utility/visibility_change_listener.h
     src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_filter_save_load_widget.cpp
+    src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_display_name_filter_widget.cpp
@@ -235,6 +242,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_database_display/visual_database_display_widget.cpp
     src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_display_options_widget.cpp
+    src/interface/widgets/visual_deck_editor/visual_deck_editor_placeholder_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp

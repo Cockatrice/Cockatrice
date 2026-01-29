@@ -54,7 +54,7 @@ PROJECT_NUMBER         = $(COCKATRICE_REF)
 # for a project that appears at the top of each page and should give viewers a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "A cross-platform virtual tabletop for multiplayer card games"
+PROJECT_BRIEF          = "A virtual tabletop for multiplayer card games"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -1068,6 +1068,8 @@ RECURSIVE              = YES
 
 EXCLUDE                = build/ \
                          cmake/ \
+                         doc/doxygen/theme/docs/ \
+                         doc/doxygen/theme/include/ \
                          vcpkg/ \
                          webclient/
 
@@ -1430,7 +1432,9 @@ HTML_STYLESHEET        =
 # documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = doc/doxygen/css/doxygen_style.css
+HTML_EXTRA_STYLESHEET  = doc/doxygen/theme/doxygen-awesome.css \
+                         doc/doxygen/css/hide_nav_sync.css \
+                         doc/doxygen/css/cockatrice_docs_style.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1453,7 +1457,7 @@ HTML_EXTRA_FILES       = doc/doxygen/js/graph_toggle.js
 # The default value is: AUTO_LIGHT.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE        = AUTO_DARK
+HTML_COLORSTYLE        = LIGHT
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -1764,7 +1768,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO
 
 # The GENERATE_TREEVIEW tag is used to specify whether a tree-like index
 # structure should be generated to display hierarchical information. If the tag

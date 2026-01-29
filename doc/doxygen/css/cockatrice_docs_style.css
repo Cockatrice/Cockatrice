@@ -1,0 +1,33 @@
+/*
+
+See "Awesome Doxygen CSS" theme docs:
+https://jothepro.github.io/doxygen-awesome-css/md_docs_2customization.html#autotoc_md36
+
+Adjustments here are based on the css file of the theme and variables defined there.
+
+*/
+
+
+/* Light Mode overrides */
+html {
+    --primary-color: #33a946;
+    --primary-dark-color: #33a946;
+    --primary-light-color: #33a946;
+}
+
+/* Dark Mode overrides */
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --primary-color: #33a946;
+        --primary-dark-color: #33a946;
+        --primary-light-color: #33a946;
+    }
+}
+
+/* Dark Mode overrides, defined twice to support both the dark-mode without and with doxygen-awesome-darkmode-toggle.js */
+html.dark-mode {
+    color-scheme: dark;
+    --primary-color: #33a946;
+    --primary-dark-color: #33a946;
+    --primary-light-color: #33a946;
+}

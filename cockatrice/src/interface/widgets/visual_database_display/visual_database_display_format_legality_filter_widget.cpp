@@ -2,6 +2,7 @@
 
 #include "../../../filters/filter_tree_model.h"
 
+#include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
@@ -14,11 +15,14 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
     : QWidget(parent), filterModel(_filterModel)
 {
     allFormatsWithCount = CardDatabaseManager::query()->getAllFormatsWithCount();
+    int maxValue = std::numeric_limits<int>::min();
+    for (int value : allFormatsWithCount) {
+        maxValue = std::max(maxValue, value);
+    }
+    setMinimumWidth(300);
+    setMaximumHeight(300);
 
-    setMaximumHeight(75);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-    layout = new QHBoxLayout(this);
+    layout = new QVBoxLayout(this);
     setLayout(layout);
     layout->setContentsMargins(0, 1, 0, 1);
     layout->setSpacing(1);
@@ -27,33 +31,45 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
+    // Create a container for the threshold control
+    auto *thresholdLayout = new QHBoxLayout();
+    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+
+    thresholdLabel = new QLabel(this);
+    thresholdLayout->addWidget(thresholdLabel);
+
     // Create the spinbox
     spinBox = new QSpinBox(this);
     spinBox->setMinimum(1);
-    spinBox->setMaximum(getMaxMainTypeCount()); // Set the max value dynamically
+    spinBox->setMaximum(maxValue); // Set the max value dynamically
     spinBox->setValue(150);
-    layout->addWidget(spinBox);
+    thresholdLayout->addWidget(spinBox);
+    thresholdLayout->addStretch();
+
+    layout->addLayout(thresholdLayout);
+
     connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDatabaseDisplayFormatLegalityFilterWidget::updateFormatButtonsVisibility);
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this,
+    connect(toggleButton, &QPushButton::clicked, this,
             &VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
         QTimer::singleShot(100, this, &VisualDatabaseDisplayFormatLegalityFilterWidget::syncWithFilterModel);
     });
 
-    createFormatButtons();   // Populate buttons initially
-    updateFilterMode(false); // Initialize toggle button text
+    createFormatButtons(); // Populate buttons initially
+    updateFilterMode();    // Initialize toggle button text
 
     retranslateUi();
 }
 
 void VisualDatabaseDisplayFormatLegalityFilterWidget::retranslateUi()
 {
+    thresholdLabel->setText(tr("Show formats with at least:"));
+    spinBox->setSuffix(tr(" cards"));
     spinBox->setToolTip(tr("Do not display formats with less than this amount of cards in the database"));
     toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
@@ -160,9 +176,9 @@ void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFormatFilter()
     emit filterModel->layoutChanged();
 }
 
-void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplayFormatLegalityFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateFormatFilter();
 }

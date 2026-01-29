@@ -182,7 +182,7 @@ bool DeckList::loadFromFile_Native(QIODevice *device)
     return loadFromXml(&xml);
 }
 
-bool DeckList::saveToFile_Native(QIODevice *device)
+bool DeckList::saveToFile_Native(QIODevice *device) const
 {
     QXmlStreamWriter xml(device);
     xml.setAutoFormatting(true);
@@ -393,7 +393,7 @@ bool DeckList::loadFromFile_Plain(QIODevice *device)
     return loadFromStream_Plain(in, false);
 }
 
-bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
+bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
@@ -410,13 +410,13 @@ bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards
     return true;
 }
 
-bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards)
+bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     QTextStream out(device);
     return saveToStream_Plain(out, prefixSideboardCards, slashTappedOutSplitCards);
 }
 
-QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappedOutSplitCards)
+QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     QString result;
     QTextStream out(&result);
@@ -438,9 +438,9 @@ void DeckList::cleanList(bool preserveMetadata)
     refreshDeckHash();
 }
 
-QStringList DeckList::getCardList() const
+QStringList DeckList::getCardList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QStringList result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result), [](auto node) { return node->getName(); });
@@ -448,9 +448,9 @@ QStringList DeckList::getCardList() const
     return result;
 }
 
-QList<CardRef> DeckList::getCardRefList() const
+QList<CardRef> DeckList::getCardRefList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QList<CardRef> result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result),
@@ -464,9 +464,9 @@ QList<const DecklistCardNode *> DeckList::getCardNodes(const QSet<QString> &rest
     return tree.getCardNodes(restrictToZones);
 }
 
-QList<const InnerDecklistNode *> DeckList::getZoneNodes() const
+QList<const InnerDecklistNode *> DeckList::getZoneNodes(const QSet<QString> &restrictToZones) const
 {
-    return tree.getZoneNodes();
+    return tree.getZoneNodes(restrictToZones);
 }
 
 int DeckList::getSideboardSize() const

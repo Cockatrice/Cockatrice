@@ -16,12 +16,7 @@
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
-#include "visual_database_display_filter_save_load_widget.h"
-#include "visual_database_display_format_legality_filter_widget.h"
-#include "visual_database_display_main_type_filter_widget.h"
-#include "visual_database_display_name_filter_widget.h"
-#include "visual_database_display_set_filter_widget.h"
-#include "visual_database_display_sub_type_filter_widget.h"
+#include "visual_database_display_filter_toolbar_widget.h"
 
 #include <QLoggingCategory>
 #include <QVBoxLayout>
@@ -52,6 +47,21 @@ public:
     void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
     void setDeckList(const DeckList &new_deck_list_model);
 
+    AbstractTabDeckEditor *getDeckEditor()
+    {
+        return deckEditor;
+    }
+
+    CardDatabaseDisplayModel *getDatabaseDisplayModel()
+    {
+        return databaseDisplayModel;
+    }
+
+    QTreeView *getDatabaseView()
+    {
+        return databaseView;
+    }
+
     QWidget *searchContainer;
     QHBoxLayout *searchLayout;
     SearchLineEdit *searchEdit;
@@ -60,7 +70,7 @@ public:
     VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
 
 public slots:
-    void searchModelChanged();
+    void onSearchModelChanged();
 
 signals:
     void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
@@ -80,23 +90,8 @@ protected slots:
 private:
     QLabel *databaseLoadIndicator;
 
-    QLabel *sortByLabel;
-    QComboBox *sortColumnCombo, *sortOrderCombo;
-
-    QLabel *filterByLabel;
     QToolButton *clearFilterWidget;
-    QWidget *filterContainer;
-    QHBoxLayout *filterContainerLayout;
-    SettingsButtonWidget *quickFilterSaveLoadWidget;
-    VisualDatabaseDisplayFilterSaveLoadWidget *saveLoadWidget;
-    SettingsButtonWidget *quickFilterNameWidget;
-    VisualDatabaseDisplayNameFilterWidget *nameFilterWidget;
-    VisualDatabaseDisplayMainTypeFilterWidget *mainTypeFilterWidget;
-    VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
-    SettingsButtonWidget *quickFilterSubTypeWidget;
-    VisualDatabaseDisplaySubTypeFilterWidget *subTypeFilterWidget;
-    SettingsButtonWidget *quickFilterSetWidget;
-    VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
+    VisualDatabaseDisplayFilterToolbarWidget *filterContainer;
     KeySignals searchKeySignals;
     AbstractTabDeckEditor *deckEditor;
     CardDatabaseModel *databaseModel;

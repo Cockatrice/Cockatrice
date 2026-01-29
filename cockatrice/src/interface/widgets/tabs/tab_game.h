@@ -58,7 +58,7 @@ class TabGame : public Tab
 private:
     AbstractGame *game;
     const UserListProxy *userListProxy;
-    ReplayManager *replayManager;
+    ReplayManager *replayManager = nullptr;
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;
@@ -78,15 +78,25 @@ private:
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
     QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
     QAction *playersSeparator;
-    QMenu *gameMenu, *viewMenu, *cardInfoDockMenu, *messageLayoutDockMenu, *playerListDockMenu, *replayDockMenu;
+    QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
     QAction *aGameInfo, *aConcede, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn, *aReverseTurn,
         *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
-    QAction *aCardInfoDockVisible, *aCardInfoDockFloating, *aMessageLayoutDockVisible, *aMessageLayoutDockFloating,
-        *aPlayerListDockVisible, *aPlayerListDockFloating, *aReplayDockVisible, *aReplayDockFloating;
     QAction *aFocusChat;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
+
+    /**
+     * @brief The actions associated with managing a QDockWidget
+     */
+    struct DockActions
+    {
+        QMenu *menu;
+        QAction *aVisible;
+        QAction *aFloating;
+    };
+
+    QMap<QDockWidget *, DockActions> dockToActions;
 
     Player *addPlayer(Player *newPlayer);
     void addLocalPlayer(Player *newPlayer, int playerId);
@@ -107,6 +117,7 @@ private:
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
+    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget);
     void createCardInfoDock(bool bReplay = false);
     void createPlayerListDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);
@@ -156,10 +167,6 @@ private slots:
     void freeDocksSize();
 
     void hideEvent(QHideEvent *event) override;
-    bool eventFilter(QObject *o, QEvent *e) override;
-    void dockVisibleTriggered();
-    void dockFloatingTriggered();
-    void dockTopLevelChanged(bool topLevel);
 
 protected slots:
     void closeEvent(QCloseEvent *event) override;

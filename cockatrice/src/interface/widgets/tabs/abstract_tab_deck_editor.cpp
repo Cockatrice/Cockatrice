@@ -18,6 +18,7 @@
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -55,38 +56,53 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 
     deckStateManager = new DeckStateManager(this);
 
-    databaseDisplayDockWidget = new DeckEditorDatabaseDisplayWidget(this);
+    cardDatabaseDockWidget = new DeckEditorCardDatabaseDockWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);
     filterDockWidget = new DeckEditorFilterDockWidget(this);
     printingSelectorDockWidget = new DeckEditorPrintingSelectorDockWidget(this);
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this, [this] {
-        printingSelectorDockWidget->setHidden(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
-    });
 
     // Connect deck signals to this tab
     connect(deckStateManager, &DeckStateManager::isModifiedChanged, this, &AbstractTabDeckEditor::onDeckModified);
     connect(deckDockWidget, &DeckEditorDeckDockWidget::selectedCardChanged, this, &AbstractTabDeckEditor::updateCard);
 
-    // Connect database display signals to this tab
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, this,
-            &AbstractTabDeckEditor::updateCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
-            &AbstractTabDeckEditor::actAddCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
-            &AbstractTabDeckEditor::actAddCardToSideboard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, this,
-            &AbstractTabDeckEditor::actDecrementCard);
-    connect(databaseDisplayDockWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, this,
-            &AbstractTabDeckEditor::actDecrementCardFromSideboard);
-
     // Connect filter signals
-    connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, databaseDisplayDockWidget,
-            &DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters);
+    connect(filterDockWidget, &DeckEditorFilterDockWidget::clearAllDatabaseFilters, cardDatabaseDockWidget,
+            &DeckEditorCardDatabaseDockWidget::clearAllDatabaseFilters);
 
     // Connect shortcut changes
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &AbstractTabDeckEditor::refreshShortcuts);
+}
+
+void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
+{
+    QMenu *menu = _viewMenu->addMenu(QString());
+
+    QAction *aVisible = menu->addAction(QString());
+    aVisible->setCheckable(true);
+
+    QAction *aFloating = menu->addAction(QString());
+    aFloating->setCheckable(true);
+    aFloating->setEnabled(false);
+
+    // user interaction
+    connect(aVisible, &QAction::triggered, widget, [widget](bool checked) { widget->setVisible(checked); });
+    connect(aFloating, &QAction::triggered, this, [widget](bool checked) { widget->setFloating(checked); });
+
+    // sync aFloating's enabled state with aVisible's checked state
+    connect(aVisible, &QAction::toggled, aFloating, [aFloating](bool checked) { aFloating->setEnabled(checked); });
+
+    // sync aFloating with dockWidget's floating state
+    connect(widget, &QDockWidget::topLevelChanged, aFloating,
+            [aFloating](bool topLevel) { aFloating->setChecked(topLevel); });
+
+    // sync aVisible with dockWidget's visible state
+    auto filter = new VisibilityChangeListener(widget);
+    connect(filter, &VisibilityChangeListener::visibilityChanged, aVisible,
+            [aVisible](bool visible) { aVisible->setChecked(visible); });
+
+    dockToActions.insert(widget, {menu, aVisible, aFloating});
 }
 
 /**
@@ -122,7 +138,7 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &
 {
     deckStateManager->addCard(card, zoneName);
 
-    databaseDisplayDockWidget->searchEdit->setSelection(0, databaseDisplayDockWidget->searchEdit->text().length());
+    cardDatabaseDockWidget->highlightAllSearchEdit();
 }
 
 /**
@@ -179,8 +195,8 @@ void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
     deckStateManager->replaceDeck(_deck);
     CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(_deck.deckList.getCardRefList()));
 
-    aDeckDockVisible->setChecked(true);
-    deckDockWidget->setVisible(aDeckDockVisible->isChecked());
+    dockToActions.value(deckDockWidget).aVisible->setChecked(true);
+    deckDockWidget->setVisible(dockToActions.value(deckDockWidget).aVisible->isChecked());
 }
 
 /** @brief Creates a new deck. Handles opening in new tab if needed. */
@@ -294,13 +310,13 @@ void AbstractTabDeckEditor::openDeckFromFile(const QString &fileName, DeckOpenLo
 {
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
-    auto l = DeckLoader(this);
-    if (l.loadFromFile(fileName, fmt, true)) {
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(fileName, fmt, true);
+    if (deckOpt) {
         if (deckOpenLocation == NEW_TAB) {
-            emit openDeckEditor(l.getDeck());
+            emit openDeckEditor(deckOpt.value());
         } else {
             deckMenu->setSaveStatus(false);
-            openDeck(l.getDeck());
+            openDeck(deckOpt.value());
         }
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Could not open deck at %1").arg(fileName));
@@ -336,9 +352,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
     if (loadedDeck.lastLoadInfo.fileName.isEmpty())
         return actSaveDeckAs();
 
-    auto deckLoader = DeckLoader(this);
-    deckLoader.setDeck(loadedDeck);
-    if (deckLoader.saveToFile(loadedDeck.lastLoadInfo.fileName, loadedDeck.lastLoadInfo.fileFormat)) {
+    if (DeckLoader::saveToFile(loadedDeck)) {
         deckStateManager->setModified(false);
         return true;
     }
@@ -355,14 +369,14 @@ bool AbstractTabDeckEditor::actSaveDeck()
  */
 bool AbstractTabDeckEditor::actSaveDeckAs()
 {
-    LoadedDeck loadedDeck = deckStateManager->toLoadedDeck();
+    DeckList deckList = deckStateManager->getDeckList();
 
     QFileDialog dialog(this, tr("Save deck"));
     dialog.setDirectory(SettingsCache::instance().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
-    dialog.selectFile(loadedDeck.deckList.getName().trimmed());
+    dialog.selectFile(deckList.getName().trimmed());
 
     if (!dialog.exec())
         return false;
@@ -370,16 +384,15 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     QString fileName = dialog.selectedFiles().at(0);
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
 
-    DeckLoader deckLoader = DeckLoader(this);
-    deckLoader.setDeck(loadedDeck);
-    if (!deckLoader.saveToFile(fileName, fmt)) {
+    std::optional<LoadedDeck::LoadInfo> infoOpt = DeckLoader::saveToFile(deckList, fileName, fmt);
+    if (!infoOpt) {
         QMessageBox::critical(
             this, tr("Error"),
             tr("The deck could not be saved.\nPlease check that the directory is writable and try again."));
         return false;
     }
 
-    deckStateManager->setLastLoadInfo({.fileName = fileName, .fileFormat = fmt});
+    deckStateManager->setLastLoadInfo(infoOpt.value());
 
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
@@ -544,21 +557,21 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 /** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
+    auto *interface = new DeckStatsInterface(*cardDatabaseDockWidget->getDatabase(), this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*databaseDisplayDockWidget->databaseModel->getDatabase(), this);
+    auto *interface = new TappedOutInterface(*cardDatabaseDockWidget->getDatabase(), this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Applies a new filter tree to the database display. */
 void AbstractTabDeckEditor::filterTreeChanged(FilterTree *filterTree)
 {
-    databaseDisplayDockWidget->setFilterTree(filterTree);
+    cardDatabaseDockWidget->setFilterTree(filterTree);
 }
 
 /**
@@ -569,43 +582,6 @@ void AbstractTabDeckEditor::closeEvent(QCloseEvent *event)
 {
     emit deckEditorClosing(this);
     event->accept();
-}
-
-/**
- * @brief Event filter for dock visibility and geometry changes.
- * @param o Object sending the event.
- * @param e Event.
- * @return False always.
- */
-bool AbstractTabDeckEditor::eventFilter(QObject *o, QEvent *e)
-{
-    if (e->type() == QEvent::Close) {
-        if (o == cardInfoDockWidget) {
-            aCardInfoDockVisible->setChecked(false);
-            aCardInfoDockFloating->setEnabled(false);
-        } else if (o == deckDockWidget) {
-            aDeckDockVisible->setChecked(false);
-            aDeckDockFloating->setEnabled(false);
-        } else if (o == filterDockWidget) {
-            aFilterDockVisible->setChecked(false);
-            aFilterDockFloating->setEnabled(false);
-        } else if (o == printingSelectorDockWidget) {
-            aPrintingSelectorDockVisible->setChecked(false);
-            aPrintingSelectorDockFloating->setEnabled(false);
-        }
-    }
-
-    if (o == this && e->type() == QEvent::Hide) {
-        LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        layouts.setDeckEditorLayoutState(saveState());
-        layouts.setDeckEditorGeometry(saveGeometry());
-        layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
-        layouts.setDeckEditorFilterSize(filterDockWidget->size());
-        layouts.setDeckEditorDeckSize(deckDockWidget->size());
-        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
-    }
-
-    return false;
 }
 
 /** @brief Shows a confirmation dialog before closing. */

@@ -152,7 +152,7 @@ static QModelIndex addAndReplacePrintings(DeckListModel *model,
     // Check if a card without a providerId already exists in the deckModel and replace it, if so.
     if (existing.isValid() && existing != newCardIndex && replaceProviderless) {
         model->offsetCountAtIndex(newCardIndex, extraCopies);
-        model->removeRow(existing.row(), existing.parent());
+        model->removeCardAtIndex(existing);
     }
 
     // Set Index and Focus as if the user had just clicked the new card and modify the deckEditor saveState
@@ -198,7 +198,7 @@ void CardAmountWidget::addPrinting(const QString &zone)
     });
 
     if (newCardIndex.isValid()) {
-        emit deckStateManager->focusIndexChanged(newCardIndex);
+        emit deckStateManager->focusIndexChanged(newCardIndex, false);
     }
 }
 

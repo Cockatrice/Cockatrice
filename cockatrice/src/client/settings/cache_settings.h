@@ -143,6 +143,7 @@ signals:
     void themeChanged();
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
+    void homeTabDisplayCardNameChanged();
     void picDownloadChanged();
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
@@ -157,6 +158,7 @@ signals:
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageDefaultTagsListChanged();
+    void visualDeckStorageShowColorIdentityChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
@@ -222,6 +224,7 @@ private:
     bool showTipsOnStartup;
     QList<int> seenTips;
     int homeTabBackgroundShuffleFrequency;
+    bool homeTabDisplayCardName;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -249,6 +252,7 @@ private:
     bool deckEditorTagsWidgetVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
+    bool visualDeckStorageShowColorIdentity;
     bool visualDeckStorageShowBannerCardComboBox;
     bool visualDeckStorageShowTagsOnDeckPreviews;
     bool visualDeckStorageShowTagFilter;
@@ -412,6 +416,10 @@ public:
     [[nodiscard]] int getHomeTabBackgroundShuffleFrequency() const
     {
         return homeTabBackgroundShuffleFrequency;
+    }
+    [[nodiscard]] bool getHomeTabDisplayCardName() const
+    {
+        return homeTabDisplayCardName;
     }
     [[nodiscard]] bool getTabVisualDeckStorageOpen() const
     {
@@ -614,6 +622,10 @@ public:
     [[nodiscard]] bool getVisualDeckStorageSearchFolderNames() const
     {
         return visualDeckStorageSearchFolderNames;
+    }
+    [[nodiscard]] bool getVisualDeckStorageShowColorIdentity() const
+    {
+        return visualDeckStorageShowColorIdentity;
     }
     [[nodiscard]] bool getVisualDeckStorageShowBannerCardComboBox() const
     {
@@ -1001,6 +1013,7 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setHomeTabBackgroundSource(const QString &_backgroundSource);
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
+    void setHomeTabDisplayCardName(QT_STATE_CHANGED_T _displayCardName);
     void setTabVisualDeckStorageOpen(bool value);
     void setTabServerOpen(bool value);
     void setTabAccountOpen(bool value);
@@ -1038,6 +1051,7 @@ public slots:
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageDefaultTagsList(QStringList _defaultTagsList);
     void setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageShowColorIdentity(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
@@ -1110,5 +1124,4 @@ public slots:
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
 };
-
 #endif

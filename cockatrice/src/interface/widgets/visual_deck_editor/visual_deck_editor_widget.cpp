@@ -38,6 +38,37 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     mainLayout->setContentsMargins(9, 0, 9, 5);
     mainLayout->setSpacing(0);
 
+    initializeDisplayOptionsAndSearchWidget();
+
+    initializeScrollAreaAndZoneContainer();
+
+    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setVisualDeckEditorCardSize);
+
+    mainLayout->addWidget(displayOptionsAndSearch);
+    mainLayout->addWidget(scrollArea);
+    mainLayout->addWidget(cardSizeWidget);
+
+    connectDeckListModel();
+
+    constructZoneWidgetsFromDeckListModel();
+
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &VisualDeckEditorWidget::onSelectionChanged);
+    }
+
+    updatePlaceholderVisibility();
+    retranslateUi();
+}
+
+// =====================================================================================================================
+//                                                  Constructor helpers
+// =====================================================================================================================
+
+void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
+{
     searchBar = new QLineEdit(this);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
         if (!searchBar->hasFocus())
@@ -109,12 +140,10 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
             emit cardAdditionRequested(card);
         }
     });
+}
 
-    displayOptionsAndSearch = new QWidget(this);
-    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
-    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
-    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
-
+void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
+{
     displayOptionsWidget = new VisualDeckDisplayOptionsWidget(this);
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::displayTypeChanged, this,
             &VisualDeckEditorWidget::displayTypeChanged);
@@ -122,11 +151,26 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
             &VisualDeckEditorWidget::activeGroupCriteriaChanged);
     connect(displayOptionsWidget, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, this,
             &VisualDeckEditorWidget::activeSortCriteriaChanged);
+}
+
+void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
+{
+    initializeSearchBarAndCompleter();
+
+    initializeDisplayOptionsWidget();
+
+    displayOptionsAndSearch = new QWidget(this);
+    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
+    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
+    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
 
     displayOptionsAndSearchLayout->addWidget(displayOptionsWidget);
     displayOptionsAndSearchLayout->addWidget(searchBar);
     displayOptionsAndSearchLayout->addWidget(searchPushButton);
+}
 
+void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
+{
     scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setMinimumSize(0, 0);
@@ -136,31 +180,25 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
     zoneContainer = new QWidget(scrollArea);
+    zoneContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    zoneContainer->setObjectName("zoneContainer");
     zoneContainerLayout = new QVBoxLayout(zoneContainer);
     zoneContainer->setLayout(zoneContainerLayout);
+
+    // Create placeholder widget
+    placeholderWidget = new VisualDeckEditorPlaceholderWidget(zoneContainer);
+    zoneContainerLayout->addWidget(placeholderWidget);
+
     scrollArea->addScrollBarWidget(zoneContainer, Qt::AlignHCenter);
     scrollArea->setWidget(zoneContainer);
+}
 
-    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckEditorCardSize);
-
-    mainLayout->addWidget(displayOptionsAndSearch);
-    mainLayout->addWidget(scrollArea);
-    mainLayout->addWidget(cardSizeWidget);
-
+void VisualDeckEditorWidget::connectDeckListModel()
+{
     connect(deckListModel, &DeckListModel::modelReset, this, &VisualDeckEditorWidget::decklistModelReset);
     connect(deckListModel, &DeckListModel::dataChanged, this, &VisualDeckEditorWidget::decklistDataChanged);
     connect(deckListModel, &QAbstractItemModel::rowsInserted, this, &VisualDeckEditorWidget::onCardAddition);
     connect(deckListModel, &QAbstractItemModel::rowsRemoved, this, &VisualDeckEditorWidget::onCardRemoval);
-    constructZoneWidgetsFromDeckListModel();
-
-    if (selectionModel) {
-        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-                &VisualDeckEditorWidget::onSelectionChanged);
-    }
-
-    retranslateUi();
 }
 
 void VisualDeckEditorWidget::retranslateUi()
@@ -169,98 +207,22 @@ void VisualDeckEditorWidget::retranslateUi()
     searchPushButton->setText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
+
+    if (placeholderWidget) {
+        placeholderWidget->retranslateUi();
+    }
 }
 
-void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
+void VisualDeckEditorWidget::updatePlaceholderVisibility()
 {
-    if (selectionModel == model) {
-        return;
-    }
-
-    if (selectionModel) {
-        // TODO: Possibly disconnect old ones?
-    }
-
-    selectionModel = model;
-
-    if (selectionModel) {
-        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
-                &VisualDeckEditorWidget::onSelectionChanged);
+    if (placeholderWidget) {
+        placeholderWidget->setVisible(indexToWidgetMap.isEmpty());
     }
 }
 
-void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    for (auto &range : selected) {
-        for (int row = range.top(); row <= range.bottom(); ++row) {
-            QModelIndex idx = range.model()->index(row, 0, range.parent());
-            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
-            if (it != indexToWidgetMap.end()) {
-                // it.value()->setHighlighted(true);
-            }
-        }
-    }
-
-    for (auto &range : deselected) {
-        for (int row = range.top(); row <= range.bottom(); ++row) {
-            QModelIndex idx = range.model()->index(row, 0, range.parent());
-            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
-            if (it != indexToWidgetMap.end()) {
-                // it.value()->setHighlighted(false);
-            }
-        }
-    }
-}
-
-void VisualDeckEditorWidget::clearAllDisplayWidgets()
-{
-    for (auto idx : indexToWidgetMap.keys()) {
-        auto displayWidget = indexToWidgetMap.value(idx);
-        zoneContainerLayout->removeWidget(displayWidget);
-        indexToWidgetMap.remove(idx);
-        delete displayWidget;
-    }
-}
-
-void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
-{
-    zoneContainerLayout->removeWidget(displayWidget);
-    for (auto idx : indexToWidgetMap.keys()) {
-        if (!idx.isValid()) {
-            indexToWidgetMap.remove(idx);
-        }
-    }
-    delete displayWidget;
-}
-
-void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
-{
-    if (parent == deckListModel->getRoot()) {
-        for (int i = first; i <= last; i++) {
-            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
-
-            if (indexToWidgetMap.contains(index)) {
-                continue;
-            }
-
-            constructZoneWidgetForIndex(index);
-        }
-    }
-}
-
-void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
-{
-    Q_UNUSED(parent);
-    Q_UNUSED(first);
-    Q_UNUSED(last);
-    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
-        if (!idx.isValid()) {
-            zoneContainerLayout->removeWidget(indexToWidgetMap.value(idx));
-            indexToWidgetMap.value(idx)->deleteLater();
-            indexToWidgetMap.remove(idx);
-        }
-    }
-}
+// =====================================================================================================================
+//                                              Display Widget Management
+// =====================================================================================================================
 
 void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex persistent)
 {
@@ -306,16 +268,69 @@ void VisualDeckEditorWidget::constructZoneWidgetsFromDeckListModel()
 
         constructZoneWidgetForIndex(persistent);
     }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::updateZoneWidgets()
 {
 }
 
-void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
+void VisualDeckEditorWidget::clearAllDisplayWidgets()
 {
-    QWidget::resizeEvent(event);
-    zoneContainer->setMaximumWidth(scrollArea->viewport()->width());
+    for (auto idx : indexToWidgetMap.keys()) {
+        auto displayWidget = indexToWidgetMap.value(idx);
+        zoneContainerLayout->removeWidget(displayWidget);
+        indexToWidgetMap.remove(idx);
+        delete displayWidget;
+    }
+    updatePlaceholderVisibility();
+}
+
+void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *displayWidget)
+{
+    zoneContainerLayout->removeWidget(displayWidget);
+    for (auto idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    delete displayWidget;
+    updatePlaceholderVisibility();
+}
+
+// =====================================================================================================================
+//                                                 DeckModel Signals Management
+// =====================================================================================================================
+
+void VisualDeckEditorWidget::onCardAddition(const QModelIndex &parent, int first, int last)
+{
+    if (parent == deckListModel->getRoot()) {
+        for (int i = first; i <= last; i++) {
+            QPersistentModelIndex index = QPersistentModelIndex(deckListModel->index(i, 0, deckListModel->getRoot()));
+
+            if (indexToWidgetMap.contains(index)) {
+                continue;
+            }
+
+            constructZoneWidgetForIndex(index);
+        }
+    }
+    updatePlaceholderVisibility();
+}
+
+void VisualDeckEditorWidget::onCardRemoval(const QModelIndex &parent, int first, int last)
+{
+    Q_UNUSED(parent);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+    for (const QPersistentModelIndex &idx : indexToWidgetMap.keys()) {
+        if (!idx.isValid()) {
+            zoneContainerLayout->removeWidget(indexToWidgetMap.value(idx));
+            indexToWidgetMap.value(idx)->deleteLater();
+            indexToWidgetMap.remove(idx);
+        }
+    }
+    updatePlaceholderVisibility();
 }
 
 void VisualDeckEditorWidget::decklistModelReset()
@@ -334,6 +349,17 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
     updateZoneWidgets();
 }
 
+// =====================================================================================================================
+//                                                 User Interaction
+// =====================================================================================================================
+
+void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
+                                         CardInfoPictureWithTextOverlayWidget *instance,
+                                         QString zoneName)
+{
+    emit cardClicked(event, instance, zoneName);
+}
+
 void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
 {
     // If user has any card selected, ignore hover
@@ -348,9 +374,43 @@ void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
     // highlightHoveredCard(hoveredCard);
 }
 
-void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
-                                         CardInfoPictureWithTextOverlayWidget *instance,
-                                         QString zoneName)
+void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
 {
-    emit cardClicked(event, instance, zoneName);
+    if (selectionModel == model) {
+        return;
+    }
+
+    if (selectionModel) {
+        // TODO: Possibly disconnect old ones?
+    }
+
+    selectionModel = model;
+
+    if (selectionModel) {
+        connect(selectionModel, &QItemSelectionModel::selectionChanged, this,
+                &VisualDeckEditorWidget::onSelectionChanged);
+    }
+}
+
+void VisualDeckEditorWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    for (auto &range : selected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(true);
+            }
+        }
+    }
+
+    for (auto &range : deselected) {
+        for (int row = range.top(); row <= range.bottom(); ++row) {
+            QModelIndex idx = range.model()->index(row, 0, range.parent());
+            auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
+            if (it != indexToWidgetMap.end()) {
+                // it.value()->setHighlighted(false);
+            }
+        }
+    }
 }
