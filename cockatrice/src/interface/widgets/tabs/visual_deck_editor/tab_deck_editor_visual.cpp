@@ -6,8 +6,10 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
+#include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "../../interface/widgets/visual_deck_editor/visual_deck_editor_widget.h"
 #include "../tab_deck_editor.h"
+#include "../tab_home.h"
 #include "../tab_supervisor.h"
 #include "tab_deck_editor_visual_tab_widget.h"
 
@@ -51,6 +53,83 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 
     loadLayout();
     cardDatabaseDockWidget->setHidden(true);
+    tutorialController = new TutorialController(this);
+
+    auto deckDockSequence = deckDockWidget->generateTutorialSequence();
+
+    tutorialController->addSequence(deckDockSequence);
+
+    auto sequence = TutorialSequence();
+
+    sequence.addStep({tabContainer->tabBar(),
+                      "The Visual Deck Editor has multiple different functionalities.\n\nYou can cycle "
+                      "through them by using these tabs.\n\nLet's start with the Visual Deck View."});
+    sequence.addStep({tabContainer->visualDeckView,
+                      "The cards in your deck will be displayed here, allowing for an easy overview.\n\nLet's try "
+                      "adding some now, so you can see it in action!",
+                      [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); }});
+
+    // sequence.addStep({printingSelectorDockWidget, "Change the printings in your deck here."});
+
+    tutorialController->addSequence(sequence);
+
+    auto vdeSequence = tabContainer->visualDeckView->addTutorialSteps();
+    vdeSequence.addStep({tabContainer->tabBar(), "Let's look at the database tab now."});
+    tutorialController->addSequence(vdeSequence);
+
+    auto vddSequence = tabContainer->visualDatabaseDisplay->addTutorialSteps();
+    vddSequence.steps.prepend(
+        {tabContainer->visualDatabaseDisplay,
+         "You can view the database here, either as card images or in the old table display "
+         "style.\n\nAdditionally, there are many powerful and easy to use filters available.\n\nLet's dive in!",
+         [this]() { tabContainer->setCurrentWidget(tabContainer->visualDatabaseDisplay); }});
+
+    tutorialController->addSequence(vddSequence);
+
+    auto analyticsSequence = tabContainer->deckAnalytics->generateTutorialSequence();
+    analyticsSequence.steps.prepend({tabContainer->tabBar(), "Let's look at the analytics tab now."});
+
+    TutorialStep analyticsConclusionStep;
+    analyticsConclusionStep.targetWidget = tabContainer->tabBar();
+    analyticsConclusionStep.text =
+        tr("That was it for the analytics tab.\n\nLet's now look at an equally useful tab, which provides you with "
+           "detailed information about possible hands, invaluable information when testing out a new deck.");
+
+    analyticsSequence.addStep(analyticsConclusionStep);
+
+    tutorialController->addSequence(analyticsSequence);
+
+    auto sampleHandSequence = tabContainer->sampleHandWidget->generateTutorialSequence();
+
+    tutorialController->addSequence(sampleHandSequence);
+
+    TutorialSequence endSequence;
+    endSequence.name = tr("Visual Deck Editor Conclusion");
+
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("This concludes the Visual Deck Editor tutorial.");
+    introStep.onEnter = [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); };
+    endSequence.addStep(introStep);
+
+    TutorialStep conclusionStep;
+    conclusionStep.targetWidget = tabSupervisor->tabBar();
+    conclusionStep.text =
+        tr("Let's go back to the Home Tab now to explore where you can manage your newly created deck.");
+    conclusionStep.onExit = [this]() { tabSupervisor->setCurrentWidget(tabSupervisor->getTabHome()); };
+    endSequence.addStep(conclusionStep);
+
+    tutorialController->addSequence(endSequence);
+}
+
+void TabDeckEditorVisual::showEvent(QShowEvent *ev)
+{
+    QWidget::showEvent(ev);
+    if (!tutorialStarted) {
+        tutorialStarted = true;
+        // Start on next event loop iteration so everything is fully painted
+        QTimer::singleShot(0, tutorialController, [this] { tutorialController->start(); });
+    }
 }
 
 /** @brief Creates the central frame containing the tab container. */
