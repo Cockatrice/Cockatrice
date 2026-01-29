@@ -259,7 +259,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS13_Intel"
             artifact_name: macOS13_Intel-package
-            qt_version: 6.6.*
+            qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -274,7 +274,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS14"
             artifact_name: macOS14-package
-            qt_version: 6.6.*
+            qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -289,7 +289,7 @@ jobs:
             make_package: 1
             package_suffix: "-macOS15"
             artifact_name: macOS15-package
-            qt_version: 6.6.*
+            qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -301,7 +301,7 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.6.*
+            qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -326,8 +326,8 @@ jobs:
             make_package: 1
             package_suffix: "-Win10"
             artifact_name: Windows10-installer
-            qt_version: 6.6.*
-            qt_arch: win64_msvc2019_64
+            qt_version: 6.10.*
+            qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
