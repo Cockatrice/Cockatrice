@@ -895,6 +895,56 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
             &SettingsCache::instance(), &SettingsCache::setDefaultDeckEditorType);
 
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setText("?");
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setAutoRaise(true);
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setEnabled(false);
+
+    // Add items with userData = internal enum
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
+        tr("Disabled"), deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled);
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
+        tr("Enabled"), deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled);
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
+        tr("Automatic"), deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic);
+
+    int storedMode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
+    for (int i = 0; i < deckEditorCommanderSpellbookIntegrationEnabledSelector.count(); ++i) {
+        if (deckEditorCommanderSpellbookIntegrationEnabledSelector.itemData(i).toInt() == storedMode) {
+            deckEditorCommanderSpellbookIntegrationEnabledSelector.setCurrentIndex(i);
+            break;
+        }
+    }
+
+    connect(&deckEditorCommanderSpellbookIntegrationEnabledSelector,
+            QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+                int mode = deckEditorCommanderSpellbookIntegrationEnabledSelector.itemData(index).toInt();
+                SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationEnabled(mode);
+                updateCommanderSpellbookUiState();
+            });
+
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.addItem(
+        tr("CommanderSpellbook bracket names")); // index 0 = false
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.addItem(
+        tr("Official Commander bracket names (approximate)")); // index 1 = true
+
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(
+        SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() ? 1 : 0);
+
+    connect(&deckEditorCommanderSpellbookIntegrationBracketNamingSelector,
+            QOverload<int>::of(&QComboBox::currentIndexChanged), &SettingsCache::instance(), [](int index) {
+                SettingsCache::instance().setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(index == 1);
+            });
+
+    updateCommanderSpellbookUiState();
+
+    auto *labelLayout = new QHBoxLayout;
+    labelLayout->setContentsMargins(0, 0, 0, 0);
+    labelLayout->addWidget(&deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel);
+    labelLayout->addWidget(&deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer);
+
+    auto *labelWidget = new QWidget;
+    labelWidget->setLayout(labelLayout);
+
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
@@ -903,6 +953,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
+    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationEnabledLabel, 5, 0);
+    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationEnabledSelector, 5, 1);
+    deckEditorGrid->addWidget(labelWidget, 6, 0);
+    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationBracketNamingSelector, 6, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -945,6 +999,27 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
     }
 }
 
+void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
+{
+    const int mode = SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationEnabled();
+
+    const bool enabled = mode != deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled &&
+                         mode != deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted;
+
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setEnabled(enabled);
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setEnabled(enabled);
+    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel.setVisible(enabled);
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setVisible(enabled);
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setVisible(enabled);
+
+    if (enabled) {
+        // Sync selector with the current stored bool
+        const bool useOfficial =
+            SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames();
+        deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(useOfficial ? 1 : 0);
+    }
+}
+
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -977,6 +1052,22 @@ void UserInterfaceSettingsPage::retranslateUi()
     defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
+    deckEditorCommanderSpellbookIntegrationEnabledLabel.setText(
+        tr("CommanderSpellbook integration to estimate commander bracket"));
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
+        deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled, tr("Disabled"));
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
+        deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled, tr("Enabled"));
+    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
+        deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic, tr("Automatic"));
+    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel.setText(tr("Bracket naming"));
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setItemText(
+        0, CommanderBracketNames::CommanderSpellbookBracketNames);
+    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setItemText(
+        1, CommanderBracketNames::OfficialCommanderBracketNames);
+
+    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setToolTip(
+        CommanderBracketNames::Explainer);
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

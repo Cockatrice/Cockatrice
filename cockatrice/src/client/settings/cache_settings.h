@@ -156,6 +156,8 @@ signals:
     void printingSelectorNavigationButtonsVisibleChanged();
     void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
+    void deckEditorCommanderSpellbookIntegrationEnabledChanged(int _enabled);
+    void deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(bool _useOfficialBracketNames);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageDefaultTagsListChanged();
     void visualDeckStorageShowColorIdentityChanged(bool _visible);
@@ -250,6 +252,8 @@ private:
     bool printingSelectorNavigationButtonsVisible;
     bool deckEditorBannerCardComboBoxVisible;
     bool deckEditorTagsWidgetVisible;
+    int deckEditorCommanderSpellbookIntegrationEnabled;
+    bool deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
     bool visualDeckStorageShowColorIdentity;
@@ -723,6 +727,14 @@ public:
     {
         return openDeckInNewTab;
     }
+    [[nodiscard]] int getDeckEditorCommanderSpellbookIntegrationEnabled() const
+    {
+        return deckEditorCommanderSpellbookIntegrationEnabled;
+    }
+    [[nodiscard]] bool getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const
+    {
+        return deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames;
+    }
     [[nodiscard]] int getRewindBufferingMs() const
     {
         return rewindBufferingMs;
@@ -1046,6 +1058,9 @@ public slots:
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible);
     void setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible);
+    void setDeckEditorCommanderSpellbookIntegrationEnabled(int _deckEditorCommanderSpellbookIntegrationEnabled);
+    void setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
+        bool _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
