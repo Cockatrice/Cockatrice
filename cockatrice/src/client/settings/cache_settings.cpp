@@ -277,7 +277,6 @@ SettingsCache::SettingsCache()
     doNotDeleteArrowsInSubPhases = settings->value("interface/doNotDeleteArrowsInSubPhases", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
-    tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
@@ -708,12 +707,6 @@ void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens)
 {
     annotateTokens = static_cast<bool>(_annotateTokens);
     settings->setValue("interface/annotatetokens", annotateTokens);
-}
-
-void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
-{
-    tabGameSplitterSizes = _tabGameSplitterSizes;
-    settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
 void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)

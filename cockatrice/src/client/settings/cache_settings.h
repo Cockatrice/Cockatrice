@@ -235,7 +235,6 @@ private:
     bool doNotDeleteArrowsInSubPhases;
     int startingHandSize;
     bool annotateTokens;
-    QByteArray tabGameSplitterSizes;
     bool showShortcuts;
     bool showGameSelectorFilterToolbar;
     bool displayCardNames;
@@ -539,10 +538,6 @@ public:
     [[nodiscard]] bool getAnnotateTokens() const
     {
         return annotateTokens;
-    }
-    [[nodiscard]] QByteArray getTabGameSplitterSizes() const
-    {
-        return tabGameSplitterSizes;
     }
     [[nodiscard]] bool getShowShortcuts() const
     {
@@ -1016,7 +1011,6 @@ public slots:
     void setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T _doNotDeleteArrowsInSubPhases);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
-    void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
