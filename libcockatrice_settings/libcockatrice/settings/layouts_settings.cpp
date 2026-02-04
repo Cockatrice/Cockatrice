@@ -5,8 +5,8 @@ const static QString GEOMETRY_PROP = "geometry";
 const static QString SIZE_PROP = "widgetSize";
 
 const static QString GROUP_DECK_EDITOR = "deckEditor";
-const static QString GROUP_DECK_EDITOR_DB_HEADER = "deckEditorDbHeader";
-const static QString GROUP_SETS_DIALOG_HEADER = "setsDialogHeader";
+const static QString GROUP_DECK_EDITOR_DB = "deckEditorDb";
+const static QString GROUP_SETS_DIALOG = "setsDialog";
 const static QString GROUP_GAME_PLAY_AREA = "gamePlayArea";
 const static QString GROUP_REPLAY_PLAY_AREA = "replayPlayArea";
 
@@ -92,22 +92,22 @@ void LayoutsSettings::setDeckEditorFilterSize(const QSize &value)
 
 const QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
 {
-    return getValue(STATE_PROP, GROUP_DECK_EDITOR_DB_HEADER).toByteArray();
+    return getValue(STATE_PROP, GROUP_DECK_EDITOR_DB, "header").toByteArray();
 }
 
 void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
 {
-    setValue(value, STATE_PROP, GROUP_DECK_EDITOR_DB_HEADER);
+    setValue(value, STATE_PROP, GROUP_DECK_EDITOR_DB, "header");
 }
 
 const QByteArray LayoutsSettings::getSetsDialogHeaderState()
 {
-    return getValue(STATE_PROP, GROUP_SETS_DIALOG_HEADER).toByteArray();
+    return getValue(STATE_PROP, GROUP_SETS_DIALOG, "header").toByteArray();
 }
 
 void LayoutsSettings::setSetsDialogHeaderState(const QByteArray &value)
 {
-    setValue(value, STATE_PROP, GROUP_SETS_DIALOG_HEADER);
+    setValue(value, STATE_PROP, GROUP_SETS_DIALOG, "header");
 }
 
 void LayoutsSettings::setGamePlayAreaGeometry(const QByteArray &value)
