@@ -4,15 +4,27 @@ const static QString STATE_PROP = "state";
 const static QString GEOMETRY_PROP = "geometry";
 const static QString SIZE_PROP = "widgetSize";
 
+const static QString GROUP_MAIN_WINDOW = "mainWindow";
 const static QString GROUP_DECK_EDITOR = "deckEditor";
 const static QString GROUP_DECK_EDITOR_DB = "deckEditorDb";
 const static QString GROUP_SETS_DIALOG = "setsDialog";
+const static QString GROUP_TOKEN_DIALOG = "tokenDialog";
 const static QString GROUP_GAME_PLAY_AREA = "gamePlayArea";
 const static QString GROUP_REPLAY_PLAY_AREA = "replayPlayArea";
 
 LayoutsSettings::LayoutsSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "layouts.ini", QString(), QString(), parent)
 {
+}
+
+void LayoutsSettings::setMainWindowGeometry(const QByteArray &value)
+{
+    setValue(value, GEOMETRY_PROP, GROUP_MAIN_WINDOW);
+}
+
+QByteArray LayoutsSettings::getMainWindowGeometry()
+{
+    return getValue(GEOMETRY_PROP, GROUP_MAIN_WINDOW).toByteArray();
 }
 
 const QByteArray LayoutsSettings::getDeckEditorLayoutState()
@@ -108,6 +120,26 @@ const QByteArray LayoutsSettings::getSetsDialogHeaderState()
 void LayoutsSettings::setSetsDialogHeaderState(const QByteArray &value)
 {
     setValue(value, STATE_PROP, GROUP_SETS_DIALOG, "header");
+}
+
+void LayoutsSettings::setSetsDialogGeometry(const QByteArray &value)
+{
+    setValue(value, GEOMETRY_PROP, GROUP_SETS_DIALOG);
+}
+
+QByteArray LayoutsSettings::getSetsDialogGeometry()
+{
+    return getValue(GEOMETRY_PROP, GROUP_SETS_DIALOG).toByteArray();
+}
+
+void LayoutsSettings::setTokenDialogGeometry(const QByteArray &value)
+{
+    setValue(value, GEOMETRY_PROP, GROUP_TOKEN_DIALOG);
+}
+
+QByteArray LayoutsSettings::getTokenDialogGeometry()
+{
+    return getValue(GEOMETRY_PROP, GROUP_TOKEN_DIALOG).toByteArray();
 }
 
 void LayoutsSettings::setGamePlayAreaGeometry(const QByteArray &value)

@@ -17,6 +17,8 @@ class LayoutsSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
+    void setMainWindowGeometry(const QByteArray &value);
+
     void setDeckEditorLayoutState(const QByteArray &value);
     void setDeckEditorGeometry(const QByteArray &value);
     void setDeckEditorCardDatabaseSize(const QSize &value);
@@ -26,6 +28,8 @@ public:
     void setDeckEditorFilterSize(const QSize &value);
     void setDeckEditorDbHeaderState(const QByteArray &value);
     void setSetsDialogHeaderState(const QByteArray &value);
+    void setSetsDialogGeometry(const QByteArray &value);
+    void setTokenDialogGeometry(const QByteArray &value);
 
     void setGamePlayAreaGeometry(const QByteArray &value);
     void setGamePlayAreaState(const QByteArray &value);
@@ -40,6 +44,8 @@ public:
     void setReplayPlayerListSize(const QSize &value);
     void setReplayReplaySize(const QSize &value);
 
+    QByteArray getMainWindowGeometry();
+
     const QByteArray getDeckEditorLayoutState();
     const QByteArray getDeckEditorGeometry();
     QSize getDeckEditorCardDatabaseSize();
@@ -49,6 +55,8 @@ public:
     QSize getDeckEditorFilterSize();
     const QByteArray getDeckEditorDbHeaderState();
     const QByteArray getSetsDialogHeaderState();
+    QByteArray getSetsDialogGeometry();
+    QByteArray getTokenDialogGeometry();
 
     const QByteArray getGamePlayAreaLayoutState();
     const QByteArray getGamePlayAreaGeometry();

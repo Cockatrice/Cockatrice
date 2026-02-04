@@ -205,9 +205,6 @@ private:
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
 
-    QByteArray mainWindowGeometry;
-    QByteArray tokenDialogGeometry;
-    QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName, homeTabBackgroundSource;
@@ -345,18 +342,6 @@ public:
     QString getSettingsPath();
     [[nodiscard]] QString getCachePath() const;
     [[nodiscard]] QString getNetworkCachePath() const;
-    [[nodiscard]] const QByteArray &getMainWindowGeometry() const
-    {
-        return mainWindowGeometry;
-    }
-    [[nodiscard]] const QByteArray &getTokenDialogGeometry() const
-    {
-        return tokenDialogGeometry;
-    }
-    [[nodiscard]] const QByteArray &getSetsDialogGeometry() const
-    {
-        return setsDialogGeometry;
-    }
     [[nodiscard]] QString getLang() const
     {
         return lang;
@@ -995,9 +980,6 @@ public:
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
-    void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
-    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
-    void setSetsDialogGeometry(const QByteArray &_setsDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
