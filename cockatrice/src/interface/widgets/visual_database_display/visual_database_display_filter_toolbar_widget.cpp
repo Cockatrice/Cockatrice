@@ -2,11 +2,14 @@
 
 #include "visual_database_display_widget.h"
 
+#include <QGroupBox>
+
 VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent)
     : QWidget(_parent), visualDatabaseDisplay(_parent)
 {
     filterContainerLayout = new QHBoxLayout(this);
     filterContainerLayout->setContentsMargins(11, 0, 11, 0);
+    filterContainerLayout->setSpacing(2);
     setLayout(filterContainerLayout);
     filterContainerLayout->setAlignment(Qt::AlignLeft);
 
@@ -15,9 +18,17 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     connect(this, &VisualDatabaseDisplayFilterToolbarWidget::searchModelChanged, visualDatabaseDisplay,
             &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
-    filterByLabel = new QLabel(this);
+    sortGroupBox = new QGroupBox(this);
+    filterGroupBox = new QGroupBox(this);
+
+    auto scalePixmap = [](const QString &fileName) { return QIcon(QPixmap(fileName)).pixmap({20, 20}); };
 
     sortByLabel = new QLabel(this);
+    sortByLabel->setPixmap(scalePixmap("theme:icons/sort_arrow_down"));
+
+    filterByLabel = new QLabel(this);
+    filterByLabel->setPixmap(scalePixmap("theme:icons/filter"));
+
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
     sortOrderCombo = new QComboBox(this);
@@ -76,14 +87,20 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
 
 void VisualDatabaseDisplayFilterToolbarWidget::initialize()
 {
-    sortByLabel->setVisible(true);
-    filterByLabel->setVisible(true);
+    // create groupbox layouts
+    auto sortLayout = new QHBoxLayout(this);
+    sortLayout->setContentsMargins(0, 0, 0, 0);
+    sortLayout->setSpacing(0);
+    sortGroupBox->setLayout(sortLayout);
+    sortLayout->setAlignment(Qt::AlignLeft);
 
-    quickFilterSaveLoadWidget->setVisible(true);
-    quickFilterNameWidget->setVisible(true);
-    quickFilterSubTypeWidget->setVisible(true);
-    quickFilterSetWidget->setVisible(true);
+    auto filterLayout = new QHBoxLayout(this);
+    filterLayout->setContentsMargins(0, 0, 0, 0);
+    filterLayout->setSpacing(2);
+    filterGroupBox->setLayout(filterLayout);
+    filterLayout->setAlignment(Qt::AlignLeft);
 
+    // create settings widgets
     auto filterModel = visualDatabaseDisplay->filterModel;
 
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
@@ -101,23 +118,29 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
     quickFilterFormatLegalityWidget->addSettingsWidget(formatLegalityWidget);
 
-    filterContainerLayout->addWidget(sortByLabel);
-    filterContainerLayout->addWidget(sortColumnCombo);
-    filterContainerLayout->addWidget(sortOrderCombo);
-    filterContainerLayout->addWidget(filterByLabel);
-    filterContainerLayout->addWidget(quickFilterNameWidget);
-    filterContainerLayout->addWidget(quickFilterMainTypeWidget);
-    filterContainerLayout->addWidget(quickFilterSubTypeWidget);
-    filterContainerLayout->addWidget(quickFilterSetWidget);
-    filterContainerLayout->addWidget(quickFilterFormatLegalityWidget);
+    // fill groupbox layouts
+    sortLayout->addWidget(sortByLabel);
+    sortLayout->addWidget(sortColumnCombo);
+    sortLayout->addWidget(sortOrderCombo);
+
+    filterLayout->addWidget(filterByLabel);
+    filterLayout->addWidget(quickFilterNameWidget);
+    filterLayout->addWidget(quickFilterMainTypeWidget);
+    filterLayout->addWidget(quickFilterSubTypeWidget);
+    filterLayout->addWidget(quickFilterSetWidget);
+    filterLayout->addWidget(quickFilterFormatLegalityWidget);
+
+    // put everything into main layout
+    filterContainerLayout->addWidget(sortGroupBox);
+    filterContainerLayout->addWidget(filterGroupBox);
     filterContainerLayout->addStretch();
     filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
 }
 
 void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
 {
-    sortByLabel->setText(tr("Sort by:"));
-    filterByLabel->setText(tr("Filter by:"));
+    sortByLabel->setToolTip(tr("Sort by"));
+    filterByLabel->setToolTip(tr("Filter by"));
 
     quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
     quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
