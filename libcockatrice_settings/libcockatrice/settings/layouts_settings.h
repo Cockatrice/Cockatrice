@@ -23,6 +23,10 @@ public:
     void setDeckEditorGeometry(const QByteArray &value);
     void setDeckEditorWidgetSize(const QString &widgetName, const QSize &value);
 
+    void setVisualDeckEditorLayoutState(const QByteArray &value);
+    void setVisualDeckEditorGeometry(const QByteArray &value);
+    void setVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &value);
+
     void setDeckEditorDbHeaderState(const QByteArray &value);
     void setSetsDialogHeaderState(const QByteArray &value);
     void setSetsDialogGeometry(const QByteArray &value);
@@ -41,6 +45,10 @@ public:
     QByteArray getDeckEditorLayoutState();
     QByteArray getDeckEditorGeometry();
     QSize getDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue = {});
+
+    QByteArray getVisualDeckEditorLayoutState();
+    QByteArray getVisualDeckEditorGeometry();
+    QSize getVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue = {});
 
     QByteArray getDeckEditorDbHeaderState();
     QByteArray getSetsDialogHeaderState();

@@ -266,19 +266,19 @@ void TabDeckEditorVisual::refreshShortcuts()
 void TabDeckEditorVisual::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
-    auto layoutState = layouts.getDeckEditorLayoutState();
+    auto layoutState = layouts.getVisualDeckEditorLayoutState();
     if (layoutState.isNull()) {
         restartLayout();
     } else {
         restoreState(layoutState);
-        restoreGeometry(layouts.getDeckEditorGeometry());
+        restoreGeometry(layouts.getVisualDeckEditorGeometry());
     }
 
     for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
         auto dockWidget = it->first;
         auto actions = it->second;
 
-        QSize size = layouts.getDeckEditorWidgetSize(dockWidget->objectName(), actions.defaultSize);
+        QSize size = layouts.getVisualDeckEditorWidgetSize(dockWidget->objectName(), actions.defaultSize);
         dockWidget->setMinimumSize(size);
         dockWidget->setMaximumSize(size);
     }
@@ -344,11 +344,11 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
 {
     if (o == this && e->type() == QEvent::Hide) {
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
-        layouts.setDeckEditorLayoutState(saveState());
-        layouts.setDeckEditorGeometry(saveGeometry());
+        layouts.setVisualDeckEditorLayoutState(saveState());
+        layouts.setVisualDeckEditorGeometry(saveGeometry());
 
         for (auto dockWidget : dockToActions.keys()) {
-            layouts.setDeckEditorWidgetSize(dockWidget->objectName(), dockWidget->size());
+            layouts.setVisualDeckEditorWidgetSize(dockWidget->objectName(), dockWidget->size());
         }
     }
     return false;

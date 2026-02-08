@@ -6,6 +6,7 @@ const static QString SIZE_PROP = "widgetSize";
 
 const static QString GROUP_MAIN_WINDOW = "mainWindow";
 const static QString GROUP_DECK_EDITOR = "deckEditor";
+const static QString GROUP_VISUAL_DECK_EDITOR = "visualDeckEditor";
 const static QString GROUP_DECK_EDITOR_DB = "deckEditorDb";
 const static QString GROUP_SETS_DIALOG = "setsDialog";
 const static QString GROUP_TOKEN_DIALOG = "tokenDialog";
@@ -55,6 +56,37 @@ void LayoutsSettings::setDeckEditorWidgetSize(const QString &widgetName, const Q
 QSize LayoutsSettings::getDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue)
 {
     QVariant previous = getValue(widgetName, GROUP_DECK_EDITOR, SIZE_PROP);
+    return previous == QVariant() ? defaultValue : previous.toSize();
+}
+
+QByteArray LayoutsSettings::getVisualDeckEditorLayoutState()
+{
+    return getValue(STATE_PROP, GROUP_VISUAL_DECK_EDITOR).toByteArray();
+}
+
+void LayoutsSettings::setVisualDeckEditorLayoutState(const QByteArray &value)
+{
+    setValue(value, STATE_PROP, GROUP_VISUAL_DECK_EDITOR);
+}
+
+QByteArray LayoutsSettings::getVisualDeckEditorGeometry()
+{
+    return getValue(GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR).toByteArray();
+}
+
+void LayoutsSettings::setVisualDeckEditorGeometry(const QByteArray &value)
+{
+    setValue(value, GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR);
+}
+
+void LayoutsSettings::setVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &value)
+{
+    setValue(value, widgetName, GROUP_VISUAL_DECK_EDITOR, SIZE_PROP);
+}
+
+QSize LayoutsSettings::getVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue)
+{
+    QVariant previous = getValue(widgetName, GROUP_VISUAL_DECK_EDITOR, SIZE_PROP);
     return previous == QVariant() ? defaultValue : previous.toSize();
 }
 
