@@ -249,17 +249,10 @@ void TabDeckEditorVisual::showPrintingSelector()
 /** @brief Set size restrictions for free floating dock widgets. */
 void TabDeckEditorVisual::freeDocksSize()
 {
-    deckDockWidget->setMinimumSize(100, 100);
-    deckDockWidget->setMaximumSize(5000, 5000);
-
-    cardInfoDockWidget->setMinimumSize(100, 100);
-    cardInfoDockWidget->setMaximumSize(5000, 5000);
-
-    filterDockWidget->setMinimumSize(100, 100);
-    filterDockWidget->setMaximumSize(5000, 5000);
-
-    printingSelectorDockWidget->setMinimumSize(100, 100);
-    printingSelectorDockWidget->setMaximumSize(5000, 5000);
+    for (auto dockWidget : dockToActions.keys()) {
+        dockWidget->setMinimumSize(100, 100);
+        dockWidget->setMaximumSize(5000, 5000);
+    }
 }
 
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */

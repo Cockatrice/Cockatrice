@@ -190,12 +190,9 @@ void TabDeckEditor::restartLayout()
 /** @brief Frees dock sizes to allow flexible resizing. */
 void TabDeckEditor::freeDocksSize()
 {
-    const QSize minSize(100, 100);
-    const QSize maxSize(5000, 5000);
-
     for (auto dockWidget : dockToActions.keys()) {
-        dockWidget->setMinimumSize(minSize);
-        dockWidget->setMaximumSize(maxSize);
+        dockWidget->setMinimumSize(100, 100);
+        dockWidget->setMaximumSize(5000, 5000);
     }
 }
 
