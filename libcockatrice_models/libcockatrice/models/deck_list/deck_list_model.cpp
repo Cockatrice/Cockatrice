@@ -340,6 +340,9 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
         emitRecursiveUpdates(parent);
     }
 
+    deckList->refreshDeckHash();
+    emit deckHashChanged();
+
     return true;
 }
 
@@ -448,8 +451,6 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         cardNode->setCardSetShortName(cardSetName);
         cardNode->setCardCollectorNumber(printingInfo.getProperty("num"));
         cardNode->setCardProviderId(printingInfo.getProperty("uuid"));
-        deckList->refreshDeckHash();
-        emit deckHashChanged();
         // Emit dataChanged for the amount column since we modified it
         QModelIndex cardIndex = nodeToIndex(cardNode);
         QModelIndex amountIndex = cardIndex.sibling(cardIndex.row(), DeckListModelColumns::CARD_AMOUNT);
@@ -458,6 +459,10 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     sort(lastKnownColumn, lastKnownOrder);
     refreshCardFormatLegalities();
     emitRecursiveUpdates(parentIndex);
+
+    deckList->refreshDeckHash();
+    emit deckHashChanged();
+
     auto index = nodeToIndex(cardNode);
 
     if (cardNodeAdded) {
