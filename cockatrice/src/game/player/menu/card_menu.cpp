@@ -396,7 +396,7 @@ void CardMenu::addRelatedCardActions()
             relatedCardName = relatedCard.getName(); // "name"
         }
 
-        QString text = tr("Token: ");
+        QString text = tr("Token") + ": ";
         if (cardRelation->getDoesAttach()) {
             text +=
                 tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
