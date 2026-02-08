@@ -917,6 +917,11 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
 {
     checkSql();
 
+    if ((server->getGlobalDecksID() != -1) && (deckId > globalDeckOffset)) {
+        deckId = deckId - globalDeckOffset;
+        userId = server->getGlobalDecksID();
+    }
+
     QSqlQuery *query =
         prepareQuery("select content from {prefix}_decklist_files where id = :id and id_user = :id_user");
     query->bindValue(":id", deckId);
