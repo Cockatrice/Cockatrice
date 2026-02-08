@@ -189,11 +189,11 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(tr("Manage sets"));
     setMinimumSize(800, 500);
-    auto &geometry = SettingsCache::instance().getSetsDialogGeometry();
+    auto geometry = SettingsCache::instance().layouts().getSetsDialogGeometry();
     if (!geometry.isEmpty()) {
         restoreGeometry(geometry);
     }
-    auto &headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
+    auto headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
     if (!headerState.isEmpty()) {
         view->header()->restoreState(headerState);
         view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
@@ -209,7 +209,7 @@ WndSets::~WndSets()
 
 void WndSets::closeEvent(QCloseEvent * /*ev*/)
 {
-    SettingsCache::instance().setSetsDialogGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setSetsDialogGeometry(saveGeometry());
 }
 
 void WndSets::saveHeaderState()

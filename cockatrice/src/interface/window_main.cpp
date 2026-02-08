@@ -879,7 +879,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     retranslateUi();
 
-    if (!restoreGeometry(SettingsCache::instance().getMainWindowGeometry())) {
+    if (!restoreGeometry(SettingsCache::instance().layouts().getMainWindowGeometry())) {
         setWindowState(Qt::WindowMaximized);
     }
     aFullScreen->setChecked(static_cast<bool>(windowState() & Qt::WindowFullScreen));
@@ -1098,7 +1098,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     tip->close();
 
     event->accept();
-    SettingsCache::instance().setMainWindowGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setMainWindowGeometry(saveGeometry());
     tabSupervisor->deleteLater();
 }
 

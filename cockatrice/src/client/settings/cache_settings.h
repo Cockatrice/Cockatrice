@@ -205,9 +205,6 @@ private:
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
 
-    QByteArray mainWindowGeometry;
-    QByteArray tokenDialogGeometry;
-    QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName, homeTabBackgroundSource;
@@ -238,7 +235,6 @@ private:
     bool doNotDeleteArrowsInSubPhases;
     int startingHandSize;
     bool annotateTokens;
-    QByteArray tabGameSplitterSizes;
     bool showShortcuts;
     bool showGameSelectorFilterToolbar;
     bool displayCardNames;
@@ -345,18 +341,6 @@ public:
     QString getSettingsPath();
     [[nodiscard]] QString getCachePath() const;
     [[nodiscard]] QString getNetworkCachePath() const;
-    [[nodiscard]] const QByteArray &getMainWindowGeometry() const
-    {
-        return mainWindowGeometry;
-    }
-    [[nodiscard]] const QByteArray &getTokenDialogGeometry() const
-    {
-        return tokenDialogGeometry;
-    }
-    [[nodiscard]] const QByteArray &getSetsDialogGeometry() const
-    {
-        return setsDialogGeometry;
-    }
     [[nodiscard]] QString getLang() const
     {
         return lang;
@@ -554,10 +538,6 @@ public:
     [[nodiscard]] bool getAnnotateTokens() const
     {
         return annotateTokens;
-    }
-    [[nodiscard]] QByteArray getTabGameSplitterSizes() const
-    {
-        return tabGameSplitterSizes;
     }
     [[nodiscard]] bool getShowShortcuts() const
     {
@@ -995,9 +975,6 @@ public:
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
-    void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
-    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
-    void setSetsDialogGeometry(const QByteArray &_setsDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
@@ -1034,7 +1011,6 @@ public slots:
     void setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T _doNotDeleteArrowsInSubPhases);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
-    void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
