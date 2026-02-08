@@ -1113,18 +1113,9 @@ void TabGame::loadLayout()
 
 void TabGame::freeDocksSize()
 {
-    cardInfoDock->setMinimumSize(100, 100);
-    cardInfoDock->setMaximumSize(5000, 5000);
-
-    messageLayoutDock->setMinimumSize(100, 100);
-    messageLayoutDock->setMaximumSize(5000, 5000);
-
-    playerListDock->setMinimumSize(100, 100);
-    playerListDock->setMaximumSize(5000, 5000);
-
-    if (replayDock) {
-        replayDock->setMinimumSize(100, 100);
-        replayDock->setMaximumSize(5000, 5000);
+    for (auto dockWidget : dockToActions.keys()) {
+        dockWidget->setMinimumSize(100, 100);
+        dockWidget->setMaximumSize(5000, 5000);
     }
 }
 
