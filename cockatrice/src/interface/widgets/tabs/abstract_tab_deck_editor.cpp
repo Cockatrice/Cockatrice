@@ -75,7 +75,7 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
             &AbstractTabDeckEditor::refreshShortcuts);
 }
 
-void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
+void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize)
 {
     QMenu *menu = _viewMenu->addMenu(QString());
 
@@ -102,7 +102,7 @@ void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *wi
     connect(filter, &VisibilityChangeListener::visibilityChanged, aVisible,
             [aVisible](bool visible) { aVisible->setChecked(visible); });
 
-    dockToActions.insert(widget, {menu, aVisible, aFloating});
+    dockToActions.insert(widget, {menu, aVisible, aFloating, defaultSize});
 }
 
 /**

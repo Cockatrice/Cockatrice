@@ -94,6 +94,7 @@ private:
         QMenu *menu;
         QAction *aVisible;
         QAction *aFloating;
+        QSize defaultSize;
     };
 
     QMap<QDockWidget *, DockActions> dockToActions;
@@ -117,7 +118,7 @@ private:
     void createMenuItems();
     void createReplayMenuItems();
     void createViewMenuItems();
-    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget);
+    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
     void createCardInfoDock(bool bReplay = false);
     void createPlayerListDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);

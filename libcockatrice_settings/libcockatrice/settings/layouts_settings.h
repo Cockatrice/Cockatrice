@@ -21,11 +21,8 @@ public:
 
     void setDeckEditorLayoutState(const QByteArray &value);
     void setDeckEditorGeometry(const QByteArray &value);
-    void setDeckEditorCardDatabaseSize(const QSize &value);
-    void setDeckEditorCardSize(const QSize &value);
-    void setDeckEditorDeckSize(const QSize &value);
-    void setDeckEditorPrintingSelectorSize(const QSize &value);
-    void setDeckEditorFilterSize(const QSize &value);
+    void setDeckEditorWidgetSize(const QString &widgetName, const QSize &value);
+
     void setDeckEditorDbHeaderState(const QByteArray &value);
     void setSetsDialogHeaderState(const QByteArray &value);
     void setSetsDialogGeometry(const QByteArray &value);
@@ -33,26 +30,18 @@ public:
 
     void setGamePlayAreaGeometry(const QByteArray &value);
     void setGamePlayAreaState(const QByteArray &value);
-    void setGameCardInfoSize(const QSize &value);
-    void setGameMessageLayoutSize(const QSize &value);
-    void setGamePlayerListSize(const QSize &value);
+    void setGamePlayAreaWidgetSize(const QString &widgetName, const QSize &value);
 
     void setReplayPlayAreaGeometry(const QByteArray &value);
     void setReplayPlayAreaState(const QByteArray &value);
-    void setReplayCardInfoSize(const QSize &value);
-    void setReplayMessageLayoutSize(const QSize &value);
-    void setReplayPlayerListSize(const QSize &value);
-    void setReplayReplaySize(const QSize &value);
+    void setReplayPlayAreaWidgetSize(const QString &widgetName, const QSize &value);
 
     QByteArray getMainWindowGeometry();
 
     QByteArray getDeckEditorLayoutState();
     QByteArray getDeckEditorGeometry();
-    QSize getDeckEditorCardDatabaseSize();
-    QSize getDeckEditorCardSize();
-    QSize getDeckEditorDeckSize();
-    QSize getDeckEditorPrintingSelectorSize();
-    QSize getDeckEditorFilterSize();
+    QSize getDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue = {});
+
     QByteArray getDeckEditorDbHeaderState();
     QByteArray getSetsDialogHeaderState();
     QByteArray getSetsDialogGeometry();
@@ -60,16 +49,11 @@ public:
 
     QByteArray getGamePlayAreaLayoutState();
     QByteArray getGamePlayAreaGeometry();
-    QSize getGameCardInfoSize();
-    QSize getGameMessageLayoutSize();
-    QSize getGamePlayerListSize();
+    QSize getGamePlayAreaWidgetSize(const QString &widgetName, const QSize &defaultValue = {});
 
     QByteArray getReplayPlayAreaLayoutState();
     QByteArray getReplayPlayAreaGeometry();
-    QSize getReplayCardInfoSize();
-    QSize getReplayMessageLayoutSize();
-    QSize getReplayPlayerListSize();
-    QSize getReplayReplaySize();
+    QSize getReplayPlayAreaWidgetSize(const QString &widgetName, const QSize &defaultValue = {});
 signals:
 
 public slots:
