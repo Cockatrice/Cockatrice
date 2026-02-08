@@ -9,6 +9,7 @@
 
 #include "../../deck_loader/deck_loader.h"
 #include "../cards/card_size_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
@@ -32,6 +33,7 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void refreshIfPossible();
     void retranslateUi();
+    TutorialSequence generateTutorialSequence(TutorialSequence vdsSequence);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
