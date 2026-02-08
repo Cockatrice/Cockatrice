@@ -136,7 +136,7 @@ void TabDeckEditor::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
 
-    auto &layoutState = layouts.getDeckEditorLayoutState();
+    auto layoutState = layouts.getDeckEditorLayoutState();
     if (layoutState.isNull())
         restartLayout();
     else {

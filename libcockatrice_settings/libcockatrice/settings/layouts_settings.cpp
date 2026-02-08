@@ -27,7 +27,7 @@ QByteArray LayoutsSettings::getMainWindowGeometry()
     return getValue(GEOMETRY_PROP, GROUP_MAIN_WINDOW).toByteArray();
 }
 
-const QByteArray LayoutsSettings::getDeckEditorLayoutState()
+QByteArray LayoutsSettings::getDeckEditorLayoutState()
 {
     return getValue(STATE_PROP, GROUP_DECK_EDITOR).toByteArray();
 }
@@ -37,7 +37,7 @@ void LayoutsSettings::setDeckEditorLayoutState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_DECK_EDITOR);
 }
 
-const QByteArray LayoutsSettings::getDeckEditorGeometry()
+QByteArray LayoutsSettings::getDeckEditorGeometry()
 {
     return getValue(GEOMETRY_PROP, GROUP_DECK_EDITOR).toByteArray();
 }
@@ -102,7 +102,7 @@ void LayoutsSettings::setDeckEditorFilterSize(const QSize &value)
     setValue(value, "filter", GROUP_DECK_EDITOR, SIZE_PROP);
 }
 
-const QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
+QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
 {
     return getValue(STATE_PROP, GROUP_DECK_EDITOR_DB, "header").toByteArray();
 }
@@ -112,7 +112,7 @@ void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_DECK_EDITOR_DB, "header");
 }
 
-const QByteArray LayoutsSettings::getSetsDialogHeaderState()
+QByteArray LayoutsSettings::getSetsDialogHeaderState()
 {
     return getValue(STATE_PROP, GROUP_SETS_DIALOG, "header").toByteArray();
 }
@@ -152,17 +152,17 @@ void LayoutsSettings::setGamePlayAreaState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_GAME_PLAY_AREA);
 }
 
-const QByteArray LayoutsSettings::getGamePlayAreaLayoutState()
+QByteArray LayoutsSettings::getGamePlayAreaLayoutState()
 {
     return getValue(STATE_PROP, GROUP_GAME_PLAY_AREA).toByteArray();
 }
 
-const QByteArray LayoutsSettings::getGamePlayAreaGeometry()
+QByteArray LayoutsSettings::getGamePlayAreaGeometry()
 {
     return getValue(GEOMETRY_PROP, GROUP_GAME_PLAY_AREA).toByteArray();
 }
 
-const QSize LayoutsSettings::getGameCardInfoSize()
+QSize LayoutsSettings::getGameCardInfoSize()
 {
     QVariant previous = getValue("cardInfo", GROUP_GAME_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
@@ -173,7 +173,7 @@ void LayoutsSettings::setGameCardInfoSize(const QSize &value)
     setValue(value, "cardInfo", GROUP_GAME_PLAY_AREA, SIZE_PROP);
 }
 
-const QSize LayoutsSettings::getGameMessageLayoutSize()
+QSize LayoutsSettings::getGameMessageLayoutSize()
 {
     QVariant previous = getValue("messageLayout", GROUP_GAME_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 250) : previous.toSize();
@@ -184,7 +184,7 @@ void LayoutsSettings::setGameMessageLayoutSize(const QSize &value)
     setValue(value, "messageLayout", GROUP_GAME_PLAY_AREA, SIZE_PROP);
 }
 
-const QSize LayoutsSettings::getGamePlayerListSize()
+QSize LayoutsSettings::getGamePlayerListSize()
 {
     QVariant previous = getValue("playerList", GROUP_GAME_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 50) : previous.toSize();
@@ -205,17 +205,17 @@ void LayoutsSettings::setReplayPlayAreaState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_REPLAY_PLAY_AREA);
 }
 
-const QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
+QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
 {
     return getValue(STATE_PROP, GROUP_REPLAY_PLAY_AREA).toByteArray();
 }
 
-const QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
+QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
 {
     return getValue(GEOMETRY_PROP, GROUP_REPLAY_PLAY_AREA).toByteArray();
 }
 
-const QSize LayoutsSettings::getReplayCardInfoSize()
+QSize LayoutsSettings::getReplayCardInfoSize()
 {
     QVariant previous = getValue("cardInfo", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 360) : previous.toSize();
@@ -226,7 +226,7 @@ void LayoutsSettings::setReplayCardInfoSize(const QSize &value)
     setValue(value, "cardInfo", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
 }
 
-const QSize LayoutsSettings::getReplayMessageLayoutSize()
+QSize LayoutsSettings::getReplayMessageLayoutSize()
 {
     QVariant previous = getValue("messageLayout", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 200) : previous.toSize();
@@ -237,7 +237,7 @@ void LayoutsSettings::setReplayMessageLayoutSize(const QSize &value)
     setValue(value, "messageLayout", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
 }
 
-const QSize LayoutsSettings::getReplayPlayerListSize()
+QSize LayoutsSettings::getReplayPlayerListSize()
 {
     QVariant previous = getValue("playerList", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(250, 50) : previous.toSize();
@@ -248,7 +248,7 @@ void LayoutsSettings::setReplayPlayerListSize(const QSize &value)
     setValue(value, "playerList", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
 }
 
-const QSize LayoutsSettings::getReplayReplaySize()
+QSize LayoutsSettings::getReplayReplaySize()
 {
     QVariant previous = getValue("replay", GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
     return previous == QVariant() ? QSize(900, 100) : previous.toSize();
