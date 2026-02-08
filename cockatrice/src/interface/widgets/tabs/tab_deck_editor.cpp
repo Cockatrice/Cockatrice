@@ -54,11 +54,11 @@ void TabDeckEditor::createMenus()
 
     viewMenu = new QMenu(this);
 
-    registerDockWidget(viewMenu, cardDatabaseDockWidget);
-    registerDockWidget(viewMenu, cardInfoDockWidget);
-    registerDockWidget(viewMenu, deckDockWidget);
-    registerDockWidget(viewMenu, filterDockWidget);
-    registerDockWidget(viewMenu, printingSelectorDockWidget);
+    registerDockWidget(viewMenu, cardDatabaseDockWidget, {500, 500});
+    registerDockWidget(viewMenu, cardInfoDockWidget, {250, 500});
+    registerDockWidget(viewMenu, deckDockWidget, {250, 360});
+    registerDockWidget(viewMenu, filterDockWidget, {250, 250});
+    registerDockWidget(viewMenu, printingSelectorDockWidget, {525, 250});
 
     connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
             [this](bool enabled) { dockToActions[printingSelectorDockWidget].menu->setEnabled(!enabled); });
@@ -144,20 +144,14 @@ void TabDeckEditor::loadLayout()
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 
-    cardDatabaseDockWidget->setMinimumSize(layouts.getDeckEditorCardDatabaseSize());
-    cardDatabaseDockWidget->setMaximumSize(layouts.getDeckEditorCardDatabaseSize());
+    for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
+        auto dockWidget = it->first;
+        auto actions = it->second;
 
-    cardInfoDockWidget->setMinimumSize(layouts.getDeckEditorCardSize());
-    cardInfoDockWidget->setMaximumSize(layouts.getDeckEditorCardSize());
-
-    filterDockWidget->setMinimumSize(layouts.getDeckEditorFilterSize());
-    filterDockWidget->setMaximumSize(layouts.getDeckEditorFilterSize());
-
-    deckDockWidget->setMinimumSize(layouts.getDeckEditorDeckSize());
-    deckDockWidget->setMaximumSize(layouts.getDeckEditorDeckSize());
-
-    printingSelectorDockWidget->setMinimumSize(layouts.getDeckEditorPrintingSelectorSize());
-    printingSelectorDockWidget->setMaximumSize(layouts.getDeckEditorPrintingSelectorSize());
+        QSize size = layouts.getDeckEditorWidgetSize(dockWidget->objectName(), actions.defaultSize);
+        dockWidget->setMinimumSize(size);
+        dockWidget->setMaximumSize(size);
+    }
 
     QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
 }
@@ -211,11 +205,10 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
         layouts.setDeckEditorGeometry(saveGeometry());
-        layouts.setDeckEditorCardDatabaseSize(cardDatabaseDockWidget->size());
-        layouts.setDeckEditorCardSize(cardInfoDockWidget->size());
-        layouts.setDeckEditorFilterSize(filterDockWidget->size());
-        layouts.setDeckEditorDeckSize(deckDockWidget->size());
-        layouts.setDeckEditorPrintingSelectorSize(printingSelectorDockWidget->size());
+
+        for (auto dockWidget : dockToActions.keys()) {
+            layouts.setDeckEditorWidgetSize(dockWidget->objectName(), dockWidget->size());
+        }
     }
     return false;
 }

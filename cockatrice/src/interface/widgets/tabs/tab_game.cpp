@@ -1034,12 +1034,12 @@ void TabGame::createViewMenuItems()
 {
     viewMenu = new QMenu(this);
 
-    registerDockWidget(viewMenu, cardInfoDock);
-    registerDockWidget(viewMenu, messageLayoutDock);
-    registerDockWidget(viewMenu, playerListDock);
+    registerDockWidget(viewMenu, cardInfoDock, {250, 360});
+    registerDockWidget(viewMenu, messageLayoutDock, {250, 200});
+    registerDockWidget(viewMenu, playerListDock, {250, 50});
 
     if (replayDock) {
-        registerDockWidget(viewMenu, replayDock);
+        registerDockWidget(viewMenu, replayDock, {900, 100});
     }
 
     viewMenu->addSeparator();
@@ -1051,7 +1051,7 @@ void TabGame::createViewMenuItems()
     addTabMenu(viewMenu);
 }
 
-void TabGame::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
+void TabGame::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize)
 {
     QMenu *menu = _viewMenu->addMenu(QString());
 
@@ -1078,7 +1078,7 @@ void TabGame::registerDockWidget(QMenu *_viewMenu, QDockWidget *widget)
     connect(filter, &VisibilityChangeListener::visibilityChanged, aVisible,
             [aVisible](bool visible) { aVisible->setChecked(visible); });
 
-    dockToActions.insert(widget, {menu, aVisible, aFloating});
+    dockToActions.insert(widget, {menu, aVisible, aFloating, defaultSize});
 }
 
 void TabGame::loadLayout()
@@ -1088,24 +1088,27 @@ void TabGame::loadLayout()
         restoreGeometry(layouts.getReplayPlayAreaGeometry());
         restoreState(layouts.getReplayPlayAreaLayoutState());
 
-        cardInfoDock->setMinimumSize(layouts.getReplayCardInfoSize());
-        cardInfoDock->setMaximumSize(layouts.getReplayCardInfoSize());
-        messageLayoutDock->setMinimumSize(layouts.getReplayMessageLayoutSize());
-        messageLayoutDock->setMaximumSize(layouts.getReplayMessageLayoutSize());
-        playerListDock->setMinimumSize(layouts.getReplayPlayerListSize());
-        playerListDock->setMaximumSize(layouts.getReplayPlayerListSize());
-        replayDock->setMinimumSize(layouts.getReplayReplaySize());
-        replayDock->setMaximumSize(layouts.getReplayReplaySize());
+        for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
+            auto dockWidget = it->first;
+            auto actions = it->second;
+
+            QSize size = layouts.getReplayPlayAreaWidgetSize(dockWidget->objectName(), actions.defaultSize);
+            dockWidget->setMinimumSize(size);
+            dockWidget->setMaximumSize(size);
+        }
+
     } else {
         restoreGeometry(layouts.getGamePlayAreaGeometry());
         restoreState(layouts.getGamePlayAreaLayoutState());
 
-        cardInfoDock->setMinimumSize(layouts.getGameCardInfoSize());
-        cardInfoDock->setMaximumSize(layouts.getGameCardInfoSize());
-        messageLayoutDock->setMinimumSize(layouts.getGameMessageLayoutSize());
-        messageLayoutDock->setMaximumSize(layouts.getGameMessageLayoutSize());
-        playerListDock->setMinimumSize(layouts.getGamePlayerListSize());
-        playerListDock->setMaximumSize(layouts.getGamePlayerListSize());
+        for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
+            auto dockWidget = it->first;
+            auto actions = it->second;
+
+            QSize size = layouts.getGamePlayAreaWidgetSize(dockWidget->objectName(), actions.defaultSize);
+            dockWidget->setMinimumSize(size);
+            dockWidget->setMaximumSize(size);
+        }
     }
 
     QTimer::singleShot(100, this, &TabGame::freeDocksSize);
@@ -1342,16 +1345,17 @@ void TabGame::hideEvent(QHideEvent *event)
     if (replayDock) {
         layouts.setReplayPlayAreaState(saveState());
         layouts.setReplayPlayAreaGeometry(saveGeometry());
-        layouts.setReplayCardInfoSize(cardInfoDock->size());
-        layouts.setReplayMessageLayoutSize(messageLayoutDock->size());
-        layouts.setReplayPlayerListSize(playerListDock->size());
-        layouts.setReplayReplaySize(replayDock->size());
+
+        for (auto dockWidget : dockToActions.keys()) {
+            layouts.setReplayPlayAreaWidgetSize(dockWidget->objectName(), dockWidget->size());
+        }
     } else {
         layouts.setGamePlayAreaState(saveState());
         layouts.setGamePlayAreaGeometry(saveGeometry());
-        layouts.setGameCardInfoSize(cardInfoDock->size());
-        layouts.setGameMessageLayoutSize(messageLayoutDock->size());
-        layouts.setGamePlayerListSize(playerListDock->size());
+
+        for (auto dockWidget : dockToActions.keys()) {
+            layouts.setGamePlayAreaWidgetSize(dockWidget->objectName(), dockWidget->size());
+        }
     }
 
     Tab::hideEvent(event);
