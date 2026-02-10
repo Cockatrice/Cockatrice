@@ -274,13 +274,14 @@ protected:
         QMenu *menu;        ///< The menu containing the actions
         QAction *aVisible;  ///< The menu action that toggles visibility
         QAction *aFloating; ///< The menu action that toggles floating
+        QSize defaultSize;  ///< The default size of the dock
     };
 
     /**
      * @brief registers a QDockWidget as a managed dock widget. Creates the associated actions and menu, adds them to
      * the viewMenu, and connects those actions to the tab's slots.
      */
-    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget);
+    void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
 
     /** @brief Confirms deck open action based on settings and modified state.
      *  @param openInSameTabIfBlank Whether to reuse same tab if blank.

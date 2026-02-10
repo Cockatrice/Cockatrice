@@ -7,6 +7,8 @@
 VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)
 {
     groupAndSortLayout = new QHBoxLayout(this);
+    groupAndSortLayout->setContentsMargins(0, 0, 0, 0);
+    groupAndSortLayout->setSpacing(3);
     groupAndSortLayout->setAlignment(Qt::AlignLeft);
     this->setLayout(groupAndSortLayout);
 

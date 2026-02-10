@@ -268,9 +268,6 @@ SettingsCache::SettingsCache()
     picDownload = settings->value("personal/picturedownload", true).toBool();
     showStatusBar = settings->value("personal/showStatusBar", false).toBool();
 
-    mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
-    tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
-    setsDialogGeometry = settings->value("interface/sets_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
@@ -280,7 +277,6 @@ SettingsCache::SettingsCache()
     doNotDeleteArrowsInSubPhases = settings->value("interface/doNotDeleteArrowsInSubPhases", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
-    tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
@@ -713,12 +709,6 @@ void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens)
     settings->setValue("interface/annotatetokens", annotateTokens);
 }
 
-void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
-{
-    tabGameSplitterSizes = _tabGameSplitterSizes;
-    settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
-}
-
 void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
 {
     showShortcuts = static_cast<bool>(_showShortcuts);
@@ -1088,24 +1078,6 @@ void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignore
 {
     ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
-}
-
-void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
-{
-    mainWindowGeometry = _mainWindowGeometry;
-    settings->setValue("interface/main_window_geometry", mainWindowGeometry);
-}
-
-void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometry)
-{
-    tokenDialogGeometry = _tokenDialogGeometry;
-    settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
-}
-
-void SettingsCache::setSetsDialogGeometry(const QByteArray &_setsDialogGeometry)
-{
-    setsDialogGeometry = _setsDialogGeometry;
-    settings->setValue("interface/sets_dialog_geometry", setsDialogGeometry);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)

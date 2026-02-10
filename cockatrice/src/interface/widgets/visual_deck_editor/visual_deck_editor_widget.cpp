@@ -161,6 +161,7 @@ void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
 
     displayOptionsAndSearch = new QWidget(this);
     displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
+    displayOptionsAndSearchLayout->setContentsMargins(0, 0, 0, 0);
     displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
     displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
 
