@@ -346,7 +346,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle(QStyleFactory::create(QStyleFactory::keys().first()));
+        qApp->setStyle("");
     }
 
     if (dirPath.isEmpty()) {
