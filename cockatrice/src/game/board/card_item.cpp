@@ -212,10 +212,12 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     }
 }
 
+/**
+ * @brief Resets the fields that should be reset after a zone transition
+ */
 void CardItem::resetState(bool keepAnnotations)
 {
     attacking = false;
-    facedown = false;
     counters.clear();
     pt.clear();
     if (!keepAnnotations) {
@@ -251,10 +253,10 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     setDoesntUntap(_info.doesnt_untap());
 }
 
-CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown)
+CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown)
 {
     deleteDragItem();
-    dragItem = new CardDragItem(this, _id, _pos, faceDown);
+    dragItem = new CardDragItem(this, _id, _pos, forceFaceDown);
     dragItem->setVisible(false);
     scene()->addItem(dragItem);
     dragItem->updatePosition(_scenePos);
@@ -352,7 +354,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         // Use the buttonDownPos to align the hot spot with the position when
         // the user originally clicked
-        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), facedown || forceFaceDown);
+        createDragItem(id, event->buttonDownPos(Qt::LeftButton), event->scenePos(), forceFaceDown);
         dragItem->grabMouse();
 
         int childIndex = 0;
@@ -366,8 +368,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 childPos = card->pos() - pos();
             else
                 childPos = QPointF(childIndex * CARD_WIDTH / 2, 0);
-            CardDragItem *drag =
-                new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
+            CardDragItem *drag = new CardDragItem(card, card->getId(), childPos, forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);
             scene()->addItem(drag);
         }
