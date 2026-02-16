@@ -12,7 +12,6 @@ PrintingDisabledInfoWidget::PrintingDisabledInfoWidget(QWidget *parent) : QWidge
 {
     auto layout = new QVBoxLayout(this);
     layout->setObjectName("PrintingDisabledInfoWidgetFrame");
-    setLayout(layout);
 
     QLabel *imageLabel = new QLabel(this);
     imageLabel->setAlignment(Qt::AlignCenter);
@@ -26,7 +25,7 @@ PrintingDisabledInfoWidget::PrintingDisabledInfoWidget(QWidget *parent) : QWidge
     settingsButton = new QPushButton(this);
     connect(settingsButton, &QPushButton::clicked, this, &PrintingDisabledInfoWidget::disableOverridePrintings);
 
-    auto buttonLayout = new QHBoxLayout(this);
+    auto buttonLayout = new QHBoxLayout();
     buttonLayout->addStretch();
     buttonLayout->addWidget(settingsButton);
     buttonLayout->addStretch();
