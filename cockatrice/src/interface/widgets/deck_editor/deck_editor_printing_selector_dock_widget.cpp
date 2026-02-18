@@ -57,4 +57,7 @@ void DeckEditorPrintingSelectorDockWidget::setVisibleWidget(bool overridePrintin
         setWidget(printingSelectorDockContents);
         printingSelector->updateDisplay();
     }
+
+    printingDisabledInfoWidget->setVisible(overridePrintings);
+    printingSelectorDockContents->setVisible(!overridePrintings);
 }
