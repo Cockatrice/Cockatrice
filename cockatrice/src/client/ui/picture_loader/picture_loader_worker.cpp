@@ -265,6 +265,7 @@ QNetworkReply *PictureLoaderWorker::makeRequest(const QUrl &url)
     req.setRawHeader("accept-encoding", "identity");
 
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }
