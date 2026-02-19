@@ -19,7 +19,7 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     layout->setSpacing(0);
     setLayout(layout);
 
-    auto upperLayout = new QVBoxLayout(this);
+    auto upperLayout = new QVBoxLayout();
     upperLayout->setContentsMargins(0, 0, 0, 0);
     upperLayout->setSpacing(0);
 

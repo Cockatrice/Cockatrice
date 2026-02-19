@@ -38,7 +38,7 @@ void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
 void SettingsButtonWidget::setButtonText(const QString &buttonText)
 {
     // 🔓 unlock size constraints
-    button->setMinimumSize(QSize());
+    button->setMinimumSize(QSize(0, 0));
     button->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
 
     button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
