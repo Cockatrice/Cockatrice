@@ -176,7 +176,7 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-    req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
+    req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/*,*/*;q=0.8");
 
     // Cached entries are served straight from the disk cache even when picture downloads are
     // enabled: re-fetching an already-cached image would burn the rate limit for nothing. Only a
