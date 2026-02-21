@@ -75,8 +75,14 @@ void ChatView::adjustColorsToPalette()
 void ChatView::refreshBlockColors()
 {
     QTextDocument *doc = document();
-    QTextCursor cursor(doc);
 
+    // Empty QTextDocuments still have 1 block, so we need handle this edge case
+    if (doc->isEmpty()) {
+        evenNumber = true;
+        return;
+    }
+
+    QTextCursor cursor(doc);
     bool even = true; // start fresh
 
     for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
