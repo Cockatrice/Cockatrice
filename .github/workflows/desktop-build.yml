@@ -528,8 +528,8 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
-          asset_path: ${{steps.build.outputs.path}}
           asset_name: ${{steps.build.outputs.name}}
+          asset_path: ${{steps.build.outputs.path}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: Attest binary provenance
@@ -538,11 +538,12 @@ jobs:
         uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{steps.build.outputs.name}}
-          subject-digest: sha256:${{ steps.upload_artifact.outputs.artifact-digest }}
+          subject-path: ${{steps.build.outputs.path}}
+          show-summary: false
 
       - name: Verify binary attestation
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
-        run: gh attestation verify ${{steps.build.outputs.path}} -R Cockatrice/Cockatrice
+        run: gh attestation verify ${{steps.build.outputs.path}} --repo Cockatrice/Cockatrice
