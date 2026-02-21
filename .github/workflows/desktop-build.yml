@@ -108,12 +108,14 @@ jobs:
         # These names correspond to the files in ".ci/$distro$version"
         include:
           - distro: Arch
+            test: skip
             package: skip    # We are packaged in Arch already
             allow-failure: yes
 
           - distro: Debian
             version: 11
             package: DEB
+            test: skip
 
           - distro: Servatrice_Debian
             version: 11
@@ -129,6 +131,7 @@ jobs:
           - distro: Debian
             version: 13
             package: DEB
+            test: skip
 
           - distro: Fedora
             version: 42
@@ -138,14 +141,17 @@ jobs:
           - distro: Fedora
             version: 43
             package: RPM
+            test: skip
 
           - distro: Ubuntu
             version: 22.04
             package: DEB
+            test: skip
 
           - distro: Ubuntu
             version: 24.04
             package: DEB
+            test: skip
 
     name: ${{matrix.distro}} ${{matrix.version}}
     needs: configure
