@@ -441,8 +441,8 @@ git push $UPSTREAM $TAG_NAME
 You should define the variables as such:
  - `$UPSTREAM`: the remote for `git@github.com:Cockatrice/Cockatrice.git`
  - `$TAG_NAME` should be formatted as:
-     - `YYYY-MM-DD-Release-MAJ.MIN.PATCH` for **stable releases**
-     - `YYYY-MM-DD-Development-MAJ.MIN.PATCH-beta.X` for **beta releases**<br>
+     - `MAJ.MIN.PATCH` for **stable releases**
+     - `MAJ.MIN.PATCH-beta[.X]` for **beta releases**<br>
        With <kbd>MAJ</kbd>.<kbd>MIN</kbd>.<kbd>PATCH</kbd> being the NEXT release version!
 
 This will cause a tagged release to be established on the GitHub repository,
