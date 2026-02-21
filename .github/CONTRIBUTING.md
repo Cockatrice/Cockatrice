@@ -461,7 +461,11 @@ revoke the tag by doing the following:
 git push --delete upstream $TAG_NAME
 git tag -d $TAG_NAME
 ```
-You can also do this on GitHub, you'll also want to delete the false release.
+You can also do this on GitHub.
+
+> [!NOTE]
+> If you want to push a new release to replace it immediately with the same
+> name you have to delete the automatically created release first!
 
 In the first lines of [CMakeLists.txt](
 https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt)
