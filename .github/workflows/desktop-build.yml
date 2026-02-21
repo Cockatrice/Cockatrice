@@ -220,7 +220,7 @@ jobs:
 
       - name: Upload to release
         id: upload_release
-        if: needs.configure.outputs.tag != null
+        if: needs.configure.outputs.tag != null && matrix.package != 'skip'
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
