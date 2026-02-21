@@ -89,9 +89,9 @@ void ChatView::refreshBlockColors()
         QTextBlockFormat fmt = block.blockFormat();
 
         if (even)
-            fmt.setBackground(palette().window());
-        else
             fmt.setBackground(palette().base());
+        else
+            fmt.setBackground(palette().window());
 
         fmt.setForeground(palette().text());
 
@@ -113,20 +113,28 @@ QTextCursor ChatView::prepareBlock(bool same)
 {
     lastSender.clear();
 
-    QTextCursor cursor(document());
+    QTextDocument *doc = document();
+    QTextCursor cursor(doc);
+
     cursor.movePosition(QTextCursor::End);
     if (same) {
         cursor.insertHtml("<br>");
     } else {
         QTextBlockFormat blockFormat;
-        if ((evenNumber = !evenNumber))
-            blockFormat.setBackground(palette().window());
-        else
+        if (evenNumber)
             blockFormat.setBackground(palette().base());
+        else
+            blockFormat.setBackground(palette().window());
+
+        evenNumber = !evenNumber;
 
         blockFormat.setForeground(palette().text());
         blockFormat.setBottomMargin(4);
-        cursor.insertBlock(blockFormat);
+
+        // Empty QTextDocuments still have 1 block. Just write to that block instead of inserting a new one
+        if (!doc->isEmpty()) {
+            cursor.insertBlock(blockFormat);
+        }
     }
 
     return cursor;
