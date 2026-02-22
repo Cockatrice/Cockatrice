@@ -67,15 +67,6 @@ public:
         doubleClickAction = _doubleClickAction;
     }
 
-    /**
-     * Checks if the dropEvent caused by the given CardDragItem should result in the face_down field of the resulting
-     * MoveCard command to be true.
-     * @param item The CardDragItem that is being dropped into this zone
-     * @param startZone The zone that the item came from
-     * @return Whether to set face_down to true
-     */
-    bool shouldDropFaceDown(const CardDragItem *item, const CardZoneLogic *startZone) const;
-
 private:
     CardZoneLogic *logic;
 };

@@ -1,6 +1,5 @@
 #include "card_zone.h"
 
-#include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "view_zone.h"
 
@@ -27,22 +26,6 @@ void CardZone::retranslateUi()
 {
     for (int i = 0; i < getLogic()->getCards().size(); ++i)
         getLogic()->getCards()[i]->retranslateUi();
-}
-
-bool CardZone::shouldDropFaceDown(const CardDragItem *item, const CardZoneLogic *startZone) const
-{
-    // forceFaceDown takes precedence over everything
-    if (item->isForceFaceDown()) {
-        return true;
-    }
-
-    // Maintain face-down state if same zone.
-    // Compare using zone names so card remains face-down when you hand it over to your opponent
-    if (startZone->getName() == getLogic()->getName()) {
-        return item->getItem()->getFaceDown();
-    }
-
-    return false;
 }
 
 void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
