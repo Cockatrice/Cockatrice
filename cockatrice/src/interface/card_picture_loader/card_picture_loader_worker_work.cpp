@@ -12,7 +12,10 @@
 #include <QThreadPool>
 
 // Card back returned by gatherer when card is not found
-static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};
+static const QStringList MD5_BLACKLIST = {
+    "db0c48db407a907c16ade38de048a441", // Old card back hash. Keep around just in case
+    "fbc7d763c08771c260b39e2115414eeb"  // Current card back hash
+};
 
 CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
     : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
