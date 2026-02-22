@@ -488,14 +488,12 @@ void TabGame::actConcede()
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
         emit game->getPlayerManager()->activeLocalPlayerConceded();
-        player->setConceded(true);
     } else {
         if (QMessageBox::question(this, tr("Unconcede"),
                                   tr("You have already conceded.  Do you want to return to this game?"),
                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
             return;
         emit game->getPlayerManager()->activeLocalPlayerUnconceded();
-        player->setConceded(false);
     }
 }
 
