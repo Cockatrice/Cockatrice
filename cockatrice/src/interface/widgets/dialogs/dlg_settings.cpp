@@ -1063,6 +1063,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkRedirectCacheTtlEdit.setSingleStep(1);
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
 
+    saveCardImagesToLocalStorageCheckBox.setChecked(SettingsCache::instance().getSaveCardImagesToLocalStorage());
+    connect(&saveCardImagesToLocalStorageCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setSaveCardImagesToLocalStorage);
+
+    localCardImageStorageNamingSchemeLineEdit =
+        new QLineEdit(SettingsCache::instance().getLocalCardImageStorageNamingScheme());
+    connect(localCardImageStorageNamingSchemeLineEdit, &QLineEdit::textChanged, &SettingsCache::instance(),
+            &SettingsCache::setLocalCardImageStorageNamingScheme);
+
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
     networkCacheLayout->addWidget(&networkCacheLabel);
@@ -1078,6 +1087,14 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     pixmapCacheLayout->addWidget(&pixmapCacheLabel);
     pixmapCacheLayout->addWidget(&pixmapCacheEdit);
 
+    auto saveCardImagesToLocalStorageLayout = new QHBoxLayout;
+    saveCardImagesToLocalStorageLayout->addWidget(&saveCardImagesToLocalStorageLabel);
+    saveCardImagesToLocalStorageLayout->addWidget(&saveCardImagesToLocalStorageCheckBox);
+
+    auto localCardImageStorageNamingSchemeLayout = new QHBoxLayout;
+    localCardImageStorageNamingSchemeLayout->addWidget(&localCardImageStorageNamingSchemeLabel);
+    localCardImageStorageNamingSchemeLayout->addWidget(localCardImageStorageNamingSchemeLineEdit);
+
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
@@ -1085,8 +1102,10 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addLayout(networkCacheLayout, 2, 1);
     lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0);
     lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 1);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 5, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 5, 1);
+    lpGeneralGrid->addLayout(saveCardImagesToLocalStorageLayout, 4, 0, 1, 2);
+    lpGeneralGrid->addLayout(localCardImageStorageNamingSchemeLayout, 5, 0, 1, 2);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 7, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 7, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -1298,6 +1317,8 @@ void DeckEditorSettingsPage::retranslateUi()
     networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
+    saveCardImagesToLocalStorageLabel.setText(tr("Save downloaded images to local storage"));
+    localCardImageStorageNamingSchemeLabel.setText(tr("Save downloaded images using this naming scheme:"));
     updateNowButton->setText(tr("Update Spoilers"));
     aAdd->setText(tr("Add New URL"));
     aEdit->setText(tr("Edit URL"));
