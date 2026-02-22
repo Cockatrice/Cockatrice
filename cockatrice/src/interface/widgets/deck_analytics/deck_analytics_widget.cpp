@@ -25,19 +25,18 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     // Controls
     controlContainer = new QWidget(this);
     controlLayout = new QHBoxLayout(controlContainer);
+    controlLayout->setContentsMargins(0, 0, 0, 0);
     addButton = new QPushButton(this);
-    removeButton = new QPushButton(this);
     saveButton = new QPushButton(this);
     loadButton = new QPushButton(this);
     controlLayout->addWidget(addButton);
-    controlLayout->addWidget(removeButton);
     controlLayout->addWidget(saveButton);
     controlLayout->addWidget(loadButton);
+    controlLayout->addStretch();
 
     layout->addWidget(controlContainer);
 
     connect(addButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::onAddPanel);
-    connect(removeButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::onRemoveSelected);
     connect(saveButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::saveLayout);
     connect(loadButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::loadLayout);
 
@@ -63,7 +62,6 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
 void DeckAnalyticsWidget::retranslateUi()
 {
     addButton->setText(tr("Add Panel"));
-    removeButton->setText(tr("Remove Panel"));
     saveButton->setText(tr("Save Layout"));
     loadButton->setText(tr("Load Layout"));
 }
@@ -111,6 +109,9 @@ void DeckAnalyticsWidget::addPanelInstance(const QString &typeId,
 
     panelLayout->insertWidget(panelLayout->count() - 1, resPanel);
 
+    panel->setClosable(true);
+    connect(panel, &AbstractAnalyticsPanelWidget::closed, this, [this, resPanel] { onPanelClosed(resPanel); });
+
     // Event filter for selection
     resPanel->installEventFilter(this);
     panel->installEventFilter(this);
@@ -119,14 +120,14 @@ void DeckAnalyticsWidget::addPanelInstance(const QString &typeId,
     connect(resPanel, &ResizablePanel::dropRequested, this, &DeckAnalyticsWidget::onPanelDropped);
 }
 
-void DeckAnalyticsWidget::onRemoveSelected()
+void DeckAnalyticsWidget::onPanelClosed(ResizablePanel *panel)
 {
-    int idx = indexOfSelectedWrapper();
+    int idx = panelWrappers.indexOf(panel);
     if (idx < 0) {
         return;
     }
 
-    ResizablePanel *panel = panelWrappers.takeAt(idx);
+    panelWrappers.removeAt(idx);
     selectWrapper(nullptr);
 
     panel->deleteLater();

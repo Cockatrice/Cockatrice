@@ -13,6 +13,16 @@ AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, Deck
 
     bannerAndSettingsLayout = new QHBoxLayout(bannerAndSettingsContainer);
     bannerAndSettingsContainer->setLayout(bannerAndSettingsLayout);
+
+    // close button
+    closeButton = new QPushButton(this);
+    closeButton->hide();
+    closeButton->setIcon(QPixmap("theme:icons/close"));
+    closeButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    connect(closeButton, &QPushButton::clicked, this, &AbstractAnalyticsPanelWidget::closed);
+    bannerAndSettingsLayout->addWidget(closeButton, 0);
+
+    // banner
     bannerWidget = new BannerWidget(this, "Analytics Widget", Qt::Vertical, 100);
     bannerWidget->setMaximumHeight(100);
 
@@ -28,6 +38,11 @@ AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, Deck
     layout->addWidget(bannerAndSettingsContainer);
 
     connect(analyzer, &DeckListStatisticsAnalyzer::statsUpdated, this, &AbstractAnalyticsPanelWidget::updateDisplay);
+}
+
+void AbstractAnalyticsPanelWidget::setClosable(bool closable)
+{
+    closeButton->setHidden(!closable);
 }
 
 bool AbstractAnalyticsPanelWidget::applyConfigFromDialog()
