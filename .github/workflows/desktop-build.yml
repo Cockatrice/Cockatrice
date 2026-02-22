@@ -309,18 +309,6 @@ jobs:
             use_ccache: 1
 
           - os: Windows
-            target: 7
-            runner: windows-2022
-            type: Release
-            make_package: 1
-            package_suffix: "-Win7"
-            artifact_name: Windows7-installer
-            qt_version: 5.15.*
-            qt_arch: win64_msvc2019_64
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_generator_platform: x64
-
-          - os: Windows
             target: 10
             runner: windows-2022
             type: Release
