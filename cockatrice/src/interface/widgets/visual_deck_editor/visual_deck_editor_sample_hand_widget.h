@@ -10,6 +10,7 @@
 #include "../cards/card_size_widget.h"
 #include "../deck_analytics/deck_list_statistics_analyzer.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 
 #include <QPushButton>
 #include <QSpinBox>
@@ -25,6 +26,7 @@ public:
                                      DeckListModel *deckListModel,
                                      DeckListStatisticsAnalyzer *statsAnalyzer);
     QList<ExactCard> getRandomCards(int amountToGet);
+    TutorialSequence generateTutorialSequence();
 
 public slots:
     void updateDisplay();

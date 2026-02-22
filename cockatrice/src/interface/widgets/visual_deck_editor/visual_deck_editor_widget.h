@@ -10,6 +10,7 @@
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "visual_deck_editor_placeholder_widget.h"
 
@@ -45,6 +46,7 @@ public:
 
     void setSelectionModel(QItemSelectionModel *model);
     void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    TutorialSequence addTutorialSteps();
     void updatePlaceholderVisibility();
     QItemSelectionModel *getSelectionModel() const
     {
