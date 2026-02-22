@@ -10,7 +10,6 @@ Available pre-compiled binaries for installation:
 
   <b>Windows</b>
    • <kbd>Windows 10+</kbd>
-   • <kbd>Windows 7+</kbd>
 
   <b>macOS</b>
    • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Apple M</sub>
