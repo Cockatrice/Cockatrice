@@ -71,7 +71,9 @@ void PileZone::handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneL
     for (int i = 0; i < dragItems.size(); ++i) {
         auto cardToMove = cmd.mutable_cards_to_move()->add_card();
         cardToMove->set_card_id(dragItems[i]->getId());
-        cardToMove->set_face_down(dragItems[i]->isForceFaceDown());
+        if (dragItems[i]->isForceFaceDown()) {
+            cardToMove->set_face_down(true);
+        }
     }
 
     getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);

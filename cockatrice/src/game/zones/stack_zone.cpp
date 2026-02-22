@@ -80,7 +80,9 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         if (item) {
             auto cardToMove = cmd.mutable_cards_to_move()->add_card();
             cardToMove->set_card_id(item->getId());
-            cardToMove->set_face_down(item->isForceFaceDown());
+            if (item->isForceFaceDown()) {
+                cardToMove->set_face_down(true);
+            }
         }
     }
 
