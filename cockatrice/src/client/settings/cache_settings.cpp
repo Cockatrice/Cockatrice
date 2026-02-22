@@ -264,6 +264,9 @@ SettingsCache::SettingsCache()
 
     networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
+    saveCardImagesToLocalStorage = settings->value("personal/saveCardImagesToLocalStorage", true).toBool();
+    localCardImageStorageNamingScheme =
+        settings->value("personal/localCardImageStorageNamingScheme", "{set}/{name}_{collector}_{uuid}.png").toString();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
     showStatusBar = settings->value("personal/showStatusBar", false).toBool();
@@ -1099,6 +1102,20 @@ void SettingsCache::setNetworkRedirectCacheTtl(const int _redirectCacheTtl)
     redirectCacheTtl = _redirectCacheTtl;
     settings->setValue("personal/redirectCacheSize", redirectCacheTtl);
     emit redirectCacheTtlChanged(redirectCacheTtl);
+}
+
+void SettingsCache::setSaveCardImagesToLocalStorage(QT_STATE_CHANGED_T _saveCardImagesToLocalStorage)
+{
+    saveCardImagesToLocalStorage = _saveCardImagesToLocalStorage;
+    settings->setValue("personal/saveCardImagesToLocalStorage", saveCardImagesToLocalStorage);
+    emit saveCardImagesToLocalStorageChanged(saveCardImagesToLocalStorage);
+}
+
+void SettingsCache::setLocalCardImageStorageNamingScheme(const QString _localCardImageStorageNamingScheme)
+{
+    localCardImageStorageNamingScheme = _localCardImageStorageNamingScheme;
+    settings->setValue("personal/localCardImageStorageNamingScheme", localCardImageStorageNamingScheme);
+    emit localCardImageStorageNamingSchemeChanged(localCardImageStorageNamingScheme);
 }
 
 void SettingsCache::setClientID(const QString &_clientID)
