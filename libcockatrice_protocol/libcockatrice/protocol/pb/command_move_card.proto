@@ -6,7 +6,9 @@ message CardToMove {
     // Id of the card in its current zone
     optional sint32 card_id = 1 [default = -1];
 
-    // Places the card face down, hiding its name
+    // If true, places the card face down, hiding its name.
+    // If false, forcibly turns the card face up.
+    // If not set, defers the resulting face down state to the server.
     optional bool face_down = 2;
 
     // When moving add this value to the power/toughness field of the card

@@ -73,7 +73,10 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         for (int i = 0; i < cardList.size(); ++i) {
             auto card = cardList[i];
             CardRef cardRef = {QString::fromStdString(card->name()), QString::fromStdString(card->provider_id())};
-            getLogic()->addCard(new CardItem(getLogic()->getPlayer(), this, cardRef, card->id()), false, i);
+            auto copy = new CardItem(getLogic()->getPlayer(), this, cardRef, card->id());
+            copy->setFaceDown(card->face_down());
+
+            getLogic()->addCard(copy, false, i);
         }
         reorganizeCards();
     } else if (!qobject_cast<ZoneViewZoneLogic *>(getLogic())->getOriginalZone()->contentsKnown()) {
@@ -91,8 +94,10 @@ void ZoneViewZone::initializeCards(const QList<const ServerInfo_Card *> &cardLis
         int number = numberCards == -1 ? c.size() : (numberCards < c.size() ? numberCards : c.size());
         for (int i = 0; i < number; i++) {
             CardItem *card = c.at(i);
-            getLogic()->addCard(new CardItem(getLogic()->getPlayer(), this, card->getCardRef(), card->getId()), false,
-                                i);
+            auto copy = new CardItem(getLogic()->getPlayer(), this, card->getCardRef(), card->getId());
+            copy->setFaceDown(card->getFaceDown());
+
+            getLogic()->addCard(copy, false, i);
         }
         reorganizeCards();
     }
@@ -107,6 +112,7 @@ void ZoneViewZone::zoneDumpReceived(const Response &r)
         auto cardName = QString::fromStdString(cardInfo.name());
         auto cardProviderId = QString::fromStdString(cardInfo.provider_id());
         auto card = new CardItem(getLogic()->getPlayer(), this, {cardName, cardProviderId}, cardInfo.id(), getLogic());
+        card->setFaceDown(cardInfo.face_down());
         getLogic()->rawInsertCard(card, i);
     }
 
@@ -279,8 +285,13 @@ void ZoneViewZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_y(0);
     cmd.set_is_reversed(qobject_cast<ZoneViewZoneLogic *>(getLogic())->getIsReversed());
 
-    for (int i = 0; i < dragItems.size(); ++i)
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+    for (int i = 0; i < dragItems.size(); ++i) {
+        auto cardToMove = cmd.mutable_cards_to_move()->add_card();
+        cardToMove->set_card_id(dragItems[i]->getId());
+        if (dragItems[i]->isForceFaceDown()) {
+            cardToMove->set_face_down(true);
+        }
+    }
 
     getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
 }
