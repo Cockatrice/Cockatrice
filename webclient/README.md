@@ -1,7 +1,52 @@
 ## Application Architecture
+
 ![Application Architecture](architecture.png?raw=true "Application Architecture")
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Local Development with Docker
+
+To develop and test the webclient against a local Servatrice server:
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js and npm
+
+### Setup Servatrice Server
+
+1. Navigate to the Cockatrice root directory
+2. Start the Servatrice server with Docker:
+   ```bash
+   docker compose up -d
+   ```
+3. The server will be available at `ws://localhost:4748`
+4. Set authentication to disabled in `servatrice/docker/servatrice-docker.ini`
+   ```
+   [authentication]
+   method=none
+   ```
+
+### Setup Webclient
+
+1. Navigate to the `webclient` directory
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+4. Open [http://localhost:3000](http://localhost:3000)
+5. The "Local Server" option should be available in the server list
+6. Use any username to connect (no password required)
+
+### Troubleshooting
+
+- Ensure Docker container exposes port 4748: `docker ps` should show `0.0.0.0:4748->4748/tcp`
+- Check Servatrice logs: `docker compose logs servatrice`
+- Verify WebSocket connection in browser developer tools (Network tab)
 
 ## Available Scripts
 
@@ -48,26 +93,25 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## To-Do List
 
-1) RefreshGuard modal
-  - there is no browser support for displaying custom output to window.onbeforeunload
-  - we should also display a custom modal explaining why they shouldnt refresh or navigate from the site
-  - ideally, the custom popup can be synced with the alert, so when the alert is closed, the modal closes too
+1. ✔️ RefreshGuard modal
 
-2) Disable AutoScrollToBottom when the user has scrolled up
-  - when the user scrolls back to bottom, it should renable
-  - renable after a period of inactivity (3 minutes?)
+2. Disable AutoScrollToBottom when the user has scrolled up
 
-3) Figure out how to type components w/ RouteComponentProps
-  - Component<RouteComponentProps<???, ???, ???>>
+- when the user scrolls back to bottom, it should renable
+- renable after a period of inactivity (3 minutes?)
 
-4) clear input onSubmit
+3. Figure out how to type components w/ RouteComponentProps
 
-5) figure out how to reflect server status changes in the ui
+- Component<RouteComponentProps<???, ???, ???>>
 
-6) Account page
+4. clear input onSubmit
 
-7) Register/Reset Password forms
+5. figure out how to reflect server status changes in the ui
 
-8) Message User
+6. Account page
 
-9) Main Nav scheme
+7. Register/Reset Password forms
+
+8. Message User
+
+9. Main Nav scheme
