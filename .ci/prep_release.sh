@@ -5,6 +5,7 @@
 # it just has to provide a template
 # this requires the repo to be unshallowed
 # adds output to GITHUB_OUTPUT
+
 template_path=".ci/release_template.md"
 body_path="/tmp/release.md"
 beta_regex='beta'
@@ -25,18 +26,18 @@ fi
 if [[ $TAG =~ $beta_regex ]]; then
   echo "is_beta=yes" >>"$GITHUB_OUTPUT"
   title="$TAG"
-  echo "creating beta release '$title'"
+  echo "Creating beta release '$title'"
 elif [[ ! $(cat CMakeLists.txt) =~ $name_regex ]]; then
   echo "::error file=$0::could not find releasename in CMakeLists.txt"
   exit 1
 else
   echo "is_beta=no" >>"$GITHUB_OUTPUT"
   name="${BASH_REMATCH[1]}"
-  version="${TAG##*-}"
+  version="${TAG%-*}"
   title="Cockatrice $version: $name"
   no_beta=1
   echo "friendly_name=$name" >>"$GITHUB_OUTPUT"
-  echo "creating full release '$title'"
+  echo "Creating stable release '$title'"
 fi
 echo "title=$title" >>"$GITHUB_OUTPUT"
 
@@ -44,7 +45,7 @@ echo "title=$title" >>"$GITHUB_OUTPUT"
 if [[ $no_beta ]]; then
   body="$(cat "$template_path")"
   if [[ ! $body ]]; then
-    echo "::warning file=$0::could not find release template"
+    echo "::warning file=$0::Could not find release template"
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
@@ -64,7 +65,7 @@ before="${all_tags%%
 "$TAG"*}" # strip line with current tag an all lines after it
 # note the extra newlines are needed to always have a last line
 if [[ $all_tags == "$before" ]]; then
-  echo "::warning file=$0::could not find current tag"
+  echo "::warning file=$0::Could not find current tag"
 else
   while
     previous="${before##*
@@ -84,8 +85,9 @@ else
   if [[ $previous ]]; then
     if generated_list="$(git log "$previous..$TAG" --pretty="- %s")"; then
       count="$(git rev-list --count "$previous..$TAG")"
-      [[ $previous =~ $beta_regex ]] && previousreleasetype="beta release" || previousreleasetype="full release"
-      echo "adding list of commits to release notes:"
+      [[ $previous =~ $beta_regex ]] && previousreleasetype="beta release" || previousreleasetype="stable release"
+      echo ""
+      echo "Adding list of commits to release notes:"
       echo "'$previous' to '$TAG' ($count commits)"
       # --> is the markdown comment escape sequence, emojis are way better
       generated_list="${generated_list//-->/→}"
@@ -96,15 +98,16 @@ else
       if [[ $beta_list =~ $whitespace ]]; then
         beta_list="-n there are no betas to delete!"
       else
-        echo "the following betas should be deleted after publishing:"
+        echo ""
+        echo "::notice::The following betas should be deleted after publishing:"
         echo "$beta_list"
       fi
       body="${body//--REPLACE-WITH-BETA-LIST--/$beta_list}"
     else
-      echo "::warning file=$0::failed to produce git log"
+      echo "::warning file=$0::Failed to produce git log"
     fi
   else
-    echo "::warning file=$0::could not find previous tag"
+    echo "::warning file=$0::Could not find previous tag"
   fi
 fi
 
