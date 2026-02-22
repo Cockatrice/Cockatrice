@@ -25,9 +25,11 @@ public:
 private:
     VisualDatabaseDisplayWidget *visualDatabaseDisplay;
 
+    QGroupBox *sortGroupBox;
     QLabel *sortByLabel;
     QComboBox *sortColumnCombo, *sortOrderCombo;
 
+    QGroupBox *filterGroupBox;
     QLabel *filterByLabel;
 
     QHBoxLayout *filterContainerLayout;
