@@ -239,6 +239,10 @@ private:
     QSpinBox networkRedirectCacheTtlEdit;
     QSpinBox pixmapCacheEdit;
     QLabel pixmapCacheLabel;
+    QCheckBox saveCardImagesToLocalStorageCheckBox;
+    QLabel saveCardImagesToLocalStorageLabel;
+    QLabel localCardImageStorageNamingSchemeLabel;
+    QLineEdit *localCardImageStorageNamingSchemeLineEdit;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage
