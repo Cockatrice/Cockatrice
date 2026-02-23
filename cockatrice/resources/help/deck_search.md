@@ -47,6 +47,6 @@ searches are case insensitive.
 <dd>[t:aggro OR o:control](#t:aggro OR o:control) <small>(Any deck filename that contains either aggro or control)</small></dd>
 
 <dt>Grouping:</dt>
-<dd><a href="#red -([[]]:100 or aggro)">red -([[]]:100 or aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
+<dd><a href="#red -([[]]:100 OR aggro)">red -([[]]:100 OR aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
 
 </dl>

@@ -51,16 +51,16 @@ In this list of examples below, each entry has an explanation and can be clicked
 
 <dt><u>E</u>dition:</dt>
 <dd>[set:lea](#set:lea) <small>(Cards that appear in Alpha, which has the set code LEA)</small></dd>
-<dd>[e:lea or e:leb](#e:lea or e:leb) <small>(Cards that appear in Alpha or Beta)</small></dd>
+<dd>[e:lea OR e:leb](#e:lea OR e:leb) <small>(Cards that appear in Alpha or Beta)</small></dd>
 
 <dt>Negate:</dt>
 <dd>[c:wu -c:m](#c:wu -c:m) <small>(Any card that is white or blue, but not multicolored)</small></dd>
 
 <dt>Branching:</dt>
-<dd>[t:sliver or o:changeling](#t:sliver or o:changeling) <small>(Any card that is either a sliver or has changeling)</small></dd>
+<dd>[t:sliver OR o:changeling](#t:sliver OR o:changeling) <small>(Any card that is either a sliver or has changeling)</small></dd>
 
 <dt>Grouping:</dt>
-<dd><a href="#t:angel -(angel or c:w)">t:angel -(angel or c:w)</a> <small>(Any angel that doesn't have angel in its name and isn't white)</small></dd>
+<dd><a href="#t:angel -(angel OR c:w)">t:angel -(angel OR c:w)</a> <small>(Any angel that doesn't have angel in its name and isn't white)</small></dd>
 
 <dt>Regular Expression:</dt>
 <dd>[/^fell/](#/^fell/) <small>(Any card name that begins with "fell")</small></dd>
