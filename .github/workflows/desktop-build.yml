@@ -410,6 +410,11 @@ jobs:
           modules: ${{matrix.qt_modules}}
           cache: true
 
+      - name: Install NSIS (Windows)
+        if: matrix.os == 'Windows'
+        shell: bash
+        run: choco install nsis
+
       - name: Setup vcpkg cache
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
