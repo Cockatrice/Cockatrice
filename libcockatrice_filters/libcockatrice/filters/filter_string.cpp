@@ -46,7 +46,7 @@ FieldQuery <- String [:] MatcherString / String ws? NumericExpression
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
-UnescapedStringListPart <- !['":<>=! ].
+UnescapedStringListPart <- !['":<>()=! ].
 SingleApostropheString <- (UnescapedStringListPart+ ws*)* ['] (UnescapedStringListPart+ ws*)*
 String <- SingleApostropheString / UnescapedStringListPart+ / ["] <NonDoubleQuoteUnlessEscaped*> ["] / ['] <NonSingleQuoteUnlessEscaped*> [']
 StringValue <- String / [(] StringList [)]
