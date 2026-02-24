@@ -410,7 +410,7 @@ jobs:
           modules: ${{matrix.qt_modules}}
           cache: true
 
-      - name: Install NSIS (Windows)
+      - name: Install NSIS
         if: matrix.os == 'Windows'
         shell: bash
         run: choco install nsis
