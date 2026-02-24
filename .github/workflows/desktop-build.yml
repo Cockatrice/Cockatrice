@@ -310,7 +310,7 @@ jobs:
 
           - os: Windows
             target: 10
-            runner: windows-2022
+            runner: windows-2025
             type: Release
             make_package: 1
             package_suffix: "-Win10"
