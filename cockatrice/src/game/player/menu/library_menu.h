@@ -8,6 +8,7 @@
 #define COCKATRICE_LIBRARY_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "abstract_zone_menu.h"
 
 #include <QAction>
 #include <QMenu>
@@ -15,7 +16,7 @@
 class Player;
 class PlayerActions;
 
-class LibraryMenu : public TearOffMenu
+class LibraryMenu : public TearOffMenu, public AbstractZoneMenu
 {
     Q_OBJECT
 public slots:
@@ -28,15 +29,15 @@ public:
     void createShuffleActions();
     void createMoveActions();
     void createViewActions();
-    void retranslateUi();
+    void retranslateUi() override;
     void populateRevealLibraryMenuWithActivePlayers();
     void populateLendLibraryMenuWithActivePlayers();
     void populateRevealTopCardMenuWithActivePlayers();
     void onRevealLibraryTriggered();
     void onLendLibraryTriggered();
     void onRevealTopCardTriggered();
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
 
     [[nodiscard]] bool isAlwaysRevealTopCardChecked() const
     {

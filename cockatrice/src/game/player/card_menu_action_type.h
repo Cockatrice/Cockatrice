@@ -19,7 +19,12 @@ enum CardMenuActionType
     cmMoveToBottomLibrary,
     cmMoveToHand,
     cmMoveToGraveyard,
-    cmMoveToExile
+    cmMoveToExile,
+    cmMoveToCommandZone,
+    cmMoveToPartnerZone,
+    cmMoveToCompanionZone,
+    cmMoveToBackgroundZone,
+    cmMoveToTable
 };
 
 #endif // COCKATRICE_CARD_MENU_ACTION_TYPE_H

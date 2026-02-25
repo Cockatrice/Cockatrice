@@ -25,7 +25,7 @@ public:
 
     QMenu *mCardCounters;
 
-    QAction *aPlay, *aPlayFacedown;
+    QAction *aPlay, *aPlayFacedown, *aPlayAndIncreaseTax;
     QAction *aRevealToAll;
     QAction *aHide;
     QAction *aClone;

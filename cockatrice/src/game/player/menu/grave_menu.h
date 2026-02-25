@@ -8,12 +8,13 @@
 #define COCKATRICE_GRAVE_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "abstract_zone_menu.h"
 
 #include <QAction>
 #include <QMenu>
 
 class Player;
-class GraveyardMenu : public TearOffMenu
+class GraveyardMenu : public TearOffMenu, public AbstractZoneMenu
 {
     Q_OBJECT
 signals:
@@ -25,9 +26,9 @@ public:
     void createViewActions();
     void populateRevealRandomMenuWithActivePlayers();
     void onRevealRandomTriggered();
-    void retranslateUi();
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void retranslateUi() override;
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
 
     QMenu *mRevealRandomGraveyardCard = nullptr;
     QMenu *moveGraveMenu = nullptr;

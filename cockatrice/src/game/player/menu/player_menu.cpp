@@ -2,9 +2,12 @@
 
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
+#include "../../zones/command_zone.h"
 #include "../../zones/hand_zone.h"
 #include "../../zones/pile_zone.h"
 #include "../../zones/table_zone.h"
+#include "../../zones/zone_names.h"
+#include "../player_graphics_item.h"
 #include "card_menu.h"
 #include "hand_menu.h"
 
@@ -35,6 +38,35 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         sideboardMenu = new SideboardMenu(player, playerMenu);
         playerMenu->addMenu(sideboardMenu);
 
+        commandZoneMenu = new CommandZoneMenu(player, ZoneNames::COMMAND, playerMenu);
+        playerMenu->addMenu(commandZoneMenu);
+        partnerZoneMenu = new CommandZoneMenu(player, ZoneNames::PARTNER, playerMenu);
+        companionZoneMenu = new CommandZoneMenu(player, ZoneNames::COMPANION, playerMenu);
+        playerMenu->addMenu(companionZoneMenu);
+        backgroundZoneMenu = new CommandZoneMenu(player, ZoneNames::BACKGROUND, playerMenu);
+        playerMenu->addMenu(backgroundZoneMenu);
+
+        auto updateCommandZoneMenuVisibility = [this](bool has) {
+            if (commandZoneMenu)
+                commandZoneMenu->menuAction()->setVisible(has);
+        };
+        auto updateCompanionZoneMenuVisibility = [this](bool has) {
+            if (companionZoneMenu)
+                companionZoneMenu->menuAction()->setVisible(has);
+        };
+        auto updateBackgroundZoneMenuVisibility = [this](bool has) {
+            if (backgroundZoneMenu)
+                backgroundZoneMenu->menuAction()->setVisible(has);
+        };
+
+        connect(player, &Player::commandZoneSupportChanged, this, updateCommandZoneMenuVisibility);
+        connect(player, &Player::companionZoneSupportChanged, this, updateCompanionZoneMenuVisibility);
+        connect(player, &Player::backgroundZoneSupportChanged, this, updateBackgroundZoneMenuVisibility);
+
+        updateCommandZoneMenuVisibility(player->hasServerCommandZone());
+        updateCompanionZoneMenuVisibility(player->hasServerCompanionZone());
+        updateBackgroundZoneMenuVisibility(player->hasServerBackgroundZone());
+
         customZonesMenu = new CustomZoneMenu(player);
         playerMenu->addMenu(customZonesMenu);
         playerMenu->addSeparator();
@@ -42,11 +74,22 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
         countersMenu = playerMenu->addMenu(QString());
 
         utilityMenu = new UtilityMenu(player, playerMenu);
+
+        // Build zone menu collection for batch shortcut operations
+        allZoneMenus = {handMenu,        libraryMenu,       graveMenu,          sideboardMenu, commandZoneMenu,
+                        partnerZoneMenu, companionZoneMenu, backgroundZoneMenu, utilityMenu};
     } else {
         sideboardMenu = nullptr;
+        commandZoneMenu = nullptr;
+        partnerZoneMenu = nullptr;
+        companionZoneMenu = nullptr;
+        backgroundZoneMenu = nullptr;
         customZonesMenu = nullptr;
         countersMenu = nullptr;
         utilityMenu = nullptr;
+
+        // Non-local players only have graveMenu
+        allZoneMenus = {graveMenu};
     }
 
     if (player->getPlayerInfo()->getLocal()) {
@@ -65,13 +108,38 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
 void PlayerMenu::setMenusForGraphicItems()
 {
-    player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
-    player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
-    player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
+    auto *graphicsItem = player->getGraphicsItem();
+    if (!graphicsItem) {
+        return;
+    }
+
+    graphicsItem->getTableZoneGraphicsItem()->setMenu(playerMenu);
+    graphicsItem->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
+    graphicsItem->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
-        player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
-        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
+        graphicsItem->getHandZoneGraphicsItem()->setMenu(handMenu);
+        graphicsItem->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
+        graphicsItem->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
+
+        // Command zone
+        if (auto *commandZone = graphicsItem->getCommandZoneGraphicsItem()) {
+            commandZone->setMenu(commandZoneMenu, commandZoneMenu->aViewZone);
+        }
+
+        // Partner zone
+        if (auto *partnerZone = graphicsItem->getPartnerZoneGraphicsItem()) {
+            partnerZone->setMenu(partnerZoneMenu, partnerZoneMenu->aViewZone);
+        }
+
+        // Companion zone
+        if (auto *companionZone = graphicsItem->getCompanionZoneGraphicsItem()) {
+            companionZone->setMenu(companionZoneMenu, companionZoneMenu->aViewZone);
+        }
+
+        // Background zone
+        if (auto *backgroundZone = graphicsItem->getBackgroundZoneGraphicsItem()) {
+            backgroundZone->setMenu(backgroundZoneMenu, backgroundZoneMenu->aViewZone);
+        }
     }
 }
 
@@ -82,8 +150,6 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
         return nullptr;
     }
 
-    // If is spectator (as spectators don't need card menus), return
-    // only update the menu if the card is actually selected
     if ((player->getGame()->getPlayerManager()->isSpectator() && !player->getGame()->getPlayerManager()->isJudge()) ||
         player->getGame()->getActiveCard() != card) {
         return nullptr;
@@ -99,19 +165,13 @@ void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
 
-    if (handMenu) {
-        handMenu->retranslateUi();
-    }
-    if (libraryMenu) {
-        libraryMenu->retranslateUi();
+    for (auto *menu : allZoneMenus) {
+        if (menu) {
+            menu->retranslateUi();
+        }
     }
 
-    graveMenu->retranslateUi();
     rfgMenu->retranslateUi();
-
-    if (sideboardMenu) {
-        sideboardMenu->retranslateUi();
-    }
 
     if (countersMenu) {
         countersMenu->setTitle(tr("&Counters"));
@@ -126,10 +186,6 @@ void PlayerMenu::retranslateUi()
         counterIterator.next().value()->retranslateUi();
     }
 
-    if (utilityMenu) {
-        utilityMenu->retranslateUi();
-    }
-
     if (sayMenu) {
         sayMenu->setTitle(tr("S&ay"));
     }
@@ -138,7 +194,6 @@ void PlayerMenu::retranslateUi()
 void PlayerMenu::refreshShortcuts()
 {
     if (shortcutsActive) {
-        // Judges get access to every player's menus but only want shortcuts to be set for their own.
         if (player->getPlayerInfo()->getLocalOrJudge() && !player->getPlayerInfo()->getLocal()) {
             setShortcutsInactive();
         } else {
@@ -153,26 +208,15 @@ void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
 
-    if (handMenu) {
-        handMenu->setShortcutsActive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsActive();
-    }
-    graveMenu->setShortcutsActive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsActive();
+    for (auto *menu : allZoneMenus) {
+        if (menu) {
+            menu->setShortcutsActive();
+        }
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsActive();
     }
 }
 
@@ -180,25 +224,14 @@ void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
 
-    if (handMenu) {
-        handMenu->setShortcutsInactive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsInactive();
-    }
-    graveMenu->setShortcutsInactive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsInactive();
+    for (auto *menu : allZoneMenus) {
+        if (menu) {
+            menu->setShortcutsInactive();
+        }
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsInactive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsInactive();
     }
 }

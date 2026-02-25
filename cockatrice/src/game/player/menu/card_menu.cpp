@@ -4,6 +4,7 @@
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../zones/logic/view_zone_logic.h"
+#include "../../zones/zone_names.h"
 #include "../card_menu_action_type.h"
 #include "../player.h"
 #include "../player_actions.h"
@@ -65,6 +66,8 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     connect(aHide, &QAction::triggered, playerActions, &PlayerActions::actHide);
     aPlayFacedown = new QAction(this);
     connect(aPlayFacedown, &QAction::triggered, playerActions, &PlayerActions::actPlayFacedown);
+    aPlayAndIncreaseTax = new QAction(this);
+    connect(aPlayAndIncreaseTax, &QAction::triggered, playerActions, &PlayerActions::actPlayAndIncreaseTax);
 
     aRevealToAll = new QAction(this);
 
@@ -217,6 +220,13 @@ void CardMenu::createStackMenu()
 
     // Card is on the stack
     if (canModifyCard) {
+        // Direct "Move into Play" action - first in menu for quick access
+        QAction *aMoveIntoPlay = new QAction(tr("Move into Play"), this);
+        aMoveIntoPlay->setData(cmMoveToTable);
+        connect(aMoveIntoPlay, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
+        addAction(aMoveIntoPlay);
+        addSeparator();
+
         addAction(aAttach);
         addAction(aDrawArrow);
         addSeparator();
@@ -274,11 +284,18 @@ void CardMenu::createHandOrCustomZoneMenu()
     addAction(aPlay);
     addAction(aPlayFacedown);
 
-    QMenu *revealMenu = addMenu(tr("Re&veal to..."));
+    // Add "Play and Increase Tax" option for command/partner zones
+    QString zoneName = card->getZone()->getName();
+    if (zoneName == ZoneNames::COMMAND || zoneName == ZoneNames::PARTNER) {
+        addAction(aPlayAndIncreaseTax);
+    }
 
-    initContextualPlayersMenu(revealMenu, aRevealToAll);
-
-    connect(revealMenu, &QMenu::triggered, player->getPlayerActions(), &PlayerActions::actReveal);
+    // Command and partner zones are always visible to all players, so reveal is unnecessary
+    if (zoneName != ZoneNames::COMMAND && zoneName != ZoneNames::PARTNER) {
+        QMenu *revealMenu = addMenu(tr("Re&veal to..."));
+        initContextualPlayersMenu(revealMenu, aRevealToAll);
+        connect(revealMenu, &QMenu::triggered, player->getPlayerActions(), &PlayerActions::actReveal);
+    }
 
     addSeparator();
     addAction(aClone);
@@ -443,6 +460,7 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    aPlayAndIncreaseTax->setText(tr("Play and &Increase Tax Counter"));
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
