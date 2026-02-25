@@ -10,6 +10,7 @@
 #include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/logic/command_zone_logic.h"
 #include "../zones/logic/hand_zone_logic.h"
 #include "../zones/logic/pile_zone_logic.h"
 #include "../zones/logic/stack_zone_logic.h"
@@ -75,6 +76,9 @@ signals:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
+    void commandZoneSupportChanged(bool hasCommandZone);
+    void companionZoneSupportChanged(bool hasCompanionZone);
+    void backgroundZoneSupportChanged(bool hasBackgroundZone);
 
 public slots:
     void setActive(bool _active);
@@ -143,7 +147,7 @@ public:
         return zone;
     }
 
-    CardZoneLogic *getZone(const QString zoneName)
+    CardZoneLogic *getZone(const QString &zoneName)
     {
         return zones.value(zoneName);
     }
@@ -188,6 +192,26 @@ public:
         return qobject_cast<HandZoneLogic *>(zones.value("hand"));
     }
 
+    CommandZoneLogic *getCommandZone()
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value("command"));
+    }
+
+    CommandZoneLogic *getPartnerZone()
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value("partner"));
+    }
+
+    CommandZoneLogic *getCompanionZone()
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value("companion"));
+    }
+
+    CommandZoneLogic *getBackgroundZone()
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value("background"));
+    }
+
     AbstractCounter *addCounter(const ServerInfo_Counter &counter);
     AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
     void delCounter(int counterId);
@@ -214,6 +238,21 @@ public:
     bool getConceded() const
     {
         return conceded;
+    }
+
+    bool hasServerCommandZone() const
+    {
+        return serverHasCommandZone;
+    }
+
+    bool hasServerCompanionZone() const
+    {
+        return serverHasCompanionZone;
+    }
+
+    bool hasServerBackgroundZone() const
+    {
+        return serverHasBackgroundZone;
     }
 
     void setGameStarted();
@@ -249,7 +288,12 @@ private:
     QMap<int, ArrowItem *> arrows;
 
     bool dialogSemaphore;
+    bool serverHasCommandZone;
+    bool serverHasCompanionZone;
+    bool serverHasBackgroundZone;
     QList<CardItem *> cardsToDelete;
+
+    void updateZoneSupport(bool *flag, void (Player::*signal)(bool), bool found);
 
     // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
 };

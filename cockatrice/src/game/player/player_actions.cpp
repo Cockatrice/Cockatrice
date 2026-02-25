@@ -8,16 +8,21 @@
 #include "../zones/hand_zone.h"
 #include "../zones/logic/view_zone_logic.h"
 #include "../zones/table_zone.h"
+#include "../zones/zone_names.h"
 #include "card_menu_action_type.h"
 
+#include <QHash>
+#include <QPointer>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/common/counter_ids.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
@@ -31,6 +36,15 @@
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
+
+// Lookup table for move-to-zone actions -> zone name strings
+// Consolidates 4 identical switch cases into data-driven dispatch
+static const QHash<CardMenuActionType, QString> moveToZoneMap = {
+    {cmMoveToCommandZone, ZoneNames::COMMAND},
+    {cmMoveToPartnerZone, ZoneNames::PARTNER},
+    {cmMoveToCompanionZone, ZoneNames::COMPANION},
+    {cmMoveToBackgroundZone, ZoneNames::BACKGROUND},
+};
 
 PlayerActions::PlayerActions(Player *_player) : player(_player), lastTokenTableRow(0), movingCardsUntil(false)
 {
@@ -520,7 +534,13 @@ void PlayerActions::moveOneCardUntil(CardItem *card)
     if (isMatch && movingCardsUntilAutoPlay) {
         // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
         // Use QTimer::singleShot to queue up the playCard on the event loop.
-        QTimer::singleShot(0, this, [card, this] { playCard(card, false); });
+        // Use QPointer to safely handle the case where the card is deleted before the timer fires.
+        QPointer<CardItem> safeCard = card;
+        QTimer::singleShot(0, this, [safeCard, this] {
+            if (safeCard) {
+                playCard(safeCard, false);
+            }
+        });
     }
 
     if (player->getDeckZone()->getCards().empty() || !card) {
@@ -1280,7 +1300,10 @@ void PlayerActions::actIncPT(int deltaP, int deltaT)
 
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : player->getGameScene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card) {
+            continue;
+        }
         QString pt = card->getPT();
         const auto ptList = parsePT(pt);
         QString newpt;
@@ -1313,7 +1336,10 @@ void PlayerActions::actResetPT()
     int playerid = player->getPlayerInfo()->getId();
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : player->getGameScene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card) {
+            continue;
+        }
         QString ptString;
         if (!card->getFaceDown()) { // leave the pt empty if the card is face down
             ExactCard ec = card->getCard();
@@ -1380,8 +1406,8 @@ void PlayerActions::actSetPT()
 
     auto sel = player->getGameScene()->selectedItems();
     for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
-        if (!card->getPT().isEmpty()) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card && !card->getPT().isEmpty()) {
             oldPT = card->getPT();
         }
     }
@@ -1399,7 +1425,10 @@ void PlayerActions::actSetPT()
 
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card) {
+            continue;
+        }
         auto *cmd = new Command_SetCardAttr;
         QString newpt = QString();
         if (!empty) {
@@ -1498,8 +1527,8 @@ void PlayerActions::actSetAnnotation()
     QString oldAnnotation;
     auto sel = player->getGameScene()->selectedItems();
     for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
-        if (!card->getAnnotation().isEmpty()) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card && !card->getAnnotation().isEmpty()) {
             oldAnnotation = card->getAnnotation();
         }
     }
@@ -1519,7 +1548,10 @@ void PlayerActions::actSetAnnotation()
 
     QList<const ::google::protobuf::Message *> commandList;
     for (const auto &item : sel) {
-        auto *card = static_cast<CardItem *>(item);
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card) {
+            continue;
+        }
         auto *cmd = new Command_SetCardAttr;
         cmd->set_zone(card->getZone()->getName().toStdString());
         cmd->set_card_id(card->getId());
@@ -1544,9 +1576,8 @@ void PlayerActions::actUnattach()
 {
     QList<const ::google::protobuf::Message *> commandList;
     for (QGraphicsItem *item : player->getGameScene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
-
-        if (!card->getAttachedTo()) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (!card || !card->getAttachedTo()) {
             continue;
         }
 
@@ -1566,8 +1597,8 @@ void PlayerActions::actCardCounterTrigger()
     switch (action->data().toInt() % 1000) {
         case 9: { // increment counter
             for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
+                auto *card = qgraphicsitem_cast<CardItem *>(item);
+                if (card && card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
                     auto *cmd = new Command_SetCardCounter;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
@@ -1580,8 +1611,8 @@ void PlayerActions::actCardCounterTrigger()
         }
         case 10: { // decrement counter
             for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0)) {
+                auto *card = qgraphicsitem_cast<CardItem *>(item);
+                if (card && card->getCounters().value(counterId, 0)) {
                     auto *cmd = new Command_SetCardCounter;
                     cmd->set_zone(card->getZone()->getName().toStdString());
                     cmd->set_card_id(card->getId());
@@ -1598,8 +1629,9 @@ void PlayerActions::actCardCounterTrigger()
 
             int oldValue = 0;
             if (player->getGameScene()->selectedItems().size() == 1) {
-                auto *card = static_cast<CardItem *>(player->getGameScene()->selectedItems().first());
-                oldValue = card->getCounters().value(counterId, 0);
+                if (auto *card = qgraphicsitem_cast<CardItem *>(player->getGameScene()->selectedItems().first())) {
+                    oldValue = card->getCounters().value(counterId, 0);
+                }
             }
             int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Set counters"), tr("Number:"), oldValue,
                                               0, MAX_COUNTERS_ON_CARD, 1, &ok);
@@ -1609,7 +1641,10 @@ void PlayerActions::actCardCounterTrigger()
             }
 
             for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
+                auto *card = qgraphicsitem_cast<CardItem *>(item);
+                if (!card) {
+                    continue;
+                }
                 auto *cmd = new Command_SetCardCounter;
                 cmd->set_zone(card->getZone()->getName().toStdString());
                 cmd->set_card_id(card->getId());
@@ -1640,8 +1675,9 @@ void PlayerActions::playSelectedCards(const bool faceDown)
 {
     QList<CardItem *> selectedCards;
     for (const auto &item : player->getGameScene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
-        selectedCards.append(card);
+        if (auto *card = qgraphicsitem_cast<CardItem *>(item)) {
+            selectedCards.append(card);
+        }
     }
 
     // CardIds will get shuffled downwards when cards leave the deck.
@@ -1667,12 +1703,52 @@ void PlayerActions::actPlayFacedown()
     playSelectedCards(true);
 }
 
+void PlayerActions::actPlayAndIncreaseTax()
+{
+    QList<CardItem *> selectedCards;
+    for (const auto &item : player->getGameScene()->selectedItems()) {
+        if (auto *card = qgraphicsitem_cast<CardItem *>(item)) {
+            selectedCards.append(card);
+        }
+    }
+
+    std::sort(selectedCards.begin(), selectedCards.end(),
+              [](const auto &card1, const auto &card2) { return card1->getId() > card2->getId(); });
+
+    for (auto &card : selectedCards) {
+        if (!card || isUnwritableRevealZone(card->getZone()) || card->getZone()->getName() == ZoneNames::TABLE) {
+            continue;
+        }
+
+        QString zoneName = card->getZone()->getName();
+
+        // Only increment tax for cards from command or partner zones
+        if (zoneName == ZoneNames::COMMAND || zoneName == ZoneNames::PARTNER) {
+            // Determine the correct counter ID
+            int counterId = (zoneName == ZoneNames::PARTNER) ? CounterIds::PartnerTax : CounterIds::CommanderTax;
+
+            // Play the card
+            playCard(card, false);
+
+            // Increment the tax counter
+            Command_IncCounter cmd;
+            cmd.set_counter_id(counterId);
+            cmd.set_delta(1);
+            sendGameCommand(cmd);
+        } else {
+            // For non-command zone cards, just play normally
+            playCard(card, false);
+        }
+    }
+}
+
 void PlayerActions::actHide()
 {
     for (const auto &item : player->getGameScene()->selectedItems()) {
-        auto *card = static_cast<CardItem *>(item);
-        if (card && isUnwritableRevealZone(card->getZone())) {
-            card->getZone()->removeCard(card);
+        if (auto *card = qgraphicsitem_cast<CardItem *>(item)) {
+            if (isUnwritableRevealZone(card->getZone())) {
+                card->getZone()->removeCard(card);
+            }
         }
     }
 }
@@ -1776,7 +1852,14 @@ void PlayerActions::cardMenuAction()
     QList<QGraphicsItem *> sel = player->getGameScene()->selectedItems();
     QList<CardItem *> cardList;
     while (!sel.isEmpty()) {
-        cardList.append(qgraphicsitem_cast<CardItem *>(sel.takeFirst()));
+        CardItem *card = qgraphicsitem_cast<CardItem *>(sel.takeFirst());
+        if (card) {
+            cardList.append(card);
+        }
+    }
+
+    if (cardList.isEmpty()) {
+        return;
     }
 
     QList<const ::google::protobuf::Message *> commandList;
@@ -1863,7 +1946,8 @@ void PlayerActions::cardMenuAction()
             idList.add_card()->set_card_id(i->getId());
         }
 
-        switch (static_cast<CardMenuActionType>(a->data().toInt())) {
+        const auto actionType = static_cast<CardMenuActionType>(a->data().toInt());
+        switch (actionType) {
             case cmMoveToTopLibrary: {
                 auto *cmd = new Command_MoveCard;
                 cmd->set_start_player_id(startPlayerId);
@@ -1942,6 +2026,58 @@ void PlayerActions::cardMenuAction()
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
+                break;
+            }
+            case cmMoveToCommandZone:
+            case cmMoveToPartnerZone:
+            case cmMoveToCompanionZone:
+            case cmMoveToBackgroundZone: {
+                const QString zoneName = moveToZoneMap.value(actionType);
+                if (zoneName.isEmpty()) {
+                    qCWarning(PlayerLog) << "Unknown move-to-zone action:" << static_cast<int>(actionType);
+                    break;
+                }
+                auto *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_zone(zoneName.toStdString());
+                cmd->set_x(0);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
+            case cmMoveToTable: {
+                // Process each card individually to position based on card type
+                for (const auto &card : cardList) {
+                    auto *cmd = new Command_MoveCard;
+                    cmd->set_start_player_id(startPlayerId);
+                    cmd->set_start_zone(startZone.toStdString());
+                    cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                    cmd->set_target_zone("table");
+
+                    CardToMove *cardToMove = cmd->mutable_cards_to_move()->add_card();
+                    cardToMove->set_card_id(card->getId());
+
+                    // Determine correct row based on card type (same logic as playCardToTable)
+                    int tableRow = 1; // default for non-creatures
+                    ExactCard exactCard = card->getCard();
+                    if (exactCard) {
+                        const CardInfo &info = exactCard.getInfo();
+                        tableRow = info.getUiAttributes().tableRow;
+                        // default instant/sorcery cards to the noncreatures row
+                        if (tableRow > 2) {
+                            tableRow = 1;
+                        }
+                        cardToMove->set_pt(info.getPowTough().toStdString());
+                        cardToMove->set_tapped(info.getUiAttributes().cipt);
+                    }
+
+                    cmd->set_x(-1);
+                    cmd->set_y(TableZone::clampValidTableRow(2 - tableRow));
+                    commandList.append(cmd);
+                }
                 break;
             }
             default:

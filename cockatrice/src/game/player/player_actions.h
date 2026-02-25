@@ -91,6 +91,7 @@ public slots:
 
     void actPlay();
     void actPlayFacedown();
+    void actPlayAndIncreaseTax();
     void actHide();
 
     void actMoveTopCardToPlay();

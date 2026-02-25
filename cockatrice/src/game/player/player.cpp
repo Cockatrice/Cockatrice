@@ -5,12 +5,16 @@
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
+#include "../board/commander_tax_counter.h"
 #include "../board/counter_general.h"
 #include "../game_scene.h"
+#include "../z_values.h"
+#include "../zones/command_zone.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
 #include "../zones/table_zone.h"
+#include "../zones/zone_names.h"
 #include "player_actions.h"
 #include "player_target.h"
 
@@ -19,6 +23,7 @@
 #include <QMetaType>
 #include <QPainter>
 #include <QtConcurrent>
+#include <libcockatrice/common/counter_ids.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
@@ -32,7 +37,8 @@
 Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), zoneId(0), dialogSemaphore(false)
+      conceded(false), zoneId(0), dialogSemaphore(false), serverHasCommandZone(false), serverHasCompanionZone(false),
+      serverHasBackgroundZone(false)
 {
     initializeZones();
 
@@ -41,6 +47,9 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
     playerMenu->setMenusForGraphicItems();
 
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
+    connect(this, &Player::commandZoneSupportChanged, graphicsItem, &PlayerGraphicsItem::setCommandZonesVisible);
+    connect(this, &Player::companionZoneSupportChanged, graphicsItem, &PlayerGraphicsItem::setCompanionZoneVisible);
+    connect(this, &Player::backgroundZoneSupportChanged, graphicsItem, &PlayerGraphicsItem::setBackgroundZoneVisible);
 
     connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
 
@@ -61,15 +70,19 @@ void Player::forwardActionSignalsToEventHandler()
 
 void Player::initializeZones()
 {
-    addZone(new PileZoneLogic(this, "deck", false, true, false, this));
-    addZone(new PileZoneLogic(this, "grave", false, false, true, this));
-    addZone(new PileZoneLogic(this, "rfg", false, false, true, this));
-    addZone(new PileZoneLogic(this, "sb", false, false, false, this));
-    addZone(new TableZoneLogic(this, "table", true, false, true, this));
-    addZone(new StackZoneLogic(this, "stack", true, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::DECK, false, true, false, this));
+    addZone(new PileZoneLogic(this, ZoneNames::GRAVE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::EXILE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::SIDEBOARD, false, false, false, this));
+    addZone(new TableZoneLogic(this, ZoneNames::TABLE, true, false, true, this));
+    addZone(new StackZoneLogic(this, ZoneNames::STACK, true, false, true, this));
     bool visibleHand = playerInfo->getLocalOrJudge() ||
                        (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
-    addZone(new HandZoneLogic(this, "hand", false, false, visibleHand, this));
+    addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
+    addZone(new CommandZoneLogic(this, ZoneNames::COMMAND, true, false, true, this));
+    addZone(new CommandZoneLogic(this, ZoneNames::PARTNER, true, false, true, this));
+    addZone(new CommandZoneLogic(this, ZoneNames::COMPANION, true, false, true, this));
+    addZone(new CommandZoneLogic(this, ZoneNames::BACKGROUND, true, false, true, this));
 }
 
 Player::~Player()
@@ -95,6 +108,14 @@ void Player::clear()
     }
 
     clearCounters();
+}
+
+void Player::updateZoneSupport(bool *flag, void (Player::*signal)(bool), bool found)
+{
+    if (*flag != found) {
+        *flag = found;
+        emit(this->*signal)(found);
+    }
 }
 
 void Player::setConceded(bool _conceded)
@@ -125,7 +146,9 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
                                       /* StackZone */
                                       "stack",
                                       /* HandZone */
-                                      "hand"};
+                                      "hand",
+                                      /* CommandZones */
+                                      "command", "partner", "companion", "background"};
     clearCounters();
     clearArrows();
 
@@ -140,7 +163,27 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 
     emit clearCustomZonesMenu();
 
+    // Check if server has command zones by scanning the zone list
+    bool foundCommandZone = false;
+    bool foundCompanionZone = false;
+    bool foundBackgroundZone = false;
     const int zoneListSize = info.zone_list_size();
+    for (int i = 0; i < zoneListSize; ++i) {
+        QString zoneName = QString::fromStdString(info.zone_list(i).name());
+        if (zoneName == ZoneNames::COMMAND) {
+            foundCommandZone = true;
+        } else if (zoneName == ZoneNames::COMPANION) {
+            foundCompanionZone = true;
+        } else if (zoneName == ZoneNames::BACKGROUND) {
+            foundBackgroundZone = true;
+        }
+    }
+
+    // Update command zone support flags and notify graphics
+    updateZoneSupport(&serverHasCommandZone, &Player::commandZoneSupportChanged, foundCommandZone);
+    updateZoneSupport(&serverHasCompanionZone, &Player::companionZoneSupportChanged, foundCompanionZone);
+    updateZoneSupport(&serverHasBackgroundZone, &Player::backgroundZoneSupportChanged, foundBackgroundZone);
+
     for (int i = 0; i < zoneListSize; ++i) {
         const ServerInfo_Zone &zoneInfo = info.zone_list(i);
 
@@ -156,7 +199,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
                 // Zones without coordinats are always treated as non-shufflable
                 // PileZones, although supporting alternate hand or stack zones
                 // might make sense in some scenarios.
-                bool contentsKnown;
+                bool contentsKnown = false; // Default to false for unknown zone types
 
                 switch (zoneInfo.type()) {
                     case ServerInfo_Zone::PrivateZone:
@@ -171,6 +214,9 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
 
                     case ServerInfo_Zone::HiddenZone:
                         contentsKnown = false;
+                        break;
+
+                    default:
                         break;
                 }
 
@@ -285,6 +331,20 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     AbstractCounter *ctr;
     if (name == "life") {
         ctr = getGraphicsItem()->getPlayerTarget()->addCounter(counterId, name, value);
+    } else if (counterId == CounterIds::CommanderTax) {
+        QGraphicsItem *parent = graphicsItem->getCommandZoneGraphicsItem();
+        if (!parent) {
+            qCWarning(PlayerLog) << "addCounter: Cannot create CommanderTax counter - command zone not available";
+            return nullptr;
+        }
+        ctr = new CommanderTaxCounter(this, counterId, name, ZoneSizes::TAX_COUNTER_SIZE, value, parent);
+    } else if (counterId == CounterIds::PartnerTax) {
+        QGraphicsItem *parent = graphicsItem->getPartnerZoneGraphicsItem();
+        if (!parent) {
+            qCWarning(PlayerLog) << "addCounter: Cannot create PartnerTax counter - partner zone not available";
+            return nullptr;
+        }
+        ctr = new CommanderTaxCounter(this, counterId, name, ZoneSizes::TAX_COUNTER_SIZE, value, parent);
     } else {
         ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, graphicsItem);
     }
