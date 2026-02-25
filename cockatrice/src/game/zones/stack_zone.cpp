@@ -33,6 +33,11 @@ QRectF StackZone::boundingRect() const
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+
+    // Set brush origin to compensate for zone position, keeping texture fixed in scene coordinates
+    QPointF scenePos = pos();
+    painter->setBrushOrigin(-scenePos);
+
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -104,5 +109,13 @@ void StackZone::reorganizeCards()
             card->setRealZValue(i);
         }
     }
+    update();
+}
+
+void StackZone::setHeight(qreal newHeight)
+{
+    prepareGeometryChange();
+    zoneHeight = newHeight;
+    reorganizeCards();
     update();
 }

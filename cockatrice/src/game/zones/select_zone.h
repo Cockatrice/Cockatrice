@@ -1,7 +1,7 @@
 /**
  * @file select_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
+ * @brief Base class for zones with directly clickable, laid-out cards.
  */
 
 #ifndef SELECTZONE_H
@@ -12,7 +12,16 @@
 #include <QSet>
 
 /**
- * A CardZone where the cards are laid out, with each card directly interactable by clicking.
+ * @class SelectZone
+ * @brief Base class for zones where cards are laid out and directly clickable.
+ *
+ * SelectZone provides mouse interaction handling for zones that display cards
+ * in a visible layout (as opposed to hidden zones like the deck). It supports
+ * click-to-select and rectangle selection via click-and-drag.
+ *
+ * Subclasses include TableZone, HandZone, and CommandZone.
+ *
+ * @see CardZone
  */
 class SelectZone : public CardZone
 {

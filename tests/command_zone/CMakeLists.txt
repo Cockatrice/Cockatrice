@@ -70,6 +70,26 @@ target_link_libraries(command_zone_state_test
 add_test(NAME command_zone_state_test COMMAND command_zone_state_test)
 
 # ------------------------
+# Command Zone Integration Test
+# Tests counter parenting and zone coordination
+# ------------------------
+add_executable(command_zone_integration_test
+    command_zone_integration_test.cpp
+)
+
+target_include_directories(command_zone_integration_test
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(command_zone_integration_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+)
+
+add_test(NAME command_zone_integration_test COMMAND command_zone_integration_test)
+
+# ------------------------
 # Counter Visibility Test
 # Tests counter visibility during zone state transitions
 # ------------------------
@@ -92,5 +112,6 @@ if(NOT GTEST_FOUND)
     add_dependencies(command_zone_logic_test gtest)
     add_dependencies(commander_tax_counter_test gtest)
     add_dependencies(command_zone_state_test gtest)
+    add_dependencies(command_zone_integration_test gtest)
     add_dependencies(counter_visibility_test gtest)
 endif()

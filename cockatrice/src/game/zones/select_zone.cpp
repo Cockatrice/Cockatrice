@@ -9,6 +9,15 @@
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse)
 {
+    // Handle single card case - return centered position or index 0
+    if (cardCount <= 1) {
+        if (reverse) {
+            return 0; // Single card maps to index 0
+        } else {
+            return (totalHeight - cardHeight) / 2.0; // Center the single card
+        }
+    }
+
     qreal cardMinOverlap = cardHeight * SettingsCache::instance().getStackCardOverlapPercent() / 100;
     qreal desiredHeight = cardHeight * cardCount - cardMinOverlap * (cardCount - 1);
     qreal y;
