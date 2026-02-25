@@ -54,7 +54,7 @@ add_library(
 
 add_dependencies(libcockatrice_network_server_remote libcockatrice_protocol)
 
-target_include_directories(libcockatrice_network_server_remote PUBLIC .)
+target_include_directories(libcockatrice_network_server_remote PUBLIC . ${CMAKE_CURRENT_SOURCE_DIR}/../../../../)
 
 # Make cockatrice_server depend on cockatrice_protocol
 target_link_libraries(

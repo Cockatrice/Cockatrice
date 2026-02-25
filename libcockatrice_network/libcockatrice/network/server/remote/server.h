@@ -174,6 +174,10 @@ public:
     {
         return false;
     }
+    virtual bool permitCommandZone() const
+    {
+        return true; // Default: allow command zones
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()

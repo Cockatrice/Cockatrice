@@ -69,6 +69,15 @@ message Command_CreateGame {
 
     // share decklists with all players when selected
     optional bool share_decklists_on_load = 14;
+
+    // enable the command zone for Commander format
+    optional bool enable_command_zone = 15;
+
+    // enable companion zone for Ikoria mechanic
+    optional bool enable_companion_zone = 16;
+
+    // enable background zone for Baldur's Gate mechanic
+    optional bool enable_background_zone = 17;
 }
 
 message Command_JoinGame {

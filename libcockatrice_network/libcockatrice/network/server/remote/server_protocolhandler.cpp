@@ -830,6 +830,12 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+    // Only enable command zone if server permits it
+    bool enableCommandZone = cmd.has_enable_command_zone() && cmd.enable_command_zone() && server->permitCommandZone();
+
+    // Companion and Background zones are independent of command zone (explicit opt-in)
+    bool enableCompanionZone = cmd.has_enable_companion_zone() && cmd.enable_companion_zone();
+    bool enableBackgroundZone = cmd.has_enable_background_zone() && cmd.enable_background_zone();
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
@@ -841,7 +847,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     auto *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
                                  cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
                                  cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(),
-                                 cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
+                                 cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad,
+                                 enableCommandZone, enableCompanionZone, enableBackgroundZone, room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

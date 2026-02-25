@@ -965,6 +965,11 @@ bool Servatrice::permitCreateGameAsJudge() const
     return settingsCache->value("game/allow_create_as_judge", false).toBool();
 }
 
+bool Servatrice::permitCommandZone() const
+{
+    return settingsCache->value("game/allow_command_zone", true).toBool();
+}
+
 QHostAddress Servatrice::getServerTCPHost() const
 {
     QString host = settingsCache->value("server/host", "any").toString();

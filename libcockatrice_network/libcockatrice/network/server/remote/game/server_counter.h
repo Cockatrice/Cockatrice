@@ -22,6 +22,7 @@
 
 #include <QString>
 #include <libcockatrice/protocol/pb/color.pb.h>
+#include <limits>
 
 class ServerInfo_Counter;
 
@@ -33,9 +34,20 @@ protected:
     color counterColor;
     int radius;
     int count;
+    int minValue;
+    int maxValue;
+
+    // Maximum reasonable counter value to prevent rendering/memory issues
+    static constexpr int DEFAULT_MAX_VALUE = 9999;
 
 public:
-    Server_Counter(int _id, const QString &_name, const color &_counterColor, int _radius, int _count = 0);
+    Server_Counter(int _id,
+                   const QString &_name,
+                   const color &_counterColor,
+                   int _radius,
+                   int _count = 0,
+                   int _minValue = std::numeric_limits<int>::min(),
+                   int _maxValue = DEFAULT_MAX_VALUE);
     ~Server_Counter()
     {
     }
@@ -59,9 +71,11 @@ public:
     {
         return count;
     }
-    void setCount(int _count)
+    bool setCount(int _count)
     {
-        count = _count;
+        int oldCount = count;
+        count = qBound(minValue, _count, maxValue);
+        return count != oldCount;
     }
 
     void getInfo(ServerInfo_Counter *info);

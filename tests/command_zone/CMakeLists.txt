@@ -106,6 +106,21 @@ target_link_libraries(counter_visibility_test
 add_test(NAME counter_visibility_test COMMAND counter_visibility_test)
 
 # ------------------------
+# Server Counter SetCount Test
+# Tests setCount() return value for event suppression
+# ------------------------
+add_executable(server_counter_setcount_test
+    server_counter_setcount_test.cpp
+)
+
+target_link_libraries(server_counter_setcount_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+)
+
+add_test(NAME server_counter_setcount_test COMMAND server_counter_setcount_test)
+
+# ------------------------
 # Dependencies on gtest
 # ------------------------
 if(NOT GTEST_FOUND)
@@ -114,4 +129,5 @@ if(NOT GTEST_FOUND)
     add_dependencies(command_zone_state_test gtest)
     add_dependencies(command_zone_integration_test gtest)
     add_dependencies(counter_visibility_test gtest)
+    add_dependencies(server_counter_setcount_test gtest)
 endif()

@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
+#include <libcockatrice/common/counter_ids.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
@@ -98,6 +99,24 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
     addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
+
+    // Command zones for Commander format
+    if (game->getEnableCommandZone()) {
+        addZone(new Server_CardZone(this, "command", false, ServerInfo_Zone::PublicZone));
+        addCounter(new Server_Counter(CounterIds::CommanderTax, CounterNames::CommanderTax, makeColor(128, 128, 128),
+                                      20, 0, 0));
+        addZone(new Server_CardZone(this, "partner", false, ServerInfo_Zone::PublicZone));
+        addCounter(
+            new Server_Counter(CounterIds::PartnerTax, CounterNames::PartnerTax, makeColor(128, 128, 128), 20, 0, 0));
+    }
+
+    // Companion and Background zones are independent mechanics
+    if (game->getEnableCompanionZone()) {
+        addZone(new Server_CardZone(this, "companion", false, ServerInfo_Zone::PublicZone));
+    }
+    if (game->getEnableBackgroundZone()) {
+        addZone(new Server_CardZone(this, "background", false, ServerInfo_Zone::PublicZone));
+    }
 
     // ------------------------------------------------------------------
 
@@ -424,6 +443,10 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
 Response::ResponseCode
 Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
+    // Security note: Counter ownership is implicitly validated through command routing.
+    // Each participant's processGameCommand operates on their own counters map,
+    // so players can only modify their own counters.
+
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -431,17 +454,27 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *c = counters.value(cmd.counter_id(), 0);
+    const int counterId = cmd.counter_id();
+
+    // Defensive validation: Commander Tax counters require command zone to be enabled
+    if ((counterId == CounterIds::CommanderTax || counterId == CounterIds::PartnerTax) &&
+        !game->getEnableCommandZone()) {
+        return Response::RespContextError;
+    }
+
+    Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
     }
 
-    c->setCount(c->getCount() + cmd.delta());
+    bool didChange = c->setCount(c->getCount() + cmd.delta());
 
-    Event_SetCounter event;
-    event.set_counter_id(c->getId());
-    event.set_value(c->getCount());
-    ges.enqueueGameEvent(event, playerId);
+    if (didChange) {
+        Event_SetCounter event;
+        event.set_counter_id(c->getId());
+        event.set_value(c->getCount());
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -475,6 +508,8 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
 Response::ResponseCode
 Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
+    // Security note: Counter ownership is implicitly validated through command routing.
+
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
     }
@@ -482,17 +517,27 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *c = counters.value(cmd.counter_id(), 0);
+    const int counterId = cmd.counter_id();
+
+    // Defensive validation: Commander Tax counters require command zone to be enabled
+    if ((counterId == CounterIds::CommanderTax || counterId == CounterIds::PartnerTax) &&
+        !game->getEnableCommandZone()) {
+        return Response::RespContextError;
+    }
+
+    Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
     }
 
-    c->setCount(cmd.value());
+    bool didChange = c->setCount(cmd.value());
 
-    Event_SetCounter event;
-    event.set_counter_id(c->getId());
-    event.set_value(c->getCount());
-    ges.enqueueGameEvent(event, playerId);
+    if (didChange) {
+        Event_SetCounter event;
+        event.set_counter_id(c->getId());
+        event.set_value(c->getCount());
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
