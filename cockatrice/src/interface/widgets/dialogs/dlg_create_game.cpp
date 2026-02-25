@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_room.h"
+#include "game_zone_options_widget.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -102,6 +103,7 @@ void DlgCreateGame::sharedCtor()
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
     shareDecklistsOnLoadCheckBox = new QCheckBox(tr("Open decklists in lobby"));
+    zoneOptionsWidget = new GameZoneOptionsWidget(this);
 
     createGameAsJudgeCheckBox = new QCheckBox(tr("Create game as judge"));
 
@@ -109,8 +111,9 @@ void DlgCreateGame::sharedCtor()
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
+    gameSetupOptionsLayout->addWidget(zoneOptionsWidget, 2, 0, 1, 2);
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
+        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 3, 0);
     } else {
         createGameAsJudgeCheckBox->setChecked(false);
         createGameAsJudgeCheckBox->setHidden(true);
@@ -171,6 +174,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     createGameAsSpectatorCheckBox->setChecked(SettingsCache::instance().getCreateGameAsSpectator());
     startingLifeTotalEdit->setValue(SettingsCache::instance().getDefaultStartingLifeTotal());
     shareDecklistsOnLoadCheckBox->setChecked(SettingsCache::instance().getShareDecklistsOnLoad());
+    zoneOptionsWidget->loadFromSettings();
 
     if (!rememberGameSettings->isChecked()) {
         actReset();
@@ -204,6 +208,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     createGameAsSpectatorCheckBox->setEnabled(false);
     startingLifeTotalEdit->setEnabled(false);
     shareDecklistsOnLoadCheckBox->setEnabled(false);
+    zoneOptionsWidget->setReadOnly(true);
 
     descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
     maxPlayersEdit->setValue(gameInfo.max_players());
@@ -249,6 +254,7 @@ void DlgCreateGame::actReset()
 
     startingLifeTotalEdit->setValue(20);
     shareDecklistsOnLoadCheckBox->setChecked(false);
+    zoneOptionsWidget->resetToDefaults();
     createGameAsJudgeCheckBox->setChecked(false);
 
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
@@ -279,6 +285,9 @@ void DlgCreateGame::actOK()
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
     cmd.set_starting_life_total(startingLifeTotalEdit->value());
     cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
+    cmd.set_enable_command_zone(zoneOptionsWidget->enableCommandZone());
+    cmd.set_enable_companion_zone(zoneOptionsWidget->enableCompanionZone());
+    cmd.set_enable_background_zone(zoneOptionsWidget->enableBackgroundZone());
 
     auto _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
@@ -303,6 +312,7 @@ void DlgCreateGame::actOK()
         SettingsCache::instance().setCreateGameAsSpectator(createGameAsSpectatorCheckBox->isChecked());
         SettingsCache::instance().setDefaultStartingLifeTotal(startingLifeTotalEdit->value());
         SettingsCache::instance().setShareDecklistsOnLoad(shareDecklistsOnLoadCheckBox->isChecked());
+        zoneOptionsWidget->saveToSettings();
         SettingsCache::instance().setGameTypes(_gameTypes);
     }
     PendingCommand *pend = room->prepareRoomCommand(cmd);

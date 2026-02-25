@@ -39,6 +39,7 @@
 #include "../main.h"
 #include "logger.h"
 #include "version_string.h"
+#include "widgets/dialogs/dlg_local_game_options.h"
 #include "widgets/utility/get_text_with_max.h"
 
 #include <QAction>
@@ -225,16 +226,20 @@ void MainWindow::actDisconnect()
 
 void MainWindow::actSinglePlayer()
 {
-    bool ok;
-    int numberPlayers =
-        QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
-    if (!ok)
+    DlgLocalGameOptions dlg(this);
+    if (!dlg.exec())
         return;
 
-    startLocalGame(numberPlayers);
+    startLocalGame(dlg.getNumberPlayers(), dlg.getStartingLifeTotal(), dlg.getEnableCommandZone(),
+                   dlg.getEnableCompanionZone(), dlg.getEnableBackgroundZone(), dlg.getSpectatorsSeeEverything());
 }
 
-void MainWindow::startLocalGame(int numberPlayers)
+void MainWindow::startLocalGame(int numberPlayers,
+                                int startingLifeTotal,
+                                bool enableCommandZone,
+                                bool enableCompanionZone,
+                                bool enableBackgroundZone,
+                                bool spectatorsSeeEverything)
 {
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
@@ -258,6 +263,11 @@ void MainWindow::startLocalGame(int numberPlayers)
 
     Command_CreateGame createCommand;
     createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
+    createCommand.set_starting_life_total(startingLifeTotal);
+    createCommand.set_enable_command_zone(enableCommandZone);
+    createCommand.set_enable_companion_zone(enableCompanionZone);
+    createCommand.set_enable_background_zone(enableBackgroundZone);
+    createCommand.set_spectators_see_everything(spectatorsSeeEverything);
     mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 
@@ -913,7 +923,11 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::startupConfigCheck()
 {
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
-        startLocalGame(SettingsCache::instance().debug().getLocalGamePlayerCount());
+        startLocalGame(
+            SettingsCache::instance().debug().getLocalGamePlayerCount(),
+            SettingsCache::instance().getDefaultStartingLifeTotal(), SettingsCache::instance().getEnableCommandZone(),
+            SettingsCache::instance().getEnableCompanionZone(), SettingsCache::instance().getEnableBackgroundZone(),
+            SettingsCache::instance().getSpectatorsCanSeeEverything());
     }
 
     if (SettingsCache::instance().getCheckUpdatesOnStartup()) {

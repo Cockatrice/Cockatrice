@@ -137,7 +137,12 @@ private:
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
 
-    void startLocalGame(int numberPlayers);
+    void startLocalGame(int numberPlayers,
+                        int startingLifeTotal,
+                        bool enableCommandZone,
+                        bool enableCompanionZone,
+                        bool enableBackgroundZone,
+                        bool spectatorsSeeEverything);
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;

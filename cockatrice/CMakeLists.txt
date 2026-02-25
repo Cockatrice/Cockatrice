@@ -27,6 +27,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
     src/interface/widgets/dialogs/dlg_default_tags_editor.cpp
+    src/interface/widgets/dialogs/game_zone_options_widget.cpp
     src/interface/widgets/dialogs/dlg_edit_avatar.cpp
     src/interface/widgets/dialogs/dlg_edit_password.cpp
     src/interface/widgets/dialogs/dlg_edit_tokens.cpp
@@ -39,6 +40,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
+    src/interface/widgets/dialogs/dlg_local_game_options.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
@@ -82,8 +84,8 @@ set(cockatrice_SOURCES
     src/game/phase.cpp
     src/game/phases_toolbar.cpp
     src/game/player/menu/card_menu.cpp
-    src/game/player/menu/custom_zone_menu.cpp
     src/game/player/menu/command_zone_menu.cpp
+    src/game/player/menu/custom_zone_menu.cpp
     src/game/player/menu/grave_menu.cpp
     src/game/player/menu/hand_menu.cpp
     src/game/player/menu/library_menu.cpp
@@ -105,18 +107,18 @@ set(cockatrice_SOURCES
     src/game/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone.cpp
+    src/game/zones/command_zone.cpp
     src/game/zones/command_zone_state.cpp
     src/game/zones/hand_zone.cpp
-    src/game/zones/command_zone.cpp
-    src/game/zones/logic/command_zone_logic.cpp
     src/game/zones/logic/card_zone_logic.cpp
+    src/game/zones/logic/command_zone_logic.cpp
     src/game/zones/logic/hand_zone_logic.cpp
     src/game/zones/logic/pile_zone_logic.cpp
     src/game/zones/logic/stack_zone_logic.cpp
     src/game/zones/logic/table_zone_logic.cpp
     src/game/zones/logic/view_zone_logic.cpp
-    src/game/zones/zone_toggle_button.cpp
     src/game/zones/pile_zone.cpp
+    src/game/zones/zone_toggle_button.cpp
     src/game/zones/select_zone.cpp
     src/game/zones/stack_zone.cpp
     src/game/zones/table_zone.cpp

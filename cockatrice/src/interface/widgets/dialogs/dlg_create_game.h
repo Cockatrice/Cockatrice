@@ -11,6 +11,7 @@
 #include <QMap>
 #include <libcockatrice/utility/macros.h>
 
+class GameZoneOptionsWidget;
 class QCheckBox;
 class QDialogButtonBox;
 class QGroupBox;
@@ -48,6 +49,7 @@ private:
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
         *spectatorsSeeEverythingCheckBox, *createGameAsJudgeCheckBox, *createGameAsSpectatorCheckBox;
     QCheckBox *shareDecklistsOnLoadCheckBox;
+    GameZoneOptionsWidget *zoneOptionsWidget;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;
