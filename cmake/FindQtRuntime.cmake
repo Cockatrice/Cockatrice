@@ -29,7 +29,7 @@ if(WITH_ORACLE)
   set(_ORACLE_NEEDED Concurrent Network Svg Widgets)
 endif()
 if(TEST)
-  set(_TEST_NEEDED Widgets)
+  set(_TEST_NEEDED Test Widgets)
 endif()
 
 set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_COCKATRICE_NEEDED} ${_ORACLE_NEEDED}
