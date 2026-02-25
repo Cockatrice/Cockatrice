@@ -61,5 +61,6 @@ target_link_libraries(
 )
 
 add_subdirectory(carddatabase)
+add_subdirectory(command_zone)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(oracle)

@@ -103,6 +103,7 @@ set(cockatrice_SOURCES
     src/game/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone.cpp
+    src/game/zones/command_zone_state.cpp
     src/game/zones/hand_zone.cpp
     src/game/zones/logic/card_zone_logic.cpp
     src/game/zones/logic/hand_zone_logic.cpp

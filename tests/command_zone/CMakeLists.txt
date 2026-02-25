@@ -1,0 +1,40 @@
+# ------------------------
+# Qt modules for command zone tests
+# Qt::Gui required for QColor in z_values.h
+# Qt::Widgets required for QGraphicsItem in abstract_card_item.h
+# ------------------------
+set(TEST_QT_MODULES
+    ${COCKATRICE_QT_VERSION_NAME}::Core
+    ${COCKATRICE_QT_VERSION_NAME}::Test
+    ${COCKATRICE_QT_VERSION_NAME}::Gui
+    ${COCKATRICE_QT_VERSION_NAME}::Widgets
+)
+
+# ------------------------
+# Command Zone State Test
+# Tests the extracted CommandZoneState pure state machine
+# ------------------------
+add_executable(command_zone_state_test
+    command_zone_state_test.cpp
+    ${CMAKE_SOURCE_DIR}/cockatrice/src/game/zones/command_zone_state.cpp
+)
+
+target_include_directories(command_zone_state_test
+    PRIVATE ${CMAKE_SOURCE_DIR}
+    PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/game/zones
+)
+
+target_link_libraries(command_zone_state_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+)
+
+add_test(NAME command_zone_state_test COMMAND command_zone_state_test)
+
+# ------------------------
+# Dependencies on gtest
+# ------------------------
+if(NOT GTEST_FOUND)
+    add_dependencies(command_zone_state_test gtest)
+endif()
