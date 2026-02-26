@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../game_scene.h"
+#include "../z_values.h"
 
 #include <QCursor>
 #include <QGraphicsScene>
@@ -215,7 +216,7 @@ void AbstractCardItem::setHovered(bool _hovered)
     if (_hovered)
         processHoverEvent();
     isHovered = _hovered;
-    setZValue(_hovered ? 2000000004 : realZValue);
+    setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
     setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CARD_WIDTH / 2 : 0, _hovered ? CARD_HEIGHT / 2 : 0);
     update();
