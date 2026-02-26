@@ -38,7 +38,7 @@ CardZoneLogic::CardZoneLogic(Player *_player,
 void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, const int y)
 {
     if (!card) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::addCard() card is null; this shouldn't normally happen";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::addCard() card is null; this shouldn't normally happen";
         return;
     }
 
@@ -92,7 +92,7 @@ CardItem *CardZoneLogic::getCard(int cardId)
 {
     CardItem *c = cards.findCard(cardId);
     if (!c) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::getCard: card id=" << cardId << "not found";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::getCard: card id=" << cardId << "not found";
         return nullptr;
     }
     // If the card's id is -1, this zone is invisible,
@@ -107,7 +107,7 @@ CardItem *CardZoneLogic::getCard(int cardId)
 void CardZoneLogic::removeCard(CardItem *card)
 {
     if (!card) {
-        qCWarning(CardZoneLog) << "CardZoneLogic::removeCard: card is null, this shouldn't normally happen";
+        qCWarning(CardZoneLogicLog) << "CardZoneLogic::removeCard: card is null, this shouldn't normally happen";
         return;
     }
 
@@ -195,6 +195,18 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
         return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
     else if (name == ZoneNames::EXILE)
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
+    else if (name == ZoneNames::COMMAND)
+        return (theirOwn ? tr("their command zone", "nominative")
+                         : tr("%1's command zone", "nominative").arg(ownerName));
+    else if (name == ZoneNames::PARTNER)
+        return (theirOwn ? tr("their partner zone", "nominative")
+                         : tr("%1's partner zone", "nominative").arg(ownerName));
+    else if (name == ZoneNames::COMPANION)
+        return (theirOwn ? tr("their companion zone", "nominative")
+                         : tr("%1's companion zone", "nominative").arg(ownerName));
+    else if (name == ZoneNames::BACKGROUND)
+        return (theirOwn ? tr("their background zone", "nominative")
+                         : tr("%1's background zone", "nominative").arg(ownerName));
     else if (name == ZoneNames::SIDEBOARD)
         switch (gc) {
             case CaseLookAtZone:

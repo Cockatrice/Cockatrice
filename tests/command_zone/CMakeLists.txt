@@ -11,6 +11,27 @@ set(TEST_QT_MODULES
 )
 
 # ------------------------
+# Command Zone Logic Test
+# Tests addCardImpl insertion behavior
+# ------------------------
+add_executable(command_zone_logic_test
+    mocks/mock_card_item.cpp
+    command_zone_logic_test.cpp
+)
+
+target_include_directories(command_zone_logic_test
+    PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/game/zones/logic
+)
+
+target_link_libraries(command_zone_logic_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+)
+
+add_test(NAME command_zone_logic_test COMMAND command_zone_logic_test)
+
+# ------------------------
 # Command Zone State Test
 # Tests the extracted CommandZoneState pure state machine
 # ------------------------
@@ -36,5 +57,6 @@ add_test(NAME command_zone_state_test COMMAND command_zone_state_test)
 # Dependencies on gtest
 # ------------------------
 if(NOT GTEST_FOUND)
+    add_dependencies(command_zone_logic_test gtest)
     add_dependencies(command_zone_state_test gtest)
 endif()

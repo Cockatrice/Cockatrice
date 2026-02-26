@@ -1,7 +1,7 @@
 /**
  * @file card_zone_logic.h
  * @ingroup GameLogicZones
- * @brief TODO: Document this.
+ * @brief Base class for zone data management, separated from graphics.
  */
 
 #ifndef COCKATRICE_CARD_ZONE_LOGIC_H
@@ -22,6 +22,18 @@ class QAction;
 class QPainter;
 class CardDragItem;
 
+/**
+ * @class CardZoneLogic
+ * @brief Abstract base class for zone data management (logic layer).
+ *
+ * CardZoneLogic handles card storage, lookup, and manipulation for a zone.
+ * It is paired with a CardZone graphics object to implement the logic/graphics
+ * separation pattern used throughout Cockatrice.
+ *
+ * Subclasses must implement addCardImpl() to define zone-specific insertion behavior.
+ *
+ * @see CardZone
+ */
 class CardZoneLogic : public QObject
 {
     Q_OBJECT
@@ -111,7 +123,7 @@ protected:
     QList<ZoneViewZone *> views;
     bool hasCardAttr;
     bool isShufflable;
-    bool alwaysRevealTopCard;
+    bool alwaysRevealTopCard = false;
 
     virtual void addCardImpl(CardItem *card, int x, int y) = 0;
 };
