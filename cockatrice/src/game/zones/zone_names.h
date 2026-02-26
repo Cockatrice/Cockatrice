@@ -23,6 +23,10 @@ constexpr const char *HAND = "hand";
 constexpr const char *DECK = "deck";
 constexpr const char *SIDEBOARD = "sb";
 constexpr const char *STACK = "stack";
+constexpr const char *COMMAND = "command";
+constexpr const char *PARTNER = "partner";
+constexpr const char *COMPANION = "companion";
+constexpr const char *BACKGROUND = "background";
 } // namespace ZoneNames
 
 #endif // ZONE_NAMES_H
