@@ -71,6 +71,8 @@ QUERY(Color2, cat, "c:gw", true)
 QUERY(Color3, cat, "c!g", true)
 QUERY(Color4, cat, "c!gw", false)
 
+QUERY(BracketNextToUnquotedString, cat, "(o:woof OR o:meow)", true)
+
 } // namespace
 
 int main(int argc, char **argv)
