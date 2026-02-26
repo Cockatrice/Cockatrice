@@ -6,19 +6,13 @@
 #include "../board/translate_counter_name.h"
 #include "../phase.h"
 #include "../player/player.h"
+#include "../zones/zone_names.h"
 
 #include <../../client/settings/card_counter_settings.h>
+#include <libcockatrice/common/counter_ids.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <utility>
-
-static const QString TABLE_ZONE_NAME = "table";
-static const QString GRAVE_ZONE_NAME = "grave";
-static const QString EXILE_ZONE_NAME = "rfg";
-static const QString HAND_ZONE_NAME = "hand";
-static const QString DECK_ZONE_NAME = "deck";
-static const QString SIDEBOARD_ZONE_NAME = "sb";
-static const QString STACK_ZONE_NAME = "stack";
 
 static QString sanitizeHtml(QString dirty)
 {
@@ -37,15 +31,15 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     QString fromStr;
     QString zoneName = zone->getName();
 
-    if (zoneName == TABLE_ZONE_NAME) {
+    if (zoneName == ZoneNames::TABLE) {
         fromStr = tr(" from play");
-    } else if (zoneName == GRAVE_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::GRAVE) {
         fromStr = tr(" from their graveyard");
-    } else if (zoneName == EXILE_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::EXILE) {
         fromStr = tr(" from exile");
-    } else if (zoneName == HAND_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::HAND) {
         fromStr = tr(" from their hand");
-    } else if (zoneName == DECK_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::DECK) {
         if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
@@ -83,10 +77,18 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 fromStr = tr(" from their library");
             }
         }
-    } else if (zoneName == SIDEBOARD_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::SIDEBOARD) {
         fromStr = tr(" from sideboard");
-    } else if (zoneName == STACK_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::STACK) {
         fromStr = tr(" from the stack");
+    } else if (zoneName == ZoneNames::COMMAND) {
+        fromStr = tr(" from the command zone");
+    } else if (zoneName == ZoneNames::PARTNER) {
+        fromStr = tr(" from the partner zone");
+    } else if (zoneName == ZoneNames::COMPANION) {
+        fromStr = tr(" from the companion zone");
+    } else if (zoneName == ZoneNames::BACKGROUND) {
+        fromStr = tr(" from the background zone");
     } else {
         fromStr = tr(" from custom zone '%1'").arg(zoneName);
     }
@@ -275,9 +277,9 @@ void MessageLogWidget::logMoveCard(Player *player,
     bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
 
     // do not log if moved within the same zone
-    if ((startZoneName == TABLE_ZONE_NAME && targetZoneName == TABLE_ZONE_NAME && !ownerChanged) ||
-        (startZoneName == HAND_ZONE_NAME && targetZoneName == HAND_ZONE_NAME) ||
-        (startZoneName == EXILE_ZONE_NAME && targetZoneName == EXILE_ZONE_NAME)) {
+    if ((startZoneName == ZoneNames::TABLE && targetZoneName == ZoneNames::TABLE && !ownerChanged) ||
+        (startZoneName == ZoneNames::HAND && targetZoneName == ZoneNames::HAND) ||
+        (startZoneName == ZoneNames::EXILE && targetZoneName == ZoneNames::EXILE)) {
         return;
     }
 
@@ -306,20 +308,20 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     QString finalStr;
     std::optional<QString> fourthArg;
-    if (targetZoneName == TABLE_ZONE_NAME) {
+    if (targetZoneName == ZoneNames::TABLE) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
             finalStr = tr("%1 puts %2 into play%3 face down.");
         } else {
             finalStr = tr("%1 puts %2 into play%3.");
         }
-    } else if (targetZoneName == GRAVE_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::GRAVE) {
         finalStr = tr("%1 puts %2%3 into their graveyard.");
-    } else if (targetZoneName == EXILE_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::EXILE) {
         finalStr = tr("%1 exiles %2%3.");
-    } else if (targetZoneName == HAND_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::HAND) {
         finalStr = tr("%1 moves %2%3 to their hand.");
-    } else if (targetZoneName == DECK_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::DECK) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
         } else if (newX >= targetZone->getCards().size()) {
@@ -331,11 +333,19 @@ void MessageLogWidget::logMoveCard(Player *player,
             fourthArg = QString::number(newX);
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
-    } else if (targetZoneName == SIDEBOARD_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::SIDEBOARD) {
         finalStr = tr("%1 moves %2%3 to sideboard.");
-    } else if (targetZoneName == STACK_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::STACK) {
         soundEngine->playSound("play_card");
         finalStr = tr("%1 plays %2%3.");
+    } else if (targetZoneName == ZoneNames::COMMAND) {
+        finalStr = tr("%1 moves %2%3 to the command zone.");
+    } else if (targetZoneName == ZoneNames::PARTNER) {
+        finalStr = tr("%1 moves %2%3 to the partner zone.");
+    } else if (targetZoneName == ZoneNames::COMPANION) {
+        finalStr = tr("%1 moves %2%3 to the companion zone.");
+    } else if (targetZoneName == ZoneNames::BACKGROUND) {
+        finalStr = tr("%1 moves %2%3 to the background zone.");
     } else {
         fourthArg = targetZoneName;
         finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
@@ -658,6 +668,20 @@ void MessageLogWidget::logSetCounter(Player *player, QString counterName, int va
     }
 
     QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
+
+    // Special format for commander/partner tax (manual player action)
+    if (counterName == CounterNames::CommanderTax || counterName == CounterNames::PartnerTax) {
+        appendHtmlServerMessage(
+            tr("%1 sets %2 counter to %3 (%4%5).")
+                .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
+                .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))
+                .arg(QString("<font class=\"blue\">%1</font>").arg(value))
+                .arg(value > oldValue ? "+" : "")
+                .arg(value - oldValue));
+        return;
+    }
+
+    // Generic counter format
     appendHtmlServerMessage(tr("%1 sets counter %2 to %3 (%4%5).")
                                 .arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg(QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName)))

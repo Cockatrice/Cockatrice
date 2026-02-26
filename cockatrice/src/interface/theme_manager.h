@@ -36,7 +36,8 @@ public:
         Stack,
         Table,
         Player,
-        MaxRole = Player,
+        Command,
+        MaxRole = Command,
     };
 
 private:

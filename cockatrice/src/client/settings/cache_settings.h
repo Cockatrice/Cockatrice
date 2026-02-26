@@ -323,6 +323,9 @@ private:
     bool createGameAsSpectator;
     int defaultStartingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool enableCommandZone;
+    bool enableCompanionZone;
+    bool enableBackgroundZone;
     int keepalive;
     int timeout;
     void translateLegacySettings();
@@ -854,6 +857,18 @@ public:
     {
         return shareDecklistsOnLoad;
     }
+    [[nodiscard]] bool getEnableCommandZone() const
+    {
+        return enableCommandZone;
+    }
+    [[nodiscard]] bool getEnableCompanionZone() const
+    {
+        return enableCompanionZone;
+    }
+    [[nodiscard]] bool getEnableBackgroundZone() const
+    {
+        return enableBackgroundZone;
+    }
     [[nodiscard]] bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
@@ -1088,6 +1103,9 @@ public slots:
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad);
+    void setEnableCommandZone(const bool _enableCommandZone);
+    void setEnableCompanionZone(const bool _enableCompanionZone);
+    void setEnableBackgroundZone(const bool _enableBackgroundZone);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);
