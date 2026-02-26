@@ -76,7 +76,7 @@ private:
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
+    QDockWidget *cardInfoDock, *playerListDock, *notesDock, *messageLayoutDock, *replayDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
@@ -121,6 +121,7 @@ private:
     void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
     void createCardInfoDock(bool bReplay = false);
     void createPlayerListDock(bool bReplay = false);
+    void createNotesDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
