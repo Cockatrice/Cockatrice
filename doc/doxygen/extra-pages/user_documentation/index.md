@@ -1,11 +1,15 @@
 @page user_reference User Reference
- 
+
 ## Deck Management
 
 - @subpage creating_decks
 - @subpage importing_decks
 - @subpage editing_decks
 - @subpage exporting_decks
+
+## Game Formats
+
+- @subpage commander_format
 
 ## Release Channels
 

@@ -9,3 +9,5 @@
 
 - @subpage loading_card_pictures
 - @subpage displaying_cards
+
+- @subpage command_zone_architecture
