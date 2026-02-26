@@ -23,12 +23,10 @@ AbstractCounter::AbstractCounter(Player *_player,
                                  int _value,
                                  bool _useNameForShortcut,
                                  QGraphicsItem *parent)
-    : QGraphicsItem(parent), player(_player), id(_id), name(_name), value(_value),
+    : QGraphicsObject(parent), player(_player), id(_id), name(_name), value(_value),
       useNameForShortcut(_useNameForShortcut), hovered(false), aDec(nullptr), aInc(nullptr), dialogSemaphore(false),
       deleteAfterDialog(false), shownInCounterArea(_shownInCounterArea)
 {
-    setAcceptHoverEvents(true);
-
     shortcutActive = false;
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {

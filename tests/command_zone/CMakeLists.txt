@@ -32,6 +32,22 @@ target_link_libraries(command_zone_logic_test
 add_test(NAME command_zone_logic_test COMMAND command_zone_logic_test)
 
 # ------------------------
+# Commander Tax Counter Test
+# Tests setValue clamping behavior
+# ------------------------
+add_executable(commander_tax_counter_test
+    commander_tax_counter_test.cpp
+)
+
+target_link_libraries(commander_tax_counter_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+)
+
+add_test(NAME commander_tax_counter_test COMMAND commander_tax_counter_test)
+
+# ------------------------
 # Command Zone State Test
 # Tests the extracted CommandZoneState pure state machine
 # ------------------------
@@ -54,9 +70,27 @@ target_link_libraries(command_zone_state_test
 add_test(NAME command_zone_state_test COMMAND command_zone_state_test)
 
 # ------------------------
+# Counter Visibility Test
+# Tests counter visibility during zone state transitions
+# ------------------------
+add_executable(counter_visibility_test
+    counter_visibility_test.cpp
+)
+
+target_link_libraries(counter_visibility_test
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+)
+
+add_test(NAME counter_visibility_test COMMAND counter_visibility_test)
+
+# ------------------------
 # Dependencies on gtest
 # ------------------------
 if(NOT GTEST_FOUND)
     add_dependencies(command_zone_logic_test gtest)
+    add_dependencies(commander_tax_counter_test gtest)
     add_dependencies(command_zone_state_test gtest)
+    add_dependencies(counter_visibility_test gtest)
 endif()

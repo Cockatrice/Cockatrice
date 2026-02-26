@@ -15,7 +15,12 @@ GeneralCounter::GeneralCounter(Player *_player,
                                QGraphicsItem *parent)
     : AbstractCounter(_player, _id, _name, true, _value, useNameForShortcut, parent), color(_color), radius(_radius)
 {
+    // Graphics configuration must be in concrete class, not AbstractCounter.
+    // Calling setCursor/setCacheMode in abstract base triggers pure virtual calls.
+    // See PileZone constructor for the same pattern.
     setCacheMode(DeviceCoordinateCache);
+    setAcceptHoverEvents(true);
+    setCursor(Qt::ArrowCursor);
 }
 
 QRectF GeneralCounter::boundingRect() const
