@@ -112,16 +112,6 @@ jobs:
             allow-failure: yes
 
           - distro: Debian
-            version: 11
-            package: DEB
-
-          - distro: Servatrice_Debian
-            version: 11
-            package: DEB
-            test: skip
-            server_only: yes
-
-          - distro: Debian
             version: 12
             package: DEB
             test: skip    # Running tests on all distros is superfluous
@@ -140,13 +130,9 @@ jobs:
             package: RPM
 
           - distro: Ubuntu
-            version: 22.04
-            package: DEB
-            test: skip    # Running tests on all distros is superfluous
-
-          - distro: Ubuntu
             version: 24.04
             package: DEB
+            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
