@@ -93,10 +93,15 @@ void HomeWidget::updateRandomCard()
         case BackgroundSources::Theme:
             break;
         case BackgroundSources::RandomCardArt:
-            do {
-                newCard = CardDatabaseManager::query()->getRandomCard();
-            } while (newCard == backgroundSourceCard->getCard() &&
-                     newCard.getCardPtr()->getProperty("layout") != "normal");
+            for (int i = 0; i < 10; ++i) {
+                ExactCard tmpCard = CardDatabaseManager::query()->getRandomCard();
+                if (tmpCard != backgroundSourceCard->getCard() &&
+                    tmpCard.getCardPtr()->getProperty("layout") == "normal" &&
+                    tmpCard.getPrinting().getSet() != nullptr) {
+                    newCard = tmpCard;
+                    break;
+                }
+            }
             break;
         case BackgroundSources::DeckFileArt:
             QList<CardRef> cardRefs = backgroundSourceDeck.getCardRefList();
@@ -321,8 +326,11 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     QString cardName;
     ExactCard card = backgroundSourceCard->getCard();
     if (card) {
-        cardName = card.getCardPtr()->getName() + " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
-                   card.getPrinting().getProperty("num");
+        cardName = card.getCardPtr()->getName();
+        if (card.getPrinting().getSet() != nullptr) {
+            cardName += " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
+                        card.getPrinting().getProperty("num");
+        }
     }
 
     if (!cardName.isEmpty() && SettingsCache::instance().getHomeTabDisplayCardName()) {
