@@ -111,6 +111,12 @@ jobs:
             package: skip    # We are packaged in Arch already
             allow-failure: yes
 
+          - distro: Servatrice_Debian
+            version: 12
+            package: DEB
+            test: skip
+            server_only: yes
+
           - distro: Debian
             version: 12
             package: DEB
