@@ -232,7 +232,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
@@ -530,7 +530,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
