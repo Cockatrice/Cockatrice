@@ -214,8 +214,8 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload to release
@@ -501,8 +501,8 @@ jobs:
         if: matrix.make_package
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload PDBs (Program Databases)
