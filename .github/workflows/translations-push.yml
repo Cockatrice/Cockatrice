@@ -7,6 +7,7 @@ on:
     - cron: '0 0 1 1,4,7,10 *'
   pull_request:
     paths:
+      - '.ci/update_translation_source_strings.sh'
       - '.github/workflows/translations-push.yml'
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install lupdate
         shell: bash
@@ -30,10 +31,10 @@ jobs:
       - name: Update Cockatrice translation source
         id: cockatrice
         shell: bash
-        env:
-          FILE: 'cockatrice/cockatrice_en@source.ts'
-          DIRS: 'cockatrice/src common'
-        run: .ci/update_translation_source_strings.sh
+        run: |
+          FILE="cockatrice/cockatrice_en@source.ts"
+          export DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
+          FILE="$FILE" DIRS="$DIRS" .ci/update_translation_source_strings.sh
 
       - name: Update Oracle translation source
         id: oracle
@@ -56,7 +57,7 @@ jobs:
       - name: Create pull request
         if: github.event_name != 'pull_request'
         id: create_pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           add-paths: |
             cockatrice/cockatrice_en@source.ts

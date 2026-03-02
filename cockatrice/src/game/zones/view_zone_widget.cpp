@@ -1,23 +1,31 @@
 #include "view_zone_widget.h"
 
-#include "../../client/ui/pixel_map_generator.h"
-#include "../../settings/cache_settings.h"
+#include "../../client/settings/cache_settings.h"
+#include "../../filters/syntax_help.h"
+#include "../../interface/pixel_map_generator.h"
 #include "../board/card_item.h"
-#include "../filters/syntax_help.h"
 #include "../game_scene.h"
 #include "../player/player.h"
-#include "pb/command_shuffle.pb.h"
+#include "../player/player_actions.h"
 #include "view_zone.h"
 
 #include <QCheckBox>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QPainter>
 #include <QScrollBar>
+#include <QStyle>
 #include <QStyleOption>
-#include <QStyleOptionTitleBar>
+#include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+
+namespace
+{
+constexpr qreal kTitleBarHeight = 24.0;
+constexpr qreal kMinVisibleWidth = 100.0;
+} // namespace
 
 /**
  * @param _player the player the cards were revealed to.
@@ -29,7 +37,7 @@
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  */
 ZoneViewWidget::ZoneViewWidget(Player *_player,
-                               CardZone *_origZone,
+                               CardZoneLogic *_origZone,
                                int numberCards,
                                bool _revealZone,
                                bool _writeableRevealZone,
@@ -130,8 +138,9 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     vbox->addItem(zoneHBox);
 
-    zone =
-        new ZoneViewZone(player, _origZone, numberCards, _revealZone, _writeableRevealZone, zoneContainer, _isReversed);
+    zone = new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
+                                                  _isReversed, zoneContainer),
+                            zoneContainer);
     connect(zone, &ZoneViewZone::wheelEventReceived, scrollBarProxy, &ScrollableGraphicsProxyWidget::recieveWheelEvent);
 
     retranslateUi();
@@ -211,7 +220,7 @@ void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 
 void ZoneViewWidget::retranslateUi()
 {
-    setWindowTitle(zone->getTranslatedName(false, CaseNominative));
+    setWindowTitle(zone->getLogic()->getTranslatedName(false, CaseNominative));
 
     { // We can't change the strings after they're put into the QComboBox, so this is our workaround
         int oldIndex = groupBySelector.currentIndex();
@@ -240,33 +249,191 @@ void ZoneViewWidget::retranslateUi()
     pileViewCheckBox.setText(tr("pile view"));
 }
 
-void ZoneViewWidget::moveEvent(QGraphicsSceneMoveEvent * /* event */)
+void ZoneViewWidget::stopWindowDrag()
 {
-    if (!scene())
+    if (!draggingWindow)
         return;
 
-    int titleBarHeight = 24;
+    draggingWindow = false;
+    ungrabMouse();
+}
 
-    QPointF scenePos = pos();
+void ZoneViewWidget::startWindowDrag(QGraphicsSceneMouseEvent *event)
+{
+    draggingWindow = true;
+    dragStartItemPos = pos();
+    dragStartScreenPos = event->screenPos();
+    dragView = findDragView(event->widget());
 
-    if (scenePos.x() < 0) {
-        scenePos.setX(0);
-    } else {
-        qreal maxw = scene()->sceneRect().width() - 100;
-        if (scenePos.x() > maxw)
-            scenePos.setX(maxw);
+    // need to grab mouse to receive events and not miss initial movement
+    grabMouse();
+}
+
+QRectF ZoneViewWidget::closeButtonRect(QWidget *styleWidget) const
+{
+    const QRectF frameRectF = windowFrameRect();
+
+    // query the style for the close button position (handles macOS top-left placement)
+    // Title bar rect MUST be local (0,0-based) for QStyle
+    const QRect titleBarRect(0, 0, static_cast<int>(frameRectF.width()), static_cast<int>(kTitleBarHeight));
+
+    if (styleWidget) {
+        QStyleOptionTitleBar opt;
+        opt.initFrom(styleWidget);
+        opt.rect = titleBarRect;
+        opt.text = windowTitle();
+        opt.icon = styleWidget->windowIcon();
+        opt.titleBarFlags = Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint;
+
+        opt.subControls = QStyle::SC_TitleBarCloseButton;
+        opt.activeSubControls = QStyle::SC_TitleBarCloseButton;
+        opt.titleBarState = styleWidget->isActiveWindow() ? Qt::WindowActive : Qt::WindowNoState;
+
+        if (styleWidget->isActiveWindow()) {
+            opt.state |= QStyle::State_Active;
+        }
+
+        QRect r = styleWidget->style()->subControlRect(QStyle::CC_TitleBar, &opt, QStyle::SC_TitleBarCloseButton,
+                                                       styleWidget);
+
+        if (r.isValid() && !r.isEmpty()) {
+            // Translate from local-titlebar coords → frame coords
+            r.translate(frameRectF.topLeft().toPoint());
+            return QRectF(r);
+        }
     }
 
-    if (scenePos.y() < titleBarHeight) {
-        scenePos.setY(titleBarHeight);
-    } else {
-        qreal maxh = scene()->sceneRect().height() - titleBarHeight;
-        if (scenePos.y() > maxh)
-            scenePos.setY(maxh);
+    // Fallback: frame-relative top-right
+    return QRectF(frameRectF.right() - kTitleBarHeight, frameRectF.top(), kTitleBarHeight, kTitleBarHeight);
+}
+
+QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
+{
+    QWidget *current = eventWidget;
+    while (current) {
+        if (auto *view = qobject_cast<QGraphicsView *>(current))
+            return view;
+        current = current->parentWidget();
     }
 
-    if (scenePos != pos())
-        setPos(scenePos);
+    if (scene() && !scene()->views().isEmpty())
+        return scene()->views().constFirst();
+
+    return nullptr;
+}
+
+QPointF ZoneViewWidget::calcDraggedWindowPos(const QPoint &screenPos,
+                                             const QPointF &scenePos,
+                                             const QPointF &buttonDownScenePos) const
+{
+    if (dragView && dragView->viewport()) {
+        const QPoint vpStart = dragView->viewport()->mapFromGlobal(dragStartScreenPos);
+        const QPoint vpNow = dragView->viewport()->mapFromGlobal(screenPos);
+        const QPointF sceneStart = dragView->mapToScene(vpStart);
+        const QPointF sceneNow = dragView->mapToScene(vpNow);
+        return dragStartItemPos + (sceneNow - sceneStart);
+    }
+
+    return dragStartItemPos + (scenePos - buttonDownScenePos);
+}
+
+bool ZoneViewWidget::windowFrameEvent(QEvent *event)
+{
+    if (event->type() == QEvent::UngrabMouse) {
+        stopWindowDrag();
+        return QGraphicsWidget::windowFrameEvent(event);
+    }
+
+    auto *me = dynamic_cast<QGraphicsSceneMouseEvent *>(event);
+    if (!me)
+        return QGraphicsWidget::windowFrameEvent(event);
+
+    switch (event->type()) {
+        case QEvent::GraphicsSceneMousePress:
+            if (me->button() == Qt::LeftButton && windowFrameSectionAt(me->pos()) == Qt::TitleBarArea) {
+                // avoid drag on close button
+                if (closeButtonRect(me->widget()).contains(me->pos())) {
+                    me->accept();
+                    close();
+                    return true;
+                }
+
+                startWindowDrag(me);
+                me->accept();
+                return true;
+            }
+            break;
+
+        case QEvent::GraphicsSceneMouseMove:
+            if (draggingWindow) {
+                if (!(me->buttons() & Qt::LeftButton)) {
+                    stopWindowDrag();
+                } else {
+                    setPos(
+                        calcDraggedWindowPos(me->screenPos(), me->scenePos(), me->buttonDownScenePos(Qt::LeftButton)));
+                }
+                me->accept();
+                return true;
+            }
+            break;
+
+        case QEvent::GraphicsSceneMouseRelease:
+            if (draggingWindow && me->button() == Qt::LeftButton) {
+                stopWindowDrag();
+                me->accept();
+                return true;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return QGraphicsWidget::windowFrameEvent(event);
+}
+
+void ZoneViewWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    // move if the scene routes moves while dragging
+    if (draggingWindow && (event->buttons() & Qt::LeftButton)) {
+        setPos(calcDraggedWindowPos(event->screenPos(), event->scenePos(), event->buttonDownScenePos(Qt::LeftButton)));
+        event->accept();
+        return;
+    }
+
+    QGraphicsWidget::mouseMoveEvent(event);
+}
+
+void ZoneViewWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (draggingWindow && event->button() == Qt::LeftButton) {
+        stopWindowDrag();
+        event->accept();
+        return;
+    }
+
+    QGraphicsWidget::mouseReleaseEvent(event);
+}
+
+QVariant ZoneViewWidget::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionChange && scene()) {
+        // Keep grab area in main view
+        const QRectF sceneRect = scene()->sceneRect();
+        const QPointF requestedPos = value.toPointF();
+        QPointF desiredPos = requestedPos;
+
+        const qreal minX = sceneRect.left();
+        const qreal maxX = qMax(minX, sceneRect.right() - kMinVisibleWidth);
+        const qreal minY = sceneRect.top() + kTitleBarHeight;
+        const qreal maxY = qMax(minY, sceneRect.bottom() - kTitleBarHeight);
+
+        desiredPos.setX(qBound(minX, desiredPos.x(), maxX));
+        desiredPos.setY(qBound(minY, desiredPos.y(), maxY));
+        return desiredPos;
+    }
+
+    return QGraphicsWidget::itemChange(change, value);
 }
 
 void ZoneViewWidget::resizeEvent(QGraphicsSceneResizeEvent *event)
@@ -349,11 +516,12 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
+    stopWindowDrag();
     disconnect(zone, &ZoneViewZone::closed, this, 0);
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
     if (shuffleCheckBox.isChecked())
-        player->sendGameCommand(Command_Shuffle());
+        player->getPlayerActions()->sendGameCommand(Command_Shuffle());
     zoneDeleted();
     event->accept();
 }

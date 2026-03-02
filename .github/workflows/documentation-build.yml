@@ -1,0 +1,63 @@
+name: Generate Docs
+
+on:
+  push:
+    tags:
+      - '*'   # Only re-generate docs when a new tagged version is pushed
+  pull_request:
+    paths:
+      - 'doc/doxygen/**'
+      - '.github/workflows/documentation-build.yml'
+      - 'Doxyfile'
+  workflow_dispatch:
+
+env:
+  COCKATRICE_REF: ${{ github.ref_name }}    # Tag name if the commit is tagged, otherwise branch name
+
+jobs:
+  docs:
+    name: Doxygen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Graphviz
+        run: |
+          sudo apt-get install -y graphviz
+          dot -V
+
+      - name: Install Doxygen
+        uses: ssciwr/doxygen-install@v2
+        with:
+          version: "1.14.0"
+
+      - name: Update Doxygen Configuration
+        run: |
+          git diff Doxyfile
+          doxygen -u Doxyfile
+          if git diff --quiet Doxyfile; then
+            echo "::notice::No config changes in Doxyfile detected."
+          else
+            echo "::error::Config changes in Doxyfile detected! Please update the file by running 'doxygen -u Doxyfile'."
+            echo ""
+            git diff --color=always Doxyfile
+            exit 1
+          fi
+
+      - name: Generate Documentation
+        if: always()
+        run: doxygen Doxyfile
+
+      - name: Deploy to cockatrice.github.io
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
+          external_repository: Cockatrice/cockatrice.github.io
+          publish_branch: master
+          publish_dir: ./docs/html
+          destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/

@@ -1,52 +1,42 @@
 #include "card_item.h"
 
-#include "../../client/tabs/tab_game.h"
-#include "../../settings/cache_settings.h"
-#include "../cards/card_info.h"
+#include "../../client/settings/cache_settings.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
+#include "../phase.h"
 #include "../player/player.h"
-#include "../zones/card_zone.h"
+#include "../player/player_actions.h"
+#include "../zones/logic/view_zone_logic.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
-#include "pb/serverinfo_card.pb.h"
 
+#include <../../client/settings/card_counter_settings.h>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QMenu>
 #include <QPainter>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
-CardItem::CardItem(Player *_owner,
-                   QGraphicsItem *parent,
-                   const QString &_name,
-                   const QString &_providerId,
-                   int _cardid,
-                   CardZone *_zone)
-    : AbstractCardItem(parent, _name, _providerId, _owner, _cardid), zone(_zone), attacking(false),
-      destroyOnZoneChange(false), doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)
+    : AbstractCardItem(parent, cardRef, _owner, _cardid), zone(_zone), attacking(false), destroyOnZoneChange(false),
+      doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
 {
     owner->addCard(this);
 
-    cardMenu = new QMenu;
-    ptMenu = new QMenu;
-    moveMenu = new QMenu;
-
-    retranslateUi();
-}
-
-CardItem::~CardItem()
-{
-    delete cardMenu;
-    delete ptMenu;
-    delete moveMenu;
+    connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
+        if (counters.contains(counterId))
+            update();
+    });
 }
 
 void CardItem::prepareDelete()
 {
     if (owner != nullptr) {
-        if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(nullptr);
+        if (owner->getGame()->getActiveCard() == this) {
+            owner->getPlayerMenu()->updateCardMenu(nullptr);
             owner->getGame()->setActiveCard(nullptr);
         }
         owner = nullptr;
@@ -71,19 +61,19 @@ void CardItem::deleteLater()
     AbstractCardItem::deleteLater();
 }
 
-void CardItem::setZone(CardZone *_zone)
+void CardItem::setZone(CardZoneLogic *_zone)
 {
     zone = _zone;
 }
 
 void CardItem::retranslateUi()
 {
-    moveMenu->setTitle(tr("&Move to"));
-    ptMenu->setTitle(tr("&Power / toughness"));
 }
 
 void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+
     painter->save();
     AbstractCardItem::paint(painter, option, widget);
 
@@ -91,8 +81,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     QMapIterator<int, int> counterIterator(counters);
     while (counterIterator.hasNext()) {
         counterIterator.next();
-        QColor _color;
-        _color.setHsv(counterIterator.key() * 60, 150, 255);
+        QColor _color = cardCounterSettings.color(counterIterator.key());
 
         paintNumberEllipse(counterIterator.value(), 14, _color, i, counters.size(), painter);
         ++i;
@@ -105,7 +94,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (!getFaceDown() && info && pt == info->getPowTough()) {
+        if (!getFaceDown() && pt == exactCard.getInfo().getPowTough()) {
             painter->setPen(Qt::white);
         } else {
             painter->setPen(QColor(255, 150, 0)); // dark orange
@@ -197,13 +186,25 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     gridPoint.setX(-1);
     attachedTo = _attachedTo;
     if (attachedTo != nullptr) {
-        setParentItem(attachedTo->getZone());
-        attachedTo->addAttachedCard(this);
-        if (zone != attachedTo->getZone()) {
-            attachedTo->getZone()->reorganizeCards();
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards
+        if (attachedTo->zone == nullptr) {
+            deleteLater();
+        } else {
+            emit attachedTo->zone->cardAdded(this);
+            attachedTo->addAttachedCard(this);
+            if (zone != attachedTo->getZone()) {
+                attachedTo->getZone()->reorganizeCards();
+            }
         }
     } else {
-        setParentItem(zone);
+        // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
+        // attached cards
+        if (zone == nullptr) {
+            deleteLater();
+        } else {
+            emit zone->cardAdded(this);
+        }
     }
 
     if (zone != nullptr) {
@@ -239,8 +240,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     }
 
     setId(_info.id());
-    setProviderId(QString::fromStdString(_info.provider_id()));
-    setName(QString::fromStdString(_info.name()));
+    setCardRef({QString::fromStdString(_info.name()), QString::fromStdString(_info.provider_id())});
     setAttacking(_info.attacking());
     setFaceDown(_info.face_down());
     setPT(QString::fromStdString(_info.pt()));
@@ -273,11 +273,17 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (owner->getGame()->getPlayerManager()->isSpectator())
         return;
 
-    Player *arrowOwner = static_cast<TabGame *>(owner->parent())->getActiveLocalPlayer();
-    ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor);
+    auto *game = owner->getGame();
+    Player *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
+    int phase = 0; // 0 means to not set the phase
+    if (SettingsCache::instance().getDoNotDeleteArrowsInSubPhases()) {
+        int currentPhase = game->getGameState()->getCurrentPhase();
+        phase = Phases::getLastSubphase(currentPhase) + 1;
+    }
+    ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
     scene()->addItem(arrow);
     arrow->grabMouse();
 
@@ -288,7 +294,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
         if (card->getZone() != zone)
             continue;
 
-        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor);
+        ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor, phase);
         scene()->addItem(childArrow);
         arrow->addChildArrow(childArrow);
     }
@@ -296,7 +302,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (static_cast<TabGame *>(owner->parent())->getSpectator())
+    if (owner->getGame()->getPlayerManager()->isSpectator())
         return;
 
     auto *arrow = new ArrowAttachItem(this);
@@ -336,10 +342,10 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
             2 * QApplication::startDragDistance())
             return;
-        if (const ZoneViewZone *view = qobject_cast<const ZoneViewZone *>(zone)) {
+        if (const ZoneViewZoneLogic *view = qobject_cast<const ZoneViewZoneLogic *>(zone)) {
             if (view->getRevealZone() && !view->getWriteableRevealZone())
                 return;
-        } else if (!owner->getLocalOrJudge())
+        } else if (!owner->getPlayerInfo()->getLocalOrJudge())
             return;
 
         bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
@@ -372,17 +378,18 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::playCard(bool faceDown)
 {
     // Do nothing if the card belongs to another player
-    if (!owner->getLocalOrJudge())
+    if (!owner->getPlayerInfo()->getLocalOrJudge())
         return;
 
-    TableZone *tz = qobject_cast<TableZone *>(zone);
+    TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(zone);
     if (tz)
-        tz->toggleTapped();
+        emit tz->toggleTapped();
     else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            faceDown ? zone->getPlayer()->actPlayFacedown() : zone->getPlayer()->actPlay();
+            faceDown ? zone->getPlayer()->getPlayerActions()->actPlayFacedown()
+                     : zone->getPlayer()->getPlayerActions()->actPlay();
         } else {
-            zone->getPlayer()->playCard(this, faceDown);
+            zone->getPlayer()->getPlayerActions()->playCard(this, faceDown);
         }
     }
 }
@@ -391,9 +398,9 @@ void CardItem::playCard(bool faceDown)
  * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
  * is nullptr.
  */
-static bool isUnwritableRevealZone(CardZone *zone)
+static bool isUnwritableRevealZone(CardZoneLogic *zone)
 {
-    if (auto *view = qobject_cast<ZoneViewZone *>(zone)) {
+    if (auto *view = qobject_cast<ZoneViewZoneLogic *>(zone)) {
         return view->getRevealZone() && !view->getWriteableRevealZone();
     }
     return false;
@@ -409,7 +416,7 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
 {
     if (isUnwritableRevealZone(zone)) {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            zone->getPlayer()->actHide();
+            zone->getPlayer()->getPlayerActions()->actHide();
         } else {
             zone->removeCard(this);
         }
@@ -421,9 +428,13 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        if (cardMenu != nullptr && !cardMenu->isEmpty() && owner != nullptr) {
-            cardMenu->popup(event->screenPos());
-            return;
+
+        if (owner != nullptr) {
+            owner->getGame()->setActiveCard(this);
+            if (QMenu *cardMenu = owner->getPlayerMenu()->updateCardMenu(this)) {
+                cardMenu->popup(event->screenPos());
+                return;
+            }
         }
     } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
                (!SettingsCache::instance().getDoubleClickToPlay())) {
@@ -476,11 +487,12 @@ QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if ((change == ItemSelectedHasChanged) && owner != nullptr) {
         if (value == true) {
-            owner->setCardMenu(cardMenu);
             owner->getGame()->setActiveCard(this);
-        } else if (owner->getCardMenu() == cardMenu) {
-            owner->setCardMenu(nullptr);
+            owner->getPlayerMenu()->updateCardMenu(this);
+        } else if (owner->getGameScene()->selectedItems().isEmpty()) {
+
             owner->getGame()->setActiveCard(nullptr);
+            owner->getPlayerMenu()->updateCardMenu(nullptr);
         }
     }
     return AbstractCardItem::itemChange(change, value);

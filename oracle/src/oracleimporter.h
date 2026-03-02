@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QRegularExpression>
 #include <QVariant>
-#include <game/cards/card_info.h>
+#include <libcockatrice/card/card_info.h>
 #include <utility>
 
 // many users prefer not to see these sets with non english arts
@@ -95,7 +95,7 @@ public:
     SplitCardPart(const QString &_name,
                   const QString &_text,
                   const QVariantHash &_properties,
-                  const CardInfoPerSet &setInfo);
+                  const PrintingInfo &_printingInfo);
     inline const QString &getName() const
     {
         return name;
@@ -108,16 +108,16 @@ public:
     {
         return properties;
     }
-    inline const CardInfoPerSet &getSetInfo() const
+    inline const PrintingInfo &getPrintingInfo() const
     {
-        return setInfo;
+        return printingInfo;
     }
 
 private:
     QString name;
     QString text;
     QVariantHash properties;
-    CardInfoPerSet setInfo;
+    PrintingInfo printingInfo;
 };
 
 class OracleImporter : public QObject
@@ -143,7 +143,7 @@ private:
                         bool isToken,
                         QVariantHash properties,
                         const QList<CardRelation *> &relatedCards,
-                        const CardInfoPerSet &setInfo);
+                        const PrintingInfo &printingInfo);
 signals:
     void setIndexChanged(int cardsImported, int setIndex, const QString &setName);
     void dataReadProgress(int bytesRead, int totalBytes);
@@ -154,6 +154,7 @@ public:
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList);
+    FormatRulesNameMap createDefaultMagicFormats();
     const CardNameMap &getCardList() const
     {
         return cards;

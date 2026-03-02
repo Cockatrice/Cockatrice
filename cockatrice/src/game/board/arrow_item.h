@@ -1,3 +1,9 @@
+/**
+ * @file arrow_item.h
+ * @ingroup GameGraphics
+ * @brief TODO: Document this.
+ */
+
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 
@@ -30,22 +36,22 @@ public:
     ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
     ~ArrowItem() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QRectF boundingRect() const override
+    [[nodiscard]] QRectF boundingRect() const override
     {
         return path.boundingRect();
     }
-    QPainterPath shape() const override
+    [[nodiscard]] QPainterPath shape() const override
     {
         return path;
     }
     void updatePath();
     void updatePath(const QPointF &endPoint);
 
-    int getId() const
+    [[nodiscard]] int getId() const
     {
         return id;
     }
-    Player *getPlayer() const
+    [[nodiscard]] Player *getPlayer() const
     {
         return player;
     }
@@ -57,11 +63,11 @@ public:
     {
         targetItem = _item;
     }
-    ArrowTarget *getStartItem() const
+    [[nodiscard]] ArrowTarget *getStartItem() const
     {
         return startItem;
     }
-    ArrowTarget *getTargetItem() const
+    [[nodiscard]] ArrowTarget *getTargetItem() const
     {
         return targetItem;
     }
@@ -76,10 +82,11 @@ class ArrowDragItem : public ArrowItem
 {
     Q_OBJECT
 private:
+    int deleteInPhase;
     QList<ArrowDragItem *> childArrows;
 
 public:
-    ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color);
+    ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
     void addChildArrow(ArrowDragItem *childArrow);
 
 protected:

@@ -1,3 +1,9 @@
+/**
+ * @file counter_general.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COUNTER_GENERAL_H
 #define COUNTER_GENERAL_H
 
@@ -18,8 +24,7 @@ public:
                    int _radius,
                    int _value,
                    bool useNameForShortcut = false,
-                   QGraphicsItem *parent = nullptr,
-                   QWidget *game = nullptr);
+                   QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };

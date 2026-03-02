@@ -1,0 +1,252 @@
+#include "visual_database_display_color_filter_widget.h"
+
+#include "../cards/additional_info/mana_symbol_widget.h"
+
+#include <QTimer>
+#include <libcockatrice/filters/filter_tree.h>
+
+/**
+ * This widget provides a graphical control element for the CardFilter::Attr::AttrColor filters applied to the filter
+ * model.
+ * @param parent The Qt Widget that this widget will parent to
+ * @param _filterModel The filter model that this widget will manipulate
+ */
+VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(QWidget *parent,
+                                                                               FilterTreeModel *_filterModel)
+    : QWidget(parent), filterModel(_filterModel), layout(new QHBoxLayout(this))
+{
+    setLayout(layout);
+    layout->setSpacing(5);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QString fullColorIdentity = "WUBRG";
+    for (const QChar &color : fullColorIdentity) {
+        auto *manaSymbol = new ManaSymbolWidget(this, color, false, true);
+        manaSymbol->setFixedWidth(25);
+
+        layout->addWidget(manaSymbol);
+
+        // Connect the color toggled signal
+        connect(manaSymbol, &ManaSymbolWidget::colorToggled, this,
+                &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
+    }
+
+    modeComboBox = new QComboBox(this);
+    layout->addWidget(modeComboBox);
+
+    connect(modeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
+
+    connect(filterModel, &FilterTreeModel::layoutChanged, this,
+            [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
+
+    // Call retranslateUi to set the initial text
+    retranslateUi();
+}
+
+void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
+{
+    modeComboBox->blockSignals(true);
+    modeComboBox->clear();
+
+    modeComboBox->addItem(tr("Exact match"), QVariant::fromValue(FilterMode::ExactMatch));
+    modeComboBox->addItem(tr("Includes"), QVariant::fromValue(FilterMode::Includes));
+    modeComboBox->addItem(tr("Include / Exclude"), QVariant::fromValue(FilterMode::IncludeExclude));
+
+    modeComboBox->setToolTip(tr("How selected and unselected colors are combined in the filter"));
+
+    // Restore current mode
+    const int index = modeComboBox->findData(QVariant::fromValue(currentMode));
+    if (index >= 0) {
+        modeComboBox->setCurrentIndex(index);
+    }
+
+    modeComboBox->blockSignals(false);
+}
+
+void VisualDatabaseDisplayColorFilterWidget::handleColorToggled(QChar color, bool active)
+{
+    if (active) {
+        addFilter(color);
+    } else {
+        removeFilter(color);
+    }
+}
+
+void VisualDatabaseDisplayColorFilterWidget::addFilter(QChar color)
+{
+    QString colorString = color;
+    QString typeStr;
+
+    // Remove previous filters
+
+    QList<const CardFilter *> allColorFilters = filterModel->getFiltersOfType(CardFilter::Attr::AttrColor);
+    QList<const CardFilter *> matchingFilters;
+
+    for (const CardFilter *filter : allColorFilters) {
+        if (filter->term() == color) {
+            matchingFilters.append(filter);
+        }
+    }
+
+    for (const CardFilter *filter : matchingFilters) {
+        filterModel->removeFilter(filter);
+    }
+
+    // Add actual filter
+
+    switch (currentMode) {
+        case FilterMode::ExactMatch:
+            filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeAnd, CardFilter::Attr::AttrColor));
+            break;
+
+        case FilterMode::Includes:
+            filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrColor));
+            break;
+
+        case FilterMode::IncludeExclude:
+            filterModel->addFilter(new CardFilter(colorString, CardFilter::Type::TypeOr, CardFilter::Attr::AttrColor));
+            break;
+    }
+}
+
+void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar color)
+{
+    QString colorString = color;
+
+    // Remove inclusion filters
+    QList<const CardFilter *> allColorFilters = filterModel->getFiltersOfType(CardFilter::Attr::AttrColor);
+    QList<const CardFilter *> matchingFilters;
+
+    for (const CardFilter *filter : allColorFilters) {
+        if (filter->term() == color) {
+            matchingFilters.append(filter);
+        }
+    }
+
+    for (const CardFilter *filter : matchingFilters) {
+        filterModel->removeFilter(filter);
+    }
+
+    // Add exclusion filters if the mode demands it
+    switch (currentMode) {
+        case FilterMode::ExactMatch:
+            filterModel->addFilter(
+                new CardFilter(colorString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor));
+            break;
+
+        case FilterMode::IncludeExclude:
+            filterModel->addFilter(
+                new CardFilter(colorString, CardFilter::Type::TypeAndNot, CardFilter::Attr::AttrColor));
+            break;
+
+        case FilterMode::Includes:
+            // No exclusion in Includes mode
+            break;
+    }
+}
+
+void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
+{
+    const QVariant data = modeComboBox->currentData();
+    if (!data.isValid()) {
+        return;
+    }
+
+    currentMode = data.value<FilterMode>();
+
+    filterModel->blockSignals(true);
+    filterModel->filterTree()->blockSignals(true);
+
+    filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
+
+    const QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+
+    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+        handleColorToggled(manaSymbolWidget->getSymbolChar(), manaSymbolWidget->isColorActive());
+    }
+
+    filterModel->blockSignals(false);
+    filterModel->filterTree()->blockSignals(false);
+
+    emit filterModel->filterTree()->changed();
+    emit filterModel->layoutChanged();
+    emit filterModeChanged(currentMode);
+}
+
+void VisualDatabaseDisplayColorFilterWidget::setManaSymbolActive(QChar color, bool active)
+{
+    QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+
+    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+        if (manaSymbolWidget->getSymbolChar() == color) {
+            manaSymbolWidget->setColorActive(active);
+        }
+    }
+}
+
+QList<QChar> VisualDatabaseDisplayColorFilterWidget::getActiveColors()
+{
+    QList<QChar> activeColors;
+    QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+
+    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+        if (manaSymbolWidget->isColorActive()) {
+            activeColors.append(manaSymbolWidget->getSymbolChar());
+        }
+    }
+
+    return activeColors;
+}
+
+void VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel()
+{
+    QList<const CardFilter *> allColorFilters = filterModel->getFiltersOfType(CardFilter::Attr::AttrColor);
+
+    QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+
+    for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
+        bool found = false;
+        for (const CardFilter *filter : allColorFilters) {
+            if (manaSymbolWidget->getSymbolChar() == filter->term()) {
+                switch (currentMode) {
+                    case FilterMode::ExactMatch:
+                        switch (filter->type()) {
+                            case CardFilter::Type::TypeAnd:
+                                setManaSymbolActive(filter->term().at(0), true);
+                                break;
+                            default:
+                                setManaSymbolActive(filter->term().at(0), false);
+                                break;
+                        }
+                        break;
+                    case FilterMode::Includes:
+                        switch (filter->type()) {
+                            case CardFilter::Type::TypeOr:
+                                setManaSymbolActive(filter->term().at(0), true);
+                                break;
+                            default:
+                                setManaSymbolActive(filter->term().at(0), false);
+                                break;
+                        }
+                        break;
+                    case FilterMode::IncludeExclude:
+                        switch (filter->type()) {
+                            case CardFilter::Type::TypeOr:
+                                setManaSymbolActive(filter->term().at(0), true);
+                                break;
+                            default:
+                                setManaSymbolActive(filter->term().at(0), false);
+                                break;
+                        }
+                        break;
+                }
+                found = true;
+            }
+        }
+
+        if (!found) {
+            setManaSymbolActive(manaSymbolWidget->getSymbolChar(), false);
+        }
+    }
+}

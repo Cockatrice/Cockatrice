@@ -5,18 +5,11 @@
  * with mocked objects.
  */
 
-#include <QObject>
-#include <QString>
-
 #define PICTURELOADER_H
 
-#include "../../cockatrice/src/game/cards/card_database.h"
-#include "../../cockatrice/src/settings/cache_settings.h"
-#include "../../cockatrice/src/utility/macros.h"
+#include <libcockatrice/card/database/card_database.h>
 
-extern SettingsCache *settingsCache;
-
-class PictureLoader
+class CardPictureLoader
 {
 public:
     static void clearPixmapCache(CardInfoPtr card);

@@ -354,7 +354,7 @@
     "label": {
       "autoConnect": "Auto Connect",
       "forgot": "Forgot Password",
-      "login": "Login",
+      "login": "Kirjaudu sisään",
       "savePassword": "Save Password",
       "savedPassword": "Saved Password"
     }
@@ -376,7 +376,7 @@
   "ResetPasswordForm": {
     "error": "Password reset failed",
     "label": {
-      "reset": "Reset Password"
+      "reset": "Nollaa Salasana"
     }
   }
 }

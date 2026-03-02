@@ -1,0 +1,48 @@
+syntax = "proto2";
+import "game_event.proto";
+
+// Sent by the server to signal a single card was moved to update the client state
+message Event_MoveCard {
+    extend GameEvent {
+        optional Event_MoveCard ext = 2009;
+    }
+
+    // The card id in the original zone
+    optional sint32 card_id = 1 [default = -1];
+
+    // The name of the card in case it was not known yet
+    optional string card_name = 2;
+
+    // The player whose zone the card started in
+    optional sint32 start_player_id = 3 [default = -1];
+
+    // The original zone
+    optional string start_zone = 4;
+
+    // The original position that the card was at.
+    // In zones without y coordinate, this corresponds with the previous x coordinate of the card.
+    // In zones with y coordinate, this value is not used.
+    optional sint32 position = 5 [default = -1];
+
+    // The player who owns the new zone the card is in
+    optional sint32 target_player_id = 6 [default = -1];
+
+    // The new zone the card is in
+    optional string target_zone = 7;
+
+    // The new x coordinate (or new position for zones with no y coordinate)
+    optional sint32 x = 8 [default = -1];
+
+    // The new y coordinate
+    optional sint32 y = 9 [default = -1];
+
+    // The new id of the card if the card moved zone
+    optional sint32 new_card_id = 10 [default = -1];
+
+    // If the card is face down, face down cards will not show their name
+    optional bool face_down = 11;
+
+    // The provider id of the card in case it was not known yet.
+    // Extends the name to supply a specific printing of that type of card.
+    optional string new_card_provider_id = 12;
+}

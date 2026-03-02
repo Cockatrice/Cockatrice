@@ -20,53 +20,12 @@
 
 #include "serversocketinterface.h"
 
-#include "decklist.h"
 #include "email_parser.h"
 #include "main.h"
-#include "pb/command_deck_del.pb.h"
-#include "pb/command_deck_del_dir.pb.h"
-#include "pb/command_deck_download.pb.h"
-#include "pb/command_deck_list.pb.h"
-#include "pb/command_deck_new_dir.pb.h"
-#include "pb/command_deck_upload.pb.h"
-#include "pb/command_replay_delete_match.pb.h"
-#include "pb/command_replay_download.pb.h"
-#include "pb/command_replay_list.pb.h"
-#include "pb/command_replay_modify_match.pb.h"
-#include "pb/commands.pb.h"
-#include "pb/event_add_to_list.pb.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_notify_user.pb.h"
-#include "pb/event_remove_from_list.pb.h"
-#include "pb/event_server_identification.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/response_ban_history.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "pb/response_deck_list.pb.h"
-#include "pb/response_deck_upload.pb.h"
-#include "pb/response_forgotpasswordrequest.pb.h"
-#include "pb/response_get_admin_notes.pb.h"
-#include "pb/response_password_salt.pb.h"
-#include "pb/response_register.pb.h"
-#include "pb/response_replay_download.pb.h"
-#include "pb/response_replay_list.pb.h"
-#include "pb/response_viewlog_history.pb.h"
-#include "pb/response_warn_history.pb.h"
-#include "pb/response_warn_list.pb.h"
-#include "pb/serverinfo_ban.pb.h"
-#include "pb/serverinfo_chat_message.pb.h"
-#include "pb/serverinfo_deckstorage.pb.h"
-#include "pb/serverinfo_replay.pb.h"
-#include "pb/serverinfo_user.pb.h"
 #include "servatrice.h"
 #include "servatrice_database_interface.h"
 #include "server_logger.h"
-#include "server_player.h"
-#include "server_response_containers.h"
-#include "server_room.h"
 #include "settingscache.h"
-#include "trice_limits.h"
 #include "version_string.h"
 
 #include <QDateTime>
@@ -76,7 +35,52 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
+#include <game/server_player.h>
 #include <iostream>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/pb/command_deck_del.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_list.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_download.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_get_code.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_list.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_modify_match.pb.h>
+#include <libcockatrice/protocol/pb/command_replay_submit_code.pb.h>
+#include <libcockatrice/protocol/pb/commands.pb.h>
+#include <libcockatrice/protocol/pb/event_add_to_list.pb.h>
+#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_notify_user.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_from_list.pb.h>
+#include <libcockatrice/protocol/pb/event_replay_added.pb.h>
+#include <libcockatrice/protocol/pb/event_server_identification.pb.h>
+#include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/response_ban_history.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_list.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
+#include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
+#include <libcockatrice/protocol/pb/response_password_salt.pb.h>
+#include <libcockatrice/protocol/pb/response_register.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_download.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
+#include <libcockatrice/protocol/pb/response_replay_list.pb.h>
+#include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
+#include <libcockatrice/protocol/pb/response_warn_history.pb.h>
+#include <libcockatrice/protocol/pb/response_warn_list.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/utility/trice_limits.h>
+#include <server_response_containers.h>
+#include <server_room.h>
 #include <string>
 
 static const int protocolVersion = 14;
@@ -179,6 +183,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdReplayModifyMatch(cmd.GetExtension(Command_ReplayModifyMatch::ext), rc);
         case SessionCommand::REPLAY_DELETE_MATCH:
             return cmdReplayDeleteMatch(cmd.GetExtension(Command_ReplayDeleteMatch::ext), rc);
+        case SessionCommand::REPLAY_GET_CODE:
+            return cmdReplayGetCode(cmd.GetExtension(Command_ReplayGetCode::ext), rc);
+        case SessionCommand::REPLAY_SUBMIT_CODE:
+            return cmdReplaySubmitCode(cmd.GetExtension(Command_ReplaySubmitCode::ext), rc);
         case SessionCommand::REGISTER:
             return cmdRegisterAccount(cmd.GetExtension(Command_Register::ext), rc);
             break;
@@ -735,6 +743,135 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
     return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
 }
 
+/**
+ * Generates a hash for the given replay folder, used for auth when replay sharing.
+ * This is a separate function in case we change the hash implementation in the future.
+ *
+ * Currently, we append together the first 128 bytes of the first 3 replays in the game.
+ * Then we md5 hash it, base64 encode it, and truncate the result to 10 characters.
+ *
+ * @param gameId The replay match to hash
+ * @return The hash as a QString. Returns an empty string if failed
+ */
+QString AbstractServerSocketInterface::createHashForReplay(int gameId)
+{
+    QSqlQuery *query =
+        sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
+    query->bindValue(":id_game", gameId);
+
+    if (!sqlInterface->execSqlQuery(query))
+        return "";
+
+    QByteArray replaysBytes;
+    while (query->next()) {
+        QByteArray replay = query->value(0).toByteArray();
+        replay.truncate(128);
+        replaysBytes.append(replay);
+    }
+
+    auto hash =
+        QCryptographicHash::hash(replaysBytes, QCryptographicHash::Md5).toBase64(QByteArray::OmitTrailingEquals);
+    hash.truncate(10);
+    return hash;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Command_ReplayGetCode &cmd,
+                                                                       ResponseContainer &rc)
+{
+    if (authState != PasswordRight)
+        return Response::RespFunctionNotAllowed;
+
+    // Check that user has access to replay match
+    {
+        QSqlQuery *query = sqlInterface->prepareQuery(
+            "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+        query->bindValue(":id_game", cmd.game_id());
+        query->bindValue(":id_player", userInfo->id());
+        if (!sqlInterface->execSqlQuery(query))
+            return Response::RespInternalError;
+        if (!query->next())
+            return Response::RespAccessDenied;
+    }
+
+    QString hash = createHashForReplay(cmd.game_id());
+    if (hash.isEmpty()) {
+        return Response::RespInternalError;
+    }
+
+    // code is of the form <game-id>-<hash>
+    QString code = QString(QString::number(cmd.game_id()) + "-" + hash);
+
+    Response_ReplayGetCode *re = new Response_ReplayGetCode;
+    re->set_replay_code(code.toStdString());
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd,
+                                                                          ResponseContainer & /*rc*/)
+{
+    // code is of the form <game-id>-<hash>
+    QString code = QString::fromStdString(cmd.replay_code());
+    QStringList split = code.split("-");
+    if (split.size() != 2) {
+        // always return the same error response if code is incorrect, to not leak info to user
+        return Response::RespNameNotFound;
+    }
+    QString gameId = split[0];
+    QString hash = split[1];
+
+    // Determine if the replay actually exists (and grab the replay name while at it)
+    auto *replayExistsQuery =
+        sqlInterface->prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
+    replayExistsQuery->bindValue(":id_game", gameId);
+    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
+        return Response::RespInternalError;
+    }
+    if (!replayExistsQuery->next()) {
+        return Response::RespNameNotFound;
+    }
+
+    const auto &replayName = replayExistsQuery->value(0).toString();
+
+    // Check if hash is correct
+    if (hash != createHashForReplay(gameId.toInt())) {
+        return Response::RespNameNotFound;
+    }
+
+    // Determine if user already has access to replay
+    auto *alreadyAccessQuery = sqlInterface->prepareQuery(
+        "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+    alreadyAccessQuery->bindValue(":id_game", gameId);
+    alreadyAccessQuery->bindValue(":id_player", userInfo->id());
+    if (!sqlInterface->execSqlQuery(alreadyAccessQuery)) {
+        return Response::RespInternalError;
+    }
+    if (alreadyAccessQuery->next()) {
+        return Response::RespOk;
+    }
+
+    // Grant the User access to the replay
+    auto *grantReplayAccessQuery =
+        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                                   "values(:idgame, :idplayer, :replayname, 0)");
+    grantReplayAccessQuery->bindValue(":idgame", gameId);
+    grantReplayAccessQuery->bindValue(":idplayer", userInfo->id());
+    grantReplayAccessQuery->bindValue(":replayname", replayName);
+
+    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+        return Response::RespInternalError;
+    }
+
+    // update user's view
+    Event_ReplayAdded event;
+    SessionEvent *se = prepareSessionEvent(event);
+    sendProtocolItem(*se);
+    delete se;
+
+    return Response::RespOk;
+}
+
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Command_ViewLogHistory &cmd,
@@ -835,11 +972,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     Response_WarnList *re = new Response_WarnList;
 
     QString officialWarnings = settingsCache->value("server/officialwarnings").toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList warningsList = officialWarnings.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList warningsList = officialWarnings.split(",", QString::SkipEmptyParts);
-#endif
     for (const QString &warning : warningsList) {
         re->add_warning(warning.toStdString());
     }
@@ -1035,13 +1168,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     const auto parsedEmailParts = EmailParser::parseEmailAddress(nameFromStdString(cmd.email()));
     const auto emailUser = parsedEmailParts.first;
     const auto emailDomain = parsedEmailParts.second;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     const QStringList emailBlackListFilters = emailBlackList.split(",", Qt::SkipEmptyParts);
     const QStringList emailWhiteListFilters = emailWhiteList.split(",", Qt::SkipEmptyParts);
-#else
-    const QStringList emailBlackListFilters = emailBlackList.split(",", QString::SkipEmptyParts);
-    const QStringList emailWhiteListFilters = emailWhiteList.split(",", QString::SkipEmptyParts);
-#endif
 
     bool requireEmailForRegistration = settingsCache->value("registration/requireemail", true).toBool();
     if (requireEmailForRegistration && emailUser.isEmpty()) {
@@ -1070,7 +1198,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespEmailBlackListed;
     }
 
-    // TODO: Move this method outside of the db interface
+    //! \todo Move this method outside of the db interface
     QString errorString;
     if (!sqlInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit())
@@ -1193,7 +1321,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
 bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &ipAddress)
 {
-    // TODO: implement
+    //! \todo implement
     Q_UNUSED(ipAddress);
     return false;
 }
@@ -1793,13 +1921,8 @@ TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
-#else
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
-#endif
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -1972,10 +2095,8 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
     }
     socket = (QWebSocket *)_socket;
     socket->setParent(this);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
     // https://bugreports.qt.io/browse/QTBUG-70693
     socket->setMaxAllowedIncomingMessageSize(1500000); // 1.5MB
-#endif
 
     address = socket->peerAddress();
 

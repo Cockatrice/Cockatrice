@@ -19,18 +19,12 @@
  ***************************************************************************/
 #include "servatrice.h"
 
-#include "decklist.h"
 #include "email_parser.h"
-#include "featureset.h"
 #include "isl_interface.h"
 #include "main.h"
-#include "pb/event_connection_closed.pb.h"
-#include "pb/event_server_message.pb.h"
-#include "pb/event_server_shutdown.pb.h"
 #include "servatrice_connection_pool.h"
 #include "servatrice_database_interface.h"
 #include "server_logger.h"
-#include "server_room.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
 #include "smtpclient.h"
@@ -45,6 +39,12 @@
 #include <QTimer>
 #include <QUrl>
 #include <iostream>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/featureset.h>
+#include <libcockatrice/protocol/pb/event_connection_closed.pb.h>
+#include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
+#include <server_room.h>
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
@@ -254,13 +254,8 @@ bool Servatrice::initServer()
     qDebug() << "Accept registered users only:" << getRegOnlyServerEnabled();
     qDebug() << "Registration enabled:" << getRegistrationEnabled();
     if (getRegistrationEnabled()) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
         QStringList emailBlackListFilters = getEmailBlackList().split(",", Qt::SkipEmptyParts);
         QStringList emailWhiteListFilters = getEmailWhiteList().split(",", Qt::SkipEmptyParts);
-#else
-        QStringList emailBlackListFilters = getEmailBlackList().split(",", QString::SkipEmptyParts);
-        QStringList emailWhiteListFilters = getEmailWhiteList().split(",", QString::SkipEmptyParts);
-#endif
         qDebug() << "Email blacklist:" << emailBlackListFilters;
         qDebug() << "Email whitelist:" << emailWhiteListFilters;
         qDebug() << "Require email address to register:" << getRequireEmailForRegistrationEnabled();
@@ -564,11 +559,7 @@ void Servatrice::setRequiredFeatures(const QString &featureList)
     FeatureSet features;
     serverRequiredFeatureList.clear();
     features.initalizeFeatureList(serverRequiredFeatureList);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList listReqFeatures = featureList.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList listReqFeatures = featureList.split(",", QString::SkipEmptyParts);
-#endif
     if (!listReqFeatures.isEmpty())
         for (const QString &reqFeature : listReqFeatures) {
             features.enableRequiredFeature(serverRequiredFeatureList, reqFeature);

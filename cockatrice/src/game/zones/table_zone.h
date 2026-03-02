@@ -1,7 +1,14 @@
+/**
+ * @file table_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
 #include "../board/abstract_card_item.h"
+#include "logic/table_zone_logic.h"
 #include "select_zone.h"
 
 /*
@@ -75,9 +82,9 @@ private:
     /*
        If this TableZone is currently active
      */
-    bool active;
+    bool active = false;
 
-    bool isInverted() const;
+    [[nodiscard]] bool isInverted() const;
 
 private slots:
     /**
@@ -98,12 +105,12 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    explicit TableZone(Player *_p, const QString &name, QGraphicsItem *parent = nullptr);
+    explicit TableZone(TableZoneLogic *_logic, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.
      */
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
 
     /**
        Render the TableZone
@@ -121,36 +128,28 @@ public:
     /**
        See HandleDropEventByGrid
      */
-    void handleDropEvent(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &dropPoint) override;
+    void
+    handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
 
     /**
        Handles the placement of cards
      */
-    void handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZone *startZone, const QPoint &gridPoint);
+    void
+    handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &gridPoint);
 
     /**
        @return CardItem from grid location
      */
-    CardItem *getCardFromGrid(const QPoint &gridPoint) const;
+    [[nodiscard]] CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 
     /**
        @return CardItem from coordinate location
      */
-    CardItem *getCardFromCoords(const QPointF &point) const;
+    [[nodiscard]] CardItem *getCardFromCoords(const QPointF &point) const;
 
     QPointF closestGridPoint(const QPointF &point) override;
 
     static int clampValidTableRow(const int row);
-
-    /**
-       Removes a card from view.
-
-       @param position card position
-       @param cardId id of card to take
-       @param toNewZone Whether the destination of the card is not the same as the starting zone. Defaults to true
-       @return CardItem that has been removed
-     */
-    CardItem *takeCard(int position, int cardId, bool toNewZone = true) override;
 
     /**
        Resizes the TableZone in case CardItems are within or
@@ -158,7 +157,7 @@ public:
      */
     void resizeToContents();
 
-    int getMinimumWidth() const
+    [[nodiscard]] int getMinimumWidth() const
     {
         return currentMinimumWidth;
     }
@@ -167,7 +166,7 @@ public:
         prepareGeometryChange();
         width = _width;
     }
-    qreal getWidth() const
+    [[nodiscard]] qreal getWidth() const
     {
         return width;
     }
@@ -176,9 +175,6 @@ public:
         active = _active;
         update();
     }
-
-protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
 
 private:
     void paintZoneOutline(QPainter *painter);
@@ -192,13 +188,13 @@ private:
     /*
     Mapping functions for points to/from gridpoints.
     */
-    QPointF mapFromGrid(QPoint gridPoint) const;
-    QPoint mapToGrid(const QPointF &mapPoint) const;
+    [[nodiscard]] QPointF mapFromGrid(QPoint gridPoint) const;
+    [[nodiscard]] QPoint mapToGrid(const QPointF &mapPoint) const;
 
     /*
     Helper function to create a single key from a card stack location.
     */
-    int getCardStackMapKey(int x, int y) const
+    [[nodiscard]] int getCardStackMapKey(int x, int y) const
     {
         return x + (y * 1000);
     }

@@ -1,14 +1,17 @@
+/**
+ * @file deck_view.h
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECKVIEW_H
 #define DECKVIEW_H
 
 #include "../board/abstract_card_drag_item.h"
-#include "pb/move_card_to_zone.pb.h"
 
-#include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMap>
-#include <QMultiMap>
-#include <QPixmap>
+#include <libcockatrice/protocol/pb/move_card_to_zone.pb.h>
 
 class DeckList;
 class InnerDecklistNode;
@@ -25,12 +28,11 @@ private:
 
 public:
     explicit DeckViewCard(QGraphicsItem *parent = nullptr,
-                          const QString &_name = QString(),
-                          const QString &_providerId = QString(),
+                          const CardRef &cardRef = {},
                           const QString &_originZone = QString());
     ~DeckViewCard() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    const QString &getOriginZone() const
+    [[nodiscard]] const QString &getOriginZone() const
     {
         return originZone;
     }
@@ -66,34 +68,34 @@ private:
     QMultiMap<QString, DeckViewCard *> cardsByType;
     QList<QPair<int, int>> currentRowsAndCols;
     qreal width, height;
-    int getCardTypeTextWidth() const;
+    [[nodiscard]] int getCardTypeTextWidth() const;
 
 public:
     enum
     {
         Type = typeDeckViewCardContainer
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
     explicit DeckViewCardContainer(const QString &_name);
-    QRectF boundingRect() const override;
+    [[nodiscard]] QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void addCard(DeckViewCard *card);
     void removeCard(DeckViewCard *card);
-    const QList<DeckViewCard *> &getCards() const
+    [[nodiscard]] const QList<DeckViewCard *> &getCards() const
     {
         return cards;
     }
-    const QString &getName() const
+    [[nodiscard]] const QString &getName() const
     {
         return name;
     }
     void setWidth(qreal _width);
 
-    QList<QPair<int, int>> getRowsAndCols() const;
-    QSizeF calculateBoundingRect(const QList<QPair<int, int>> &rowsAndCols) const;
+    [[nodiscard]] QList<QPair<int, int>> getRowsAndCols() const;
+    [[nodiscard]] QSizeF calculateBoundingRect(const QList<QPair<int, int>> &rowsAndCols) const;
     void rearrangeItems(const QList<QPair<int, int>> &rowsAndCols);
 };
 
@@ -118,7 +120,7 @@ public:
     {
         locked = _locked;
     }
-    bool getLocked() const
+    [[nodiscard]] bool getLocked() const
     {
         return locked;
     }
@@ -130,7 +132,7 @@ public:
     }
     void rearrangeItems();
     void updateContents();
-    QList<MoveCard_ToZone> getSideboardPlan() const;
+    [[nodiscard]] QList<MoveCard_ToZone> getSideboardPlan() const;
     void resetSideboardPlan();
     void applySideboardPlan(const QList<MoveCard_ToZone> &plan);
 };
@@ -157,7 +159,7 @@ public:
     {
         deckViewScene->setLocked(_locked);
     }
-    QList<MoveCard_ToZone> getSideboardPlan() const
+    [[nodiscard]] QList<MoveCard_ToZone> getSideboardPlan() const
     {
         return deckViewScene->getSideboardPlan();
     }

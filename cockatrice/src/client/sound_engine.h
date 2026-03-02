@@ -1,3 +1,9 @@
+/**
+ * @file sound_engine.h
+ * @ingroup Core
+ * @brief TODO: Document this.
+ */
+
 #ifndef SOUNDENGINE_H
 #define SOUNDENGINE_H
 

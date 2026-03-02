@@ -1,0 +1,35 @@
+syntax = "proto2";
+import "game_commands.proto";
+import "color.proto";
+
+// Command to draw an arrow from cards to either other cards or a player
+message Command_CreateArrow {
+    extend GameCommand {
+        optional Command_CreateArrow ext = 1011;
+    }
+    // the player that has the card the arrow is drawn from
+    optional sint32 start_player_id = 1 [default = -1];
+
+    // the zone that the card the arrow is drawn from is in
+    optional string start_zone = 2;
+
+    // the id of the card that the arrow is drawn from
+    optional sint32 start_card_id = 3 [default = -1];
+
+    // the player that has the card the arrow is drawn to, or that the arrow is drawn to if not a card
+    optional sint32 target_player_id = 4 [default = -1];
+
+    // the zone that the card the arrow is drawn to is in, the player will be targeted if this is absent
+    optional string target_zone = 5;
+
+    // the id of the card that the arrow is drawn to, the player will be targeted if this is absent
+    optional sint32 target_card_id = 6 [default = -1];
+
+    // the color of the arrow
+    optional color arrow_color = 7;
+
+    // the phase that this arrow is deleted in, arrows are deleted when this or a later phase is activated and also
+    // when the phase moves back before the current phase or the turn is passed, when not set the arrow is deleted
+    // immediately when the phase is changed
+    optional sint32 delete_in_phase = 8;
+}

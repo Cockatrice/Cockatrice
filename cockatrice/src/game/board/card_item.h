@@ -1,8 +1,16 @@
+/**
+ * @file card_item.h
+ * @ingroup GameGraphicsCards
+ * @brief TODO: Document this.
+ */
+
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
+#include "../zones/logic/card_zone_logic.h"
 #include "abstract_card_item.h"
-#include "server_card.h"
+
+#include <libcockatrice/network/server/remote/game/server_card.h>
 
 class CardDatabase;
 class CardDragItem;
@@ -21,7 +29,7 @@ class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardZone *zone;
+    CardZoneLogic *zone;
     bool attacking;
     QMap<int, int> counters;
     QString annotation;
@@ -33,8 +41,6 @@ private:
     CardItem *attachedTo;
     QList<CardItem *> attachedCards;
 
-    QMenu *cardMenu, *ptMenu, *moveMenu;
-
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);
 public slots:
@@ -45,25 +51,24 @@ public:
     {
         Type = typeCard
     };
-    int type() const override
+    [[nodiscard]] int type() const override
     {
         return Type;
     }
     explicit CardItem(Player *_owner,
                       QGraphicsItem *parent = nullptr,
-                      const QString &_name = QString(),
-                      const QString &_providerId = QString(),
+                      const CardRef &cardRef = {},
                       int _cardid = -1,
-                      CardZone *_zone = nullptr);
-    ~CardItem() override;
+                      CardZoneLogic *_zone = nullptr);
+
     void retranslateUi();
-    CardZone *getZone() const
+    [[nodiscard]] CardZoneLogic *getZone() const
     {
         return zone;
     }
-    void setZone(CardZone *_zone);
+    void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    QPoint getGridPoint() const
+    [[nodiscard]] QPoint getGridPoint() const
     {
         return gridPoint;
     }
@@ -71,11 +76,11 @@ public:
     {
         gridPoint = _gridPoint;
     }
-    QPoint getGridPos() const
+    [[nodiscard]] QPoint getGridPos() const
     {
         return gridPoint;
     }
-    Player *getOwner() const
+    [[nodiscard]] Player *getOwner() const
     {
         return owner;
     }
@@ -83,32 +88,32 @@ public:
     {
         owner = _owner;
     }
-    bool getAttacking() const
+    [[nodiscard]] bool getAttacking() const
     {
         return attacking;
     }
     void setAttacking(bool _attacking);
-    const QMap<int, int> &getCounters() const
+    [[nodiscard]] const QMap<int, int> &getCounters() const
     {
         return counters;
     }
     void setCounter(int _id, int _value);
-    QString getAnnotation() const
+    [[nodiscard]] QString getAnnotation() const
     {
         return annotation;
     }
     void setAnnotation(const QString &_annotation);
-    bool getDoesntUntap() const
+    [[nodiscard]] bool getDoesntUntap() const
     {
         return doesntUntap;
     }
     void setDoesntUntap(bool _doesntUntap);
-    QString getPT() const
+    [[nodiscard]] QString getPT() const
     {
         return pt;
     }
     void setPT(const QString &_pt);
-    bool getDestroyOnZoneChange() const
+    [[nodiscard]] bool getDestroyOnZoneChange() const
     {
         return destroyOnZoneChange;
     }
@@ -116,7 +121,7 @@ public:
     {
         destroyOnZoneChange = _destroy;
     }
-    CardItem *getAttachedTo() const
+    [[nodiscard]] CardItem *getAttachedTo() const
     {
         return attachedTo;
     }
@@ -129,25 +134,12 @@ public:
     {
         attachedCards.removeOne(card);
     }
-    const QList<CardItem *> &getAttachedCards() const
+    [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
     {
         return attachedCards;
     }
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
-
-    QMenu *getCardMenu() const
-    {
-        return cardMenu;
-    }
-    QMenu *getPTMenu() const
-    {
-        return ptMenu;
-    }
-    QMenu *getMoveMenu() const
-    {
-        return moveMenu;
-    }
 
     bool animationEvent();
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);

@@ -1,5 +1,13 @@
+/**
+ * @file player_list_widget.h
+ * @ingroup GameWidgets
+ * @brief TODO: Document this.
+ */
+
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
+
+#include "player.h"
 
 #include <QIcon>
 #include <QMap>
@@ -9,7 +17,7 @@
 class ServerInfo_PlayerProperties;
 class TabSupervisor;
 class AbstractClient;
-class TabGame;
+class AbstractGame;
 class UserContextMenu;
 
 class PlayerListItemDelegate : public QStyledItemDelegate
@@ -37,7 +45,7 @@ private:
     QMap<int, QTreeWidgetItem *> players;
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
-    TabGame *game;
+    AbstractGame *game;
     UserContextMenu *userContextMenu;
     QIcon readyIcon, notReadyIcon, concededIcon, playerIcon, judgeIcon, spectatorIcon, lockIcon;
     bool gameStarted;
@@ -45,14 +53,19 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 public:
-    PlayerListWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, TabGame *_game, QWidget *parent = nullptr);
+    PlayerListWidget(TabSupervisor *_tabSupervisor,
+                     AbstractClient *_client,
+                     AbstractGame *_game,
+                     QWidget *parent = nullptr);
     void retranslateUi();
-    void addPlayer(const ServerInfo_PlayerProperties &player);
-    void removePlayer(int playerId);
     void setActivePlayer(int playerId);
-    void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
     void setGameStarted(bool _gameStarted, bool resuming);
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
+
+public slots:
+    void addPlayer(const ServerInfo_PlayerProperties &player);
+    void removePlayer(int playerId);
+    void updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId = -1);
 };
 
 #endif

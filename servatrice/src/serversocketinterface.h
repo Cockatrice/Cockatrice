@@ -20,12 +20,11 @@
 #ifndef SERVERSOCKETINTERFACE_H
 #define SERVERSOCKETINTERFACE_H
 
-#include "server_protocolhandler.h"
-
 #include <QHostAddress>
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <server_protocolhandler.h>
 
 class Servatrice;
 class Servatrice_DatabaseInterface;
@@ -44,6 +43,8 @@ class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
 class Command_ReplayDeleteMatch;
+class Command_ReplayGetCode;
+class Command_ReplaySubmitCode;
 
 class Command_BanFromServer;
 class Command_UpdateServerMessage;
@@ -97,6 +98,9 @@ private:
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd, ResponseContainer &rc);
+    QString createHashForReplay(int gameId);
+    Response::ResponseCode cmdReplayGetCode(const Command_ReplayGetCode &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
@@ -142,7 +146,9 @@ public:
     AbstractServerSocketInterface(Servatrice *_server,
                                   Servatrice_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
-    ~AbstractServerSocketInterface(){};
+    ~AbstractServerSocketInterface()
+    {
+    }
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
@@ -171,7 +177,7 @@ public:
     QString getConnectionType() const
     {
         return "tcp";
-    };
+    }
 
 private:
     QTcpSocket *socket;
@@ -184,11 +190,11 @@ protected:
     void writeToSocket(QByteArray &data)
     {
         socket->write(data);
-    };
+    }
     void flushSocket()
     {
         socket->flush();
-    };
+    }
     void initSessionDeprecated();
     bool initTcpSession();
 protected slots:
@@ -218,7 +224,7 @@ public:
     QString getConnectionType() const
     {
         return "websocket";
-    };
+    }
 
 private:
     QWebSocket *socket;
@@ -228,11 +234,11 @@ protected:
     void writeToSocket(QByteArray &data)
     {
         socket->sendBinaryMessage(data);
-    };
+    }
     void flushSocket()
     {
         socket->flush();
-    };
+    }
     bool initWebsocketSession();
 protected slots:
     void binaryMessageReceived(const QByteArray &message);

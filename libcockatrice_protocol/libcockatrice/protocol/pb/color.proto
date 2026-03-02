@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+// Container for a 4 component color code
+message color {
+    // the red component of the color, limited to 256 values
+    optional uint32 r = 1;
+
+    // the green component of the color, limited to 256 values
+    optional uint32 g = 2;
+
+    // the blue component of the color, limited to 256 values
+    optional uint32 b = 3;
+
+    // the opacity component of the color, limited to 256 values
+    optional uint32 a = 4;
+}

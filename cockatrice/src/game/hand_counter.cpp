@@ -17,7 +17,7 @@ HandCounter::~HandCounter()
 
 void HandCounter::updateNumber()
 {
-    number = static_cast<CardZone *>(sender())->getCards().size();
+    number = static_cast<CardZoneLogic *>(sender())->getCards().size();
     update();
 }
 

@@ -1,0 +1,250 @@
+#include "printing_selector.h"
+
+#include "../../../client/settings/cache_settings.h"
+#include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../deck_editor/deck_state_manager.h"
+#include "printing_selector_card_display_widget.h"
+#include "printing_selector_card_search_widget.h"
+#include "printing_selector_card_selection_widget.h"
+#include "printing_selector_card_sorting_widget.h"
+#include "printing_selector_placeholder_widget.h"
+
+#include <QBoxLayout>
+#include <QScrollBar>
+
+/**
+ * @brief Constructs a PrintingSelector widget to display and manage card printings.
+ *
+ * This constructor initializes the PrintingSelector widget, setting up various child widgets
+ * such as sorting tools, search bar, card size options, and navigation controls. It also connects
+ * signals and slots to update the display when the deck model changes, and loads available printings
+ * for the selected card.
+ *
+ * @param parent The parent widget for the PrintingSelector.
+ * @param deckEditor The TabDeckEditor instance used for managing the deck.
+ */
+PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deckEditor)
+    : QWidget(parent), deckEditor(_deckEditor), deckStateManager(_deckEditor->deckStateManager)
+{
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout = new QVBoxLayout(this);
+    setLayout(layout);
+
+    widgetLoadingBufferTimer = new QTimer(this);
+
+    flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
+
+    placeholderWidget = new PrintingSelectorPlaceholderWidget(this);
+
+    sortToolBar = new PrintingSelectorCardSortingWidget(this);
+    sortToolBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    displayOptionsWidget = new SettingsButtonWidget(this);
+    displayOptionsWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+
+    // Create the checkbox for navigation buttons visibility
+    navigationCheckBox = new QCheckBox(this);
+    navigationCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &PrintingSelector::toggleVisibilityNavigationButtons);
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setPrintingSelectorNavigationButtonsVisible);
+
+    cardSizeWidget =
+        new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
+            &SettingsCache::setPrintingSelectorCardSize);
+
+    displayOptionsWidget->addSettingsWidget(sortToolBar);
+    displayOptionsWidget->addSettingsWidget(navigationCheckBox);
+    displayOptionsWidget->addSettingsWidget(cardSizeWidget);
+
+    sortAndOptionsContainer = new QWidget(this);
+    sortAndOptionsLayout = new QHBoxLayout(sortAndOptionsContainer);
+    sortAndOptionsLayout->setSpacing(3);
+    sortAndOptionsLayout->setContentsMargins(0, 0, 0, 0);
+    sortAndOptionsContainer->setLayout(sortAndOptionsLayout);
+
+    searchBar = new PrintingSelectorCardSearchWidget(this);
+
+    sortAndOptionsLayout->addWidget(searchBar);
+    sortAndOptionsLayout->addWidget(displayOptionsWidget);
+
+    layout->addWidget(sortAndOptionsContainer);
+
+    layout->addWidget(placeholderWidget);
+    layout->addWidget(flowWidget);
+
+    // Initially show placeholder, hide flowWidget
+    placeholderWidget->setVisible(true);
+    flowWidget->setVisible(false);
+
+    cardSelectionBar = new PrintingSelectorCardSelectionWidget(this, deckStateManager);
+    cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
+    layout->addWidget(cardSelectionBar);
+
+    // Connect deck model data change signal to update display
+    connect(deckStateManager, &DeckStateManager::uniqueCardsChanged, this, &PrintingSelector::printingsInDeckChanged);
+    connect(deckStateManager, &DeckStateManager::cardModified, this, &PrintingSelector::updateCardAmounts);
+
+    retranslateUi();
+}
+
+void PrintingSelector::retranslateUi()
+{
+    navigationCheckBox->setText(tr("Display Navigation Buttons"));
+}
+
+void PrintingSelector::printingsInDeckChanged()
+{
+    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+        // Delay the update to avoid race conditions
+        QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
+    }
+}
+
+/**
+ * @return A map of uuid to amounts (main, side).
+ */
+static QMap<QString, QPair<int, int>> tallyUuidCounts(const DeckListModel *model, const QString &cardName)
+{
+    QMap<QString, QPair<int, int>> map;
+
+    auto mainNodes = model->getCardNodesForZone(DECK_ZONE_MAIN);
+    for (auto &node : mainNodes) {
+        if (node->getName() == cardName) {
+            map[node->getCardProviderId()].first += node->getNumber();
+        }
+    }
+
+    auto sideNodes = model->getCardNodesForZone(DECK_ZONE_SIDE);
+    for (auto &node : sideNodes) {
+        if (node->getName() == cardName) {
+            map[node->getCardProviderId()].second += node->getNumber();
+        }
+    }
+
+    return map;
+}
+
+void PrintingSelector::updateCardAmounts()
+{
+    if (selectedCard.isNull()) {
+        return;
+    }
+
+    auto map = tallyUuidCounts(deckStateManager->getModel(), selectedCard->getName());
+    emit cardAmountsChanged(map);
+}
+
+/**
+ * @brief Updates the display by clearing the layout and loading new sets for the current card.
+ */
+void PrintingSelector::updateDisplay()
+{
+    widgetLoadingBufferTimer->stop();
+    widgetLoadingBufferTimer->deleteLater();
+    widgetLoadingBufferTimer = new QTimer(this);
+    flowWidget->clearLayout();
+
+    if (selectedCard.isNull()) {
+        // Show placeholder, hide flowWidget
+        placeholderWidget->setVisible(true);
+        flowWidget->setVisible(false);
+        setWindowTitle(tr("Printing Selector"));
+    } else {
+        // Hide placeholder, show flowWidget
+        placeholderWidget->setVisible(false);
+        flowWidget->setVisible(true);
+        setWindowTitle(selectedCard->getName());
+    }
+    getAllSetsForCurrentCard();
+}
+
+/**
+ * @brief Sets the current card for the selector and updates the display.
+ *
+ * @param newCard The new card to set.
+ */
+void PrintingSelector::setCard(const CardInfoPtr &newCard)
+{
+    if (newCard.isNull()) {
+        selectedCard = newCard;
+        updateDisplay();
+        return;
+    }
+
+    // we don't need to redraw the widget if the card is the same
+    if (!selectedCard.isNull() && selectedCard->getName() == newCard->getName()) {
+        return;
+    }
+
+    selectedCard = newCard;
+    if (isVisible()) {
+        updateDisplay();
+    }
+    flowWidget->setMinimumSizeToMaxSizeHint();
+    flowWidget->scrollArea->verticalScrollBar()->setValue(0);
+    flowWidget->repaint();
+}
+
+/**
+ * @brief Loads and displays all sets for the current selected card.
+ */
+void PrintingSelector::getAllSetsForCurrentCard()
+{
+    if (selectedCard.isNull()) {
+        return;
+    }
+
+    SetToPrintingsMap setMap = selectedCard->getSets();
+    const QList<PrintingInfo> sortedPrintings = sortToolBar->sortSets(setMap);
+    const QList<PrintingInfo> filteredPrintings =
+        sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());
+    QList<PrintingInfo> printingsToUse;
+
+    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+        printingsToUse =
+            sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckStateManager->getModel());
+    } else {
+        printingsToUse = filteredPrintings;
+    }
+    printingsToUse = sortToolBar->prependPinnedPrintings(printingsToUse, selectedCard->getName());
+
+    auto uuidToAmounts = tallyUuidCounts(deckStateManager->getModel(), selectedCard->getName());
+
+    // Defer widget creation
+    currentIndex = 0;
+
+    connect(widgetLoadingBufferTimer, &QTimer::timeout, this, [=, this]() mutable {
+        for (int i = 0; i < BATCH_SIZE && currentIndex < printingsToUse.size(); ++i, ++currentIndex) {
+            auto card = ExactCard(selectedCard, printingsToUse[currentIndex]);
+            auto *cardDisplayWidget = new PrintingSelectorCardDisplayWidget(this, deckEditor, deckStateManager,
+                                                                            cardSizeWidget->getSlider(), card);
+            flowWidget->addWidget(cardDisplayWidget);
+            cardDisplayWidget->updateCardAmounts(uuidToAmounts);
+            connect(cardDisplayWidget, &PrintingSelectorCardDisplayWidget::cardPreferenceChanged, this,
+                    &PrintingSelector::updateDisplay);
+            connect(this, &PrintingSelector::cardAmountsChanged, cardDisplayWidget,
+                    &PrintingSelectorCardDisplayWidget::updateCardAmounts);
+        }
+
+        // Stop timer when done
+        if (currentIndex >= printingsToUse.size()) {
+            widgetLoadingBufferTimer->stop();
+        }
+    });
+    currentIndex = 0;
+    widgetLoadingBufferTimer->start(0); // Process as soon as possible
+}
+
+/**
+ * @brief Toggles the visibility of the navigation buttons.
+ *
+ * @param _state The visibility state to set.
+ */
+void PrintingSelector::toggleVisibilityNavigationButtons(bool _state)
+{
+    cardSelectionBar->setVisible(_state);
+}

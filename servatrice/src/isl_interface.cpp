@@ -1,25 +1,25 @@
 #include "isl_interface.h"
 
-#include "debug_pb_message.h"
-#include "get_pb_extension.h"
 #include "main.h"
-#include "pb/event_game_joined.pb.h"
-#include "pb/event_join_room.pb.h"
-#include "pb/event_leave_room.pb.h"
-#include "pb/event_list_games.pb.h"
-#include "pb/event_remove_messages.pb.h"
-#include "pb/event_room_say.pb.h"
-#include "pb/event_server_complete_list.pb.h"
-#include "pb/event_user_joined.pb.h"
-#include "pb/event_user_left.pb.h"
-#include "pb/event_user_message.pb.h"
-#include "pb/isl_message.pb.h"
 #include "server_logger.h"
-#include "server_protocolhandler.h"
-#include "server_room.h"
 
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/debug_pb_message.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
+#include <libcockatrice/protocol/pb/event_game_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_join_room.pb.h>
+#include <libcockatrice/protocol/pb/event_leave_room.pb.h>
+#include <libcockatrice/protocol/pb/event_list_games.pb.h>
+#include <libcockatrice/protocol/pb/event_remove_messages.pb.h>
+#include <libcockatrice/protocol/pb/event_room_say.pb.h>
+#include <libcockatrice/protocol/pb/event_server_complete_list.pb.h>
+#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
+#include <libcockatrice/protocol/pb/event_user_left.pb.h>
+#include <libcockatrice/protocol/pb/event_user_message.pb.h>
+#include <libcockatrice/protocol/pb/isl_message.pb.h>
+#include <server_protocolhandler.h>
+#include <server_room.h>
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {
@@ -112,11 +112,7 @@ void IslInterface::initServer()
 
     socket->startServerEncryption();
     if (!socket->waitForEncrypted(5000)) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
         QList<QSslError> sslErrors(socket->sslHandshakeErrors());
-#else
-        QList<QSslError> sslErrors(socket->sslErrors());
-#endif
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
         else
@@ -193,11 +189,7 @@ void IslInterface::initClient()
         return;
     }
     if (!socket->waitForEncrypted(5000)) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
         QList<QSslError> sslErrors(socket->sslHandshakeErrors());
-#else
-        QList<QSslError> sslErrors(socket->sslErrors());
-#endif
         if (sslErrors.isEmpty())
             qDebug() << "[ISL] SSL handshake timeout, terminating connection";
         else

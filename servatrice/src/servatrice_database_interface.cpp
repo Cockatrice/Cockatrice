@@ -1,8 +1,5 @@
 #include "servatrice_database_interface.h"
 
-#include "decklist.h"
-#include "passwordhasher.h"
-#include "pb/game_replay.pb.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
@@ -12,6 +9,9 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/utility/passwordhasher.h>
 
 Servatrice_DatabaseInterface::Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server)
     : instanceId(_instanceId), sqlDatabase(QSqlDatabase()), server(_server)
@@ -163,11 +163,7 @@ bool Servatrice_DatabaseInterface::usernameIsValid(const QString &user, QString 
     bool allowPunctuationPrefix = settingsCache->value("users/allowpunctuationprefix", false).toBool();
     QString allowedPunctuation = settingsCache->value("users/allowedpunctuation", "_").toString();
     QString disallowedWordsStr = settingsCache->value("users/disallowedwords", "").toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QStringList disallowedWords = disallowedWordsStr.split(",", Qt::SkipEmptyParts);
-#else
-    QStringList disallowedWords = disallowedWordsStr.split(",", QString::SkipEmptyParts);
-#endif
     disallowedWords.removeDuplicates();
     QVariant displayDisallowedWords = settingsCache->value("users/displaydisallowedwords");
     QString disallowedRegExpStr;

@@ -1,12 +1,38 @@
+@page deck_search_syntax_help Deck Search Syntax Help
+
 ## Deck Search Syntax Help
------
+
 The search bar recognizes a set of special commands.<br>
 In this list of examples below, each entry has an explanation and can be clicked to test the query. Note that all
 searches are case insensitive.
+
 <dl>
-<dt>Filename:</dt>
-<dd>[red deck wins](#red deck wins) <small>(Any deck filename containing the words red, deck, and wins)</small></dd>
-<dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck filename containing the exact phrase "red deck wins")</small></dd>
+
+<dt>Display Name (The deck name, or the filename if the deck name isn't set):</dt>
+<dd>[red deck wins](#red deck wins) <small>(Any deck with a display name containing the words red, deck, and wins)</small></dd>
+<dd>["red deck wins"](#%22red deck wins%22) <small>(Any deck with a display name containing the exact phrase "red deck wins")</small></dd>
+
+<dt>Deck <u>N</u>ame:</dt>
+<dd>[n:aggro](#n:aggro) <small>(Any deck with a name containing the word aggro)</small></dd>
+<dd>[n:red n:deck n:wins](#n:red n:deck n:wins) <small>(Any deck with a name containing the words red, deck, and wins)</small></dd>
+<dd>[n:"red deck wins"](#n:%22red deck wins%22) <small>(Any deck with a name containing the exact phrase "red deck wins")</small></dd>
+
+<dt><u>F</u>ile <u>N</u>ame:</dt>
+<dd>[fn:aggro](#fn:aggro) <small>(Any deck with a filename containing the word aggro)</small></dd>
+<dd>[fn:red fn:deck fn:wins](#fn:red fn:deck fn:wins) <small>(Any deck with a filename containing the words red, deck, and wins)</small></dd>
+<dd>[fn:"red deck wins"](#fn:%22red deck wins%22) <small>(Any deck with a filename containing the exact phrase "red deck wins")</small></dd>
+
+<dt>Relative <u>P</u>ath (starting from the deck folder):</dt>
+<dd>[p:aggro](#p:aggro) <small>(Any deck that has "aggro" somewhere in its relative path)</small></dd>
+<dd>[p:edh/](#p:edh/) <small>(Any deck with "edh/" in its relative path, A.K.A. decks in the "edh" folder)</small></dd>
+
+<dt><u>F</u>ormat:</dt>
+<dd>[f:standard](#f:standard) <small>(Any deck with format set to standard)</small></dd>
+
+<dt><u>C</u>omments:</dt>
+<dd>[c:good](#c:good) <small>(Any deck with comments containing the word good)</small></dd>
+<dd>[c:good c:deck](#c:good c:deck) <small>(Any deck with comments containing the words good and deck)</small></dd>
+<dd>[c:"good deck"](#c:%22good deck%22) <small>(Any deck with comments containing the exact phrase "good deck")</small></dd>
 
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>
@@ -21,6 +47,6 @@ searches are case insensitive.
 <dd>[t:aggro OR o:control](#t:aggro OR o:control) <small>(Any deck filename that contains either aggro or control)</small></dd>
 
 <dt>Grouping:</dt>
-<dd><a href="#red -([[]]:100 or aggro)">red -([[]]:100 or aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
+<dd><a href="#red -([[]]:100 OR aggro)">red -([[]]:100 OR aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
 
 </dl>

@@ -1,0 +1,65 @@
+syntax = "proto2";
+import "serverinfo_user.proto";
+
+// Container for information about a game in the room's game list
+message ServerInfo_Game {
+    // id of server the game is on
+    optional sint32 server_id = 1 [default = -1];
+
+    // id of room the game is in
+    optional sint32 room_id = 2 [default = -1];
+
+    // unique id of the game inside the room
+    optional sint32 game_id = 3 [default = -1];
+
+    // user provided game description
+    optional string description = 4;
+
+    // password required to join game
+    optional bool with_password = 5;
+
+    // players required to play
+    optional uint32 max_players = 6;
+
+    // mask of server defined game types
+    repeated sint32 game_types = 7;
+
+    // user that created the game
+    optional ServerInfo_User creator_info = 8;
+
+    // only buddies of the creator can join this game
+    optional bool only_buddies = 9;
+
+    // only registered users can join this game
+    optional bool only_registered = 10;
+
+    // if spectators are allowed to join
+    optional bool spectators_allowed = 11;
+
+    // spectators need to enter the game
+    optional bool spectators_need_password = 12;
+
+    // spectators can use cmdGameSay
+    optional bool spectators_can_chat = 13;
+
+    // spectators receive private events for all players
+    optional bool spectators_omniscient = 14;
+
+    // decklists are sent to all players when loaded
+    optional bool share_decklists_on_load = 15;
+
+    // the current player count
+    optional uint32 player_count = 30;
+
+    // the current spectator count
+    optional uint32 spectators_count = 31;
+
+    // whether the game is currently ongoing
+    optional bool started = 50;
+
+    // time that the game started at
+    optional uint32 start_time = 51;
+
+    // whether the game is closed. Closed games are finished and can't be interacted with
+    optional bool closed = 52;
+}

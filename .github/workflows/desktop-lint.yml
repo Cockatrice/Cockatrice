@@ -1,13 +1,22 @@
 name: Code Style (C++) 
 
 on:
+  # push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'webclient/**'
-      - '.github/workflows/web-*.yml'
-      - '.github/workflows/translations-*.yml'
-      - '.github/workflows/docker-release.yml'
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.ci/**'
+      - '!.github/**'
+      - '!.husky/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '!webclient/**'
+      - '.ci/lint_cpp.sh'
+      - '.github/workflows/desktop-lint.yml'
+      - '.clang-format'
+      - '.cmake-format.json'
+      - 'format.sh'
 
 jobs:
   format:
@@ -15,7 +24,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 20 # should be enough to find merge base
 
@@ -23,7 +32,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends clang-format cmake-format
+        sudo apt-get install -y --no-install-recommends clang-format cmake-format shellcheck
 
     - name: Check code formatting
       shell: bash

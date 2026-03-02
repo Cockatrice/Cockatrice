@@ -1,0 +1,83 @@
+syntax = "proto2";
+message RoomCommand {
+    enum RoomCommandType {
+        LEAVE_ROOM = 1000;
+        ROOM_SAY = 1001;
+        CREATE_GAME = 1002;
+        JOIN_GAME = 1003;
+    }
+    extensions 100 to max;
+}
+
+message Command_LeaveRoom {
+    extend RoomCommand {
+        optional Command_LeaveRoom ext = 1000;
+    }
+}
+
+message Command_RoomSay {
+    extend RoomCommand {
+        optional Command_RoomSay ext = 1001;
+    }
+    optional string message = 1;
+}
+
+// Create a new game in the room
+message Command_CreateGame {
+    extend RoomCommand {
+        optional Command_CreateGame ext = 1002;
+    }
+
+    // game description shown in game list
+    optional string description = 1;
+
+    // password users will have to provide to join the game
+    optional string password = 2;
+
+    // amount of players needed to play
+    optional uint32 max_players = 3;
+
+    // limits the game to only allowing users on the creator's buddy list to join
+    optional bool only_buddies = 4;
+
+    // limits the game to only allowing registered users
+    optional bool only_registered = 5;
+
+    // allows non players to view the game as spectator
+    optional bool spectators_allowed = 6;
+
+    // allows spectators to join without password if false
+    optional bool spectators_need_password = 7;
+
+    // allows spectators to use game say commands
+    optional bool spectators_can_talk = 8;
+
+    // allows spectators to see hands and hidden information
+    optional bool spectators_see_everything = 9;
+
+    // selection of game types as presented in the server's room configuration
+    repeated uint32 game_type_ids = 10;
+
+    // the creator of the game will join it as a judge
+    optional bool join_as_judge = 11;
+
+    // the creator of the game will join it as a spectator
+    optional bool join_as_spectator = 12;
+
+    // set the starting life total
+    optional uint32 starting_life_total = 13;
+
+    // share decklists with all players when selected
+    optional bool share_decklists_on_load = 14;
+}
+
+message Command_JoinGame {
+    extend RoomCommand {
+        optional Command_JoinGame ext = 1003;
+    }
+    optional sint32 game_id = 1 [default = -1];
+    optional string password = 2;
+    optional bool spectator = 3;
+    optional bool override_restrictions = 4;
+    optional bool join_as_judge = 5;
+}

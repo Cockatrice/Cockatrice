@@ -1,7 +1,13 @@
+/**
+ * @file abstract_counter.h
+ * @ingroup GameGraphicsPlayers
+ * @brief TODO: Document this.
+ */
+
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include "../../client/tearoff_menu.h"
+#include "../../interface/widgets/menus/tearoff_menu.h"
 
 #include <QGraphicsItem>
 #include <QInputDialog>
@@ -34,7 +40,6 @@ private:
     bool dialogSemaphore, deleteAfterDialog;
     bool shownInCounterArea;
     bool shortcutActive;
-    QWidget *game;
 
 private slots:
     void refreshShortcuts();
@@ -48,8 +53,7 @@ public:
                     bool _shownInCounterArea,
                     int _value,
                     bool _useNameForShortcut = false,
-                    QGraphicsItem *parent = nullptr,
-                    QWidget *game = nullptr);
+                    QGraphicsItem *parent = nullptr);
     ~AbstractCounter() override;
 
     void retranslateUi();

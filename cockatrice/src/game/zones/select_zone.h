@@ -1,3 +1,9 @@
+/**
+ * @file select_zone.h
+ * @ingroup GameGraphicsZones
+ * @brief TODO: Document this.
+ */
+
 #ifndef SELECTZONE_H
 #define SELECTZONE_H
 
@@ -21,12 +27,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 public:
-    SelectZone(Player *_player,
-               const QString &_name,
-               bool _hasCardAttr,
-               bool _isShufflable,
-               bool _contentsKnown,
-               QGraphicsItem *parent = nullptr);
+    SelectZone(CardZoneLogic *logic, QGraphicsItem *parent = nullptr);
 };
 
 qreal divideCardSpaceInZone(qreal index, int cardCount, qreal totalHeight, qreal cardHeight, bool reverse = false);

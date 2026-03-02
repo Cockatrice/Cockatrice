@@ -11,7 +11,7 @@
                 <colors>G</colors>
                 <manacost>2G</manacost>
                 <cmc>2</cmc>
-                <type>Creature</type>
+                <type>Creature — Cat</type>
                 <maintype>Creature</maintype>
                 <pt>3/3</pt>
             </prop>
@@ -26,7 +26,22 @@
                 <colors>R</colors>
                 <manacost>2RR</manacost>
                 <cmc>4</cmc>
-                <type>Creature</type>
+                <type>Creature — Dog</type>
+                <maintype>Creature</maintype>
+                <pt>4/4</pt>
+            </prop>
+        </card>
+        <card>
+            <name>Doctor</name>
+            <set>WHO</set>
+            <tablerow>0</tablerow>
+            <text>Why did wizards introduce two-word creature types</text>
+            <prop>
+                <muid>222</muid>
+                <colors>R</colors>
+                <manacost>2RR</manacost>
+                <cmc>4</cmc>
+                <type>Creature — Human Time Lord Doctor</type>
                 <maintype>Creature</maintype>
                 <pt>4/4</pt>
             </prop>

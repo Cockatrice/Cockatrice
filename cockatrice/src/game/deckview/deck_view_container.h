@@ -1,7 +1,13 @@
+/**
+ * @file deck_view_container.h
+ * @ingroup Lobby
+ * @brief TODO: Document this.
+ */
+
 #ifndef DECK_VIEW_CONTAINER_H
 #define DECK_VIEW_CONTAINER_H
 
-#include "../../deck/deck_loader.h"
+#include "../../interface/deck_loader/deck_loader.h"
 
 #include <QPushButton>
 
@@ -26,7 +32,7 @@ signals:
 
 public:
     explicit ToggleButton(QWidget *parent = nullptr);
-    bool getState() const
+    [[nodiscard]] bool getState() const
     {
         return state;
     }
@@ -44,7 +50,8 @@ class DeckViewContainer : public QWidget
     Q_OBJECT
 private:
     QVBoxLayout *deckViewLayout;
-    QPushButton *loadLocalButton, *loadRemoteButton, *unloadDeckButton, *forceStartGameButton;
+    QPushButton *loadLocalButton, *loadRemoteButton, *loadFromClipboardButton, *loadFromWebsiteButton;
+    QPushButton *unloadDeckButton, *forceStartGameButton;
     ToggleButton *readyStartButton, *sideboardLockButton;
     DeckView *deckView;
     VisualDeckStorageWidget *visualDeckStorageWidget;
@@ -58,6 +65,8 @@ private slots:
     void switchToDeckLoadedView();
     void loadLocalDeck();
     void loadRemoteDeck();
+    void loadFromClipboard();
+    void loadFromWebsite();
     void unloadDeck();
     void readyStart();
     void forceStart();
@@ -76,11 +85,12 @@ public:
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);
-    void setDeck(const DeckLoader &deck);
+    void setDeck(const DeckList &deck);
     void setVisualDeckStorageExists(bool exists);
 
 public slots:
     void loadDeckFromFile(const QString &filePath);
+    void loadDeckFromDeckList(const DeckList &deck);
 };
 
 #endif // DECK_VIEW_CONTAINER_H

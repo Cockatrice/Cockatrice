@@ -7,6 +7,7 @@ on:
     - cron: '0 0 15 1,4,7,10 *'
   pull_request:
     paths:
+      - '.tx/**'
       - '.github/workflows/translations-pull.yml'
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Pull translated strings from Transifex
         uses: transifex/cli-action@v2
@@ -32,7 +33,7 @@ jobs:
       - name: Create pull request
         if: github.event_name != 'pull_request'
         id: create_pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           add-paths: |
             cockatrice/translations/*.ts
@@ -51,7 +52,7 @@ jobs:
             *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`. Review [action runs][2].*<br>
             *After merging, all new languages and translations are available in the next build.*
             
-            [1]: https://app.transifex.com/cockatrice/cockatrice/
+            [1]: https://explore.transifex.com/cockatrice/cockatrice/
             [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
           labels: |
             CI

@@ -1,27 +1,25 @@
 #include "deck_view_container.h"
 
-#include "../../client/tabs/tab_game.h"
-#include "../../client/ui/picture_loader/picture_loader.h"
-#include "../../deck/deck_loader.h"
-#include "../../dialogs/dlg_load_deck.h"
-#include "../../dialogs/dlg_load_remote_deck.h"
-#include "../../server/pending_command.h"
-#include "../../settings/cache_settings.h"
-#include "../cards/card_database.h"
-#include "../cards/card_database_manager.h"
-#include "../game_scene.h"
+#include "../../client/settings/cache_settings.h"
+#include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/deck_loader/deck_loader.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
+#include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
+#include "../../interface/widgets/tabs/tab_game.h"
 #include "deck_view.h"
-#include "pb/command_deck_select.pb.h"
-#include "pb/command_ready_start.pb.h"
-#include "pb/command_set_sideboard_lock.pb.h"
-#include "pb/command_set_sideboard_plan.pb.h"
-#include "pb/response_deck_download.pb.h"
-#include "trice_limits.h"
 
 #include <QMessageBox>
-#include <QMouseEvent>
-#include <QToolButton>
-#include <google/protobuf/descriptor.h>
+#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/protocol/pb/command_deck_select.pb.h>
+#include <libcockatrice/protocol/pb/command_ready_start.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
+#include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_download.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
 {
@@ -52,6 +50,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
+    loadFromClipboardButton = new QPushButton;
+    loadFromWebsiteButton = new QPushButton;
     unloadDeckButton = new QPushButton;
     readyStartButton = new ToggleButton;
     forceStartGameButton = new QPushButton;
@@ -59,6 +59,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     connect(loadLocalButton, &QPushButton::clicked, this, &DeckViewContainer::loadLocalDeck);
     connect(loadRemoteButton, &QPushButton::clicked, this, &DeckViewContainer::loadRemoteDeck);
+    connect(loadFromClipboardButton, &QPushButton::clicked, this, &DeckViewContainer::loadFromClipboard);
+    connect(loadFromWebsiteButton, &QPushButton::clicked, this, &DeckViewContainer::loadFromWebsite);
     connect(readyStartButton, &QPushButton::clicked, this, &DeckViewContainer::readyStart);
     connect(unloadDeckButton, &QPushButton::clicked, this, &DeckViewContainer::unloadDeck);
     connect(forceStartGameButton, &QPushButton::clicked, this, &DeckViewContainer::forceStart);
@@ -68,6 +70,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     auto *buttonHBox = new QHBoxLayout;
     buttonHBox->addWidget(loadLocalButton);
     buttonHBox->addWidget(loadRemoteButton);
+    buttonHBox->addWidget(loadFromClipboardButton);
+    buttonHBox->addWidget(loadFromWebsiteButton);
     buttonHBox->addWidget(unloadDeckButton);
     buttonHBox->addWidget(readyStartButton);
     buttonHBox->addWidget(sideboardLockButton);
@@ -118,6 +122,8 @@ void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
     loadRemoteButton->setText(tr("Load remote deck..."));
+    loadFromClipboardButton->setText(tr("Load from clipboard..."));
+    loadFromWebsiteButton->setText(tr("Load from website..."));
     unloadDeckButton->setText(tr("Unload deck"));
     readyStartButton->setText(tr("Ready to start"));
     forceStartGameButton->setText(tr("Force start"));
@@ -147,7 +153,9 @@ void DeckViewContainer::switchToDeckSelectView()
     deckViewLayout->update();
 
     setVisibility(loadLocalButton, true);
-    setVisibility(loadRemoteButton, !parentGame->getIsLocalGame());
+    setVisibility(loadRemoteButton, !parentGame->getGame()->getGameState()->getIsLocalGame());
+    setVisibility(loadFromClipboardButton, true);
+    setVisibility(loadFromWebsiteButton, true);
     setVisibility(unloadDeckButton, false);
     setVisibility(readyStartButton, false);
     setVisibility(sideboardLockButton, false);
@@ -172,11 +180,13 @@ void DeckViewContainer::switchToDeckLoadedView()
 
     setVisibility(loadLocalButton, false);
     setVisibility(loadRemoteButton, false);
+    setVisibility(loadFromClipboardButton, false);
+    setVisibility(loadFromWebsiteButton, false);
     setVisibility(unloadDeckButton, true);
     setVisibility(readyStartButton, true);
     setVisibility(sideboardLockButton, true);
 
-    if (parentGame->isHost()) {
+    if (parentGame->getGame()->isHost()) {
         setVisibility(forceStartGameButton, true);
     }
 }
@@ -198,8 +208,11 @@ void DeckViewContainer::refreshShortcuts()
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
+    loadFromClipboardButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromClipboardButton"));
+    unloadDeckButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/unloadDeckButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
+    forceStartGameButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/forceStartGameButton"));
 }
 
 /**
@@ -246,45 +259,75 @@ void DeckViewContainer::loadLocalDeck()
 
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
-    DeckLoader::FileFormat fmt = DeckLoader::getFormatFromName(filePath);
-    QString deckString;
-    DeckLoader deck;
+    DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
 
-    bool error = !deck.loadFromFile(filePath, fmt, true);
-    if (!error) {
-        deckString = deck.writeToString_Native();
-        error = deckString.length() > MAX_FILE_LENGTH;
-    }
-    if (error) {
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, fmt, true);
+
+    if (!deckOpt) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
+        return;
+    }
+
+    loadDeckFromDeckList(deckOpt.value().deckList);
+}
+
+void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
+{
+    QString deckString = deck.writeToString_Native();
+
+    if (deckString.length() > MAX_FILE_LENGTH) {
+        QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));
         return;
     }
 
     Command_DeckSelect cmd;
     cmd.set_deck(deckString.toStdString());
-    PendingCommand *pend = parentGame->prepareGameCommand(cmd);
+    PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
-    parentGame->sendGameCommand(pend, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
 }
 
 void DeckViewContainer::loadRemoteDeck()
 {
-    DlgLoadRemoteDeck dlg(parentGame->getClientForPlayer(playerId), this);
+    DlgLoadRemoteDeck dlg(parentGame->getGame()->getClientForPlayer(playerId), this);
     if (dlg.exec()) {
         Command_DeckSelect cmd;
         cmd.set_deck_id(dlg.getDeckId());
-        PendingCommand *pend = parentGame->prepareGameCommand(cmd);
+        PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
-        parentGame->sendGameCommand(pend, playerId);
+        parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
     }
+}
+
+void DeckViewContainer::loadFromClipboard()
+{
+    auto dlg = DlgLoadDeckFromClipboard(this);
+
+    if (!dlg.exec()) {
+        return;
+    }
+
+    DeckList deck = dlg.getDeckList();
+    loadDeckFromDeckList(deck);
+}
+
+void DeckViewContainer::loadFromWebsite()
+{
+    auto dlg = DlgLoadDeckFromWebsite(this);
+
+    if (!dlg.exec()) {
+        return;
+    }
+
+    DeckList deck = dlg.getDeck();
+    loadDeckFromDeckList(deck);
 }
 
 void DeckViewContainer::deckSelectFinished(const Response &r)
 {
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
-    DeckLoader newDeck(QString::fromStdString(resp.deck()));
-    PictureLoader::cacheCardPixmaps(
-        CardDatabaseManager::getInstance()->getCardsByNameAndProviderId(newDeck.getCardListWithProviderId()));
+    DeckList newDeck = DeckList(QString::fromStdString(resp.deck()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(newDeck.getCardRefList()));
     setDeck(newDeck);
     switchToDeckLoadedView();
 }
@@ -306,7 +349,7 @@ void DeckViewContainer::forceStart()
     Command_ReadyStart cmd;
     cmd.set_force_start(true);
     cmd.set_ready(true);
-    parentGame->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::sideboardLockButtonClicked()
@@ -314,7 +357,7 @@ void DeckViewContainer::sideboardLockButtonClicked()
     Command_SetSideboardLock cmd;
     cmd.set_locked(sideboardLockButton->getState());
 
-    parentGame->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 void DeckViewContainer::sideboardPlanChanged()
@@ -323,7 +366,7 @@ void DeckViewContainer::sideboardPlanChanged()
     const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
     for (const auto &i : newPlan)
         cmd.add_move_list()->CopyFrom(i);
-    parentGame->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 /**
@@ -333,7 +376,7 @@ void DeckViewContainer::sendReadyStartCommand(bool ready)
 {
     Command_ReadyStart cmd;
     cmd.set_ready(ready);
-    parentGame->sendGameCommand(cmd, playerId);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
 /**
@@ -365,7 +408,7 @@ void DeckViewContainer::setSideboardLocked(bool locked)
         deckView->resetSideboardPlan();
 }
 
-void DeckViewContainer::setDeck(const DeckLoader &deck)
+void DeckViewContainer::setDeck(const DeckList &deck)
 {
     deckView->setDeck(deck);
     switchToDeckLoadedView();

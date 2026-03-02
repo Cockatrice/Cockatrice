@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_ReplaySubmitCode {
+    extend SessionCommand {
+        optional Command_ReplaySubmitCode ext = 1105;
+    }
+    optional string replay_code = 1;
+}

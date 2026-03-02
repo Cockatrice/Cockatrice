@@ -1,0 +1,57 @@
+/**
+ * @file printing_selector_card_overlay_widget.h
+ * @ingroup PrintingWidgets
+ * @brief TODO: Document this.
+ */
+
+#ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
+#define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
+
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "all_zones_card_amount_widget.h"
+#include "set_name_and_collectors_number_display_widget.h"
+
+#include <libcockatrice/models/deck_list/deck_list_model.h>
+
+class PrintingSelectorCardOverlayWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
+                                               AbstractTabDeckEditor *_deckEditor,
+                                               DeckStateManager *_deckStateManager,
+                                               QSlider *_cardSizeSlider,
+                                               const ExactCard &_rootCard);
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent(QEnterEvent *event) override;
+#else
+    void enterEvent(QEvent *event) override;
+#endif
+    void leaveEvent(QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void customMenu(QPoint point);
+
+signals:
+    void cardPreferenceChanged();
+
+public slots:
+    void updateCardAmounts(int mainboardAmount, int sideboardAmount);
+
+private slots:
+    void updateVisibility();
+    void updatePinBadgeVisibility();
+
+private:
+    void initializePinBadge();
+    CardInfoPictureWidget *cardInfoPicture;
+    AllZonesCardAmountWidget *allZonesCardAmountWidget;
+    QLabel *pinBadge = nullptr;
+    AbstractTabDeckEditor *deckEditor;
+    ExactCard rootCard;
+};
+
+#endif // PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

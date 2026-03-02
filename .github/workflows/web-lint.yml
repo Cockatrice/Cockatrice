@@ -1,11 +1,12 @@
 name: Code Style (TypeScript) 
 
 on:
+  # push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:
     paths:
-      - '.github/workflows/web-*.yml'
       - 'webclient/**'
       - '!**.md'
+      - '.github/workflows/web-lint.yml'
 
 jobs:
   ESLint:
@@ -17,10 +18,10 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         cache: 'npm'
         cache-dependency-path: 'webclient/package-lock.json'

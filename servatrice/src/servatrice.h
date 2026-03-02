@@ -20,8 +20,6 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
-#include "server.h"
-
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>
@@ -31,6 +29,7 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <server.h>
 #include <utility>
 
 Q_DECLARE_METATYPE(QSqlDatabase)

@@ -20,31 +20,27 @@
 
 #include "main.h"
 
-#include "QtNetwork/QNetworkInterface"
-#include "client/network/spoiler_background_updater.h"
+#include "client/network/update/card_spoiler/spoiler_background_updater.h"
+#include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
-#include "client/ui/pixel_map_generator.h"
-#include "client/ui/theme_manager.h"
-#include "client/ui/window_main.h"
-#include "dialogs/dlg_settings.h"
-#include "featureset.h"
-#include "rng_sfmt.h"
-#include "settings/cache_settings.h"
-#include "utility/logger.h"
+#include "database/interface/settings_card_preference_provider.h"
+#include "interface/logger.h"
+#include "interface/pixel_map_generator.h"
+#include "interface/theme_manager.h"
+#include "interface/widgets/dialogs/dlg_settings.h"
+#include "interface/window_main.h"
 #include "version_string.h"
 
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
-#include <QDir>
-#include <QFile>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QSystemTrayIcon>
-#include <QTextStream>
 #include <QTranslator>
-#include <QtPlugin>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/rng/rng_sfmt.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -250,6 +246,11 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::English);
 
+    // Dependency Injections
+    CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
+    CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
+    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
+
     qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
@@ -259,10 +260,8 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
-#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
-#endif
 
     SettingsCache::instance().setClientID(generateClientID());
 

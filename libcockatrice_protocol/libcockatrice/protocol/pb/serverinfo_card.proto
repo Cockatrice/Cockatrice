@@ -1,0 +1,56 @@
+syntax = "proto2";
+import "serverinfo_cardcounter.proto";
+
+// Container for all the properties of a single card
+message ServerInfo_Card {
+    // unique card id in this zone
+    optional sint32 id = 1 [default = -1];
+
+    // name of this kind of card
+    optional string name = 2;
+
+    // x coordinate in zone
+    optional sint32 x = 3 [default = -1];
+
+    // y coordinate in zone
+    optional sint32 y = 4 [default = -1];
+
+    // if the card is face_down, hiding its information
+    optional bool face_down = 5;
+
+    // if the card is tapped, turned sideways
+    optional bool tapped = 6;
+
+    // if the card is marked as attacking
+    optional bool attacking = 7;
+
+    // the card's color
+    optional string color = 8;
+
+    // the power/toughness field, displayed on the bottom right
+    optional string pt = 9;
+
+    // an optional string placed over the card
+    optional string annotation = 10;
+
+    // whether the card should be deleted when removed from the table, like a token
+    optional bool destroy_on_zone_change = 11;
+
+    // whether the card should not be untapped when the untap command is sent
+    optional bool doesnt_untap = 12;
+
+    // list of counters on the card
+    repeated ServerInfo_CardCounter counter_list = 13;
+
+    // the player that owns the card this is attached to
+    optional sint32 attach_player_id = 14 [default = -1];
+
+    // the zone of the card this is attached to
+    optional string attach_zone = 15;
+
+    // the unique id of the card in that zone
+    optional sint32 attach_card_id = 16 [default = -1];
+
+    // unique id of this kind of card, extends the name to specify a specific printing of a card
+    optional string provider_id = 17;
+}

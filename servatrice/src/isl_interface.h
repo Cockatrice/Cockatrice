@@ -1,13 +1,13 @@
 #ifndef ISL_INTERFACE_H
 #define ISL_INTERFACE_H
 
-#include "pb/serverinfo_game.pb.h"
-#include "pb/serverinfo_room.pb.h"
-#include "pb/serverinfo_user.pb.h"
 #include "servatrice.h"
 
 #include <QSslCertificate>
 #include <QWaitCondition>
+#include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
 class Servatrice;
 class QSslSocket;

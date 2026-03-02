@@ -1,0 +1,27 @@
+syntax = "proto2";
+import "game_event.proto";
+import "serverinfo_player.proto";
+
+// Signals that the game state has changed.
+// If a field is present in this message, it will overwrite the client's game state.
+// Also used to provide the entire game state when joining a game.
+message Event_GameStateChanged {
+    extend GameEvent {
+        optional Event_GameStateChanged ext = 1005;
+    }
+
+    // the list of players. Players contain their zones which contain all cards in the game
+    repeated ServerInfo_Player player_list = 1;
+
+    // if the game has started
+    optional bool game_started = 2;
+
+    // the player who is currently holding the turn
+    optional sint32 active_player_id = 3;
+
+    // the current phase
+    optional sint32 active_phase = 4;
+
+    // the amount of seconds since the game started
+    optional uint32 seconds_elapsed = 5;
+}

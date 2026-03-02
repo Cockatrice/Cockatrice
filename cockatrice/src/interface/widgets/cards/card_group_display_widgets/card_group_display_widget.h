@@ -1,0 +1,90 @@
+/**
+ * @file card_group_display_widget.h
+ * @ingroup DeckEditorCardGroupWidgets
+ * @brief TODO: Document this.
+ */
+
+#ifndef CARD_GROUP_DISPLAY_WIDGET_H
+#define CARD_GROUP_DISPLAY_WIDGET_H
+
+#include "../../general/display/banner_widget.h"
+#include "../card_info_picture_with_text_overlay_widget.h"
+#include "../card_size_widget.h"
+
+#include <QItemSelectionModel>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
+
+class CardGroupDisplayWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    CardGroupDisplayWidget(QWidget *parent,
+                           DeckListModel *deckListModel,
+                           QItemSelectionModel *selectionModel,
+                           QPersistentModelIndex trackedIndex,
+                           QString zoneName,
+                           QString cardGroupCategory,
+                           QString activeGroupCriteria,
+                           QStringList activeSortCriteria,
+                           int bannerOpacity,
+                           CardSizeWidget *cardSizeWidget);
+    void onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void refreshSelectionForIndex(const QPersistentModelIndex &persistent);
+    void clearAllDisplayWidgets();
+
+    DeckListModel *deckListModel;
+    QItemSelectionModel *selectionModel;
+    QPersistentModelIndex trackedIndex;
+    QMap<QPersistentModelIndex, QList<QWidget *>> indexToWidgetMap;
+    QString zoneName;
+    QString cardGroupCategory;
+    QString activeGroupCriteria;
+    QStringList activeSortCriteria;
+    CardSizeWidget *cardSizeWidget;
+
+public slots:
+    void mousePressEvent(QMouseEvent *event) override;
+    void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
+    void onHover(const ExactCard &card);
+    virtual QWidget *constructWidgetForIndex(QPersistentModelIndex index);
+    virtual void updateCardDisplays();
+    virtual void onCardAddition(const QModelIndex &parent, int first, int last);
+    virtual void onCardRemoval(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void onActiveSortCriteriaChanged(QStringList activeSortCriteria);
+    void resizeEvent(QResizeEvent *event) override;
+
+signals:
+    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
+    void cardHovered(const ExactCard &card);
+    void cleanupRequested(CardGroupDisplayWidget *cardGroupDisplayWidget);
+
+protected:
+    QVBoxLayout *layout;
+    BannerWidget *banner;
+
+    virtual QWidget *getLayoutParent()
+    {
+        return this;
+    }
+
+    virtual void addToLayout(QWidget *toAdd)
+    {
+        layout->addWidget(toAdd);
+    }
+
+    virtual void insertIntoLayout(QWidget *toInsert, int insertAt)
+    {
+        layout->insertWidget(insertAt, toInsert);
+    }
+
+    virtual void removeFromLayout(QWidget *toRemove)
+    {
+        layout->removeWidget(toRemove);
+    }
+};
+#endif // CARD_GROUP_DISPLAY_WIDGET_H

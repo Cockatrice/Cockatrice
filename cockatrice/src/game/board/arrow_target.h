@@ -1,7 +1,13 @@
+/**
+ * @file arrow_target.h
+ * @ingroup GameGraphics
+ * @brief TODO: Document this.
+ */
+
 #ifndef ARROWTARGET_H
 #define ARROWTARGET_H
 
-#include "abstract_graphics_item.h"
+#include "../../game_graphics/board/abstract_graphics_item.h"
 
 #include <QList>
 
@@ -22,18 +28,18 @@ public:
     explicit ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
     ~ArrowTarget() override;
 
-    Player *getOwner() const
+    [[nodiscard]] Player *getOwner() const
     {
         return owner;
     }
 
     void setBeingPointedAt(bool _beingPointedAt);
-    bool getBeingPointedAt() const
+    [[nodiscard]] bool getBeingPointedAt() const
     {
         return beingPointedAt;
     }
 
-    const QList<ArrowItem *> &getArrowsFrom() const
+    [[nodiscard]] const QList<ArrowItem *> &getArrowsFrom() const
     {
         return arrowsFrom;
     }
@@ -45,7 +51,7 @@ public:
     {
         arrowsFrom.removeOne(arrow);
     }
-    const QList<ArrowItem *> &getArrowsTo() const
+    [[nodiscard]] const QList<ArrowItem *> &getArrowsTo() const
     {
         return arrowsTo;
     }

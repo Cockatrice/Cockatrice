@@ -1,0 +1,76 @@
+syntax = "proto2";
+
+// Sent immediately after a command with the same cmd_id, connecting it to the command sent to the server
+message Response {
+    enum ResponseCode {
+        RespNotConnected = -1;
+        RespNothing = 0;
+        RespOk = 1;
+        RespNotInRoom = 2;
+        RespInternalError = 3;
+        RespInvalidCommand = 4;
+        RespInvalidData = 5;
+        RespNameNotFound = 6;
+        RespLoginNeeded = 7;
+        RespFunctionNotAllowed = 8;
+        RespGameNotStarted = 9;
+        RespGameFull = 10;
+        RespContextError = 11;
+        RespWrongPassword = 12;
+        RespSpectatorsNotAllowed = 13;
+        RespOnlyBuddies = 14;
+        RespUserLevelTooLow = 15;
+        RespInIgnoreList = 16;
+        RespWouldOverwriteOldSession = 17;
+        RespChatFlood = 18;
+        RespUserIsBanned = 19;
+        RespAccessDenied = 20;
+        RespUsernameInvalid = 21;
+        RespRegistrationRequired = 22;
+        RespRegistrationAccepted = 23;    // Server agrees to process client's registration request
+        RespUserAlreadyExists = 24;       // Client attempted to register a name which is already registered
+        RespEmailRequiredToRegister = 25; // Server requires email to register accounts but client did not provide one
+        RespTooManyRequests = 26;  // Server refused to complete command because client has sent too many too quickly
+        RespPasswordTooShort = 27; // Server requires a decent password
+        RespAccountNotActivated =
+            28; // Client attempted to log into a registered username but the account hasn't been activated
+        RespRegistrationDisabled = 29; // Server does not allow clients to register
+        RespRegistrationFailed = 30;   // Server accepted a reg request but failed to perform the registration
+        RespActivationAccepted = 31;   // Server accepted a reg user activation token
+        RespActivationFailed = 32;     // Server didn't accept a reg user activation token
+        RespRegistrationAcceptedNeedsActivation =
+            33;                    // Server accepted client registration, but it will need token activation
+        RespClientIdRequired = 34; // Server requires client to generate and send its client id before allowing access
+        RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
+        RespServerFull = 36;           // Server user limit reached
+        RespEmailBlackListed = 37;     // Server has blocked the email address provided for registration for some reason
+    }
+    enum ResponseType {
+        JOIN_ROOM = 1000;
+        LIST_USERS = 1001;
+        GET_GAMES_OF_USER = 1002;
+        GET_USER_INFO = 1003;
+        DUMP_ZONE = 1004;
+        LOGIN = 1005;
+        DECK_LIST = 1006;
+        DECK_DOWNLOAD = 1007;
+        DECK_UPLOAD = 1008;
+        REGISTER = 1009;
+        ACTIVATE = 1010;
+        ADJUST_MOD = 1011;
+        BAN_HISTORY = 1012;
+        WARN_HISTORY = 1013;
+        WARN_LIST = 1014;
+        VIEW_LOG = 1015;
+        FORGOT_PASSWORD_REQUEST = 1016;
+        PASSWORD_SALT = 1017;
+        GET_ADMIN_NOTES = 1018;
+        REPLAY_LIST = 1100;
+        REPLAY_DOWNLOAD = 1101;
+        REPLAY_GET_CODE = 1102;
+    }
+    required uint64 cmd_id = 1;
+    optional ResponseCode response_code = 2;
+
+    extensions 100 to max;
+}

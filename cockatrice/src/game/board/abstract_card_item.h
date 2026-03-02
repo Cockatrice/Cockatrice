@@ -1,8 +1,17 @@
+/**
+ * @file abstract_card_item.h
+ * @ingroup GameGraphicsCards
+ * @brief TODO: Document this.
+ */
+
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
-#include "../cards/card_info.h"
+#include "../../game_graphics/board/graphics_item_type.h"
 #include "arrow_target.h"
+
+#include <libcockatrice/card/printing/exact_card.h>
+#include <libcockatrice/utility/card_ref.h>
 
 class Player;
 
@@ -13,10 +22,9 @@ class AbstractCardItem : public ArrowTarget
 {
     Q_OBJECT
 protected:
-    CardInfoPtr info;
+    ExactCard exactCard;
     int id;
-    QString name;
-    QString providerId;
+    CardRef cardRef;
     bool tapped;
     bool facedown;
     int tapAngle;
@@ -34,7 +42,7 @@ public slots:
 
 signals:
     void hovered(AbstractCardItem *card);
-    void showCardInfoPopup(const QPoint &pos, const QString &cardName, const QString &providerId);
+    void showCardInfoPopup(const QPoint &pos, const CardRef &cardRef);
     void deleteCardInfoPopup(QString cardName);
     void sigPixmapUpdated();
     void cardShiftClicked(QString cardName);
@@ -49,8 +57,7 @@ public:
         return Type;
     }
     explicit AbstractCardItem(QGraphicsItem *parent = nullptr,
-                              const QString &_name = QString(),
-                              const QString &_providerId = QString(),
+                              const CardRef &cardRef = {},
                               Player *_owner = nullptr,
                               int _id = -1);
     ~AbstractCardItem() override;
@@ -59,10 +66,11 @@ public:
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    CardInfoPtr getInfo() const
+    ExactCard getCard() const
     {
-        return info;
+        return exactCard;
     }
+    const CardInfo &getCardInfo() const;
     int getId() const
     {
         return id;
@@ -73,14 +81,17 @@ public:
     }
     QString getName() const
     {
-        return name;
+        return cardRef.name;
     }
-    void setName(const QString &_name = QString());
     QString getProviderId() const
     {
-        return providerId;
+        return cardRef.providerId;
     }
-    void setProviderId(const QString &_providerId = QString());
+    void setCardRef(const CardRef &_cardRef);
+    CardRef getCardRef() const
+    {
+        return cardRef;
+    }
     qreal getRealZValue() const
     {
         return realZValue;
@@ -105,7 +116,7 @@ public:
     void processHoverEvent();
     void deleteCardInfoPopup()
     {
-        emit deleteCardInfoPopup(name);
+        emit deleteCardInfoPopup(cardRef.name);
     }
 
 protected:

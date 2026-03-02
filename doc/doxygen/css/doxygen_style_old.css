@@ -1,0 +1,88 @@
+/* === Accent Tuning for Doxygen Dark Mode === */
+
+/* Main accent color */
+:root {
+    --main-accent: #33a946;
+}
+
+/* Links */
+a, a:visited {
+    color: var(--main-accent) !important;
+}
+
+a:hover {
+    color: #4fd467 !important; /* lighter green */
+}
+
+/* Project title */
+#projectname {
+    color: var(--main-accent) !important;
+}
+
+/* Current sidebar item */
+#side-nav .selected {
+    border-left: 3px solid var(--main-accent) !important;
+}
+
+/* Tabs */
+.tablist li.current {
+    background: var(--main-accent) !important;
+    color: #fff !important;
+}
+
+/* Search box focus */
+#MSearchField:focus {
+    outline: 1px solid var(--main-accent) !important;
+}
+
+/* Code block border highlight */
+pre, code {
+    border: 1px solid #333;
+}
+
+pre.fragment {
+    border-color: var(--main-accent) !important;
+}
+
+/* Graph toggle (caller / callee two-button) */
+.graph-toggle {
+    display: inline-flex;
+    margin: 0.5em 0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #111;
+}
+
+.graph-toggle button {
+    flex: 1 1 50%;
+    padding: 0.35em 0.8em;
+    background: transparent;
+    color: #aaa;
+    border: 0;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.graph-toggle button:hover:not(:disabled) {
+    background: #222;
+    color: #fff;
+}
+
+.graph-toggle button.active {
+    background: var(--main-accent);
+    color: #fff;
+}
+
+.graph-toggle button:disabled,
+.graph-toggle button.disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* small accessibility focus ring */
+.graph-toggle button:focus {
+    outline: 2px solid rgba(51, 169, 70, 0.3);
+    outline-offset: 1px;
+}
+

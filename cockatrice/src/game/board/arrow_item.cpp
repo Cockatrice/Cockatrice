@@ -1,22 +1,23 @@
 #define _USE_MATH_DEFINES
 #include "arrow_item.h"
 
-#include "../../settings/cache_settings.h"
-#include "../cards/card_info.h"
+#include "../../client/settings/cache_settings.h"
 #include "../player/player.h"
+#include "../player/player_actions.h"
 #include "../player/player_target.h"
 #include "../zones/card_zone.h"
 #include "card_item.h"
-#include "color.h"
-#include "pb/command_attach_card.pb.h"
-#include "pb/command_create_arrow.pb.h"
-#include "pb/command_delete_arrow.pb.h"
 
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QtMath>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
+#include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/utility/color.h>
 
 ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), targetLocked(false),
@@ -130,7 +131,7 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!player->getLocal()) {
+    if (!player->getPlayerInfo()->getLocal()) {
         event->ignore();
         return;
     }
@@ -147,12 +148,12 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::RightButton) {
         Command_DeleteArrow cmd;
         cmd.set_arrow_id(id);
-        player->sendGameCommand(cmd);
+        player->getPlayerActions()->sendGameCommand(cmd);
     }
 }
 
-ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color)
-    : ArrowItem(_owner, -1, _startItem, 0, _color)
+ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
+    : ArrowItem(_owner, -1, _startItem, 0, _color), deleteInPhase(_deleteInPhase)
 {
 }
 
@@ -214,7 +215,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         return;
 
     if (targetItem && (targetItem != startItem)) {
-        CardZone *startZone = static_cast<CardItem *>(startItem)->getZone();
+        CardZoneLogic *startZone = static_cast<CardItem *>(startItem)->getZone();
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
         CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
@@ -222,30 +223,38 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         Command_CreateArrow cmd;
         cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
-        cmd.set_start_player_id(startZone->getPlayer()->getId());
+        cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
         cmd.set_start_zone(startZone->getName().toStdString());
         cmd.set_start_card_id(startCard->getId());
 
         if (targetCard) {
-            CardZone *targetZone = targetCard->getZone();
-            cmd.set_target_player_id(targetZone->getPlayer()->getId());
+            CardZoneLogic *targetZone = targetCard->getZone();
+            cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
             cmd.set_target_zone(targetZone->getName().toStdString());
             cmd.set_target_card_id(targetCard->getId());
-        } else {
+        } else { // failed to cast target to card, this means it's a player
             PlayerTarget *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem);
-            cmd.set_target_player_id(targetPlayer->getOwner()->getId());
+            cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
         }
-        if (startZone->getName().compare("hand") == 0) {
+
+        // if the card is in hand then we will move the card to stack or table as part of drawing the arrow
+        if (startZone->getName() == "hand") {
             startCard->playCard(false);
-            CardInfoPtr ci = startCard->getInfo();
-            if (ci && (((!SettingsCache::instance().getPlayToStack() && ci->getTableRow() == 3) ||
-                        ((SettingsCache::instance().getPlayToStack() && ci->getTableRow() != 0) &&
-                         startCard->getZone()->getName().toStdString() != "stack"))))
+            CardInfoPtr ci = startCard->getCard().getCardPtr();
+            bool playToStack = SettingsCache::instance().getPlayToStack();
+            if (ci &&
+                ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
+                 (playToStack && ci->getUiAttributes().tableRow != 0 && startCard->getZone()->getName() != "stack")))
                 cmd.set_start_zone("stack");
             else
-                cmd.set_start_zone(SettingsCache::instance().getPlayToStack() ? "stack" : "table");
+                cmd.set_start_zone(playToStack ? "stack" : "table");
         }
-        player->sendGameCommand(cmd);
+
+        if (deleteInPhase != 0) {
+            cmd.set_delete_in_phase(deleteInPhase);
+        }
+
+        player->getPlayerActions()->sendGameCommand(cmd);
     }
     delArrow();
 
@@ -312,22 +321,22 @@ void ArrowAttachItem::attachCards(CardItem *startCard, const CardItem *targetCar
         return;
     }
 
-    CardZone *startZone = startCard->getZone();
-    CardZone *targetZone = targetCard->getZone();
+    CardZoneLogic *startZone = startCard->getZone();
+    CardZoneLogic *targetZone = targetCard->getZone();
 
     // move card onto table first if attaching from some other zone
     if (startZone->getName() != "table") {
-        player->playCardToTable(startCard, false);
+        player->getPlayerActions()->playCardToTable(startCard, false);
     }
 
     Command_AttachCard cmd;
     cmd.set_start_zone("table");
     cmd.set_card_id(startCard->getId());
-    cmd.set_target_player_id(targetZone->getPlayer()->getId());
+    cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
     cmd.set_target_zone(targetZone->getName().toStdString());
     cmd.set_target_card_id(targetCard->getId());
 
-    player->sendGameCommand(cmd);
+    player->getPlayerActions()->sendGameCommand(cmd);
 }
 
 void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

@@ -333,7 +333,7 @@
     "title": "Request Password Reset"
   },
   "ResetPasswordDialog": {
-    "title": "Reset Password"
+    "title": "mi o sin e nimi ken"
   },
   "AccountActivationForm": {
     "error": {
@@ -354,7 +354,7 @@
     "label": {
       "autoConnect": "Auto Connect",
       "forgot": "nimi ken pi kama sina li weka tan sona",
-      "login": "Login",
+      "login": "mi o kama e sina lon kulupu",
       "savePassword": "mi o awen e nimi ken",
       "savedPassword": "mi awen e nimi ken"
     }

@@ -1,0 +1,53 @@
+syntax = "proto2";
+import "game_commands.proto";
+
+// Container describing a single card to move
+message CardToMove {
+    // Id of the card in its current zone
+    optional sint32 card_id = 1 [default = -1];
+
+    // Places the card face down, hiding its name
+    optional bool face_down = 2;
+
+    // When moving add this value to the power/toughness field of the card
+    optional string pt = 3;
+
+    // When moving sets the card to be tapped
+    optional bool tapped = 4;
+}
+
+// Container of multiple cards to move
+message ListOfCardsToMove {
+    repeated CardToMove card = 1;
+}
+
+// Command to move an amount of cards from one zone to another index/coordinate or another zone
+message Command_MoveCard {
+    extend GameCommand {
+        optional Command_MoveCard ext = 1027;
+    }
+
+    // The player the zone the cards are in belongs to
+    optional sint32 start_player_id = 1 [default = -1];
+
+    // The zone the cards start in
+    optional string start_zone = 2;
+
+    // List of the cards and their new properties
+    optional ListOfCardsToMove cards_to_move = 3;
+
+    // The player the zone the cards will be moved to belongs to
+    optional sint32 target_player_id = 4 [default = -1];
+
+    // The zone the cards will be moved to
+    optional string target_zone = 5;
+
+    // New x coordinate of the first card in the list
+    optional sint32 x = 6 [default = -1];
+
+    // New y coordinate of the first card in the list
+    optional sint32 y = 7 [default = -1];
+
+    // Inverts the x coordinate to apply from the end of the target zone instead of the start
+    optional bool is_reversed = 8 [default = false];
+}

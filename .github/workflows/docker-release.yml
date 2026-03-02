@@ -11,12 +11,7 @@ on:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
-      - 'CMakeLists.txt'
       - 'Dockerfile'
-      - 'servatrice/**'
-      - 'common/**'
-      - 'cmake/**'
-      - '!**.md'
 
 jobs:
   docker:
@@ -28,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Docker metadata
         id: metadata

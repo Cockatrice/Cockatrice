@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_ReplayGetCode {
+    extend Response {
+        optional Response_ReplayGetCode ext = 1102;
+    }
+    optional string replay_code = 1;
+}
