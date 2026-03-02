@@ -1,6 +1,7 @@
 #include "abstract_card_drag_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../z_values.h"
 
 #include <QCursor>
 #include <QDebug>
@@ -18,13 +19,13 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 {
     if (parentDrag) {
         parentDrag->addChildDrag(this);
-        setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
+        setZValue(ZValues::childDragZValue(hotSpot.x(), hotSpot.y()));
         connect(parentDrag, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
     } else {
         hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
                           qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
         setCursor(Qt::ClosedHandCursor);
-        setZValue(2000000007);
+        setZValue(ZValues::DRAG_ITEM);
     }
     if (item->getTapped())
         setTransform(QTransform()

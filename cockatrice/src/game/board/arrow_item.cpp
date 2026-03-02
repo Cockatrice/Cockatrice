@@ -5,6 +5,7 @@
 #include "../player/player.h"
 #include "../player/player_actions.h"
 #include "../player/player_target.h"
+#include "../z_values.h"
 #include "../zones/card_zone.h"
 #include "card_item.h"
 
@@ -23,7 +24,7 @@ ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTar
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), targetLocked(false),
       color(_color), fullColor(true)
 {
-    setZValue(2000000005);
+    setZValue(ZValues::ARROWS);
 
     if (startItem)
         startItem->addArrowFrom(this);
