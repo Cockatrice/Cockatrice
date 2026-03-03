@@ -125,7 +125,7 @@ void HomeWidget::updateRandomCard()
 
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);
-    background = backgroundSourceCard->getProcessedBackground(size());
+    background = backgroundSourceCard->getBackground();
 
     if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
         cardChangeTimer->stop();
@@ -143,7 +143,7 @@ void HomeWidget::onBackgroundShuffleFrequencyChanged()
 
 void HomeWidget::updateBackgroundProperties()
 {
-    background = backgroundSourceCard->getProcessedBackground(size());
+    background = backgroundSourceCard->getBackground();
     updateButtonsToBackgroundColor();
     update(); // Triggers repaint
 }
@@ -301,14 +301,17 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    background = background.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    if (!background.isNull()) {
+        QSize widgetSize = size() * devicePixelRatio();
+        QPixmap toDraw = background.scaled(widgetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
-    // Draw already-scaled background centered
-    QSize widgetSize = size();
-    QSize bgSize = background.size();
-    QPoint topLeft((widgetSize.width() - bgSize.width()) / 2, (widgetSize.height() - bgSize.height()) / 2);
+        // Draw scaled background centered
+        QSize bgSize = toDraw.size();
+        QPoint topLeft((widgetSize.width() - bgSize.width()) / (devicePixelRatio() * 2), // undo scaling for painter
+                       (widgetSize.height() - bgSize.height()) / (devicePixelRatio() * 2));
 
-    painter.drawPixmap(topLeft, background);
+        painter.drawPixmap(topLeft, toDraw);
+    }
 
     // Draw translucent black overlay with rounded corners
     QRectF overlayRect(5, 5, width() - 10, height() - 10);
