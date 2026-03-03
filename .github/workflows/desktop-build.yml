@@ -4,7 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
-  actions: write
+  actions: write # needed for ccache action to be able to delete gha caches
 
 on:
   push:
@@ -41,7 +41,7 @@ on:
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref_name != 'master' }}
 
 jobs:
   configure:
@@ -214,9 +214,11 @@ jobs:
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
 
       - name: Upload artifact
         id: upload_artifact
