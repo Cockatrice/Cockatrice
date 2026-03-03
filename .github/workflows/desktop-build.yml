@@ -509,7 +509,7 @@ jobs:
         if: matrix.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
-          name: Windows${{matrix.target}}-PDBs
+          name: ${{steps.build.outputs.name}}-PDBs
           path: |
             build/cockatrice/Release/*.pdb
             build/oracle/Release/*.pdb
