@@ -63,6 +63,7 @@ void HomeWidget::initializeBackgroundFromSource()
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
             background = QPixmap("theme:backgrounds/home");
+            backgroundSourceCard->setCard(ExactCard());
             updateButtonsToBackgroundColor();
             update();
             break;
