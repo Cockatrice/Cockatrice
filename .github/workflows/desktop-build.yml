@@ -4,7 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
-  actions: write # needed for ccache action to be able to delete gha caches
+  actions: write
 
 on:
   push:
@@ -41,7 +41,7 @@ on:
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: ${{ github.ref_name != 'master' }}
+  cancel-in-progress: true
 
 jobs:
   configure:
@@ -171,7 +171,9 @@ jobs:
         with:
           path: ${{env.CACHE}}
           key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+          restore-keys: |
+            ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}-
+            ccache-${{matrix.distro}}${{matrix.version}}-master-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
@@ -202,12 +204,12 @@ jobs:
                   --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
-      # Delete stale ccache so Save can refresh it; failures are non-fatal (e.g. no prior cache)
       - name: Delete stale ccache
         if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{github.token}}
-        run: gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || echo "warning: cache delete failed"
+        run: |
+          gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || true
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -432,7 +434,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-        run: .ci/compile.sh --server --test --vcpkg --ccache 500M
+        run: .ci/compile.sh --server --test --vcpkg
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
