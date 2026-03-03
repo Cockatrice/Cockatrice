@@ -264,7 +264,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 14
@@ -279,7 +279,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 15
@@ -294,7 +294,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 15
@@ -306,7 +306,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: Windows
             target: 10
@@ -319,43 +319,28 @@ jobs:
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
+            ccache_variant: sccache
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
-    env:
-      CCACHE_DIR: ${{github.workspace}}/.cache/
-      # Cache size over the entire repo is 10Gi:
-      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 500M
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: recursive
 
-      # Ninja+MSVC requires developer environment; setup-msbuild does not add cl.exe
-      - name: Setup MSVC developer environment
+      - name: Setup ${{ matrix.ccache_variant }}
+        uses: hendrikmuhs/ccache-action@v1.2.20
+        with:
+          key: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-${{ github.ref_name }}
+          restore-keys: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          max-size: 500M
+          variant: ${{ matrix.ccache_variant }}
+
+      - name: Setup MSVC (Windows)
         if: matrix.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Setup ccache
-        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
-        run: brew install ccache
-
-      - name: Restore compiler cache (ccache)
-        if: matrix.use_ccache == 1
-        id: ccache_restore
-        uses: actions/cache/restore@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+        uses: ilammy/msvc-dev-cmd@v1.13.0
 
       - name: Install aqtinstall
         if: matrix.os == 'macOS'
@@ -423,13 +408,15 @@ jobs:
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
         id: build
+        shell: bash
         env:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform || '' }}
+          USE_CCACHE: 1
+          CCACHE_VARIANT: ${{ matrix.ccache_variant }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -438,16 +425,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-        run: bash .ci/compile.sh --server --test --vcpkg
-
-      - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
-        uses: actions/cache/save@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+        run: .ci/compile.sh --server --test --vcpkg --ccache 500M
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
@@ -508,9 +486,9 @@ jobs:
         with:
           name: Windows${{matrix.target}}-PDBs
           path: |
-            build/cockatrice/*.pdb
-            build/oracle/*.pdb
-            build/servatrice/*.pdb
+            build/cockatrice/**/*.pdb
+            build/oracle/**/*.pdb
+            build/servatrice/**/*.pdb
           if-no-files-found: error
 
       - name: Upload to release

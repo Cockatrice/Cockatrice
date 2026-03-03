@@ -233,7 +233,6 @@ if(WIN32)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
-  # Use target runtime dir for both multi-config (VS) and single-config (Ninja)
   install(
     DIRECTORY "$<TARGET_FILE_DIR:oracle>/"
     DESTINATION ./

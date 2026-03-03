@@ -183,7 +183,6 @@ if(WIN32)
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
 
-  # Use target runtime dir for both multi-config (VS) and single-config (Ninja)
   install(
     DIRECTORY "$<TARGET_FILE_DIR:servatrice>/"
     DESTINATION ./
