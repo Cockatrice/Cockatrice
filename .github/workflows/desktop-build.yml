@@ -214,11 +214,9 @@ jobs:
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Upload artifact
         id: upload_artifact
