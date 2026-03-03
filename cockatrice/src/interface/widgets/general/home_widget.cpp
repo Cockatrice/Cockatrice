@@ -58,21 +58,24 @@ void HomeWidget::initializeBackgroundFromSource()
 
     auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
 
-    cardChangeTimer->stop();
-
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
+            cardChangeTimer->stop();
             background = QPixmap("theme:backgrounds/home");
+            backgroundSourceDeck = DeckList();
             backgroundSourceCard->setCard(ExactCard());
             updateButtonsToBackgroundColor();
             update();
             break;
         case BackgroundSources::RandomCardArt:
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            backgroundSourceDeck = DeckList();
+            updateRandomCard();
+            onBackgroundShuffleFrequencyChanged();
             break;
         case BackgroundSources::DeckFileArt:
             loadBackgroundSourceDeck();
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            updateRandomCard();
+            onBackgroundShuffleFrequencyChanged();
             break;
     }
 }
@@ -82,6 +85,20 @@ void HomeWidget::loadBackgroundSourceDeck()
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
         SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
+}
+
+void HomeWidget::setRandomCard(ExactCard &newCard)
+{
+    static constexpr int ATTEMPTS = 10;
+    for (int i = 0; i < ATTEMPTS; ++i) {
+        ExactCard tmpCard = CardDatabaseManager::query()->getRandomCard();
+        if (tmpCard != backgroundSourceCard->getCard() && tmpCard.getCardPtr()->getProperty("layout") == "normal" &&
+            tmpCard.getPrinting().getSet() != nullptr) {
+            newCard = tmpCard;
+            return;
+        }
+    }
+    qWarning() << "failed to set random card image after" << ATTEMPTS << "attempts";
 }
 
 void HomeWidget::updateRandomCard()
@@ -94,10 +111,7 @@ void HomeWidget::updateRandomCard()
         case BackgroundSources::Theme:
             break;
         case BackgroundSources::RandomCardArt:
-            do {
-                newCard = CardDatabaseManager::query()->getRandomCard();
-            } while (newCard == backgroundSourceCard->getCard() &&
-                     newCard.getCardPtr()->getProperty("layout") != "normal");
+            setRandomCard(newCard);
             break;
         case BackgroundSources::DeckFileArt:
             QList<CardRef> cardRefs = backgroundSourceDeck.getCardRefList();
@@ -126,19 +140,14 @@ void HomeWidget::updateRandomCard()
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);
     background = backgroundSourceCard->getBackground();
-
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
-        cardChangeTimer->stop();
-    }
 }
 
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
 {
     cardChangeTimer->stop();
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
-        return;
+    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() > 0) {
+        cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
     }
-    cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
 }
 
 void HomeWidget::updateBackgroundProperties()
@@ -325,8 +334,11 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     QString cardName;
     ExactCard card = backgroundSourceCard->getCard();
     if (card) {
-        cardName = card.getCardPtr()->getName() + " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
-                   card.getPrinting().getProperty("num");
+        cardName = card.getCardPtr()->getName();
+        if (card.getPrinting().getSet() != nullptr) {
+            cardName += " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
+                        card.getPrinting().getProperty("num");
+        }
     }
 
     if (!cardName.isEmpty() && SettingsCache::instance().getHomeTabDisplayCardName()) {
