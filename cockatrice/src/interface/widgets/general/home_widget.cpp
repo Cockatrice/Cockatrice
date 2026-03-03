@@ -139,7 +139,7 @@ void HomeWidget::updateRandomCard()
 
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);
-    background = backgroundSourceCard->getBackground(size());
+    background = backgroundSourceCard->getBackground();
 }
 
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
