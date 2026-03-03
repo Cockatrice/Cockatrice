@@ -202,6 +202,13 @@ jobs:
                   --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
+      # Delete stale ccache so Save can refresh it; failures are non-fatal (e.g. no prior cache)
+      - name: Delete stale ccache
+        if: github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{github.token}}
+        run: gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || echo "warning: cache delete failed"
+
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
