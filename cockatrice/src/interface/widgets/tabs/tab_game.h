@@ -20,6 +20,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 
+class JournalWidget;
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
@@ -66,6 +67,7 @@ private:
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
+    JournalWidget *journalWidget;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
@@ -76,7 +78,7 @@ private:
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *playerListDock, *notesDock, *messageLayoutDock, *replayDock;
+    QDockWidget *cardInfoDock, *playerListDock, *journalDock, *messageLayoutDock, *replayDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
@@ -121,7 +123,7 @@ private:
     void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
     void createCardInfoDock(bool bReplay = false);
     void createPlayerListDock(bool bReplay = false);
-    void createNotesDock(bool bReplay = false);
+    void createJournalDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);

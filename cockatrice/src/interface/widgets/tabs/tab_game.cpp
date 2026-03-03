@@ -16,6 +16,7 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
+#include "../interface/widgets/game/journal_widget.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
@@ -52,7 +53,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 
     createCardInfoDock(true);
     createPlayerListDock(true);
-    createNotesDock(true);
+    createJournalDock(true);
     createMessageDock(true);
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
@@ -60,7 +61,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
-    addDockWidget(Qt::RightDockWidgetArea, notesDock);
+    addDockWidget(Qt::RightDockWidgetArea, journalDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
     addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
@@ -98,7 +99,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     createCardInfoDock();
     createPlayerListDock();
-    createNotesDock();
+    createJournalDock();
     createMessageDock();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
@@ -106,7 +107,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
-    addDockWidget(Qt::RightDockWidgetArea, notesDock);
+    addDockWidget(Qt::RightDockWidgetArea, journalDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
     mainWidget = new QStackedWidget(this);
@@ -283,7 +284,7 @@ void TabGame::retranslateUi()
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
-    notesDock->setWindowTitle(tr("Notes") + (notesDock->isWindow() ? tabText : QString()));
+    journalDock->setWindowTitle(tr("Journal") + (journalDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if (replayDock)
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
@@ -347,7 +348,7 @@ void TabGame::retranslateUi()
 
     dockToActions[cardInfoDock].menu->setTitle(tr("Card Info"));
     dockToActions[messageLayoutDock].menu->setTitle(tr("Messages"));
-    dockToActions[notesDock].menu->setTitle(tr("Notes"));
+    dockToActions[journalDock].menu->setTitle(tr("Journal"));
     dockToActions[playerListDock].menu->setTitle(tr("Player List"));
 
     if (replayDock) {
@@ -1042,7 +1043,7 @@ void TabGame::createViewMenuItems()
     registerDockWidget(viewMenu, cardInfoDock, {250, 360});
     registerDockWidget(viewMenu, messageLayoutDock, {250, 200});
     registerDockWidget(viewMenu, playerListDock, {250, 50});
-    registerDockWidget(viewMenu, notesDock, {250, 50});
+    registerDockWidget(viewMenu, journalDock, {250, 50});
 
     if (replayDock) {
         registerDockWidget(viewMenu, replayDock, {900, 100});
@@ -1132,17 +1133,17 @@ void TabGame::actResetLayout()
 {
     cardInfoDock->setVisible(true);
     playerListDock->setVisible(true);
-    notesDock->setVisible(false);
+    journalDock->setVisible(false);
     messageLayoutDock->setVisible(true);
 
     cardInfoDock->setFloating(false);
     playerListDock->setFloating(false);
-    notesDock->setFloating(false);
+    journalDock->setFloating(false);
     messageLayoutDock->setFloating(false);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
-    addDockWidget(Qt::RightDockWidgetArea, notesDock);
+    addDockWidget(Qt::RightDockWidgetArea, journalDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
     if (replayDock) {
@@ -1251,19 +1252,20 @@ void TabGame::createPlayerListDock(bool bReplay)
     playerListDock->setFloating(false);
 }
 
-void TabGame::createNotesDock(bool bReplay)
+void TabGame::createJournalDock(bool bReplay)
 {
     Q_UNUSED(bReplay);
 
-    auto textEdit = new QPlainTextEdit(this);
-    notesDock = new QDockWidget(this);
-    notesDock->setObjectName("notesDock");
-    notesDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
-                           QDockWidget::DockWidgetMovable);
-    notesDock->setWidget(textEdit);
+    journalWidget = new JournalWidget(this);
+
+    journalDock = new QDockWidget(this);
+    journalDock->setObjectName("journalDock");
+    journalDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
+                             QDockWidget::DockWidgetMovable);
+    journalDock->setWidget(journalWidget);
 
     // Prevent text from autofocusing if there are no other focusable widgets (such as when loading replay)
-    QTimer::singleShot(1, textEdit, &QWidget::clearFocus);
+    QTimer::singleShot(1, journalWidget, &QWidget::clearFocus);
 }
 
 void TabGame::createMessageDock(bool bReplay)
