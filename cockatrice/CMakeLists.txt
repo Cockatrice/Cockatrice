@@ -527,8 +527,9 @@ if(WIN32)
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
 
+  # Use target runtime dir for both multi-config (VS) and single-config (Ninja)
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"

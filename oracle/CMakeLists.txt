@@ -233,8 +233,9 @@ if(WIN32)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
 
+  # Use target runtime dir for both multi-config (VS) and single-config (Ninja)
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:oracle>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"

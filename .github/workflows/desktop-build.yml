@@ -335,12 +335,12 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Add msbuild to PATH
+      # Ninja+MSVC requires developer environment; setup-msbuild does not add cl.exe
+      - name: Setup MSVC developer environment
         if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v2
+        uses: ilammy/msvc-dev-cmd@v1
         with:
-          msbuild-architecture: x64
+          arch: x64
 
       - name: Setup ccache
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
@@ -423,7 +423,6 @@ jobs:
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
         id: build
-        shell: bash
         env:
           BUILDTYPE: '${{matrix.type}}'
           MAKE_PACKAGE: '${{matrix.make_package}}'
@@ -433,14 +432,13 @@ jobs:
           USE_CCACHE: ${{matrix.use_ccache}}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # macOS-specific environment variables, will be ignored on Windows
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-        run: .ci/compile.sh --server --test --vcpkg
+        run: bash .ci/compile.sh --server --test --vcpkg
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
