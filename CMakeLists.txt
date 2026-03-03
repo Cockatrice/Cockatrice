@@ -144,7 +144,8 @@ endif()
 # Define proper compilation flags
 if(MSVC)
   # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
+  # /FS: Allow concurrent PDB writes (required for Ninja + /MP parallel builds)
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi /FS")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL

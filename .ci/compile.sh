@@ -128,9 +128,11 @@ if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
 if [[ $USE_CCACHE ]]; then
-  flags+=("-DUSE_CCACHE=1")
   if [[ $CCACHE_VARIANT ]]; then
-    flags+=("-DCMAKE_C_COMPILER_LAUNCHER=$CCACHE_VARIANT" "-DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE_VARIANT")
+    # COMPILER_LAUNCHER only; USE_CCACHE=OFF prevents RULE_LAUNCH_COMPILE (avoids Strawberry ccache on Windows)
+    flags+=("-DUSE_CCACHE=OFF" "-DCMAKE_C_COMPILER_LAUNCHER=$CCACHE_VARIANT" "-DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE_VARIANT")
+  else
+    flags+=("-DUSE_CCACHE=1")
   fi
   if [[ $CCACHE_SIZE && "$CCACHE_VARIANT" != "sccache" ]]; then
     # note, this setting persists after running the script
