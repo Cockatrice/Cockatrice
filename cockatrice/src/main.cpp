@@ -238,7 +238,6 @@ int main(int argc, char *argv[])
     }
 
     rng = new RNG_SFMT;
-    const auto bla = 42;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
 
