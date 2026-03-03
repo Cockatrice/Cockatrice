@@ -16,8 +16,8 @@ class CardInfoPictureArtCropWidget : public CardInfoPictureWidget
 public:
     explicit CardInfoPictureArtCropWidget(QWidget *parent = nullptr);
 
-    // Returns a processed (cropped & scaled) version of the pixmap
-    QPixmap getProcessedBackground(const QSize &targetSize);
+    // Returns a cropped version of the pixmap
+    QPixmap getBackground();
 };
 
 #endif // CARD_INFO_PICTURE_ART_CROP_WIDGET_H

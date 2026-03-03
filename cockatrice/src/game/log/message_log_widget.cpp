@@ -314,9 +314,17 @@ void MessageLogWidget::logMoveCard(Player *player,
             finalStr = tr("%1 puts %2 into play%3.");
         }
     } else if (targetZoneName == GRAVE_ZONE_NAME) {
-        finalStr = tr("%1 puts %2%3 into their graveyard.");
+        if (card->getFaceDown()) {
+            finalStr = tr("%1 puts %2%3 into their graveyard face down.");
+        } else {
+            finalStr = tr("%1 puts %2%3 into their graveyard.");
+        }
     } else if (targetZoneName == EXILE_ZONE_NAME) {
-        finalStr = tr("%1 exiles %2%3.");
+        if (card->getFaceDown()) {
+            finalStr = tr("%1 exiles %2%3 face down.");
+        } else {
+            finalStr = tr("%1 exiles %2%3.");
+        }
     } else if (targetZoneName == HAND_ZONE_NAME) {
         finalStr = tr("%1 moves %2%3 to their hand.");
     } else if (targetZoneName == DECK_ZONE_NAME) {
@@ -335,10 +343,18 @@ void MessageLogWidget::logMoveCard(Player *player,
         finalStr = tr("%1 moves %2%3 to sideboard.");
     } else if (targetZoneName == STACK_ZONE_NAME) {
         soundEngine->playSound("play_card");
-        finalStr = tr("%1 plays %2%3.");
+        if (card->getFaceDown()) {
+            finalStr = tr("%1 plays %2%3 face down.");
+        } else {
+            finalStr = tr("%1 plays %2%3.");
+        }
     } else {
         fourthArg = targetZoneName;
-        finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
+        if (card->getFaceDown()) {
+            finalStr = tr("%1 moves %2%3 to custom zone '%4' face down.");
+        } else {
+            finalStr = tr("%1 moves %2%3 to custom zone '%4'.");
+        }
     }
 
     QString message = finalStr.arg(sanitizeHtml(player->getPlayerInfo()->getName()), cardStr, nameFrom.second);
