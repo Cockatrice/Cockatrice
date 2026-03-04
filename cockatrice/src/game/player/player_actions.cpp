@@ -424,37 +424,15 @@ void PlayerActions::actMoveTopCardToExile()
 
 void PlayerActions::actMoveTopCardsToGrave()
 {
-    const int maxCards = player->getDeckZone()->getCards().size();
-    if (maxCards == 0) {
-        return;
-    }
-
-    bool ok;
-    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move top cards to grave"),
-                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberTopCards, 1,
-                                      maxCards, 1, &ok);
-    if (!ok) {
-        return;
-    } else if (number > maxCards) {
-        number = maxCards;
-    }
-    defaultNumberTopCards = number;
-
-    Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("grave");
-    cmd.set_x(0);
-    cmd.set_y(0);
-
-    for (int i = number - 1; i >= 0; --i) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
-    }
-
-    sendGameCommand(cmd);
+    moveTopCardsTo("grave", "grave");
 }
 
 void PlayerActions::actMoveTopCardsToExile()
+{
+    moveTopCardsTo("rfg", "exile");
+}
+
+void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName)
 {
     const int maxCards = player->getDeckZone()->getCards().size();
     if (maxCards == 0) {
@@ -462,7 +440,7 @@ void PlayerActions::actMoveTopCardsToExile()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move top cards to exile"),
+    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move top cards to %1").arg(zoneDisplayName),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberTopCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -475,7 +453,7 @@ void PlayerActions::actMoveTopCardsToExile()
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -628,37 +606,15 @@ void PlayerActions::actMoveBottomCardToExile()
 
 void PlayerActions::actMoveBottomCardsToGrave()
 {
-    const int maxCards = player->getDeckZone()->getCards().size();
-    if (maxCards == 0) {
-        return;
-    }
-
-    bool ok;
-    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move bottom cards to grave"),
-                                      tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
-                                      maxCards, 1, &ok);
-    if (!ok) {
-        return;
-    } else if (number > maxCards) {
-        number = maxCards;
-    }
-    defaultNumberBottomCards = number;
-
-    Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("grave");
-    cmd.set_x(0);
-    cmd.set_y(0);
-
-    for (int i = maxCards - number; i < maxCards; ++i) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
-    }
-
-    sendGameCommand(cmd);
+    moveBottomCardsTo("grave", "grave");
 }
 
 void PlayerActions::actMoveBottomCardsToExile()
+{
+    moveBottomCardsTo("rfg", "exile");
+}
+
+void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName)
 {
     const int maxCards = player->getDeckZone()->getCards().size();
     if (maxCards == 0) {
@@ -666,7 +622,7 @@ void PlayerActions::actMoveBottomCardsToExile()
     }
 
     bool ok;
-    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move bottom cards to exile"),
+    int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Move bottom cards to %1").arg(zoneDisplayName),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
                                       maxCards, 1, &ok);
     if (!ok) {
@@ -679,7 +635,7 @@ void PlayerActions::actMoveBottomCardsToExile()
     Command_MoveCard cmd;
     cmd.set_start_zone("deck");
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
 

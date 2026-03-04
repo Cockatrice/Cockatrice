@@ -180,6 +180,9 @@ private:
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
 
+    void moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName);
+    void moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName);
+
     void createCard(const CardItem *sourceCard,
                     const QString &dbCardName,
                     CardRelationType attach = CardRelationType::DoesNotAttach,
