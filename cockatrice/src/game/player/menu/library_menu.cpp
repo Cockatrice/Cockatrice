@@ -51,8 +51,10 @@ LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent)
     topLibraryMenu->addSeparator();
     topLibraryMenu->addAction(aMoveTopCardToGraveyard);
     topLibraryMenu->addAction(aMoveTopCardsToGraveyard);
+    topLibraryMenu->addAction(aMoveTopCardsToGraveyardFaceDown);
     topLibraryMenu->addAction(aMoveTopCardToExile);
     topLibraryMenu->addAction(aMoveTopCardsToExile);
+    topLibraryMenu->addAction(aMoveTopCardsToExileFaceDown);
     topLibraryMenu->addAction(aMoveTopCardsUntil);
     topLibraryMenu->addSeparator();
     topLibraryMenu->addAction(aShuffleTopCards);
@@ -66,8 +68,10 @@ LibraryMenu::LibraryMenu(Player *_player, QWidget *parent) : TearOffMenu(parent)
     bottomLibraryMenu->addSeparator();
     bottomLibraryMenu->addAction(aMoveBottomCardToGraveyard);
     bottomLibraryMenu->addAction(aMoveBottomCardsToGraveyard);
+    bottomLibraryMenu->addAction(aMoveBottomCardsToGraveyardFaceDown);
     bottomLibraryMenu->addAction(aMoveBottomCardToExile);
     bottomLibraryMenu->addAction(aMoveBottomCardsToExile);
+    bottomLibraryMenu->addAction(aMoveBottomCardsToExileFaceDown);
     bottomLibraryMenu->addSeparator();
     bottomLibraryMenu->addAction(aShuffleBottomCards);
 
@@ -136,8 +140,14 @@ void LibraryMenu::createMoveActions()
         connect(aMoveTopCardToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToExile);
         aMoveTopCardsToGraveyard = new QAction(this);
         connect(aMoveTopCardsToGraveyard, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToGrave);
+        aMoveTopCardsToGraveyardFaceDown = new QAction(this);
+        connect(aMoveTopCardsToGraveyardFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveTopCardsToGraveFaceDown);
         aMoveTopCardsToExile = new QAction(this);
         connect(aMoveTopCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsToExile);
+        aMoveTopCardsToExileFaceDown = new QAction(this);
+        connect(aMoveTopCardsToExileFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveTopCardsToExileFaceDown);
         aMoveTopCardsUntil = new QAction(this);
         connect(aMoveTopCardsUntil, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsUntil);
         aMoveTopCardToBottom = new QAction(this);
@@ -156,8 +166,14 @@ void LibraryMenu::createMoveActions()
         aMoveBottomCardsToGraveyard = new QAction(this);
         connect(aMoveBottomCardsToGraveyard, &QAction::triggered, playerActions,
                 &PlayerActions::actMoveBottomCardsToGrave);
+        aMoveBottomCardsToGraveyardFaceDown = new QAction(this);
+        connect(aMoveBottomCardsToGraveyardFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveBottomCardsToGraveFaceDown);
         aMoveBottomCardsToExile = new QAction(this);
         connect(aMoveBottomCardsToExile, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardsToExile);
+        aMoveBottomCardsToExileFaceDown = new QAction(this);
+        connect(aMoveBottomCardsToExileFaceDown, &QAction::triggered, playerActions,
+                &PlayerActions::actMoveBottomCardsToExileFaceDown);
         aMoveBottomCardToTop = new QAction(this);
         connect(aMoveBottomCardToTop, &QAction::triggered, playerActions, &PlayerActions::actMoveBottomCardToTop);
     }
@@ -216,7 +232,9 @@ void LibraryMenu::retranslateUi()
         aMoveTopCardToGraveyard->setText(tr("Move top card to grave&yard"));
         aMoveTopCardToExile->setText(tr("Move top card to e&xile"));
         aMoveTopCardsToGraveyard->setText(tr("Move top cards to &graveyard..."));
+        aMoveTopCardsToGraveyardFaceDown->setText(tr("Move top cards to graveyard face down..."));
         aMoveTopCardsToExile->setText(tr("Move top cards to &exile..."));
+        aMoveTopCardsToExileFaceDown->setText(tr("Move top cards to exile face down..."));
         aMoveTopCardsUntil->setText(tr("Put top cards on stack &until..."));
         aShuffleTopCards->setText(tr("Shuffle top cards..."));
 
@@ -227,7 +245,9 @@ void LibraryMenu::retranslateUi()
         aMoveBottomCardToGraveyard->setText(tr("Move bottom card to grave&yard"));
         aMoveBottomCardToExile->setText(tr("Move bottom card to e&xile"));
         aMoveBottomCardsToGraveyard->setText(tr("Move bottom cards to &graveyard..."));
+        aMoveBottomCardsToGraveyardFaceDown->setText(tr("Move bottom cards to graveyard face down..."));
         aMoveBottomCardsToExile->setText(tr("Move bottom cards to &exile..."));
+        aMoveBottomCardsToExileFaceDown->setText(tr("Move bottom cards to exile face down..."));
         aMoveBottomCardToTop->setText(tr("Put bottom card on &top"));
         aShuffleBottomCards->setText(tr("Shuffle bottom cards..."));
     }
@@ -335,8 +355,10 @@ void LibraryMenu::setShortcutsActive()
     aMoveTopToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveTopToPlayFaceDown"));
     aMoveTopCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToGraveyard"));
     aMoveTopCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToGraveyard"));
+    aMoveTopCardsToGraveyardFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToGraveyardFaceDown"));
     aMoveTopCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToExile"));
     aMoveTopCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToExile"));
+    aMoveTopCardsToExileFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsToExileFaceDown"));
     aMoveTopCardsUntil->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardsUntil"));
     aMoveTopCardToBottom->setShortcuts(shortcuts.getShortcut("Player/aMoveTopCardToBottom"));
     aDrawBottomCard->setShortcuts(shortcuts.getShortcut("Player/aDrawBottomCard"));
@@ -345,8 +367,10 @@ void LibraryMenu::setShortcutsActive()
     aMoveBottomToPlayFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomToPlayFaceDown"));
     aMoveBottomCardToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToGrave"));
     aMoveBottomCardsToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToGrave"));
+    aMoveBottomCardsToGraveyardFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToGraveFaceDown"));
     aMoveBottomCardToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToExile"));
     aMoveBottomCardsToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToExile"));
+    aMoveBottomCardsToExileFaceDown->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardsToExileFaceDown"));
     aMoveBottomCardToTop->setShortcuts(shortcuts.getShortcut("Player/aMoveBottomCardToTop"));
 }
 
@@ -367,8 +391,10 @@ void LibraryMenu::setShortcutsInactive()
     aMoveTopToPlayFaceDown->setShortcut(QKeySequence());
     aMoveTopCardToGraveyard->setShortcut(QKeySequence());
     aMoveTopCardsToGraveyard->setShortcut(QKeySequence());
+    aMoveTopCardsToGraveyardFaceDown->setShortcut(QKeySequence());
     aMoveTopCardToExile->setShortcut(QKeySequence());
     aMoveTopCardsToExile->setShortcut(QKeySequence());
+    aMoveTopCardsToExileFaceDown->setShortcut(QKeySequence());
     aMoveTopCardsUntil->setShortcut(QKeySequence());
     aDrawBottomCard->setShortcut(QKeySequence());
     aDrawBottomCards->setShortcut(QKeySequence());
@@ -376,6 +402,8 @@ void LibraryMenu::setShortcutsInactive()
     aMoveBottomToPlayFaceDown->setShortcut(QKeySequence());
     aMoveBottomCardToGraveyard->setShortcut(QKeySequence());
     aMoveBottomCardsToGraveyard->setShortcut(QKeySequence());
+    aMoveBottomCardsToGraveyardFaceDown->setShortcut(QKeySequence());
     aMoveBottomCardToExile->setShortcut(QKeySequence());
     aMoveBottomCardsToExile->setShortcut(QKeySequence());
+    aMoveBottomCardsToExileFaceDown->setShortcut(QKeySequence());
 }
