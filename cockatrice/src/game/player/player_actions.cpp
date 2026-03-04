@@ -445,7 +445,9 @@ void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zon
                                       maxCards, 1, &ok);
     if (!ok) {
         return;
-    } else if (number > maxCards) {
+    }
+
+    if (number > maxCards) {
         number = maxCards;
     }
     defaultNumberTopCards = number;
@@ -627,7 +629,9 @@ void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &
                                       maxCards, 1, &ok);
     if (!ok) {
         return;
-    } else if (number > maxCards) {
+    }
+
+    if (number > maxCards) {
         number = maxCards;
     }
     defaultNumberBottomCards = number;
