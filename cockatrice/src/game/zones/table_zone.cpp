@@ -7,6 +7,7 @@
 #include "../board/card_item.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../z_values.h"
 #include "logic/table_zone_logic.h"
 
 #include <QGraphicsScene>
@@ -167,7 +168,7 @@ void TableZone::reorganizeCards()
             actualY += 15;
 
         getLogic()->getCards()[i]->setPos(actualX, actualY);
-        getLogic()->getCards()[i]->setRealZValue((actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100);
+        getLogic()->getCards()[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
 
         QListIterator<CardItem *> attachedCardIterator(getLogic()->getCards()[i]->getAttachedCards());
         int j = 0;
@@ -177,7 +178,7 @@ void TableZone::reorganizeCards()
             qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
-            attachedCard->setRealZValue((childY + CARD_HEIGHT) * 100000 + (childX + 1) * 100);
+            attachedCard->setRealZValue(ZValues::tableCardZValue(childX, childY));
         }
     }
 

@@ -102,7 +102,7 @@ constexpr qreal OVERLAY_BASE = 2000000000.0;
  * @param zValue The Z-value to validate
  * @return true if the Z-value is valid for a card
  */
-[[nodiscard]] inline constexpr bool isValidCardZValue(qreal zValue)
+[[nodiscard]] constexpr bool isValidCardZValue(qreal zValue)
 {
     return zValue >= 1.0 && zValue <= CARD_Z_VALUE_MAX;
 }
@@ -115,7 +115,7 @@ constexpr qreal OVERLAY_BASE = 2000000000.0;
  * @param zValue The Z-value to validate
  * @return true if the Z-value is valid for an overlay element
  */
-[[nodiscard]] inline constexpr bool isOverlayZValue(qreal zValue)
+[[nodiscard]] constexpr bool isOverlayZValue(qreal zValue)
 {
     return zValue >= OVERLAY_BASE;
 }
@@ -126,7 +126,7 @@ constexpr qreal OVERLAY_BASE = 2000000000.0;
  * @param offset Offset from OVERLAY_BASE (0-7 for current elements)
  * @return The absolute Z-value for the overlay element
  */
-[[nodiscard]] inline constexpr qreal overlayZValue(qreal offset)
+[[nodiscard]] constexpr qreal overlayZValue(qreal offset)
 {
     return OVERLAY_BASE + offset;
 }
