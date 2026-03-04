@@ -45,6 +45,7 @@ private:
     QPair<QColor, QColor> gradientColors;
     HomeStyledButton *connectButton;
 
+    void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();
 };
 
