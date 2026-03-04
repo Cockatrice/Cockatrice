@@ -166,13 +166,10 @@ jobs:
       - name: Restore compiler cache (ccache)
         id: ccache_restore
         uses: actions/cache/restore@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
+          key: ccache-${{matrix.distro}}${{matrix.version}}-master
           restore-keys: |
-            ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}-
             ccache-${{matrix.distro}}${{matrix.version}}-master-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
@@ -333,19 +330,34 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.cache/
+      SCCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_SIZE: 500M
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: recursive
 
+      - name: Restore compiler cache (ccache)
+        id: ccache_restore
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ github.workspace }}/.cache/
+          key: ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          restore-keys: |
+            ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
+
       - name: Setup ${{ matrix.ccache_variant }}
         uses: hendrikmuhs/ccache-action@v1.2.20
         with:
-          key: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-${{ github.ref_name }}
-          restore-keys: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          key: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          restore-keys: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
           max-size: 500M
           variant: ${{ matrix.ccache_variant }}
+          save: false
 
       - name: Setup MSVC (Windows)
         if: matrix.os == 'Windows'
@@ -435,6 +447,21 @@ jobs:
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
+
+      # github does not overwrite GHA cache entries when the key is the same, so we need to delete the stale ones before saving
+      - name: Delete stale ccache
+        if: github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || true
+
+      - name: Save compiler cache (ccache)
+        if: github.ref == 'refs/heads/master' && steps.build.outcome == 'success'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/.cache/
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
