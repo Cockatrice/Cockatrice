@@ -1,5 +1,7 @@
 #include "deck_list.h"
 
+#include "../../../libcockatrice_card/libcockatrice/card/database/card_database.h"
+#include "../../../libcockatrice_card/libcockatrice/card/database/card_database_manager.h"
 #include "deck_list_memento.h"
 #include "tree/abstract_deck_list_node.h"
 #include "tree/deck_list_card_node.h"
@@ -195,6 +197,21 @@ bool DeckList::saveToFile_Native(QIODevice *device) const
 }
 
 /**
+ * @brief Resolves the complete display name of a card.
+ * @param cardName Base name.
+ * @return Full display name, or the cardName unchanged if a display name is not found.
+ */
+static QString getCompleteCardName(const QString &cardName)
+{
+    ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
+    if (temp) {
+        return temp.getName();
+    }
+
+    return cardName;
+}
+
+/**
  * Clears the decklist and loads in a new deck from text
  *
  * @param in The text to load
@@ -375,6 +392,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
         for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
             cardName.replace(diff.key(), diff.value());
         }
+
+        // Resolve complete card name
+        cardName = getCompleteCardName(cardName);
 
         // Determine the zone (mainboard/sideboard)
         QString zoneName = sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
