@@ -424,12 +424,12 @@ void PlayerActions::actMoveTopCardToExile()
 
 void PlayerActions::actMoveTopCardsToGrave()
 {
-    moveTopCardsTo("grave", "grave");
+    moveTopCardsTo("grave", tr("grave"));
 }
 
 void PlayerActions::actMoveTopCardsToExile()
 {
-    moveTopCardsTo("rfg", "exile");
+    moveTopCardsTo("rfg", tr("exile"));
 }
 
 void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName)
@@ -608,12 +608,12 @@ void PlayerActions::actMoveBottomCardToExile()
 
 void PlayerActions::actMoveBottomCardsToGrave()
 {
-    moveBottomCardsTo("grave", "grave");
+    moveBottomCardsTo("grave", tr("grave"));
 }
 
 void PlayerActions::actMoveBottomCardsToExile()
 {
-    moveBottomCardsTo("rfg", "exile");
+    moveBottomCardsTo("rfg", tr("exile"));
 }
 
 void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName)
