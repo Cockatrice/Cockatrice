@@ -40,6 +40,7 @@ public:
     };
 
 private:
+    QString defaultStyleName;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
     /*
