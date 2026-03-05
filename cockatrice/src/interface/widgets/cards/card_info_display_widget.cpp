@@ -10,7 +10,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 
 CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *parent, Qt::WindowFlags flags)
-    : QFrame(parent, flags), aspectRatio((qreal)CARD_HEIGHT / (qreal)CARD_WIDTH)
+    : QFrame(parent, flags), aspectRatio((qreal)CardDimensions::HEIGHT / (qreal)CardDimensions::WIDTH)
 {
     setContentsMargins(3, 3, 3, 3);
     pic = new CardInfoPictureWidget();

@@ -31,7 +31,7 @@ TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CARD_HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CardDimensions::HEIGHT + (TABLEROWS - 1) * PADDING_Y;
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
@@ -106,7 +106,7 @@ void TableZone::paintLandDivider(QPainter *painter)
 {
     // Place the line 2 grid heights down then back it off just enough to allow
     // some space between a 3-card stack and the land area.
-    qreal separatorY = MARGIN_TOP + 2 * (CARD_HEIGHT + PADDING_Y) - STACKED_CARD_OFFSET_Y / 2;
+    qreal separatorY = MARGIN_TOP + 2 * (CardDimensions::HEIGHT + PADDING_Y) - STACKED_CARD_OFFSET_Y / 2;
     if (isInverted())
         separatorY = height - separatorY;
     painter->setPen(QColor(255, 255, 255, 40));
@@ -230,7 +230,7 @@ void TableZone::resizeToContents()
 
     // Minimum width is the rightmost card position plus enough room for
     // another card with padding, then margin.
-    currentMinimumWidth = xMax + (2 * CARD_WIDTH) + PADDING_X + MARGIN_RIGHT;
+    currentMinimumWidth = xMax + (2 * CardDimensions::WIDTH) + PADDING_X + MARGIN_RIGHT;
 
     if (currentMinimumWidth < MIN_WIDTH)
         currentMinimumWidth = MIN_WIDTH;
@@ -280,10 +280,10 @@ void TableZone::computeCardStackWidths()
         const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
         const int stackCount = cardStackCount.value(key, 0);
         if (stackCount == 1)
-            cardStackWidth.insert(key, CARD_WIDTH + getLogic()->getCards()[i]->getAttachedCards().size() *
-                                                        STACKED_CARD_OFFSET_X);
+            cardStackWidth.insert(key, CardDimensions::WIDTH + getLogic()->getCards()[i]->getAttachedCards().size() *
+                                                                   STACKED_CARD_OFFSET_X);
         else
-            cardStackWidth.insert(key, CARD_WIDTH + (stackCount - 1) * STACKED_CARD_OFFSET_X);
+            cardStackWidth.insert(key, CardDimensions::WIDTH + (stackCount - 1) * STACKED_CARD_OFFSET_X);
     }
 }
 
@@ -297,7 +297,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     // Add in width of card stack plus padding for each column
     for (int i = 0; i < gridPoint.x() / 3; ++i) {
         const int key = getCardStackMapKey(i, gridPoint.y());
-        x += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
+        x += cardStackWidth.value(key, CardDimensions::WIDTH) + PADDING_X;
     }
 
     if (isInverted())
@@ -308,7 +308,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
 
     // Add in card size and padding for each row
     for (int i = 0; i < gridPoint.y(); ++i)
-        y += CARD_HEIGHT + PADDING_Y;
+        y += CardDimensions::HEIGHT + PADDING_Y;
 
     return QPointF(x, y);
 }
@@ -322,7 +322,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     int y = mapPoint.y() - MARGIN_TOP;
 
     // Below calculation effectively rounds to the nearest grid point.
-    const int gridPointHeight = CARD_HEIGHT + PADDING_Y;
+    const int gridPointHeight = CardDimensions::HEIGHT + PADDING_Y;
     int gridPointY = (y + PADDING_Y / 2) / gridPointHeight;
 
     gridPointY = clampValidTableRow(gridPointY);
@@ -338,7 +338,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
 
     // Maximum value is a card width from the right margin, referenced to the
     // grid area.
-    const int xMax = width - MARGIN_LEFT - MARGIN_RIGHT - CARD_WIDTH;
+    const int xMax = width - MARGIN_LEFT - MARGIN_RIGHT - CardDimensions::WIDTH;
 
     int xStack = 0;
     int xNextStack = 0;
@@ -346,7 +346,7 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     while ((xNextStack <= x) && (xNextStack <= xMax)) {
         xStack = xNextStack;
         const int key = getCardStackMapKey(nextStackCol, gridPointY);
-        xNextStack += cardStackWidth.value(key, CARD_WIDTH) + PADDING_X;
+        xNextStack += cardStackWidth.value(key, CardDimensions::WIDTH) + PADDING_X;
         nextStackCol++;
     }
     int stackCol = qMax(nextStackCol - 1, 0);

@@ -365,7 +365,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             if (zone->getHasCardAttr())
                 childPos = card->pos() - pos();
             else
-                childPos = QPointF(childIndex * CARD_WIDTH / 2, 0);
+                childPos = QPointF(childIndex * CardDimensions::WIDTH / 2, 0);
             CardDragItem *drag =
                 new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);

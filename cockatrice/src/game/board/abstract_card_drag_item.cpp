@@ -8,8 +8,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
-static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
+static const float CARD_WIDTH_HALF = CardDimensions::WIDTH / 2.0f;
+static const float CARD_HEIGHT_HALF = CardDimensions::HEIGHT / 2.0f;
 const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
@@ -22,8 +22,8 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
         setZValue(ZValues::childDragZValue(hotSpot.x(), hotSpot.y()));
         connect(parentDrag, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
     } else {
-        hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
-                          qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
+        hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CardDimensions::WIDTH - 1)),
+                          qBound(0.0, hotSpot.y(), static_cast<qreal>(CardDimensions::HEIGHT - 1))};
         setCursor(Qt::ClosedHandCursor);
         setZValue(ZValues::DRAG_ITEM);
     }
@@ -48,7 +48,7 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 QPainterPath AbstractCardDragItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }

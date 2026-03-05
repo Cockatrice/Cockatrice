@@ -56,7 +56,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 QRectF HandZone::boundingRect() const
 {
     if (SettingsCache::instance().getHorizontalHand())
-        return QRectF(0, 0, width, CARD_HEIGHT + 10);
+        return QRectF(0, 0, width, CardDimensions::HEIGHT + 10);
     else
         return QRectF(0, 0, 100, zoneHeight);
 }
