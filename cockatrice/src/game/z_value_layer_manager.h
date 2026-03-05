@@ -15,7 +15,7 @@
  *    - Cards within zones (1.0 base + index)
  *
  * 2. **Card Layer (1-40,000,000)**: Dynamic card rendering on the table zone
- *    - Cards use formula: (actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100
+ *    - Cards use formula: (actualY + CardDimensions::HEIGHT) * 100000 + (actualX + 1) * 100
  *    - Maximum card Z-value: ~40,000,000 (with 3 rows, actualY <= ~289)
  *
  * 3. **Overlay Layer (2,000,000,000+)**: UI elements that must appear above all cards
@@ -77,9 +77,9 @@ enum class Layer
 /**
  * @brief Maximum Z-value a card can have on the table zone.
  *
- * Based on table zone formula: (actualY + CARD_HEIGHT) * 100000 + (actualX + 1) * 100
- * With maximum 3 rows and CARD_HEIGHT ~96, actualY <= ~289.
- * Maximum: (289 + 96) * 100000 + 100 * 100 = 38,510,000
+ * Based on table zone formula: (actualY + CardDimensions::HEIGHT) * 100000 + (actualX + 1) * 100
+ * With maximum 3 rows and CardDimensions::HEIGHT = 102, actualY <= ~289.
+ * Maximum: (289 + 102) * 100000 + 100 * 100 = 39,110,000
  *
  * We use 40,000,000 as a safe upper bound with margin.
  */

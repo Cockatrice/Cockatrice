@@ -95,8 +95,9 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CARD_WIDTH - 3) : 0.0;
-    painter->drawRoundedRect(QRectF(1.5, 1.5, CARD_WIDTH - 3., CARD_HEIGHT - 3.), cardRadius, cardRadius);
+    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CardDimensions::WIDTH - 3) : 0.0;
+    painter->drawRoundedRect(QRectF(1.5, 1.5, CardDimensions::WIDTH - 3., CardDimensions::HEIGHT - 3.), cardRadius,
+                             cardRadius);
     painter->restore();
 }
 
@@ -122,7 +123,7 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if (c == this)
             continue;
         ++j;
-        auto childPos = QPointF(j * CARD_WIDTH / 2, 0);
+        auto childPos = QPointF(j * CardDimensions::WIDTH / 2, 0);
         auto *drag = new DeckViewCardDragItem(c, childPos, dragItem);
         drag->setPos(dragItem->pos() + childPos);
         scene()->addItem(drag);
@@ -204,7 +205,7 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
             painter->setPen(QColor(255, 255, 255, 100));
             painter->drawLine(QPointF(0, yUntilNow - paddingY / 2), QPointF(width, yUntilNow - paddingY / 2));
         }
-        qreal thisRowHeight = CARD_HEIGHT * currentRowsAndCols[i].first;
+        qreal thisRowHeight = CardDimensions::HEIGHT * currentRowsAndCols[i].first;
         QRectF textRect(0, yUntilNow, totalTextWidth, thisRowHeight);
         yUntilNow += thisRowHeight + paddingY;
 
@@ -260,9 +261,9 @@ QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int>>
 
     // Calculate space needed for cards
     for (int i = 0; i < rowsAndCols.size(); ++i) {
-        totalHeight += CARD_HEIGHT * rowsAndCols[i].first + paddingY;
-        if (CARD_WIDTH * rowsAndCols[i].second > totalWidth)
-            totalWidth = CARD_WIDTH * rowsAndCols[i].second;
+        totalHeight += CardDimensions::HEIGHT * rowsAndCols[i].first + paddingY;
+        if (CardDimensions::WIDTH * rowsAndCols[i].second > totalWidth)
+            totalWidth = CardDimensions::WIDTH * rowsAndCols[i].second;
     }
 
     return QSizeF(getCardTypeTextWidth() + totalWidth, totalHeight + separatorY + paddingY);
@@ -289,9 +290,10 @@ void DeckViewCardContainer::rearrangeItems(const QList<QPair<int, int>> &rowsAnd
         std::sort(row.begin(), row.end(), DeckViewCardContainer::sortCardsByName);
         for (int j = 0; j < row.size(); ++j) {
             DeckViewCard *card = row[j];
-            card->setPos(x + (j % tempCols) * CARD_WIDTH, yUntilNow + (j / tempCols) * CARD_HEIGHT);
+            card->setPos(x + (j % tempCols) * CardDimensions::WIDTH,
+                         yUntilNow + (j / tempCols) * CardDimensions::HEIGHT);
         }
-        yUntilNow += tempRows * CARD_HEIGHT + paddingY;
+        yUntilNow += tempRows * CardDimensions::HEIGHT + paddingY;
     }
 
     prepareGeometryChange();
@@ -392,7 +394,7 @@ void DeckViewScene::applySideboardPlan(const QList<MoveCard_ToZone> &plan)
 
 void DeckViewScene::rearrangeItems()
 {
-    const int spacing = CARD_HEIGHT / 3;
+    const int spacing = CardDimensions::HEIGHT / 3;
     QList<DeckViewCardContainer *> contList = cardContainers.values();
 
     // Initialize space requirements

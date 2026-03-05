@@ -8,15 +8,13 @@
 #define ABSTRACTCARDITEM_H
 
 #include "../../game_graphics/board/graphics_item_type.h"
+#include "../card_dimensions.h"
 #include "arrow_target.h"
 
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 
 class Player;
-
-const int CARD_WIDTH = 72;
-const int CARD_HEIGHT = 102;
 
 class AbstractCardItem : public ArrowTarget
 {
