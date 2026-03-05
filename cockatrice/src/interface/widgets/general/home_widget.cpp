@@ -46,6 +46,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::updateButtonsToBackgroundColor);
 }
 
 void HomeWidget::initializeBackgroundFromSource()
