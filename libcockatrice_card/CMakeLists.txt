@@ -37,7 +37,7 @@ add_library(
   libcockatrice/card/database/parser/card_database_parser.cpp
   libcockatrice/card/database/parser/cockatrice_xml_3.cpp
   libcockatrice/card/database/parser/cockatrice_xml_4.cpp
-    libcockatrice/card/import/card_name_normalizer.cpp
+  libcockatrice/card/import/card_name_normalizer.cpp
   libcockatrice/card/printing/exact_card.cpp
   libcockatrice/card/printing/printing_info.cpp
   libcockatrice/card/relation/card_relation.cpp
