@@ -1,7 +1,5 @@
 #include "deck_loader.h"
 
-#include "card_name_normalizer.h"
-
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
@@ -19,6 +17,7 @@
 #include <QtConcurrentRun>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 

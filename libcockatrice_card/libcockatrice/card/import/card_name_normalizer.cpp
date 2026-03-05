@@ -1,6 +1,6 @@
 #include "card_name_normalizer.h"
 
-#include "libcockatrice/card/database/card_database_manager.h"
+#include <QRegularExpression>
 
 QString CardNameNormalizer::operator()(const QString &cardNameString) const
 {

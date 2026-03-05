@@ -14,6 +14,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLoggingCategory>
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
 

@@ -7,12 +7,12 @@
 #ifndef INTERFACE_JSON_DECK_PARSER_H
 #define INTERFACE_JSON_DECK_PARSER_H
 
-#include "../../../interface/deck_loader/card_name_normalizer.h"
 #include "../../../interface/deck_loader/card_node_function.h"
-#include "../../../interface/deck_loader/deck_loader.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <libcockatrice/card/import/card_name_normalizer.h>
+#include <libcockatrice/deck_list/deck_list.h>
 
 class IJsonDeckParser
 {

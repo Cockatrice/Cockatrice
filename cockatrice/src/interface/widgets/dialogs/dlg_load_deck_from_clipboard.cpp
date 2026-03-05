@@ -1,7 +1,6 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/card_name_normalizer.h"
 #include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
 #include "dlg_settings.h"
@@ -15,6 +14,7 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window

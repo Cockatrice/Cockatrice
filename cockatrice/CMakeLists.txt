@@ -19,7 +19,6 @@ set(cockatrice_SOURCES
     src/client/settings/card_counter_settings.cpp
     src/client/settings/shortcut_treeview.cpp
     src/client/settings/shortcuts_settings.cpp
-    src/interface/deck_loader/card_name_normalizer.cpp
     src/interface/deck_loader/card_node_function.cpp
     src/interface/deck_loader/deck_file_format.cpp
     src/interface/deck_loader/deck_loader.cpp

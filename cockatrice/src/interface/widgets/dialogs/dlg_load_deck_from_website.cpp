@@ -1,7 +1,5 @@
 #include "dlg_load_deck_from_website.h"
 
-#include "../../deck_loader/card_name_normalizer.h"
-
 #include <QApplication>
 #include <QClipboard>
 #include <QDialogButtonBox>
@@ -10,6 +8,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkReply>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 #include <version_string.h>
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
