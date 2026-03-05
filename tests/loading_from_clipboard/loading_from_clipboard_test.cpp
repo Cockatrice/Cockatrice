@@ -128,20 +128,30 @@ TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 
 
 // Mainboard (11 cards)
-No Count
-4X Forest
+Æther Adept
+2x Fire // Ice
+1 Minsc & Boo, Timeless Heroes
+3 Pain/Suffering
+4X [B] Forest (3)
 
 
 // Sideboard (11 cards)
 
+5x [WTH] Nature’s Resurgence
 6X Gaea's Skyfolk
+7  B.F.M. (Big Furry Monster)
 
 
 
 )");
 
-    Result result("DeckName", "Comment 1\n\nComment [two]\n(test) Æ ’ | / (3)", {{"No Count", 1}, {"Forest", 4}},
-                  {{"Gaea's Skyfolk", 6}});
+    Result result("DeckName", "Comment 1\n\nComment [two]\n(test) Æ ’ | / (3)",
+                  {{"Aether Adept", 1},
+                   {"Fire // Ice", 2},
+                   {"Minsc & Boo, Timeless Heroes", 1},
+                   {"Pain // Suffering", 3},
+                   {"Forest", 4}},
+                  {{"Nature's Resurgence", 5}, {"Gaea's Skyfolk", 6}, {"B.F.M. (Big Furry Monster)", 7}});
     testDeck(clipboard, result);
 }
 
