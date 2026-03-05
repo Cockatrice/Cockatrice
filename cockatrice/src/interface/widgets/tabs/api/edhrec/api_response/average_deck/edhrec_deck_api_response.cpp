@@ -1,5 +1,6 @@
 #include "edhrec_deck_api_response.h"
 
+#include "../../../../../../deck_loader/card_name_normalizer.h"
 #include "../../../../../../deck_loader/deck_loader.h"
 
 #include <QApplication>
@@ -15,7 +16,7 @@ void EdhrecDeckApiResponse::fromJson(const QJsonArray &json)
     }
 
     QTextStream stream(&deckList);
-    deck.loadFromStream_Plain(stream, true);
+    deck.loadFromStream_Plain(stream, true, CardNameNormalizer());
 }
 
 void EdhrecDeckApiResponse::debugPrint() const

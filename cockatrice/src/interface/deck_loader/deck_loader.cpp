@@ -1,5 +1,7 @@
 #include "deck_loader.h"
 
+#include "card_name_normalizer.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDebug>
@@ -42,7 +44,7 @@ DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bo
     DeckList deckList;
     switch (fmt) {
         case DeckFileFormat::PlainText:
-            result = deckList.loadFromFile_Plain(&file);
+            result = deckList.loadFromFile_Plain(&file, CardNameNormalizer());
             break;
         case DeckFileFormat::Cockatrice: {
             result = deckList.loadFromFile_Native(&file);
@@ -50,7 +52,7 @@ DeckLoader::loadFromFile(const QString &fileName, DeckFileFormat::Format fmt, bo
                 qCInfo(DeckLoaderLog) << "Failed to load " << fileName
                                       << "as cockatrice format; retrying as plain format";
                 file.seek(0);
-                result = deckList.loadFromFile_Plain(&file);
+                result = deckList.loadFromFile_Plain(&file, CardNameNormalizer());
                 fmt = DeckFileFormat::PlainText;
             }
             break;

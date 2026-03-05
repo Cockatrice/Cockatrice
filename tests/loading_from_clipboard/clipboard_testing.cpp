@@ -8,7 +8,7 @@ DeckList getDeckList(const QString &clipboard)
     DeckList deckList;
     QString cp(clipboard);
     QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream, false);
+    deckList.loadFromStream_Plain(stream, false, [](auto s) { return s; });
     return deckList;
 }
 

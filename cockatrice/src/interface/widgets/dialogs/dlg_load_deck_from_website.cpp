@@ -1,5 +1,7 @@
 #include "dlg_load_deck_from_website.h"
 
+#include "../../deck_loader/card_name_normalizer.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDialogButtonBox>
@@ -99,7 +101,7 @@ void DlgLoadDeckFromWebsite::accept()
             // Parse the plain text deck here
             DeckList deckList;
             QTextStream stream(&deckText);
-            deckList.loadFromStream_Plain(stream, false);
+            deckList.loadFromStream_Plain(stream, false, CardNameNormalizer());
             deckList.forEachCard(CardNodeFunction::ResolveProviderId());
             deck = deckList;
 

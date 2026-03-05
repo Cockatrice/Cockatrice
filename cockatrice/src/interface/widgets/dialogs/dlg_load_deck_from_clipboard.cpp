@@ -1,6 +1,7 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/card_name_normalizer.h"
 #include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
 #include "dlg_settings.h"
@@ -81,7 +82,7 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckList &deckList) const
 
     QTextStream stream(&buffer);
 
-    if (deckList.loadFromStream_Plain(stream, true)) {
+    if (deckList.loadFromStream_Plain(stream, true, CardNameNormalizer())) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
             deckList.forEachCard(CardNodeFunction::ResolveProviderId());
         } else {
