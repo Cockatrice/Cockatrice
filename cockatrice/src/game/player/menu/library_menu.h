@@ -88,7 +88,9 @@ public:
     QAction *aMoveTopCardToGraveyard = nullptr;
     QAction *aMoveTopCardToExile = nullptr;
     QAction *aMoveTopCardsToGraveyard = nullptr;
+    QAction *aMoveTopCardsToGraveyardFaceDown = nullptr;
     QAction *aMoveTopCardsToExile = nullptr;
+    QAction *aMoveTopCardsToExileFaceDown = nullptr;
     QAction *aMoveTopCardsUntil = nullptr;
     QAction *aShuffleTopCards = nullptr;
 
@@ -100,7 +102,9 @@ public:
     QAction *aMoveBottomCardToGraveyard = nullptr;
     QAction *aMoveBottomCardToExile = nullptr;
     QAction *aMoveBottomCardsToGraveyard = nullptr;
+    QAction *aMoveBottomCardsToGraveyardFaceDown = nullptr;
     QAction *aMoveBottomCardsToExile = nullptr;
+    QAction *aMoveBottomCardsToExileFaceDown = nullptr;
     QAction *aShuffleBottomCards = nullptr;
 
     int defaultNumberTopCards = 1;

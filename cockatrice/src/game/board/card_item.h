@@ -142,7 +142,7 @@ public:
     void processCardInfo(const ServerInfo_Card &_info);
 
     bool animationEvent();
-    CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
+    CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
     void drawAttachArrow();
