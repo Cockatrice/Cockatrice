@@ -129,7 +129,7 @@ TEST(LoadingFromClipboardTest, EdgeCaseTesting)
 
 // Mainboard (11 cards)
 No Count
-4X Forest (3)
+4X Forest
 
 
 // Sideboard (11 cards)
