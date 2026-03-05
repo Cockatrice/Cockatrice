@@ -424,15 +424,25 @@ void PlayerActions::actMoveTopCardToExile()
 
 void PlayerActions::actMoveTopCardsToGrave()
 {
-    moveTopCardsTo("grave", tr("grave"));
+    moveTopCardsTo("grave", tr("grave"), false);
+}
+
+void PlayerActions::actMoveTopCardsToGraveFaceDown()
+{
+    moveTopCardsTo("grave", tr("grave"), true);
 }
 
 void PlayerActions::actMoveTopCardsToExile()
 {
-    moveTopCardsTo("rfg", tr("exile"));
+    moveTopCardsTo("rfg", tr("exile"), false);
 }
 
-void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName)
+void PlayerActions::actMoveTopCardsToExileFaceDown()
+{
+    moveTopCardsTo("rfg", tr("exile"), true);
+}
+
+void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown)
 {
     const int maxCards = player->getDeckZone()->getCards().size();
     if (maxCards == 0) {
@@ -460,7 +470,11 @@ void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zon
     cmd.set_y(0);
 
     for (int i = number - 1; i >= 0; --i) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+        auto card = cmd.mutable_cards_to_move()->add_card();
+        card->set_card_id(i);
+        if (faceDown) {
+            card->set_face_down(true);
+        }
     }
 
     sendGameCommand(cmd);
@@ -608,15 +622,25 @@ void PlayerActions::actMoveBottomCardToExile()
 
 void PlayerActions::actMoveBottomCardsToGrave()
 {
-    moveBottomCardsTo("grave", tr("grave"));
+    moveBottomCardsTo("grave", tr("grave"), false);
+}
+
+void PlayerActions::actMoveBottomCardsToGraveFaceDown()
+{
+    moveBottomCardsTo("grave", tr("grave"), true);
 }
 
 void PlayerActions::actMoveBottomCardsToExile()
 {
-    moveBottomCardsTo("rfg", tr("exile"));
+    moveBottomCardsTo("rfg", tr("exile"), false);
 }
 
-void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName)
+void PlayerActions::actMoveBottomCardsToExileFaceDown()
+{
+    moveBottomCardsTo("rfg", tr("exile"), true);
+}
+
+void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown)
 {
     const int maxCards = player->getDeckZone()->getCards().size();
     if (maxCards == 0) {
@@ -644,7 +668,11 @@ void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &
     cmd.set_y(0);
 
     for (int i = maxCards - number; i < maxCards; ++i) {
-        cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
+        auto card = cmd.mutable_cards_to_move()->add_card();
+        card->set_card_id(i);
+        if (faceDown) {
+            card->set_face_down(true);
+        }
     }
 
     sendGameCommand(cmd);
