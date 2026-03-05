@@ -34,7 +34,7 @@ public:
     AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
     [[nodiscard]] QRectF boundingRect() const override
     {
-        return QRectF(0, 0, CardDimensions::WIDTH, CardDimensions::HEIGHT);
+        return QRectF(0, 0, CardDimensions::WIDTH_F, CardDimensions::HEIGHT_F);
     }
     [[nodiscard]] QPainterPath shape() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

@@ -20,6 +20,10 @@ constexpr int HEIGHT = 102;
 /// Pre-converted for floating-point contexts (Z-value calculations)
 constexpr qreal WIDTH_F = static_cast<qreal>(WIDTH);
 constexpr qreal HEIGHT_F = static_cast<qreal>(HEIGHT);
+
+/// Half-dimensions for centering and rotation transforms
+constexpr qreal WIDTH_HALF_F = WIDTH_F / 2;
+constexpr qreal HEIGHT_HALF_F = HEIGHT_F / 2;
 } // namespace CardDimensions
 
 #endif // CARD_DIMENSIONS_H

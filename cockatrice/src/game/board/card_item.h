@@ -21,8 +21,6 @@ class QAction;
 class QColor;
 
 const int MAX_COUNTERS_ON_CARD = 999;
-const float CARD_WIDTH_HALF = CardDimensions::WIDTH / 2.0f;
-const float CARD_HEIGHT_HALF = CardDimensions::HEIGHT / 2.0f;
 const int ROTATION_DEGREES_PER_FRAME = 10;
 
 class CardItem : public AbstractCardItem

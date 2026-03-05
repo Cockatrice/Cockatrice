@@ -39,13 +39,13 @@ AbstractCardItem::~AbstractCardItem()
 
 QRectF AbstractCardItem::boundingRect() const
 {
-    return QRectF(0, 0, CardDimensions::WIDTH, CardDimensions::HEIGHT);
+    return QRectF(0, 0, CardDimensions::WIDTH_F, CardDimensions::HEIGHT_F);
 }
 
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -218,7 +218,7 @@ void AbstractCardItem::setHovered(bool _hovered)
     isHovered = _hovered;
     setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
     setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
-    setTransformOriginPoint(_hovered ? CardDimensions::WIDTH / 2 : 0, _hovered ? CardDimensions::HEIGHT / 2 : 0);
+    setTransformOriginPoint(_hovered ? CardDimensions::WIDTH_HALF_F : 0, _hovered ? CardDimensions::HEIGHT_HALF_F : 0);
     update();
 }
 
@@ -274,9 +274,9 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
     else {
         tapAngle = tapped ? 90 : 0;
         setTransform(QTransform()
-                         .translate((float)CardDimensions::WIDTH / 2, (float)CardDimensions::HEIGHT / 2)
+                         .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
                          .rotate(tapAngle)
-                         .translate((float)-CardDimensions::WIDTH / 2, (float)-CardDimensions::HEIGHT / 2));
+                         .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
         update();
     }
 }
