@@ -19,9 +19,9 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
     setCursor(Qt::OpenHandCursor);
 
     setTransform(QTransform()
-                     .translate(CardDimensions::WIDTH_F / 2, CardDimensions::HEIGHT_F / 2)
+                     .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
                      .rotate(90)
-                     .translate(-CardDimensions::WIDTH_F / 2, -CardDimensions::HEIGHT_F / 2));
+                     .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
 
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
@@ -52,9 +52,9 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         getLogic()->getCards().at(0)->paintPicture(painter, getLogic()->getCards().at(0)->getTranslatedSize(painter),
                                                    90);
 
-    painter->translate(CardDimensions::WIDTH_F / 2, CardDimensions::HEIGHT_F / 2);
+    painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
     painter->rotate(-90);
-    painter->translate(-CardDimensions::WIDTH_F / 2, -CardDimensions::HEIGHT_F / 2);
+    painter->translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F);
     paintNumberEllipse(getLogic()->getCards().size(), 28, Qt::white, -1, -1, painter);
 }
 
