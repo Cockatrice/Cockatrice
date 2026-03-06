@@ -458,7 +458,7 @@ void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
  */
 static qreal rowsToHeight(int rows)
 {
-    const qreal cardsHeight = (rows + 1) * (CARD_HEIGHT / 3);
+    const qreal cardsHeight = (rows + 1) * (CardDimensions::HEIGHT_F / 3);
     return cardsHeight + 5; // +5 padding to make the cutoff look nicer
 }
 

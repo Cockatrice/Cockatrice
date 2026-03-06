@@ -1,6 +1,7 @@
 #ifndef Z_VALUES_H
 #define Z_VALUES_H
 
+#include "card_dimensions.h"
 #include "z_value_layer_manager.h"
 
 /**
@@ -70,8 +71,7 @@ constexpr qreal TOP_UI = ZValueLayerManager::overlayZValue(7.0);
  */
 [[nodiscard]] constexpr qreal tableCardZValue(qreal x, qreal y)
 {
-    constexpr qreal CARD_HEIGHT_FOR_Z = 102.0;
-    return (y + CARD_HEIGHT_FOR_Z) * 100000.0 + (x + 1) * 100.0;
+    return (y + CardDimensions::HEIGHT_F) * 100000.0 + (x + 1) * 100.0;
 }
 
 // Card layering (general architecture, not command-zone specific)

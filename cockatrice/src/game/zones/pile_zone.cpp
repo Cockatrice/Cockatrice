@@ -19,9 +19,9 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
     setCursor(Qt::OpenHandCursor);
 
     setTransform(QTransform()
-                     .translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2)
+                     .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
                      .rotate(90)
-                     .translate((float)-CARD_WIDTH / 2, (float)-CARD_HEIGHT / 2));
+                     .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
 
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
@@ -33,13 +33,13 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
 
 QRectF PileZone::boundingRect() const
 {
-    return QRectF(0, 0, CARD_WIDTH, CARD_HEIGHT);
+    return QRectF(0, 0, CardDimensions::WIDTH_F, CardDimensions::HEIGHT_F);
 }
 
 QPainterPath PileZone::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -52,9 +52,9 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         getLogic()->getCards().at(0)->paintPicture(painter, getLogic()->getCards().at(0)->getTranslatedSize(painter),
                                                    90);
 
-    painter->translate((float)CARD_WIDTH / 2, (float)CARD_HEIGHT / 2);
+    painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
     painter->rotate(-90);
-    painter->translate((float)-CARD_WIDTH / 2, (float)-CARD_HEIGHT / 2);
+    painter->translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F);
     paintNumberEllipse(getLogic()->getCards().size(), 28, Qt::white, -1, -1, painter);
 }
 
