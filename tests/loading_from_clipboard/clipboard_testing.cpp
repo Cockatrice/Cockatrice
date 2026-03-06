@@ -1,6 +1,7 @@
 #include "clipboard_testing.h"
 
 #include <QTextStream>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 
 DeckList getDeckList(const QString &clipboard)
@@ -8,7 +9,7 @@ DeckList getDeckList(const QString &clipboard)
     DeckList deckList;
     QString cp(clipboard);
     QTextStream stream(&cp); // text stream requires local copy
-    deckList.loadFromStream_Plain(stream, false);
+    deckList.loadFromStream_Plain(stream, false, CardNameNormalizer());
     return deckList;
 }
 
