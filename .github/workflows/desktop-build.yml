@@ -111,12 +111,8 @@ jobs:
             package: skip    # We are packaged in Arch already
             allow-failure: yes
 
-          - distro: Debian
-            version: 11
-            package: DEB
-
           - distro: Servatrice_Debian
-            version: 11
+            version: 12
             package: DEB
             test: skip
             server_only: yes
@@ -138,10 +134,6 @@ jobs:
           - distro: Fedora
             version: 43
             package: RPM
-
-          - distro: Ubuntu
-            version: 22.04
-            package: DEB
 
           - distro: Ubuntu
             version: 24.04

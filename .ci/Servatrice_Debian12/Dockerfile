@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:12
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -9,18 +9,13 @@ RUN apt-get update && \
         file \
         g++ \
         git \
-        liblzma-dev \
         libmariadb-dev-compat \
         libprotobuf-dev \
-        libqt5multimedia5-plugins \
-        libqt5sql5-mysql \
-        libqt5svg5-dev \
-        libqt5websockets5-dev \
+        libqt6sql6-mysql \
         ninja-build \
         protobuf-compiler \
-        qt5-image-formats-plugins \
-        qtmultimedia5-dev \
-        qttools5-dev \
-        qttools5-dev-tools \
+        qt6-tools-dev \
+        qt6-tools-dev-tools \
+        qt6-websockets-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
