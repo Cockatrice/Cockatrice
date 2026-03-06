@@ -1,6 +1,24 @@
 #include "card_name_normalizer.h"
 
+#include "../database/card_database_manager.h"
+#include "../printing/exact_card.h"
+
 #include <QRegularExpression>
+
+/**
+ * @brief Resolves the complete display name of a card.
+ * @param cardName Base name.
+ * @return Full display name, or the cardName unchanged if a display name is not found.
+ */
+static QString getCompleteCardName(const QString &cardName)
+{
+    ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
+    if (temp) {
+        return temp.getName();
+    }
+
+    return cardName;
+}
 
 QString CardNameNormalizer::operator()(const QString &cardNameString) const
 {
@@ -40,6 +58,9 @@ QString CardNameNormalizer::operator()(const QString &cardNameString) const
     for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
         cardName.replace(diff.key(), diff.value());
     }
+
+    // Resolve complete card name
+    cardName = getCompleteCardName(cardName);
 
     return cardName;
 }
