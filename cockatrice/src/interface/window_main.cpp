@@ -27,6 +27,7 @@
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_request.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_reset.h"
+#include "../interface/widgets/dialogs/dlg_local_game_options.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
 #include "../interface/widgets/dialogs/dlg_register.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
@@ -49,7 +50,6 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
-#include <QInputDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -225,16 +225,15 @@ void MainWindow::actDisconnect()
 
 void MainWindow::actSinglePlayer()
 {
-    bool ok;
-    int numberPlayers =
-        QInputDialog::getInt(this, tr("Number of players"), tr("Please enter the number of players."), 1, 1, 8, 1, &ok);
-    if (!ok)
+    DlgLocalGameOptions dlg(this);
+    if (dlg.exec() != QDialog::Accepted) {
         return;
+    }
 
-    startLocalGame(numberPlayers);
+    startLocalGame(dlg.getOptions());
 }
 
-void MainWindow::startLocalGame(int numberPlayers)
+void MainWindow::startLocalGame(const LocalGameOptions &options)
 {
     aConnect->setEnabled(false);
     aRegister->setEnabled(false);
@@ -248,7 +247,7 @@ void MainWindow::startLocalGame(int numberPlayers)
     QList<AbstractClient *> localClients;
     localClients.append(mainClient);
 
-    for (int i = 0; i < numberPlayers - 1; ++i) {
+    for (int i = 0; i < options.numberPlayers - 1; ++i) {
         LocalServerInterface *slaveLsi = localServer->newConnection();
         LocalClient *slaveClient =
             new LocalClient(slaveLsi, tr("Player %1").arg(i + 2), SettingsCache::instance().getClientID(), this);
@@ -257,7 +256,9 @@ void MainWindow::startLocalGame(int numberPlayers)
     tabSupervisor->startLocal(localClients);
 
     Command_CreateGame createCommand;
-    createCommand.set_max_players(static_cast<google::protobuf::uint32>(numberPlayers));
+    createCommand.set_max_players(static_cast<google::protobuf::uint32>(options.numberPlayers));
+    createCommand.set_starting_life_total(options.startingLifeTotal);
+    createCommand.set_spectators_see_everything(options.spectatorsSeeEverything);
     mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 
@@ -913,7 +914,9 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::startupConfigCheck()
 {
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
-        startLocalGame(SettingsCache::instance().debug().getLocalGamePlayerCount());
+        LocalGameOptions options;
+        options.numberPlayers = SettingsCache::instance().debug().getLocalGamePlayerCount();
+        startLocalGame(options);
     }
 
     if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
