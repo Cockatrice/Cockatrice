@@ -1,5 +1,5 @@
 add_definitions("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
-add_executable(loading_from_clipboard_test clipboard_testing.cpp loading_from_clipboard_test.cpp)
+add_executable(loading_from_clipboard_test ${VERSION_STRING_CPP} clipboard_testing.cpp loading_from_clipboard_test.cpp)
 
 if(NOT GTEST_FOUND)
   add_dependencies(loading_from_clipboard_test gtest)
