@@ -6,8 +6,6 @@
  * This struct encapsulates all settings that can be configured when starting
  * a local game, providing a clean interface that prevents parameter explosion
  * as more options are added in the future.
- *
- * @note User documentation: doc/doxygen/extra-pages/user_documentation/local_game/starting_a_local_game.md
  */
 
 #ifndef LOCAL_GAME_OPTIONS_H

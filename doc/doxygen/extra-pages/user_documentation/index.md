@@ -1,9 +1,5 @@
 @page user_reference User Reference
 
-## Local Games
-
-- @subpage starting_local_game
-
 ## Deck Management
 
 - @subpage creating_decks
