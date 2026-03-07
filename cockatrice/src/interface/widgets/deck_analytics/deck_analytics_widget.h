@@ -32,7 +32,7 @@ public:
 
 private slots:
     void onAddPanel();
-    void onRemoveSelected();
+    void onPanelClosed(ResizablePanel *panel);
     void onPanelDropped(ResizablePanel *dragged, ResizablePanel *target, bool insertBefore);
     void saveLayout();
     void loadLayout();
@@ -53,7 +53,6 @@ private:
     QHBoxLayout *controlLayout;
 
     QPushButton *addButton;
-    QPushButton *removeButton;
     QPushButton *saveButton;
     QPushButton *loadButton;
 
