@@ -184,6 +184,8 @@ signals:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
     void redirectCacheTtlChanged(int newTtl);
+    void saveCardImagesToLocalStorageChanged(bool saveCardImagesToLocalStorage);
+    void localCardImageStorageNamingSchemeChanged(QString localCardImageStorageNamingScheme);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
@@ -302,6 +304,8 @@ private:
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
+    bool saveCardImagesToLocalStorage;
+    QString localCardImageStorageNamingScheme;
     bool scaleCards;
     int verticalCardOverlapPercent;
     bool showMessagePopups;
@@ -773,6 +777,14 @@ public:
     {
         return redirectCacheTtl;
     }
+    [[nodiscard]] bool getSaveCardImagesToLocalStorage() const
+    {
+        return saveCardImagesToLocalStorage;
+    }
+    [[nodiscard]] QString getLocalCardImageStorageNamingScheme() const
+    {
+        return localCardImageStorageNamingScheme;
+    }
     [[nodiscard]] bool getScaleCards() const
     {
         return scaleCards;
@@ -1067,6 +1079,8 @@ public slots:
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
     void setNetworkRedirectCacheTtl(const int _redirectCacheTtl);
+    void setSaveCardImagesToLocalStorage(QT_STATE_CHANGED_T _saveCardImagesToLocalStorage);
+    void setLocalCardImageStorageNamingScheme(const QString _localCardImageStorageNamingScheme);
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
     void setStackCardOverlapPercent(const int _verticalCardOverlapPercent);
     void setShowMessagePopups(const QT_STATE_CHANGED_T _showMessagePopups);
