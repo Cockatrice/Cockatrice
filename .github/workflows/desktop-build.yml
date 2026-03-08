@@ -214,8 +214,8 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload to release
@@ -232,7 +232,7 @@ jobs:
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest@v4
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
@@ -502,15 +502,15 @@ jobs:
         id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload PDBs (Program Databases)
         if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
-          name: Windows${{matrix.target}}-PDBs
+          name: ${{steps.build.outputs.name}}-PDBs
           path: |
             build/cockatrice/Release/*.pdb
             build/oracle/Release/*.pdb
@@ -531,7 +531,7 @@ jobs:
       - name: Attest binary provenance
         if: steps.upload_release.outcome == 'success'
         id: attestation
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest@v4
         with:
           subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
