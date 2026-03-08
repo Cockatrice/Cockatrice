@@ -225,7 +225,7 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
-          asset_name: ${{steps.build.outputs.name}}
+          asset_name: ${{steps.build.outputs.fullname}}
           asset_path: ${{steps.build.outputs.path}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
@@ -234,7 +234,6 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest@v4
         with:
-          subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
           show-summary: false
 
@@ -519,7 +518,7 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
-          asset_name: ${{steps.build.outputs.name}}
+          asset_name: ${{steps.build.outputs.fullname}}
           asset_path: ${{steps.build.outputs.path}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
@@ -528,7 +527,6 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest@v4
         with:
-          subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
           show-summary: false
 
