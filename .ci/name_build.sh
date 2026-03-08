@@ -35,15 +35,15 @@ if ! cd "$path"; then
 fi
 
 # set filename
-name="${file%.*}" # remove all after last .
-new_name="$name$SUFFIX."
+name="${file%.*}" # remove file extension
+new_name="$name$SUFFIX"
 if [[ $MAKE_ZIP ]]; then
-  filename="${new_name}zip"
+  filename="${new_name}.zip"
   echo "creating zip '$filename' from '$file'"
   zip "$filename" "$file"
 else
   extension="${file##*.}" # remove all before last .
-  filename="$new_name$extension"
+  filename="$new_name.$extension"
   echo "renaming '$file' to '$filename'"
   mv "$file" "$filename"
 fi
@@ -52,4 +52,4 @@ cd "$oldpwd"
 relative_path="$path/$filename"
 ls -l "$relative_path"
 echo "path=$relative_path" >>"$GITHUB_OUTPUT"
-echo "name=$filename" >>"$GITHUB_OUTPUT"
+echo "name=$new_name" >>"$GITHUB_OUTPUT"
