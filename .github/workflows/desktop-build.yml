@@ -220,7 +220,7 @@ jobs:
 
       - name: Upload to release
         id: upload_release
-        if: needs.configure.outputs.tag != null && matrix.package != 'skip'
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
@@ -453,7 +453,8 @@ jobs:
           key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
 
       - name: Sign app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
+        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        id: sign_macos
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
@@ -465,7 +466,7 @@ jobs:
           fi
 
       - name: Notarize app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
+        if: steps.sign_macos.outcome == 'success'
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -497,8 +498,8 @@ jobs:
           fi
 
       - name: Upload artifact
-        id: upload_artifact
         if: matrix.make_package
+        id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{matrix.artifact_name}}
@@ -506,7 +507,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload PDBs (Program Databases)
-        if: matrix.os == 'Windows'
+        if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
           name: Windows${{matrix.target}}-PDBs
@@ -517,8 +518,8 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
-        if: needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
@@ -528,8 +529,8 @@ jobs:
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: Attest binary provenance
-        id: attestation
         if: steps.upload_release.outcome == 'success'
+        id: attestation
         uses: actions/attest-build-provenance@v4
         with:
           subject-name: ${{steps.build.outputs.name}}
