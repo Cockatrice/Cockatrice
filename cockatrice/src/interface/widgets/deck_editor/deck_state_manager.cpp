@@ -320,6 +320,7 @@ void DeckStateManager::undo(int steps)
     deckListModel->rebuildTree();
 
     emit deckListModel->layoutChanged();
+    emit deckReplaced();
 }
 
 void DeckStateManager::redo(int steps)
@@ -338,6 +339,7 @@ void DeckStateManager::redo(int steps)
     deckListModel->rebuildTree();
 
     emit deckListModel->layoutChanged();
+    emit deckReplaced();
 }
 
 void DeckStateManager::requestHistorySave(const QString &reason)
