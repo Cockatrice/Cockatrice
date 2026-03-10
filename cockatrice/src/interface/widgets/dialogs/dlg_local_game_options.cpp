@@ -32,12 +32,9 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
-    spectatorsSeeEverythingCheckBox = new QCheckBox(tr("Spectators can see &everything"), this);
-
     auto *gameSetupGrid = new QGridLayout;
     gameSetupGrid->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupGrid->addWidget(startingLifeTotalEdit, 0, 1);
-    gameSetupGrid->addWidget(spectatorsSeeEverythingCheckBox, 1, 0, 1, 2);
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"), this);
     gameSetupOptionsGroupBox->setLayout(gameSetupGrid);
 
@@ -58,7 +55,6 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     if (rememberSettingsCheckBox->isChecked()) {
         numberPlayersEdit->setValue(SettingsCache::instance().getMaxPlayers());
         startingLifeTotalEdit->setValue(SettingsCache::instance().getDefaultStartingLifeTotal());
-        spectatorsSeeEverythingCheckBox->setChecked(SettingsCache::instance().getSpectatorsCanSeeEverything());
     }
 
     setWindowTitle(tr("Local game options"));
@@ -73,7 +69,6 @@ void DlgLocalGameOptions::actOK()
     if (rememberSettingsCheckBox->isChecked()) {
         SettingsCache::instance().setMaxPlayers(numberPlayersEdit->value());
         SettingsCache::instance().setDefaultStartingLifeTotal(startingLifeTotalEdit->value());
-        SettingsCache::instance().setSpectatorsCanSeeEverything(spectatorsSeeEverythingCheckBox->isChecked());
     }
 
     accept();
@@ -84,6 +79,5 @@ LocalGameOptions DlgLocalGameOptions::getOptions() const
     return LocalGameOptions{
         .numberPlayers = numberPlayersEdit->value(),
         .startingLifeTotal = startingLifeTotalEdit->value(),
-        .spectatorsSeeEverything = spectatorsSeeEverythingCheckBox->isChecked(),
     };
 }

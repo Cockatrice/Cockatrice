@@ -25,7 +25,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "../game/local_game_options.h"
+#include "widgets/dialogs/dlg_local_game_options.h"
 
 #include <QList>
 #include <QMainWindow>

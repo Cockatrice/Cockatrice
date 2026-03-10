@@ -258,7 +258,6 @@ void MainWindow::startLocalGame(const LocalGameOptions &options)
     Command_CreateGame createCommand;
     createCommand.set_max_players(static_cast<google::protobuf::uint32>(options.numberPlayers));
     createCommand.set_starting_life_total(options.startingLifeTotal);
-    createCommand.set_spectators_see_everything(options.spectatorsSeeEverything);
     mainClient->sendCommand(LocalClient::prepareRoomCommand(createCommand, 0));
 }
 

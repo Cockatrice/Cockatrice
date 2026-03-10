@@ -4,15 +4,19 @@
  * @brief Dialog for configuring local game options.
  *
  * Provides a user interface for setting up local games with configurable
- * number of players, starting life total, and spectator visibility options.
+ * number of players and starting life total.
  */
 
 #ifndef DLG_LOCAL_GAME_OPTIONS_H
 #define DLG_LOCAL_GAME_OPTIONS_H
 
-#include "../../../game/local_game_options.h"
-
 #include <QDialog>
+
+struct LocalGameOptions
+{
+    int numberPlayers = 1;
+    int startingLifeTotal = 20;
+};
 
 class QCheckBox;
 class QDialogButtonBox;
@@ -41,7 +45,6 @@ private:
     QLabel *startingLifeTotalLabel;
     QSpinBox *startingLifeTotalEdit;
 
-    QCheckBox *spectatorsSeeEverythingCheckBox;
     QCheckBox *rememberSettingsCheckBox;
 
     QDialogButtonBox *buttonBox;
