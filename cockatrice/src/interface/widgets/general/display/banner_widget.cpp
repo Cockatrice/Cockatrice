@@ -18,7 +18,7 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     // Create the banner label and set properties
     bannerLabel = new QLabel(text, this);
     bannerLabel->setAlignment(Qt::AlignCenter);
-    bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
+    bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
 
     layout->addWidget(iconLabel);
     layout->addWidget(bannerLabel);
