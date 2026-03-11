@@ -11,6 +11,7 @@
 #include <libcockatrice/protocol/pb/command_next_turn.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 
 PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_doubleClickAction, bool _highlightable)
     : QObject(), QGraphicsItem(parent), name(_name), active(false), highlightable(_highlightable),
@@ -259,7 +260,7 @@ void PhasesToolbar::actNextTurn()
 void PhasesToolbar::actUntapAll()
 {
     Command_SetCardAttr cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZoneNames::TABLE);
     cmd.set_attribute(AttrTapped);
     cmd.set_attr_value("0");
 

@@ -28,6 +28,7 @@
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/zone_names.h>
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
@@ -63,13 +64,13 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
     int tableRow = info.getUiAttributes().tableRow;
     bool playToStack = SettingsCache::instance().getPlayToStack();
     QString currentZone = card->getZone()->getName();
-    if (currentZone == "stack" && tableRow == 3) {
-        cmd.set_target_zone("grave");
+    if (currentZone == ZoneNames::STACK && tableRow == 3) {
+        cmd.set_target_zone(ZoneNames::GRAVE);
         cmd.set_x(0);
         cmd.set_y(0);
-    } else if (!faceDown &&
-               ((!playToStack && tableRow == 3) || ((playToStack && tableRow != 0) && currentZone != "stack"))) {
-        cmd.set_target_zone("stack");
+    } else if (!faceDown && ((!playToStack && tableRow == 3) ||
+                             ((playToStack && tableRow != 0) && currentZone != ZoneNames::STACK))) {
+        cmd.set_target_zone(ZoneNames::STACK);
         cmd.set_x(-1);
         cmd.set_y(0);
     } else {
@@ -81,7 +82,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         }
         cardToMove->set_tapped(!faceDown && info.getUiAttributes().cipt);
         if (tableRow != 3)
-            cmd.set_target_zone("table");
+            cmd.set_target_zone(ZoneNames::TABLE);
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }
@@ -124,7 +125,7 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
         cardToMove->set_pt(info.getPowTough().toStdString());
     }
     cardToMove->set_tapped(!faceDown && info.getUiAttributes().cipt);
-    cmd.set_target_zone("table");
+    cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
     sendGameCommand(cmd);
@@ -132,12 +133,12 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
 
 void PlayerActions::actViewLibrary()
 {
-    player->getGameScene()->toggleZoneView(player, "deck", -1);
+    player->getGameScene()->toggleZoneView(player, ZoneNames::DECK, -1);
 }
 
 void PlayerActions::actViewHand()
 {
-    player->getGameScene()->toggleZoneView(player, "hand", -1);
+    player->getGameScene()->toggleZoneView(player, ZoneNames::HAND, -1);
 }
 
 /**
@@ -181,7 +182,7 @@ void PlayerActions::actViewTopCards()
                                       deckSize, 1, &ok);
     if (ok) {
         defaultNumberTopCards = number;
-        player->getGameScene()->toggleZoneView(player, "deck", number);
+        player->getGameScene()->toggleZoneView(player, ZoneNames::DECK, number);
     }
 }
 
@@ -194,14 +195,14 @@ void PlayerActions::actViewBottomCards()
                                       deckSize, 1, &ok);
     if (ok) {
         defaultNumberBottomCards = number;
-        player->getGameScene()->toggleZoneView(player, "deck", number, true);
+        player->getGameScene()->toggleZoneView(player, ZoneNames::DECK, number, true);
     }
 }
 
 void PlayerActions::actAlwaysRevealTopCard()
 {
     Command_ChangeZoneProperties cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_always_reveal_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysRevealTopCardChecked());
 
     sendGameCommand(cmd);
@@ -210,7 +211,7 @@ void PlayerActions::actAlwaysRevealTopCard()
 void PlayerActions::actAlwaysLookAtTopCard()
 {
     Command_ChangeZoneProperties cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_always_look_at_top_card(player->getPlayerMenu()->getLibraryMenu()->isAlwaysLookAtTopCardChecked());
 
     sendGameCommand(cmd);
@@ -223,17 +224,17 @@ void PlayerActions::actOpenDeckInDeckEditor()
 
 void PlayerActions::actViewGraveyard()
 {
-    player->getGameScene()->toggleZoneView(player, "grave", -1);
+    player->getGameScene()->toggleZoneView(player, ZoneNames::GRAVE, -1);
 }
 
 void PlayerActions::actViewRfg()
 {
-    player->getGameScene()->toggleZoneView(player, "rfg", -1);
+    player->getGameScene()->toggleZoneView(player, ZoneNames::EXILE, -1);
 }
 
 void PlayerActions::actViewSideboard()
 {
-    player->getGameScene()->toggleZoneView(player, "sb", -1);
+    player->getGameScene()->toggleZoneView(player, ZoneNames::SIDEBOARD, -1);
 }
 
 void PlayerActions::actShuffle()
@@ -263,7 +264,7 @@ void PlayerActions::actShuffleTop()
     defaultNumberTopCards = number;
 
     Command_Shuffle cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_start(0);
     cmd.set_end(number - 1); // inclusive, the indexed card at end will be shuffled
 
@@ -292,7 +293,7 @@ void PlayerActions::actShuffleBottom()
     defaultNumberBottomCards = number;
 
     Command_Shuffle cmd;
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_start(-number);
     cmd.set_end(-1);
 
@@ -376,7 +377,7 @@ void PlayerActions::actUndoDraw()
 
 void PlayerActions::cmdSetTopCard(Command_MoveCard &cmd)
 {
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
@@ -386,7 +387,7 @@ void PlayerActions::cmdSetBottomCard(Command_MoveCard &cmd)
 {
     CardZoneLogic *zone = player->getDeckZone();
     int lastCard = zone->getCards().size() - 1;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(lastCard);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
@@ -400,7 +401,7 @@ void PlayerActions::actMoveTopCardToGrave()
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZoneNames::GRAVE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -415,7 +416,7 @@ void PlayerActions::actMoveTopCardToExile()
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZoneNames::EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -424,22 +425,22 @@ void PlayerActions::actMoveTopCardToExile()
 
 void PlayerActions::actMoveTopCardsToGrave()
 {
-    moveTopCardsTo("grave", tr("grave"), false);
+    moveTopCardsTo(ZoneNames::GRAVE, tr("grave"), false);
 }
 
 void PlayerActions::actMoveTopCardsToGraveFaceDown()
 {
-    moveTopCardsTo("grave", tr("grave"), true);
+    moveTopCardsTo(ZoneNames::GRAVE, tr("grave"), true);
 }
 
 void PlayerActions::actMoveTopCardsToExile()
 {
-    moveTopCardsTo("rfg", tr("exile"), false);
+    moveTopCardsTo(ZoneNames::EXILE, tr("exile"), false);
 }
 
 void PlayerActions::actMoveTopCardsToExileFaceDown()
 {
-    moveTopCardsTo("rfg", tr("exile"), true);
+    moveTopCardsTo(ZoneNames::EXILE, tr("exile"), true);
 }
 
 void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown)
@@ -463,7 +464,7 @@ void PlayerActions::moveTopCardsTo(const QString &targetZone, const QString &zon
     defaultNumberTopCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
@@ -549,7 +550,7 @@ void PlayerActions::actMoveTopCardToBottom()
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("deck");
+    cmd.set_target_zone(ZoneNames::DECK);
     cmd.set_x(-1); // bottom of deck
     cmd.set_y(0);
 
@@ -564,7 +565,7 @@ void PlayerActions::actMoveTopCardToPlay()
 
     Command_MoveCard cmd;
     cmdSetTopCard(cmd);
-    cmd.set_target_zone("stack");
+    cmd.set_target_zone(ZoneNames::STACK);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -578,12 +579,12 @@ void PlayerActions::actMoveTopCardToPlayFaceDown()
     }
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
     cardToMove->set_face_down(true);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("table");
+    cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -598,7 +599,7 @@ void PlayerActions::actMoveBottomCardToGrave()
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("grave");
+    cmd.set_target_zone(ZoneNames::GRAVE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -613,7 +614,7 @@ void PlayerActions::actMoveBottomCardToExile()
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("rfg");
+    cmd.set_target_zone(ZoneNames::EXILE);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -622,22 +623,22 @@ void PlayerActions::actMoveBottomCardToExile()
 
 void PlayerActions::actMoveBottomCardsToGrave()
 {
-    moveBottomCardsTo("grave", tr("grave"), false);
+    moveBottomCardsTo(ZoneNames::GRAVE, tr("grave"), false);
 }
 
 void PlayerActions::actMoveBottomCardsToGraveFaceDown()
 {
-    moveBottomCardsTo("grave", tr("grave"), true);
+    moveBottomCardsTo(ZoneNames::GRAVE, tr("grave"), true);
 }
 
 void PlayerActions::actMoveBottomCardsToExile()
 {
-    moveBottomCardsTo("rfg", tr("exile"), false);
+    moveBottomCardsTo(ZoneNames::EXILE, tr("exile"), false);
 }
 
 void PlayerActions::actMoveBottomCardsToExileFaceDown()
 {
-    moveBottomCardsTo("rfg", tr("exile"), true);
+    moveBottomCardsTo(ZoneNames::EXILE, tr("exile"), true);
 }
 
 void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown)
@@ -661,7 +662,7 @@ void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &
     defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
@@ -686,7 +687,7 @@ void PlayerActions::actMoveBottomCardToTop()
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("deck");
+    cmd.set_target_zone(ZoneNames::DECK);
     cmd.set_x(0); // top of deck
     cmd.set_y(0);
 
@@ -756,7 +757,7 @@ void PlayerActions::actDrawBottomCard()
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("hand");
+    cmd.set_target_zone(ZoneNames::HAND);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -782,9 +783,9 @@ void PlayerActions::actDrawBottomCards()
     defaultNumberBottomCards = number;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("hand");
+    cmd.set_target_zone(ZoneNames::HAND);
     cmd.set_x(0);
     cmd.set_y(0);
 
@@ -803,7 +804,7 @@ void PlayerActions::actMoveBottomCardToPlay()
 
     Command_MoveCard cmd;
     cmdSetBottomCard(cmd);
-    cmd.set_target_zone("stack");
+    cmd.set_target_zone(ZoneNames::STACK);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -820,13 +821,13 @@ void PlayerActions::actMoveBottomCardToPlayFaceDown()
     int lastCard = zone->getCards().size() - 1;
 
     Command_MoveCard cmd;
-    cmd.set_start_zone("deck");
+    cmd.set_start_zone(ZoneNames::DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(lastCard);
     cardToMove->set_face_down(true);
 
     cmd.set_target_player_id(player->getPlayerInfo()->getId());
-    cmd.set_target_zone("table");
+    cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
 
@@ -836,7 +837,7 @@ void PlayerActions::actMoveBottomCardToPlayFaceDown()
 void PlayerActions::actUntapAll()
 {
     Command_SetCardAttr cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZoneNames::TABLE);
     cmd.set_attribute(AttrTapped);
     cmd.set_attr_value("0");
 
@@ -886,7 +887,7 @@ void PlayerActions::actCreateAnotherToken()
     }
 
     Command_CreateToken cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZoneNames::TABLE);
     cmd.set_card_name(lastTokenInfo.name.toStdString());
     cmd.set_card_provider_id(lastTokenInfo.providerId.toStdString());
     cmd.set_color(lastTokenInfo.color.toStdString());
@@ -1067,7 +1068,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
 
         // move card onto table first if attaching from some other zone
         // we only do this for AttachTo because cross-zone TransformInto is already handled server-side
-        if (attachType == CardRelationType::AttachTo && sourceCard->getZone()->getName() != "table") {
+        if (attachType == CardRelationType::AttachTo && sourceCard->getZone()->getName() != ZoneNames::TABLE) {
             playCardToTable(sourceCard, false);
         }
 
@@ -1093,7 +1094,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
 
     // create the token for the related card
     Command_CreateToken cmd;
-    cmd.set_zone("table");
+    cmd.set_zone(ZoneNames::TABLE);
     cmd.set_card_name(cardInfo->getName().toStdString());
     switch (cardInfo->getColors().size()) {
         case 0:
@@ -1122,12 +1123,12 @@ void PlayerActions::createCard(const CardItem *sourceCard,
 
     switch (attachType) {
         case CardRelationType::DoesNotAttach:
-            cmd.set_target_zone("table");
+            cmd.set_target_zone(ZoneNames::TABLE);
             cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             break;
 
         case CardRelationType::AttachTo:
-            cmd.set_target_zone("table"); // We currently only support creating tokens on the table
+            cmd.set_target_zone(ZoneNames::TABLE); // We currently only support creating tokens on the table
             cmd.set_card_provider_id(relatedCard.getPrinting().getUuid().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
             cmd.set_target_mode(Command_CreateToken::ATTACH_TO);
@@ -1135,7 +1136,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
 
         case CardRelationType::TransformInto:
             // allow cards to directly transform on stack
-            cmd.set_zone(sourceCard->getZone()->getName() == "stack" ? "stack" : "table");
+            cmd.set_zone(sourceCard->getZone()->getName() == ZoneNames::STACK ? ZoneNames::STACK : ZoneNames::TABLE);
             // Transform card zone changes are handled server-side
             cmd.set_target_zone(sourceCard->getZone()->getName().toStdString());
             cmd.set_target_card_id(sourceCard->getId());
@@ -1250,7 +1251,7 @@ void PlayerActions::actMoveCardXCardsFromTop()
     cmd->set_start_zone(startZone.toStdString());
     cmd->mutable_cards_to_move()->CopyFrom(idList);
     cmd->set_target_player_id(player->getPlayerInfo()->getId());
-    cmd->set_target_zone("deck");
+    cmd->set_target_zone(ZoneNames::DECK);
     cmd->set_x(number);
     cmd->set_y(0);
     commandList.append(cmd);
@@ -1639,7 +1640,7 @@ void PlayerActions::playSelectedCards(const bool faceDown)
               [](const auto &card1, const auto &card2) { return card1->getId() > card2->getId(); });
 
     for (auto &card : selectedCards) {
-        if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != "table") {
+        if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != ZoneNames::TABLE) {
             playCard(card, faceDown);
         }
     }
@@ -1692,7 +1693,7 @@ void PlayerActions::actRevealHand(int revealToPlayerId)
     if (revealToPlayerId != -1) {
         cmd.set_player_id(revealToPlayerId);
     }
-    cmd.set_zone_name("hand");
+    cmd.set_zone_name(ZoneNames::HAND);
 
     sendGameCommand(cmd);
 }
@@ -1703,7 +1704,7 @@ void PlayerActions::actRevealRandomHandCard(int revealToPlayerId)
     if (revealToPlayerId != -1) {
         cmd.set_player_id(revealToPlayerId);
     }
-    cmd.set_zone_name("hand");
+    cmd.set_zone_name(ZoneNames::HAND);
     cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
 
     sendGameCommand(cmd);
@@ -1715,7 +1716,7 @@ void PlayerActions::actRevealLibrary(int revealToPlayerId)
     if (revealToPlayerId != -1) {
         cmd.set_player_id(revealToPlayerId);
     }
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
 
     sendGameCommand(cmd);
 }
@@ -1726,7 +1727,7 @@ void PlayerActions::actLendLibrary(int lendToPlayerId)
     if (lendToPlayerId != -1) {
         cmd.set_player_id(lendToPlayerId);
     }
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_grant_write_access(true);
 
     sendGameCommand(cmd);
@@ -1739,7 +1740,7 @@ void PlayerActions::actRevealTopCards(int revealToPlayerId, int amount)
         cmd.set_player_id(revealToPlayerId);
     }
 
-    cmd.set_zone_name("deck");
+    cmd.set_zone_name(ZoneNames::DECK);
     cmd.set_top_cards(amount);
     // backward compatibility: servers before #1051 only permits to reveal the first card
     cmd.add_card_id(0);
@@ -1753,7 +1754,7 @@ void PlayerActions::actRevealRandomGraveyardCard(int revealToPlayerId)
     if (revealToPlayerId != -1) {
         cmd.set_player_id(revealToPlayerId);
     }
-    cmd.set_zone_name("grave");
+    cmd.set_zone_name(ZoneNames::GRAVE);
     cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
     sendGameCommand(cmd);
 }
@@ -1816,7 +1817,7 @@ void PlayerActions::cardMenuAction()
                 }
                 case cmClone: {
                     auto *cmd = new Command_CreateToken;
-                    cmd->set_zone("table");
+                    cmd->set_zone(ZoneNames::TABLE);
                     cmd->set_card_name(card->getName().toStdString());
                     cmd->set_card_provider_id(card->getProviderId().toStdString());
                     cmd->set_color(card->getColor().toStdString());
@@ -1858,13 +1859,13 @@ void PlayerActions::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
-                cmd->set_target_zone("deck");
+                cmd->set_target_zone(ZoneNames::DECK);
                 cmd->set_x(0);
                 cmd->set_y(0);
 
                 if (idList.card_size() > 1) {
                     auto *scmd = new Command_Shuffle;
-                    scmd->set_zone_name("deck");
+                    scmd->set_zone_name(ZoneNames::DECK);
                     scmd->set_start(0);
                     scmd->set_end(idList.card_size() - 1); // inclusive, the indexed card at end will be shuffled
                     // Server process events backwards, so...
@@ -1880,13 +1881,13 @@ void PlayerActions::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
-                cmd->set_target_zone("deck");
+                cmd->set_target_zone(ZoneNames::DECK);
                 cmd->set_x(-1);
                 cmd->set_y(0);
 
                 if (idList.card_size() > 1) {
                     auto *scmd = new Command_Shuffle;
-                    scmd->set_zone_name("deck");
+                    scmd->set_zone_name(ZoneNames::DECK);
                     scmd->set_start(-idList.card_size());
                     scmd->set_end(-1);
                     // Server process events backwards, so...
@@ -1902,7 +1903,7 @@ void PlayerActions::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
-                cmd->set_target_zone("hand");
+                cmd->set_target_zone(ZoneNames::HAND);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
@@ -1914,7 +1915,7 @@ void PlayerActions::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
-                cmd->set_target_zone("grave");
+                cmd->set_target_zone(ZoneNames::GRAVE);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
@@ -1926,7 +1927,7 @@ void PlayerActions::cardMenuAction()
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
-                cmd->set_target_zone("rfg");
+                cmd->set_target_zone(ZoneNames::EXILE);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);

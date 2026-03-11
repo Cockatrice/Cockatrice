@@ -12,6 +12,7 @@
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/zone_names.h>
 
 CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
@@ -115,11 +116,12 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     } else if (writeableCard) {
 
         if (card->getZone()) {
-            if (card->getZone()->getName() == "table") {
+            if (card->getZone()->getName() == ZoneNames::TABLE) {
                 createTableMenu();
-            } else if (card->getZone()->getName() == "stack") {
+            } else if (card->getZone()->getName() == ZoneNames::STACK) {
                 createStackMenu();
-            } else if (card->getZone()->getName() == "rfg" || card->getZone()->getName() == "grave") {
+            } else if (card->getZone()->getName() == ZoneNames::EXILE ||
+                       card->getZone()->getName() == ZoneNames::GRAVE) {
                 createGraveyardOrExileMenu();
             } else {
                 createHandOrCustomZoneMenu();
@@ -128,7 +130,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
             addMenu(new MoveMenu(player));
         }
     } else {
-        if (card->getZone() && card->getZone()->getName() != "hand") {
+        if (card->getZone() && card->getZone()->getName() != ZoneNames::HAND) {
             addAction(aDrawArrow);
             addSeparator();
             addRelatedCardView();
@@ -285,7 +287,7 @@ void CardMenu::createHandOrCustomZoneMenu()
     addMenu(new MoveMenu(player));
 
     // actions that are really wonky when done from deck or sideboard
-    if (card->getZone()->getName() == "hand") {
+    if (card->getZone()->getName() == ZoneNames::HAND) {
         addSeparator();
         addAction(aAttach);
         addAction(aDrawArrow);
@@ -298,7 +300,7 @@ void CardMenu::createHandOrCustomZoneMenu()
     }
 
     addRelatedCardView();
-    if (card->getZone()->getName() == "hand") {
+    if (card->getZone()->getName() == ZoneNames::HAND) {
         addRelatedCardActions();
     }
 }

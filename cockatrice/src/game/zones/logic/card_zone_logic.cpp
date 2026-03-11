@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 
 /**
  * @param _player the player that the zone belongs to
@@ -174,9 +175,9 @@ void CardZoneLogic::clearContents()
 QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
     QString ownerName = player->getPlayerInfo()->getName();
-    if (name == "hand")
+    if (name == ZoneNames::HAND)
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
-    else if (name == "deck")
+    else if (name == ZoneNames::DECK)
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their library", "look at zone")
@@ -192,11 +193,11 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
             default:
                 return (theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName));
         }
-    else if (name == "grave")
+    else if (name == ZoneNames::GRAVE)
         return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
-    else if (name == "rfg")
+    else if (name == ZoneNames::EXILE)
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
-    else if (name == "sb")
+    else if (name == ZoneNames::SIDEBOARD)
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their sideboard", "look at zone")
