@@ -48,6 +48,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/zone_names.h>
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,
@@ -190,8 +191,8 @@ shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, c
     }
 
     // Allow tokens on the stack
-    if ((startZone->getName() == "table" || startZone->getName() == "stack") &&
-        (targetZone->getName() == "table" || targetZone->getName() == "stack")) {
+    if ((startZone->getName() == ZoneNames::TABLE || startZone->getName() == ZoneNames::STACK) &&
+        (targetZone->getName() == ZoneNames::TABLE || targetZone->getName() == ZoneNames::STACK)) {
         return false;
     }
 
@@ -264,7 +265,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
         }
 
         // do not allow attached cards to move around on the table
-        if (card->getParentCard() && targetzone->getName() == "table") {
+        if (card->getParentCard() && targetzone->getName() == ZoneNames::TABLE) {
             continue;
         }
 
@@ -347,7 +348,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                 newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
             } else {
                 yCoord = 0;
-                card->resetState(targetzone->getName() == "stack");
+                card->resetState(targetzone->getName() == ZoneNames::STACK);
             }
 
             targetzone->insertCard(card, newX, yCoord);
