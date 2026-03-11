@@ -14,6 +14,7 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
+#include <libcockatrice/utility/zone_names.h>
 #include <numeric>
 
 /**
@@ -410,9 +411,9 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
 
-    if (zoneName == "grave")
+    if (zoneName == ZoneNames::GRAVE)
         item->setPos(360, 100);
-    else if (zoneName == "rfg")
+    else if (zoneName == ZoneNames::EXILE)
         item->setPos(380, 120);
     else
         item->setPos(340, 80);
