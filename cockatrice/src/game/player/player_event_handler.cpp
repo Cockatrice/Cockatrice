@@ -30,6 +30,7 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(Player *_player) : player(_player)
 {
@@ -321,8 +322,8 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     }
     player->getPlayerMenu()->updateCardMenu(card);
 
-    if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == "deck" &&
-        targetZone->getName() == "stack") {
+    if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == ZoneNames::DECK &&
+        targetZone->getName() == ZoneNames::STACK) {
         player->getPlayerActions()->moveOneCardUntil(card);
     }
 }
