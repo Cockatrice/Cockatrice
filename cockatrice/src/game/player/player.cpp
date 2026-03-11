@@ -61,15 +61,15 @@ void Player::forwardActionSignalsToEventHandler()
 
 void Player::initializeZones()
 {
-    addZone(new PileZoneLogic(this, "deck", false, true, false, this));
-    addZone(new PileZoneLogic(this, "grave", false, false, true, this));
-    addZone(new PileZoneLogic(this, "rfg", false, false, true, this));
-    addZone(new PileZoneLogic(this, "sb", false, false, false, this));
-    addZone(new TableZoneLogic(this, "table", true, false, true, this));
-    addZone(new StackZoneLogic(this, "stack", true, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::DECK, false, true, false, this));
+    addZone(new PileZoneLogic(this, ZoneNames::GRAVE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::EXILE, false, false, true, this));
+    addZone(new PileZoneLogic(this, ZoneNames::SIDEBOARD, false, false, false, this));
+    addZone(new TableZoneLogic(this, ZoneNames::TABLE, true, false, true, this));
+    addZone(new StackZoneLogic(this, ZoneNames::STACK, true, false, true, this));
     bool visibleHand = playerInfo->getLocalOrJudge() ||
                        (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
-    addZone(new HandZoneLogic(this, "hand", false, false, visibleHand, this));
+    addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
 }
 
 Player::~Player()
@@ -119,13 +119,13 @@ void Player::setZoneId(int _zoneId)
 void Player::processPlayerInfo(const ServerInfo_Player &info)
 {
     static QSet<QString> builtinZones{/* PileZones */
-                                      "deck", "grave", "rfg", "sb",
+                                      ZoneNames::DECK, ZoneNames::GRAVE, ZoneNames::EXILE, ZoneNames::SIDEBOARD,
                                       /* TableZone */
-                                      "table",
+                                      ZoneNames::TABLE,
                                       /* StackZone */
-                                      "stack",
+                                      ZoneNames::STACK,
                                       /* HandZone */
-                                      "hand"};
+                                      ZoneNames::HAND};
     clearCounters();
     clearArrows();
 
