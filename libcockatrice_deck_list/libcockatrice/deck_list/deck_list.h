@@ -206,8 +206,10 @@ public:
 
     /// @name Serialization (Plain text)
     ///@{
-    bool loadFromStream_Plain(QTextStream &stream, bool preserveMetadata);
-    bool loadFromFile_Plain(QIODevice *device);
+    bool loadFromStream_Plain(QTextStream &stream,
+                              bool preserveMetadata,
+                              const std::function<QString(const QString &)> &cardNameNormalizer);
+    bool loadFromFile_Plain(QIODevice *device, const std::function<QString(const QString &)> &cardNameNormalizer);
     bool saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const;
     bool
     saveToFile_Plain(QIODevice *device, bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false) const;

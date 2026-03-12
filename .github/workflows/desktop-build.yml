@@ -220,27 +220,26 @@ jobs:
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.distro}}${{matrix.version}}-package
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload to release
         id: upload_release
-        if: needs.configure.outputs.tag != null && matrix.package != 'skip'
+        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
-          asset_name: ${{steps.build.outputs.name}}
+          asset_name: ${{steps.build.outputs.fullname}}
           asset_path: ${{steps.build.outputs.path}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: Attest binary provenance
         id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest@v4
         with:
-          subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
           show-summary: false
 
@@ -265,7 +264,6 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            artifact_name: macOS13_Intel-package
             qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -280,7 +278,6 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            artifact_name: macOS14-package
             qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -295,7 +292,6 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            artifact_name: macOS15-package
             qt_version: 6.10.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -320,7 +316,6 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            artifact_name: Windows10-installer
             qt_version: 6.10.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -464,7 +459,8 @@ jobs:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
+        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        id: sign_macos
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
@@ -476,7 +472,7 @@ jobs:
           fi
 
       - name: Notarize app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && (github.ref == 'refs/heads/master' || needs.configure.outputs.tag != null)
+        if: steps.sign_macos.outcome == 'success'
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -508,19 +504,19 @@ jobs:
           fi
 
       - name: Upload artifact
-        id: upload_artifact
         if: matrix.make_package
+        id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{matrix.artifact_name}}
           path: ${{steps.build.outputs.path}}
+          archive: false
           if-no-files-found: error
 
       - name: Upload PDBs (Program Databases)
-        if: matrix.os == 'Windows'
+        if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
-          name: Windows${{matrix.target}}-PDBs
+          name: ${{steps.build.outputs.name}}-PDBs
           path: |
             build/cockatrice/**/*.pdb
             build/oracle/**/*.pdb
@@ -528,22 +524,21 @@ jobs:
           if-no-files-found: error
 
       - name: Upload to release
+        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
-        if: needs.configure.outputs.tag != null
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
           tag_name: ${{needs.configure.outputs.tag}}
-          asset_name: ${{steps.build.outputs.name}}
+          asset_name: ${{steps.build.outputs.fullname}}
           asset_path: ${{steps.build.outputs.path}}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: Attest binary provenance
-        id: attestation
         if: steps.upload_release.outcome == 'success'
-        uses: actions/attest-build-provenance@v4
+        id: attestation
+        uses: actions/attest@v4
         with:
-          subject-name: ${{steps.build.outputs.name}}
           subject-path: ${{steps.build.outputs.path}}
           show-summary: false
 

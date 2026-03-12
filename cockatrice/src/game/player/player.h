@@ -27,6 +27,7 @@
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
 
@@ -155,37 +156,37 @@ public:
 
     PileZoneLogic *getDeckZone()
     {
-        return qobject_cast<PileZoneLogic *>(zones.value("deck"));
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::DECK));
     }
 
     PileZoneLogic *getGraveZone()
     {
-        return qobject_cast<PileZoneLogic *>(zones.value("grave"));
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::GRAVE));
     }
 
     PileZoneLogic *getRfgZone()
     {
-        return qobject_cast<PileZoneLogic *>(zones.value("rfg"));
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::EXILE));
     }
 
     PileZoneLogic *getSideboardZone()
     {
-        return qobject_cast<PileZoneLogic *>(zones.value("sb"));
+        return qobject_cast<PileZoneLogic *>(zones.value(ZoneNames::SIDEBOARD));
     }
 
     TableZoneLogic *getTableZone()
     {
-        return qobject_cast<TableZoneLogic *>(zones.value("table"));
+        return qobject_cast<TableZoneLogic *>(zones.value(ZoneNames::TABLE));
     }
 
     StackZoneLogic *getStackZone()
     {
-        return qobject_cast<StackZoneLogic *>(zones.value("stack"));
+        return qobject_cast<StackZoneLogic *>(zones.value(ZoneNames::STACK));
     }
 
     HandZoneLogic *getHandZone()
     {
-        return qobject_cast<HandZoneLogic *>(zones.value("hand"));
+        return qobject_cast<HandZoneLogic *>(zones.value(ZoneNames::HAND));
     }
 
     AbstractCounter *addCounter(const ServerInfo_Counter &counter);

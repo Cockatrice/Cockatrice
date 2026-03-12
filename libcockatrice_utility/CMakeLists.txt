@@ -10,8 +10,13 @@ set(UTILITY_SOURCES libcockatrice/utility/expression.cpp libcockatrice/utility/l
 )
 
 set(UTILITY_HEADERS
-    libcockatrice/utility/color.h libcockatrice/utility/expression.h libcockatrice/utility/levenshtein.h
-    libcockatrice/utility/macros.h libcockatrice/utility/passwordhasher.h libcockatrice/utility/trice_limits.h
+    libcockatrice/utility/color.h
+    libcockatrice/utility/expression.h
+    libcockatrice/utility/levenshtein.h
+    libcockatrice/utility/macros.h
+    libcockatrice/utility/passwordhasher.h
+    libcockatrice/utility/trice_limits.h
+    libcockatrice/utility/zone_names.h
 )
 
 add_library(libcockatrice_utility STATIC ${UTILITY_SOURCES} ${UTILITY_HEADERS})

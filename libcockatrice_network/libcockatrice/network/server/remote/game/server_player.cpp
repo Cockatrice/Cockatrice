@@ -47,6 +47,7 @@
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/zone_names.h>
 
 Server_Player::Server_Player(Server_Game *_game,
                              int _playerId,
@@ -80,15 +81,15 @@ void Server_Player::setupZones()
     // ------------------------------------------------------------------
 
     // Create zones
-    auto *deckZone = new Server_CardZone(this, "deck", false, ServerInfo_Zone::HiddenZone);
+    auto *deckZone = new Server_CardZone(this, ZoneNames::DECK, false, ServerInfo_Zone::HiddenZone);
     addZone(deckZone);
-    auto *sbZone = new Server_CardZone(this, "sb", false, ServerInfo_Zone::HiddenZone);
+    auto *sbZone = new Server_CardZone(this, ZoneNames::SIDEBOARD, false, ServerInfo_Zone::HiddenZone);
     addZone(sbZone);
-    addZone(new Server_CardZone(this, "table", true, ServerInfo_Zone::PublicZone));
-    addZone(new Server_CardZone(this, "hand", false, ServerInfo_Zone::PrivateZone));
-    addZone(new Server_CardZone(this, "stack", false, ServerInfo_Zone::PublicZone));
-    addZone(new Server_CardZone(this, "grave", false, ServerInfo_Zone::PublicZone));
-    addZone(new Server_CardZone(this, "rfg", false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::TABLE, true, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::HAND, false, ServerInfo_Zone::PrivateZone));
+    addZone(new Server_CardZone(this, ZoneNames::STACK, false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::GRAVE, false, ServerInfo_Zone::PublicZone));
+    addZone(new Server_CardZone(this, ZoneNames::EXILE, false, ServerInfo_Zone::PublicZone));
 
     addCounter(new Server_Counter(0, "life", makeColor(255, 255, 255), 25, game->getStartingLifeTotal()));
     addCounter(new Server_Counter(1, "w", makeColor(255, 255, 150), 20, 0));
@@ -164,8 +165,8 @@ void Server_Player::addCounter(Server_Counter *counter)
 
 Response::ResponseCode Server_Player::drawCards(GameEventStorage &ges, int number)
 {
-    Server_CardZone *deckZone = zones.value("deck");
-    Server_CardZone *handZone = zones.value("hand");
+    Server_CardZone *deckZone = zones.value(ZoneNames::DECK);
+    Server_CardZone *handZone = zones.value(ZoneNames::HAND);
     if (deckZone->getCards().size() < number) {
         number = deckZone->getCards().size();
     }
@@ -210,7 +211,7 @@ void Server_Player::onCardBeingMoved(GameEventStorage &ges,
     // "Undo draw" should only remain valid if the just-drawn card stays within the user's hand (e.g., they only
     // reorder their hand). If a just-drawn card leaves the hand then remove cards before it from the list
     // (Ignore the case where the card is currently being un-drawn.)
-    if (startzone->getName() == "hand" && targetzone->getName() != "hand" && !undoingDraw) {
+    if (startzone->getName() == ZoneNames::HAND && targetzone->getName() != ZoneNames::HAND && !undoingDraw) {
         int index = lastDrawList.lastIndexOf(card->getId());
         if (index != -1) {
             lastDrawList.erase(lastDrawList.begin(), lastDrawList.begin() + index);
@@ -326,11 +327,11 @@ Server_Player::cmdShuffle(const Command_Shuffle &cmd, ResponseContainer & /*rc*/
         return Response::RespContextError;
     }
 
-    if (cmd.has_zone_name() && cmd.zone_name() != "deck") {
+    if (cmd.has_zone_name() && cmd.zone_name() != ZoneNames::DECK) {
         return Response::RespFunctionNotAllowed;
     }
 
-    Server_CardZone *zone = zones.value("deck");
+    Server_CardZone *zone = zones.value(ZoneNames::DECK);
     if (!zone) {
         return Response::RespNameNotFound;
     }
@@ -357,8 +358,8 @@ Server_Player::cmdMulligan(const Command_Mulligan &cmd, ResponseContainer & /*rc
         return Response::RespContextError;
     }
 
-    Server_CardZone *hand = zones.value("hand");
-    Server_CardZone *_deck = zones.value("deck");
+    Server_CardZone *hand = zones.value(ZoneNames::HAND);
+    Server_CardZone *_deck = zones.value(ZoneNames::DECK);
     int number = cmd.number();
 
     if (!hand->getCards().isEmpty()) {
@@ -414,8 +415,8 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
     Response::ResponseCode retVal;
     auto *cardToMove = new CardToMove;
     cardToMove->set_card_id(lastDrawList.takeLast());
-    retVal = moveCard(ges, zones.value("hand"), QList<const CardToMove *>() << cardToMove, zones.value("deck"), 0, 0,
-                      false, true);
+    retVal = moveCard(ges, zones.value(ZoneNames::HAND), QList<const CardToMove *>() << cardToMove,
+                      zones.value(ZoneNames::DECK), 0, 0, false, true);
     delete cardToMove;
 
     return retVal;

@@ -48,6 +48,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/zone_names.h>
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,
@@ -190,12 +191,41 @@ shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, c
     }
 
     // Allow tokens on the stack
-    if ((startZone->getName() == "table" || startZone->getName() == "stack") &&
-        (targetZone->getName() == "table" || targetZone->getName() == "stack")) {
+    if ((startZone->getName() == ZoneNames::TABLE || startZone->getName() == ZoneNames::STACK) &&
+        (targetZone->getName() == ZoneNames::TABLE || targetZone->getName() == ZoneNames::STACK)) {
         return false;
     }
 
     return true;
+}
+
+/**
+ * @brief Determines whether the moved card should be face-down
+ */
+static bool
+shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZone, const Server_CardZone *targetZone)
+{
+    if (!targetZone) {
+        return false;
+    }
+
+    // being face-down only makes sense for public zones
+    if (targetZone->getType() != ServerInfo_Zone::PublicZone) {
+        return false;
+    }
+
+    // face-down property in proto takes precedence
+    if (cardStruct.cardToMove->has_face_down()) {
+        return cardStruct.cardToMove->face_down();
+    }
+
+    // Default to keep face-down the same if zone didn't change.
+    // Compare using zone names because face-down is maintained when changing controllers.
+    if (startZone && startZone->getName() == targetZone->getName()) {
+        return cardStruct.card->getFaceDown();
+    }
+
+    return false;
 }
 
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
@@ -235,7 +265,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
         }
 
         // do not allow attached cards to move around on the table
-        if (card->getParentCard() && targetzone->getName() == "table") {
+        if (card->getParentCard() && targetzone->getName() == ZoneNames::TABLE) {
             continue;
         }
 
@@ -257,10 +287,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 
     for (auto cardStruct : cardsToMove) {
         Server_Card *card = cardStruct.card;
-        const CardToMove *thisCardProperties = cardStruct.cardToMove;
         int originalPosition = cardStruct.position;
-        bool faceDown = targetzone->hasCoords() &&
-                        (thisCardProperties->has_face_down() ? thisCardProperties->face_down() : card->getFaceDown());
 
         bool sourceBeingLookedAt;
         int position = startzone->removeCard(card, sourceBeingLookedAt);
@@ -315,11 +342,13 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
             ++xIndex;
             int newX = isReversed ? targetzone->getCards().size() - xCoord + xIndex : xCoord + xIndex;
 
+            bool faceDown = shouldBeFaceDown(cardStruct, startzone, targetzone);
+
             if (targetzone->hasCoords()) {
                 newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
             } else {
                 yCoord = 0;
-                card->resetState(targetzone->getName() == "stack");
+                card->resetState(targetzone->getName() == ZoneNames::STACK);
             }
 
             targetzone->insertCard(card, newX, yCoord);

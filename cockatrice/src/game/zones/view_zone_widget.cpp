@@ -7,6 +7,7 @@
 #include "../game_scene.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../z_values.h"
 #include "view_zone.h"
 
 #include <QCheckBox>
@@ -47,7 +48,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 {
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
-    setZValue(2000000006);
+    setZValue(ZValues::ZONE_VIEW_WIDGET);
     setFlag(ItemIgnoresTransformations);
 
     QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
@@ -71,7 +72,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
         QGraphicsProxyWidget *searchEditProxy = new QGraphicsProxyWidget;
         searchEditProxy->setWidget(&searchEdit);
-        searchEditProxy->setZValue(2000000007);
+        searchEditProxy->setZValue(ZValues::DRAG_ITEM);
         vbox->addItem(searchEditProxy);
 
         // top row
@@ -80,13 +81,13 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
         // groupBy options
         QGraphicsProxyWidget *groupBySelectorProxy = new QGraphicsProxyWidget;
         groupBySelectorProxy->setWidget(&groupBySelector);
-        groupBySelectorProxy->setZValue(2000000008);
+        groupBySelectorProxy->setZValue(ZValues::TOP_UI);
         hTopRow->addItem(groupBySelectorProxy);
 
         // sortBy options
         QGraphicsProxyWidget *sortBySelectorProxy = new QGraphicsProxyWidget;
         sortBySelectorProxy->setWidget(&sortBySelector);
-        sortBySelectorProxy->setZValue(2000000007);
+        sortBySelectorProxy->setZValue(ZValues::DRAG_ITEM);
         hTopRow->addItem(sortBySelectorProxy);
 
         vbox->addItem(hTopRow);
@@ -457,7 +458,7 @@ void ZoneViewWidget::resizeScrollbar(const qreal newZoneHeight)
  */
 static qreal rowsToHeight(int rows)
 {
-    const qreal cardsHeight = (rows + 1) * (CARD_HEIGHT / 3);
+    const qreal cardsHeight = (rows + 1) * (CardDimensions::HEIGHT_F / 3);
     return cardsHeight + 5; // +5 padding to make the cutoff look nicer
 }
 

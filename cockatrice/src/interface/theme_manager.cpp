@@ -12,6 +12,7 @@
 #include <QPixmapCache>
 #include <QStandardPaths>
 #include <QString>
+#include <QStyle>
 #include <QStyleFactory>
 #include <QStyleHints>
 #include <Qt>
@@ -89,6 +90,7 @@ struct PaletteColorInfo
 
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
+    defaultStyleName = qApp->style()->objectName();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
@@ -346,7 +348,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle("");
+        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
     }
 
     if (dirPath.isEmpty()) {

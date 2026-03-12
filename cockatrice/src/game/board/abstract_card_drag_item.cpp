@@ -1,14 +1,13 @@
 #include "abstract_card_drag_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../z_values.h"
 
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-static const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
-static const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
 const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 
 AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
@@ -18,19 +17,19 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 {
     if (parentDrag) {
         parentDrag->addChildDrag(this);
-        setZValue(2000000007 + hotSpot.x() * 1000000 + hotSpot.y() * 1000 + 1000);
+        setZValue(ZValues::childDragZValue(hotSpot.x(), hotSpot.y()));
         connect(parentDrag, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
     } else {
-        hotSpot = QPointF{qBound(0.0, hotSpot.x(), static_cast<qreal>(CARD_WIDTH - 1)),
-                          qBound(0.0, hotSpot.y(), static_cast<qreal>(CARD_HEIGHT - 1))};
+        hotSpot = QPointF{qBound(0.0, hotSpot.x(), CardDimensions::WIDTH_F - 1),
+                          qBound(0.0, hotSpot.y(), CardDimensions::HEIGHT_F - 1)};
         setCursor(Qt::ClosedHandCursor);
-        setZValue(2000000007);
+        setZValue(ZValues::DRAG_ITEM);
     }
     if (item->getTapped())
         setTransform(QTransform()
-                         .translate(CARD_WIDTH_HALF, CARD_HEIGHT_HALF)
+                         .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
                          .rotate(90)
-                         .translate(-CARD_WIDTH_HALF, -CARD_HEIGHT_HALF));
+                         .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
 
     setCacheMode(DeviceCoordinateCache);
 
@@ -47,7 +46,7 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 QPainterPath AbstractCardDragItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CARD_WIDTH : 0.0;
+    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
