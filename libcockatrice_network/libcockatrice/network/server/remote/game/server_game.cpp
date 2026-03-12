@@ -51,6 +51,7 @@
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 
 Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          int _gameId,
@@ -832,7 +833,7 @@ void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPl
     QMutexLocker locker(&gameMutex);
     // Return cards to their rightful owners before conceding the game
     static const QRegularExpression ownerRegex{"Owner: ?([^\n]+)"};
-    const auto &playerTable = player->getZones().value("table");
+    const auto &playerTable = player->getZones().value(ZoneNames::TABLE);
     for (const auto &card : playerTable->getCards()) {
         if (card == nullptr) {
             continue;
@@ -858,7 +859,7 @@ void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPl
                 continue;
             }
 
-            const auto &targetZone = otherPlayer->getZones().value("table");
+            const auto &targetZone = otherPlayer->getZones().value(ZoneNames::TABLE);
 
             if (playerTable == nullptr || targetZone == nullptr) {
                 continue;

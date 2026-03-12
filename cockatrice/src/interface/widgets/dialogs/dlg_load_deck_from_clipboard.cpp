@@ -14,6 +14,7 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QVBoxLayout>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 
 /**
  * Creates the main layout and connects the signals that are common to all versions of this window
@@ -81,7 +82,7 @@ bool AbstractDlgDeckTextEdit::loadIntoDeck(DeckList &deckList) const
 
     QTextStream stream(&buffer);
 
-    if (deckList.loadFromStream_Plain(stream, true)) {
+    if (deckList.loadFromStream_Plain(stream, true, CardNameNormalizer())) {
         if (loadSetNameAndNumberCheckBox->isChecked()) {
             deckList.forEachCard(CardNodeFunction::ResolveProviderId());
         } else {

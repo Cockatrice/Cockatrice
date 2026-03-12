@@ -3,6 +3,8 @@
 #include "../player.h"
 #include "../player_actions.h"
 
+#include <libcockatrice/utility/zone_names.h>
+
 RfgMenu::RfgMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     createMoveActions();
@@ -30,13 +32,13 @@ void RfgMenu::createMoveActions()
         auto rfg = player->getRfgZone();
 
         aMoveRfgToTopLibrary = new QAction(this);
-        aMoveRfgToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveRfgToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
         aMoveRfgToBottomLibrary = new QAction(this);
-        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveRfgToBottomLibrary->setData(QList<QVariant>() << ZoneNames::DECK << -1);
         aMoveRfgToHand = new QAction(this);
-        aMoveRfgToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveRfgToHand->setData(QList<QVariant>() << ZoneNames::HAND << 0);
         aMoveRfgToGrave = new QAction(this);
-        aMoveRfgToGrave->setData(QList<QVariant>() << "grave" << 0);
+        aMoveRfgToGrave->setData(QList<QVariant>() << ZoneNames::GRAVE << 0);
 
         connect(aMoveRfgToTopLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);
         connect(aMoveRfgToBottomLibrary, &QAction::triggered, rfg, &PileZoneLogic::moveAllToZone);

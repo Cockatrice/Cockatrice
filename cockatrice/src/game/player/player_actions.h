@@ -98,7 +98,9 @@ public slots:
     void actMoveTopCardToGrave();
     void actMoveTopCardToExile();
     void actMoveTopCardsToGrave();
+    void actMoveTopCardsToGraveFaceDown();
     void actMoveTopCardsToExile();
+    void actMoveTopCardsToExileFaceDown();
     void actMoveTopCardsUntil();
     void actMoveTopCardToBottom();
     void actDrawBottomCard();
@@ -108,7 +110,9 @@ public slots:
     void actMoveBottomCardToGrave();
     void actMoveBottomCardToExile();
     void actMoveBottomCardsToGrave();
+    void actMoveBottomCardsToGraveFaceDown();
     void actMoveBottomCardsToExile();
+    void actMoveBottomCardsToExileFaceDown();
     void actMoveBottomCardToTop();
 
     void actSelectAll();
@@ -180,8 +184,8 @@ private:
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
 
-    void moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName);
-    void moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName);
+    void moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
+    void moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
 
     void createCard(const CardItem *sourceCard,
                     const QString &dbCardName,

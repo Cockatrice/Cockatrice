@@ -10,15 +10,8 @@
 #include <../../client/settings/card_counter_settings.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/utility/zone_names.h>
 #include <utility>
-
-static const QString TABLE_ZONE_NAME = "table";
-static const QString GRAVE_ZONE_NAME = "grave";
-static const QString EXILE_ZONE_NAME = "rfg";
-static const QString HAND_ZONE_NAME = "hand";
-static const QString DECK_ZONE_NAME = "deck";
-static const QString SIDEBOARD_ZONE_NAME = "sb";
-static const QString STACK_ZONE_NAME = "stack";
 
 static QString sanitizeHtml(QString dirty)
 {
@@ -37,15 +30,15 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     QString fromStr;
     QString zoneName = zone->getName();
 
-    if (zoneName == TABLE_ZONE_NAME) {
+    if (zoneName == ZoneNames::TABLE) {
         fromStr = tr(" from play");
-    } else if (zoneName == GRAVE_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::GRAVE) {
         fromStr = tr(" from their graveyard");
-    } else if (zoneName == EXILE_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::EXILE) {
         fromStr = tr(" from exile");
-    } else if (zoneName == HAND_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::HAND) {
         fromStr = tr(" from their hand");
-    } else if (zoneName == DECK_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::DECK) {
         if (position == 0) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
@@ -83,9 +76,9 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 fromStr = tr(" from their library");
             }
         }
-    } else if (zoneName == SIDEBOARD_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::SIDEBOARD) {
         fromStr = tr(" from sideboard");
-    } else if (zoneName == STACK_ZONE_NAME) {
+    } else if (zoneName == ZoneNames::STACK) {
         fromStr = tr(" from the stack");
     } else {
         fromStr = tr(" from custom zone '%1'").arg(zoneName);
@@ -275,9 +268,9 @@ void MessageLogWidget::logMoveCard(Player *player,
     bool ownerChanged = startZone->getPlayer() != targetZone->getPlayer();
 
     // do not log if moved within the same zone
-    if ((startZoneName == TABLE_ZONE_NAME && targetZoneName == TABLE_ZONE_NAME && !ownerChanged) ||
-        (startZoneName == HAND_ZONE_NAME && targetZoneName == HAND_ZONE_NAME) ||
-        (startZoneName == EXILE_ZONE_NAME && targetZoneName == EXILE_ZONE_NAME)) {
+    if ((startZoneName == ZoneNames::TABLE && targetZoneName == ZoneNames::TABLE && !ownerChanged) ||
+        (startZoneName == ZoneNames::HAND && targetZoneName == ZoneNames::HAND) ||
+        (startZoneName == ZoneNames::EXILE && targetZoneName == ZoneNames::EXILE)) {
         return;
     }
 
@@ -306,28 +299,28 @@ void MessageLogWidget::logMoveCard(Player *player,
 
     QString finalStr;
     std::optional<QString> fourthArg;
-    if (targetZoneName == TABLE_ZONE_NAME) {
+    if (targetZoneName == ZoneNames::TABLE) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
             finalStr = tr("%1 puts %2 into play%3 face down.");
         } else {
             finalStr = tr("%1 puts %2 into play%3.");
         }
-    } else if (targetZoneName == GRAVE_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::GRAVE) {
         if (card->getFaceDown()) {
             finalStr = tr("%1 puts %2%3 into their graveyard face down.");
         } else {
             finalStr = tr("%1 puts %2%3 into their graveyard.");
         }
-    } else if (targetZoneName == EXILE_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::EXILE) {
         if (card->getFaceDown()) {
             finalStr = tr("%1 exiles %2%3 face down.");
         } else {
             finalStr = tr("%1 exiles %2%3.");
         }
-    } else if (targetZoneName == HAND_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::HAND) {
         finalStr = tr("%1 moves %2%3 to their hand.");
-    } else if (targetZoneName == DECK_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::DECK) {
         if (newX == -1) {
             finalStr = tr("%1 puts %2%3 into their library.");
         } else if (newX >= targetZone->getCards().size()) {
@@ -339,9 +332,9 @@ void MessageLogWidget::logMoveCard(Player *player,
             fourthArg = QString::number(newX);
             finalStr = tr("%1 puts %2%3 into their library %4 cards from the top.");
         }
-    } else if (targetZoneName == SIDEBOARD_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::SIDEBOARD) {
         finalStr = tr("%1 moves %2%3 to sideboard.");
-    } else if (targetZoneName == STACK_ZONE_NAME) {
+    } else if (targetZoneName == ZoneNames::STACK) {
         soundEngine->playSound("play_card");
         if (card->getFaceDown()) {
             finalStr = tr("%1 plays %2%3 face down.");

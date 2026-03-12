@@ -9,6 +9,7 @@
 
 #include <QAction>
 #include <QMenu>
+#include <libcockatrice/utility/zone_names.h>
 
 HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -76,13 +77,13 @@ HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : T
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         aMoveHandToTopLibrary = new QAction(this);
-        aMoveHandToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveHandToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
         aMoveHandToBottomLibrary = new QAction(this);
-        aMoveHandToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveHandToBottomLibrary->setData(QList<QVariant>() << ZoneNames::DECK << -1);
         aMoveHandToGrave = new QAction(this);
-        aMoveHandToGrave->setData(QList<QVariant>() << "grave" << 0);
+        aMoveHandToGrave->setData(QList<QVariant>() << ZoneNames::GRAVE << 0);
         aMoveHandToRfg = new QAction(this);
-        aMoveHandToRfg->setData(QList<QVariant>() << "rfg" << 0);
+        aMoveHandToRfg->setData(QList<QVariant>() << ZoneNames::EXILE << 0);
 
         auto hand = player->getHandZone();
 

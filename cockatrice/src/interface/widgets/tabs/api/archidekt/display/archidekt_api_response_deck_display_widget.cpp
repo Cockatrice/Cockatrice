@@ -2,7 +2,6 @@
 
 #include "../../../../../deck_loader/card_node_function.h"
 #include "../../../../../deck_loader/deck_loader.h"
-#include "../../../../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../../../cards/card_size_widget.h"
 #include "../../../../cards/deck_card_zone_display_widget.h"
 #include "../../../../visual_deck_editor/visual_deck_display_options_widget.h"
@@ -10,7 +9,7 @@
 #include "../api_response/deck/archidekt_api_response_deck.h"
 
 #include <QSortFilterProxyModel>
-#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 
 ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWidget *parent,
                                                                              ArchidektApiResponseDeck _response,
@@ -80,7 +79,7 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     connect(model, &DeckListModel::modelReset, this, &ArchidektApiResponseDeckDisplayWidget::decklistModelReset);
 
     auto decklist = QSharedPointer<DeckList>(new DeckList);
-    decklist->loadFromStream_Plain(deckStream, false);
+    decklist->loadFromStream_Plain(deckStream, false, CardNameNormalizer());
     model->setDeckList(decklist);
 
     model->forEachCard(CardNodeFunction::ResolveProviderId());
