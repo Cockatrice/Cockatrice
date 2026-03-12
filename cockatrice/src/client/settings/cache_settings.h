@@ -330,6 +330,12 @@ private:
     [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     void loadPaths();
     bool rememberGameSettings;
+
+    // Local game settings (separate from server game settings in game/*)
+    bool localGameRememberSettings;
+    int localGameMaxPlayers;
+    int localGameStartingLifeTotal;
+
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
     bool roundCardCorners;
@@ -862,6 +868,18 @@ public:
     {
         return rememberGameSettings;
     }
+    [[nodiscard]] bool getLocalGameRememberSettings() const
+    {
+        return localGameRememberSettings;
+    }
+    [[nodiscard]] int getLocalGameMaxPlayers() const
+    {
+        return localGameMaxPlayers;
+    }
+    [[nodiscard]] int getLocalGameStartingLifeTotal() const
+    {
+        return localGameStartingLifeTotal;
+    }
     [[nodiscard]] int getKeepAlive() const override
     {
         return keepalive;
@@ -1089,6 +1107,9 @@ public slots:
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setLocalGameRememberSettings(bool value);
+    void setLocalGameMaxPlayers(int value);
+    void setLocalGameStartingLifeTotal(int value);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);
     void setStartupCardUpdateCheckAlwaysUpdate(bool value);

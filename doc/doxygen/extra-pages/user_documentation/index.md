@@ -1,5 +1,5 @@
 @page user_reference User Reference
- 
+
 ## Deck Management
 
 - @subpage creating_decks
