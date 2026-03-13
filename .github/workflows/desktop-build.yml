@@ -449,7 +449,7 @@ jobs:
       - name: Delete old compiler cache (ccache)
         env:
           GH_TOKEN: ${{ github.token }}
-        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Save compiler cache (ccache)
