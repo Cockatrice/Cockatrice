@@ -343,7 +343,8 @@ jobs:
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache
 
-      - name: Run sccache-cache
+      - name: Run sccache-cache (Windows)
+        if: matrix.os == 'Windows'
         uses: mozilla-actions/sccache-action@v0.0.9
 
       - name: Restore compiler cache (ccache)
