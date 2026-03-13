@@ -324,6 +324,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
+      SCCACHE_GHA_ENABLED: "true"
 
     steps:
       - name: Checkout
@@ -338,12 +339,15 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: Setup ccache
+      - name: Setup ccache (macOS)
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache
 
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.9
+
       - name: Restore compiler cache (ccache)
-        if: matrix.use_ccache == 1
+        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         id: ccache_restore
         uses: actions/cache/restore@v5
         env:
@@ -439,7 +443,7 @@ jobs:
         run: .ci/compile.sh --server --test --vcpkg
 
       - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && matrix.os == 'macOS'
         uses: actions/cache/save@v5
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
