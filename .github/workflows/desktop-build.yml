@@ -334,7 +334,7 @@ jobs:
             cmake_generator: "Visual Studio 17 2022"
             ccache_variant: sccache
 
-    name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ 'Windows' && ' matrix.cmake_generator' || '' }}
+    name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.os == 'Windows' && format(' {0}', matrix.cmake_generator) || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
