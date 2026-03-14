@@ -1,16 +1,9 @@
 #!/bin/bash
-# Reports GitHub Actions cache usage: either grouped by key prefix or for a single prefix.
-# Prefix = first segment of key (before first "-" or "/"). E.g. buildkit-blob-* -> buildkit, vcpkg/xxx -> vcpkg.
-#
-# Requires: gh (GitHub CLI), jq
-# Run from repo root with gh auth login already done (or GITHUB_TOKEN set in CI).
+# Reports GitHub Actions cache usage, grouped by key prefix (first segment before "-" or "/") or for one prefix.
 #
 # Usage: .ci/gh_buildkit_cache_usage.sh [key-prefix]
-#   No args: fetch all caches, group by prefix, print table (count + size per prefix) and grand total.
-#   One arg: report only caches whose key starts with key-prefix (default: buildkit-blob).
-#
-# Example: .ci/gh_buildkit_cache_usage.sh              # all prefixes
-# Example: .ci/gh_buildkit_cache_usage.sh buildkit-blob # single prefix
+#   No args: all caches grouped by prefix. One arg: caches with that key prefix (default buildkit-blob).
+# Requires: gh, jq
 
 set -eo pipefail
 
