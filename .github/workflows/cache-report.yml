@@ -9,7 +9,7 @@ on:
 
 jobs:
   report:
-    name: buildkit-blob cache usage
+    name: GHA cache usage
     runs-on: ubuntu-latest
     permissions:
       actions: read
