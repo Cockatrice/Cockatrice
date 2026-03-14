@@ -4,9 +4,7 @@
 name: Cache usage report
 
 on:
-  schedule:
-    # Mondays 09:00 UTC
-    - cron: '0 9 * * 1'
+  push:
   workflow_dispatch:
 
 jobs:
@@ -27,7 +25,7 @@ jobs:
       - name: Report cache usage
         id: cache_report
         run: |
-          ./.ci/gh_buildkit_cache_usage.sh buildkit-blob | tee report.txt
+          ./.ci/gh_buildkit_cache_usage.sh | tee report.txt
           echo "summary<<EOF" >> "$GITHUB_STEP_SUMMARY"
           cat report.txt >> "$GITHUB_STEP_SUMMARY"
           echo "EOF" >> "$GITHUB_STEP_SUMMARY"
