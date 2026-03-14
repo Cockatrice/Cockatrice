@@ -340,15 +340,15 @@ jobs:
         with:
           msbuild-architecture: x64
 
+      - name: Run sccache-cache (Windows, sccache)
+        if:  matrix.use_sccache == 1 && matrix.os == 'Windows'
+        uses: mozilla-actions/sccache-action@v0.0.9
+
       - name: Setup ccache (macOS)
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache
 
-      - name: Run sccache-cache (Windows)
-        if:  matrix.use_sccache == 1 && matrix.os == 'Windows'
-        uses: mozilla-actions/sccache-action@v0.0.9
-
-      - name: Restore compiler cache (ccache)
+      - name: Restore compiler cache (macOS, ccache)
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         id: ccache_restore
         uses: actions/cache/restore@v5
@@ -445,7 +445,7 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      - name: Save compiler cache (ccache)
+      - name: Save compiler cache (macOS, ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && matrix.os == 'macOS'
         uses: actions/cache/save@v5
         env:
