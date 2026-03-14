@@ -69,17 +69,17 @@ fix_app() {
 
   # 1. Remove quarantine
   echo "  Removing quarantine..."
-  xattr -dr com.apple.quarantine "$resolved_app"
+  xattr -dr com.apple.quarantine -- "$resolved_app"
 
   # 2. Ad-hoc sign all binaries and dylibs
   echo "  Signing dylibs, frameworks and executables..."
   # find .dylib files by name and executable files (binaries, frameworks, etc.) by permission via `-perm +111`
-  find "$resolved_app" -type f \( -name "*.dylib" -o -perm +111 \) -print0 | \
-    xargs -0 -I {} codesign -s - -f {}
+  find -- "$resolved_app" -type f \( -name "*.dylib" -o -perm +111 \) -print0 | \
+    xargs -0 -I {} codesign -s - -f -- {}
 
   # 3. Deep sign the app bundle
   echo "  Deep signing app bundle..."
-  codesign -s - --force --deep "$resolved_app"
+  codesign -s - --force --deep -- "$resolved_app"
 
   echo "  Done."
 }
