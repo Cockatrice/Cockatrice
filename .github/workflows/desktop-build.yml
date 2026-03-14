@@ -325,7 +325,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
-      SCCACHE_GHA_ENABLED: "true"
+      SCCACHE_GHA_ENABLED: true
 
     steps:
       - name: Checkout
