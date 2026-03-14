@@ -17,9 +17,11 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         handMenu = new HandMenu(player, player->getPlayerActions(), playerMenu);
         playerMenu->addMenu(handMenu);
+        allZoneMenus.append(handMenu);
 
         libraryMenu = new LibraryMenu(player, playerMenu);
         playerMenu->addMenu(libraryMenu);
+        allZoneMenus.append(libraryMenu);
     } else {
         handMenu = nullptr;
         libraryMenu = nullptr;
@@ -27,21 +29,26 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
     graveMenu = new GraveyardMenu(player, playerMenu);
     playerMenu->addMenu(graveMenu);
+    allZoneMenus.append(graveMenu);
 
     rfgMenu = new RfgMenu(player, playerMenu);
     playerMenu->addMenu(rfgMenu);
+    allZoneMenus.append(rfgMenu);
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         sideboardMenu = new SideboardMenu(player, playerMenu);
         playerMenu->addMenu(sideboardMenu);
+        allZoneMenus.append(sideboardMenu);
 
         customZonesMenu = new CustomZoneMenu(player);
         playerMenu->addMenu(customZonesMenu);
+        allZoneMenus.append(customZonesMenu);
         playerMenu->addSeparator();
 
         countersMenu = playerMenu->addMenu(QString());
 
         utilityMenu = new UtilityMenu(player, playerMenu);
+        allZoneMenus.append(utilityMenu);
     } else {
         sideboardMenu = nullptr;
         customZonesMenu = nullptr;
@@ -99,35 +106,17 @@ void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
 
-    if (handMenu) {
-        handMenu->retranslateUi();
-    }
-    if (libraryMenu) {
-        libraryMenu->retranslateUi();
-    }
-
-    graveMenu->retranslateUi();
-    rfgMenu->retranslateUi();
-
-    if (sideboardMenu) {
-        sideboardMenu->retranslateUi();
+    for (auto *menu : allZoneMenus) {
+        menu->retranslateUi();
     }
 
     if (countersMenu) {
         countersMenu->setTitle(tr("&Counters"));
     }
 
-    if (customZonesMenu) {
-        customZonesMenu->retranslateUi();
-    }
-
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->retranslateUi();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->retranslateUi();
     }
 
     if (sayMenu) {
@@ -153,26 +142,13 @@ void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
 
-    if (handMenu) {
-        handMenu->setShortcutsActive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsActive();
-    }
-    graveMenu->setShortcutsActive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsActive();
+    for (auto *menu : allZoneMenus) {
+        menu->setShortcutsActive();
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsActive();
     }
 }
 
@@ -180,25 +156,12 @@ void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
 
-    if (handMenu) {
-        handMenu->setShortcutsInactive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsInactive();
-    }
-    graveMenu->setShortcutsInactive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsInactive();
+    for (auto *menu : allZoneMenus) {
+        menu->setShortcutsInactive();
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsInactive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsInactive();
     }
 }

@@ -18,6 +18,7 @@
 #include "sideboard_menu.h"
 #include "utility_menu.h"
 
+#include <QList>
 #include <QMenu>
 #include <QObject>
 
@@ -82,6 +83,7 @@ private:
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
 
+    QList<AbstractZoneMenu *> allZoneMenus;
     bool shortcutsActive;
 
     void initSayMenu();
