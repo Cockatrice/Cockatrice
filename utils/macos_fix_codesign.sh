@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fix code signing for unsigned macOS app bundles (mainly used to test packages from PRs on CI).
-# Run from project root: ./scripts/macos_fix_codesign.sh [path/to/app.app ...]
+# Run from project root: ./utils/macos_fix_codesign.sh [path/to/app.app ...]
 #
 # Steps:
 #   1. Remove quarantine extended attribute
