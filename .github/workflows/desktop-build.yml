@@ -204,7 +204,7 @@ jobs:
 
       # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342.
       - name: Delete old compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
+        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
