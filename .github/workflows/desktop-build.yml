@@ -38,13 +38,10 @@ on:
       - 'vcpkg.json'
       - 'vcpkg'
 
-# Ensure at most one run per ref: queue new runs when one is in progress.
-# On master, cancel-in-progress is false so each push gets full CI (runs queue).
-# On other refs (tags, PRs), cancel-in-progress is true to avoid redundant builds.
-# Using github.ref ensures stable grouping (ref_name can be empty in some events).
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref || github.run_id }}"
-  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.ref_name != 'master' }}
 
 jobs:
   configure:
