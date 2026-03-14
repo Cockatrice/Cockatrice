@@ -38,6 +38,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# `gh cache list --json`` fields (see https://cli.github.com/manual/gh_cache_list): createdAt, id, key, lastAccessedAt, ref, sizeInBytes, version
 if [[ $# -eq 0 ]]; then
   echo "Grouping all caches by prefix..."
   json=$(gh cache list --limit "$LIMIT" --json key,sizeInBytes 2>/dev/null) || {
