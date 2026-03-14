@@ -12,6 +12,7 @@ Available pre-compiled binaries for installation:
    • <kbd>Windows 10+</kbd>
 
   <b>macOS</b>
+   • <kbd>macOS 26+</kbd> <sub><i>Tahoe</i></sub> <sub>Apple M</sub>
    • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Apple M</sub>
    • <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub> <sub>Apple M</sub>
    • <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub> <sub>Intel</sub>
